@@ -1,0 +1,30 @@
+# 설치된 패키지와 Expo가 생성하는 파일을 제외한다.
+node_modules/
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+*.tsbuildinfo
+.metro-health-check*
+
+# 네이티브 프로젝트는 필요할 때 Expo 설정으로 생성한다.
+/android/
+/ios/
+.kotlin/
+
+# 로컬 환경 변수와 서명 파일을 저장소에서 제외한다.
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+*.p8
+*.p12
+*.key
+*.pem
+*.mobileprovision
+
+# 운영체제 임시 파일과 개발 로그를 제외한다.
+.DS_Store
+Thumbs.db
+*.log

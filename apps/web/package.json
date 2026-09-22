@@ -1,0 +1,9 @@
+{
+  "name": "@wherego/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "echo \"Next.js web app will be initialized in Phase 4.\"",
+    "build": "echo \"Web build placeholder\""
+  }
+}

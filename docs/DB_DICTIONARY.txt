@@ -1,0 +1,412 @@
+================================================================================
+ travel_APP (WHEREGO) 데이터베이스 및 도메인 객체 사전 (DB_DICTIONARY.txt)
+ 문서 버전: v1.1
+ 최종 수정일: 2026-09-22
+ 데이터베이스 환경: Supabase PostgreSQL 15+
+ 프로젝트 목적: 여행 계획(PLAN) -> 공유(SHARE) -> 여행 중(TRAVEL) -> 기록/정산(RECORD)
+================================================================================
+
+[ 목차 ]
+1. 데이터베이스 개요 및 공통 Enum 타입
+2. DB 테이블별 컬럼 명세 (13개 테이블)
+3. 프론트엔드 TypeScript 도메인 객체(Entity) 명세 (13개 엔티티)
+4. 변경 이력 및 관리 지침
+
+================================================================================
+1. 데이터베이스 개요 및 공통 Enum 타입
+================================================================================
+
+* 기본 데이터베이스명: postgres (wherego_travel)
+* 문자셋: UTF-8
+* 고유 식별자(PK): UUID v4 (uuid_generate_v4())
+* 시간 표준: TIMESTAMPTZ (UTC 기준)
+
+[ Enum 타입 정의 ]
+
+1) trip_status (여행 진행 상태)
+   - 'DRAFT'       : 작성 중인 임시 여행
+   - 'PLANNED'     : 여행 예정 (출발 전 D-Day)
+   - 'IN_PROGRESS' : 여행 중 (실시간 Travel Mode / Today 화면 대상)
+   - 'COMPLETED'   : 여행 완료 (발자국 스크랩북 전환 및 정산 대상)
+   - 'ARCHIVED'    : 보관된 여행
+
+2) place_category (장소 분류)
+   - 'stay'        : 숙소 (호텔, 리조트, 펜션, 게스트하우스 등)
+   - 'food'        : 식당/음식점
+   - 'cafe'        : 카페/디저트
+   - 'sightseeing' : 관광지/자연명소/유적지
+   - 'activity'    : 액티비티/체험/레저
+   - 'etc'         : 기타
+
+3) member_role (동행 멤버 권한)
+   - 'owner'       : 방장 (여행 생성자, 모든 편집/삭제/멤버관리 권한)
+   - 'editor'      : 편집자 (일정/가계부/체크리스트 추가 및 수정 권한)
+   - 'viewer'      : 뷰어 (읽기 전용 조회 권한)
+
+4) verification_method (발자국 방문 인증 방식)
+   - 'gps'         : 현재 위치 위경도 기반 반경 200m 자동 인증
+   - 'manual'      : 사용자 수동 방문 완료 체크인
+   - 'receipt'     : 영수증 촬영/OCR 결제 내역 매칭 인증
+
+5) schedule_type (일정 항목 성격)
+   - 'PLACE'       : 방문 명소 및 식당
+   - 'TRANSPORT'   : 항공/기차/버스/렌터카 등 이동 수단
+   - 'STAY'        : 숙박 시설 및 체크인/아웃
+   - 'RESERVATION' : 사전 티켓/투어 예약
+   - 'TODO'        : 여행 중 챙겨야 할 할 일
+   - 'MEMO'        : 참고 메모 및 꿀팁
+
+6) expense_category (가계부 지출 카테고리)
+   - 'food'        : 식비/카페
+   - 'transport'   : 항공/대중교통/주유/택시비
+   - 'stay'        : 숙박비
+   - 'activity'    : 입장료/티켓/체험비
+   - 'shopping'    : 쇼핑/기념품
+   - 'etc'         : 여행자보험/기타 잡비
+
+================================================================================
+2. DB 테이블별 컬럼 명세 (13개 테이블)
+================================================================================
+
+--------------------------------------------------------------------------------
+1) 테이블명: profiles (사용자 기본 프로필)
+   - 설명: Supabase Auth(auth.users)와 연동되는 사용자 프로필 정보 관리 테이블
+--------------------------------------------------------------------------------
+컬럼명        | 데이터 타입  | NULL | 기본값            | 제약조건 / FK              | 한글 설명
+-------------+--------------+------+-------------------+---------------------------+-------------------------------------
+id           | UUID         | NO   |                   | PK, REFERENCES auth.users | 사용자 고유 식별자 (Auth UID)
+nickname     | VARCHAR(50)  | NO   |                   |                           | 서비스 닉네임
+avatar_url   | TEXT         | YES  | NULL              |                           | 프로필 이미지 스토리지 URL
+created_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 계정 생성 시각
+updated_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 프로필 수정 시각
+
+--------------------------------------------------------------------------------
+2) 테이블명: trips (여행 마스터)
+   - 설명: 서비스의 최상위 허브 객체로, 국가/도시/기간 및 여행 상태를 관리
+--------------------------------------------------------------------------------
+컬럼명        | 데이터 타입  | NULL | 기본값            | 제약조건 / FK              | 한글 설명
+-------------+--------------+------+-------------------+---------------------------+-------------------------------------
+id           | UUID         | NO   | uuid_generate_v4()| PK                        | 여행 고유 식별자
+user_id      | UUID         | NO   |                   | FK -> profiles(id) ON DEL | 여행 개설자(소유자) ID
+title        | VARCHAR(100) | NO   |                   |                           | 여행 제목 (예: 오사카 3박 4일 탐방)
+country      | VARCHAR(50)  | NO   |                   |                           | 대상 국가 (예: 일본, 대한민국)
+city         | VARCHAR(50)  | NO   |                   |                           | 대표 도시 (예: 오사카, 제주)
+start_date   | DATE         | NO   |                   | CHECK(start <= end)       | 여행 시작일 (YYYY-MM-DD)
+end_date     | DATE         | NO   |                   |                           | 여행 종료일 (YYYY-MM-DD)
+status       | trip_status  | NO   | 'PLANNED'         |                           | 여행 진행 상태 Enum
+cover_color  | VARCHAR(20)  | YES  | '#246A54'         |                           | 카드 및 테마 대표 커버 색상
+created_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 여행 생성 시각
+updated_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 여행 수정 시각
+
+--------------------------------------------------------------------------------
+3) 테이블명: trip_members (동행자 및 권한)
+   - 설명: 하나의 여행에 참여하는 동행인과 각자의 편집 권한을 관리
+--------------------------------------------------------------------------------
+컬럼명        | 데이터 타입  | NULL | 기본값            | 제약조건 / FK              | 한글 설명
+-------------+--------------+------+-------------------+---------------------------+-------------------------------------
+id           | UUID         | NO   | uuid_generate_v4()| PK                        | 멤버십 식별자
+trip_id      | UUID         | NO   |                   | FK -> trips(id) ON DELETE | 여행 마스터 ID
+user_id      | UUID         | NO   |                   | FK -> profiles(id) ON DEL | 참여 사용자 ID
+role         | member_role  | NO   | 'viewer'          |                           | 권한 ('owner','editor','viewer')
+joined_at    | TIMESTAMPTZ  | NO   | NOW()             | UNIQUE(trip_id, user_id)  | 참여 승인 시각
+
+--------------------------------------------------------------------------------
+4) 테이블명: trip_days (여행 일차별 날짜)
+   - 설명: 여행 시작일~종료일 기간에 따라 자동 계산되어 생성되는 DAY 1~N 데이터
+--------------------------------------------------------------------------------
+컬럼명        | 데이터 타입  | NULL | 기본값            | 제약조건 / FK              | 한글 설명
+-------------+--------------+------+-------------------+---------------------------+-------------------------------------
+id           | UUID         | NO   | uuid_generate_v4()| PK                        | 일차 식별자
+trip_id      | UUID         | NO   |                   | FK -> trips(id) ON DELETE | 소속 여행 마스터 ID
+day_number   | INT          | NO   |                   |                           | 일차 번호 (1 = DAY 1, 2 = DAY 2...)
+trip_date    | DATE         | NO   |                   | UNIQUE(trip_id, day_num)  | 해당 일차의 실제 달력 날짜
+created_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 생성 시각
+
+--------------------------------------------------------------------------------
+5) 테이블명: places (장소 마스터)
+   - 설명: 지도 좌표와 주소 정보를 포함하는 장소 메타데이터 테이블 (중복 조회 방지)
+--------------------------------------------------------------------------------
+컬럼명        | 데이터 타입  | NULL | 기본값            | 제약조건 / FK              | 한글 설명
+-------------+--------------+------+-------------------+---------------------------+-------------------------------------
+id           | UUID         | NO   | uuid_generate_v4()| PK                        | 장소 고유 식별자
+name         | VARCHAR(150) | NO   |                   |                           | 장소 또는 상호 명칭
+address      | TEXT         | YES  | NULL              |                           | 도로명 또는 지번 주소
+latitude     | NUMERIC(10,7)| YES  | NULL              |                           | 위도 (WGS84 좌표)
+longitude    | NUMERIC(10,7)| YES  | NULL              |                           | 경도 (WGS84 좌표)
+category     | place_cat    | NO   | 'sightseeing'     |                           | 장소 카테고리 Enum
+phone        | VARCHAR(30)  | YES  | NULL              |                           | 대표 전화번호
+created_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 등록 시각
+
+--------------------------------------------------------------------------------
+6) 테이블명: itinerary_items (세부 일정 아이템)
+   - 설명: 특정 일차(DAY N)에 계획된 방문 일정, 이동, 숙소 및 예상 비용을 관리
+--------------------------------------------------------------------------------
+컬럼명        | 데이터 타입  | NULL | 기본값            | 제약조건 / FK              | 한글 설명
+-------------+--------------+------+-------------------+---------------------------+-------------------------------------
+id           | UUID         | NO   | uuid_generate_v4()| PK                        | 일정 아이템 고유 식별자
+trip_day_id  | UUID         | NO   |                   | FK -> trip_days(id)       | 소속 일차 ID
+place_id     | UUID         | YES  | NULL              | FK -> places(id)          | 연계 장소 ID (메모/이동 시 NULL 가능)
+type         | VARCHAR(20)  | NO   | 'PLACE'           |                           | 일정 유형 (PLACE/TRANSPORT/STAY 등)
+title        | VARCHAR(100) | YES  | NULL              |                           | 일정 표시 제목
+time_slot    | VARCHAR(10)  | YES  | NULL              |                           | 방문 예정 시간 (HH:MM 형식)
+sort_order   | INT          | NO   | 1                 |                           | 동선 순서 번호 (① ② ③ 마커 정렬)
+estimated_cost| NUMERIC(12,2| YES  | 0                 |                           | 사전 계획 단계 예상 비용 (원)
+actual_cost  | NUMERIC(12,2)| YES  | NULL              |                           | 정산된 실제 결제 비용
+memo         | TEXT         | YES  | NULL              |                           | 일정 메모 및 이동 팁
+created_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 등록 시각
+
+--------------------------------------------------------------------------------
+7) 테이블명: expenses (여행 가계부 및 지출 내역)
+   - 설명: 예상 경비 및 실제 결제 내역을 2원화하여 통합 관리하고 통계를 집계
+--------------------------------------------------------------------------------
+컬럼명        | 데이터 타입  | NULL | 기본값            | 제약조건 / FK              | 한글 설명
+-------------+--------------+------+-------------------+---------------------------+-------------------------------------
+id           | UUID         | NO   | uuid_generate_v4()| PK                        | 비용 항목 고유 식별자
+trip_id      | UUID         | NO   |                   | FK -> trips(id)           | 소속 여행 ID
+trip_day_id  | UUID         | YES  | NULL              | FK -> trip_days(id)       | 연계 일차 ID (전체 공통 시 NULL)
+schedule_id  | UUID         | YES  | NULL              | FK -> itinerary_items(id) | 연계 세부 일정 ID
+title        | VARCHAR(100) | NO   |                   |                           | 지출 항목명 (예: 식사, 렌터카)
+amount       | NUMERIC(12,2)| NO   |                   |                           | 금액
+currency     | VARCHAR(10)  | NO   | 'KRW'             |                           | 통화 코드 (KRW, JPY, USD 등)
+category     | VARCHAR(20)  | NO   | 'food'            |                           | 지출 카테고리
+is_actual    | BOOLEAN      | NO   | TRUE              |                           | FALSE: 예상 경비, TRUE: 실제 결제
+paid_by_user_id| UUID       | YES  | NULL              | FK -> profiles(id)        | 결제한 사용자 ID
+created_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 등록 시각
+
+--------------------------------------------------------------------------------
+8) 테이블명: checklists (여행 준비물 체크리스트)
+   - 설명: 여행 전 짐 챙기기 및 필수 서류(여권, 바우처 등) 체크 상태 관리
+--------------------------------------------------------------------------------
+컬럼명        | 데이터 타입  | NULL | 기본값            | 제약조건 / FK              | 한글 설명
+-------------+--------------+------+-------------------+---------------------------+-------------------------------------
+id           | UUID         | NO   | uuid_generate_v4()| PK                        | 체크리스트 항목 고유 식별자
+trip_id      | UUID         | NO   |                   | FK -> trips(id)           | 소속 여행 ID
+title        | VARCHAR(100) | NO   |                   |                           | 준비물 항목명
+is_completed | BOOLEAN      | NO   | FALSE             |                           | 챙김/완료 여부
+assigned_user_id| UUID      | YES  | NULL              | FK -> profiles(id)        | 준비 담당자 ID
+created_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 등록 시각
+
+--------------------------------------------------------------------------------
+9) 테이블명: visits (실제 방문 기록 / 발자국)
+   - 설명: 계획된 일정을 실제 방문하여 GPS, 수동, 영수증으로 인증 완료된 발자국 기록
+--------------------------------------------------------------------------------
+컬럼명        | 데이터 타입  | NULL | 기본값            | 제약조건 / FK              | 한글 설명
+-------------+--------------+------+-------------------+---------------------------+-------------------------------------
+id           | UUID         | NO   | uuid_generate_v4()| PK                        | 발자국 고유 식별자
+trip_id      | UUID         | NO   |                   | FK -> trips(id)           | 소속 여행 ID
+place_id     | UUID         | NO   |                   | FK -> places(id)          | 방문 장소 ID
+user_id      | UUID         | NO   |                   | FK -> profiles(id)        | 인증한 사용자 ID
+visited_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 실제 방문 시각
+latitude     | NUMERIC(10,7)| YES  | NULL              |                           | 방문 당시 인증 위도
+longitude    | NUMERIC(10,7)| YES  | NULL              |                           | 방문 당시 인증 경도
+verification | verif_method | NO   | 'manual'          |                           | 인증 수단 ('gps','manual','receipt')
+is_verified  | BOOLEAN      | NO   | FALSE             |                           | 인증 성공 여부 플래그
+created_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 등록 시각
+
+--------------------------------------------------------------------------------
+10) 테이블명: reviews (방문 장소 후기 및 별점)
+    - 설명: 발자국을 남긴 장소에 대한 사용자 별점 평가 및 텍스트 리뷰
+--------------------------------------------------------------------------------
+컬럼명        | 데이터 타입  | NULL | 기본값            | 제약조건 / FK              | 한글 설명
+-------------+--------------+------+-------------------+---------------------------+-------------------------------------
+id           | UUID         | NO   | uuid_generate_v4()| PK                        | 리뷰 고유 식별자
+visit_id     | UUID         | NO   |                   | FK -> visits(id) ON DEL   | 연계 방문 발자국 ID
+user_id      | UUID         | NO   |                   | FK -> profiles(id)        | 작성자 ID
+rating       | SMALLINT     | NO   |                   | CHECK(rating >= 1 AND <=5)| 별점 점수 (1 ~ 5)
+content      | TEXT         | NO   |                   |                           | 상세 후기 내용
+created_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 작성 시각
+updated_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 수정 시각
+
+--------------------------------------------------------------------------------
+11) 테이블명: receipts (영수증 OCR 분석 내역)
+    - 설명: 카메라로 촬영한 영수증 이미지의 텍스트 파싱 결과 및 결제 데이터
+--------------------------------------------------------------------------------
+컬럼명        | 데이터 타입  | NULL | 기본값            | 제약조건 / FK              | 한글 설명
+-------------+--------------+------+-------------------+---------------------------+-------------------------------------
+id           | UUID         | NO   | uuid_generate_v4()| PK                        | 영수증 데이터 식별자
+visit_id     | UUID         | YES  | NULL              | FK -> visits(id)          | 매칭된 방문 발자국 ID
+user_id      | UUID         | NO   |                   | FK -> profiles(id)        | 등록자 ID
+merchant_name| VARCHAR(100) | YES  | NULL              |                           | 가맹점 상호명
+transaction_date| DATE      | YES  | NULL              |                           | 결제 일자
+total_amount | NUMERIC(12,2)| YES  | NULL              |                           | 영수증 총 결제 금액
+ocr_raw_text | TEXT         | YES  | NULL              |                           | OCR 엔진 원본 추출 텍스트
+created_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 등록 시각
+
+--------------------------------------------------------------------------------
+12) 테이블명: attachments (사진 및 영수증 파일 첨부)
+    - 설명: Supabase Storage에 업로드된 미디어 파일과 비즈니스 객체 간의 매핑
+--------------------------------------------------------------------------------
+컬럼명        | 데이터 타입  | NULL | 기본값            | 제약조건 / FK              | 한글 설명
+-------------+--------------+------+-------------------+---------------------------+-------------------------------------
+id           | UUID         | NO   | uuid_generate_v4()| PK                        | 첨부파일 식별자
+target_type  | VARCHAR(20)  | NO   |                   |                           | 대상 구분 ('review','receipt','trip')
+target_id    | UUID         | NO   |                   |                           | 대상 객체의 UUID
+file_path    | TEXT         | NO   |                   |                           | 스토리지 내부 파일 경로
+file_url     | TEXT         | NO   |                   |                           | 공개/서명된 다운로드 CDN URL
+created_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 업로드 시각
+
+--------------------------------------------------------------------------------
+13) 테이블명: share_links (읽기 전용 공유 링크)
+    - 설명: 웹 링크를 통해 비로그인 사용자나 외부 지인에게 여행을 공유하는 토큰
+--------------------------------------------------------------------------------
+컬럼명        | 데이터 타입  | NULL | 기본값            | 제약조건 / FK              | 한글 설명
+-------------+--------------+------+-------------------+---------------------------+-------------------------------------
+id           | UUID         | NO   | uuid_generate_v4()| PK                        | 공유 링크 식별자
+trip_id      | UUID         | NO   |                   | FK -> trips(id)           | 대상 여행 ID
+token        | VARCHAR(64)  | NO   |                   | UNIQUE                    | 암호화된 난수 공유 토큰
+expires_at   | TIMESTAMPTZ  | YES  | NULL              |                           | 링크 만료 일시
+permissions  | VARCHAR(20)  | NO   | 'read_only'       |                           | 열람 권한 범위
+created_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 링크 발급 시각
+
+================================================================================
+3. 프론트엔드 TypeScript 도메인 객체(Entity) 명세 (13개 엔티티)
+================================================================================
+
+패키지 위치: packages/domain/src/index.ts 및 apps/mobile/src/services/securityService.ts
+
+1) Profile
+   - id: string               -> profiles.id
+   - nickname: string         -> profiles.nickname
+   - avatarUrl?: string|null  -> profiles.avatar_url
+   - createdAt: string        -> profiles.created_at
+   - updatedAt: string        -> profiles.updated_at
+
+2) Trip
+   - id: string               -> trips.id
+   - userId: string           -> trips.user_id
+   - title: string            -> trips.title
+   - country: string          -> trips.country
+   - city: string             -> trips.city
+   - startDate: string        -> trips.start_date
+   - endDate: string          -> trips.end_date
+   - status: TripStatus       -> trips.status
+   - coverColor: string       -> trips.cover_color
+   - createdAt: string        -> trips.created_at
+   - updatedAt: string        -> trips.updated_at
+
+3) TripMember
+   - id: string               -> trip_members.id
+   - tripId: string           -> trip_members.trip_id
+   - userId: string           -> trip_members.user_id
+   - role: MemberRole         -> trip_members.role
+   - joinedAt: string         -> trip_members.joined_at
+
+4) TripDay
+   - id: string               -> trip_days.id
+   - tripId: string           -> trip_days.trip_id
+   - dayNumber: number        -> trip_days.day_number
+   - tripDate: string         -> trip_days.trip_date
+   - createdAt: string        -> trip_days.created_at
+
+5) Place
+   - id: string               -> places.id
+   - name: string             -> places.name
+   - address?: string|null    -> places.address
+   - latitude?: number|null   -> places.latitude
+   - longitude?: number|null  -> places.longitude
+   - category: PlaceCategory  -> places.category
+   - phone?: string|null      -> places.phone
+   - createdAt: string        -> places.created_at
+
+6) ItineraryItem (세부 일정)
+   - id: string               -> itinerary_items.id
+   - tripDayId: string        -> itinerary_items.trip_day_id
+   - placeId: string          -> itinerary_items.place_id
+   - type?: ScheduleType      -> itinerary_items.type
+   - title?: string           -> itinerary_items.title
+   - timeSlot?: string|null   -> itinerary_items.time_slot
+   - sortOrder: number        -> itinerary_items.sort_order
+   - estimatedCost?: number|null -> itinerary_items.estimated_cost
+   - actualCost?: number|null -> itinerary_items.actual_cost
+   - memo?: string|null       -> itinerary_items.memo
+   - createdAt: string        -> itinerary_items.created_at
+   - place?: Place            -> JOIN places
+
+7) Expense (가계부 지출)
+   - id: string               -> expenses.id
+   - tripId: string           -> expenses.trip_id
+   - tripDayId?: string|null  -> expenses.trip_day_id
+   - scheduleId?: string|null -> expenses.schedule_id
+   - title: string            -> expenses.title
+   - amount: number           -> expenses.amount
+   - currency: string         -> expenses.currency
+   - category: string         -> expenses.category
+   - isActual: boolean        -> expenses.is_actual
+   - paidByUserId?: string|null -> expenses.paid_by_user_id
+   - createdAt: string        -> expenses.created_at
+
+8) ChecklistItem (준비물 체크리스트)
+   - id: string               -> checklists.id
+   - tripId: string           -> checklists.trip_id
+   - title: string            -> checklists.title
+   - isCompleted: boolean     -> checklists.is_completed
+   - assignedUserId?: string|null -> checklists.assigned_user_id
+   - createdAt: string        -> checklists.created_at
+
+9) Visit (발자국 인증)
+   - id: string               -> visits.id
+   - tripId: string           -> visits.trip_id
+   - placeId: string          -> visits.place_id
+   - userId: string           -> visits.user_id
+   - visitedAt: string        -> visits.visited_at
+   - latitude?: number|null   -> visits.latitude
+   - longitude?: number|null  -> visits.longitude
+   - verification: VerificationMethod -> visits.verification
+   - isVerified: boolean      -> visits.is_verified
+   - createdAt: string        -> visits.created_at
+   - place?: Place            -> JOIN places
+
+10) Review (장소 후기)
+    - id: string              -> reviews.id
+    - visitId: string         -> reviews.visit_id
+    - userId: string          -> reviews.user_id
+    - rating: number          -> reviews.rating
+    - content: string         -> reviews.content
+    - createdAt: string       -> reviews.created_at
+    - updatedAt: string       -> reviews.updated_at
+
+11) Receipt (영수증 OCR 데이터)
+    - id: string              -> receipts.id
+    - visitId?: string|null   -> receipts.visit_id
+    - userId: string          -> receipts.user_id
+    - merchantName?: string|null -> receipts.merchant_name
+    - transactionDate?: string|null -> receipts.transaction_date
+    - totalAmount?: number|null -> receipts.total_amount
+    - ocrRawText?: string|null -> receipts.ocr_raw_text
+    - createdAt: string       -> receipts.created_at
+
+12) ShareLink (공유 링크)
+    - id: string              -> share_links.id
+    - tripId: string          -> share_links.trip_id
+    - token: string           -> share_links.token
+    - expiresAt?: string|null -> share_links.expires_at
+    - permissions: 'read_only'-> share_links.permissions
+    - createdAt: string       -> share_links.created_at
+
+13) DatabaseSecurityKey (DB 보안 연동 코드)
+    - storageKey: string       -> 'wherego_encrypted_db_code'
+    - defaultCode: string      -> '24541c7e-d148-46d9-80ef-f647ad649eb1'
+    - cipherPayload: string    -> Base64 인코딩 XOR 대칭키 암호문
+    - storageTarget: string    -> 모바일: Expo SecureStore / 웹: localStorage
+    - description: string      -> DB 연동 인증용 보안 키 (암호화 읽기/쓰기 보장)
+
+================================================================================
+4. 변경 이력 및 관리 지침
+================================================================================
+
+* [2026-09-22] v1.1 업데이트:
+  - DB 보안 연동 코드(24541c7e-d148-46d9-80ef-f647ad649eb1) 암호화 입출력
+    모듈(securityService) 및 DatabaseSecurityKey 객체 명세 추가.
+
+* [2026-09-22] 최초 문서 생성 (v1.0):
+  - Supabase 11개 마이그레이션 테이블(profiles, trips, trip_members, trip_days,
+    places, itinerary_items, visits, reviews, attachments, receipts, share_links)
+    및 기획서 v0.3 확장 테이블(expenses, checklists)과 TypeScript 엔티티 전체 정리.
+
+* [관리 원칙]:
+  1) 새로운 DB 컬럼 추가 시 본 문서의 테이블 명세와 TypeScript 도메인 모델을
+     반드시 동시에 갱신해야 합니다.
+  2) 외래키(FK) 연결 관계와 CASCADE 삭제 조건을 명확히 기재합니다.
+  3) 금액은 국가별 통화 표기를 지원하기 위해 NUMERIC(12,2)과 currency 코드를
+     함께 보관합니다.
+================================================================================

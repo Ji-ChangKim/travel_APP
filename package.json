@@ -1,0 +1,71 @@
+{
+  "name": "wherego-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "packageManager": "npm@11.5.2",
+  "engines": {
+    "node": "^22.13.0 || ^24.3.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "mobile": "npm --workspace=@wherego/mobile run start",
+    "mobile:web": "npm --workspace=@wherego/mobile run web",
+    "mobile:doctor": "npm --workspace=@wherego/mobile run doctor",
+    "mobile:build:web": "npm --workspace=@wherego/mobile run build:web",
+    "mobile:build:apk": "npm --workspace=@wherego/mobile run build:apk",
+    "api:dev": "npm --workspace=@wherego/api run dev",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run typecheck && npm run lint && npm run format:check",
+    "build:web": "expo export --platform web",
+    "build:apk": "eas build -p android --profile preview",
+    "build:all": "eas build -p all --profile production",
+    "eas:login": "eas login",
+    "doctor": "npx expo-doctor"
+  },
+  "dependencies": {
+    "@expo/vector-icons": "^15.0.2",
+    "@hookform/resolvers": "^4.1.3",
+    "@supabase/supabase-js": "^2.49.1",
+    "@tanstack/react-query": "^5.67.1",
+    "expo": "~57.0.24",
+    "expo-constants": "~57.0.19",
+    "expo-font": "~57.0.4",
+    "expo-linking": "~57.0.10",
+    "expo-router": "~57.0.22",
+    "expo-secure-store": "~57.0.4",
+    "expo-splash-screen": "~57.0.9",
+    "expo-status-bar": "~57.0.1",
+    "expo-system-ui": "~57.0.4",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-hook-form": "^7.54.2",
+    "react-native": "0.86.3",
+    "react-native-gesture-handler": "~2.32.0",
+    "react-native-reanimated": "4.5.1",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "~4.26.0",
+    "react-native-web": "~0.21.0",
+    "react-native-worklets": "0.10.1",
+    "zod": "^3.24.2",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "eslint": "^9.39.0",
+    "eslint-config-expo": "~57.0.2",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.6.2",
+    "typescript": "~6.0.3"
+  }
+}

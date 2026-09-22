@@ -1,0 +1,11 @@
+# 자동 생성 파일과 플랫폼별 빌드 결과는 서식 검사에서 제외한다.
+node_modules/
+.expo/
+dist/
+**/dist/
+**/.expo/
+**/node_modules/
+android/
+ios/
+package-lock.json
+expo-env.d.ts

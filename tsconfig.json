@@ -1,0 +1,20 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "paths": {
+      "@/*": ["./apps/mobile/src/*"],
+      "@wherego/domain": ["./packages/domain/src/index.ts"],
+      "@wherego/validation": ["./packages/validation/src/index.ts"],
+      "@wherego/api-client": ["./packages/api-client/src/index.ts"]
+    }
+  },
+  "include": [
+    "apps/**/*.ts",
+    "apps/**/*.tsx",
+    "packages/**/*.ts",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
+  ]
+}
