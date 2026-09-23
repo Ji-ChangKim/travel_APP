@@ -1,7 +1,7 @@
 ================================================================================
  travel_APP (WHEREGO) 데이터베이스 및 도메인 객체 사전 (DB_DICTIONARY.txt)
- 문서 버전: v1.1
- 최종 수정일: 2026-09-22
+ 문서 버전: v1.4
+ 최종 수정일: 2026-09-24
  데이터베이스 환경: Supabase PostgreSQL 15+
  프로젝트 목적: 여행 계획(PLAN) -> 공유(SHARE) -> 여행 중(TRAVEL) -> 기록/정산(RECORD)
 ================================================================================
@@ -77,6 +77,12 @@
 id           | UUID         | NO   |                   | PK, REFERENCES auth.users | 사용자 고유 식별자 (Auth UID)
 nickname     | VARCHAR(50)  | NO   |                   |                           | 서비스 닉네임
 avatar_url   | TEXT         | YES  | NULL              |                           | 프로필 이미지 스토리지 URL
+bio          | TEXT         | YES  | NULL              |                           | 한 줄 자기소개
+travel_styles| TEXT[]       | YES  | '{}'              |                           | 선호 여행 스타일 태그 목록
+phone        | VARCHAR(30)  | YES  | NULL              |                           | 비상 연락처
+os_platform  | VARCHAR(20)  | NO   | 'web'             |                           | 가입/접속 OS ('android','ios','web')
+auth_provider| VARCHAR(20)  | NO   | 'guest'           |                           | 인증 제공자 ('google','kakao','apple','guest')
+last_sign_in_at| TIMESTAMPTZ| NO   | NOW()             |                           | 마지막 접속/로그인 시각
 created_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 계정 생성 시각
 updated_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 프로필 수정 시각
 
@@ -94,9 +100,11 @@ city         | VARCHAR(50)  | NO   |                   |                        
 start_date   | DATE         | NO   |                   | CHECK(start <= end)       | 여행 시작일 (YYYY-MM-DD)
 end_date     | DATE         | NO   |                   |                           | 여행 종료일 (YYYY-MM-DD)
 status       | trip_status  | NO   | 'PLANNED'         |                           | 여행 진행 상태 Enum
-cover_color  | VARCHAR(20)  | YES  | '#246A54'         |                           | 카드 및 테마 대표 커버 색상
+cover_color  | VARCHAR(20)  | YES  | '#F45135'         |                           | 카드 및 테마 대표 커버 색상
+invite_code  | VARCHAR(20)  | YES  | NULL              | UNIQUE                    | 동행 참여용 6~8자리 초대 코드
 created_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 여행 생성 시각
 updated_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 여행 수정 시각
+
 
 --------------------------------------------------------------------------------
 3) 테이블명: trip_members (동행자 및 권한)
@@ -153,6 +161,9 @@ sort_order   | INT          | NO   | 1                 |                        
 estimated_cost| NUMERIC(12,2| YES  | 0                 |                           | 사전 계획 단계 예상 비용 (원)
 actual_cost  | NUMERIC(12,2)| YES  | NULL              |                           | 정산된 실제 결제 비용
 memo         | TEXT         | YES  | NULL              |                           | 일정 메모 및 이동 팁
+transit_info | VARCHAR(150) | YES  | NULL              |                           | 다음 지점 이동 안내 (노선, 시간)
+is_completed | BOOLEAN      | NO   | FALSE             |                           | 방문 체크인 완료 여부
+image_url    | TEXT         | YES  | NULL              |                           | 장소 썸네일/사진 URL
 created_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 등록 시각
 
 --------------------------------------------------------------------------------
@@ -268,6 +279,12 @@ created_at   | TIMESTAMPTZ  | NO   | NOW()             |                        
    - id: string               -> profiles.id
    - nickname: string         -> profiles.nickname
    - avatarUrl?: string|null  -> profiles.avatar_url
+   - bio?: string|null        -> profiles.bio
+   - travelStyles?: string[]  -> profiles.travel_styles
+   - phone?: string|null      -> profiles.phone
+   - osPlatform?: OsPlatform  -> profiles.os_platform ('android'|'ios'|'web')
+   - authProvider?: AuthProvider -> profiles.auth_provider ('google'|'kakao'|'apple'|'guest')
+   - lastSignInAt?: string    -> profiles.last_sign_in_at
    - createdAt: string        -> profiles.created_at
    - updatedAt: string        -> profiles.updated_at
 
@@ -393,6 +410,15 @@ created_at   | TIMESTAMPTZ  | NO   | NOW()             |                        
 ================================================================================
 4. 변경 이력 및 관리 지침
 ================================================================================
+
+* [2026-09-24] v1.4 업데이트:
+  - AOS/iOS 플랫폼별 소셜 인증(구글/카톡 vs 애플/카톡) 및 게스트 영속 로그인 지원.
+  - profiles 테이블에 접속 OS(os_platform), 인증 제공자(auth_provider), 마지막 로그인(last_sign_in_at) 로그 컬럼 추가.
+
+* [2026-09-24] v1.3 업데이트:
+  - 사용자 관리 및 개인 프로필 저장 속성(bio, travel_styles, phone) 확장.
+  - Supabase auth.users 신규 가입 연동 자동 트리거(handle_new_user) 명세 추가.
+  - trips.invite_code, expenses, checklists 테이블 DDL 및 RLS 정책 보완.
 
 * [2026-09-22] v1.1 업데이트:
   - DB 보안 연동 코드(24541c7e-d148-46d9-80ef-f647ad649eb1) 암호화 입출력

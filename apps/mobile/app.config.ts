@@ -41,6 +41,12 @@ const config: ExpoConfig = {
       },
     ],
   ],
+  owner: 'rupang',
+  extra: {
+    eas: {
+      projectId: '3b23b462-262c-4b64-aff2-5fb03280e6b5',
+    },
+  },
   experiments: {
     typedRoutes: true,
   },

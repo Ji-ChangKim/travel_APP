@@ -28,3 +28,9 @@ expo-env.d.ts
 .DS_Store
 Thumbs.db
 *.log
+.vs/
+
+# 보안 키 및 접근 토큰 문서
+docs/98. keys/
+
+

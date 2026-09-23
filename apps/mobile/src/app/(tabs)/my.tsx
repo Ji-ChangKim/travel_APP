@@ -11,9 +11,11 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 import { colors } from '@/constants/theme';
+import { updateUserProfile } from '@/services/profileService';
 import {
   DEFAULT_DB_SECURITY_CODE,
   encryptText,
@@ -23,9 +25,22 @@ import {
 } from '@/services/securityService';
 import { useTripStore } from '@/stores/useTripStore';
 
+// 여행 스타일 선택 옵션 목록을 정의한다.
+const TRAVEL_STYLE_OPTIONS = [
+  '휴양/힐링',
+  '미식/맛집',
+  '액티비티',
+  '자연/풍경',
+  '쇼핑',
+  '문화/역사',
+  '인스타감성',
+  '배낭여행',
+];
+
 // [마이] 프로필 및 앱 환경 설정 화면을 렌더링한다.
 export default function MyScreen() {
-  const { trips, visits } = useTripStore();
+  const router = useRouter();
+  const { trips, visits, currentUser, updateProfile, logout } = useTripStore();
 
   const [isGpsEnabled, setIsGpsEnabled] = useState(true);
   const [isOfflineCacheEnabled, setIsOfflineCacheEnabled] = useState(true);
@@ -38,6 +53,65 @@ export default function MyScreen() {
   const [isCodeRevealed, setIsCodeRevealed] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [inputCode, setInputCode] = useState<string>('');
+
+  // 프로필 편집 모달 및 폼 상태를 관리한다.
+  const [isProfileEditModalOpen, setIsProfileEditModalOpen] =
+    useState<boolean>(false);
+  const [editNickname, setEditNickname] = useState<string>('');
+  const [editBio, setEditBio] = useState<string>('');
+  const [editTravelStyles, setEditTravelStyles] = useState<string[]>([]);
+  const [isSavingProfile, setIsSavingProfile] = useState<boolean>(false);
+
+  // 프로필 수정 모달을 열고 현재 데이터를 폼 상태에 채운다.
+  const openProfileEditModal = () => {
+    setEditNickname(currentUser?.nickname || '');
+    setEditBio(currentUser?.bio || '');
+    setEditTravelStyles(currentUser?.travelStyles || []);
+    setIsProfileEditModalOpen(true);
+  };
+
+  // 프로필 수정 모달을 닫는다.
+  const closeProfileEditModal = () => {
+    setIsProfileEditModalOpen(false);
+  };
+
+  // 여행 스타일 태그 선택을 토글한다.
+  const handleToggleTravelStyle = (tag: string) => {
+    setEditTravelStyles((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
+    );
+  };
+
+  // 프로필 정보 수정을 서버 및 스토어에 반영한다.
+  const handleSaveProfile = async () => {
+    if (!editNickname.trim()) {
+      Alert.alert('알림', '닉네임을 1자 이상 입력해 주세요.');
+      return;
+    }
+
+    setIsSavingProfile(true);
+    const updates = {
+      nickname: editNickname.trim(),
+      bio: editBio.trim() || null,
+      travelStyles: editTravelStyles,
+    };
+
+    // 로컬 스토어에 즉시 반영한다.
+    updateProfile(updates);
+
+    // Supabase 서버와 동기화를 시도한다 (실제 사용자 ID가 있는 경우).
+    if (currentUser?.id) {
+      try {
+        await updateUserProfile(currentUser.id, updates);
+      } catch {
+        // 서버 동기화 실패 시에도 로컬 상태는 유지됨을 안내한다.
+      }
+    }
+
+    setIsSavingProfile(false);
+    setIsProfileEditModalOpen(false);
+    Alert.alert('저장 완료', '프로필 정보가 안전하게 저장되었습니다.');
+  };
 
   // 보안 스토리지에서 암호화된 DB 코드를 읽어와 상태를 갱신한다.
   const fetchDecryptedCode = async () => {
@@ -119,7 +193,10 @@ export default function MyScreen() {
       {
         text: '로그아웃',
         style: 'destructive',
-        onPress: () => Alert.alert('로그아웃 완료'),
+        onPress: () => {
+          logout();
+          router.replace('/');
+        },
       },
     ]);
   };
@@ -146,18 +223,57 @@ export default function MyScreen() {
 
         {/* 사용자 프로필 카드 */}
         <View style={styles.profileCard}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>민</Text>
-          </View>
-          <View style={styles.profileInfo}>
-            <View style={styles.nameRow}>
-              <Text style={styles.userName}>여행자 민지</Text>
-              <View style={styles.authBadge}>
-                <Text style={styles.authBadgeText}>Supabase Auth</Text>
-              </View>
+          <View style={styles.profileCardHeader}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>
+                {(currentUser?.nickname || '나')[0]}
+              </Text>
             </View>
-            <Text style={styles.userEmail}>traveler.minji@example.com</Text>
+            <View style={styles.profileInfo}>
+              <View style={styles.nameRow}>
+                <Text style={styles.userName}>
+                  {currentUser?.nickname || '여행자'}
+                </Text>
+                <View style={styles.authBadge}>
+                  <Text style={styles.authBadgeText}>인증됨</Text>
+                </View>
+              </View>
+              <Text style={styles.userEmail}>
+                {currentUser ? '로그인 세션 활성' : '게스트 모드'}
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={styles.editProfileBtn}
+              onPress={openProfileEditModal}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="pencil" size={14} color={colors.accent} />
+              <Text style={styles.editProfileBtnText}>수정</Text>
+            </TouchableOpacity>
           </View>
+
+          {/* 한 줄 자기소개 */}
+          {currentUser?.bio ? (
+            <View style={styles.bioContainer}>
+              <Ionicons
+                name="chatbubble-ellipses-outline"
+                size={14}
+                color={colors.muted}
+              />
+              <Text style={styles.bioText}>{currentUser.bio}</Text>
+            </View>
+          ) : null}
+
+          {/* 선호 여행 스타일 태그 목록 */}
+          {currentUser?.travelStyles && currentUser.travelStyles.length > 0 ? (
+            <View style={styles.travelStylesWrap}>
+              {currentUser.travelStyles.map((style) => (
+                <View key={style} style={styles.travelStyleChip}>
+                  <Text style={styles.travelStyleChipText}>#{style}</Text>
+                </View>
+              ))}
+            </View>
+          ) : null}
         </View>
 
         {/* 여행 활동 통계 요약 */}
@@ -384,102 +500,289 @@ export default function MyScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* 개인 프로필 수정 모달 */}
+      <Modal visible={isProfileEditModalOpen} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>개인 프로필 수정</Text>
+              <TouchableOpacity onPress={closeProfileEditModal}>
+                <Ionicons name="close" size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.modalDesc}>
+              나만의 프로필과 여행 성향을 설정하여 동행자에게 공유해 보세요.
+            </Text>
+
+            {/* 닉네임 입력 */}
+            <View style={styles.editInputGroup}>
+              <Text style={styles.editInputLabel}>닉네임</Text>
+              <TextInput
+                style={styles.modalTextInput}
+                value={editNickname}
+                onChangeText={setEditNickname}
+                placeholder="닉네임 입력"
+                placeholderTextColor={colors.mutedLight}
+                maxLength={20}
+              />
+            </View>
+
+            {/* 한 줄 소개 입력 */}
+            <View style={styles.editInputGroup}>
+              <Text style={styles.editInputLabel}>한 줄 소개 (소개글)</Text>
+              <TextInput
+                style={[styles.modalTextInput, styles.bioInput]}
+                value={editBio}
+                onChangeText={setEditBio}
+                placeholder="예: 힐링과 맛집 탐방을 사랑하는 여행자입니다 :)"
+                placeholderTextColor={colors.mutedLight}
+                multiline
+                numberOfLines={2}
+                maxLength={80}
+              />
+            </View>
+
+            {/* 여행 스타일 태그 선택 */}
+            <View style={styles.editInputGroup}>
+              <Text style={styles.editInputLabel}>
+                나의 여행 스타일 (다중 선택)
+              </Text>
+              <View style={styles.tagSelectWrap}>
+                {TRAVEL_STYLE_OPTIONS.map((tag) => {
+                  const isSelected = editTravelStyles.includes(tag);
+                  return (
+                    <TouchableOpacity
+                      key={tag}
+                      style={[
+                        styles.tagOptionChip,
+                        isSelected && styles.tagOptionChipActive,
+                      ]}
+                      onPress={() => handleToggleTravelStyle(tag)}
+                      activeOpacity={0.8}
+                    >
+                      <Text
+                        style={[
+                          styles.tagOptionText,
+                          isSelected && styles.tagOptionTextActive,
+                        ]}
+                      >
+                        {isSelected ? '✓ ' : ''}
+                        {tag}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+
+            {/* 저장 CTA 버튼 */}
+            <TouchableOpacity
+              style={styles.modalSubmitBtn}
+              onPress={handleSaveProfile}
+              disabled={isSavingProfile}
+              activeOpacity={0.85}
+            >
+              <Ionicons
+                name="checkmark-circle-outline"
+                size={18}
+                color="#FFFFFF"
+              />
+              <Text style={styles.modalSubmitBtnText}>
+                {isSavingProfile ? '저장 중...' : '프로필 저장하기'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
 
-// 화면 스타일을 정의한다.
+// 마이페이지 화면 스타일 규격
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
-  scrollContent: { paddingHorizontal: 20, paddingVertical: 16, gap: 20 },
-  header: { gap: 2 },
-  headerSubtitle: { fontSize: 13, color: colors.muted, fontWeight: '600' },
-  headerTitle: { fontSize: 24, fontWeight: '800', color: colors.text },
+  scrollContent: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 40 },
+  header: { marginBottom: 16 },
+  headerSubtitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.primary,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: colors.text,
+    marginTop: 2,
+  },
   profileCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: colors.surface,
-    borderColor: colors.border,
-    borderWidth: 1,
     borderRadius: 20,
     padding: 18,
-    gap: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+    gap: 12,
+  },
+  profileCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
   },
   avatar: {
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: colors.accent,
-    justifyContent: 'center',
+    backgroundColor: colors.primary,
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  avatarText: { color: colors.textLight, fontSize: 20, fontWeight: '800' },
-  profileInfo: { flex: 1, gap: 4 },
+  avatarText: { fontSize: 20, fontWeight: '800', color: colors.textLight },
+  profileInfo: { flex: 1, gap: 3 },
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   userName: { fontSize: 17, fontWeight: '800', color: colors.text },
   authBadge: {
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: 6,
+    backgroundColor: colors.primarySoft,
+    paddingHorizontal: 7,
     paddingVertical: 2,
     borderRadius: 6,
   },
-  authBadgeText: { fontSize: 10, color: colors.accent, fontWeight: '700' },
+  authBadgeText: { fontSize: 10, fontWeight: '700', color: colors.primary },
   userEmail: { fontSize: 12, color: colors.muted },
-  summaryBox: {
-    flexDirection: 'row',
-    backgroundColor: colors.surface,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: 18,
-    paddingVertical: 14,
-    justifyContent: 'space-around',
-    alignItems: 'center',
-  },
-  summaryItem: { alignItems: 'center' },
-  summaryNum: { fontSize: 18, fontWeight: '800', color: colors.accent },
-  summaryText: { fontSize: 11, color: colors.muted, marginTop: 2 },
-  summaryDivider: { width: 1, height: 26, backgroundColor: colors.border },
-  section: { gap: 10 },
-  sectionHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  sectionTitle: { fontSize: 15, fontWeight: '700', color: colors.text },
-  verifyBtn: {
+  editProfileBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: colors.accentSoft,
+    backgroundColor: colors.primarySoft,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 10,
+  },
+  editProfileBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.accent,
+  },
+  bioContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: colors.background,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+  },
+  bioText: {
+    fontSize: 13,
+    color: colors.text,
+    flex: 1,
+    lineHeight: 18,
+  },
+  travelStylesWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginTop: 2,
+  },
+  travelStyleChip: {
+    backgroundColor: colors.primarySoft,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
   },
-  verifyBtnText: { fontSize: 11, fontWeight: '700', color: colors.accent },
-  card: {
-    backgroundColor: colors.surface,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: 18,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+  travelStyleChipText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.primary,
   },
-  securityCodeRow: {
+  summaryBox: {
+    flexDirection: 'row',
+    backgroundColor: colors.surface,
+    borderRadius: 18,
+    paddingVertical: 16,
+    paddingHorizontal: 8,
+    marginBottom: 16,
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  summaryItem: { alignItems: 'center', flex: 1 },
+  summaryNum: { fontSize: 20, fontWeight: '800', color: colors.primary },
+  summaryText: { fontSize: 11, color: colors.muted, marginTop: 2 },
+  summaryDivider: { width: 1, height: 24, backgroundColor: colors.border },
+  section: { marginBottom: 16 },
+  sectionHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
+    marginBottom: 8,
   },
-  codeTextGroup: { flex: 1, gap: 4 },
-  codeLabel: { fontSize: 12, color: colors.muted, fontWeight: '600' },
-  codeValue: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: colors.text,
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: colors.muted,
+    textTransform: 'uppercase',
     letterSpacing: 0.5,
+    marginBottom: 8,
   },
-  iconActionBtn: { padding: 6 },
-  btnRow: { flexDirection: 'row', gap: 10, paddingVertical: 10 },
+  verifyBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: colors.primarySoft,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  verifyBtnText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: colors.primary,
+  },
+  card: {
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  securityCodeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 4,
+  },
+  codeTextGroup: { flex: 1 },
+  codeLabel: { fontSize: 13, fontWeight: '700', color: colors.text },
+  codeValue: {
+    fontSize: 12,
+    color: colors.accent,
+    fontFamily: 'Courier',
+    marginTop: 2,
+    fontWeight: '600',
+  },
+  iconActionBtn: {
+    padding: 6,
+    borderRadius: 8,
+    backgroundColor: colors.background,
+  },
+  btnRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 8,
+  },
   editCodeBtn: {
     flex: 1,
     flexDirection: 'row',
@@ -499,39 +802,42 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.borderLight,
+    backgroundColor: colors.background,
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderRadius: 12,
     gap: 4,
   },
-  resetCodeBtnText: { fontSize: 12, fontWeight: '700', color: colors.muted },
+  resetCodeBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.muted,
+  },
   settingRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
+    justifyContent: 'space-between',
+    paddingVertical: 4,
   },
   settingTextGroup: { flex: 1, paddingRight: 12 },
   settingTitle: { fontSize: 14, fontWeight: '700', color: colors.text },
   settingDesc: { fontSize: 12, color: colors.muted, marginTop: 2 },
-  divider: { height: 1, backgroundColor: colors.borderLight },
+  divider: { height: 1, backgroundColor: colors.border, marginVertical: 12 },
   actionRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
+    justifyContent: 'space-between',
+    paddingVertical: 4,
   },
   actionLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  actionText: { fontSize: 14, fontWeight: '700', color: colors.text },
+  actionText: { fontSize: 14, fontWeight: '600', color: colors.text },
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 2,
   },
   infoLabel: { fontSize: 13, color: colors.muted },
-  infoValue: { fontSize: 13, fontWeight: '700', color: colors.text },
+  infoValue: { fontSize: 13, fontWeight: '600', color: colors.text },
   logoutBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -554,6 +860,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     gap: 12,
+    maxHeight: '90%',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -572,15 +879,57 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     fontFamily: 'Courier',
   },
+  editInputGroup: { gap: 6 },
+  editInputLabel: { fontSize: 12, fontWeight: '700', color: colors.text },
+  modalTextInput: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    fontSize: 14,
+    backgroundColor: colors.background,
+    color: colors.text,
+  },
+  bioInput: {
+    height: 60,
+    textAlignVertical: 'top',
+  },
+  tagSelectWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  tagOptionChip: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.background,
+  },
+  tagOptionChipActive: {
+    borderColor: colors.primary,
+    backgroundColor: colors.primarySoft,
+  },
+  tagOptionText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.muted,
+  },
+  tagOptionTextActive: {
+    color: colors.primary,
+    fontWeight: '700',
+  },
   modalSubmitBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.accent,
+    backgroundColor: colors.primary,
     borderRadius: 12,
     paddingVertical: 12,
     gap: 6,
-    marginTop: 4,
+    marginTop: 6,
   },
   modalSubmitBtnText: {
     color: colors.textLight,

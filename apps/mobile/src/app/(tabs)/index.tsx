@@ -15,12 +15,19 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { colors } from '@/constants/theme';
 import { useTripStore } from '@/stores/useTripStore';
-import type { ItineraryItem, PlaceCategory, TripStatus } from '@wherego/domain';
-import { tripCreateSchema } from '@wherego/validation';
+import type { Trip, TripStatus } from '@wherego/domain';
 
-// 상태별 배지 색상 및 라벨 정보를 반환한다.
-function getStatusBadge(status: TripStatus) {
-  // 여행 진행 상태에 따라 적합한 라벨과 색상 객체를 반환한다.
+// 여행 커버 테마 색상 옵션을 정의한다.
+const coverColorOptions = [
+  { label: '코랄 오렌지', color: '#F45135' },
+  { label: '스카이 블루', color: '#3D8DFF' },
+  { label: '포레스트 그린', color: '#246A54' },
+  { label: '로열 퍼플', color: '#7B1FA2' },
+  { label: '선셋 골드', color: '#E65100' },
+];
+
+// 여행 상태별 라벨과 배지 스타일을 반환한다.
+function getTripStatusBadge(status: TripStatus) {
   switch (status) {
     case 'IN_PROGRESS':
       return {
@@ -29,545 +36,540 @@ function getStatusBadge(status: TripStatus) {
         text: colors.tagOrangeText,
       };
     case 'COMPLETED':
-      return { label: '여행 완료', bg: colors.borderLight, text: colors.muted };
+      return {
+        label: '여행 완료',
+        bg: colors.borderLight,
+        text: colors.muted,
+      };
     case 'ARCHIVED':
-      return { label: '보관됨', bg: colors.borderLight, text: colors.muted };
+      return {
+        label: '보관됨',
+        bg: colors.borderLight,
+        text: colors.muted,
+      };
     case 'PLANNED':
     default:
-      return { label: '여행 예정', bg: colors.accentSoft, text: colors.accent };
+      return {
+        label: '여행 예정',
+        bg: colors.tagBlue,
+        text: colors.tagBlueText,
+      };
   }
 }
 
-// 카테고리별 배지 스타일을 반환한다.
-function getCategoryBadge(category: PlaceCategory) {
-  // 장소 카테고리에 맞는 스타일 객체를 반환한다.
-  switch (category) {
-    case 'food':
-      return {
-        label: '식당',
-        bg: colors.tagOrange,
-        text: colors.tagOrangeText,
-      };
-    case 'cafe':
-      return {
-        label: '카페',
-        bg: colors.tagPurple,
-        text: colors.tagPurpleText,
-      };
-    case 'stay':
-      return { label: '숙소', bg: colors.tagBlue, text: colors.tagBlueText };
-    case 'activity':
-      return {
-        label: '액티비티',
-        bg: colors.accentSoft,
-        text: colors.accentDark,
-      };
-    case 'sightseeing':
-    default:
-      return { label: '관광지', bg: colors.accentSoft, text: colors.accent };
-  }
+// 오늘 날짜 기준 D-Day 문자열을 계산한다.
+function calculateDDay(startDate: string): string {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const start = new Date(startDate);
+  start.setHours(0, 0, 0, 0);
+  const diffTime = start.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) return 'D-Day 오늘';
+  if (diffDays > 0) return `D-${diffDays}`;
+  return `D+${Math.abs(diffDays)}`;
 }
 
-// [내 여행] 화면을 렌더링한다.
+// [내 여행] 목록 및 여행 생성/참여 허브 화면을 렌더링한다.
 export default function MyTripsScreen() {
-  // 페이지 이동을 위한 Expo 라우터 인스턴스를 가져온다.
   const router = useRouter();
 
-  // 여행 전역 스토어 상태 및 액션을 구독한다.
+  // 전역 여행 스토어 상태 및 액션을 구독한다.
   const {
+    currentUser,
     trips,
-    selectedTripId,
-    itineraries,
-    setSelectedTripId,
     createTrip,
-    updateTripStatus,
-    addItineraryItem,
-    checkInPlace,
+    deleteTrip,
+    joinTripByInviteCode,
+    setSelectedTripId,
   } = useTripStore();
 
-  const [filterStatus, setFilterStatus] = useState<TripStatus | 'ALL'>('ALL');
+  // 여행 생성 모달 노출 상태를 관리한다.
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  // 여행 제목 입력값을 관리한다.
+  const [titleInput, setTitleInput] = useState('');
+  // 여행 국가 입력값을 관리한다.
+  const [countryInput, setCountryInput] = useState('일본');
+  // 여행 도시 입력값을 관리한다.
+  const [cityInput, setCityInput] = useState('와카야마');
+  // 여행 시작일 입력값을 관리한다.
+  const [startDateInput, setStartDateInput] = useState('2026-10-03');
+  // 여행 종료일 입력값을 관리한다.
+  const [endDateInput, setEndDateInput] = useState('2026-10-08');
+  // 선택된 커버 색상을 관리한다.
+  const [selectedColor, setSelectedColor] = useState('#F45135');
 
-  // 여행 생성 모달
-  const [isTripModalOpen, setIsTripModalOpen] = useState(false);
-  const [formTitle, setFormTitle] = useState('');
-  const [formCountry, setFormCountry] = useState('대한민국');
-  const [formCity, setFormCity] = useState('');
-  const [formStartDate, setFormStartDate] = useState('');
-  const [formEndDate, setFormEndDate] = useState('');
+  // 초대 코드 참여 모달 노출 상태를 관리한다.
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
+  // 입력된 초대 코드를 관리한다.
+  const [inviteCodeInput, setInviteCodeInput] = useState('');
 
-  // 일정 추가 모달
-  const [isPlaceModalOpen, setIsPlaceModalOpen] = useState(false);
-  const [placeName, setPlaceName] = useState('');
-  const [placeTime, setPlaceTime] = useState('11:00');
-  const [placeCategory, setPlaceCategory] =
-    useState<PlaceCategory>('sightseeing');
-  const [placeMemo, setPlaceMemo] = useState('');
-
-  // 필터링된 여행 목록을 구한다.
-  const filteredTrips = trips.filter((t) =>
-    filterStatus === 'ALL' ? true : t.status === filterStatus,
-  );
-
-  const selectedTrip = trips.find((t) => t.id === selectedTripId) || trips[0];
-  const currentItinerary = selectedTrip
-    ? itineraries[selectedTrip.id] || []
-    : [];
-
-  // Zod 검증을 거쳐 새로운 여행을 생성하고 상세 허브로 이동한다.
-  const handleCreateTrip = () => {
-    // 폼 입력값을 정리한다.
-    const input = {
-      title: formTitle.trim(),
-      country: formCountry.trim(),
-      city: formCity.trim(),
-      startDate: formStartDate.trim(),
-      endDate: formEndDate.trim(),
-      coverColor: '#246A54',
-    };
-
-    // Zod 스키마 검증을 수행한다.
-    const validationResult = tripCreateSchema.safeParse(input);
-    if (!validationResult.success) {
-      // 검증 실패 시 오류 메시지를 표시한다.
-      const errorMsg =
-        validationResult.error.errors[0]?.message || '입력값을 확인해 주세요.';
-      Alert.alert('입력 오류', errorMsg);
+  // 새로운 여행을 생성하고 상세 화면으로 이동한다.
+  const handleConfirmCreateTrip = () => {
+    // 제목 입력 여부를 검사한다.
+    if (!titleInput.trim()) {
+      Alert.alert('알림', '여행 제목을 입력해 주세요.');
+      return;
+    }
+    // 시작일과 종료일 입력 여부를 검사한다.
+    if (!startDateInput.trim() || !endDateInput.trim()) {
+      Alert.alert('알림', '여행 시작일과 종료일을 입력해 주세요.');
       return;
     }
 
-    // 여행을 생성하고 생성된 인스턴스를 받는다.
-    const createdTrip = createTrip({
-      ...input,
+    // 날짜 유효성을 검사한다.
+    if (new Date(startDateInput) > new Date(endDateInput)) {
+      Alert.alert('알림', '시작일은 종료일보다 이전이어야 합니다.');
+      return;
+    }
+
+    // 스토어에 새 여행을 생성한다.
+    const created = createTrip({
+      title: titleInput.trim(),
+      country: countryInput.trim() || '대한민국',
+      city: cityInput.trim() || '여행지',
+      startDate: startDateInput.trim(),
+      endDate: endDateInput.trim(),
       status: 'PLANNED',
+      coverColor: selectedColor,
     });
 
-    // 폼 상태를 초기화하고 모달을 닫는다.
-    setIsTripModalOpen(false);
-    setFormTitle('');
-    setFormCity('');
-    setFormStartDate('');
-    setFormEndDate('');
+    // 모달을 닫고 폼 필드를 초기화한다.
+    setIsCreateModalOpen(false);
+    setTitleInput('');
 
-    // 생성된 여행의 상세 허브 화면으로 즉시 이동한다.
-    router.push(`/trips/${createdTrip.id}`);
+    // 생성된 여행의 상세 페이지로 즉시 이동한다.
+    setSelectedTripId(created.id);
+    router.push(`/trips/${created.id}`);
   };
 
-  // 새로운 장소 일정을 추가한다.
-  const handleAddPlace = () => {
-    // 장소 이름 유효성을 검사한다.
-    if (!placeName.trim() || !selectedTrip) {
-      Alert.alert('알림', '장소 이름을 입력해 주세요.');
+  // 초대 코드로 여행에 참여한다.
+  const handleConfirmJoinTrip = () => {
+    // 초대 코드 입력 여부를 검사한다.
+    if (!inviteCodeInput.trim()) {
+      Alert.alert('알림', '전달받은 6자리 초대 코드를 입력해 주세요.');
       return;
     }
 
-    // 일정을 스토어에 추가한다.
-    addItineraryItem(selectedTrip.id, {
-      tripDayId: 'day-1',
-      placeId: `place-${Date.now()}`,
-      timeSlot: placeTime.trim() || '12:00',
-      sortOrder: currentItinerary.length + 1,
-      memo: placeMemo.trim(),
-      place: {
-        id: `place-${Date.now()}`,
-        name: placeName.trim(),
-        category: placeCategory,
-        latitude: 33.5066,
-        longitude: 126.493,
-        createdAt: new Date().toISOString(),
+    // 스토어의 초대 코드 참여 액션을 실행한다.
+    const result = joinTripByInviteCode(inviteCodeInput.trim());
+
+    if (!result.success || !result.trip) {
+      Alert.alert('참여 실패', result.message);
+      return;
+    }
+
+    // 참여 성공 피드백을 제공하고 해당 여행 상세로 이동한다.
+    Alert.alert('참여 완료', result.message, [
+      {
+        text: '일정 확인하기',
+        onPress: () => {
+          setIsJoinModalOpen(false);
+          setInviteCodeInput('');
+          setSelectedTripId(result.trip!.id);
+          router.push(`/trips/${result.trip!.id}`);
+        },
       },
-    });
-
-    // 모달을 닫고 인풋 필드를 초기화한다.
-    setIsPlaceModalOpen(false);
-    setPlaceName('');
-    setPlaceMemo('');
+    ]);
   };
 
-  // 예정된 일정 장소를 방문 체크인하여 발자국으로 전환한다.
-  const handleCheckIn = (item: ItineraryItem) => {
-    // 활성 여행이 없으면 중단한다.
-    if (!selectedTrip) return;
-    // 발자국 등록을 실행한다.
-    checkInPlace(selectedTrip.id, item, 'gps');
-    // 체크인 안내 알림을 표시한다.
+  // 여행 카드를 클릭하여 상세 화면으로 이동한다.
+  const handleSelectTrip = (trip: Trip) => {
+    // 활성 여행 아이디를 설정하고 화면을 전환한다.
+    setSelectedTripId(trip.id);
+    router.push(`/trips/${trip.id}`);
+  };
+
+  // 여행을 삭제한다.
+  const handleDeleteTrip = (trip: Trip) => {
     Alert.alert(
-      '체크인 완료 (발자국 등록)',
-      `'${item.place?.name}'에 체크인했습니다!\n[발자국] 탭에서 확인하실 수 있습니다.`,
+      '여행 삭제',
+      `'${trip.title}' 일정을 삭제하시겠습니까?\n이 작업은 취소할 수 없습니다.`,
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '삭제',
+          style: 'destructive',
+          onPress: () => deleteTrip(trip.id),
+        },
+      ],
     );
-  };
-
-  // 여행 상세 허브 화면으로 이동한다.
-  const navigateToTripDetail = (tripId: string) => {
-    // 해당 여행 ID의 상세 페이지로 경로를 이동한다.
-    router.push(`/trips/${tripId}`);
   };
 
   return (
     <SafeAreaView style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* 상단 헤더 */}
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.brand}>WHEREGO</Text>
-            <Text style={styles.headerTitle}>내 여행</Text>
-          </View>
+      {/* 상단 헤더 바 */}
+      <View style={styles.topHeader}>
+        <View style={styles.headerTitleWrap}>
+          <Text style={styles.pageTitle}>내 여행</Text>
+          <Text style={styles.pageSubtitle}>
+            {currentUser?.nickname
+              ? `${currentUser.nickname}님의 여행 계획`
+              : '로그인 후 직접 여행을 계획해 보세요'}
+          </Text>
+        </View>
+
+        {/* 상단 액션 버튼 그룹 */}
+        <View style={styles.headerBtnRow}>
           <TouchableOpacity
-            style={styles.createButton}
-            onPress={() => setIsTripModalOpen(true)}
+            style={styles.joinCodeBtn}
+            onPress={() => setIsJoinModalOpen(true)}
+            activeOpacity={0.8}
           >
-            <Ionicons name="add" size={20} color={colors.textLight} />
-            <Text style={styles.createButtonText}>새 여행 생성</Text>
+            <Ionicons name="key-outline" size={16} color={colors.secondary} />
+            <Text style={styles.joinCodeBtnText}>코드 참여</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.addTripBtn}
+            onPress={() => setIsCreateModalOpen(true)}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="add" size={18} color={colors.textLight} />
+            <Text style={styles.addTripBtnText}>새 여행</Text>
           </TouchableOpacity>
         </View>
+      </View>
 
-        {/* 상태 필터 탭 (전체 / 예정 / 여행 중 / 완료) */}
-        <View style={styles.filterRow}>
-          {(['ALL', 'PLANNED', 'IN_PROGRESS', 'COMPLETED'] as const).map(
-            (st) => {
-              const isSelected = filterStatus === st;
-              const label =
-                st === 'ALL'
-                  ? '전체'
-                  : st === 'PLANNED'
-                    ? '예정'
-                    : st === 'IN_PROGRESS'
-                      ? '여행 중'
-                      : '완료';
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* 여행 목록이 비어 있는 경우 (Empty State) */}
+        {trips.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <View style={styles.emptyIconWrap}>
+              <Ionicons name="map-outline" size={48} color={colors.primary} />
+            </View>
+            <Text style={styles.emptyTitle}>
+              아직 등록된 여행 일정이 없습니다
+            </Text>
+            <Text style={styles.emptyDesc}>
+              {
+                '새로운 여행 계획을 직접 만들어 보거나,\n친구에게 전달받은 초대 코드를 입력해 동행에 참여하세요!'
+              }
+            </Text>
+
+            <View style={styles.emptyBtnGroup}>
+              <TouchableOpacity
+                style={styles.emptyPrimaryBtn}
+                onPress={() => setIsCreateModalOpen(true)}
+                activeOpacity={0.85}
+              >
+                <Ionicons
+                  name="add-circle-outline"
+                  size={18}
+                  color={colors.textLight}
+                />
+                <Text style={styles.emptyPrimaryBtnText}>
+                  + 첫 번째 여행 계획 만들기
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.emptySubBtn}
+                onPress={() => setIsJoinModalOpen(true)}
+                activeOpacity={0.85}
+              >
+                <Ionicons
+                  name="key-outline"
+                  size={16}
+                  color={colors.secondary}
+                />
+                <Text style={styles.emptySubBtnText}>초대 코드로 참여하기</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : (
+          // 등록된 여행 카드 목록
+          <View style={styles.tripList}>
+            {trips.map((trip) => {
+              const badge = getTripStatusBadge(trip.status);
+              const dday = calculateDDay(trip.startDate);
+
               return (
                 <TouchableOpacity
-                  key={st}
-                  style={[
-                    styles.filterChip,
-                    isSelected && styles.filterChipActive,
-                  ]}
-                  onPress={() => setFilterStatus(st)}
+                  key={trip.id}
+                  style={styles.tripCard}
+                  onPress={() => handleSelectTrip(trip)}
+                  activeOpacity={0.85}
                 >
-                  <Text
+                  {/* 좌측 테마 컬러 바 */}
+                  <View
                     style={[
-                      styles.filterChipText,
-                      isSelected && styles.filterChipTextActive,
+                      styles.cardColorBar,
+                      { backgroundColor: trip.coverColor || colors.primary },
                     ]}
-                  >
-                    {label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            },
-          )}
-        </View>
-
-        {/* 여행 카드 목록 슬라이드 */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.tripScroll}
-        >
-          {filteredTrips.map((trip) => {
-            const isSelected = trip.id === selectedTrip?.id;
-            const badge = getStatusBadge(trip.status);
-            return (
-              <TouchableOpacity
-                key={trip.id}
-                style={[styles.tripCard, isSelected && styles.tripCardSelected]}
-                onPress={() => setSelectedTripId(trip.id)}
-              >
-                <View style={styles.tripCardTop}>
-                  <Text style={styles.tripLocation}>
-                    📍 {trip.country} · {trip.city}
-                  </Text>
-                  <View style={[styles.badge, { backgroundColor: badge.bg }]}>
-                    <Text style={[styles.badgeText, { color: badge.text }]}>
-                      {badge.label}
-                    </Text>
-                  </View>
-                </View>
-                <Text style={styles.tripTitle} numberOfLines={1}>
-                  {trip.title}
-                </Text>
-                <Text style={styles.tripDates}>
-                  🗓️ {trip.startDate} ~ {trip.endDate}
-                </Text>
-
-                {/* 여행 상세 허브 열기 바로가기 버튼 */}
-                <TouchableOpacity
-                  style={styles.openHubBtn}
-                  onPress={() => navigateToTripDetail(trip.id)}
-                >
-                  <Text style={styles.openHubBtnText}>통합 허브 열기</Text>
-                  <Ionicons
-                    name="arrow-forward"
-                    size={14}
-                    color={colors.accent}
                   />
-                </TouchableOpacity>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
 
-        {/* 선택된 여행 상세 및 일정 섹션 */}
-        {selectedTrip && (
-          <View style={styles.itinerarySection}>
-            {/* 기획서 v0.3 기반 5대 허브 진입 배너 */}
-            <TouchableOpacity
-              style={styles.hubBanner}
-              onPress={() => navigateToTripDetail(selectedTrip.id)}
-            >
-              <View style={styles.hubBannerLeft}>
-                <Ionicons name="sparkles" size={20} color={colors.textLight} />
-                <View>
-                  <Text style={styles.hubBannerTitle}>
-                    {selectedTrip.title} 통합 허브
-                  </Text>
-                  <Text style={styles.hubBannerSub}>
-                    일정 · 지도 동선 · 가계부 · 준비물 · 멤버 관리
-                  </Text>
-                </View>
-              </View>
-              <Ionicons
-                name="chevron-forward"
-                size={20}
-                color={colors.textLight}
-              />
-            </TouchableOpacity>
-
-            <View style={styles.itineraryHeader}>
-              <View>
-                <Text style={styles.itinerarySubtitle}>
-                  {selectedTrip.city} 여행 코스
-                </Text>
-                <Text style={styles.itineraryTitle}>
-                  날짜별 계획 ({currentItinerary.length}개 장소)
-                </Text>
-              </View>
-              <TouchableOpacity
-                style={styles.addPlaceBtn}
-                onPress={() => setIsPlaceModalOpen(true)}
-              >
-                <Ionicons name="add-circle" size={18} color={colors.accent} />
-                <Text style={styles.addPlaceBtnText}>장소 등록</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* 일정 장소 목록 */}
-            <View style={styles.itineraryList}>
-              {currentItinerary.length === 0 ? (
-                <View style={styles.emptyCard}>
-                  <Ionicons
-                    name="map-outline"
-                    size={36}
-                    color={colors.mutedLight}
-                  />
-                  <Text style={styles.emptyCardTitle}>
-                    등록된 일정이 없습니다.
-                  </Text>
-                  <Text style={styles.emptyCardSub}>
-                    숙소, 식당, 관광지를 직접 추가해 보세요!
-                  </Text>
-                </View>
-              ) : (
-                currentItinerary.map((item, idx) => {
-                  const catBadge = getCategoryBadge(
-                    item.place?.category || 'sightseeing',
-                  );
-                  return (
-                    <View key={item.id} style={styles.itineraryItem}>
-                      <View style={styles.timeColumn}>
-                        <Text style={styles.timeText}>
-                          {item.timeSlot || '시간 미정'}
-                        </Text>
-                        <View style={styles.timelineBar} />
-                      </View>
-                      <View style={styles.placeCard}>
-                        <View style={styles.placeCardHeader}>
-                          <View
+                  <View style={styles.cardMain}>
+                    {/* 상단 상태 배지 및 D-Day */}
+                    <View style={styles.cardHeaderRow}>
+                      <View style={styles.badgeRow}>
+                        <View
+                          style={[
+                            styles.statusBadge,
+                            { backgroundColor: badge.bg },
+                          ]}
+                        >
+                          <Text
                             style={[
-                              styles.badge,
-                              { backgroundColor: catBadge.bg },
+                              styles.statusBadgeText,
+                              { color: badge.text },
                             ]}
                           >
-                            <Text
-                              style={[
-                                styles.badgeText,
-                                { color: catBadge.text },
-                              ]}
-                            >
-                              {catBadge.label}
-                            </Text>
-                          </View>
-                          <TouchableOpacity
-                            style={styles.checkInBtn}
-                            onPress={() => handleCheckIn(item)}
-                          >
-                            <Ionicons
-                              name="location-outline"
-                              size={14}
-                              color={colors.accent}
-                            />
-                            <Text style={styles.checkInBtnText}>체크인</Text>
-                          </TouchableOpacity>
-                        </View>
-                        <Text style={styles.placeName}>
-                          {idx + 1}. {item.place?.name}
-                        </Text>
-                        {item.place?.address && (
-                          <Text style={styles.placeAddress}>
-                            {item.place.address}
+                            {badge.label}
                           </Text>
-                        )}
-                        {item.memo ? (
-                          <Text style={styles.placeMemo}>💡 {item.memo}</Text>
-                        ) : null}
+                        </View>
+                        <View style={styles.ddayBadge}>
+                          <Text style={styles.ddayBadgeText}>{dday}</Text>
+                        </View>
+                      </View>
+
+                      {/* 삭제 버튼 */}
+                      <TouchableOpacity
+                        style={styles.deleteIconBtn}
+                        onPress={() => handleDeleteTrip(trip)}
+                      >
+                        <Ionicons
+                          name="trash-outline"
+                          size={16}
+                          color={colors.mutedLight}
+                        />
+                      </TouchableOpacity>
+                    </View>
+
+                    {/* 여행 제목 */}
+                    <Text style={styles.cardTitle} numberOfLines={1}>
+                      {trip.title}
+                    </Text>
+
+                    {/* 여행지 및 기간 */}
+                    <View style={styles.cardMetaRow}>
+                      <View style={styles.metaItem}>
+                        <Ionicons
+                          name="location-outline"
+                          size={14}
+                          color={colors.muted}
+                        />
+                        <Text style={styles.metaText}>
+                          {trip.country} · {trip.city}
+                        </Text>
+                      </View>
+                      <View style={styles.metaItem}>
+                        <Ionicons
+                          name="calendar-outline"
+                          size={14}
+                          color={colors.muted}
+                        />
+                        <Text style={styles.metaText}>
+                          {trip.startDate} ~ {trip.endDate}
+                        </Text>
                       </View>
                     </View>
-                  );
-                })
-              )}
-            </View>
 
-            {/* 상태 변경 퀵 버튼 */}
-            <View style={styles.statusChangeRow}>
-              <Text style={styles.statusChangeLabel}>여행 상태 변경:</Text>
-              <TouchableOpacity
-                style={[
-                  styles.statusButton,
-                  selectedTrip.status === 'IN_PROGRESS' &&
-                    styles.statusButtonActive,
-                ]}
-                onPress={() => updateTripStatus(selectedTrip.id, 'IN_PROGRESS')}
-              >
-                <Text style={styles.statusButtonText}>여행 시작</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.statusButton,
-                  selectedTrip.status === 'COMPLETED' &&
-                    styles.statusButtonActive,
-                ]}
-                onPress={() => updateTripStatus(selectedTrip.id, 'COMPLETED')}
-              >
-                <Text style={styles.statusButtonText}>
-                  여행 완료 (발자국 전환)
-                </Text>
-              </TouchableOpacity>
-            </View>
+                    {/* 하단 초대 코드 안내 */}
+                    <View style={styles.cardFooterRow}>
+                      <View style={styles.inviteBadge}>
+                        <Ionicons
+                          name="key-outline"
+                          size={12}
+                          color={colors.muted}
+                        />
+                        <Text style={styles.inviteBadgeText}>
+                          초대 코드: {trip.inviteCode || '미발급'}
+                        </Text>
+                      </View>
+                      <View style={styles.detailLink}>
+                        <Text style={styles.detailLinkText}>일정 보기</Text>
+                        <Ionicons
+                          name="chevron-forward"
+                          size={14}
+                          color={colors.primary}
+                        />
+                      </View>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         )}
       </ScrollView>
 
-      {/* 여행 생성 모달 */}
-      <Modal visible={isTripModalOpen} animationType="slide" transparent>
+      {/* 새 여행 만들기 모달 */}
+      <Modal
+        visible={isCreateModalOpen}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setIsCreateModalOpen(false)}
+      >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+          <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>새 여행 생성</Text>
-              <TouchableOpacity onPress={() => setIsTripModalOpen(false)}>
-                <Ionicons name="close" size={24} color={colors.text} />
+              <Text style={styles.modalTitle}>새 여행 만들기</Text>
+              <TouchableOpacity
+                onPress={() => setIsCreateModalOpen(false)}
+                style={styles.modalCloseBtn}
+              >
+                <Ionicons name="close" size={20} color={colors.text} />
               </TouchableOpacity>
             </View>
-            <TextInput
-              style={styles.input}
-              placeholder="여행 제목 (예: 도쿄 미식 탐방)"
-              value={formTitle}
-              onChangeText={setFormTitle}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="국가 (예: 대한민국, 일본)"
-              value={formCountry}
-              onChangeText={setFormCountry}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="도시 (예: 서울, 도쿄, 제주)"
-              value={formCity}
-              onChangeText={setFormCity}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="시작일 (YYYY-MM-DD)"
-              value={formStartDate}
-              onChangeText={setFormStartDate}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="종료일 (YYYY-MM-DD)"
-              value={formEndDate}
-              onChangeText={setFormEndDate}
-            />
-            <TouchableOpacity
-              style={styles.submitBtn}
-              onPress={handleCreateTrip}
+
+            <ScrollView
+              contentContainerStyle={styles.modalForm}
+              showsVerticalScrollIndicator={false}
             >
-              <Text style={styles.submitBtnText}>여행 생성하기</Text>
-            </TouchableOpacity>
+              {/* 여행 제목 */}
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>여행 제목 *</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="예: 와카야마 힐링 투어, 오사카 3박 4일"
+                  placeholderTextColor={colors.mutedLight}
+                  value={titleInput}
+                  onChangeText={setTitleInput}
+                />
+              </View>
+
+              {/* 여행 국가 & 도시 */}
+              <View style={styles.twoColumnRow}>
+                <View style={[styles.fieldGroup, { flex: 1 }]}>
+                  <Text style={styles.fieldLabel}>국가</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    placeholder="예: 일본"
+                    placeholderTextColor={colors.mutedLight}
+                    value={countryInput}
+                    onChangeText={setCountryInput}
+                  />
+                </View>
+                <View style={[styles.fieldGroup, { flex: 1 }]}>
+                  <Text style={styles.fieldLabel}>대표 도시</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    placeholder="예: 와카야마"
+                    placeholderTextColor={colors.mutedLight}
+                    value={cityInput}
+                    onChangeText={setCityInput}
+                  />
+                </View>
+              </View>
+
+              {/* 시작일 & 종료일 */}
+              <View style={styles.twoColumnRow}>
+                <View style={[styles.fieldGroup, { flex: 1 }]}>
+                  <Text style={styles.fieldLabel}>시작일 (YYYY-MM-DD)</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    placeholder="2026-10-03"
+                    placeholderTextColor={colors.mutedLight}
+                    value={startDateInput}
+                    onChangeText={setStartDateInput}
+                  />
+                </View>
+                <View style={[styles.fieldGroup, { flex: 1 }]}>
+                  <Text style={styles.fieldLabel}>종료일 (YYYY-MM-DD)</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    placeholder="2026-10-08"
+                    placeholderTextColor={colors.mutedLight}
+                    value={endDateInput}
+                    onChangeText={setEndDateInput}
+                  />
+                </View>
+              </View>
+
+              {/* 테마 색상 선택 */}
+              <View style={styles.fieldGroup}>
+                <Text style={styles.fieldLabel}>테마 대표 색상</Text>
+                <View style={styles.colorPaletteRow}>
+                  {coverColorOptions.map((item) => {
+                    const isSelected = selectedColor === item.color;
+                    return (
+                      <TouchableOpacity
+                        key={item.color}
+                        style={[
+                          styles.colorCircle,
+                          { backgroundColor: item.color },
+                          isSelected && styles.colorCircleActive,
+                        ]}
+                        onPress={() => setSelectedColor(item.color)}
+                      >
+                        {isSelected && (
+                          <Ionicons
+                            name="checkmark"
+                            size={16}
+                            color={colors.textLight}
+                          />
+                        )}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            </ScrollView>
+
+            {/* 모달 하단 버튼 */}
+            <View style={styles.modalFooter}>
+              <TouchableOpacity
+                style={styles.confirmSubmitBtn}
+                onPress={handleConfirmCreateTrip}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.confirmSubmitBtnText}>
+                  여행 생성하고 일정 짜기
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
 
-      {/* 장소 등록 모달 */}
-      <Modal visible={isPlaceModalOpen} animationType="slide" transparent>
+      {/* 초대 코드 참여 모달 */}
+      <Modal
+        visible={isJoinModalOpen}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setIsJoinModalOpen(false)}
+      >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+          <View style={styles.modalCardSmall}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>일정에 장소 등록</Text>
-              <TouchableOpacity onPress={() => setIsPlaceModalOpen(false)}>
-                <Ionicons name="close" size={24} color={colors.text} />
+              <Text style={styles.modalTitle}>초대 코드로 참여</Text>
+              <TouchableOpacity
+                onPress={() => setIsJoinModalOpen(false)}
+                style={styles.modalCloseBtn}
+              >
+                <Ionicons name="close" size={20} color={colors.text} />
               </TouchableOpacity>
             </View>
-            {/* 카테고리 선택 */}
-            <View style={styles.catRow}>
-              {(
-                ['sightseeing', 'food', 'cafe', 'stay', 'activity'] as const
-              ).map((cat) => (
-                <TouchableOpacity
-                  key={cat}
-                  style={[
-                    styles.catChip,
-                    placeCategory === cat && styles.catChipActive,
-                  ]}
-                  onPress={() => setPlaceCategory(cat)}
-                >
-                  <Text
-                    style={[
-                      styles.catChipText,
-                      placeCategory === cat && styles.catChipTextActive,
-                    ]}
-                  >
-                    {cat === 'sightseeing'
-                      ? '관광지'
-                      : cat === 'food'
-                        ? '식당'
-                        : cat === 'cafe'
-                          ? '카페'
-                          : cat === 'stay'
-                            ? '숙소'
-                            : '액티비티'}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+
+            <View style={styles.joinModalBody}>
+              <Text style={styles.joinDesc}>
+                친구에게 전달받은 6자리 초대 코드를 입력하면 해당 여행의 동행
+                멤버로 참여할 수 있습니다.
+              </Text>
+
+              <TextInput
+                style={styles.joinInput}
+                placeholder="예: 7X9B2K"
+                placeholderTextColor={colors.mutedLight}
+                autoCapitalize="characters"
+                maxLength={10}
+                value={inviteCodeInput}
+                onChangeText={setInviteCodeInput}
+              />
+
+              <TouchableOpacity
+                style={styles.joinConfirmBtn}
+                onPress={handleConfirmJoinTrip}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.joinConfirmBtnText}>참여하기</Text>
+              </TouchableOpacity>
             </View>
-            <TextInput
-              style={styles.input}
-              placeholder="장소명 (예: 오사카성, 안목해변)"
-              value={placeName}
-              onChangeText={setPlaceName}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="방문 예정 시간 (HH:MM)"
-              value={placeTime}
-              onChangeText={setPlaceTime}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="메모 (예: 사전 예약 필수, 주차 가능)"
-              value={placeMemo}
-              onChangeText={setPlaceMemo}
-            />
-            <TouchableOpacity style={styles.submitBtn} onPress={handleAddPlace}>
-              <Text style={styles.submitBtnText}>일정에 추가</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -575,232 +577,376 @@ export default function MyTripsScreen() {
   );
 }
 
-// 화면 스타일을 정의한다.
+// [내 여행] 화면의 스타일을 정의한다.
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.background },
-  scrollContent: { paddingHorizontal: 20, paddingVertical: 16, gap: 18 },
-  header: {
+  screen: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  topHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 14,
+    backgroundColor: colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
   },
-  brand: {
-    fontSize: 12,
-    fontWeight: '800',
-    letterSpacing: 2,
-    color: colors.accent,
+  headerTitleWrap: {
+    gap: 2,
   },
-  headerTitle: {
-    fontSize: 24,
+  pageTitle: {
+    fontSize: 22,
     fontWeight: '800',
     color: colors.text,
-    marginTop: 2,
   },
-  createButton: {
+  pageSubtitle: {
+    fontSize: 12,
+    color: colors.muted,
+  },
+  headerBtnRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.accent,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 18,
-    gap: 4,
-  },
-  createButtonText: {
-    color: colors.textLight,
-    fontWeight: '700',
-    fontSize: 13,
-  },
-  filterRow: { flexDirection: 'row', gap: 8 },
-  filterChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 14,
-    backgroundColor: colors.surface,
-    borderColor: colors.border,
-    borderWidth: 1,
-  },
-  filterChipActive: {
-    backgroundColor: colors.accent,
-    borderColor: colors.accent,
-  },
-  filterChipText: { fontSize: 12, fontWeight: '700', color: colors.muted },
-  filterChipTextActive: { color: colors.textLight },
-  tripScroll: { marginHorizontal: -20, paddingHorizontal: 20 },
-  tripCard: {
-    width: 240,
-    backgroundColor: colors.surface,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: 18,
-    padding: 16,
-    marginRight: 12,
     gap: 8,
   },
-  tripCardSelected: {
-    borderColor: colors.accent,
-    backgroundColor: colors.accentSoft,
-  },
-  tripCardTop: {
+  joinCodeBtn: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 4,
+    backgroundColor: colors.secondarySoft,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 10,
   },
-  tripLocation: { fontSize: 13, fontWeight: '700', color: colors.text },
-  badge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
-  badgeText: { fontSize: 11, fontWeight: '700' },
-  tripTitle: { fontSize: 16, fontWeight: '800', color: colors.text },
-  tripDates: { fontSize: 12, color: colors.muted },
-  openHubBtn: {
+  joinCodeBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.secondary,
+  },
+  addTripBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: colors.primary,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+  },
+  addTripBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.textLight,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+    gap: 12,
+  },
+  emptyIconWrap: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: colors.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  emptyDesc: {
+    fontSize: 13,
+    color: colors.muted,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  emptyBtnGroup: {
+    marginTop: 16,
+    gap: 10,
+    width: '100%',
+    maxWidth: 280,
+  },
+  emptyPrimaryBtn: {
+    backgroundColor: colors.primary,
+    borderRadius: 14,
+    paddingVertical: 14,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.surface,
-    borderColor: colors.accent,
-    borderWidth: 1,
-    paddingVertical: 6,
-    borderRadius: 10,
-    gap: 4,
-    marginTop: 4,
+    gap: 6,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  openHubBtnText: { fontSize: 11, fontWeight: '700', color: colors.accent },
-  hubBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: colors.accent,
-    paddingHorizontal: 16,
+  emptyPrimaryBtnText: {
+    color: colors.textLight,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  emptySubBtn: {
+    backgroundColor: colors.secondarySoft,
+    borderRadius: 14,
     paddingVertical: 12,
-    borderRadius: 16,
-  },
-  hubBannerLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  hubBannerTitle: { fontSize: 15, fontWeight: '800', color: colors.textLight },
-  hubBannerSub: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.85)',
-    marginTop: 2,
-  },
-  itinerarySection: { gap: 14 },
-  itineraryHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  itinerarySubtitle: { fontSize: 12, color: colors.muted, fontWeight: '600' },
-  itineraryTitle: { fontSize: 17, fontWeight: '800', color: colors.text },
-  addPlaceBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  addPlaceBtnText: { fontSize: 13, fontWeight: '700', color: colors.accent },
-  itineraryList: { gap: 12 },
-  emptyCard: {
-    alignItems: 'center',
-    paddingVertical: 32,
-    backgroundColor: colors.surface,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: 16,
+    justifyContent: 'center',
     gap: 6,
   },
-  emptyCardTitle: { fontSize: 15, fontWeight: '700', color: colors.text },
-  emptyCardSub: { fontSize: 12, color: colors.muted },
-  itineraryItem: { flexDirection: 'row', gap: 12 },
-  timeColumn: { width: 44, alignItems: 'center' },
-  timeText: { fontSize: 11, fontWeight: '700', color: colors.muted },
-  timelineBar: {
-    width: 2,
-    flex: 1,
-    backgroundColor: colors.border,
-    marginVertical: 4,
+  emptySubBtnText: {
+    color: colors.secondary,
+    fontSize: 13,
+    fontWeight: '700',
   },
-  placeCard: {
-    flex: 1,
+  tripList: {
+    gap: 14,
+  },
+  tripCard: {
+    flexDirection: 'row',
     backgroundColor: colors.surface,
-    borderColor: colors.border,
-    borderWidth: 1,
     borderRadius: 16,
-    padding: 14,
-    gap: 6,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.border,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
   },
-  placeCardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  cardColorBar: {
+    width: 6,
   },
-  checkInBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: colors.accentSoft,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  checkInBtnText: { fontSize: 11, fontWeight: '700', color: colors.accent },
-  placeName: { fontSize: 15, fontWeight: '700', color: colors.text },
-  placeAddress: { fontSize: 12, color: colors.muted },
-  placeMemo: { fontSize: 12, color: colors.muted, lineHeight: 18 },
-  statusChangeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  cardMain: {
+    flex: 1,
+    padding: 16,
     gap: 8,
-    marginTop: 8,
+  },
+  cardHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  statusBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  ddayBadge: {
+    backgroundColor: colors.borderLight,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  ddayBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  deleteIconBtn: {
+    padding: 4,
+  },
+  cardTitle: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: colors.text,
+  },
+  cardMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
     flexWrap: 'wrap',
   },
-  statusChangeLabel: { fontSize: 12, color: colors.muted, fontWeight: '600' },
-  statusButton: {
-    backgroundColor: colors.surface,
-    borderColor: colors.border,
-    borderWidth: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 10,
+  metaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
-  statusButtonActive: {
-    backgroundColor: colors.accentSoft,
-    borderColor: colors.accent,
+  metaText: {
+    fontSize: 12,
+    color: colors.muted,
   },
-  statusButtonText: { fontSize: 12, fontWeight: '700', color: colors.text },
+  cardFooterRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 6,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderLight,
+    marginTop: 4,
+  },
+  inviteBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  inviteBadgeText: {
+    fontSize: 11,
+    color: colors.muted,
+  },
+  detailLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  detailLinkText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.primary,
+  },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    padding: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+    justifyContent: 'flex-end',
   },
-  modalContent: {
+  modalCard: {
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '90%',
+    paddingBottom: 24,
+  },
+  modalCardSmall: {
     backgroundColor: colors.surface,
     borderRadius: 20,
-    padding: 22,
-    gap: 12,
+    marginHorizontal: 20,
+    marginBottom: 'auto',
+    marginTop: 'auto',
+    padding: 20,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   modalHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 18,
+    paddingBottom: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
   },
-  modalTitle: { fontSize: 18, fontWeight: '800', color: colors.text },
-  catRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  catChip: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  modalCloseBtn: {
+    padding: 6,
+    borderRadius: 20,
     backgroundColor: colors.borderLight,
   },
-  catChipActive: { backgroundColor: colors.accent },
-  catChipText: { fontSize: 11, fontWeight: '700', color: colors.muted },
-  catChipTextActive: { color: colors.textLight },
-  input: {
+  modalForm: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    gap: 14,
+  },
+  fieldGroup: {
+    gap: 6,
+  },
+  fieldLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  textInput: {
+    backgroundColor: colors.background,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 12,
+    borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 10,
     fontSize: 14,
-    backgroundColor: colors.background,
+    color: colors.text,
   },
-  submitBtn: {
-    backgroundColor: colors.accent,
-    borderRadius: 14,
-    paddingVertical: 13,
+  twoColumnRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  colorPaletteRow: {
+    flexDirection: 'row',
+    gap: 12,
+    paddingTop: 4,
+  },
+  colorCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
-    marginTop: 4,
+    justifyContent: 'center',
   },
-  submitBtnText: { color: colors.textLight, fontWeight: '700', fontSize: 14 },
+  colorCircleActive: {
+    borderWidth: 3,
+    borderColor: colors.text,
+  },
+  modalFooter: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
+  },
+  confirmSubmitBtn: {
+    backgroundColor: colors.primary,
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  confirmSubmitBtnText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.textLight,
+  },
+  joinModalBody: {
+    paddingTop: 12,
+    gap: 14,
+  },
+  joinDesc: {
+    fontSize: 13,
+    color: colors.muted,
+    lineHeight: 18,
+  },
+  joinInput: {
+    backgroundColor: colors.background,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 18,
+    fontWeight: '700',
+    textAlign: 'center',
+    letterSpacing: 4,
+    color: colors.text,
+  },
+  joinConfirmBtn: {
+    backgroundColor: colors.secondary,
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  joinConfirmBtnText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.textLight,
+  },
 });

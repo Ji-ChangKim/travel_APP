@@ -21,11 +21,23 @@ export type MemberRole = 'owner' | 'editor' | 'viewer';
 // 방문 인증 수단을 구분한다.
 export type VerificationMethod = 'gps' | 'manual' | 'receipt';
 
+// 사용자 접속 OS 플랫폼을 구분한다.
+export type OsPlatform = 'android' | 'ios' | 'web';
+
+// 사용자 인증 제공자 유형을 구분한다.
+export type AuthProvider = 'google' | 'kakao' | 'apple' | 'guest';
+
 // 사용자 기본 프로필 정보를 정의한다.
 export interface Profile {
   id: string;
   nickname: string;
   avatarUrl?: string | null;
+  bio?: string | null;
+  travelStyles?: string[];
+  phone?: string | null;
+  osPlatform?: OsPlatform;
+  authProvider?: AuthProvider;
+  lastSignInAt?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -53,6 +65,7 @@ export interface Trip {
   endDate: string;
   status: TripStatus;
   coverColor: string;
+  inviteCode?: string; // 6~8자리 초대 코드
   createdAt: string;
   updatedAt: string;
 }
@@ -91,6 +104,9 @@ export interface ItineraryItem {
   estimatedCost?: number | null;
   actualCost?: number | null;
   memo?: string | null;
+  transitInfo?: string | null; // 이동 수단 및 소요시간 안내
+  isCompleted?: boolean; // 체크인/방문 완료 여부
+  imageUrl?: string | null; // 장소 사진 URL
   createdAt: string;
   place?: Place;
 }

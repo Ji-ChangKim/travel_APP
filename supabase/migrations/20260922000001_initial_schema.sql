@@ -1,22 +1,39 @@
 -- ==============================================================================
 -- travel_APP (wherego) 초기 데이터베이스 스키마 마이그레이션
 -- 11개 핵심 테이블 및 RLS(Row Level Security), 인덱스 정의
+-- (재실행 가능하도록 IF NOT EXISTS 및 EXCEPTION 블록 적용)
 -- ==============================================================================
 
 -- 1. UUID 확장 기능 활성화
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- 2. 여행 상태 Enum 정의
-CREATE TYPE trip_status AS ENUM ('DRAFT', 'PLANNED', 'IN_PROGRESS', 'COMPLETED', 'ARCHIVED');
+-- 2. 여행 상태 Enum 정의 (중복 생성 방지)
+DO $$ BEGIN
+  CREATE TYPE trip_status AS ENUM ('DRAFT', 'PLANNED', 'IN_PROGRESS', 'COMPLETED', 'ARCHIVED');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
 
--- 3. 장소 카테고리 Enum 정의
-CREATE TYPE place_category AS ENUM ('stay', 'food', 'cafe', 'sightseeing', 'activity', 'etc');
+-- 3. 장소 카테고리 Enum 정의 (중복 생성 방지)
+DO $$ BEGIN
+  CREATE TYPE place_category AS ENUM ('stay', 'food', 'cafe', 'sightseeing', 'activity', 'etc');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
 
--- 4. 동행자 권한 Enum 정의
-CREATE TYPE member_role AS ENUM ('owner', 'editor', 'viewer');
+-- 4. 동행자 권한 Enum 정의 (중복 생성 방지)
+DO $$ BEGIN
+  CREATE TYPE member_role AS ENUM ('owner', 'editor', 'viewer');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
 
--- 5. 방문 인증 방식 Enum 정의
-CREATE TYPE verification_method AS ENUM ('gps', 'manual', 'receipt');
+-- 5. 방문 인증 방식 Enum 정의 (중복 생성 방지)
+DO $$ BEGIN
+  CREATE TYPE verification_method AS ENUM ('gps', 'manual', 'receipt');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
 
 -- ==============================================================================
 -- 테이블 생성
@@ -173,16 +190,37 @@ ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE receipts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE attachments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE share_links ENABLE ROW LEVEL SECURITY;
+ALTER TABLE places ENABLE ROW LEVEL SECURITY;
 
--- 프로필: 모든 사용자가 읽기 가능, 본인만 수정 가능
+-- 장소: 누구나 조회 가능, 인증된 사용자는 등록 가능
+DROP POLICY IF EXISTS "Places are viewable by everyone" ON places;
+CREATE POLICY "Places are viewable by everyone" ON places FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Authenticated users can insert places" ON places;
+CREATE POLICY "Authenticated users can insert places" ON places FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+-- 프로필: 모든 사용자가 읽기 가능, 본인만 수정/삽입 가능
+DROP POLICY IF EXISTS "Public profiles are viewable by everyone" ON profiles;
 CREATE POLICY "Public profiles are viewable by everyone" ON profiles FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Users can insert own profile" ON profiles;
+CREATE POLICY "Users can insert own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
+
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
 CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
 
 -- 여행: 소유자 또는 동행자 멤버만 조회 및 작성 가능
+DROP POLICY IF EXISTS "Users can view own trips and shared trips" ON trips;
 CREATE POLICY "Users can view own trips and shared trips" ON trips FOR SELECT USING (
   auth.uid() = user_id OR
   EXISTS (SELECT 1 FROM trip_members WHERE trip_members.trip_id = trips.id AND trip_members.user_id = auth.uid())
 );
+
+DROP POLICY IF EXISTS "Users can insert own trips" ON trips;
 CREATE POLICY "Users can insert own trips" ON trips FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Owners can update trips" ON trips;
 CREATE POLICY "Owners can update trips" ON trips FOR UPDATE USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Owners can delete trips" ON trips;
 CREATE POLICY "Owners can delete trips" ON trips FOR DELETE USING (auth.uid() = user_id);
