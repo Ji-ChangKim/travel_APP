@@ -41,6 +41,13 @@ const config: ExpoConfig = {
       },
     ],
   ],
+  // EAS 클라우드 빌드 계정 및 프로젝트 식별자를 설정한다.
+  owner: 'rupang',
+  extra: {
+    eas: {
+      projectId: '3b23b462-262c-4b64-aff2-5fb03280e6b5',
+    },
+  },
   experiments: {
     typedRoutes: true,
   },
