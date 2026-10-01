@@ -195,7 +195,7 @@ export default function MyScreen() {
         style: 'destructive',
         onPress: () => {
           logout();
-          router.replace('/');
+          router.replace('/login');
         },
       },
     ]);
