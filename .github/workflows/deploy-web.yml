@@ -36,7 +36,7 @@ jobs:
       - name: Pages 아티팩트 업로드
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: apps/mobile/dist
 
       - name: GitHub Pages 배포
         id: deployment
