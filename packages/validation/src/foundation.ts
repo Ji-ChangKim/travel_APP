@@ -41,6 +41,25 @@ export const persistedTripCreateSchema = z
     city: z.string().trim().min(1).max(50),
     startDate: calendarDateSchema,
     endDate: calendarDateSchema,
+    flight: z
+      .object({
+        number: z
+          .string()
+          .trim()
+          .regex(/^[A-Z0-9]{2,3}[0-9]{1,4}[A-Z]?$/),
+        departure: z.string().regex(/^[A-Z]{3}$/),
+        arrival: z.string().regex(/^[A-Z]{3}$/),
+        time: z
+          .string()
+          .regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)
+          .or(z.literal('')),
+      })
+      .strict()
+      .refine((flight) => {
+        // 같은 출발·도착 공항은 항공편으로 등록하지 않는다.
+        return flight.departure !== flight.arrival;
+      })
+      .optional(),
     timezone: z
       .string()
       .max(100)

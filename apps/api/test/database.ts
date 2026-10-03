@@ -168,7 +168,14 @@ export const tripInput = {
 export function createTrip(
   db: PGlite,
   key: string = crypto.randomUUID(),
-  input = tripInput,
+  input: typeof tripInput & {
+    flight?: {
+      number: string;
+      departure: string;
+      arrival: string;
+      time: string;
+    };
+  } = tripInput,
   user = accounts.owner,
 ): Promise<CreatedTrip> {
   // API와 동일한 SQL 명령을 사용한다.

@@ -4,6 +4,8 @@
 
 ## 로컬에서 확인한 준비
 
+이번 피드백 버전에는 네이티브 시스템 바·날짜 선택기가 추가되었다. 새 APK 재빌드, `20261003000002_flight_onboarding.sql` 적용, 최신 API 배포가 필요하다. 앱 내 장소 검색에는 별도 `GEOAPIFY_API_KEY` 서버 설정이 필요하다. [피드백 반영 및 실기기 체크](TEST_FEEDBACK_20261003.md)
+
 - [x] SDK 57 권장 패치 4개를 루트·모바일 워크스페이스에 적용.
 - [x] preview 내부 APK 프로필과 preview 환경 설정.
 - [x] preview 빌드 번호 자동 증가, EAS의 개발 .env 로딩 제외.

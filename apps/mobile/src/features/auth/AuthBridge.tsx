@@ -7,6 +7,13 @@ import { supabase } from '@/services/supabase';
 import { useTripStore } from '@/stores/useTripStore';
 import { profileFromAuth } from './model';
 import { clearSocialExchange } from './oauth';
+import { create } from 'zustand';
+
+// 초기 서버 세션 복원과 로그아웃 상태를 구분한다.
+export const useAuthReady = create<{ ready: boolean }>(() => {
+  // SDK 초기 인증 이벤트 전에는 탭에서 인증 결정을 보류한다.
+  return { ready: false };
+});
 
 // 모바일이 활성 상태일 때만 토큰 자동 갱신을 실행한다.
 function refreshForState(state: string): void {
@@ -25,6 +32,8 @@ export default function AuthBridge() {
   useEffect(() => {
     // Auth 콜백에서는 다른 비동기 Auth 메서드를 호출하지 않는다.
     const applySession = (_event: string, session: Session | null) => {
+      // 초기 세션 확인이 끝나야 보호된 화면 진입을 결정한다.
+      useAuthReady.setState({ ready: true });
       // 로그아웃 후에는 같은 코드의 완료 결과도 재사용하지 않는다.
       if (_event === 'SIGNED_OUT') clearSocialExchange();
       // 같은 계정의 토큰 갱신은 여행 데이터를 지우지 않는다.

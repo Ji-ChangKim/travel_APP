@@ -227,7 +227,23 @@ function WorkspaceContent() {
         return;
       }
       const input = persistedTripCreateSchema.parse({
-        ...form.values,
+        title: form.values.title,
+        country: form.values.country,
+        city: form.values.city,
+        startDate: form.values.startDate,
+        endDate: form.values.endDate,
+        timezone: form.values.timezone,
+        defaultCurrency: form.values.defaultCurrency,
+        ...(form.values.flightSkipped === 'true'
+          ? {}
+          : {
+              flight: {
+                number: form.values.flightNumber,
+                departure: form.values.flightDeparture,
+                arrival: form.values.flightArrival,
+                time: form.values.flightTime || '',
+              },
+            }),
         coverColor: '#246A54',
       });
       const key = form.id;
@@ -496,7 +512,7 @@ function WorkspaceContent() {
             {!id && (
               <>
                 <Action
-                  label="새 여행 만들기"
+                  label="항공편 등록하고 새 여행 만들기"
                   disabled={busy || scanning || hasPending}
                   onPress={() => {
                     // 필수 날짜·지역·시간대를 사용자가 작성한다.
@@ -511,6 +527,11 @@ function WorkspaceContent() {
                         endDate: '',
                         timezone: 'Asia/Seoul',
                         defaultCurrency: 'KRW',
+                        flightNumber: '',
+                        flightDeparture: 'ICN',
+                        flightArrival: '',
+                        flightTime: '',
+                        flightSkipped: 'false',
                       },
                     });
                   }}
@@ -1025,6 +1046,10 @@ function WorkspaceContent() {
         {busy && <Text>요청을 확인하고 있습니다…</Text>}
       </ScrollView>
       <PlanEditor
+        onReceipt={(camera) => {
+          // 팝업을 닫지 않아 취소 시 입력을 유지하고 업로드 성공 시 영수증 확인으로 전환한다.
+          photo('receipt', camera);
+        }}
         userId={userId}
         form={form}
         snapshot={snapshot}

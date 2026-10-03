@@ -16,6 +16,8 @@ export interface PersistedTripInput {
   timezone: string;
   defaultCurrency?: SupportedCurrency;
   coverColor?: string;
+  // 사용자 확인 항공편이며 운항 조회 또는 예약 인증 결과가 아니다.
+  flight?: { number: string; departure: string; arrival: string; time: string };
 }
 
 // 서버가 확정한 여행과 집계 버전을 정의한다.

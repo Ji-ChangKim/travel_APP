@@ -32,7 +32,10 @@ function readChunks(
   });
 }
 // 외부 응답을 bounded reader로 연결한다.
-function readBounded(response: Response, limit: number): Promise<Uint8Array> {
+export function readBounded(
+  response: Response,
+  limit: number,
+): Promise<Uint8Array> {
   // 실패 응답 본문과 공급자 오류 메시지는 사용자에게 노출하지 않는다.
   return !response.ok || !response.body
     ? Promise.reject(new Error('외부 응답 실패'))

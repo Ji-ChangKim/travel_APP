@@ -18,7 +18,7 @@ async function fields(
 ): Promise<void> {
   // React 상태를 주입하지 않고 사용자 입력만 사용한다.
   for (const [label, value] of Object.entries(values))
-    await page.getByRole('textbox', { name: label, exact: true }).fill(value);
+    await page.getByLabel(label, { exact: true }).fill(value);
 }
 // 외부 Auth·API·Storage 응답만 격리된 브라우저에 주입한다.
 async function network(
@@ -161,6 +161,13 @@ async function network(
         { trip: snapshot.trip, days: snapshot.days, tripVersion: 1 },
         201,
       );
+      return;
+    }
+    if (path === '/api/v1/places/search') {
+      // 외부 지도 결과만 대체하고 선택·저장 동작은 실제 팝업을 사용한다.
+      await respond(route, [
+        { id: 'fixture-place', title: '도쿄 식당', address: '도쿄' },
+      ]);
       return;
     }
     if (path === '/api/v1/trips') {
@@ -354,7 +361,10 @@ async function login(page: Page): Promise<void> {
   await page.goto('/login');
   await page.getByText('Google 계정으로 계속하기', { exact: true }).click();
   await expect(
-    page.getByRole('button', { name: '새 여행 만들기', exact: true }),
+    page.getByRole('button', {
+      name: '항공편 등록하고 새 여행 만들기',
+      exact: true,
+    }),
   ).toBeVisible();
 }
 // 서버 저장·응답 유실 복구·파일 선택·수동 OCR 확인·공개를 사용자 흐름으로 검증한다.
@@ -365,16 +375,23 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
   await network(page, true);
   await login(page);
   await page
-    .getByRole('button', { name: '새 여행 만들기', exact: true })
+    .getByRole('button', {
+      name: '항공편 등록하고 새 여행 만들기',
+      exact: true,
+    })
     .click();
   await fields(page, {
-    제목: '검증 여행',
-    국가: '일본',
-    '도시·지역': '도쿄',
+    '여행 타이틀 (비우면 자동 생성)': '검증 여행',
+    '나라 검색': '일본',
+    '도시 검색': '도쿄',
     출발일: '2026-11-10',
     종료일: '2026-11-10',
     '현지 시간대': 'Asia/Tokyo',
   });
+  // 항공편 없는 여행의 명시적 건너뛰기도 유지한다.
+  await page
+    .getByRole('button', { name: '항공편 없이 여행 만들기', exact: true })
+    .click();
   await page
     .getByRole('button', { name: '확인하고 저장', exact: true })
     .click();
@@ -382,6 +399,18 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
     page.getByText('DAY 1 · 2026-11-10', { exact: true }),
   ).toBeVisible();
   await page.getByRole('button', { name: '일정 추가', exact: true }).click();
+  // 수동 제목 작성 전에 지도 검색 결과로 입력을 채운다.
+  await page.getByLabel('장소 검색어', { exact: true }).fill('식당');
+  await page.getByRole('button', { name: '지도 검색', exact: true }).click();
+  await page
+    .getByRole('button', { name: '선택: 도쿄 식당', exact: true })
+    .click();
+  await expect(page.getByLabel('제목', { exact: true })).toHaveValue(
+    '도쿄 식당',
+  );
+  await expect(page.getByLabel('지역명·주소', { exact: true })).toHaveValue(
+    '도쿄',
+  );
   await fields(page, {
     제목: '도쿄 식당',
     '일정 시간 (HH:mm)': '12:30',
@@ -471,6 +500,66 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
   });
 });
 // 링크 복귀는 로그인 전후 토큰을 유지하되 자동 수락하지 않는다.
+test('인증되지 않은 앱 탭 진입은 로그인 화면으로 이동한다', async ({
+  page,
+}) => {
+  // 초기 SDK 세션 확인 이후 로그인하지 않은 사용자는 탭을 보지 못한다.
+  await network(page);
+  await page.goto('/footprints');
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(
+    page.getByText('Google 계정으로 계속하기', { exact: true }),
+  ).toBeVisible();
+});
+
+test('항공편 등록에서 도착 나라·도시를 채우고 달력 날짜와 함께 저장 요청한다', async ({
+  page,
+}) => {
+  // 항공편·공항 선택과 여행 생성 계약을 실제 화면에서 검증한다.
+  await network(page);
+  await login(page);
+  await page
+    .getByRole('button', {
+      name: '항공편 등록하고 새 여행 만들기',
+      exact: true,
+    })
+    .click();
+  await page.getByLabel('항공 편명 (예: KE123)', { exact: true }).fill('ke123');
+  await page
+    .getByRole('button', { name: '간사이 (KIX)', exact: true })
+    .last()
+    .click();
+  await expect(page.getByLabel('나라 검색', { exact: true })).toHaveValue(
+    '일본',
+  );
+  await expect(page.getByLabel('도시 검색', { exact: true })).toHaveValue(
+    '오사카',
+  );
+  await fields(page, {
+    출발일: '2026-11-10',
+    종료일: '2026-11-12',
+    '출발 시각 (선택, HH:mm)': '09:30',
+  });
+  const request = page.waitForRequest((candidate) => {
+    // 사용자 저장 명령이 전송한 항공편만 검사한다.
+    return (
+      candidate.url().endsWith('/api/v1/trips') && candidate.method() === 'POST'
+    );
+  });
+  await page
+    .getByRole('button', { name: '확인하고 저장', exact: true })
+    .click();
+  expect((await request).postDataJSON().flight).toEqual({
+    number: 'KE123',
+    departure: 'ICN',
+    arrival: 'KIX',
+    time: '09:30',
+  });
+  await expect(
+    page.getByText('DAY 1 · 2026-11-10', { exact: true }),
+  ).toBeVisible();
+});
+
 test('초대 링크를 로그인 과정에서 보존한다', async ({ page }) => {
   // 실제 링크·로그인 버튼·콜백만 사용한다.
   await network(page);

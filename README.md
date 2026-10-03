@@ -6,6 +6,8 @@ Expo + React Native + TypeScript를 사용해 Android, iOS, 웹에서 같은 화
 
 ## 개발 환경
 
+Android 설치 테스트의 하단 시스템 바·로그인 진입·항공편 기반 여행 생성·지도/영수증 우선 입력 변경은 [피드백 반영 및 재빌드 절차](docs/TEST_FEEDBACK_20261003.md)를 확인하세요.
+
 - Node.js 22.13 이상인 22 LTS 또는 24.3 이상인 24 LTS (`.nvmrc`: 22.17.0)
 - npm 11.5.2 기준
 - Expo SDK 57 / React Native 0.86 / React 19.2

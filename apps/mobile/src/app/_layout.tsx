@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { NavigationBar } from 'expo-navigation-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { colors } from '@/constants/theme';
@@ -29,6 +30,7 @@ export default function RootLayout() {
           }}
         />
         <StatusBar style="dark" />
+        <NavigationBar hidden />
       </SafeAreaProvider>
     </QueryClientProvider>
   );

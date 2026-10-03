@@ -4,7 +4,7 @@ import { test, expect, type Page } from '@playwright/test';
 function createContent(page: Page): Promise<void> {
   // 외부 계정이나 데이터 주입 없이 실제 폼을 사용한다.
   return page
-    .goto('/footprints')
+    .goto('/local-records')
     .then(() => {
       // 저장소 읽기가 끝나면 여행 생성을 시작한다.
       return page

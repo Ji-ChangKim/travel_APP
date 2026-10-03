@@ -3,6 +3,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import type { WorkspaceSnapshot } from '@wherego/domain';
 import { Action, Field, ServerPhoto, styles } from './ui';
 import type { PlanForm } from './forms';
+import { DateField, DestinationFields, FlightFields } from './TravelInputs';
+import PlaceSearch from './PlaceSearch';
 
 const labels: Record<string, string> = {
   title: '제목',
@@ -33,6 +35,7 @@ export default function PlanEditor({
   onSave,
   onReload,
   onClose,
+  onReceipt,
 }: {
   userId: string;
   form: PlanForm | null;
@@ -43,6 +46,7 @@ export default function PlanEditor({
   onSave: () => void;
   onReload: () => void;
   onClose: () => void;
+  onReceipt: (camera: boolean) => void;
 }) {
   // 실패해도 같은 폼 입력값과 원본을 유지한다.
   return (
@@ -74,23 +78,100 @@ export default function PlanEditor({
                   mediaId={form.values.mediaId!}
                 />
               )}
+              {form.kind === 'trip' && (
+                <>
+                  <FlightFields values={form.values} onChange={onChange} />
+                  <DestinationFields values={form.values} onChange={onChange} />
+                </>
+              )}
+              {form.kind === 'schedule' && (
+                <>
+                  <View style={styles.card}>
+                    <Text style={styles.title}>장소를 어떻게 추가할까요?</Text>
+                    <View style={styles.row}>
+                      <Action
+                        label="영수증 촬영으로 추가"
+                        disabled={busy}
+                        onPress={() => {
+                          // 등록된 영수증 인식 흐름으로 연결한다.
+                          onReceipt(true);
+                        }}
+                      />
+                      <Action
+                        label="영수증 사진으로 추가"
+                        disabled={busy}
+                        onPress={() => {
+                          // 저장된 영수증 사진을 선택한다.
+                          onReceipt(false);
+                        }}
+                      />
+                    </View>
+                  </View>
+                  <PlaceSearch
+                    key={form.id}
+                    userId={userId}
+                    city={snapshot?.trip.city || ''}
+                    disabled={busy}
+                    onSelect={(title, address) => {
+                      // 선택한 장소명과 주소를 확인 폼에 반영한다.
+                      onChange('title', title);
+                      onChange('address', address);
+                    }}
+                  />
+                </>
+              )}
               {Object.entries(form.values)
                 .filter(([key]) => {
                   // 식별자와 선택 필드는 자유 입력으로 노출하지 않는다.
-                  return Boolean(labels[key]);
+                  return (
+                    Boolean(labels[key]) &&
+                    !(
+                      form.kind === 'trip' &&
+                      ['country', 'city', 'title'].includes(key)
+                    ) &&
+                    key !== 'sortOrder'
+                  );
                 })
-                .map(([key, value]) => (
-                  <Field
-                    key={key}
-                    label={labels[key]!}
-                    value={value}
-                    multiline={['memo', 'body', 'details'].includes(key)}
-                    onChange={(next) => {
-                      // 해당 필드 하나만 변경한다.
-                      onChange(key, next);
-                    }}
-                  />
-                ))}
+                .map(([key, value]) =>
+                  [
+                    'startDate',
+                    'endDate',
+                    'transactionDate',
+                    'timeSlot',
+                  ].includes(key) ? (
+                    <DateField
+                      key={key}
+                      label={labels[key]!}
+                      value={value}
+                      mode={key === 'timeSlot' ? 'time' : 'date'}
+                      onChange={(next) => {
+                        // 달력에서 선택한 날짜만 폼에 반영한다.
+                        onChange(key, next);
+                      }}
+                    />
+                  ) : (
+                    <Field
+                      key={key}
+                      label={labels[key]!}
+                      value={value}
+                      multiline={['memo', 'body', 'details'].includes(key)}
+                      onChange={(next) => {
+                        // 해당 필드 하나만 변경한다.
+                        onChange(key, next);
+                      }}
+                    />
+                  ),
+                )}
+              {form.kind === 'trip' && (
+                <Field
+                  label="여행 타이틀 (비우면 자동 생성)"
+                  value={form.values.title || ''}
+                  onChange={(next) => {
+                    // 제목은 목적지와 날짜를 선택한 뒤 선택적으로 지정한다.
+                    onChange('title', next);
+                  }}
+                />
+              )}
               {['schedule', 'receipt'].includes(form.kind) && (
                 <View style={styles.card}>
                   <Text style={styles.title}>여행 날짜 선택</Text>
