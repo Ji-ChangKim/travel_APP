@@ -2,6 +2,8 @@
 
 2026-10-03. 목표는 **Expo EAS에서 APK를 내려받아 Android 실기기로 테스트하는 MVP**다. 스토어 심사·제출·운영 정책 완료는 이번 빌드의 선행 조건이 아니다. 이전 플랫폼 전체 체크리스트를 현재 Android 범위에 맞춰 정리했다. 자세한 절차는 [Android MVP 빌드](MVP_ANDROID_BUILD.md)를 따른다.
 
+2026-10-04 Gradle 리소스 연결 오류는 루트 네이티브 의존성 누락을 수정했다. 재빌드 전 `npm run test:release`로 실제 Android 자동 연결을 검사한다. [오류 원인과 재빌드 절차](GRADLE_FIX_20261004.md)
+
 ## 로컬에서 확인한 준비
 
 이번 피드백 버전에는 네이티브 시스템 바·날짜 선택기가 추가되었다. 새 APK 재빌드, `20261003000002_flight_onboarding.sql` 및 `20261003000003_google_places.sql` 적용, 최신 API 배포가 필요하다. 앱 내 장소 검색에는 별도 `GOOGLE_PLACES_API_KEY` 서버 설정이 필요하다. [피드백 반영 및 실기기 체크](TEST_FEEDBACK_20261003.md)
