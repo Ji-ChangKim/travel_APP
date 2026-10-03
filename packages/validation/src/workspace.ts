@@ -24,6 +24,10 @@ export const scheduleInputSchema = z
     sortOrder: z.number().int().positive().max(10000),
     memo: z.string().max(300).default(''),
     address: z.string().max(200).default(''),
+    googlePlaceId: z
+      .string()
+      .regex(/^[A-Za-z0-9_-]{1,200}$|^$/)
+      .optional(),
   })
   .strict();
 export const expenseInputSchema = z
@@ -227,6 +231,10 @@ export const workspaceSnapshotSchema = z.object({
       sortOrder: z.number(),
       memo: z.string().nullable(),
       address: z.string(),
+      googlePlaceId: z
+        .string()
+        .regex(/^[A-Za-z0-9_-]{1,200}$/)
+        .optional(),
     }),
   ),
   expenses: z.array(

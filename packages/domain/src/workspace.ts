@@ -15,6 +15,7 @@ export interface WorkspaceSchedule {
   sortOrder: number;
   memo: string | null;
   address: string;
+  googlePlaceId?: string;
 }
 export interface WorkspaceMedia {
   id: string;

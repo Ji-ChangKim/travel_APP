@@ -163,6 +163,16 @@ async function network(
       );
       return;
     }
+    if (path === '/api/v1/places/fixture-place') {
+      // 저장된 장소 ID의 표시 정보만 조회한다.
+      await respond(route, {
+        id: 'fixture-place',
+        title: '도쿄 식당',
+        address: '도쿄',
+        attributions: [],
+      });
+      return;
+    }
     if (path === '/api/v1/places/search') {
       // 외부 지도 결과만 대체하고 선택·저장 동작은 실제 팝업을 사용한다.
       await respond(route, [
@@ -405,12 +415,8 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
   await page
     .getByRole('button', { name: '선택: 도쿄 식당', exact: true })
     .click();
-  await expect(page.getByLabel('제목', { exact: true })).toHaveValue(
-    '도쿄 식당',
-  );
-  await expect(page.getByLabel('지역명·주소', { exact: true })).toHaveValue(
-    '도쿄',
-  );
+  await expect(page.getByLabel('제목', { exact: true })).toHaveValue('식당');
+  await expect(page.getByLabel('지역명·주소', { exact: true })).toHaveValue('');
   await fields(page, {
     제목: '도쿄 식당',
     '일정 시간 (HH:mm)': '12:30',

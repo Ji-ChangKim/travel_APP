@@ -472,3 +472,54 @@ test('실제 OCR 텍스트에서 상호·날짜·합계 후보를 추출한다',
     },
   );
 });
+
+// 공급자 표시 정보 없이 장소 ID 연결만 저장하고 수정·해제를 검증한다.
+test('구글 장소 ID 연결은 멱등 저장·기존 클라이언트 수정·해제를 지원한다', () => {
+  // 실제 마이그레이션과 역할 검사를 실행한다.
+  return withDatabase(async (db) => {
+    // 여행 일정과 장소 연결을 같은 명령으로 저장한다.
+    const trip = await createTrip(db);
+    const tid = trip.data.trip.id;
+    const input = schedule(crypto.randomUUID(), trip.data.days[0]!.id);
+    const key = crypto.randomUUID();
+    await command(
+      db,
+      tid,
+      'schedule.save',
+      { ...input, googlePlaceId: 'ChIJfixture' },
+      1,
+      accounts.owner,
+      key,
+    );
+    const replay = await command(
+      db,
+      tid,
+      'schedule.save',
+      { ...input, googlePlaceId: 'ChIJfixture' },
+      1,
+      accounts.owner,
+      key,
+    );
+    assert.equal(replay.replayed, true);
+    assert.equal(
+      (await snapshot(db, tid)).itinerary[0]!.googlePlaceId,
+      'ChIJfixture',
+    );
+    await command(db, tid, 'schedule.save', input, 2);
+    assert.equal(
+      (await snapshot(db, tid)).itinerary[0]!.googlePlaceId,
+      'ChIJfixture',
+    );
+    await assert.rejects(snapshot(db, tid, accounts.outsider));
+    await command(db, tid, 'schedule.save', { ...input, googlePlaceId: '' }, 3);
+    assert.equal(
+      (await snapshot(db, tid)).itinerary[0]!.googlePlaceId,
+      undefined,
+    );
+    assert.equal(
+      (await db.query('SELECT * FROM wherego_private.itinerary_google_places'))
+        .rows.length,
+      0,
+    );
+  });
+});

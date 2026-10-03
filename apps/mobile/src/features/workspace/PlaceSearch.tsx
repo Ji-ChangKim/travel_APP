@@ -1,13 +1,12 @@
 import { useRef, useState } from 'react';
 import { Linking, Text, View } from 'react-native';
 import { z } from 'zod';
+import { GoogleAttribution, googlePlaceSchema } from './GooglePlace';
 import { requestFoundation } from '@wherego/api-client';
 import { serverOptions } from './service';
 import { Action, Field, styles } from './ui';
 
-const resultSchema = z.array(
-  z.object({ id: z.string(), title: z.string(), address: z.string() }),
-);
+const resultSchema = z.array(googlePlaceSchema);
 type Place = z.infer<typeof resultSchema>[number];
 
 // 장소를 검색한 뒤 선택한 결과만 편집 중 일정에 반영한다.
@@ -20,7 +19,7 @@ export default function PlaceSearch({
   userId: string;
   city: string;
   disabled: boolean;
-  onSelect: (title: string, address: string) => void;
+  onSelect: (placeId: string, authoredTitle: string) => void;
 }) {
   // 검색 결과는 현재 팝업에만 보관한다.
   const [query, setQuery] = useState('');
@@ -71,7 +70,7 @@ export default function PlaceSearch({
   // 검색과 원본 지도 확인을 입력 폼보다 먼저 제공한다.
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>지도에서 장소 검색</Text>
+      <Text style={styles.title}>Google Maps에서 장소 검색</Text>
       <Field label="장소 검색어" value={query} onChange={change} />
       <View style={styles.row}>
         <Action
@@ -80,7 +79,7 @@ export default function PlaceSearch({
           onPress={search}
         />
         <Action
-          label="외부 지도에서 검색"
+          label="Google Maps 열기"
           disabled={disabled || !query.trim()}
           onPress={() => {
             // 공급자 실패에도 공식 지도에서 직접 확인할 수 있다.
@@ -101,41 +100,21 @@ export default function PlaceSearch({
       {results.length > 0 && (
         <View>
           <Text>검색 결과 · 선택 후 내용을 확인해 주세요.</Text>
-          <View style={styles.row}>
-            <Action
-              label="Powered by Geoapify"
-              onPress={() => {
-                // 검색 데이터 공급자 출처를 연결한다.
-                void Linking.openURL('https://www.geoapify.com/').catch(() => {
-                  // 출처 링크 실패만 안내한다.
-                  setError('출처 페이지를 열지 못했습니다.');
-                });
-              }}
-            />
-            <Action
-              label="© OpenStreetMap contributors"
-              onPress={() => {
-                // 장소 데이터의 원본 라이선스 출처를 연결한다.
-                void Linking.openURL(
-                  'https://www.openstreetmap.org/copyright',
-                ).catch(() => {
-                  // 출처 링크 실패만 안내한다.
-                  setError('출처 페이지를 열지 못했습니다.');
-                });
-              }}
-            />
-          </View>
+          <GoogleAttribution />
         </View>
       )}
       {results.map((place) => (
         <View key={place.id}>
           <Text>{place.address}</Text>
+          {place.attributions.length > 0 && (
+            <GoogleAttribution attributions={place.attributions} />
+          )}
           <Action
             label={`선택: ${place.title}`}
             disabled={disabled}
             onPress={() => {
-              // 사용자가 선택한 결과만 일정 입력을 채운다.
-              onSelect(place.title, place.address);
+              // 공급자 이름·주소는 저장하지 않고 장소 ID와 사용자가 입력한 제목만 전달한다.
+              onSelect(place.id, query.trim().slice(0, 100));
             }}
           />
         </View>

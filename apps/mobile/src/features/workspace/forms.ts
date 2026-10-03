@@ -35,6 +35,7 @@ export function scheduleForm(
       sortOrder: String(item?.sortOrder || snapshot.itinerary.length + 1),
       memo: item?.memo || '',
       address: item?.address || '',
+      googlePlaceId: item?.googlePlaceId || '',
     },
   };
 }

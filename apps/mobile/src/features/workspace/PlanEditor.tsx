@@ -5,6 +5,7 @@ import { Action, Field, ServerPhoto, styles } from './ui';
 import type { PlanForm } from './forms';
 import { DateField, DestinationFields, FlightFields } from './TravelInputs';
 import PlaceSearch from './PlaceSearch';
+import GooglePlace from './GooglePlace';
 
 const labels: Record<string, string> = {
   title: '제목',
@@ -112,12 +113,29 @@ export default function PlanEditor({
                     userId={userId}
                     city={snapshot?.trip.city || ''}
                     disabled={busy}
-                    onSelect={(title, address) => {
-                      // 선택한 장소명과 주소를 확인 폼에 반영한다.
-                      onChange('title', title);
-                      onChange('address', address);
+                    onSelect={(placeId, authoredTitle) => {
+                      // 사용자 제목과 구글 장소 ID만 영구 기록에 포함한다.
+                      onChange('googlePlaceId', placeId);
+                      onChange('title', authoredTitle);
                     }}
                   />
+                  {form.values.googlePlaceId && (
+                    <>
+                      <GooglePlace
+                        userId={userId}
+                        placeId={form.values.googlePlaceId}
+                        label={form.values.title || ''}
+                      />
+                      <Action
+                        label="선택한 구글 장소 연결 해제"
+                        disabled={busy}
+                        onPress={() => {
+                          // 사용자 작성 내용은 유지하고 장소 참조만 해제한다.
+                          onChange('googlePlaceId', '');
+                        }}
+                      />
+                    </>
+                  )}
                 </>
               )}
               {Object.entries(form.values)

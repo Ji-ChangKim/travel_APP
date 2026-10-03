@@ -33,6 +33,7 @@ import {
 import { Action, Field, ServerPhoto, styles } from './ui';
 import { scheduleForm, formCommand, type PlanForm } from './forms';
 import PlanEditor from './PlanEditor';
+import GooglePlace from './GooglePlace';
 
 // API 실패를 입력 보존·재인증·충돌 안내로 바꾼다.
 export function workspaceError(error: unknown): string {
@@ -680,6 +681,13 @@ function WorkspaceContent() {
                             {item.timeSlot || '시간 미정'} · {item.title}
                           </Text>
                           <Text>{item.address || '지역명 미등록'}</Text>
+                          {item.googlePlaceId && (
+                            <GooglePlace
+                              userId={userId}
+                              placeId={item.googlePlaceId}
+                              label={item.title}
+                            />
+                          )}
                           {item.memo && <Text>{item.memo}</Text>}
                           <View style={styles.row}>
                             <Action

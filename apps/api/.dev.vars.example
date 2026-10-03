@@ -4,4 +4,4 @@ SUPABASE_ANON_KEY="YOUR_PUBLIC_API_KEY"
 ALLOWED_ORIGINS="http://localhost:8081,http://localhost:19006"
 # OCR 공급자 비밀 키는 앱에 넣지 않는다. 미설정 시 수동 입력을 제공한다.
 GOOGLE_VISION_API_KEY=""
-GEOAPIFY_API_KEY=""
+GOOGLE_PLACES_API_KEY=""

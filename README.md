@@ -4,6 +4,8 @@
 
 Expo + React Native + TypeScript를 사용해 Android, iOS, 웹에서 같은 화면 코드를 사용합니다. 소셜 인증, 서버 여행·일정·비용·초대, 비공개 사진·영수증 확인, 종료 여행 커뮤니티 게시를 구현했습니다. 실제 Supabase/제공자 콘솔·OCR·실기기 인수는 환경 준비 후 진행합니다. [서비스 연결 절차](docs/APP_SERVICES_SETUP.md)를 먼저 확인하세요.
 
+지도는 Google Places 검색과 Google Maps 앱·웹 열기를 사용합니다. [설정 및 변경 보고](docs/GOOGLE_MAPS_SETUP.md)를 확인하세요.
+
 ## 개발 환경
 
 Android 설치 테스트의 하단 시스템 바·로그인 진입·항공편 기반 여행 생성·지도/영수증 우선 입력 변경은 [피드백 반영 및 재빌드 절차](docs/TEST_FEEDBACK_20261003.md)를 확인하세요.

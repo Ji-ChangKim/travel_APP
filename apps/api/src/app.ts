@@ -13,7 +13,7 @@ import { runRpc, verifySession } from './backend';
 import { rejectRequest, renderError } from './errors';
 import type { ApiEnvironment, VerifiedSession } from './types';
 import { registerWorkspaceRoutes } from './workspace';
-import { searchPlaces } from './places';
+import { getGooglePlace, searchPlaces } from './places';
 
 type ApiContext = Context<ApiEnvironment>;
 
@@ -298,6 +298,7 @@ export function createApp(fetcher: typeof fetch = fetch): Hono<ApiEnvironment> {
       .get('/health', health)
       .get('/api/v1/me', getMe.bind(null, fetcher))
       .get('/api/v1/places/search', searchPlaces.bind(null, fetcher))
+      .get('/api/v1/places/:placeId', getGooglePlace.bind(null, fetcher))
       .get('/api/v1/trips', listTrips.bind(null, fetcher))
       .post('/api/v1/trips', createTrip.bind(null, fetcher))
       .get('/api/v1/trips/:tripId', getTrip.bind(null, fetcher))

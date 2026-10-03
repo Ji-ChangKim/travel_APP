@@ -967,11 +967,30 @@ itinerary_items.id: UUID 난수 PK, title: '편명 · 출발 → 도착', type: 
   인증되지 않은 직접 접근은 기존 권한/RLS로 차단. private 함수 EXECUTE는 PUBLIC/anon/authenticated에 부여하지 않음.
 여행과 항공편은 함께 성공/롤백, 동일 생성 키 재시도는 항공편도 중복 생성하지 않음.
 
-[장소 검색 응답 객체 / DB 저장 객체 아님]
-GET /api/v1/places/search?q=검색어: 실제 로그인 필수, q trim 2~200자.
-PlaceSearchResult: id string 공급자 ID, title string 최대100자, address string 최대200자.
-응답은 팝업 메모리에만 보관, 검색만으로 일정 저장하지 않음. 사용자 선택 후 확인 저장.
-GEOAPIFY_API_KEY: 선택 Worker secret string. 앱·EXPO_PUBLIC·Git에 넣지 않음.
-공급자 endpoint 고정 api.geoapify.com/v1/geocode/search, timeout10초, 응답64KiB 제한, 최대10결과.
-키 누락503, 외부 실패503, 미인증401. 실제 키·공급자 응답 인수는 별도 필요.
+[v2.0 Google Maps 장소 연결 / 2026-10-03]
+DB명: Supabase PostgreSQL. schema: wherego_private.
+테이블명: itinerary_google_places. Google Places 콘텐츠 대신 장소 식별자만 보관.
+schedule_id: UUID PRIMARY KEY, NOT NULL, FK public.itinerary_items(id), ON DELETE CASCADE. 일정 한 개당 구글 장소 한 개.
+place_id: TEXT NOT NULL, CHECK ^[A-Za-z0-9_-]{1,200}$. 영구 저장 가능한 Google place ID.
+RLS 활성화. PUBLIC/anon/authenticated 직접 SELECT/INSERT/UPDATE/DELETE 권한 없음.
+공개 wherego_command schedule.save와 멤버 검사를 통과한 wherego_workspace를 통해서만 연결 저장·읽기.
+WorkspaceSchedule.googlePlaceId: 선택 string 위 정규식. DB 스냅샷의 일정에 포함.
+ScheduleInput.googlePlaceId: 선택 string. 빈 문자열은 연결 해제, 필드 생략은 기존 연결 보존.
+PlanForm.values.googlePlaceId: string, 신규 기본값 빈 문자열. 수동 제목·주소·메모는 사용자 작성 데이터.
+20261003000003_google_places.sql: validate_command_base/schedule_save_base/wherego_workspace_base로 이전 구현을 보존.
+validate_command: 기존 strict 입력 검증에 일정 장소 ID만 추가. schedule_save: 일정과 ID 연결의 원자 저장.
+wherego_workspace: 기존 여행 권한 확인 후 일정에 ID만 병합. 멱등 재시도·버전 검사 유지.
+일정 삭제 시 연결 행도 FK cascade로 삭제. 커뮤니티 스냅샷에는 Google 콘텐츠를 복사하지 않음.
+
+[Google 장소 검색·상세 응답 객체 / DB 저장 객체 아님]
+GET /api/v1/places/search?q=검색어: 실제 로그인 필수, q trim 2~200자, 최대10결과.
+GET /api/v1/places/:placeId: 실제 로그인 필수, ID 정규식 위와 동일.
+GooglePlaceResult: id string 최대200자, title string 최대300자, address string 최대1000자.
+attributions: 최대20개 {provider string 최대200자, providerUri HTTP(S) URL 최대2000자}.
+응답은 팝업·활성 화면 메모리에만 보관. 상세 Query staleTime=0/gcTime=0. DB·영구 캐시 미저장.
+Google Maps 및 공급자 출처를 표시. Google Maps 링크는 장소 ID와 사용자 검색어로 구성.
+GOOGLE_PLACES_API_KEY: 선택 Worker secret string. 앱·EXPO_PUBLIC·Git에 넣지 않음.
+고정 공급자 places.googleapis.com/v1/places:searchText POST 및 /v1/places/{ID} GET.
+서버 헤더 X-Goog-Api-Key와 필요한 필드만 요청하는 X-Goog-FieldMask 사용.
+timeout10초, 응답64KiB 제한, redirect 거부, no-store. 키 누락503, 외부 실패503, 미인증401.
 useAuthReady.ready: 앱 메모리 boolean, SDK 초기 세션 확인 완료 여부. DB 컬럼 아님.

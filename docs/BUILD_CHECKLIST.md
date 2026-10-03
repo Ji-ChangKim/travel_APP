@@ -4,7 +4,7 @@
 
 ## 로컬에서 확인한 준비
 
-이번 피드백 버전에는 네이티브 시스템 바·날짜 선택기가 추가되었다. 새 APK 재빌드, `20261003000002_flight_onboarding.sql` 적용, 최신 API 배포가 필요하다. 앱 내 장소 검색에는 별도 `GEOAPIFY_API_KEY` 서버 설정이 필요하다. [피드백 반영 및 실기기 체크](TEST_FEEDBACK_20261003.md)
+이번 피드백 버전에는 네이티브 시스템 바·날짜 선택기가 추가되었다. 새 APK 재빌드, `20261003000002_flight_onboarding.sql` 및 `20261003000003_google_places.sql` 적용, 최신 API 배포가 필요하다. 앱 내 장소 검색에는 별도 `GOOGLE_PLACES_API_KEY` 서버 설정이 필요하다. [피드백 반영 및 실기기 체크](TEST_FEEDBACK_20261003.md)
 
 - [x] SDK 57 권장 패치 4개를 루트·모바일 워크스페이스에 적용.
 - [x] preview 내부 APK 프로필과 preview 환경 설정.
@@ -58,3 +58,5 @@ OCR 키는 첫 staging 테스트의 필수 항목이 아니다. 미설정 시 �
 | 설치 결과 / 미해결 기능  | 미검증                |
 
 운영 공개와 스토어 제출은 추후 [배포 절차](DEPLOYMENT.md)에서 별도로 확인한다.
+
+구글 지도 검색·장소 연결의 변경 및 서버 키 준비는 [Google Maps 설정](GOOGLE_MAPS_SETUP.md)을 따른다.
