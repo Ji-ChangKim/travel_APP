@@ -8,6 +8,8 @@ module.exports = defineConfig([
     ignores: [
       '**/dist/**',
       '**/.expo/**',
+      '**/.wrangler/**',
+      '**/.release/**',
       '**/expo-env.d.ts',
       '**/node_modules/**',
     ],

@@ -12,12 +12,18 @@
       },
       "ios": {
         "simulator": true
-      }
+      },
+      "environment": "development"
     },
     "preview": {
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "environment": "preview",
+      "autoIncrement": true,
+      "env": {
+        "EXPO_NO_DOTENV": "1"
       }
     },
     "production": {
@@ -26,7 +32,9 @@
       },
       "ios": {
         "simulator": false
-      }
+      },
+      "environment": "production",
+      "autoIncrement": true
     }
   },
   "submit": {

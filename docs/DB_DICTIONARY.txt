@@ -1,16 +1,20 @@
 ================================================================================
  travel_APP (WHEREGO) 데이터베이스 및 도메인 객체 사전 (DB_DICTIONARY.txt)
- 문서 버전: v1.4
- 최종 수정일: 2026-09-24
+ 문서 버전: v1.8 (M1 물리 DB는 5절, 기기 객체는 6절, 인증은 7절, 서버 앱은 8절)
+ 최종 수정일: 2026-10-03
  데이터베이스 환경: Supabase PostgreSQL 15+
  프로젝트 목적: 여행 계획(PLAN) -> 공유(SHARE) -> 여행 중(TRAVEL) -> 기록/정산(RECORD)
 ================================================================================
 
 [ 목차 ]
 1. 데이터베이스 개요 및 공통 Enum 타입
-2. DB 테이블별 컬럼 명세 (13개 테이블)
+2. 기존 DB 테이블별 컬럼 명세 (13개 테이블, 5절 후 15개, 8절 후 public 총 20개)
 3. 프론트엔드 TypeScript 도메인 객체(Entity) 명세 (13개 엔티티)
 4. 변경 이력 및 관리 지침
+5. M0/M1 실제 마이그레이션·도메인 변경 명세 (2026-10-02)
+6. 발자취 기기 저장·도메인 객체 명세 (2026-10-02)
+7. 실제 소셜 인증과 계정 전환 객체 (2026-10-03)
+8. 일정·초대·사진·영수증·커뮤니티 서버 명세 (2026-10-03)
 
 ================================================================================
 1. 데이터베이스 개요 및 공통 Enum 타입
@@ -81,7 +85,7 @@ bio          | TEXT         | YES  | NULL              |                        
 travel_styles| TEXT[]       | YES  | '{}'              |                           | 선호 여행 스타일 태그 목록
 phone        | VARCHAR(30)  | YES  | NULL              |                           | 비상 연락처
 os_platform  | VARCHAR(20)  | NO   | 'web'             |                           | 가입/접속 OS ('android','ios','web')
-auth_provider| VARCHAR(20)  | NO   | 'guest'           |                           | 인증 제공자 ('google','kakao','apple','guest')
+auth_provider| VARCHAR(20)  | NO   | 'guest'           |                           | 인증 제공자 ('google','kakao','apple','email','guest')
 last_sign_in_at| TIMESTAMPTZ| NO   | NOW()             |                           | 마지막 접속/로그인 시각
 created_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 계정 생성 시각
 updated_at   | TIMESTAMPTZ  | NO   | NOW()             |                           | 프로필 수정 시각
@@ -283,7 +287,7 @@ created_at   | TIMESTAMPTZ  | NO   | NOW()             |                        
    - travelStyles?: string[]  -> profiles.travel_styles
    - phone?: string|null      -> profiles.phone
    - osPlatform?: OsPlatform  -> profiles.os_platform ('android'|'ios'|'web')
-   - authProvider?: AuthProvider -> profiles.auth_provider ('google'|'kakao'|'apple'|'guest')
+   - authProvider?: AuthProvider -> profiles.auth_provider ('google'|'kakao'|'apple'|'email'|'guest')
    - lastSignInAt?: string    -> profiles.last_sign_in_at
    - createdAt: string        -> profiles.created_at
    - updatedAt: string        -> profiles.updated_at
@@ -436,3 +440,511 @@ created_at   | TIMESTAMPTZ  | NO   | NOW()             |                        
   3) 금액은 국가별 통화 표기를 지원하기 위해 NUMERIC(12,2)과 currency 코드를
      함께 보관합니다.
 ================================================================================
+
+================================================================================
+기획 부록 A. 2026-10-02 상세 데이터 저장 설계 (승인 전 / 미적용)
+================================================================================
+
+- 본문 v1.4는 기존 명세이며 이번 작업에서 실제 DB/도메인 객체를 변경하지 않았다.
+- 현재 SQL에는 없는 일정 필드가 본문에 현행처럼 기록된 부분이 있으므로,
+  본문에 기재되어 있다는 이유만으로 구현/마이그레이션 완료로 판단하지 않는다.
+- 제안 대상 DB명: Supabase 프로젝트 PostgreSQL postgres / public 스키마.
+- 목표 테이블명·컬럼·타입·NULL·기본값·제약·FK·설명·도메인 매핑 상세:
+  docs/planning/DATA_STORAGE_SPEC.md 3~4장.
+- 현행 SQL/도메인과 목표 설계 차이 및 이행 순서: 위 문서 9장.
+- 상세 원본/캐시·저장/재시도·권한·삭제 정책: 위 문서 1~8장.
+
+[대상 및 상태]
+profiles         : 현행. version/프로필 최소 조회 범위 등 변경 제안.
+trips            : 현행. timezone/default_currency/version 등 변경 제안.
+trip_members     : 현행. owner 단일성/역할별 접근/updated_at 보완 제안.
+trip_days        : 현행. 날짜 유일성/기간 변경 원자 처리/updated_at 제안.
+places           : 현행. provider/external_place_id/scope_trip_id/좌표쌍 제안.
+itinerary_items  : 현행. place_id NULL 허용/type/title/actor/updated_at 제안.
+                  estimated_cost/actual_cost는 expenses 계산 응답 투영 제안.
+expenses         : 현행. amount/currency/source/부모 일치/actor/updated_at 제안.
+checklists       : 현행. actor/updated_at 및 원하는 완료 상태 저장 제안.
+trip_invites     : 신규 기획안. token_hash/role/만료/철회/1회 수락 모델, 미생성.
+mutation_requests: 신규 기획안. actor+요청키 유일/입력 해시/결과/만료, 미생성.
+visits/reviews/receipts/attachments/share_links:
+                  현행 테이블, P1/P2 연결·파일 접근·공개 범위 변경은 후속 제안.
+
+[적용 규칙]
+제안안 승인 후 실제 SQL/도메인을 수정하는 작업에서 본문 필드 사전과
+TypeScript 매핑을 동시에 갱신하고, 적용/미적용/응답 투영 상태를 구분한다.
+금액 decimal string API 계약과 현행 number 객체의 이행도 함께 수행한다.
+이 부록은 새 테이블 또는 컬럼의 실제 생성 완료 기록이 아니다.
+
+================================================================================
+5. M0/M1 실제 마이그레이션·도메인 변경 명세 (2026-10-02)
+================================================================================
+
+[적용 상태 및 원본]
+DB명: postgres (Supabase 테스트 프로젝트명 미정), schema: public / wherego_private.
+이 절은 v1.4 본문과 충돌할 때 우선한다. 기존 미변경 컬럼은 2절을 참조한다.
+실제 SQL: supabase/migrations/20261002000001_foundation_schema.sql,
+          supabase/migrations/20261002000002_foundation_commands.sql.
+기존 3개+신규 2개 전체 체인을 격리 PostgreSQL(PGlite)에서 적용·실행했다.
+원격 Supabase 적용은 미실행. public 테이블은 기존 13개+신규 2개=15개.
+wherego_private는 함수만 보관하며 사용자 데이터 테이블은 없다.
+
+[기존 테이블의 추가·변경 컬럼]
+1) public.profiles
+- version: BIGINT, NOT NULL, DEFAULT 1, CHECK >0. 프로필 낙관적 충돌용 버전.
+- 본인 SELECT만 허용. 일반 사용자 INSERT/UPDATE/DELETE 차단, 수정 RPC는 후속.
+- Auth 가입 트리거: id=auth.users.id, nickname은 metadata.nickname/name/email 앞부분/
+  여행자 순으로 공백 제거 및 50자 제한. auth_provider는 raw_app_meta_data.provider.
+- v1.4의 app_metadata 접근과 달리 실제 Auth 컬럼 raw_app_meta_data를 사용한다.
+
+2) public.trips
+- timezone: TEXT, NOT NULL, DEFAULT 'UTC'. RPC에서 pg_timezone_names 검증.
+  DB 컬럼 자체의 시간대 CHECK는 없으며 직접 사용자 쓰기는 차단한다.
+- default_currency: VARCHAR(3), NOT NULL, DEFAULT 'KRW', CHECK KRW/JPY/USD.
+- version: BIGINT, NOT NULL, DEFAULT 1, CHECK >0. 여행 aggregate 쓰기 버전.
+- 기간 제약: end_date-start_date BETWEEN 0 AND 89, 포함 1~90일.
+- owner 참조: (id,user_id) -> trip_members(trip_id,user_id), DEFERRABLE INITIALLY DEFERRED.
+  생성 명령에서 여행과 owner 멤버를 같은 트랜잭션에 만들기 위한 참조.
+- 생성 RPC: title 선택, 공백/미입력은 YYYY 도시 여행. title 입력 최대 50자.
+- snapshot의 status는 저장된 trip_status이며 날짜 기반 displayStatus는 후속.
+
+3) public.trip_members
+- updated_at: TIMESTAMPTZ, NOT NULL, DEFAULT NOW(). 향후 역할 수정 명령에서 갱신.
+- UNIQUE(trip_id,user_id)는 기존 유지. role='owner' 부분 유일 인덱스(trip_id).
+- BEFORE INSERT/UPDATE 트리거: trips.user_id와 owner 역할의 일치 검증.
+- 기존 소유자를 owner로 백필. 소유자 아닌 owner가 남아 있으면 적용 실패.
+
+4) public.trip_days
+- updated_at: TIMESTAMPTZ, NOT NULL, DEFAULT NOW(). 향후 기간 변경 명령에서 갱신.
+- day_number CHECK >0, UNIQUE(trip_id,trip_date). 기존 UNIQUE(trip_id,day_number) 유지.
+- 생성 RPC에서 start_date~end_date 전체 달력 날짜를 generate_series로 저장.
+
+5) public.places
+- provider: VARCHAR(30), NOT NULL, DEFAULT 'legacy'. 기존 데이터 공급자 미확정 표시.
+- external_place_id: TEXT, NULL 허용. 외부 공급자 장소 식별자.
+- scope_trip_id: UUID, NULL 허용, FK trips.id ON DELETE CASCADE. 사적 장소 소속.
+- fetched_at: TIMESTAMPTZ, NULL 허용. 공급자 조회 시각, 현재 외부 검색 미연결.
+- updated_at: TIMESTAMPTZ, NOT NULL, DEFAULT NOW().
+- 좌표: 둘 다 NULL 또는 둘 다 값. latitude[-90,90], longitude[-180,180].
+- provider='manual'이면 scope_trip_id 필수. 외부 ID가 있으면 provider+ID 부분 UNIQUE.
+- 멤버 소속 장소 또는 해당 여행 일정에 연결한 장소만 SELECT.
+
+6) public.itinerary_items
+- place_id: 기존 UUID를 NULL 허용으로 변경, FK places.id ON DELETE RESTRICT.
+  장소 없는 TRANSPORT/MEMO 등 지원. master 장소 삭제로 일정 삭제하지 않는다.
+- type: VARCHAR(20), NOT NULL, DEFAULT 'PLACE', CHECK PLACE/TRANSPORT/STAY/
+  RESERVATION/TODO/MEMO.
+- title: VARCHAR(100), NOT NULL, CHECK btrim 길이 1~100. 기존 places.name에서 백필.
+- created_by: UUID, NOT NULL, FK profiles.id. 기존 부모 여행 owner로 백필.
+- updated_by: UUID, NOT NULL, FK profiles.id. 기존 부모 여행 owner로 백필.
+- updated_at: TIMESTAMPTZ, NOT NULL, DEFAULT NOW().
+- memo: 기존 컬럼, NULL 허용, CHECK length<=300.
+- time_slot: 기존 컬럼, NULL 허용, CHECK HH:mm(00:00~23:59).
+- sort_order: 기존 정수 컬럼, CHECK >0.
+- 트리거: 사적 place.scope_trip_id와 trip_day의 trip_id 일치 검증.
+- estimatedCost 등 기존 도메인 표시 필드는 물리 컬럼이 아니다. 비용 원본 expenses.
+  자동 예상비용 생성/수정/삭제 명령은 후속 M3 작업이다.
+
+7) public.expenses
+- source: VARCHAR(20), NOT NULL, DEFAULT 'manual', CHECK manual/schedule/receipt.
+- created_by/updated_by: UUID 각각 NOT NULL, FK profiles.id. 기존 owner로 백필.
+- updated_at: TIMESTAMPTZ, NOT NULL, DEFAULT NOW().
+- amount: 기존 NUMERIC(12,2), 추가 CHECK >0. API 금액은 문자열로 직렬화.
+- currency: 기존 VARCHAR(3), CHECK KRW/JPY/USD. KRW/JPY amount=trunc(amount).
+- category: 기존 컬럼, CHECK food/transport/stay/activity/shopping/etc.
+- title: 기존 컬럼, CHECK btrim 길이 1~100.
+- source='schedule'이면 schedule_id 필수, is_actual=false.
+- schedule_id+currency 부분 UNIQUE WHERE source='schedule' AND is_actual=false.
+- 트리거: trip_day_id 소속 여행, schedule_id의 DAY/여행 일치, 결제자의 여행 멤버십.
+- USD 초과 소수 입력의 NUMERIC 자동 반올림은 PostgreSQL 특성이다.
+  사용자 입력 원문 소수 제한은 공통 Zod 및 향후 비용 명령에서 검증해야 한다.
+- 비용 CRUD·합계·일정 삭제 시 실제 비용 유지 처리는 후속, 현재 제약/조회만 제공.
+
+8) public.checklists
+- created_by/updated_by: UUID 각각 NOT NULL, FK profiles.id. 기존 owner로 백필.
+- updated_at: TIMESTAMPTZ, NOT NULL, DEFAULT NOW(), 상태 변경 RPC에서 갱신.
+- title: 기존 컬럼, CHECK btrim 길이 1~100.
+- is_completed: 기존 boolean. RPC는 명시 true/false, toggle 연산 아님.
+- 쓰기 시 trips.version과 요청 버전을 대조하고 한 번 증가.
+
+9) share_links/attachments/visits/reviews/receipts
+- 이번 변경은 컬럼을 추가하지 않는다. 일반 anon/authenticated 테이블 접근 전부
+  회수. P1/P2 명령·권한·Storage 정책 재설계는 후속이다.
+
+[신규 테이블 전체 컬럼]
+10) public.trip_invites (초대 발급/수락 기능은 후속 M6)
+- id: UUID, PK, DEFAULT uuid_generate_v4().
+- trip_id: UUID, NOT NULL, FK trips.id ON DELETE CASCADE.
+- token_hash: TEXT, NOT NULL, UNIQUE. 불투명 초대 토큰 해시, 원문 저장 금지.
+- role: member_role, NOT NULL, CHECK editor/viewer. owner 초대 불가.
+- created_by: UUID, NOT NULL, FK profiles.id. 초대 생성 사용자.
+- expires_at: TIMESTAMPTZ, NOT NULL, CHECK >created_at. 만료 시각.
+- revoked_at: TIMESTAMPTZ, NULL 허용. 철회 시각.
+- used_at: TIMESTAMPTZ, NULL 허용. 소비 시각.
+- accepted_by: UUID, NULL 허용, FK profiles.id. 수락 사용자.
+- created_at: TIMESTAMPTZ, NOT NULL, DEFAULT NOW().
+- CHECK (used_at IS NULL)=(accepted_by IS NULL). 수락자/소비 상태 일치.
+- RLS 활성화, 사용자 직접 SELECT/쓰기 및 정책 미제공. 실제 API 후속.
+
+11) public.mutation_requests
+- id: UUID, PK, DEFAULT uuid_generate_v4().
+- principal_id: UUID, NOT NULL, FK profiles.id ON DELETE CASCADE. 실제 actor.
+- request_key: UUID, NOT NULL. 클라이언트 한 사용자 행동의 요청 키.
+- operation: TEXT, NOT NULL. trip.create/checklist.add/checklist.state.
+- request_hash: TEXT, NOT NULL. jsonb 본문의 SHA-256 hex.
+- result: JSONB, NULL 허용. 명령 실행 중 NULL, 확정 데이터 같은 트랜잭션에 저장.
+- created_at: TIMESTAMPTZ, NOT NULL, DEFAULT NOW().
+- expires_at: TIMESTAMPTZ, NOT NULL, DEFAULT NOW()+24 hours, CHECK >created_at.
+- UNIQUE(principal_id,request_key), expires_at 조회 인덱스.
+- RLS 활성화, 직접 접근 금지. SECURITY DEFINER 내부 명령만 사용.
+- 동일 키 경쟁은 INSERT ON CONFLICT DO UPDATE 행 잠금으로 최초 본문 유지.
+- 같은 키 다른 operation/hash 거부, 만료키 거부, 재생 시 현재 권한 검사.
+- 자동 청소 미연결. 기록 삭제 후 재실행 위험과 보존 정책은 운영 전 결정.
+
+[DB RPC·권한·함수]
+공개 사용자 RPC(모두 SECURITY DEFINER, search_path='', authenticated만 EXECUTE):
+- wherego_me() -> JSONB: 본인 id/nickname/bio/version.
+- wherego_list_trips() -> JSONB: 현재 여행 멤버 목록, 정렬 start_date/id.
+- wherego_trip_snapshot(p_trip UUID) -> JSONB: 동일 statement snapshot.
+- wherego_create_trip(p_input JSONB,p_key UUID) -> JSONB: 여행/owner/DAY 원자 생성.
+- wherego_add_checklist(p_trip UUID,p_title TEXT,p_version BIGINT,p_key UUID) -> JSONB.
+- wherego_set_checklist(p_item UUID,p_trip UUID,p_completed BOOLEAN,p_version BIGINT,
+  p_key UUID) -> JSONB: 실제 부모와 헤더 여행 대조.
+조회는 멤버·실제 actor 확인, 쓰기는 owner/editor·보관 아님·버전 검사.
+익명 Auth(is_anonymous=true) 사용자 명령 거부. 주체는 auth.uid, 요청 userId 불신.
+내부 wherego_private 함수 EXECUTE는 PUBLIC/anon/authenticated 회수.
+RLS에서 사용하는 member_role(UUID) 하나만 authenticated EXECUTE 허용.
+공개 handle_new_user() trigger 함수 EXECUTE도 사용자에게 회수.
+일반 사용자 public 테이블 전체 DML 권한 회수. authenticated SELECT는 본인 profiles
+및 멤버 trips/members/days/places/itinerary/expenses/checklists의 RLS 정책에 한정.
+서비스 관리자 접근과 파일 Storage 자체 정책은 별도이며 이 마일스톤 인수와 다르다.
+
+[신규 TypeScript 도메인·계약 객체]
+원본: packages/domain/src/foundation.ts, 기존 UI 도메인 객체와 분리(M2 연결 예정).
+- SupportedCurrency: 'KRW'|'JPY'|'USD', 지원 통화 타입.
+- DecimalAmount: string, 금액 JSON 손실 방지. 검증: packages/validation foundation.
+- PersistedTripInput: title?:string; country/city/startDate/endDate/timezone:string;
+  defaultCurrency?:SupportedCurrency; coverColor?:string. 입력 서버 기본값 적용.
+- PersistedTrip: PersistedTripInput 중 title/defaultCurrency/coverColor 필수,
+  id/ownerId:string(UUID), version:number(양의 안전 정수), status:TripStatus.
+- MutationResult<T>: data:T, replayed:boolean. DB 원자 명령 결과.
+- FoundationApiError: code/message:string, fieldErrors?:Record<string,string[]>.
+원본: packages/api-client/src/foundation.ts.
+- FoundationClientOptions: baseUrl/accessToken:string, fetcher?:typeof fetch.
+- FoundationResponse: data:unknown(기능별 화면 연결 시 좁힐 대상),
+  meta:{requestId:string,replayed?:boolean}. M1 HTTP 공통 envelope.
+- FoundationClientError: status:number, payload:unknown, 공개 HTTP 실패 전달.
+- foundationQueryKey(userId,resource,id?): readonly string[], 계정 분리 캐시 키.
+공통 Zod: 실제 날짜/1~90일/UUID/양의 안전 정수 버전/지원 시간대/준비물 제목/
+명시 boolean/decimal 금액 검증. 실제 비용 저장 명령은 후속이다.
+
+[변경 이력]
+v1.5 (2026-10-02): M0/M1 실제 SQL·API·권한·새 도메인 명세, 기존 13개 및 신규
+2개 테이블의 적용 차이·검증 한계 기록. 실제 원격 적용/전체 UI 저장 연결 미완료.
+
+================================================================================
+6. 발자취 기기 저장·도메인 객체 명세 (2026-10-02)
+================================================================================
+DB/저장소명: WHEREGO_TRAIL_LOCAL (논리 이름, SQL DB 아님).
+물리 위치: 웹 localStorage wherego-trail-device-draft;
+  네이티브 앱 문서 wherego-trail-device-draft.json.
+저장 버전: {version:1, journeys:TrailJourney[]}.
+현재 영역은 로그인 계정 미연동 기기 초안. 기존 public DB 15개 테이블 변경 없음.
+원본: packages/domain/src/trail.ts, packages/validation/src/trail.ts,
+apps/mobile/src/features/trail/{model,storage,store,TrailScreen}.
+
+[논리 객체 TrailJourney / journeys]
+- id: string(UUID), 필수, 앱 crypto UUID, 기기 콘텐츠 식별자.
+- sourceTripId: string, 선택, 기존 여행 복사 원본 ID, 같은 여행 재가져오기 차단.
+- title: string, 필수, trim 1~100자, 콘텐츠 제목.
+- city: string, 필수, trim 1~100자, 여행 도시.
+- startDate/endDate: string YYYY-MM-DD, 필수, 실제 날짜 및 포함 1~90일.
+- flights: TrailFlight[], 필수, 가는 편/오는 편 각 한 구간, 같은 방향은 교체.
+- plans: TrailPlan[], 필수, 날짜별 장소 계획.
+- receipts: TrailReceipt[], 필수, 계획과 연결한 실제 구매·경험 기록.
+
+[논리 객체 TrailFlight / flights]
+- id: string(UUID), 필수, 항공 기준표 항목 식별자.
+- direction: 'outbound'|'return', 필수, 가는 편/오는 편.
+- flightNumber: string, 필수, trim/대문자, 항공편명 형식 검증.
+- departureAirport/arrivalAirport: string 각각 필수, 대문자 IATA 3자.
+- departureAt/arrivalAt: string ISO(datetime + offset), 필수, 실제 도착>출발.
+  UI는 공항 현지 날짜/HH:mm/UTC 오프셋으로 분리 입력.
+- source: 'user-confirmed', 필수, 사용자가 확인한 정보. 공급자 자동 조회 아님.
+- 왕복 실제 시각 비교 및 기존 계획·영수증 기간 축소 차단.
+- 가는 편 출발 현지 날짜 -> startDate, 오는 편 도착 현지 날짜 -> endDate.
+
+[논리 객체 TrailPlan / plans]
+- id: string(UUID), 필수, 계획 생성/수정 시 동일 ID 유지.
+- date: string YYYY-MM-DD, 필수, 여행 기간 안 실제 날짜.
+- time: string HH:mm, 필수, 00:00~23:59, 현지 계획 시각.
+- title: string, 필수, trim 1~100자, 장소·일정명.
+- address: string, 필수(빈 값 허용), trim 최대 200자, 장소 주소.
+- memo: string, 필수(빈 값 허용), trim 최대 1000자, 예약/방문 계획.
+- 정렬 date/time/id. 영수증 연결된 계획 삭제 거부.
+
+[논리 객체 TrailReceipt / receipts]
+- id: string(UUID), 필수, 같은 ID 저장은 교체. 자동 결제 중복 탐지 없음.
+- planId: string, 필수, 동일 journey.plans에 존재해야 함. 다른 콘텐츠 부모 거부.
+- merchant: string, 필수, trim 1~100자, 영수증 상호.
+- date: string YYYY-MM-DD, 필수, 실제 결제 날짜, 여행 범위 내.
+- time: string HH:mm, 필수, 실제 결제 현지 시각. 계획 시각 덮어쓰기 없음.
+- amount: string(decimal), 필수, 양수, 정수부 최대 10자리.
+- currency: 'KRW'|'JPY'|'USD', 필수, KRW/JPY 정수 및 USD 소수 2자리.
+- details: string, 필수, trim 1~1000자, 메뉴/수량/단가/이용 내용.
+- note: string, 필수(빈 값 허용), trim 최대 1000자, 실제 경험·다음 방문 팁.
+- attachment: {name:string,uri:string,mimeType:string}, 필수, 원본 파일 메타데이터.
+  name: 사용자 원본 파일명. mimeType: image/jpeg,image/png,application/pdf만 허용.
+  uri: 웹 data URI, 네이티브 앱 문서 원본 URI. 파일당 2MB 이하.
+  네이티브 원본 파일명: trail-receipt-<uuid>.jpg/png/pdf.
+  실제 파일 복사 완료 후에만 연결, 앱 문서 경로 변경 시 관리 파일명 재연결.
+  닫기/교체/기록 삭제 시 참조 없는 관리 원본만 정리. 외부 경로 삭제 금지.
+- createdAt: string ISO UTC, 필수, 영수증 콘텐츠 등록 시각.
+- OCR/GPS 인증 플래그 없음. 기존 expenses/visits/receipts 테이블 자동 기록 없음.
+
+[화면 저장 상태 TrailState / Zustand]
+- scope: string, 필수, 현재 device-draft. 서버 actor/인증 역할과 다름.
+- journeys: TrailJourney[], 필수, 저장이 확인된 콘텐츠 스냅샷.
+- loading/saving: boolean, 필수, 읽기 완료/중복 저장 차단.
+- error: string, 필수, 저장소 오류 안내. 읽기 실패 시 빈 파일로 덮어쓰지 않음.
+- 파일/localStorage 쓰기 성공 후 화면 확정. 서버 트랜잭션/백업과 별개.
+
+[v1.6 변경 기록]
+2026-10-02: 발자취 항공 기준표·일정 생성·영수증 원본/상세 콘텐츠 및
+기기 저장 명세 추가. 기존 물리 DB 테이블/권한/API 스키마는 이번에 변경하지 않음.
+원격 동기화·실시간 항공 조회·발권·OCR·실기기 검증은 미완료/후속.
+
+================================================================================
+7. v1.7 실제 소셜 인증과 계정 전환 객체 (2026-10-03)
+================================================================================
+DB명: WHEREGO / Supabase PostgreSQL (물리 스키마 변경 없음)
+테이블명: auth.users (Supabase 관리), public.profiles (기존 프로필 트리거 사용)
+- auth.users.id: uuid, 기본키/필수, SDK 실제 사용자 ID. 임시 user-<provider>-<time> 생성 제거.
+- auth.users.app_metadata.provider: SDK 문자열, 서버 인증 제공자. 앱에서는 지원 유형만 투영.
+- auth.users.user_metadata.nickname/name/avatar_url: SDK 메타데이터, 기본 표시명/사진.
+  메타데이터는 편집 권한 판정에 사용하지 않음. 서버 RPC는 JWT Auth UID로 판정.
+- public.profiles.id: 기존 uuid PK/FK auth.users(id), 최초 소셜 가입 트리거로 생성.
+- public.profiles.auth_provider: 기존 varchar(20), email/google/kakao/apple/guest.
+  이번 변경에서 컬럼/타입/RLS/트리거는 수정하지 않음.
+
+[논리 객체 Profile / 인증 화면 투영]
+위치: packages/domain/src/index.ts 및 apps/mobile/src/features/auth/model.ts.
+- id: string(uuid), 필수, 실제 Auth UID 유지.
+- nickname: string, 필수, 메타데이터 nickname/name 또는 '여행자'.
+- avatarUrl: string|null, 선택, 문자열 avatar_url만 표시.
+- authProvider: 'google'|'kakao'|'apple'|'email'|'guest', 선택.
+  email 추가: 실제 이메일 계정을 게스트로 오인하지 않음.
+- osPlatform: 'android'|'ios'|'web', 선택, 현재 앱 실행 플랫폼.
+- createdAt: string ISO, 필수, Auth created_at.
+- updatedAt: string ISO, 필수, Auth updated_at 또는 created_at.
+- lastSignInAt: string ISO|undefined, 선택, Auth last_sign_in_at.
+- 기존 bio/travelStyles/phone 속성은 그대로 유지. Auth 투영은 서버 프로필 편집/저장 아님.
+
+[논리 타입 SocialProvider]
+- 타입: 'kakao'|'google'|'apple'. OAuth 진입 함수의 제공자를 제한.
+- email/guest는 소셜 OAuth 제공자로 요청하지 않음.
+
+[논리 객체 OAuthExchange / 모듈 메모리]
+위치: apps/mobile/src/features/auth/oauth.ts. DB 테이블 없음, 영구 저장 없음.
+- code: string, 필수, PKCE 일회용 인증 코드. 정확한 콜백의 단일 code만 허용.
+  최대 4096자, 오류·누락·빈 문자열·중복 파라미터 거부. 로그/화면 출력 금지.
+- startedAt: number(epoch milliseconds), 필수, 같은 콜백 Promise 재사용 60초 제한.
+- promise: Promise<Session>, 필수, Supabase exchangeCodeForSession 결과.
+  모듈에서는 한 코드만 유지. 새 로그인/로그아웃에 캐시 폐기.
+- Session: Supabase SDK 관리 타입. 토큰 저장은 기존 SecureStore/localStorage 어댑터.
+  새 공개 도메인/사용자 프로필에 access_token/refresh_token을 복사하지 않음.
+- SDK flowType: pkce, detectSessionInUrl: false. 성공한 교환만 앱 진입.
+- sb_flow_id: string|undefined, 콜백의 선택적 PKCE 식별자, 8~64자
+  영문/숫자/_/-만 허용, 다중 파라미터 거부. 최신 SDK의 flowId 옵션에 전달.
+- 네이티브 난수·SHA-256은 expo-crypto 어댑터로 보완. WebCrypto가 없는
+  웹 origin과 암호 API 미지원 런타임에서는 plain challenge 폴백을 차단.
+
+[논리 결과 AccountChangeState / Zustand 부분 상태]
+- currentUser: Profile|null, 필수, 다음 계정 또는 로그아웃.
+- 동일 UID: currentUser만 갱신, 여행 화면 데이터 유지.
+- UID 변경/로그아웃: trips/visits = 빈 배열, selectedTripId = 빈 문자열.
+  itineraries/expenses/checklists/members/shareTokens = 빈 객체.
+  타입은 기존 TripState의 배열/Record와 동일. 새로운 저장 테이블 아님.
+- AuthBridge는 계정 ID 변경 시 TanStack Query 캐시도 초기화한다.
+- 발자취 device-draft는 기기 공용 독립 초안이며 계정 서버 데이터로 간주하지 않음.
+
+[완성 범위와 향후 저장 변경]
+사용자 요구 7개는 docs/planning/APP_COMPLETION_SCOPE.md에 기록했다.
+v1.7 당시 영수증 OCR/사진/커뮤니티 게시의 신규 테이블은 미생성이었다.
+v1.8 신규 마이그레이션 및 객체는 아래 8절을 최신 기준으로 적용한다.
+새 스키마·객체 구현 시 사진 비공개 권한, 원자 영수증/지출 연결,
+공개 게시물 투영과 필드 제약을 본 사전에 동시에 반영한다.
+
+[v1.7 변경 기록]
+2026-10-03: 실제 소셜 인증·PKCE·계정 전환 객체 및 email 제공자 명세 추가.
+실제 공급자 인증/가입·원격 환경 적용·실기기 검증은 아직 미완료.
+
+================================================================================
+8. 일정·초대·사진·영수증·커뮤니티 서버 명세 (v1.8 / 2026-10-03)
+================================================================================
+DB명: Supabase PostgreSQL 프로젝트 DB(public, wherego_private, storage).
+실제 적용 파일: supabase/migrations/20261003000001_complete_app.sql.
+전체 체인 6개. 로컬 실제 PostgreSQL(PGlite) 적용 검증이며 원격 적용은 미검증.
+기존 발자취 device-draft/legacy receipts/attachments/share_links와 별도 원본이다.
+
+[기존 테이블 변경]
+public.itinerary_items.address: TEXT NOT NULL DEFAULT '', length<=200, 일정 지역명/주소.
+public.trips.trips_nonempty_labels: title trim 1~100, country/city trim 1~50 CHECK.
+public.trip_days.uq_trip_day: UNIQUE(trip_id,day_number), DEFERRABLE INITIALLY DEFERRED.
+public.trip_days.trip_days_unique_date: UNIQUE(trip_id,trip_date), DEFERRABLE INITIALLY DEFERRED.
+  기간 이동 중 일시 충돌은 거래 종료에 검사한다. DAY 순서와 UUID를 유지한다.
+  기간은 1~90일, 기록이 있는 마지막 DAY 제거 및 확정 결제일 범위 제외는 거부.
+  일정에 비용이 연결되어 있으면 DAY 변경을 거부해 지출 부모 일치를 보존한다.
+
+[테이블 public.trip_media]
+- id: UUID PK, 클라이언트 보안 UUID, 기본값 없음. 재시도 시 같은 값.
+- trip_id: UUID NOT NULL FK trips(id) ON DELETE CASCADE, 비공개 여행 부모.
+- schedule_id: UUID NULL FK itinerary_items(id) ON DELETE RESTRICT, 선택 일정.
+  등록 RPC가 같은 여행 일정인지 검사한다.
+- uploaded_by: UUID NOT NULL FK profiles(id), JWT 작성자.
+- path: TEXT NOT NULL UNIQUE, tripUUID/assetUUID.jpg 또는 .png CHECK.
+  등록 시 앞부분=trip_id, 파일 UUID=id, storage.objects 실제 업로드 존재 검사.
+- purpose: TEXT NOT NULL CHECK IN('photo','receipt'), 원본 목적.
+- mime_type: TEXT NOT NULL CHECK IN('image/jpeg','image/png'), 업로드 형식.
+- created_at: TIMESTAMPTZ NOT NULL DEFAULT now(), 등록 시각.
+- RLS: authenticated 여행 멤버 SELECT. 직접 INSERT/UPDATE/DELETE 권한 없음.
+- 공개 선택 사진·참조 중 영수증 원본은 삭제 거부. DB 등록 해제 후 Storage 삭제.
+
+[테이블 public.receipt_records]
+- id: UUID PK, 확인 폼 UUID, 같은 확인 거래의 expense_id와 동일 값.
+- trip_id: UUID NOT NULL FK trips(id) ON DELETE CASCADE.
+- schedule_id: UUID NOT NULL FK itinerary_items(id) ON DELETE RESTRICT.
+- media_id: UUID NOT NULL UNIQUE FK trip_media(id) ON DELETE RESTRICT.
+  영수증 목적·같은 여행·실제 업로드 원본만 허용. 원본당 확인 1개.
+- expense_id: UUID NOT NULL UNIQUE FK expenses(id) ON DELETE RESTRICT.
+  확인 저장에서 is_actual=true, source='receipt', category='etc'로 원자 생성.
+- merchant: TEXT NOT NULL CHECK(trim length 1~100), 사용자가 확인한 상호.
+- transaction_date: DATE NOT NULL, 실제 결제일. RPC에서 여행 기간 내 검사.
+- total_amount: NUMERIC(12,2) NOT NULL CHECK>0. HTTP와 직접 RPC에서 정밀도 검증.
+- currency: TEXT NOT NULL CHECK IN('KRW','JPY','USD'). KRW/JPY 정수 CHECK.
+- details: TEXT NOT NULL DEFAULT '' CHECK length<=1000, 구매 내역 확인값.
+- confirmed_by: UUID NOT NULL FK profiles(id), 현재 JWT 확인자.
+- created_at: TIMESTAMPTZ NOT NULL DEFAULT now(), 확인 시각.
+- RLS: 여행 멤버 SELECT만. 삭제 RPC가 확인 기록과 지출을 함께 제거한다.
+  원본 사진·연결 일정은 남는다. 기존 계획 시각은 결제일로 덮어쓰지 않는다.
+  기존 일정 선택 또는 같은 DAY의 신규 PLACE 일정 생성 지원.
+
+[테이블 public.community_posts]
+- id: UUID PK DEFAULT pg_catalog.gen_random_uuid(), 공개 글 식별자.
+- trip_id: UUID NOT NULL UNIQUE FK trips(id) ON DELETE CASCADE, 여행당 글 1개.
+- author_id: UUID NOT NULL FK profiles(id), 여행 소유자의 JWT UID.
+- title: TEXT NOT NULL CHECK(trim length 1~100), 공개 제목.
+- body: TEXT NOT NULL CHECK length<=2000, 공개 본문.
+- snapshot: JSONB NOT NULL, 선택된 일정·지역·기간·선택 비용의 공개 복사본.
+  country/city/startDate/endDate, itinerary[{title,date,timeSlot,address}], costs.
+  costs는 실제 지출을 통화별 decimal 문자열로 합산하거나 비공개 시 {}.
+  비공개 memo·영수증 원본/내역·연락처·동행 목록·초대 토큰은 포함하지 않음.
+- photo_ids: UUID[] NOT NULL DEFAULT '{}', 같은 여행 purpose='photo'만 선택.
+- published: BOOLEAN NOT NULL DEFAULT true, 철회 시 false.
+- published_at/updated_at: TIMESTAMPTZ NOT NULL DEFAULT now(), 게시/수정 시각.
+- RLS: anon/authenticated published=true SELECT. 직접 쓰기 없음.
+- owner + trip.status='COMPLETED'만 게시. 재게시 시 같은 trip_id 글을 갱신한다.
+
+[테이블 public.community_reports]
+- post_id: UUID NOT NULL FK community_posts(id) ON DELETE CASCADE.
+- reporter_id: UUID NOT NULL FK profiles(id) ON DELETE CASCADE, JWT 신고자.
+- reason: TEXT NOT NULL CHECK(trim length 1~500), 사용자 입력 사유.
+- created_at: TIMESTAMPTZ NOT NULL DEFAULT now().
+- PK(post_id,reporter_id), 같은 글 재신고는 사유를 갱신한다.
+- RLS 활성, 일반 사용자 직접 읽기·쓰기는 모두 차단. 공개 글 신고 RPC만 허용.
+
+[테이블 public.community_blocks]
+- user_id: UUID NOT NULL FK profiles(id) ON DELETE CASCADE, JWT 차단자.
+- blocked_user_id: UUID NOT NULL FK profiles(id) ON DELETE CASCADE, 차단 작성자.
+- created_at: TIMESTAMPTZ NOT NULL DEFAULT now().
+- PK(user_id,blocked_user_id), CHECK user_id<>blocked_user_id.
+- RLS 활성, 직접 접근 차단. 본인 목록 추가 RPC와 본인 피드 필터만 제공.
+  다른 사용자 공개 접근권한을 박탈하는 기능이 아니라 본인 피드에서 숨기는 기능.
+
+[기존 초대·요청 테이블 사용 정책]
+public.trip_invites: 기존 id/trip_id/token_hash/role/created_by/expires_at/revoked_at/
+  used_at/accepted_by/created_at 컬럼 변경 없음. role editor/viewer, 만료 7일.
+  2개 보안 UUID를 결합한 64hex 토큰의 SHA-256 hash를 저장한다.
+  초대당 수락 계정 1개, 기존 멤버 role 유지. 멤버 제거 시 수락한 초대도 철회.
+public.mutation_requests: 기존 actor+request_key UUID UNIQUE, 입력 SHA-256·결과 JSONB.
+  명령 성공 재생 때 현재 권한도 재검사. 같은 키의 다른 입력·만료 키 재사용 거부.
+  초대 원문은 제한된 재생 결과에만 포함. 직접 SELECT 권한은 제공하지 않는다.
+  저장 결과 보관 만료 24시간. 청소 작업은 운영 설정 필요.
+
+[storage 외부 관리 테이블과 정책]
+storage.buckets id/name='trip-private', public=false, file_size_limit=4194304(BIGINT),
+  allowed_mime_types(TEXT[])={image/jpeg,image/png}. 기존 외부 컬럼을 사용한다.
+storage.objects: 기존 Supabase 관리 컬럼 사용. bucket_id/name으로 등록 검사.
+- INSERT authenticated: can_upload_media(name), owner/editor, 보관 여행 제외.
+- SELECT anon/authenticated: 멤버 또는 published 글의 선택된 photo 원본만.
+  미등록 업로드 파일은 같은 여행 owner/editor만 조회·정리 가능하다.
+- DELETE authenticated: 편집 권한 + trip_media 참조 없는 파일만.
+- UPDATE/덮어쓰기 허용하지 않음. 파일 ID마다 고유 경로.
+- 서명 URL 60초. 철회 이후 신규 발급 거부, 기존 URL은 만료까지 유효할 수 있음.
+- 업로드 후 앱 중단으로 남은 미등록 파일의 주기적 정리는 운영 작업으로 남음.
+
+[새 공개 RPC / 인증·명령]
+wherego_command(p_trip UUID,p_operation TEXT,p_input JSONB,p_version BIGINT,p_key UUID)
+  -> {data:{id?,tripId,tripVersion,token?,expiresAt?,path?},replayed:boolean}.
+  명령: schedule.save/delete, expense.save/delete, trip.update/period,
+  media.register/delete, receipt.confirm/delete, invite.create/revoke,
+  member.role/remove, community.publish/withdraw.
+  trip/invite/member/community는 owner, 나머지 owner/editor. 보관 여행 거부.
+  요청 키·필드·부모·통화 정밀도·버전 검사와 저장이 한 거래다.
+wherego_accept_invite(p_token TEXT,p_key UUID) -> {data:{tripId,tripVersion},replayed}.
+  authenticated, 실제 비익명 JWT 필요. 철회·만료·외부 계정 재사용 거부.
+wherego_workspace(p_trip UUID) -> WorkspaceSnapshot, authenticated 멤버 전용.
+wherego_community(p_offset INT DEFAULT 0) -> CommunityPost[], anon/authenticated.
+  게시 시각 DESC,id 정렬, LIMIT20, offset0..10000, JWT 본인 차단 필터.
+wherego_report(p_post UUID,p_reason TEXT) -> {id}, authenticated 본인 신고.
+wherego_block(p_user UUID) -> {id}, authenticated 본인 차단.
+모든 RPC는 SECURITY DEFINER + search_path=''. private helper 실행권한은 철회.
+RLS용 member_role(UUID),can_read_media(TEXT),can_upload_media(TEXT)만 제한 공개.
+
+[HTTP 경로]
+GET /api/v1/trips/:tripId/workspace, POST /api/v1/trips/:tripId/commands.
+POST /api/v1/invites/accept. GET /api/v1/community, GET /public/community(익명).
+POST /api/v1/community/reports, POST /api/v1/community/blocks.
+POST /api/v1/trips/:tripId/receipts/ocr: {mediaId UUID} -> ReceiptDraft.
+GET /api/v1/trips/:tripId/media/:mediaId/url -> {url HTTPS signedURL}.
+기존 생성/list/checklist API 유지. 기존 /api/share/link,/api/receipt/ocr는 503 유지.
+저장 명령 If-Match="trip:<UUID>:<positive version>", Idempotency-Key=UUID.
+민감한 본문·원본·토큰·외부 오류 URL은 로그/공개 오류 문자열에 포함하지 않음.
+
+[논리 객체 / packages/domain/src/workspace.ts]
+WorkspaceSchedule: id/dayId string UUID, title string1..100, type ScheduleType,
+  timeSlot stringHH:mm|null, sortOrder positive int, memo string<=300|null,
+  address string<=200(빈 값 허용).
+WorkspaceMedia: id UUID,path string,purpose photo|receipt,scheduleId UUID|null.
+WorkspaceExpense: id UUID,dayId/scheduleId UUID|null,title string,amount decimal string,
+  currency KRW|JPY|USD,isActual boolean,category string,source manual|schedule|receipt.
+WorkspaceReceipt: id/scheduleId/mediaId UUID,merchant string,date YYYY-MM-DD,
+  amount decimal string,currency KRW|JPY|USD,details string<=1000.
+WorkspaceSnapshot: trip PersistedTrip,myRole owner|editor|viewer,
+  days[{id UUID,dayNumber int,tripDate YYYY-MM-DD}],itinerary WorkspaceSchedule[],
+  expenses WorkspaceExpense[],checklists[{id UUID,title string,isCompleted boolean}],
+  members[{memberId UUID,userId UUID,nickname string,role MemberRole,isMe boolean}],
+  media WorkspaceMedia[],receipts WorkspaceReceipt[],postId UUID|null,
+  invites[{id UUID,role editor|viewer,expiresAt ISO,revokedAt ISO|null,usedAt ISO|null}].
+  invites는 owner만 내용 조회, 다른 멤버는 []. 원문 토큰은 스냅샷에 없음.
+CommunityPost: id/authorId UUID,author/title/body string,publishedAt ISO,
+  photoPaths string[],snapshot{country,city,startDate,endDate,itinerary,costs}.
+ReceiptDraft: rawText string<=10000,merchant string<=100,transactionDate string,
+  amount string,currency KRW|JPY|USD,needsConfirmation true.
+  인식 실패 필드는 빈 값 가능. 저장 시 stricter receiptInputSchema 검증.
+WorkspaceCommand: operation별 discriminated union, strict input, 공통 Zod 계약.
+PlanForm: kind trip|schedule|expense|receipt|publish|metadata|period,id UUID,
+  values Record<string,string>, 앱 입력 초안. DB 객체 아님.
+  같은 응답 유실 요청은 같은 본문·버전·키로만 재시도한다.
+PendingInvite: token string64hex, 웹 현재 탭 sessionStorage/네이티브 SecureStore.
+  키 wherego-pending-invite, 수락 성공/명시적 취소 시 삭제. DB 테이블 없음.
+
+[OCR 서버 바인딩]
+GOOGLE_VISION_API_KEY: string Worker secret. 앱/public 환경에 포함하지 않는다.
+외부 고정 endpoint Vision images:annotate, DOCUMENT_TEXT_DETECTION.
+원본4MiB/응답256KiB/20초 인식 제한. OCR만으로 DB 기록을 자동 저장하지 않음.
+실제 공급자 샘플 정확도·과금·원격 키/정책은 아직 인수하지 않았다.
+
+[v1.8 변경 기록]
+2026-10-03: 서버 앱 5개 테이블, 일정 주소/DAY 제약, 6개 공개 RPC,
+  사진 Storage 정책, 앱·웹 공통 명령·스냅샷·OCR 후보 객체 명세 추가.
+  소셜 콘솔·Supabase 원격 적용·실기기·실제 OCR 인수는 별도 남은 작업이다.

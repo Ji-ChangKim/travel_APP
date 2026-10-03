@@ -194,8 +194,16 @@ export default function MyScreen() {
         text: '로그아웃',
         style: 'destructive',
         onPress: () => {
-          logout();
-          router.replace('/login');
+          // 실제 세션 종료가 완료된 경우에만 로그인 화면으로 이동한다.
+          logout()
+            .then(() => {
+              // 로그아웃 이후의 계정 화면을 닫는다.
+              router.replace('/login');
+            })
+            .catch(() => {
+              // 세션 종료 실패를 성공으로 안내하지 않는다.
+              Alert.alert('로그아웃 실패', '잠시 후 다시 시도해 주세요.');
+            });
         },
       },
     ]);

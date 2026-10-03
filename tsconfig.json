@@ -3,6 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "noUncheckedIndexedAccess": true,
+    "types": ["node"],
     "paths": {
       "@/*": ["./apps/mobile/src/*"],
       "@wherego/domain": ["./packages/domain/src/index.ts"],
@@ -14,6 +15,8 @@
     "apps/**/*.ts",
     "apps/**/*.tsx",
     "packages/**/*.ts",
+    "tests/**/*.ts",
+    "playwright.config.ts",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
   ]

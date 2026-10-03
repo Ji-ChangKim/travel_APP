@@ -1,4 +1,6 @@
 import type { Place } from '@wherego/domain';
+export * from './foundation';
+export * from './workspace';
 
 // Hono API 엔드포인트 기본 주소를 정의한다.
 const API_BASE_URL =

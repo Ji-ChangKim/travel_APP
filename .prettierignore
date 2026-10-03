@@ -4,6 +4,7 @@ node_modules/
 dist/
 **/dist/
 **/.expo/
+**/.release/
 **/node_modules/
 android/
 ios/

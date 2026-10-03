@@ -10,12 +10,23 @@ expo-env.d.ts
 # 네이티브 프로젝트는 필요할 때 Expo 설정으로 생성한다.
 /android/
 /ios/
+/apps/mobile/android/
+/apps/mobile/ios/
 .kotlin/
 
 # 로컬 환경 변수와 서명 파일을 저장소에서 제외한다.
 .env
 .env.*
 !.env.example
+!.env.release.example
+!.env.mvp.example
+.release/
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+.wrangler/
+test-results/
+playwright-report/
 *.jks
 *.keystore
 *.p8

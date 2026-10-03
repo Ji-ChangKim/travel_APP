@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 
 import type {
-  AuthProvider,
   ChecklistItem,
   Expense,
   ItineraryItem,
@@ -19,7 +18,8 @@ import {
   loadStoredGuestSession,
   saveGuestSession,
 } from '@/services/guestAuthService';
-import { upsertSocialProfile } from '@/services/profileService';
+import { signOutUser } from '@/services/authService';
+import { accountChangeState } from '@/features/auth/model';
 
 // 일차 계산 결과 데이터 구조를 정의한다.
 export interface CalculatedDay {
@@ -92,15 +92,6 @@ interface TripState {
   // 방문 체크인 발자국 기록 목록
   visits: Visit[];
 
-  // 사용자 로그인 처리
-  login: (nickname: string) => Profile;
-  // 소셜 로그인 처리 (구글/카카오/애플)
-  loginWithSocial: (
-    provider: AuthProvider,
-    nickname: string,
-    osPlatform: OsPlatform,
-    avatarUrl?: string,
-  ) => Promise<Profile>;
   // 게스트 둘러보기 로그인 처리 (기기 영구 저장)
   loginAsGuest: (osPlatform: OsPlatform) => Promise<Profile>;
   // 기기 저장소에 보관된 게스트 세션 복원
@@ -110,7 +101,7 @@ interface TripState {
   // 사용자 프로필 정보 갱신
   updateProfile: (updates: Partial<Profile>) => void;
   // 사용자 로그아웃 처리
-  logout: () => void;
+  logout: () => Promise<void>;
   // 활성 여행 ID 설정
   setSelectedTripId: (id: string) => void;
   // 새 여행 생성
@@ -170,61 +161,25 @@ export const useTripStore = create<TripState>((set, get) => ({
   shareTokens: {},
   visits: [],
 
-  // 간편 테스트 로그인을 수행하고 프로필을 등록한다.
-  login: (nickname: string) => {
-    // 신규 프로필 객체를 생성한다.
-    const userProfile: Profile = {
-      id: `user-${Date.now()}`,
-      nickname: nickname.trim() || '여행자',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    // 상태에 현재 사용자 정보를 저장한다.
-    set({ currentUser: userProfile });
-    return userProfile;
-  },
-
-  // 소셜 로그인 인증 완료 시 즉시 프로필을 구성하고 상태 및 DB에 동기화한다.
-  loginWithSocial: async (provider, nickname, osPlatform, avatarUrl) => {
-    const now = new Date().toISOString();
-    const newProfile: Profile = {
-      id: `user-${provider}-${Date.now()}`,
-      nickname: nickname.trim() || `${provider} 여행자`,
-      avatarUrl: avatarUrl || null,
-      bio: null,
-      travelStyles: [],
-      phone: null,
-      osPlatform,
-      authProvider: provider,
-      lastSignInAt: now,
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    set({ currentUser: newProfile });
-
-    try {
-      await upsertSocialProfile(newProfile);
-    } catch {
-      // 오프라인이거나 개발 환경인 경우 로컬 상태로 안전하게 유지한다.
-    }
-
-    return newProfile;
-  },
-
   // 게스트 둘러보기 세션을 기기 안전 저장소에 영구 보관하여 앱 삭제 전까지 유지한다.
   loginAsGuest: async (osPlatform) => {
     const guestProfile = generateGuestProfile(osPlatform);
-    set({ currentUser: guestProfile });
+    get().setCurrentUser(guestProfile);
     await saveGuestSession(guestProfile);
     return guestProfile;
   },
 
   // 기기 안전 저장소에서 기존 게스트 세션을 조회하여 복원한다.
   initGuestSession: async () => {
+    // 실제 로그인 세션을 게스트 복원으로 덮어쓰지 않는다.
+    if (get().currentUser?.authProvider !== 'guest' && get().currentUser)
+      return null;
     const saved = await loadStoredGuestSession();
-    if (saved) {
-      set({ currentUser: saved });
+    if (
+      saved &&
+      (!get().currentUser || get().currentUser?.authProvider === 'guest')
+    ) {
+      get().setCurrentUser(saved);
       return saved;
     }
     return null;
@@ -232,8 +187,11 @@ export const useTripStore = create<TripState>((set, get) => ({
 
   // 인증된 사용자 프로필 객체로 전역 상태를 직접 갱신한다.
   setCurrentUser: (profile: Profile | null) => {
-    // 상태의 currentUser를 전달받은 profile 객체로 설정한다.
-    set({ currentUser: profile });
+    // 다른 계정의 여행·일정·비용·멤버·방문을 새 사용자에게 노출하지 않는다.
+    set((state) => {
+      // 같은 UUID의 토큰 갱신에서는 화면 데이터를 유지한다.
+      return accountChangeState(state.currentUser, profile);
+    });
   },
 
   // 현재 로그인된 사용자의 프로필 속성을 부분 갱신한다.
@@ -253,10 +211,18 @@ export const useTripStore = create<TripState>((set, get) => ({
 
   // 로그아웃을 수행하고 기기 게스트 세션을 해제한다.
   logout: () => {
-    // 기기 안전 저장소의 게스트 세션을 정리한다.
-    clearGuestSession().catch(() => {});
-    // 사용자 정보를 null로 초기화한다.
-    set({ currentUser: null });
+    // 실제 Auth 세션 종료 실패를 호출자에게 전달한다.
+    return signOutUser()
+      .then(({ error }) => {
+        // 세션 종료를 성공한 것처럼 표시하지 않는다.
+        if (error) throw error;
+        // 게스트 저장소도 정리한다.
+        return clearGuestSession();
+      })
+      .then(() => {
+        // 계정과 계정 소유 메모리 데이터를 함께 초기화한다.
+        return get().setCurrentUser(null);
+      });
   },
 
   // 현재 선택된 활성 여행 아이디를 변경한다.

@@ -5,13 +5,22 @@
   "private": true,
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "test": "tsx --test test/*.test.ts",
+    "types": "wrangler types worker-configuration.d.ts --include-runtime false --strict-vars false",
+    "build": "wrangler deploy --dry-run --env staging"
   },
   "dependencies": {
-    "hono": "^4.7.0"
+    "@supabase/supabase-js": "^2.117.2",
+    "@wherego/domain": "^0.1.0",
+    "@wherego/validation": "^0.1.0",
+    "hono": "^4.7.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250214.0",
-    "wrangler": "^3.109.2"
+    "@cloudflare/workers-types": "^5.20261002.1",
+    "@electric-sql/pglite": "^0.5.8",
+    "tsx": "^4.23.15",
+    "wrangler": "^4.146.0"
   }
 }

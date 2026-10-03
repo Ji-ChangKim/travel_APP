@@ -52,9 +52,18 @@ export default function TabLayout() {
       <Tabs.Screen
         name="footprints"
         options={{
-          title: '발자국',
+          title: '발자취',
           tabBarIcon: ({ color, size }) => (
             <TabBarIcon name="footsteps-outline" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="community"
+        options={{
+          title: '커뮤니티',
+          tabBarIcon: ({ color, size }) => (
+            <TabBarIcon name="people-outline" color={color} size={size} />
           ),
         }}
       />

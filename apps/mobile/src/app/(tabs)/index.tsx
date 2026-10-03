@@ -72,7 +72,8 @@ function calculateDDay(startDate: string): string {
 }
 
 // [내 여행] 목록 및 여행 생성/참여 허브 화면을 렌더링한다.
-export default function MyTripsScreen() {
+export { default } from '@/features/workspace/WorkspaceScreen';
+export function MyTripsPrototypeScreen() {
   const router = useRouter();
 
   // 전역 여행 스토어 상태 및 액션을 구독한다.

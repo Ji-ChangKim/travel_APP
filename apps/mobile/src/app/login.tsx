@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Platform,
   StyleSheet,
   Text,
@@ -11,9 +12,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import type { AuthProvider, OsPlatform } from '@wherego/domain';
+import type { OsPlatform } from '@wherego/domain';
+import { signInWithSocial } from '@/features/auth/oauth';
+import type { SocialProvider } from '@/features/auth/model';
 
 import { useTripStore } from '@/stores/useTripStore';
+import { pendingInvite } from '@/features/workspace/invite';
 
 // 로그인 화면 전용 디자인 토큰 규격을 정의한다.
 const loginTheme = {
@@ -45,64 +49,76 @@ export function resolveCurrentOsPlatform(): OsPlatform {
 // 비밀번호 없이 OS 맞춤 소셜 및 게스트 원클릭 인증 화면을 렌더링한다.
 export default function SocialAuthScreen() {
   const router = useRouter();
-  const {
-    currentUser,
-    loginWithSocial,
-    loginAsGuest,
-    initGuestSession,
-    logout,
-  } = useTripStore();
+  const { currentUser, loginAsGuest, logout } = useTripStore();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  // 웹과 모바일에서 인증 실패를 동일하게 보여준다.
+  const [authError, setAuthError] = useState('');
   const currentOs = resolveCurrentOsPlatform();
-
-  // 컴포넌트 마운트 시 기기 SecureStore에 저장된 게스트 세션을 복원한다.
-  useEffect(() => {
-    // 저장된 게스트 세션을 복원하는 단일 명령을 수행한다.
-    initGuestSession().catch(() => {});
-  }, [initGuestSession]);
 
   // 메인 여행 대시보드 화면으로 라우팅한다.
   const navigateToTabs = () => {
     // 탭 네비게이션 화면으로 교체 이동한다.
-    router.replace('/(tabs)');
-  };
-
-  // 제공자별 사용자 표시 닉네임을 생성한다.
-  const getProviderDefaultNickname = (provider: AuthProvider): string => {
-    const providerNameMap: Record<AuthProvider, string> = {
-      kakao: '카카오',
-      google: 'Google',
-      apple: 'Apple',
-      guest: '게스트',
-    };
-    return `${providerNameMap[provider]} 여행자`;
+    void pendingInvite()
+      .then((invite) => {
+        // 인증 전에 받은 초대 링크로 복귀한다.
+        router.replace(invite ? '/invite' : '/(tabs)');
+      })
+      .catch(() => {
+        // 저장소 오류가 있어도 여행 허브에 진입할 수 있다.
+        router.replace('/(tabs)');
+      });
   };
 
   // 소셜 로그인(구글/카톡/애플)을 처리하고 OS 및 제공자 정보를 기록한다.
-  const handleSocialAuth = async (provider: AuthProvider) => {
+  const handleSocialAuth = async (provider: SocialProvider) => {
+    // 새 요청에서 이전 오류 안내를 제거한다.
+    setAuthError('');
     // 로딩 인디케이터 상태를 활성화한다.
     setIsLoading(true);
-    // 제공자에 맞는 기본 닉네임을 생성한다.
-    const defaultNickname = getProviderDefaultNickname(provider);
-    // 소셜 로그인 비즈니스 로직을 호출한다.
-    await loginWithSocial(provider, defaultNickname, currentOs);
-    // 로딩 인디케이터 상태를 비활성화한다.
-    setIsLoading(false);
-    // 탭 화면으로 화면을 전환한다.
-    navigateToTabs();
+    // 세션 발급에 성공한 경우에만 앱을 시작한다.
+    try {
+      if (await signInWithSocial(provider)) navigateToTabs();
+    } catch (error) {
+      // 웹의 Alert 지원 여부와 관계없이 실패 이유를 표시한다.
+      setAuthError(
+        error instanceof Error
+          ? error.message
+          : '로그인에 실패했습니다. 다시 시도해 주세요.',
+      );
+      // 연결 누락·공급자 거부·교환 실패를 사용자에게 알린다.
+      Alert.alert(
+        '로그인 실패',
+        error instanceof Error
+          ? error.message
+          : '로그인에 실패했습니다. 다시 시도해 주세요.',
+      );
+    } finally {
+      // 취소 또는 실패한 경우에도 버튼을 다시 사용할 수 있다.
+      setIsLoading(false);
+    }
   };
 
   // 게스트 둘러보기 로그인을 처리하고 기기 저장소에 영구 보존한다.
   const handleGuestAuth = async () => {
+    // 이전 인증 오류를 새 둘러보기 요청과 구분한다.
+    setAuthError('');
     // 로딩 인디케이터 상태를 활성화한다.
     setIsLoading(true);
-    // 게스트 로그인 단일 명령 함수를 호출한다.
-    await loginAsGuest(currentOs);
-    // 로딩 인디케이터 상태를 비활성화한다.
-    setIsLoading(false);
-    // 탭 화면으로 화면을 전환한다.
-    navigateToTabs();
+    // 실제 로그인 중인 사용자는 계정 전환 동작을 먼저 수행한다.
+    try {
+      if (currentUser && currentUser.authProvider !== 'guest') await logout();
+      await loginAsGuest(currentOs);
+      navigateToTabs();
+    } catch {
+      // 기기 저장 실패는 웹에서도 확인할 수 있다.
+      setAuthError('기기 저장소 또는 세션을 확인해 주세요.');
+      // 저장 실패 후 성공 화면으로 이동하지 않는다.
+      Alert.alert('둘러보기 실패', '기기 저장소 또는 세션을 확인해 주세요.');
+    } finally {
+      // 실패한 뒤에도 다시 시도할 수 있다.
+      setIsLoading(false);
+    }
   };
 
   // 기존 로그인 세션을 유지하며 메인 화면으로 이동한다.
@@ -114,7 +130,12 @@ export default function SocialAuthScreen() {
   // 현재 세션을 종료하고 새로 로그인한다.
   const handleSwitchAccount = () => {
     // 현재 로그인된 세션을 초기화하는 단일 명령을 수행한다.
-    logout();
+    logout().catch(() => {
+      // 세션 종료 실패를 화면에서도 안내한다.
+      setAuthError('로그아웃에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      // 세션 종료가 실패하면 기존 계정을 유지한다.
+      Alert.alert('로그아웃 실패', '잠시 후 다시 시도해 주세요.');
+    });
   };
 
   return (
@@ -206,6 +227,16 @@ export default function SocialAuthScreen() {
           </View>
         )}
 
+        {/* 인증 실패는 현재 입력과 버튼을 유지하며 표시한다. */}
+        {authError ? (
+          <Text
+            accessibilityRole="alert"
+            style={{ color: '#B42318', textAlign: 'center' }}
+          >
+            {authError}
+          </Text>
+        ) : null}
+
         {/* 로딩 인디케이터 */}
         {isLoading ? (
           <View style={styles.loadingWrap}>
@@ -226,13 +257,11 @@ export default function SocialAuthScreen() {
                 size={18}
                 color={loginTheme.kakaoText}
               />
-              <Text style={styles.kakaoBtnText}>
-                카카오톡으로 3초 만에 시작하기
-              </Text>
+              <Text style={styles.kakaoBtnText}>카카오톡으로 계속하기</Text>
             </TouchableOpacity>
 
             {/* 2. AOS(Android): Google 로그인 */}
-            {(currentOs === 'android' || currentOs === 'web') && (
+            {
               <TouchableOpacity
                 style={styles.googleBtn}
                 onPress={() => handleSocialAuth('google')}
@@ -243,7 +272,7 @@ export default function SocialAuthScreen() {
                   Google 계정으로 계속하기
                 </Text>
               </TouchableOpacity>
-            )}
+            }
 
             {/* 3. iOS: Apple 로그인 */}
             {(currentOs === 'ios' || currentOs === 'web') && (
@@ -279,7 +308,8 @@ export default function SocialAuthScreen() {
               </Text>
             </TouchableOpacity>
             <Text style={styles.guestNoticeText}>
-              * 게스트 데이터는 앱을 삭제하기 전까지 기기에 안전하게 보존됩니다.
+              게스트는 둘러보기용입니다. 여행 서버 저장·초대는 로그인 후 이용할
+              수 있습니다.
             </Text>
           </View>
         )}

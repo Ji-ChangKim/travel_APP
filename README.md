@@ -2,7 +2,7 @@
 
 여행을 계획하고, 동행자와 일정을 공유하고, 다녀온 이야기를 기록하는 APP/WEB 프로젝트입니다.
 
-Expo + React Native + TypeScript를 사용해 Android, iOS, 웹에서 같은 화면 코드를 사용합니다. 현재는 개발 환경과 소개 화면까지 구성했으며, 여행 관리·공유·기록 기능은 이후 구현합니다.
+Expo + React Native + TypeScript를 사용해 Android, iOS, 웹에서 같은 화면 코드를 사용합니다. 소셜 인증, 서버 여행·일정·비용·초대, 비공개 사진·영수증 확인, 종료 여행 커뮤니티 게시를 구현했습니다. 실제 Supabase/제공자 콘솔·OCR·실기기 인수는 환경 준비 후 진행합니다. [서비스 연결 절차](docs/APP_SERVICES_SETUP.md)를 먼저 확인하세요.
 
 ## 개발 환경
 
@@ -22,22 +22,27 @@ npm ci
 npm start
 ```
 
-| 명령                       | 용도                                            |
-| -------------------------- | ----------------------------------------------- |
-| `npm run mobile`           | 모바일 앱(apps/mobile) Expo 개발 서버 실행      |
-| `npm run mobile:web`       | 모바일 앱 웹 브라우저 실행                      |
-| `npm run mobile:doctor`    | 모바일 앱 Expo 호환성 및 설정 검사              |
-| `npm run mobile:build:web` | 모바일 앱 정적 배포 파일(`dist/`) 생성          |
-| `npm run mobile:build:apk` | EAS 기반 실기기 설치용 Android APK 빌드         |
-| `npm run api:dev`          | Hono API(apps/api) Cloudflare Workers 개발 서버 |
-| `npm run check`            | 모노레포 전체 타입·린트·서식 통합 검사          |
-| `npm run format`           | 모노레포 전체 코드 서식 자동 정리               |
-| `npm run format:check`     | 파일 수정 없이 서식 일치 여부 검사              |
-| `npm run build:all`        | Android(AAB) + iOS(IPA) 스토어 프로덕션 빌드    |
+| 명령                         | 용도                                               |
+| ---------------------------- | -------------------------------------------------- |
+| `npm run mobile`             | 모바일 앱(apps/mobile) Expo 개발 서버 실행         |
+| `npm run mobile:web`         | 모바일 앱 웹 브라우저 실행                         |
+| `npm run mobile:doctor`      | 모바일 앱 Expo 호환성 및 설정 검사                 |
+| `npm run mobile:build:web`   | 모바일 앱 정적 배포 파일(`dist/`) 생성             |
+| `npm run mobile:build:apk`   | EAS 기반 실기기 설치용 Android APK 빌드            |
+| `npm run api:dev`            | Hono API(apps/api) Cloudflare Workers 개발 서버    |
+| `npm run check`              | 모노레포 전체 타입·린트·서식 통합 검사             |
+| `npm run test:workspace:web` | 격리된 Auth/API/Storage 응답으로 전체 앱 흐름 검증 |
+| `npm run format`             | 모노레포 전체 코드 서식 자동 정리                  |
+| `npm run format:check`       | 파일 수정 없이 서식 일치 여부 검사                 |
+| `npm run build:all`          | Android(AAB) + iOS(IPA) 스토어 프로덕션 빌드       |
 
 ### 배포 프로세스 상세 가이드
 
+현재 목표는 Expo에서 내려받아 Android 실기기에 설치하는 MVP APK입니다. [Android MVP 빌드 절차](docs/MVP_ANDROID_BUILD.md)와 [체크리스트](docs/BUILD_CHECKLIST.md)를 먼저 확인하세요. 공개 값 4개를 준비해 `npm run mvp:check`, `npm run mvp:prepare`로 검사하고, Expo 로그인·preview 환경 등록 후 `npm run mobile:build:apk`를 실행합니다. 스토어 심사·제출은 이번 범위에 포함하지 않습니다.
+
 자세한 빌드 및 배포 절차는 [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) 문서를 참고하세요.
+
+`.env.release.example`에 따라 실제 공개 설정을 준비한 뒤 `npm run release:check`와 `npm run release:prepare`로 환경 검사·웹 export·Worker dry-run을 실행합니다. 원격 배포는 main에서 staging/production을 선택하는 수동 GitHub Actions로 준비했습니다. 실제 외부 계정 설정·인수와 운영 공개 전 남은 작업은 배포 문서를 따릅니다.
 
 ### 실제 휴대폰
 

@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { colors } from '@/constants/theme';
+import AuthBridge from '@/features/auth/AuthBridge';
 
 // 앱 전역에서 사용할 TanStack QueryClient 인스턴스를 생성한다.
 const queryClient = new QueryClient({
@@ -19,6 +20,7 @@ const queryClient = new QueryClient({
 export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
+      <AuthBridge />
       <SafeAreaProvider>
         <Stack
           screenOptions={{

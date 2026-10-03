@@ -25,5 +25,20 @@ jobs:
       - name: 코드 품질 및 타입 검사
         run: npm run check
 
+      - name: DB·API 기반 검증
+        run: npm run test:foundation
+
+      - name: 인증 및 배포 설정 검증
+        run: npm run test:auth && npm run test:release
+
+      - name: Chrome 설치
+        run: npx playwright install --with-deps chrome
+
+      - name: 앱 핵심 화면 흐름 검증
+        run: npm run test:workspace:web
+
+      - name: Worker 배포 번들 검증
+        run: npm run api:build
+
       - name: 웹 정적 빌드 테스트
         run: npm run build:web

@@ -1,3 +1,11 @@
+// 발자취 기기 콘텐츠 모델을 공개한다.
+export type {
+  TrailFlight,
+  TrailPlan,
+  TrailReceipt,
+  TrailJourney,
+} from './trail';
+
 // 여행 진행 상태를 구분한다.
 export type TripStatus =
   | 'DRAFT' // 작성 중
@@ -25,7 +33,7 @@ export type VerificationMethod = 'gps' | 'manual' | 'receipt';
 export type OsPlatform = 'android' | 'ios' | 'web';
 
 // 사용자 인증 제공자 유형을 구분한다.
-export type AuthProvider = 'google' | 'kakao' | 'apple' | 'guest';
+export type AuthProvider = 'google' | 'kakao' | 'apple' | 'email' | 'guest';
 
 // 사용자 기본 프로필 정보를 정의한다.
 export interface Profile {
@@ -183,3 +191,22 @@ export interface ShareLink {
   permissions: 'read_only';
   createdAt: string;
 }
+
+// 서버 저장 기반 계약을 공개한다.
+export type {
+  DecimalAmount,
+  FoundationApiError,
+  MutationResult,
+  PersistedTrip,
+  PersistedTripInput,
+  SupportedCurrency,
+} from './foundation';
+export type {
+  WorkspaceSchedule,
+  WorkspaceMedia,
+  WorkspaceExpense,
+  WorkspaceReceipt,
+  WorkspaceSnapshot,
+  CommunityPost,
+  ReceiptDraft,
+} from './workspace';

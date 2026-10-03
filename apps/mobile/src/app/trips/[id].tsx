@@ -93,7 +93,8 @@ function getScheduleTypeBadge(type?: ScheduleType) {
 }
 
 // 여행 상세(Trip Detail) 일정 계획 및 공유 허브 화면을 렌더링한다.
-export default function TripDetailScreen() {
+export { default } from '@/features/workspace/WorkspaceScreen';
+export function TripDetailPrototypeScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
 

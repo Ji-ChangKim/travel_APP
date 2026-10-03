@@ -101,3 +101,23 @@ export const reviewCreateSchema = z.object({
 
 // 리뷰 생성 폼의 타입 추론을 정의한다.
 export type ReviewCreateInput = z.infer<typeof reviewCreateSchema>;
+
+// M1 서버 입력 검증을 기존 모바일 폼 계약과 함께 공개한다.
+export {
+  calendarDateSchema,
+  checklistAddSchema,
+  checklistStateSchema,
+  decimalExpenseSchema,
+  foundationUuidSchema,
+  mutationResultSchema,
+  persistedTripCreateSchema,
+  tripVersionSchema,
+} from './foundation';
+export {
+  trailFlightSchema,
+  trailJourneySchema,
+  trailPlanSchema,
+  trailReceiptSchema,
+} from './trail';
+export * from './workspace';
+export { isCalendarDate } from './foundation';

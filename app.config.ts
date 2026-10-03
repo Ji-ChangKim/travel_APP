@@ -32,6 +32,16 @@ const config: ExpoConfig = {
   // 파일 기반 화면 전환과 앱 시작 시 표시할 기본 이미지를 등록한다.
   plugins: [
     'expo-router',
+    'expo-web-browser',
+    [
+      'expo-image-picker',
+      {
+        photosPermission:
+          '여행 사진과 영수증을 선택하기 위해 사진 접근이 필요합니다.',
+        cameraPermission: '영수증을 촬영하기 위해 카메라 접근이 필요합니다.',
+        microphonePermission: false,
+      },
+    ],
     [
       'expo-splash-screen',
       {

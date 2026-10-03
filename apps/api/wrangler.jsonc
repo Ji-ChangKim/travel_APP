@@ -1,0 +1,36 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "wherego-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-02",
+  "compatibility_flags": ["nodejs_compat"],
+  // MVP에서는 OCR 키 없이 수동 영수증 입력을 테스트한다.
+  "secrets": { "required": [] },
+  // 실제 프로젝트 주소와 공개 API 키는 로컬 설정 또는 환경별 vars에서 주입한다.
+  "vars": {
+    "SUPABASE_URL": "",
+    "SUPABASE_ANON_KEY": "",
+    "ALLOWED_ORIGINS": "http://localhost:8081,http://localhost:19006",
+  },
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "env": {
+    "staging": {
+      "secrets": { "required": [] },
+      "name": "wherego-api-staging",
+      "vars": {
+        "SUPABASE_URL": "",
+        "SUPABASE_ANON_KEY": "",
+        "ALLOWED_ORIGINS": "",
+      },
+    },
+    "production": {
+      "secrets": { "required": ["GOOGLE_VISION_API_KEY"] },
+      "name": "wherego-api-production",
+      "vars": {
+        "SUPABASE_URL": "",
+        "SUPABASE_ANON_KEY": "",
+        "ALLOWED_ORIGINS": "",
+      },
+    },
+  },
+}
