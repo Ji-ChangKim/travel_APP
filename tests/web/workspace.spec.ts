@@ -372,7 +372,7 @@ async function login(page: Page): Promise<void> {
   await page.getByText('Google 계정으로 계속하기', { exact: true }).click();
   await expect(
     page.getByRole('button', {
-      name: '항공편 등록하고 새 여행 만들기',
+      name: '새 여행 시작하기',
       exact: true,
     }),
   ).toBeVisible();
@@ -386,7 +386,7 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
   await login(page);
   await page
     .getByRole('button', {
-      name: '항공편 등록하고 새 여행 만들기',
+      name: '새 여행 시작하기',
       exact: true,
     })
     .click();
@@ -394,9 +394,10 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
     '여행 타이틀 (비우면 자동 생성)': '검증 여행',
     '나라 검색': '일본',
     '도시 검색': '도쿄',
-    출발일: '2026-11-10',
+    시작일: '2026-11-10',
     종료일: '2026-11-10',
     '현지 시간대': 'Asia/Tokyo',
+    '기본 통화': 'KRW',
   });
   // 항공편 없는 여행의 명시적 건너뛰기도 유지한다.
   await page
@@ -526,7 +527,7 @@ test('항공편 등록에서 도착 나라·도시를 채우고 달력 날짜와
   await login(page);
   await page
     .getByRole('button', {
-      name: '항공편 등록하고 새 여행 만들기',
+      name: '새 여행 시작하기',
       exact: true,
     })
     .click();
@@ -542,7 +543,7 @@ test('항공편 등록에서 도착 나라·도시를 채우고 달력 날짜와
     '오사카',
   );
   await fields(page, {
-    출발일: '2026-11-10',
+    시작일: '2026-11-10',
     종료일: '2026-11-12',
     '출발 시각 (선택, HH:mm)': '09:30',
   });
@@ -564,6 +565,69 @@ test('항공편 등록에서 도착 나라·도시를 채우고 달력 날짜와
   await expect(
     page.getByText('DAY 1 · 2026-11-10', { exact: true }),
   ).toBeVisible();
+});
+
+// 독립 페이지 이동·국가 제한·달력 범위·취소를 사용자 동작으로 확인한다.
+test('새 여행 페이지에서 국가 검색과 달력 입력을 제공하고 취소 시 목록으로 돌아간다', async ({
+  page,
+}) => {
+  // 로그인된 사용자의 실제 생성 버튼으로 페이지에 진입한다.
+  await network(page);
+  await login(page);
+  await page
+    .getByRole('button', { name: '새 여행 시작하기', exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/new-trip$/);
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await page.getByLabel('나라 검색', { exact: true }).fill('프');
+  await expect(
+    page.getByRole('button', { name: '프랑스', exact: true }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: '프랑스', exact: true }).click();
+  await expect(page.getByLabel('나라 검색', { exact: true })).toHaveValue(
+    '프랑스',
+  );
+  await expect(page.getByLabel('현지 시간대', { exact: true })).toHaveValue(
+    'Europe/Paris',
+  );
+  await expect(page.getByLabel('국가 검색 결과')).toHaveCount(0);
+  await page.getByLabel('나라 검색', { exact: true }).fill('이라크');
+  await expect(
+    page.getByRole('button', { name: '이라크', exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByText(
+      '선택 가능한 국가가 없습니다. 국가명을 다시 입력해 주세요.',
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await page
+    .getByRole('button', { name: '확인하고 저장', exact: true })
+    .click();
+  await expect(page.getByRole('alert')).toContainText(
+    '검색 결과에서 여행 가능한 국가',
+  );
+  await page.getByLabel('나라 검색', { exact: true }).fill('필리핀');
+  await page.getByRole('button', { name: '필리핀', exact: true }).click();
+  await expect(page.getByText(/일부 지역 여행금지: 잠보앙가/)).toBeVisible();
+  await fields(page, { 시작일: '2026-11-10', 종료일: '2026-11-12' });
+  await expect(page.getByLabel('시작일', { exact: true })).toHaveAttribute(
+    'type',
+    'date',
+  );
+  await expect(page.getByLabel('종료일', { exact: true })).toHaveAttribute(
+    'min',
+    '2026-11-10',
+  );
+  await expect(page.getByLabel('시작일', { exact: true })).toHaveAttribute(
+    'max',
+    '2026-11-12',
+  );
+  await page.getByRole('button', { name: '취소', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: '새 여행 시작하기', exact: true }),
+  ).toBeVisible();
+  await expect(page).not.toHaveURL(/\/new-trip$/);
 });
 
 test('초대 링크를 로그인 과정에서 보존한다', async ({ page }) => {

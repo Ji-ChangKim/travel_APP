@@ -18,6 +18,28 @@ export interface PlanForm {
   id: string;
   values: Record<string, string>;
 }
+// 생성 페이지마다 별도의 멱등 키와 빈 여행 초안을 준비한다.
+export function newTripForm(): PlanForm {
+  // 날짜와 목적지는 사용자가 선택하며 기존 항공편 등록 기본값을 유지한다.
+  return {
+    kind: 'trip',
+    id: Crypto.randomUUID(),
+    values: {
+      title: '',
+      country: '',
+      city: '',
+      startDate: '',
+      endDate: '',
+      timezone: 'Asia/Seoul',
+      defaultCurrency: 'KRW',
+      flightNumber: '',
+      flightDeparture: 'ICN',
+      flightArrival: '',
+      flightTime: '',
+      flightSkipped: 'false',
+    },
+  };
+}
 // 일정 작성·수정의 초기값을 만든다.
 export function scheduleForm(
   snapshot: WorkspaceSnapshot,

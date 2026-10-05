@@ -31,9 +31,10 @@ import {
   removeImage,
 } from './service';
 import { Action, Field, ServerPhoto, styles } from './ui';
-import { scheduleForm, formCommand, type PlanForm } from './forms';
+import { scheduleForm, formCommand, newTripForm, type PlanForm } from './forms';
 import PlanEditor from './PlanEditor';
 import GooglePlace from './GooglePlace';
+import { countryDefaults, travelCountries } from './countries';
 
 // API 실패를 입력 보존·재인증·충돌 안내로 바꾼다.
 export function workspaceError(error: unknown): string {
@@ -88,7 +89,11 @@ function totals(expenses: WorkspaceExpense[], actual: boolean): string {
     .join(' · ');
 }
 // 실제 계정의 여행 목록과 일정·비용·동행·사진 허브를 표시한다.
-export default function WorkspaceScreen() {
+export default function WorkspaceScreen({
+  creating = false,
+}: {
+  creating?: boolean;
+}) {
   // 계정·여행 경로가 바뀌면 비공개 폼·재시도 상태를 새 화면으로 교체한다.
   const userId = useTripStore((state) => {
     // 게스트와 로그인 계정의 작성 상태를 분리한다.
@@ -96,10 +101,15 @@ export default function WorkspaceScreen() {
   });
   const { id } = useLocalSearchParams<{ id?: string }>();
   // React key로 이전 계정의 입력·요청 클로저를 남기지 않는다.
-  return <WorkspaceContent key={`${userId}:${id || 'list'}`} />;
+  return (
+    <WorkspaceContent
+      key={`${userId}:${creating ? 'new' : id || 'list'}`}
+      creating={creating}
+    />
+  );
 }
 // 한 계정·한 여행의 서버 조회와 작성 명령을 연결한다.
-function WorkspaceContent() {
+function WorkspaceContent({ creating }: { creating: boolean }) {
   // 서버 자료의 기준 계정과 현재 경로를 구독한다.
   const user = useTripStore((state) => {
     // 게스트는 서버 작성 권한을 갖지 않는다.
@@ -109,7 +119,9 @@ function WorkspaceContent() {
   const router = useRouter();
   const cache = useQueryClient();
   const userId = user && user.authProvider !== 'guest' ? user.id : '';
-  const [form, setForm] = useState<PlanForm | null>(null);
+  const [form, setForm] = useState<PlanForm | null>(
+    creating ? newTripForm : null,
+  );
   const [busy, setBusy] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [hasPending, setHasPending] = useState(false);
@@ -119,7 +131,7 @@ function WorkspaceContent() {
   const pending = useRef<null | (() => Promise<unknown>)>(null);
   const trips = useQuery({
     queryKey: foundationQueryKey(userId, 'trips'),
-    enabled: Boolean(userId && !id),
+    enabled: Boolean(userId && !id && !creating),
     queryFn: () => {
       // 실제 서버 목록만 사용한다.
       return serverOptions(userId).then(listServerTrips);
@@ -227,6 +239,14 @@ function WorkspaceContent() {
         if (snapshot) command(formCommand(form, snapshot));
         return;
       }
+      // 국가 오류는 다른 필수 항목 오류와 구분하여 안내한다.
+      if (
+        !travelCountries.some((item) => {
+          // 여행금지·미등록 국가명은 생성 요청으로 보내지 않는다.
+          return item.country === form.values.country;
+        })
+      )
+        return setError('검색 결과에서 여행 가능한 국가를 선택해 주세요.');
       const input = persistedTripCreateSchema.parse({
         title: form.values.title,
         country: form.values.country,
@@ -257,7 +277,7 @@ function WorkspaceContent() {
           })
           .then((result) => {
             // 확인된 서버 여행 ID로 이동한다.
-            router.push(
+            router.replace(
               `/trips/${z.object({ trip: workspaceTripSchema }).parse(result.data).trip.id}`,
             );
           });
@@ -279,6 +299,11 @@ function WorkspaceContent() {
             values: {
               ...previous.values,
               [key]: value,
+              ...(previous.kind === 'trip' &&
+              key === 'country' &&
+              previous.values.country !== value
+                ? countryDefaults(value)
+                : {}),
               ...(key === 'dayId' && previous.kind === 'receipt'
                 ? { scheduleId: '' }
                 : key === 'scheduleId' && value
@@ -446,6 +471,29 @@ function WorkspaceContent() {
       return shareInvite(snapshot!.trip.title, result.token!);
     });
   }
+  // 생성 페이지에서 이전 화면으로 돌아간다.
+  function closeCreation(): void {
+    // 직접 링크로 열어도 내 여행 목록으로 돌아갈 수 있게 한다.
+    return router.canGoBack() ? router.back() : router.replace('/(tabs)');
+  }
+  // 새 여행 작성 폼을 독립된 페이지로 표시한다.
+  if (creating && userId)
+    return (
+      <PlanEditor
+        userId={userId}
+        form={form}
+        busy={busy}
+        error={error}
+        onChange={change}
+        onSave={save}
+        onReload={reload}
+        onClose={closeCreation}
+        onReceipt={() => {
+          // 여행 생성 페이지에서는 영수증을 등록하지 않는다.
+          return;
+        }}
+      />
+    );
   // 저장된 실제 자료만 화면에 표시한다.
   return (
     <SafeAreaView style={styles.screen}>
@@ -513,28 +561,11 @@ function WorkspaceContent() {
             {!id && (
               <>
                 <Action
-                  label="항공편 등록하고 새 여행 만들기"
+                  label="새 여행 시작하기"
                   disabled={busy || scanning || hasPending}
                   onPress={() => {
-                    // 필수 날짜·지역·시간대를 사용자가 작성한다.
-                    edit({
-                      kind: 'trip',
-                      id: Crypto.randomUUID(),
-                      values: {
-                        title: '',
-                        country: '',
-                        city: '',
-                        startDate: '',
-                        endDate: '',
-                        timezone: 'Asia/Seoul',
-                        defaultCurrency: 'KRW',
-                        flightNumber: '',
-                        flightDeparture: 'ICN',
-                        flightArrival: '',
-                        flightTime: '',
-                        flightSkipped: 'false',
-                      },
-                    });
+                    // 여행 생성 전용 페이지로 이동한다.
+                    router.push('/new-trip');
                   }}
                 />
                 {trips.data?.length === 0 && (

@@ -1,4 +1,5 @@
 import { Modal, ScrollView, Text, View } from 'react-native';
+import type { ReactNode } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { WorkspaceSnapshot } from '@wherego/domain';
 import { Action, Field, ServerPhoto, styles } from './ui';
@@ -11,7 +12,7 @@ const labels: Record<string, string> = {
   title: '제목',
   country: '국가',
   city: '도시·지역',
-  startDate: '출발일',
+  startDate: '시작일',
   endDate: '종료일',
   timezone: '현지 시간대',
   defaultCurrency: '기본 통화',
@@ -25,6 +26,29 @@ const labels: Record<string, string> = {
   details: '구매 내역',
   body: '커뮤니티 본문',
 };
+// 여행 생성만 일반 페이지로 표시하고 기존 편집 화면의 모달을 유지한다.
+function EditorSurface({
+  form,
+  onClose,
+  children,
+}: {
+  form: PlanForm | null;
+  onClose: () => void;
+  children: ReactNode;
+}) {
+  // 생성 페이지는 모달 계층 없이 내비게이션 스택에 표시한다.
+  return form?.kind === 'trip' ? (
+    children
+  ) : (
+    <Modal
+      visible={Boolean(form)}
+      animationType="slide"
+      onRequestClose={onClose}
+    >
+      {children}
+    </Modal>
+  );
+}
 // 명령 종류에 맞춘 입력·선택·공개 미리보기를 제공한다.
 export default function PlanEditor({
   userId,
@@ -51,11 +75,7 @@ export default function PlanEditor({
 }) {
   // 실패해도 같은 폼 입력값과 원본을 유지한다.
   return (
-    <Modal
-      visible={Boolean(form)}
-      animationType="slide"
-      onRequestClose={onClose}
-    >
+    <EditorSurface form={form} onClose={onClose}>
       <SafeAreaView style={styles.modal}>
         <ScrollView
           contentContainerStyle={styles.content}
@@ -63,13 +83,20 @@ export default function PlanEditor({
         >
           <Text style={styles.header}>
             {form?.kind === 'trip'
-              ? '새 여행'
+              ? '새 여행 시작하기'
               : form?.kind === 'publish'
                 ? '커뮤니티 공개'
                 : form?.kind === 'receipt'
                   ? '영수증 확인'
                   : '여행 내용 작성'}
           </Text>
+          {form?.kind === 'trip' && (
+            <Action
+              label="내 여행으로 돌아가기"
+              disabled={busy}
+              onPress={onClose}
+            />
+          )}
           {form && (
             <>
               {form.kind === 'receipt' && snapshot && (
@@ -162,6 +189,12 @@ export default function PlanEditor({
                       label={labels[key]!}
                       value={value}
                       mode={key === 'timeSlot' ? 'time' : 'date'}
+                      minimumDate={
+                        key === 'endDate' ? form.values.startDate : undefined
+                      }
+                      maximumDate={
+                        key === 'startDate' ? form.values.endDate : undefined
+                      }
                       onChange={(next) => {
                         // 달력에서 선택한 날짜만 폼에 반영한다.
                         onChange(key, next);
@@ -398,7 +431,11 @@ export default function PlanEditor({
               disabled={busy}
               onPress={onSave}
             />
-            <Action label="닫기" disabled={busy} onPress={onClose} />
+            <Action
+              label={form?.kind === 'trip' ? '취소' : '닫기'}
+              disabled={busy}
+              onPress={onClose}
+            />
             {error.includes('동행') && (
               <Action
                 label="최신 내용 불러오기"
@@ -409,7 +446,7 @@ export default function PlanEditor({
           </View>
         </ScrollView>
       </SafeAreaView>
-    </Modal>
+    </EditorSurface>
   );
 }
 // 공개 선택 목록에서 특정 항목을 확인한다.

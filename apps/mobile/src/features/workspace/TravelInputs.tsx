@@ -1,9 +1,23 @@
 import { useState } from 'react';
-import { Platform, Text, View } from 'react-native';
+import {
+  Linking,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Action, Field, styles } from './ui';
+import {
+  restrictedRegions,
+  searchCountries,
+  travelCountries,
+  travelPolicy,
+} from './countries';
 
-// 빠른 선택 목록이며 전체 국가·도시 목록으로 가장하지 않는다.
+// 도시 추천을 제공하는 국가만 별도로 관리한다.
 const destinations = [
   {
     country: '대한민국',
@@ -164,11 +178,15 @@ export function DateField({
   value,
   onChange,
   mode = 'date',
+  minimumDate,
+  maximumDate,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   mode?: 'date' | 'time';
+  minimumDate?: string;
+  maximumDate?: string;
 }) {
   // 취소는 기존 값을 유지한다.
   const [open, setOpen] = useState(false);
@@ -181,11 +199,24 @@ export function DateField({
           aria-label={label}
           type={mode}
           value={value}
+          min={minimumDate || undefined}
+          max={maximumDate || undefined}
+          onClick={(event) => {
+            // 입력 영역을 눌러도 브라우저 달력 선택기가 열린다.
+            event.currentTarget.showPicker?.();
+          }}
           onChange={(event) => {
             // 브라우저가 선택한 달력 날짜만 전달한다.
             onChange(event.target.value);
           }}
-          style={{ padding: 14, fontSize: 16 }}
+          style={{
+            padding: 14,
+            fontSize: 16,
+            border: '1px solid #CCD8D1',
+            borderRadius: 10,
+            backgroundColor: '#FFFFFF',
+            color: '#182D26',
+          }}
         />
       ) : (
         <>
@@ -208,6 +239,19 @@ export function DateField({
                   : new Date()
               }
               mode={mode}
+              display={
+                mode === 'date'
+                  ? Platform.OS === 'ios'
+                    ? 'inline'
+                    : 'calendar'
+                  : 'default'
+              }
+              minimumDate={
+                minimumDate ? new Date(`${minimumDate}T00:00:00`) : undefined
+              }
+              maximumDate={
+                maximumDate ? new Date(`${maximumDate}T23:59:59`) : undefined
+              }
               onChange={(event, date) => {
                 // 닫은 뒤 확정된 날짜만 입력에 반영한다.
                 setOpen(Platform.OS === 'ios' && event.type !== 'dismissed');
@@ -243,38 +287,83 @@ export function DestinationFields({
   values: Record<string, string>;
   onChange: (key: string, value: string) => void;
 }) {
-  // 추천 이외 목적지도 직접 입력할 수 있다.
+  // 국가 검색 결과의 펼침 상태만 관리한다.
+  const [open, setOpen] = useState(false);
+  // 선택 국가에 일부 지역 금지가 있는지 확인한다.
+  const selected = travelCountries.find((item) => {
+    // 저장된 한국어 국가명과 일치하는 국가 정책을 읽는다.
+    return item.country === values.country;
+  });
+  // 국가 선택은 검색 결과에서 하고 도시는 직접 작성하거나 추천을 선택한다.
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>나라 → 도시 → 날짜</Text>
-      <Field
-        label="나라 검색"
+      <Text style={styles.title}>여행지 선택</Text>
+      <Text style={styles.label}>나라 검색</Text>
+      <TextInput
+        accessibilityLabel="나라 검색"
+        accessibilityRole="combobox"
+        accessibilityState={{ expanded: open }}
+        placeholder="국가명 입력 (예: 일본, 프랑스)"
+        style={styles.input}
         value={values.country || ''}
-        onChange={(value) => {
+        onFocus={() => {
+          // 국가 입력 아래에 자동완성 목록을 펼친다.
+          setOpen(true);
+        }}
+        onChangeText={(value) => {
           // 나라 입력만 갱신한다.
           onChange('country', value);
         }}
       />
-      <View style={styles.row}>
-        {destinations
-          .filter((item) => {
-            // 입력한 국가명이 포함된 추천만 표시한다.
-            return !values.country || item.country.includes(values.country);
-          })
-          .map((item) => (
-            <Action
+      {open && (
+        <ScrollView
+          style={{
+            maxHeight: 220,
+            borderWidth: 1,
+            borderColor: '#CCD8D1',
+            borderRadius: 10,
+          }}
+          nestedScrollEnabled
+          contentContainerStyle={{ gap: 6 }}
+          keyboardShouldPersistTaps="handled"
+          accessibilityLabel="국가 검색 결과"
+        >
+          {searchCountries(values.country || '').map((item) => (
+            <Pressable
               key={item.country}
-              label={item.country}
-              onPress={() => {
-                // 목적지 기본 설정을 국가 선택과 함께 갱신한다.
-                onChange('country', item.country);
-                onChange('city', '');
-                onChange('timezone', item.timezone);
-                onChange('defaultCurrency', item.currency);
+              accessibilityRole="button"
+              accessibilityLabel={item.country}
+              style={{
+                padding: 12,
+                borderBottomWidth: 1,
+                borderColor: '#E1E8E4',
               }}
-            />
+              onPress={() => {
+                // 허용된 국가 하나를 선택한다.
+                onChange('country', item.country);
+                // 선택을 마치면 자동완성 목록을 닫는다.
+                setOpen(false);
+              }}
+            >
+              <Text style={{ color: '#182D26', fontSize: 15 }}>
+                {item.country}
+              </Text>
+            </Pressable>
           ))}
-      </View>
+          {searchCountries(values.country || '').length === 0 && (
+            <Text>
+              선택 가능한 국가가 없습니다. 국가명을 다시 입력해 주세요.
+            </Text>
+          )}
+          <Action
+            label="국가 목록 접기"
+            onPress={() => {
+              // 검색 목록만 닫아 선택한 국가를 유지한다.
+              setOpen(false);
+            }}
+          />
+        </ScrollView>
+      )}
       <Field
         label="도시 검색"
         value={values.city || ''}
@@ -308,8 +397,25 @@ export function DestinationFields({
           ))}
       </View>
       <Text style={styles.subtitle}>
-        추천에 없는 나라는 직접 입력할 수 있습니다. 시간대와 통화를 확인해
-        주세요.
+        외교부 전 지역 여행금지 국가는 목록에서 제외했습니다. 기준일:{' '}
+        {travelPolicy.checkedAt}
+      </Text>
+      {selected && restrictedRegions[selected.code] && (
+        <Text style={styles.error}>
+          일부 지역 여행금지: {restrictedRegions[selected.code]}. 여행 지역을
+          확인해 주세요.
+        </Text>
+      )}
+      <Action
+        label="외교부 여행금지 현황 확인"
+        onPress={() => {
+          // 변경될 수 있는 지역별 여행금지 현황을 공식 페이지에서 확인한다.
+          void Linking.openURL(travelPolicy.source);
+        }}
+      />
+      <Text style={styles.subtitle}>
+        현지 시간대를 확인해 주세요. 비용 기록 통화는 KRW·JPY·USD 중 선택할 수
+        있습니다.
       </Text>
     </View>
   );

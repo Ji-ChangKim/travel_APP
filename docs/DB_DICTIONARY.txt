@@ -994,3 +994,22 @@ GOOGLE_PLACES_API_KEY: 선택 Worker secret string. 앱·EXPO_PUBLIC·Git에 넣
 서버 헤더 X-Goog-Api-Key와 필요한 필드만 요청하는 X-Goog-FieldMask 사용.
 timeout10초, 응답64KiB 제한, redirect 거부, no-store. 키 누락503, 외부 실패503, 미인증401.
 useAuthReady.ready: 앱 메모리 boolean, SDK 초기 세션 확인 완료 여부. DB 컬럼 아님.
+
+[새 여행 생성 페이지 / 2026-10-05]
+DB명: 기존 Supabase PostgreSQL. 테이블·컬럼·서버 계약 변경 없음.
+PlanForm: 기존 kind='trip', id UUID(생성 요청 멱등 키), values Record<string,string> 유지.
+초안은 /new-trip 페이지 메모리에 보관하며 계정 전환 시 초기화한다.
+values.country: string, 국가 검색 목록의 정식 한국어 이름만 새 여행 생성에 허용.
+values.city: string, 국가 변경 시 빈 문자열로 초기화. 저장 시 기존 필수 입력 검증.
+values.timezone: string, 국가별 대표 IANA 시간대 기본값 또는 UTC, 사용자가 도시별 시간대를 확인·수정.
+values.defaultCurrency: KRW|JPY|USD, 일본 JPY/미국 USD/그 외 KRW 기록 통화 기본값.
+현지 통화 지원 확대가 아니며 기존 비용·영수증 통화 제약조건 유지.
+values.startDate/endDate: YYYY-MM-DD, 달력 선택, 시작일<=종료일 및 기존 1~90일 서버 검증 유지.
+travelCountries: 앱 번들 메모리 목록 {code:string ISO2 또는 XK, country:string 한국어 표시명}.
+국가 및 주요 여행 지역을 포함. 북한은 일반 여행 선택 목록에서 제공하지 않음.
+travelPolicy: checkedAt string '2026-10-05', source HTTPS URL, prohibitedCodes string[].
+전 지역 여행금지 10개국(AF,HT,IQ,IR,LY,ML,SO,SD,UA,YE)은 검색·생성 선택에서 제외.
+restrictedRegions: Record<string,string>, 일부 지역 금지 대상 14개 국가 코드의 지역 안내.
+일부 지역 금지 국가는 검색에 유지하고 선택 후 금지 지역·공식 현황 링크를 표시.
+출처: https://0404.go.kr/bbs/contsPst/MST0000000000101/1/detail
+정책은 2026-10-05 확인한 정적 스냅샷으로 자동 갱신되지 않음. 변경 시 countries.ts와 본 명세를 함께 갱신.
