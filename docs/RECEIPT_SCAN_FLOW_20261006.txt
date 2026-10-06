@@ -63,7 +63,7 @@ docs/RECEIPT_SCAN_FLOW_20261006.txt: 변경 내역과 검증 근거, 알려진 �
 
 5. 검증 범위
 서버 foundation 테스트 58개 통과.
-웹 사용자 흐름 15개 통과: 자동 인식 결과 확인 → DAY3 등록 → 메뉴·장소·시간·비용.
+최종 웹 사용자 흐름 16개 통과: 일반 사진과8MB PNG 자동 압축 → DAY3 등록 → 메뉴·장소·시간·비용.
 웹 테스트는 공급자/저장 응답을 격리하며 실제 앱 UI와 요청 계약을 검증한다.
 실제 Cloudflare AI 사진 호출은 별도 실행해 목업 응답과 구분했다.
 Cloudflare D1/R2/Worker 통합 테스트 3개 통과.
@@ -74,7 +74,11 @@ Cloudflare D1/R2/Worker 통합 테스트 3개 통과.
 동일 검사를 일반 파일 접근 권한으로 재실행해 루트/모바일 EAS 모두 통과했다.
 
 6. 배포 및 실제 서비스 최종 검증
-최종 검증 결과와 배포 주소는 실제 배포 완료 후 아래에 기록한다.
+웹: https://wherego-staging.pages.dev / 릴리스 test-1-receipt-scan.
+최종 웹 배포: https://ada578ba.wherego-staging.pages.dev
+API: https://wherego-api-staging.gametps.workers.dev
+Worker 버전: 1f5e1fa4-3768-471c-b584-125dd41ca316
+소스 커밋: 9e4d764 (스캔 구현 6a6d016 포함), main 푸시 완료.
 기존 설치된 APK는 웹 배포로 코드가 갱신되지 않으므로 새 Android 빌드가 필요하다.
 네이티브 카메라·Android 권한 안내는 실제 APK 기기 테스트가 필요하다.
 
@@ -88,3 +92,25 @@ apps/mobile/package.json, package.json, package-lock.json(Expo 호환 이미지 
 tests/release/native-linking.test.mjs(루트/모바일 EAS 압축 모듈 연결 검사).
 설치 명령: 각 프로젝트에서 npx expo install expo-image-manipulator.
 공식 API: https://docs.expo.dev/versions/latest/sdk/imagemanipulator/
+
+8. 실제 배포 서비스 전체 플로우 통과
+검증 시간: 2026-10-06 19:04 KST.
+독립 테스트 계정 생성 → 실제 이메일 로그인 → 실제4일 여행 생성 →
+첨부 8,163,822바이트 PNG 선택 → 앱에서709,936바이트 JPEG 자동 변환 →
+비공개 R2 업로드 → 실제 Workers AI 인식 → 사용자 확인 버튼 → 실제 D1 저장.
+상호 Kagerou Cafe / 결제2026-09-28 16:36 / 주소和歌山県西牟婁郡白浜町1279-3 /
+메뉴3개 / JPY2450. 인식 후 상호·메뉴·날짜·금액을 수동 입력하지 않았다.
+DAY3의 장소와 영수증·미디어·지출이 같은 scheduleId에 연결됐다.
+메뉴 수량·단가·금액3개 행을 보존했으며 세금222엔은 지출에 추가하지 않았다.
+캐시 재조회200 / 동일 저장 요청 재시도 replayed=true / 새 ID의 동일 원본 확정422.
+비용 탭의 실제 지출2450엔과 저장된 D1 스냅샷 일치. 브라우저 실행 오류0개.
+로컬·배포 JavaScript 번들 SHA256 일치, 첫 방문/로그인 이동/주소 복귀 통과.
+npm run check: TypeScript·ESLint 경고0·Prettier 모두 통과.
+원본 분석 결과·저장 스냅샷·실제 화면6장은 .release/receipt-scan에 보관.
+전체 페이지 갤러리: outputs/TripPrint-pages/index.html (39장).
+기존33개 화면을 최종 UI로 다시 캡처하고 실제 영수증 흐름6장을 추가했다.
+일반 페이지의 샘플 HTTP 응답과 실제 영수증 서버 검증을 갤러리 설명에서 구분했다.
+영수증 촬영·스캔은 인식 결과 확인이 필수이며 작은 글자 오인식은 수정 가능하다.
+검증용 임시 계정3개·여행3개와 이번 실행에서 올린 비공개 사본2개는 정리 완료.
+지정 UUID에 한정한 최종 D1 조회: 테스트 계정0 / 여행0 / 업로드 메타데이터0.
+실제 인식 화면·검증 결과는 로컬 보고 자료에 보존했다.
