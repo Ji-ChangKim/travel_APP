@@ -54,4 +54,14 @@ TripPrint 홈·여행 허브 디자인 수정 기록
 - 웹 빌드 18개 정적 경로 성공. release:artifacts 진입 화면·rewrite·테스트 설정 미포함 검사 통과.
 - 비교 미리보기: http://127.0.0.1:8791/home.html#screens. 전체 45개 캡처 중 수정 화면 4개를 비교.
 - 설치 APK의 새 화면은 이 변경을 포함한 별도 Expo 빌드가 필요하며 이번에 생성하지 않음.
-- 테스트 웹 배포 결과는 공개 주소 검증 후 아래에 추가한다.
+- 소스 커밋: feae9fa, 기존 main 원격 푸시 완료.
+- 테스트 웹: https://wherego-staging.pages.dev
+- 고정 배포: https://3f2343aa.wherego-staging.pages.dev
+- 배포 식별자: test-1-trip-hub.
+- 웹 번들: entry-2cb1e446bd322195a4bffc211bba22ad.js
+- SHA256: 68f027ff400b64ac9754ce578eed610042c86302e6f46880a0cf1001f60bf6bf
+- 공개 별칭의 식별자·파일명·SHA256이 로컬 번들과 일치함을 확인.
+- 공개 주소에서 첫 방문·도시 인증 전달·새로고침·로그인 복구·하루 오류 복귀 검증 통과. 렌더링 오류 0, 익명 개인 여행 API 조회 없음.
+- 공개 앱 번들에서도 홈 3개 상태와 여행 허브, 320px 화면 및 일정 관리 펼침 재검증·재촬영 완료. 인증·여행 자료는 HTTP 경계에 격리하며 실제 서버 쓰기 없음.
+- 결과 파일: .release/trip-hub-live/verification.json, .release/home-redesign-verification.json.
+- API Worker·D1·R2에는 이번 변경의 배포나 데이터 조작을 수행하지 않았다.
