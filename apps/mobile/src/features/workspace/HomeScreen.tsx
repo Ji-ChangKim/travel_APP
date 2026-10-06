@@ -1,3 +1,4 @@
+import HaruState from '@/components/HaruState';
 import { useState, type Dispatch, type SetStateAction } from 'react';
 import {
   Image,
@@ -115,17 +116,20 @@ function HomeContent({
           )}
         </View>
         {(!ready || loading) && (
-          <Text style={styles.subtitle} accessibilityLiveRegion="polite">
-            내 여행을 확인하고 있어요.
-          </Text>
+          <HaruState
+            kind="loading"
+            title="내 여행을 확인하고 있어요."
+            compact
+          />
         )}
         {error && (
-          <View style={styles.card}>
-            <Text style={styles.error} accessibilityRole="alert">
-              {error}
-            </Text>
+          <HaruState
+            kind="error"
+            title="내 여행을 불러오지 못했어요"
+            description={error}
+          >
             <Action label="내 여행 다시 불러오기" onPress={onReload} />
-          </View>
+          </HaruState>
         )}
         {continuingTrips(trips).length > 0 && (
           <View style={homeStyles.section}>

@@ -54,7 +54,9 @@ function respond(response, file) {
             mime[path.extname(file)] ?? 'application/octet-stream',
         }),
       )
-    : response.writeHead(404).end('Not found');
+    : fs
+        .createReadStream(path.join(root, '404.html'))
+        .pipe(response.writeHead(404, { 'Content-Type': mime['.html'] }));
 }
 
 // 잘못된 URL 인코딩은 요청 오류로 처리한다.

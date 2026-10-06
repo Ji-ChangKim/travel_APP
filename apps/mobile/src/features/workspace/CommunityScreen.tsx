@@ -1,3 +1,4 @@
+import HaruState from '@/components/HaruState';
 import { useState } from 'react';
 import { Image, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -176,19 +177,35 @@ export default function CommunityScreen() {
             }}
           />
         </View>
-        {query.isLoading && <Text>여행 기록을 불러오는 중입니다.</Text>}
-        {query.error && (
-          <Text style={styles.error} accessibilityRole="alert">
-            {workspaceError(query.error)}
-          </Text>
+        {query.isLoading && (
+          <HaruState
+            kind="loading"
+            title="여행 기록을 불러오는 중입니다."
+            compact
+          />
         )}
-        {query.data?.pages[0]?.length === 0 && (
-          <View style={styles.card}>
-            <Text style={styles.title}>아직 공개된 여행 기록이 없습니다</Text>
-            <Text style={styles.subtitle}>
-              먼저 나의 여행을 계획해 보세요. 여행을 마친 뒤 공개할 기록을
-              선택해 이곳에 나눌 수 있어요.
-            </Text>
+        {query.error && (
+          <HaruState
+            kind="error"
+            title="여행 이야기를 불러오지 못했어요"
+            description={workspaceError(query.error)}
+          >
+            <Action
+              label="다시 불러오기"
+              disabled={query.isFetching}
+              onPress={() => {
+                // 실패한 공개 피드 조회를 다시 요청한다.
+                return void query.refetch();
+              }}
+            />
+          </HaruState>
+        )}
+        {!query.isError && query.data?.pages[0]?.length === 0 && (
+          <HaruState
+            kind="empty"
+            title="아직 공개된 여행 기록이 없습니다"
+            description="먼저 나의 여행을 계획해 보세요. 여행을 마친 뒤 공개할 기록을 선택해 이곳에 나눌 수 있어요."
+          >
             <Action
               label="홈에서 여행 시작하기"
               variant="primary"
@@ -197,7 +214,7 @@ export default function CommunityScreen() {
                 return router.push('/(tabs)');
               }}
             />
-          </View>
+          </HaruState>
         )}
         {query.data?.pages.flat().map((post) => (
           <View key={post.id} style={styles.card}>

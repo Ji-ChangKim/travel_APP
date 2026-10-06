@@ -1,3 +1,4 @@
+import HaruState from '@/components/HaruState';
 import { useRef, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -56,7 +57,7 @@ export function workspaceError(error: unknown): string {
           : error.status === 410
             ? '초대가 만료되었거나 취소되었습니다.'
             : error.status === 503
-              ? '서버 또는 영수증 인식 설정이 준비되지 않았습니다.'
+              ? '잠시 연결할 수 없어요. 조금 뒤에 다시 시도해 주세요.'
               : error.status === 422
                 ? '입력값과 연결할 날짜·일정을 확인해 주세요.'
                 : `저장 요청을 확인하지 못했습니다 (${error.status}). 같은 요청으로 재시도해 주세요.`
@@ -583,12 +584,20 @@ function WorkspaceContent({
         ) : (
           <>
             {(trips.isLoading || workspace.isLoading) && (
-              <Text>여행을 불러오는 중입니다.</Text>
+              <HaruState
+                kind="loading"
+                title="여행을 불러오는 중입니다."
+                compact
+              />
             )}
             {(trips.error || workspace.error) && (
-              <Text style={styles.error}>
-                {workspaceError(trips.error || workspace.error)}
-              </Text>
+              <HaruState
+                kind="error"
+                title="여행을 불러오지 못했어요"
+                description={workspaceError(trips.error || workspace.error)}
+              >
+                <Action label="여행 다시 불러오기" onPress={reload} />
+              </HaruState>
             )}
             {snapshot && (
               <>

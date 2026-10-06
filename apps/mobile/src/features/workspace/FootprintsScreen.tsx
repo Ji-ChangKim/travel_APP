@@ -1,3 +1,4 @@
+import HaruState from '@/components/HaruState';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -51,12 +52,19 @@ export default function FootprintsScreen() {
                 return router.push('/(tabs)');
               }}
             />
-            {query.isLoading && <Text>여행 기록을 불러오는 중입니다.</Text>}
+            {query.isLoading && (
+              <HaruState
+                kind="loading"
+                title="여행 기록을 불러오는 중입니다."
+                compact
+              />
+            )}
             {query.isError && (
-              <View>
-                <Text style={styles.error}>
-                  여행 기록을 불러오지 못했습니다.
-                </Text>
+              <HaruState
+                kind="error"
+                title="여행 기록을 불러오지 못했습니다."
+                description="연결을 확인한 뒤 다시 시도해 주세요."
+              >
                 <Action
                   label="다시 불러오기"
                   onPress={() => {
@@ -64,22 +72,27 @@ export default function FootprintsScreen() {
                     void query.refetch();
                   }}
                 />
-              </View>
+              </HaruState>
             )}
             {query.isSuccess &&
               !query.data.some((trip) => {
                 // 아직 종료되지 않은 여행을 완성된 기록으로 표시하지 않는다.
                 return trip.status === 'COMPLETED';
               }) && (
-                <View style={styles.card}>
-                  <Text style={styles.title}>
-                    여행이 끝나면 발자국이 남아요
-                  </Text>
-                  <Text style={styles.subtitle}>
-                    여행 중 남긴 사진과 음식, 비용을 날짜별로 모아 나만의
-                    다이어리로 간직하세요.
-                  </Text>
-                </View>
+                <HaruState
+                  kind="empty"
+                  title="여행이 끝나면 발자국이 남아요"
+                  description="여행 중 남긴 사진과 음식, 비용을 날짜별로 모아 나만의 다이어리로 간직하세요."
+                >
+                  <Action
+                    label="여행 계획하러 가기"
+                    variant="primary"
+                    onPress={() => {
+                      // 아직 기록이 없는 사용자를 여행 계획 시작점으로 안내한다.
+                      return router.push('/(tabs)');
+                    }}
+                  />
+                </HaruState>
               )}
             {query.data
               ?.filter((trip) => {

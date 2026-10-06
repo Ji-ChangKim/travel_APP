@@ -1,0 +1,34 @@
+{
+  "brand": "TripPrint",
+  "character": "하루 / Haru",
+  "version": "v1",
+  "tool": "image_gen.imagegen (built-in)",
+  "mode": "reference-based generation and background-extraction edit",
+  "background": "transparent RGBA; original generated alpha preserved, no manual recoloring or scaling",
+  "references": ["하루 SD 캐릭터 3면도.png", "하루SD_스트라이프이미지.png"],
+  "assets": [
+    {
+      "file": "TripPrint_Haru_loading_1233x1275.png",
+      "use": "actual loading, compact query states",
+      "width": 1233,
+      "height": 1275,
+      "prompt": "Use case: background-extraction. Extract only the upper-left walking Haru and mint suitcase from the supplied sprite sheet. Preserve face, loop hair tuft, amber eyes, blue plaid shirt, cream shorts, white crossbody bag, socks and sneakers, pose and suitcase logo. Remove other characters, dark background and shadows. Transparent background, full figure, no text or frame."
+    },
+    {
+      "file": "TripPrint_Haru_error_1024x1536.png",
+      "use": "query failures, authentication failure, missing page",
+      "width": 1024,
+      "height": 1536,
+      "prompt": "Use case: identity-preserve. SD Haru from the supplied character sheet, full body, holding a small travel map with both hands, calmly puzzled friendly expression, mint suitcase beside her feet. Preserve black bob, loop hair tuft, amber eyes, blue plaid shirt/blue top, cream shorts, white crossbody bag, socks and sneakers. Transparent background, no text or frame."
+    },
+    {
+      "file": "TripPrint_Haru_empty_1024x1536.png",
+      "use": "empty public feed and completed travel records",
+      "width": 1024,
+      "height": 1536,
+      "prompt": "Use case: identity-preserve. SD Haru from the supplied character sheet, full body, warm smile, waving one hand and holding a travel notebook in the other. Preserve black bob, loop hair tuft, amber eyes, blue plaid shirt/blue top, cream shorts, white crossbody bag, socks and sneakers. Transparent background, no text or frame."
+    }
+  ],
+  "finalExtractionPrompt": "Use case: background-extraction. EDIT TARGET: this generated Haru UI asset. Keep the existing character, face, pose, hair, blue plaid outfit, hands and props pixel-consistent as much as possible. Remove ALL remaining background glow, gray gradient, black haze, colored bloom, vignette and all ground shadow. Produce a clean full-body foreground cutout consisting only of Haru and her solid props. Everywhere outside the crisp character/prop silhouette must have alpha=0; only antialiasing immediately at silhouette edges may be partially transparent. There must be NO translucent atmospheric layer or blurred halo behind the character. This image will sit on a warm white app interface. Keep full body centered and do not crop the feet/hair. No text, frames, checkerboard or new illustration changes.",
+  "animation": "Static character poses with native ActivityIndicator during real pending requests; not an eight-frame walk animation."
+}

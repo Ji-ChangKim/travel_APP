@@ -1363,3 +1363,101 @@ test('초대 링크를 로그인 과정에서 보존한다', async ({ page }) =>
     page.getByRole('button', { name: '비용 추가', exact: true }),
   ).toBeDisabled();
 });
+// 공개 조회 실패·재시도·빈 상태·잘못된 주소에서도 실제 다음 행동을 검증한다.
+test('하루 오류 안내 → 공개 피드 재시도 → 빈 기록 시작 → 잘못된 주소 홈 복귀', ({
+  page,
+}) => {
+  // 외부 응답만 대체하며 화면과 라우터는 실제 앱을 사용한다.
+  return testSteps([
+    () => {
+      // 기존 인증·서버 경계를 격리한다.
+      return network(page);
+    },
+    () => {
+      // 게스트에게 개인 데이터 조회 권한을 부여하지 않는다.
+      return page.route('**/api/auth/get-session', (route) => {
+        // 미인증 조회 응답 하나를 반환한다.
+        return route.fulfill({ json: null });
+      });
+    },
+    () => {
+      // 공개 서버 오류를 성공한 빈 기록으로 오인하지 않도록 한다.
+      return page.route('**/public/community?*', (route) => {
+        // 실패 응답은 재시도 전까지 유지한다.
+        return route.fulfill({
+          status: 503,
+          json: { error: { code: 'UNAVAILABLE' } },
+        });
+      });
+    },
+    () => {
+      // 공개 피드 주소로 직접 진입한다.
+      return page.goto('/community');
+    },
+    () => {
+      // 오류에 지도를 확인하는 하루가 표시되는지 확인한다.
+      return expect(
+        page.getByRole('img', { name: '지도를 살펴보는 하루' }),
+      ).toBeVisible();
+    },
+    () => {
+      // 실패를 빈 콘텐츠로 표시하지 않는지 확인한다.
+      return expect(
+        page.getByText('아직 공개된 여행 기록이 없습니다', { exact: true }),
+      ).toHaveCount(0);
+    },
+    () => {
+      // 네트워크가 복구된 이후의 실제 공개 응답을 제공한다.
+      return page.route('**/public/community?*', (route) => {
+        // 현재 공개 글이 없는 응답을 반환한다.
+        return route.fulfill({ json: { data: [] } });
+      });
+    },
+    () => {
+      // 재시도 버튼으로 서버를 다시 읽는다.
+      return page
+        .getByRole('button', { name: '다시 불러오기', exact: true })
+        .click();
+    },
+    () => {
+      // 오류 포즈가 빈 기록 안내의 손 인사 포즈로 바뀌는지 확인한다.
+      return expect(
+        page.getByRole('img', { name: '손을 흔드는 하루' }),
+      ).toBeVisible();
+    },
+    () => {
+      // 빈 상태의 여행 시작 버튼을 실행한다.
+      return page
+        .getByRole('button', { name: '홈에서 여행 시작하기', exact: true })
+        .click();
+    },
+    () => {
+      // 홈의 목적지 선택으로 이어지는지 확인한다.
+      return expect(
+        page.getByRole('button', { name: '도쿄 선택', exact: true }),
+      ).toBeVisible();
+    },
+    () => {
+      // 존재하지 않는 주소의 복귀 흐름을 실행한다.
+      return page.goto('/missing-haru-test');
+    },
+    () => {
+      // 기본 시스템 오류 대신 브랜드의 길 찾기 안내를 확인한다.
+      return expect(
+        page.getByText('길을 조금 벗어났어요', { exact: true }),
+      ).toBeVisible();
+    },
+    () => {
+      // 주소 입력이 서비스 홈으로 복구될 수 있어야 한다.
+      return page
+        .getByRole('button', { name: '홈으로 돌아가기', exact: true })
+        .click();
+    },
+    () => {
+      // 새 여행 행동이 복귀 후에도 유지되는지 확인한다.
+      return expect(
+        page.getByRole('button', { name: '새 여행 시작하기', exact: true }),
+      ).toBeVisible();
+    },
+  ]);
+});

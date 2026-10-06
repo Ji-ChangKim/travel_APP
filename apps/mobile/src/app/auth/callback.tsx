@@ -1,15 +1,11 @@
 import { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Platform,
-  Text,
-  View,
-  Pressable,
-} from 'react-native';
+import { Platform, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import HaruState from '@/components/HaruState';
+import { Action, styles } from '@/features/workspace/ui';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { completeSocialAuth, socialRedirectUrl } from '@/features/auth/oauth';
-import { colors } from '@/constants/theme';
 import { pendingAuthDestination } from '@/features/workspace/mapsShare';
 
 // 웹 및 모바일 OAuth의 공통 복귀 화면을 제공한다.
@@ -68,28 +64,30 @@ export default function AuthCallbackScreen() {
 
   // 성공 대기와 인증 실패 복귀 동작을 구분한다.
   return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 24,
-        gap: 16,
-      }}
-    >
-      {!failed && <ActivityIndicator color={colors.accent} />}
-      <Text accessibilityRole="alert">{message}</Text>
-      {failed && (
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => {
-            // 만료된 코드 재사용 대신 새 로그인을 시작한다.
-            router.replace('/login');
-          }}
+    <SafeAreaView style={styles.screen}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.content,
+          { flexGrow: 1, justifyContent: 'center' },
+        ]}
+      >
+        <HaruState
+          kind={failed ? 'error' : 'loading'}
+          title={failed ? '로그인을 마치지 못했어요' : message}
+          description={failed ? message : '확인이 끝나면 여행으로 안내할게요.'}
         >
-          <Text>로그인으로 돌아가기</Text>
-        </Pressable>
-      )}
-    </View>
+          {failed && (
+            <Action
+              label="로그인으로 돌아가기"
+              variant="primary"
+              onPress={() => {
+                // 만료된 코드 재사용 대신 새 로그인을 시작한다.
+                return router.replace('/login');
+              }}
+            />
+          )}
+        </HaruState>
+      </ScrollView>
+    </SafeAreaView>
   );
 }

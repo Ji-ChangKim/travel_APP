@@ -1,3 +1,4 @@
+import HaruState from '@/components/HaruState';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -252,12 +253,19 @@ function DiaryView({
             }}
           />
         )}
-        {query.isLoading && <Text>여행의 순간을 모으고 있습니다.</Text>}
+        {query.isLoading && (
+          <HaruState
+            kind="loading"
+            title="여행의 순간을 모으고 있습니다."
+            compact
+          />
+        )}
         {query.isError && (
-          <>
-            <Text accessibilityRole="alert" style={styles.error}>
-              {workspaceError(query.error)}
-            </Text>
+          <HaruState
+            kind="error"
+            title="발자국을 불러오지 못했어요"
+            description={workspaceError(query.error)}
+          >
             <Action
               label="다시 불러오기"
               onPress={() => {
@@ -265,7 +273,7 @@ function DiaryView({
                 return void query.refetch();
               }}
             />
-          </>
+          </HaruState>
         )}
         {query.data &&
           (query.data.trip.status === 'COMPLETED' ? (

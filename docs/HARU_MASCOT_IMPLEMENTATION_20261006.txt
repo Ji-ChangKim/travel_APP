@@ -1,0 +1,76 @@
+TripPrint 하루(Haru) 마스코트 적용 보고 — 2026-10-06
+
+목적
+로딩·조회 오류·빈 기록을 하루와 구체적인 안내 및 다음 행동으로 표현한다.
+첨부된 SD 캐릭터의 검은 단발/머리 고리/갈색 눈/푸른 체크 셔츠/흰 가방을 유지한다.
+사용자 원본 세 장은 수정하지 않았다.
+
+수정 파일과 동작
+1. apps/mobile/assets/brand/haru-v1/TripPrint_Haru_loading_1233x1275.png
+   걷는 하루와 민트 캐리어의 투명 PNG. 실제 요청 대기 안내용.
+2. apps/mobile/assets/brand/haru-v1/TripPrint_Haru_error_1024x1536.png
+   지도를 살펴보는 하루의 투명 PNG. 조회·인증 실패 및 잘못된 주소 안내용.
+3. apps/mobile/assets/brand/haru-v1/TripPrint_Haru_empty_1024x1536.png
+   손 인사와 기록 노트가 있는 하루의 투명 PNG. 공개 피드·완료 기록의 빈 상태용.
+4. apps/mobile/assets/brand/haru-v1/manifest.json
+   자산 크기·용도·참고 이미지·생성/추출 프롬프트·도구와 모드를 기록.
+   image_gen.imagegen 내장 도구를 사용했다. 최종 RGBA 알파를 그대로 보존했다.
+5. apps/mobile/src/components/HaruState.tsx
+   상태별 포즈, 전체/간결 배치, 보조기기 설명, 오류 알림, 실제 대기 스피너 제공.
+   버튼은 소비 화면에서 전달하며 자동 이동이나 가짜 진행률을 만들지 않는다.
+6. apps/mobile/src/components/TripPrintLoading.tsx
+   기존 로고 중심 준비 화면을 가로 로고와 하루 대기 안내로 변경.
+7. apps/mobile/src/app/+not-found.tsx
+   잘못된 주소에 하루와 길 찾기 안내 및 홈 복귀 버튼을 제공.
+8. apps/mobile/src/app/auth/callback.tsx
+   로그인 확인 중/실패 화면에 하루 적용. 실제 인증 교환 로직은 유지.
+9. apps/mobile/src/features/workspace/HomeScreen.tsx
+   인증 복원·여행 조회의 간결한 로딩 안내, 조회 실패와 재시도 버튼 연결.
+   첫 방문 목적지 선택·새 여행·기존 여행 재개 행동은 계속 제공.
+10. apps/mobile/src/features/workspace/CommunityScreen.tsx
+    공개 피드 로딩·오류·빈 상태에 적용하고 조회 재시도/여행 시작 버튼 제공.
+    재조회 실패에 기존 빈 상태 안내가 동시에 표시되지 않도록 조건 구분.
+11. apps/mobile/src/features/workspace/FootprintsScreen.tsx
+    로딩·조회 실패·완료 여행이 없는 상태에 적용. 여행 계획 복귀 버튼 추가.
+12. apps/mobile/src/features/workspace/DiaryScreen.tsx
+    실제 다이어리 조회의 로딩·오류 및 기존 재시도 행동에 적용.
+13. apps/mobile/src/features/workspace/WorkspaceScreen.tsx
+    여행 상세 로딩·오류 및 조회 재시도에 적용. 입력 검증 문구는 인접 표시 유지.
+14. apps/mobile/package.json
+    웹 내보내기 이후 postbuild:web 훅으로 하루 404 산출물을 준비.
+15. scripts/prepare-web-not-found.mjs
+    Expo +not-found.html을 Cloudflare Pages용 404.html로 복사.
+    참고: https://developers.cloudflare.com/pages/configuration/serving-pages/
+16. scripts/preview-trail.mjs
+    존재하지 않는 로컬 주소에도 동일한 404 파일을 상태 코드 404로 반환.
+17. apps/mobile/public/release.json
+    배포 식별자를 test-1-haru로 변경.
+18. tests/web/workspace.spec.ts
+    오류 → 실제 재조회 → 빈 안내 → 여행 시작 및 잘못된 주소 → 홈 복귀 검증 추가.
+19. docs/HARU_MASCOT_IMPLEMENTATION_20261006.txt
+    본 수정 보고와 검증 범위 기록.
+
+검증/납품
+확정 결과는 아래 배포 확인 섹션에 기록한다.
+새 DB 테이블·컬럼·도메인 데이터 계약 변경 없음. DB 마이그레이션 없음.
+캐릭터 세 포즈는 정적 PNG이며 로딩은 실제 ActivityIndicator로 표시한다.
+8프레임 걷기 애니메이션, Android 시스템 스플래시 변경은 이번 적용에 포함되지 않는다.
+웹 갤러리는 실제 앱 UI + 격리된 HTTP 샘플 응답으로 캡처한다.
+
+시각 검토 보완
+오류 캡처에서 사용자에게 불필요한 서버·인식 설정 안내가 보이는 것을 확인했다.
+WorkspaceScreen.tsx의 서비스 일시 중단(503) 문구를
+“잠시 연결할 수 없어요. 조금 뒤에 다시 시도해 주세요.”로 수정했다.
+
+확정 검증 결과 (배포 전)
+- npm run check: TypeScript 엄격 검사·ESLint·Prettier 모두 통과.
+- npm run mobile:build:web: 18개 정적 라우트 및 postbuild:web 404 파일 준비 통과.
+- Playwright 실제 앱 흐름 14개 통과. 마지막 오류 문구 변경 후 하루 복구 테스트 재통과.
+- npm run release:check / npm run release:artifacts 통과.
+- 실제 모바일 웹 화면 33개 캡처, 화면 실행 오류 0.
+- 12개 주요 페이지 개요 및 33개 전체 캡처의 이미지 표시·확대/닫기 확인.
+- 로딩·오류·빈 상태 이미지를 밝은 배경의 실제 390×844 UI에서 시각 확인.
+- 갤러리: outputs/TripPrint-pages/index.html 및 http://127.0.0.1:8791/#screens
+- 갤러리용 .release/page-gallery/capture.mjs / build-gallery.mjs / render.mjs 보완.
+  격리된 캡처 도구는 배포·커밋 대상에서 제외하며 저장소 외 사용자 원본도 포함하지 않는다.
+- Android APK는 이번 웹 배포로 교체되지 않는다. 새 네이티브 설치본에는 EAS 재빌드가 필요하다.
