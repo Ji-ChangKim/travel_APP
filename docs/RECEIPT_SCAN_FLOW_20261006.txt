@@ -1,0 +1,79 @@
+TripPrint 영수증 자동 인식 → 여행 기록 등록 보고서
+작성일: 2026-10-06 / 적용 환경: staging
+
+1. 목적 및 실제 사용자 흐름
+사진 촬영 또는 사진 선택 → 비공개 원본 업로드 → 하루 로딩 안내 →
+상호·주소·실제 결제 일시·메뉴별 수량/가격·최종 결제 합계 자동 인식 →
+필요한 항목만 수정 → 여행 기록에 등록 → 실제 결제 날짜의 DAY로 이동.
+사용자 확인 전에는 인식 초안을 장소 기록이나 실제 지출로 확정하지 않는다.
+인식 실패는 빈 수동 입력 성공으로 바꾸지 않고 보관된 원본의 재스캔을 제공한다.
+수동 입력은 사용자가 직접 선택한 예외 복구 경로로만 제공한다.
+
+2. 변경한 이유
+이전 구현은 인식 공급자 미설정 오류 뒤 상호·날짜·금액을 직접 입력하게 했다.
+인식 날짜와 무관하게 첫 DAY를 선택할 수 있었고 메뉴·시간·주소가 저장되지 않았다.
+이번 구현은 서버 AI 바인딩에 사진 자체를 보내 구조화 초안을 얻는다.
+항목 누락이나 불확실한 통화·합계 차이는 확인 문구로 남긴다.
+최종 결제 합계를 메뉴 합계, 세금, 맡긴 돈, 거스름돈으로 대체하지 않는다.
+주소는 인쇄된 주소 문자열이며 Google 장소 ID·좌표를 임의로 생성하지 않는다.
+
+3. 첨부 사진으로 실제 인식 서비스 검증
+원본: codex-clipboard-c226231e-992b-4388-826d-a4acb5272f2d.png
+실제 공급자 호출 결과: Kagerou Cafe / 和歌山県西牟婁郡白浜町1279-3 /
+2026-09-28 16:36 / JPY 2450 / 메뉴 3개.
+A6種ミックス 1개 1250엔 / みかんしぼり 1개 600엔 /
+세 번째 음료는 첫 호출에서 はつさくソーダ로 읽었다.
+작은 글자 はっさく의 오인식이 있어 결과를 완전한 정답으로 주장하지 않는다.
+사용자 확인·항목별 수정은 이러한 오인식을 바로잡기 위한 단계다.
+입점 시간 13:50 대신 실제 결제 시간 16:36을 사용했다.
+결제 총액 2450엔에 포함된 세금 222엔을 추가 지출로 더하지 않았다.
+원본 사진은 공개 저장소나 앱 이미지 번들에 포함하지 않는다.
+
+4. 변경 파일별 설명
+apps/api/migrations/0004_receipt_scans.sql: 비공개 인식 초안·계정별 호출 제한 테이블 추가.
+apps/api/src/receiptAnalysis.ts: 사진 기반 구조화 인식, 출력 검증, 누락·합계 확인 문구.
+apps/api/src/receiptCache.ts: 권한 확인 뒤 캐시 재사용, 분당5회/하루40회 호출 제한.
+apps/api/src/ocr.ts: 멤버십·편집 권한·등록된 영수증 검사 후 원본 분석; 기존 Vision 호환.
+apps/api/src/cloudModel.ts: 날짜와 DAY 일치 검사; 장소 시간·주소, 메뉴, 지출, 원본 원자 연결.
+apps/api/src/errors.ts: 호출 제한 공개 오류 OCR_RATE_LIMITED/429.
+apps/api/wrangler.jsonc: staging Workers AI 바인딩 연결.
+apps/api/bindings.d.ts: Workers AI 런타임 타입 선언.
+apps/api/worker-configuration.d.ts: 바인딩 타입 재생성.
+scripts/release-config.mjs: 환경별 배포 설정 생성 시 AI 바인딩 보존.
+packages/domain/src/workspace.ts: ReceiptItem·ReceiptCategory 및 초안/영수증 속성 확장.
+packages/domain/src/index.ts: 공통 새 타입 내보내기.
+packages/validation/src/workspace.ts: 인식·등록 계약, 날짜/시간/메뉴/금액 제약과 이전 데이터 호환.
+apps/mobile/src/features/workspace/receiptFlow.ts: 인식 후보 폼·날짜별 DAY 연결·메뉴 수정.
+apps/mobile/src/features/workspace/ReceiptReview.tsx: 하루 대기/실패 및 자동 인식 확인 화면.
+apps/mobile/src/features/workspace/ReceiptDetails.tsx: 저장한 일시·주소·메뉴 상세 공통 표시.
+apps/mobile/src/features/workspace/PlanEditor.tsx: 빈 영수증 폼 대신 확인 화면·명시적 등록 버튼.
+apps/mobile/src/features/workspace/WorkspaceScreen.tsx: 스캔 상태, 실패 복구, 등록 후 DAY/일정 이동.
+apps/mobile/src/features/workspace/forms.ts: 확인한 인식 속성을 실제 등록 명령에 포함.
+apps/mobile/src/features/workspace/service.ts: 서버 인식 결과를 공통 런타임 계약으로 검증.
+apps/mobile/src/features/workspace/DiaryScreen.tsx: 다이어리에도 같은 메뉴·주소·일시 표시.
+apps/mobile/public/release.json: 배포 식별자 test-1-receipt-scan.
+apps/api/test/receipt-analysis.test.ts: 실제 인식 결과, 통화·날짜·합계·DAY·중복 회귀 검사.
+apps/api/test/workspace-http.test.ts: 권한 검사가 공급자 호출보다 앞서는 HTTP 계약 검증.
+apps/api/test/workspace.test.ts: 확장된 영수증 초안 계약 검증.
+tests/fixtures/kagerou-receipt-analysis.json: 실제 사진 호출의 구조화 결과; 원본 사진 제외.
+tests/cloud/runtime.test.mjs: 실제 D1/R2/Worker에서 영수증 원자 저장·제한·캐시 접근 검사.
+tests/web/workspace.spec.ts: 입력 없이 자동 인식 후보를 DAY3에 등록하는 실제 UI 회귀 검사.
+docs/DB_DICTIONARY.txt: 새 테이블·컬럼·제약·도메인·화면 전용 상태 명세.
+docs/RECEIPT_SCAN_FLOW_20261006.txt: 변경 내역과 검증 근거, 알려진 한계.
+
+5. 검증 범위
+서버 foundation 테스트 58개 통과.
+웹 사용자 흐름 15개 통과: 자동 인식 결과 확인 → DAY3 등록 → 메뉴·장소·시간·비용.
+웹 테스트는 공급자/저장 응답을 격리하며 실제 앱 UI와 요청 계약을 검증한다.
+실제 Cloudflare AI 사진 호출은 별도 실행해 목업 응답과 구분했다.
+Cloudflare D1/R2/Worker 통합 테스트 3개 통과.
+기존 인식 결과는 호출 제한 이후에도 권한 안에서 재사용된다.
+조회자403, 외부 사용자404, 신규 스캔 여섯 번째429 검증.
+배포·Android 네이티브 연결 테스트 20개 통과.
+네이티브 검사 첫 실행은 제한된 파일 접근에서 모듈을 누락했으나
+동일 검사를 일반 파일 접근 권한으로 재실행해 루트/모바일 EAS 모두 통과했다.
+
+6. 배포 및 실제 서비스 최종 검증
+최종 검증 결과와 배포 주소는 실제 배포 완료 후 아래에 기록한다.
+기존 설치된 APK는 웹 배포로 코드가 갱신되지 않으므로 새 Android 빌드가 필요하다.
+네이티브 카메라·Android 권한 안내는 실제 APK 기기 테스트가 필요하다.

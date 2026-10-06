@@ -5,6 +5,7 @@ import { Platform, Share } from 'react-native';
 import type { FoundationClientOptions } from '@wherego/api-client';
 import { getServerMediaUrl, requestFoundation } from '@wherego/api-client';
 import { z } from 'zod';
+import { receiptDraftSchema } from '@wherego/validation';
 import type { ReceiptDraft } from '@wherego/domain';
 import { getCloudSession } from '@/services/cloudAuth';
 
@@ -181,16 +182,7 @@ export function scanServerReceipt(
     body: JSON.stringify({ mediaId: media }),
   }).then((response) => {
     // 후보 데이터만 해석하며 금액을 자동 확정하지 않는다.
-    return z
-      .object({
-        rawText: z.string(),
-        merchant: z.string(),
-        transactionDate: z.string(),
-        amount: z.string(),
-        currency: z.enum(['KRW', 'JPY', 'USD']),
-        needsConfirmation: z.literal(true),
-      })
-      .parse(response.data);
+    return receiptDraftSchema.parse(response.data);
   });
 }
 // 설치된 메시지 앱의 공유 시트로 초대 링크를 전달한다.

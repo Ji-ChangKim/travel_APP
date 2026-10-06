@@ -1247,3 +1247,52 @@ CloudSession: user(CloudUser),access_token(서명된 서버 Bearer).
 App Profile: 실제 UUID와 닉네임, avatarUrl|null, authProvider=email, osPlatform,
 createdAt,updatedAt,lastSignInAt; 상세 bio/travelStyles는 본인 D1 조회로 복원.
 ======================================================================
+
+[2026-10-06 영수증 사진 인식 / D1 wherego-staging]
+마이그레이션: apps/api/migrations/0004_receipt_scans.sql.
+receipt_scans: 비공개 인식 초안 캐시이며 확정 여행 기록과 구분한다.
+trip_id TEXT NOT NULL FK trips(id) ON DELETE CASCADE: 접근 권한을 검사할 여행 UUID.
+media_id TEXT NOT NULL: snapshot.media에 등록된 purpose=receipt의 원본 UUID.
+draft TEXT NOT NULL CHECK json_valid: ReceiptDraft 구조화 인식 결과 JSON.
+created_at INTEGER NOT NULL: UTC 밀리초.
+PK(trip_id,media_id). 미디어 FK는 JSON 객체에 있으므로 서비스에서 부모·목적을 검사.
+캐시 조회 전 현재 멤버십·편집 역할·보관 여부를 재검사하며 공개 API에서 노출하지 않음.
+
+receipt_scan_limits: 실제 신규 인식 시도 제한. 캐시 재사용은 카운터를 소모하지 않음.
+actor_id TEXT NOT NULL FK user(id) ON DELETE CASCADE: 서버 인증 계정 UUID.
+window_start INTEGER NOT NULL: 분 창 시작 UTC 밀리초 또는 일 창 시작+1 밀리초.
+hits INTEGER NOT NULL CHECK hits>0: 조건부 UPSERT로 분당5회·하루40회 제한.
+PK(actor_id,window_start). 2일 이전 카운터 정리. 제한 초과 API 오류 OCR_RATE_LIMITED/429.
+
+[ReceiptItem / trips.snapshot.receipts[].items[] / ReceiptDraft.items[]]
+name string 1~120자: 번역하지 않은 메뉴·상품명.
+quantity number|null: 양의 정수 최대10000; 읽지 못한 수량은 null.
+unitPrice string: 단가, 빈 문자열 또는 최대12자리·소수2자리 십진 문자열.
+amount string: 행 합계, 동일 형식. 단가·행 합계는 0 허용.
+JPY/KRW 확정 저장에서는 소수 불가, USD 최대2자리. 배열 최대50개.
+
+[ReceiptDraft / 서버 인식 응답 / receipt_scans.draft]
+rawText string 최대10000자: 장소·주소·결제일시·메뉴·합계에 필요한 원문만 유지.
+merchant string 최대100자, address string 최대200자: 읽지 못한 경우 빈 문자열.
+transactionDate string: YYYY-MM-DD 실제 달력 또는 빈 값.
+transactionTime string: HH:mm 또는 빈 값. 입점 시간 대신 실제 결제 시간을 사용.
+amount string: 최종 결제 합계 또는 빈 값. 세금·거스름돈·메뉴 합계로 덮어쓰지 않음.
+currency enum KRW/JPY/USD: 인식 불가 시 여행 기본 통화와 확인 경고를 함께 반환.
+category enum food/transport/stay/activity/shopping/etc: 지출 분류 후보.
+items ReceiptItem[]; warnings string[] 최대12개, 각200자; needsConfirmation literal true.
+공급자 출력은 서버 스키마로 검증. 초안 생성만으로 일정·비용을 만들지 않음.
+
+[WorkspaceReceipt / trips.snapshot.receipts[] 추가 속성]
+address string, transactionTime string, items ReceiptItem[], category 위 enum.
+기존 데이터는 조회 검증에서 '', '', [], food 기본값을 적용해 호환.
+receipt.confirm 입력에도 위 속성을 저장하며 transactionDate와 dayId의 tripDate가 같아야 함.
+새 PLACE 기록의 title=merchant, address=address, timeSlot=transactionTime.
+영수증·미디어·실제 비용은 동일 scheduleId와 DAY에 연결되고 원본당 확정 한 번.
+기존 일정에 연결한 경우 기존 일정 제목·시간·주소는 유지하며 영수증의 실제 값은 별도 보존.
+영수증 원본과 메뉴 상세는 커뮤니티 공개 스냅샷에서 제외.
+
+[화면 PlanForm receipt / DB에 저장하지 않는 화면 상태]
+receiptStatus string loading/ready/error/manual; receiptEditing string true/false.
+items, warnings: 편집용 JSON 문자열. dayId는 실제 결제 날짜의 DAY 또는 빈 값.
+범위 밖·누락 날짜는 첫 DAY로 대체하지 않고 등록을 차단.
+======================================================================

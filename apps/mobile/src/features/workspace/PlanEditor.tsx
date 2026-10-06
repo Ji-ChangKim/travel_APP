@@ -1,3 +1,4 @@
+import ReceiptReview from './ReceiptReview';
 import { Modal, ScrollView, Text, View } from 'react-native';
 import type { ReactNode } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -62,6 +63,7 @@ export default function PlanEditor({
   onReload,
   onClose,
   onReceipt,
+  onRescan,
 }: {
   userId: string;
   form: PlanForm | null;
@@ -73,6 +75,7 @@ export default function PlanEditor({
   onReload: () => void;
   onClose: () => void;
   onReceipt: (camera: boolean) => void;
+  onRescan: () => void;
 }) {
   // 실패해도 같은 폼 입력값과 원본을 유지한다.
   return (
@@ -105,6 +108,19 @@ export default function PlanEditor({
                   userId={userId}
                   tripId={snapshot.trip.id}
                   mediaId={form.values.mediaId!}
+                />
+              )}
+              {form.kind === 'receipt' && snapshot && (
+                <ReceiptReview
+                  form={form}
+                  snapshot={snapshot}
+                  busy={busy}
+                  onChange={onChange}
+                  onRetry={onRescan}
+                  onPhoto={() => {
+                    // 촬영이 잘못되었을 때 다른 원본을 선택한다.
+                    return onReceipt(false);
+                  }}
                 />
               )}
               {form.kind === 'trip' && (
@@ -168,6 +184,7 @@ export default function PlanEditor({
                 .filter(([key]) => {
                   // 식별자와 선택 필드는 자유 입력으로 노출하지 않는다.
                   return (
+                    form.kind !== 'receipt' &&
                     Boolean(labels[key]) &&
                     !(
                       form.kind === 'trip' &&
@@ -220,7 +237,7 @@ export default function PlanEditor({
                     />
                   ),
                 )}
-              {['schedule', 'receipt'].includes(form.kind) && (
+              {form.kind === 'schedule' && (
                 <View style={styles.card}>
                   <Text style={styles.title}>여행 날짜 선택</Text>
                   {snapshot?.days.map((day) => (
@@ -258,7 +275,13 @@ export default function PlanEditor({
                   ))}
                 </View>
               )}
-              {['expense', 'receipt'].includes(form.kind) && (
+              {(form.kind === 'expense' ||
+                (form.kind === 'receipt' &&
+                  ['ready', 'manual'].includes(
+                    form.values.receiptStatus || '',
+                  ) &&
+                  (form.values.receiptEditing === 'true' ||
+                    form.values.receiptStatus === 'manual'))) && (
                 <View style={styles.row}>
                   {['KRW', 'JPY', 'USD'].map((currency) => (
                     <Action
@@ -276,28 +299,44 @@ export default function PlanEditor({
                   ))}
                 </View>
               )}
-              {['expense', 'receipt'].includes(form.kind) && (
+              {(form.kind === 'expense' ||
+                (form.kind === 'receipt' &&
+                  ['ready', 'manual'].includes(
+                    form.values.receiptStatus || '',
+                  ))) && (
                 <View style={styles.card}>
                   <Text style={styles.title}>연결할 일정</Text>
                   <Action
-                    label="새 기록 / 일정 연결 없이"
+                    label={
+                      form.kind === 'receipt'
+                        ? '새 장소 기록 만들기'
+                        : '새 기록 / 일정 연결 없이'
+                    }
                     disabled={busy}
                     onPress={() => {
                       // 영수증은 새 일정을 생성하고 수동 비용은 여행 전체에 연결한다.
                       onChange('scheduleId', '');
                     }}
                   />
-                  {snapshot?.itinerary.map((item) => (
-                    <Action
-                      key={item.id}
-                      label={`${form.values.scheduleId === item.id ? '✓ ' : ''}${item.title}`}
-                      disabled={busy}
-                      onPress={() => {
-                        // 일정의 실제 DAY도 함께 연결한다.
-                        onChange('scheduleId', item.id);
-                      }}
-                    />
-                  ))}
+                  {snapshot?.itinerary
+                    .filter((item) => {
+                      // 영수증은 실제 결제 날짜에 속한 일정만 연결한다.
+                      return (
+                        form.kind !== 'receipt' ||
+                        item.dayId === form.values.dayId
+                      );
+                    })
+                    .map((item) => (
+                      <Action
+                        key={item.id}
+                        label={`${form.values.scheduleId === item.id ? '✓ ' : ''}${item.title}`}
+                        disabled={busy}
+                        onPress={() => {
+                          // 일정의 실제 DAY도 함께 연결한다.
+                          onChange('scheduleId', item.id);
+                        }}
+                      />
+                    ))}
                 </View>
               )}
               {form.kind === 'expense' && (
@@ -398,8 +437,8 @@ export default function PlanEditor({
               )}
               {form.kind === 'receipt' && (
                 <Text style={styles.subtitle}>
-                  OCR 후보의 상호·결제 날짜·금액·통화를 확인해 주세요. 확인 저장
-                  시에만 일정과 실제 지출에 반영됩니다.
+                  결제 날짜에 맞는 장소 기록, 메뉴와 실제 지출, 원본 영수증을
+                  함께 저장합니다. 등록 전에는 여행 기록이 바뀌지 않아요.
                 </Text>
               )}
               {form.kind === 'period' && (
@@ -424,9 +463,20 @@ export default function PlanEditor({
                   ? '저장 중…'
                   : form?.kind === 'publish'
                     ? '확인하고 게시'
-                    : '확인하고 저장'
+                    : form?.kind === 'receipt'
+                      ? '여행 기록에 등록'
+                      : '확인하고 저장'
               }
-              disabled={busy}
+              disabled={
+                busy ||
+                (form?.kind === 'receipt' &&
+                  (!form.values.dayId ||
+                    !form.values.merchant ||
+                    !form.values.amount ||
+                    !['ready', 'manual'].includes(
+                      form.values.receiptStatus || '',
+                    )))
+              }
               onPress={onSave}
             />
             <Action

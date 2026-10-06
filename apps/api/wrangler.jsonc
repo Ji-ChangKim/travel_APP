@@ -4,7 +4,7 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-10-02",
   "compatibility_flags": ["nodejs_compat"],
-  // MVP에서는 OCR 키 없이 수동 영수증 입력을 테스트한다.
+  // 서버 AI 바인딩으로 영수증을 인식하며 사용자 확인 후 기록한다.
   "secrets": { "required": ["AUTH_SECRET"] },
   // 실제 프로젝트 주소와 공개 API 키는 로컬 설정 또는 환경별 vars에서 주입한다.
   "vars": {
@@ -24,11 +24,13 @@
   "r2_buckets": [
     { "binding": "MEDIA", "bucket_name": "tripprint-staging-private" },
   ],
+  "ai": { "binding": "AI", "remote": true },
   "observability": { "enabled": true, "head_sampling_rate": 1 },
   "env": {
     "staging": {
       "secrets": { "required": ["AUTH_SECRET"] },
       "name": "wherego-api-staging",
+      "ai": { "binding": "AI", "remote": true },
       "d1_databases": [
         {
           "binding": "DB",

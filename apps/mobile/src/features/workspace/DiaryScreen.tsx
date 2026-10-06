@@ -1,3 +1,4 @@
+import ReceiptDetails from './ReceiptDetails';
 import HaruState from '@/components/HaruState';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -75,7 +76,7 @@ function DiaryEntry({
             <Text>
               {receipt.merchant} · {receipt.amount} {receipt.currency}
             </Text>
-            {receipt.details && <Text>음식·구매 기록: {receipt.details}</Text>}
+            <ReceiptDetails receipt={receipt} />
           </View>
         ))}
       {diaryCosts(

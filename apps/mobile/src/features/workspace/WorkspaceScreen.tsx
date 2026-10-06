@@ -1,3 +1,5 @@
+import ReceiptDetails from './ReceiptDetails';
+import { receiptForm, receiptDateValues } from './receiptFlow';
 import HaruState from '@/components/HaruState';
 import { useRef, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
@@ -21,7 +23,7 @@ import {
   workspaceTripSchema,
   type WorkspaceCommand,
 } from '@wherego/validation';
-import type { WorkspaceExpense } from '@wherego/domain';
+import type { WorkspaceExpense, WorkspaceSnapshot } from '@wherego/domain';
 import { useTripStore } from '@/stores/useTripStore';
 import {
   serverOptions,
@@ -43,6 +45,25 @@ import {
   memberRoleLabel,
   workspaceSections,
 } from './presentation';
+
+// 실패한 인식 초안에 공개 상태에 따른 복구 안내만 추가한다.
+function receiptScanFailure(
+  snapshot: WorkspaceSnapshot,
+  mediaId: string,
+  failure: unknown,
+): PlanForm {
+  // 공급자 원문·보안 설정을 노출하지 않고 보관된 사진의 재시도를 안내한다.
+  return {
+    ...receiptForm(snapshot, mediaId, undefined, 'error'),
+    values: {
+      ...receiptForm(snapshot, mediaId, undefined, 'error').values,
+      receiptError:
+        failure instanceof FoundationClientError && failure.status === 429
+          ? '스캔 횟수가 많아요. 잠시 후 다시 시도해 주세요. 하루 한도에 도달했다면 내일 다시 이용할 수 있어요. 원본 사진은 보관되어 있어요.'
+          : '사진을 처리하지 못했어요. 잠시 후 다시 스캔하거나 글자가 선명한 사진을 선택해 주세요. 원본 사진은 보관되어 있어요.',
+    },
+  };
+}
 
 // API 실패를 입력 보존·재인증·충돌 안내로 바꾼다.
 export function workspaceError(error: unknown): string {
@@ -149,7 +170,6 @@ function WorkspaceContent({
   const [scanning, setScanning] = useState(false);
   const [hasPending, setHasPending] = useState(false);
   const [error, setError] = useState('');
-  const [notice, setNotice] = useState('');
   const [checklist, setChecklist] = useState('');
   // 여행 계획과 현장 기록을 작업별 영역으로 나눈다.
   const [activeSection, setActiveSection] = useState(
@@ -254,6 +274,14 @@ function WorkspaceContent({
         });
     });
   }
+  // 저장된 영수증의 실제 날짜로 이동하여 생성된 장소 기록을 보여준다.
+  function receiptRegistered(dayId: string): Promise<void> {
+    // 서버에서 성공한 등록에만 날짜와 일정 탭을 변경한다.
+    return Promise.resolve(setSelectedDay(dayId)).then(() => {
+      // 영수증에서 생성된 여행 기록을 바로 확인한다.
+      return setActiveSection('itinerary');
+    });
+  }
   // 새 여행 또는 기존 여행 폼을 확정한다.
   function save(): void {
     // 실패한 모달에서도 동일 본문·요청 키의 저장을 재개한다.
@@ -267,7 +295,13 @@ function WorkspaceContent({
       if (!form || busy || pending.current) return;
       if (form.kind !== 'trip') {
         // 화면 폼이 선택한 일정·날짜를 검증한다.
-        if (snapshot) command(formCommand(form, snapshot));
+        if (snapshot)
+          command(
+            formCommand(form, snapshot),
+            form.kind === 'receipt'
+              ? receiptRegistered.bind(null, form.values.dayId || '')
+              : undefined,
+          );
         return;
       }
       // 국가 오류는 다른 필수 항목 오류와 구분하여 안내한다.
@@ -335,6 +369,9 @@ function WorkspaceContent({
               previous.values.country !== value
                 ? countryDefaults(value)
                 : {}),
+              ...(key === 'transactionDate' && previous.kind === 'receipt'
+                ? receiptDateValues(snapshot, value)
+                : {}),
               ...(key === 'dayId' && previous.kind === 'receipt'
                 ? { scheduleId: '' }
                 : key === 'scheduleId' && value
@@ -353,52 +390,43 @@ function WorkspaceContent({
         : null;
     });
   }
-  // 서버에서 등록한 원본으로 영수증 확인 폼을 시작한다.
+  // 등록한 비공개 원본의 인식 상태를 확인 화면에 연결한다.
   function receipt(mediaId: string): Promise<unknown> {
-    // 처리 중 원본을 중복 분석하지 않는다.
-    if (scanning) return Promise.resolve();
-    setScanning(true);
-    // OCR 설정이 없으면 사용자 확인 입력으로 이어진다.
-    return serverOptions(userId)
-      .then((options) => {
-        // 공개 링크 대신 등록한 비공개 파일 ID를 사용한다.
-        return scanServerReceipt(options, snapshot!.trip.id, mediaId);
+    // 권한·일정 스냅샷이 있는 현재 화면만 인식 요청을 시작한다.
+    return scanning || !snapshot
+      ? Promise.resolve()
+      : beginReceiptScan(mediaId);
+  }
+  // 인식 중 화면과 실제 서버 요청 하나를 연결한다.
+  function beginReceiptScan(mediaId: string): Promise<unknown> {
+    // 상태 갱신과 초안 요청을 순서대로 처리한다.
+    return Promise.resolve(setScanning(true))
+      .then(() => {
+        // 이전 인식 결과를 저장 가능한 상태로 표시하지 않는다.
+        return setForm(receiptForm(snapshot!, mediaId, undefined, 'loading'));
       })
-      .catch(() => {
-        // 인식 실패에서도 업로드한 원본을 잃지 않는다.
-        setNotice(
-          '영수증 인식을 완료하지 못했습니다. 원본을 보며 상호·결제일·금액을 입력해 주세요.',
-        );
-        return {
-          merchant: '',
-          transactionDate: snapshot!.days[0]?.tripDate || '',
-          amount: '',
-          currency: snapshot!.trip.defaultCurrency,
-          rawText: '',
-        };
-      })
-      .then((draft) => {
-        // 다른 계정으로 전환한 화면에는 원본 초안을 표시하지 않는다.
-        if (useTripStore.getState().currentUser?.id !== userId) return;
-        // 확인 버튼 전에는 일정이나 비용을 생성하지 않는다.
-        setForm({
-          kind: 'receipt',
-          id: Crypto.randomUUID(),
-          values: {
-            mediaId,
-            dayId: snapshot!.days[0]?.id || '',
-            scheduleId: '',
-            merchant: draft.merchant,
-            transactionDate: draft.transactionDate,
-            amount: draft.amount,
-            currency: draft.currency,
-            details: draft.rawText.slice(0, 1000),
-          },
+      .then(() => {
+        // 실제 원본 미디어 ID만 서버에 전달한다.
+        return serverOptions(userId).then((options) => {
+          // 외부 공유 URL로 영수증 원본을 노출하지 않는다.
+          return scanServerReceipt(options, snapshot!.trip.id, mediaId);
         });
       })
+      .then((draft) => {
+        // 계정 전환 이후에는 이전 계정의 인식 결과를 표시하지 않는다.
+        return useTripStore.getState().currentUser?.id === userId
+          ? setForm(receiptForm(snapshot!, mediaId, draft))
+          : undefined;
+      })
+      .catch((failure: unknown) => {
+        // 실패를 빈 수동 입력 성공으로 대체하지 않고 재스캔을 안내한다.
+        return useTripStore.getState().currentUser?.id === userId
+          ? setForm(receiptScanFailure(snapshot!, mediaId, failure))
+          : undefined;
+      })
       .finally(() => {
-        // 인식 실패에도 수동 확인 폼을 사용할 수 있게 복귀한다.
-        setScanning(false);
+        // 완료 또는 실패 시에만 다음 사용자의 선택을 허용한다.
+        return setScanning(false);
       });
   }
   // 사용자 선택 사진을 비공개 저장하고 용도 메타데이터를 등록한다.
@@ -530,6 +558,10 @@ function WorkspaceContent({
         onSave={save}
         onReload={reload}
         onClose={closeCreation}
+        onRescan={() => {
+          // 여행 생성 화면에는 재스캔할 원본이 없다.
+          return undefined;
+        }}
         onReceipt={() => {
           // 여행 생성 페이지에서는 영수증을 등록하지 않는다.
           return;
@@ -1009,6 +1041,7 @@ function WorkspaceContent({
                                 {item.merchant} · {item.date} · {item.amount}{' '}
                                 {item.currency}
                               </Text>
+                              <ReceiptDetails receipt={item} />
                               <Action
                                 variant="danger"
                                 label="영수증 기록·지출 삭제"
@@ -1236,7 +1269,6 @@ function WorkspaceContent({
             )}
           </>
         )}
-        {notice && <Text style={styles.subtitle}>{notice}</Text>}
         {error && !form && (
           <Text style={styles.error} accessibilityRole="alert">
             {error}
@@ -1254,6 +1286,10 @@ function WorkspaceContent({
         {busy && <Text>요청을 확인하고 있습니다…</Text>}
       </ScrollView>
       <PlanEditor
+        onRescan={() => {
+          // 현재 확인 중인 원본 하나만 다시 요청한다.
+          return void receipt(form?.values.mediaId || '');
+        }}
         onReceipt={(camera) => {
           // 팝업을 닫지 않아 취소 시 입력을 유지하고 업로드 성공 시 영수증 확인으로 전환한다.
           photo('receipt', camera);

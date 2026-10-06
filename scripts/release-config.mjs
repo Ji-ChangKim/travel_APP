@@ -113,6 +113,7 @@ function configureWorker(template, env) {
       return { ...binding, migrations_dir: '../migrations' };
     }),
     r2_buckets: template.env[env.RELEASE_ENV].r2_buckets,
+    ai: template.env[env.RELEASE_ENV].ai,
     vars: {
       AUTH_BASE_URL: env.EXPO_PUBLIC_API_URL,
       ALLOWED_ORIGINS: env.RELEASE_WEB_ORIGIN,

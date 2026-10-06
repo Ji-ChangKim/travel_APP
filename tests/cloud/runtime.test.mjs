@@ -64,6 +64,7 @@ before(() => {
         '0001_cloud_storage.sql',
         '0002_auth_rate_limit.sql',
         '0003_upload_deletion.sql',
+        '0004_receipt_scans.sql',
       ]
         .map((file) => {
           /* 배포 마이그레이션을 순서대로 읽는다. */ return readFileSync(
@@ -668,6 +669,12 @@ function receiptIntegrity(id = randomUUID()) {
     amount: '20.50',
     currency: 'USD',
     details: '피자',
+    address: 'New York sample cafe',
+    transactionTime: '16:36',
+    category: 'food',
+    items: [
+      { name: 'Pizza', quantity: 1, unitPrice: '20.50', amount: '20.50' },
+    ],
   })
     .then((body) => {
       /* 생성된 부모 일정을 확인한다. */ return (state.schedule =
@@ -685,6 +692,18 @@ function receiptIntegrity(id = randomUUID()) {
     .then((body) => {
       /* 영수증·일정·비용이 모두 저장되어야 한다. */ return (
         assert.equal(body.data.receipts.length, 1),
+        assert.equal(body.data.receipts[0].transactionTime, '16:36'),
+        assert.equal(body.data.receipts[0].address, 'New York sample cafe'),
+        assert.equal(body.data.receipts[0].items[0].name, 'Pizza'),
+        assert.equal(
+          body.data.media.find((item) => item.id === state.media).scheduleId,
+          state.schedule,
+        ),
+        assert.equal(
+          body.data.itinerary.find((item) => item.id === state.schedule)
+            .timeSlot,
+          '16:36',
+        ),
         assert.ok(
           body.data.itinerary.some((item) => {
             /* 자동 생성 일정을 대조한다. */ return item.id === state.schedule;
@@ -769,6 +788,7 @@ function receiptIntegrity(id = randomUUID()) {
         503,
       );
     })
+    .then(receiptScanBoundaries)
     .then(() => save('receipt.delete', { id }))
     .then(() => save('media.delete', { id: state.media }))
     .then(() =>
@@ -793,6 +813,94 @@ function receiptIntegrity(id = randomUUID()) {
         response.status,
         422,
       );
+    });
+}
+
+// 동일 사용자의 실제 호출 제한과 권한 안의 캐시 재사용을 검증한다.
+function receiptScanBoundaries() {
+  // 최초 실패를 포함해 다섯 번 이후에는 공급자 호출을 제한한다.
+  return Array.from({ length: 5 })
+    .reduce((previous, _, index) => {
+      // 호출을 순서대로 보내 실제 D1 카운터를 사용한다.
+      return previous.then(() =>
+        request(
+          `/api/v1/trips/${state.trip}/receipts/ocr`,
+          'POST',
+          { mediaId: state.media },
+          state.users[0],
+        ).then((response) => {
+          // 공급자가 없는 처음 네 번은 실패하고 여섯 번째 시도는 제한된다.
+          return assert.equal(response.status, index === 4 ? 429 : 503);
+        }),
+      );
+    }, Promise.resolve())
+    .then(() => mf.getD1Database('DB'))
+    .then((db) => {
+      // 실제 인식 출력 형태의 캐시를 등록된 원본에 연결한다.
+      return db
+        .prepare(
+          'INSERT INTO receipt_scans(trip_id,media_id,draft,created_at) VALUES(?,?,?,?)',
+        )
+        .bind(
+          state.trip,
+          state.media,
+          readFileSync(
+            new URL(
+              '../fixtures/kagerou-receipt-analysis.json',
+              import.meta.url,
+            ),
+            'utf8',
+          ),
+          Date.now(),
+        )
+        .run();
+    })
+    .then(() =>
+      request(
+        `/api/v1/trips/${state.trip}/receipts/ocr`,
+        'POST',
+        { mediaId: state.media },
+        state.users[0],
+      ),
+    )
+    .then(json)
+    .then((body) => {
+      // 제한 후에도 권한이 있는 기존 인식 결과는 재사용한다.
+      return assert.equal(body.data.merchant, 'Kagerou Cafe');
+    })
+    .then(() => mf.getD1Database('DB'))
+    .then((db) => {
+      // 이전 시나리오에서 제거한 테스트 회원을 조회자로만 다시 연결한다.
+      return db
+        .prepare(
+          "INSERT INTO trip_members(trip_id,user_id,role) VALUES(?,?,'viewer')",
+        )
+        .bind(state.trip, state.users[1].id)
+        .run();
+    })
+    .then(() =>
+      request(
+        `/api/v1/trips/${state.trip}/receipts/ocr`,
+        'POST',
+        { mediaId: state.media },
+        state.users[1],
+      ),
+    )
+    .then((response) => {
+      // 조회자는 캐시 재사용도 포함해 인식 쓰기 작업을 실행하지 못한다.
+      return assert.equal(response.status, 403);
+    })
+    .then(() =>
+      request(
+        `/api/v1/trips/${state.trip}/receipts/ocr`,
+        'POST',
+        { mediaId: state.media },
+        state.users[2],
+      ),
+    )
+    .then((response) => {
+      // 캐시가 존재해도 여행 외부 사용자는 원본 내용을 읽지 못한다.
+      return assert.equal(response.status, 404);
     });
 }
 

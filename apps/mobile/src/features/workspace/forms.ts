@@ -1,3 +1,4 @@
+import { receiptItems } from './receiptFlow';
 import * as Crypto from 'expo-crypto';
 import {
   workspaceCommandSchema,
@@ -141,6 +142,10 @@ function commandValue(form: PlanForm, snapshot: WorkspaceSnapshot) {
               amount: form.values.amount,
               currency: form.values.currency,
               details: form.values.details,
+              address: form.values.address || '',
+              transactionTime: form.values.transactionTime || '',
+              category: form.values.category || 'etc',
+              items: receiptItems(form.values.items),
             },
           }
         : form.kind === 'metadata'

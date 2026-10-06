@@ -31,7 +31,8 @@ function fixture(calls: Request[], oversized = false): typeof fetch {
         })
       : request.url.includes('wherego_workspace')
         ? Response.json({
-            trip: { defaultCurrency: 'JPY' },
+            trip: { defaultCurrency: 'JPY', status: 'PLANNED' },
+            myRole: 'owner',
             media: [
               { id: media, path: `${trip}/${media}.jpg`, purpose: 'receipt' },
             ],
@@ -180,7 +181,7 @@ test('OCR API는 실제 Vision 계약과 사용자 JWT로 비공개 원본을 �
 });
 // 설정 누락·다른 파일·무제한 원본을 성공 후보로 바꾸지 않는다.
 test('OCR 미설정·부모 위조·4MiB 초과는 공급자 호출 없이 실패', async () => {
-  // 미설정일 때 외부 요청은 전혀 없어야 한다.
+  // 미설정이어도 먼저 사용자와 부모 권한을 확인하며 공급자는 호출하지 않는다.
   const missing: Request[] = [];
   await assert.rejects(
     scanReceipt(
@@ -191,7 +192,13 @@ test('OCR 미설정·부모 위조·4MiB 초과는 공급자 호출 없이 실�
       fixture(missing),
     ),
   );
-  assert.equal(missing.length, 0);
+  assert.equal(
+    missing.some((request) => {
+      // 인식 서비스의 비밀과 사진을 외부 공급자에 보내지 않는다.
+      return request.url.includes('vision.googleapis.com');
+    }),
+    false,
+  );
   for (const [id, oversized] of [
     [accounts.outsider, false],
     [media, true],

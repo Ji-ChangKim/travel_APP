@@ -1,3 +1,4 @@
+import receiptScan from '../fixtures/kagerou-receipt-analysis.json';
 import { test, expect, type Page, type Route } from '@playwright/test';
 import type { WorkspaceSnapshot, CommunityPost } from '@wherego/domain';
 import {
@@ -11,6 +12,137 @@ const tinyPng = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a/Z8AAAAASUVORK5CYII=',
   'base64',
 );
+
+// 사진 업로드 뒤 인식된 결과를 입력 없이 여행 기록에 등록한다.
+test('영수증 자동 인식 → DAY3 등록 → 메뉴·장소·시간·지출 조회', ({ page }) => {
+  // 공급자 경계만 실제 사진 인식 결과로 고정하고 화면·저장 요청은 실제 구현을 사용한다.
+  return testSteps([
+    () => {
+      // 저장 및 인증 응답을 브라우저마다 격리한다.
+      return network(page);
+    },
+    () => {
+      // 사진에서 얻은 구조화 결과를 인식 응답으로 사용한다.
+      return page.route('**/receipts/ocr', (route) => {
+        // 인식 완료 전에는 장소나 지출을 생성하지 않는다.
+        return route.fulfill({ json: { data: receiptScan } });
+      });
+    },
+    () => {
+      // 사용자 로그인 화면을 통과한다.
+      return login(page);
+    },
+    () => {
+      // 여행을 생성하는 사용자 버튼을 누른다.
+      return page
+        .getByRole('button', { name: '새 여행 시작하기', exact: true })
+        .click();
+    },
+    () => {
+      // 영수증 날짜가 첫날이 아닌 여행을 만든다.
+      return fields(page, {
+        '나라 검색': '일본',
+        '도시 검색': '도쿄',
+        시작일: '2026-09-26',
+        종료일: '2026-09-29',
+      });
+    },
+    () => {
+      // 생성된 날짜별 DAY를 서버 응답으로 확인한다.
+      return page
+        .getByRole('button', { name: '확인하고 저장', exact: true })
+        .click();
+    },
+    () => {
+      // 실제 파일 선택기로 사진을 업로드한다.
+      return uploadReceiptPhoto(page);
+    },
+    () => {
+      // 수동 입력을 요구하지 않고 인식 내용이 표시돼야 한다.
+      return expect(
+        page.getByText('사진에서 읽은 내용이에요', { exact: true }),
+      ).toBeVisible();
+    },
+    () => {
+      // 결제 날짜를 첫 DAY로 바꾸지 않는다.
+      return expect(
+        page.getByText('DAY 3에 기록돼요', { exact: true }),
+      ).toBeVisible();
+    },
+    () => {
+      // 모든 내용을 다시 적는 입력창을 기본으로 열지 않는다.
+      return expect(
+        page.getByRole('textbox', { name: '영수증 상호', exact: true }),
+      ).toHaveCount(0);
+    },
+    () => {
+      // 메뉴 원문이 확인 화면에 자동으로 들어온다.
+      return expect(
+        page.getByText('みかんしぼり', { exact: true }),
+      ).toBeVisible();
+    },
+    () => {
+      // 사용자 확인 한 번으로 장소 기록과 지출을 등록한다.
+      return page
+        .getByRole('button', { name: '여행 기록에 등록', exact: true })
+        .click();
+    },
+    () => {
+      // 등록된 날짜로 바로 이동해 장소 기록을 보여준다.
+      return expect(
+        page.getByText('DAY 3 · 2026-09-28', { exact: true }),
+      ).toBeVisible();
+    },
+    () => {
+      // 입장 시간이 아닌 결제 시간이 일정에 연결된다.
+      return expect(
+        page.getByText('16:36 · Kagerou Cafe', { exact: true }),
+      ).toBeVisible();
+    },
+    () => {
+      // 등록 후 영수증의 메뉴와 실제 결제 금액을 확인한다.
+      return page
+        .getByRole('button', { name: '사진·영수증', exact: true })
+        .click();
+    },
+    () => {
+      // 총액과 세금·거스름돈을 혼동하지 않는다.
+      return expect(
+        page.getByText('Kagerou Cafe · 2026-09-28 · 2450 JPY', { exact: true }),
+      ).toBeVisible();
+    },
+    () => {
+      // 메뉴별 기록을 저장된 영수증에서 읽는다.
+      return expect(page.getByText(/みかんしぼり.*600/)).toBeVisible();
+    },
+    () => {
+      // 비용 탭에서도 같은 확정 지출을 읽는다.
+      return page.getByRole('button', { name: '비용', exact: true }).click();
+    },
+    () => {
+      // 한 번 등록한 영수증은 실제 지출 하나만 만든다.
+      return expect(
+        page.getByText('Kagerou Cafe · 2450 JPY · 실제', { exact: true }),
+      ).toBeVisible();
+    },
+  ]);
+});
+
+// 브라우저 파일 선택을 실제 사진 업로드 버튼에 연결한다.
+function uploadReceiptPhoto(page: Page): Promise<void> {
+  // 파일 선택 이벤트를 놓치지 않도록 버튼 클릭과 함께 기다린다.
+  return Promise.all([
+    page.waitForEvent('filechooser'),
+    page.getByRole('button', { name: '영수증 사진 선택', exact: true }).click(),
+  ]).then(([chooser]) => {
+    // 외부 인식은 별도 실제 이미지 검증으로 확인하고 UI 업로드는 작은 PNG로 실행한다.
+    return chooser.setFiles({
+      name: 'receipt.png',
+      mimeType: 'image/png',
+      buffer: tinyPng,
+    });
+  });
+}
 
 // 날짜별 화면 동작 검증에 사용할 서버 응답 DAY를 준비한다.
 function fixtureDays(
@@ -639,26 +771,39 @@ async function network(
           scheduleId: command.input.scheduleId || null,
         });
       if (command.operation === 'receipt.confirm') {
-        // 확인 전에는 생성되지 않던 지출과 기록을 응답에 연결한다.
+        // 실제 서버처럼 결제 날짜와 일정·원본·지출을 연결한 응답을 제공한다.
+        const scheduleId = command.input.scheduleId || command.input.id;
+        if (!command.input.scheduleId)
+          snapshot.itinerary.push({
+            id: scheduleId,
+            dayId: command.input.dayId,
+            title: command.input.merchant,
+            type: 'PLACE',
+            timeSlot: command.input.transactionTime || null,
+            sortOrder: snapshot.itinerary.length + 1,
+            memo: command.input.details || null,
+            address: command.input.address,
+          });
         snapshot.receipts.push({
-          id: command.input.id,
-          scheduleId: command.input.scheduleId || snapshot.itinerary[0]!.id,
-          mediaId: command.input.mediaId,
-          merchant: command.input.merchant,
+          ...command.input,
+          scheduleId,
           date: command.input.transactionDate,
-          amount: command.input.amount,
-          currency: command.input.currency,
-          details: command.input.details,
+        });
+        snapshot.media = snapshot.media.map((media) => {
+          // 원본은 확인한 장소 기록의 ID에 연결한다.
+          return media.id === command.input.mediaId
+            ? { ...media, scheduleId }
+            : media;
         });
         snapshot.expenses.push({
           id: command.input.id,
           dayId: command.input.dayId,
-          scheduleId: snapshot.itinerary[0]!.id,
+          scheduleId,
           title: command.input.merchant,
           amount: command.input.amount,
           currency: command.input.currency,
           isActual: true,
-          category: 'etc',
+          category: command.input.category,
           source: 'receipt',
         });
       }
@@ -1116,6 +1261,9 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
   await (
     await chooser
   ).setFiles({ name: 'receipt.png', mimeType: 'image/png', buffer: tinyPng });
+  await page
+    .getByRole('button', { name: '직접 입력으로 계속', exact: true })
+    .click();
   await expect(
     page.getByRole('textbox', { name: '영수증 상호', exact: true }),
   ).toBeVisible();
@@ -1128,7 +1276,7 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
   await page.getByRole('button', { name: 'JPY', exact: true }).click();
   await page.getByRole('button', { name: '도쿄 식당', exact: true }).click();
   await page
-    .getByRole('button', { name: '확인하고 저장', exact: true })
+    .getByRole('button', { name: '여행 기록에 등록', exact: true })
     .click();
   // 확인한 영수증 원본과 내역은 사진 영역에서 조회한다.
   await page.getByRole('button', { name: '사진·영수증', exact: true }).click();

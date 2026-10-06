@@ -469,6 +469,11 @@ test('실제 OCR 텍스트에서 상호·날짜·합계 후보를 추출한다',
       amount: '2500',
       currency: 'JPY',
       needsConfirmation: true,
+      address: '',
+      transactionTime: '',
+      items: [],
+      category: 'etc',
+      warnings: ['메뉴별 내역을 확인해 주세요.'],
     },
   );
 });

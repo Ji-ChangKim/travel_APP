@@ -499,6 +499,10 @@ function confirmReceipt(
   // 영수증 재등록과 다른 여행 참조를 거부한다.
   return validDay(s, input.dayId) &&
     validSchedule(s, input.scheduleId, input.dayId) &&
+    s.days.some((day) => {
+      // 선택 DAY와 실제 결제 날짜가 같은지 서버에서도 확인한다.
+      return day.id === input.dayId && day.tripDate === input.transactionDate;
+    }) &&
     input.transactionDate >= s.trip.startDate &&
     input.transactionDate <= s.trip.endDate &&
     s.media.some((media) => {
@@ -534,12 +538,16 @@ function receiptChange(
               dayId: input.dayId,
               title: input.merchant,
               type: 'PLACE',
-              timeSlot: null,
+              timeSlot: input.transactionTime || null,
               sortOrder: s.itinerary.length + 1,
-              memo: null,
-              address: '',
+              memo: input.details || null,
+              address: input.address,
             },
           ],
+      media: s.media.map((media) => {
+        // 확정한 영수증 원본을 같은 장소 기록에 연결한다.
+        return media.id === input.mediaId ? { ...media, scheduleId } : media;
+      }),
       receipts: [
         ...s.receipts,
         {
@@ -551,6 +559,10 @@ function receiptChange(
           amount: input.amount,
           currency: input.currency,
           details: input.details,
+          address: input.address,
+          transactionTime: input.transactionTime,
+          items: input.items,
+          category: input.category,
         },
       ],
       expenses: [
@@ -563,7 +575,7 @@ function receiptChange(
           amount: input.amount,
           currency: input.currency,
           isActual: true,
-          category: 'food',
+          category: input.category,
           source: 'receipt',
         },
       ],

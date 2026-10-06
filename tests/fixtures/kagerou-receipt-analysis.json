@@ -1,0 +1,32 @@
+{
+  "rawText": "Kagerou Cafe\n和歌山県西牟婁郡白浜町1279-3\n2026年9月28日(月) 16時36分\nA6種ミックス 1 1,250\nみかんしぼり 1 600\nはつさくソーダ 1 600\n小 計 ¥2,450\n合 計 ¥2,450",
+  "merchant": "Kagerou Cafe",
+  "address": "和歌山県西牟婁郡白浜町1279-3",
+  "transactionDate": "2026-09-28",
+  "transactionTime": "16:36",
+  "amount": "2450",
+  "currency": "JPY",
+  "category": "food",
+  "items": [
+    {
+      "name": "A6種ミックス",
+      "quantity": 1,
+      "unitPrice": "1250",
+      "amount": "1250"
+    },
+    {
+      "name": "みかんしぼり",
+      "quantity": 1,
+      "unitPrice": "600",
+      "amount": "600"
+    },
+    {
+      "name": "はつさくソーダ",
+      "quantity": 1,
+      "unitPrice": "600",
+      "amount": "600"
+    }
+  ],
+  "warnings": [],
+  "needsConfirmation": true
+}

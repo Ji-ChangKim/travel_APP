@@ -43,6 +43,10 @@ export interface WorkspaceReceipt {
   amount: string;
   currency: SupportedCurrency;
   details: string;
+  address?: string;
+  transactionTime?: string;
+  items?: ReceiptItem[];
+  category?: ReceiptCategory;
 }
 export interface WorkspaceSnapshot {
   trip: PersistedTrip;
@@ -98,4 +102,19 @@ export interface ReceiptDraft {
   amount: string;
   currency: SupportedCurrency;
   needsConfirmation: true;
+  address: string;
+  transactionTime: string;
+  items: ReceiptItem[];
+  category: ReceiptCategory;
+  warnings: string[];
 }
+
+// 읽지 못한 단가·수량은 빈 값으로 두고 메뉴 원문을 보존한다.
+export interface ReceiptItem {
+  name: string;
+  quantity: number | null;
+  unitPrice: string;
+  amount: string;
+}
+export type ReceiptCategory =
+  'food' | 'transport' | 'stay' | 'activity' | 'shopping' | 'etc';

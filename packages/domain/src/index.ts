@@ -209,4 +209,6 @@ export type {
   WorkspaceSnapshot,
   CommunityPost,
   ReceiptDraft,
+  ReceiptItem,
+  ReceiptCategory,
 } from './workspace';

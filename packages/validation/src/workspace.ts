@@ -56,6 +56,38 @@ export const expenseInputSchema = z
       currency: value.currency,
     }).success;
   });
+// 원문 메뉴명과 인식된 수량·가격만 저장하며 알 수 없는 숫자는 비워 둔다.
+export const receiptItemSchema = z
+  .object({
+    name: z.string().trim().min(1).max(120),
+    quantity: z.number().int().positive().max(10000).nullable(),
+    unitPrice: z.string().regex(/^$|^\d{1,12}(?:\.\d{1,2})?$/),
+    amount: z.string().regex(/^$|^\d{1,12}(?:\.\d{1,2})?$/),
+  })
+  .strict();
+export const receiptCategorySchema = z.enum([
+  'food',
+  'transport',
+  'stay',
+  'activity',
+  'shopping',
+  'etc',
+]);
+const receiptTimeSchema = z.string().regex(/^$|^([01]\d|2[0-3]):[0-5]\d$/);
+// 공급자 결과도 서버와 앱에서 같은 확인용 초안 계약으로 검증한다.
+export const receiptDraftSchema = z.object({
+  rawText: z.string().max(10000),
+  merchant: z.string().max(100),
+  address: z.string().max(200).default(''),
+  transactionDate: z.union([calendarDateSchema, z.literal('')]),
+  transactionTime: receiptTimeSchema.default(''),
+  amount: z.string().regex(/^$|^\d{1,12}(?:\.\d{1,2})?$/),
+  currency: z.enum(['KRW', 'JPY', 'USD']),
+  category: receiptCategorySchema.default('etc'),
+  items: z.array(receiptItemSchema).max(50).default([]),
+  warnings: z.array(z.string().max(200)).max(12).default([]),
+  needsConfirmation: z.literal(true),
+});
 export const receiptInputSchema = z
   .object({
     id: foundationUuidSchema,
@@ -67,14 +99,33 @@ export const receiptInputSchema = z
     amount: z.string(),
     currency: z.enum(['KRW', 'JPY', 'USD']),
     details: z.string().max(1000).default(''),
+    address: z.string().max(200).default(''),
+    transactionTime: receiptTimeSchema.default(''),
+    items: z.array(receiptItemSchema).max(50).default([]),
+    category: receiptCategorySchema.default('food'),
   })
   .strict()
   .refine((value) => {
     // 사용자가 확인한 금액만 실제 지출로 저장한다.
-    return decimalExpenseSchema.safeParse({
-      amount: value.amount,
-      currency: value.currency,
-    }).success;
+    return (
+      decimalExpenseSchema.safeParse({
+        amount: value.amount,
+        currency: value.currency,
+      }).success &&
+      value.items.every((item) => {
+        // 인식된 메뉴별 금액도 결제 통화의 소수 규칙을 따른다.
+        return [item.unitPrice, item.amount].every((amount) => {
+          // 읽지 못한 값은 빈 값으로 보존하며 결제 합계로 대체하지 않는다.
+          return (
+            !amount ||
+            (Number(amount) === 0 &&
+              (value.currency === 'USD' || !amount.includes('.'))) ||
+            decimalExpenseSchema.safeParse({ amount, currency: value.currency })
+              .success
+          );
+        });
+      })
+    );
   });
 // 명령별 허용 필드와 기본값을 서버와 화면에서 함께 사용한다.
 export const workspaceCommandSchema = z.discriminatedUnion('operation', [
@@ -284,6 +335,10 @@ export const workspaceSnapshotSchema = z.object({
       amount: z.string(),
       currency: z.enum(['KRW', 'JPY', 'USD']),
       details: z.string(),
+      address: z.string().default(''),
+      transactionTime: receiptTimeSchema.default(''),
+      items: z.array(receiptItemSchema).max(50).default([]),
+      category: receiptCategorySchema.default('food'),
     }),
   ),
   invites: z.array(
