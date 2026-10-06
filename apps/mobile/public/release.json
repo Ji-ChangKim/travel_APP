@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "release": "test-1-trip-hub",
+  "release": "test-1-no-dummy",
   "environment": "staging",
   "releaseDate": "2026-10-06",
   "webOrigin": "https://wherego-staging.pages.dev",

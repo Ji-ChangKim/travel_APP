@@ -200,7 +200,7 @@ function html(items, overview = false) {
   // 제품을 바꾸지 않고 현재 구현 화면을 비교하는 정적 갤러리를 생성한다.
   return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TripPrint · 전체 페이지 미리보기</title><style>
 *{box-sizing:border-box}body{margin:0;background:#FFF9F3;color:#203247;font-family:"Malgun Gothic",sans-serif}main{max-width:1400px;margin:auto;padding:48px 36px}.brand{font-weight:900;font-size:30px;letter-spacing:-1px}.brand span{color:#FF6B57}.eyebrow{font-size:12px;letter-spacing:2px;margin-top:32px;color:#C84432;font-weight:700}h1{font-size:34px;margin:12px 0 16px;letter-spacing:-1.5px}.lead{font-size:15px;line-height:1.8;color:#677584;max-width:850px}.chips{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0 34px}.chips span{border:1px solid #E8DDD3;border-radius:30px;padding:8px 14px;font-size:12px;background:#fff}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}article{background:#fff;border:1px solid #E8DDD3;border-radius:18px;overflow:hidden;box-shadow:0 5px 16px #20324706}.card-head{display:flex;gap:10px;align-items:center;padding:18px 14px;border-bottom:1px solid #F0E8E0}h2{font-size:14px;margin:0}.number{font-size:12px;color:#C84432;font-weight:700}article img{width:100%;height:auto;display:block}article>a{display:block;padding:12px;background:#F7F0E9}.card-foot{padding:14px;min-height:85px}code{font-size:10px;word-break:break-all;color:#9B604F}.card-foot p{font-size:11px;line-height:1.6;color:#768390;margin:8px 0 0}.footer{font-size:12px;line-height:1.9;color:#768390;margin-top:36px}.lightbox{display:none;position:fixed;inset:0;z-index:20;align-items:center;justify-content:center}.lightbox:target{display:flex}.backdrop{position:absolute;inset:0;background:#142232dd}.expanded{position:relative;background:white;border-radius:16px;padding:14px;max-height:95vh;overflow:auto}.expanded header{display:flex;gap:24px;justify-content:space-between;font-size:13px;margin:4px 0 14px}.expanded header a{color:#C84432}.expanded img{width:min(390px,80vw);display:block}a{color:inherit}.overview main{padding:36px}.overview .grid{gap:18px}.overview .card-foot{min-height:63px}.overview article>a{padding:8px}.overview h1{font-size:30px}.overview .chips{margin-bottom:28px}@media(max-width:950px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:700px){main{padding:28px 18px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}h1{font-size:27px}.card-head{padding:12px 10px}h2{font-size:12px}}@media(max-width:420px){.grid{grid-template-columns:1fr}}
-</style></head><body class="${overview ? 'overview' : ''}"><main><div class="brand">Trip<span>Print</span></div><div class="eyebrow">LEAVE YOUR TRIPPRINT</div><h1>${overview ? '여행의 모든 순간을 TripPrint에' : 'TripPrint 화면 둘러보기'}</h1><p class="lead">여행 계획부터 사진과 비용 기록, 발자국 공유까지. 화면을 눌러 자세히 살펴보세요.</p><div class="chips"><span>여행 계획</span><span>친구와 함께</span><span>사진·영수증</span><span>발자국 공유</span></div><div class="grid" id="screens">${items.map(card).join('')}</div><p class="footer">가고 싶은 곳을 계획하고, 다녀온 순간을 기록하세요. 나만의 발자국이 다음 여행의 길잡이가 됩니다.</p></main>${items.map(lightbox).join('')}</body></html>`;
+</style></head><body class="${overview ? 'overview' : ''}"><main><div class="brand">Trip<span>Print</span></div><div class="eyebrow">LEAVE YOUR TRIPPRINT</div><h1>${overview ? '여행의 모든 순간을 TripPrint에' : 'TripPrint 화면 둘러보기'}</h1><p class="lead">여행 계획부터 사진과 비용 기록, 발자국 공유까지. 화면을 눌러 자세히 살펴보세요.</p><div class="chips"><span>여행 계획</span><span>친구와 함께</span><span>사진·영수증</span><span>발자국 공유</span></div><div class="grid" id="screens">${items.length ? items.map(card).join('') : '<p class="lead">로그인하고 여행을 만들면 일정과 영수증 기록을 볼 수 있어요. <a href="https://wherego-staging.pages.dev">TripPrint 시작하기</a></p>'}</div><p class="footer">가고 싶은 곳을 계획하고, 다녀온 순간을 기록하세요. 나만의 발자국이 다음 여행의 길잡이가 됩니다.</p></main>${items.map(lightbox).join('')}</body></html>`;
 }
 const overviewKeys = [
   'first-visit-home',
@@ -216,19 +216,19 @@ const overviewKeys = [
   'maps-import',
   'local-records',
 ];
-const overviewShots = overviewKeys.map((key) => {
-  // 모든 주요 사용자 페이지가 한 장의 개요에 포함되어야 한다.
-  return manifest.shots.find((item) => item.key === key);
-});
+const overviewShots = overviewKeys
+  .map((key) => {
+    // 실제로 촬영한 사용자 페이지를 개요에 포함한다.
+    return manifest.shots.find((item) => item.key === key);
+  })
+  .filter(Boolean);
 if (
   !manifest.completed ||
+  manifest.responseSource !== 'service' ||
   manifest.errors.length ||
-  overviewShots.some((item) => {
-    // 캡처 누락이나 화면 오류가 있는 갤러리를 완료 처리하지 않는다.
-    return !item;
-  })
+  !manifest.shots.length
 )
-  throw new Error('갤러리 캡처 누락 또는 실행 오류');
+  throw new Error('실제 서비스 캡처가 아니거나 실행 오류가 있습니다.');
 writeFileSync(join(output, 'index.html'), html(manifest.shots));
 writeFileSync(join(output, 'overview.html'), html(overviewShots, true));
 // 첫 방문·재방문·조회 실패와 여행 허브를 한 페이지에서 비교한다.
@@ -247,7 +247,7 @@ writeFileSync(
   ).replaceAll('TripPrint 화면 둘러보기', '여행을 시작하고 이어가는 TripPrint'),
 );
 console.info(
-  `주요 페이지 12종 및 전체 화면 ${manifest.shots.length}개 갤러리 생성`,
+  `주요 페이지 ${overviewShots.length}종 및 전체 화면 ${manifest.shots.length}개 갤러리 생성`,
 );
 
 // 영수증 촬영부터 정보 확인과 저장 결과까지 한곳에서 살펴본다.
@@ -265,13 +265,15 @@ writeFileSync(
       'receipt-info-only',
       'receipt-saved',
       'receipt-cost',
-    ].map((key) => {
-      // 촬영·두 가지 확인 질문·보관 선택별 결과를 사용자 순서로 정렬한다.
-      return manifest.shots.find((item) => {
-        // 해당 단계의 실제 앱 캡처 한 장을 선택한다.
-        return item.key === key;
-      });
-    }),
+    ]
+      .map((key) => {
+        // 촬영·두 가지 확인 질문·보관 선택별 결과를 사용자 순서로 정렬한다.
+        return manifest.shots.find((item) => {
+          // 해당 단계의 실제 앱 캡처 한 장을 선택한다.
+          return item.key === key;
+        });
+      })
+      .filter(Boolean),
   ).replaceAll('TripPrint 화면 둘러보기', '영수증 한 장으로 남기는 여행'),
 );
 

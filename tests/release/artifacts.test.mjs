@@ -51,6 +51,15 @@ test('테스트 인증 설정과 서버 비밀 키를 배포 청크에서 거부
       'AUTH_SECRET',
       'SUPABASE_SERVICE_ROLE_KEY',
       'CLOUDFLARE_API_TOKEN',
+      '제주 푸른 바다 힐링 여행',
+      '도쿄 골목 산책과 미식 여행',
+      'JEJU-2026',
+      'TOKYO-777',
+      'preview@example.test',
+      'home@example.test',
+      'fixture@example.test',
+      '가을 도쿄 산책',
+      '시라하마에서 보내는 하루',
     ].every(hasUnsafeReleaseValues),
   );
 });
