@@ -20,6 +20,8 @@ import { updateUserProfile } from '@/services/profileService';
 import { useTripStore } from '@/stores/useTripStore';
 import { serverOptions } from '@/features/workspace/service';
 import { Action } from '@/features/workspace/ui';
+import { useAuthReady } from '@/features/auth/AuthBridge';
+import TripPrintLoading from '@/components/TripPrintLoading';
 
 // 여행 스타일 선택 옵션 목록을 정의한다.
 const TRAVEL_STYLE_OPTIONS = [
@@ -35,6 +37,19 @@ const TRAVEL_STYLE_OPTIONS = [
 
 // [마이] 프로필 및 앱 환경 설정 화면을 렌더링한다.
 export default function MyScreen() {
+  // 탭 경로를 유지한 채 실제 인증 상태가 확정된 뒤 개인 화면을 표시한다.
+  return useAuthReady((state) => {
+    // 정적 렌더와 첫 클라이언트 렌더에서 같은 준비 화면을 사용한다.
+    return state.ready;
+  }) ? (
+    <MyContent />
+  ) : (
+    <TripPrintLoading message="계정을 확인하고 있어요" />
+  );
+}
+
+// 확인된 계정의 프로필과 여행 통계를 표시한다.
+function MyContent() {
   const router = useRouter();
   const { trips, visits, currentUser, updateProfile, logout } = useTripStore();
 

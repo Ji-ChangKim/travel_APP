@@ -34,6 +34,7 @@ import { Action, Field, ServerPhoto, styles } from './ui';
 import { scheduleForm, formCommand, newTripForm, type PlanForm } from './forms';
 import PlanEditor from './PlanEditor';
 import GooglePlace from './GooglePlace';
+import HomeScreen from './HomeScreen';
 import { countryDefaults, travelCountries } from './countries';
 import { useSharedSchedule } from './useSharedSchedule';
 import {
@@ -105,14 +106,15 @@ export default function WorkspaceScreen({
     // 게스트와 로그인 계정의 작성 상태를 분리한다.
     return state.currentUser?.id || 'public';
   });
-  const { id, importPlace } = useLocalSearchParams<{
+  const { id, importPlace, destination } = useLocalSearchParams<{
     id?: string;
     importPlace?: string;
+    destination?: string;
   }>();
   // React key로 이전 계정의 입력·요청 클로저를 남기지 않는다.
   return (
     <WorkspaceContent
-      key={`${userId}:${creating ? 'new' : id || 'list'}:${importPlace || ''}`}
+      key={`${userId}:${creating ? `new:${destination || ''}` : id || 'list'}:${importPlace || ''}`}
       creating={creating}
       importing={importPlace === '1'}
     />
@@ -131,15 +133,16 @@ function WorkspaceContent({
     // 게스트는 서버 작성 권한을 갖지 않는다.
     return state.currentUser;
   });
-  const { id, section } = useLocalSearchParams<{
+  const { id, section, destination } = useLocalSearchParams<{
     id?: string;
     section?: string;
+    destination?: string;
   }>();
   const router = useRouter();
   const cache = useQueryClient();
   const userId = user && user.authProvider !== 'guest' ? user.id : '';
   const [form, setForm] = useState<PlanForm | null>(
-    creating ? newTripForm : null,
+    creating ? () => newTripForm(destination) : null,
   );
   const [busy, setBusy] = useState(false);
   const [scanning, setScanning] = useState(false);
@@ -504,6 +507,17 @@ function WorkspaceContent({
     return router.canGoBack() ? router.back() : router.replace('/(tabs)');
   }
   // 새 여행 작성 폼을 독립된 페이지로 표시한다.
+  if (!id && !creating)
+    return (
+      <HomeScreen
+        userId={userId}
+        trips={trips.data}
+        loading={trips.isLoading}
+        error={trips.error ? workspaceError(trips.error) : ''}
+        onReload={reload}
+      />
+    );
+  // 홈에서 고른 목적지로 인증된 계정의 여행 생성을 시작한다.
   if (creating && userId)
     return (
       <PlanEditor
@@ -538,55 +552,10 @@ function WorkspaceContent({
             }}
           />
         )}
-        <Text style={styles.header}>{id ? '나의 여행' : '내 여행'}</Text>
+        <Text style={styles.header}>{id ? '나의 여행' : '여행 계획'}</Text>
         <Text style={styles.subtitle}>
           함께 계획하고, 사진과 비용으로 여행을 기록하세요.
         </Text>
-        {!id && userId && (
-          <Action
-            label="새 여행 시작하기"
-            variant="primary"
-            disabled={busy || scanning || hasPending}
-            onPress={() => {
-              // 여행 생성 전용 페이지로 이동한다.
-              router.push('/new-trip');
-            }}
-          />
-        )}
-        {!id && (
-          <View style={styles.row}>
-            <Action
-              label="Google Maps 장소 가져오기"
-              onPress={() => {
-                // 지도에서 공유한 장소를 내 여행에 추가한다.
-                return router.push('/import-place');
-              }}
-            />
-            <Action
-              label="커뮤니티"
-              onPress={() => {
-                // 완료된 여행의 공개 기록으로 이동한다.
-                router.push('/(tabs)/community');
-              }}
-            />
-            <Action
-              label="초대 링크로 참여"
-              onPress={() => {
-                // 붙여넣기 또는 받은 링크에서 참여한다.
-                router.push('/invite');
-              }}
-            />
-            {id && (
-              <Action
-                label="내 여행 목록"
-                onPress={() => {
-                  // 서버 여행 목록으로 돌아간다.
-                  router.replace('/(tabs)');
-                }}
-              />
-            )}
-          </View>
-        )}
         {!userId ? (
           <View style={styles.card}>
             <Text style={styles.title}>로그인하고 여행을 시작하세요</Text>
@@ -597,20 +566,22 @@ function WorkspaceContent({
               label="로그인 / 회원가입"
               onPress={() => {
                 // 실제 인증 화면으로 이동한다.
-                router.push('/login');
+                return router.push(
+                  creating
+                    ? {
+                        pathname: '/login',
+                        params: {
+                          next: 'new-trip',
+                          destination: destination || '',
+                        },
+                      }
+                    : '/login',
+                );
               }}
             />
           </View>
         ) : (
           <>
-            {!id && (
-              <Action
-                label="새로고침"
-                variant="quiet"
-                disabled={busy}
-                onPress={reload}
-              />
-            )}
             {(trips.isLoading || workspace.isLoading) && (
               <Text>여행을 불러오는 중입니다.</Text>
             )}
@@ -618,34 +589,6 @@ function WorkspaceContent({
               <Text style={styles.error}>
                 {workspaceError(trips.error || workspace.error)}
               </Text>
-            )}
-            {!id && (
-              <>
-                {trips.data?.length === 0 && (
-                  <Text>아직 여행이 없습니다. 첫 여행을 만들어 보세요.</Text>
-                )}
-                {trips.data?.map((trip) => (
-                  <View key={trip.id} style={styles.card}>
-                    <Text style={styles.title}>{trip.title}</Text>
-                    <Text>
-                      {trip.country} · {trip.city}
-                    </Text>
-                    <Text>
-                      {trip.startDate} ~ {trip.endDate}
-                    </Text>
-                    <Text style={styles.badge}>
-                      {tripStatusLabel(trip.status)}
-                    </Text>
-                    <Action
-                      label="여행 열기"
-                      onPress={() => {
-                        // 실제 저장 ID로 상세 자료를 조회한다.
-                        router.push(`/trips/${trip.id}`);
-                      }}
-                    />
-                  </View>
-                ))}
-              </>
             )}
             {snapshot && (
               <>

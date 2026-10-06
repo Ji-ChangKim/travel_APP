@@ -1,31 +1,12 @@
 import { useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import TripPrintLoading from '@/components/TripPrintLoading';
-import { useTripStore } from '@/stores/useTripStore';
-import { getCloudSession } from '@/services/cloudAuth';
 import { pendingAuthDestination } from '@/features/workspace/mapsShare';
 
-// 저장한 게스트와 실제 서버 세션에 맞는 시작 경로를 결정한다.
+// 앱 시작은 공개 홈으로 보내되 대기 중인 초대·장소 공유 경로를 보존한다.
 function restoredStartDestination() {
-  // 게스트 저장소 실패는 실제 서버 인증 확인을 막지 않는다.
-  return useTripStore
-    .getState()
-    .initGuestSession()
-    .catch(() => {
-      // 복원할 게스트가 없으면 서버 세션 확인으로 이어간다.
-      return null;
-    })
-    .then(() => {
-      // 서버의 유효한 세션만 로그인 성공으로 인정한다.
-      return getCloudSession();
-    })
-    .then((session) => {
-      // 초대와 지도 공유의 인증 후 목적지를 보존한다.
-      return session ||
-        useTripStore.getState().currentUser?.authProvider === 'guest'
-        ? pendingAuthDestination()
-        : ('/login' as const);
-    });
+  // 인증 복원은 AuthBridge에 맡겨 홈을 여는 데 중복 서버 조회를 기다리지 않는다.
+  return pendingAuthDestination();
 }
 
 // 시작 화면의 수명 동안에만 인증 복원 후 이동한다.
@@ -41,8 +22,8 @@ function connectStart(
         return lifetime.active ? router.replace(destination) : undefined;
       })
       .catch(() => {
-        // 인증 확인 실패는 로그인 화면에서 다시 시작할 수 있다.
-        return lifetime.active ? router.replace('/login') : undefined;
+        // 임시 공유 저장소 실패에도 공개 홈에서 시작할 수 있다.
+        return lifetime.active ? router.replace('/(tabs)') : undefined;
       }),
     () => {
       // 해제된 시작 화면의 이동 콜백을 비활성화한다.
@@ -59,7 +40,7 @@ function useStartScreen(router: ReturnType<typeof useRouter>) {
       // React 화면 해제 시 시작 작업의 이동 권한을 정리한다.
       return connectStart(router);
     }, [router]),
-    (<TripPrintLoading message="여행 기록을 불러오고 있어요" />)
+    (<TripPrintLoading message="여행을 준비하고 있어요" />)
   );
 }
 

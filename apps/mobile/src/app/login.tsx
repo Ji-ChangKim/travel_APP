@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import type { OsPlatform } from '@wherego/domain';
@@ -19,6 +19,7 @@ import type { OsPlatform } from '@wherego/domain';
 import { useTripStore } from '@/stores/useTripStore';
 import { pendingAuthDestination } from '@/features/workspace/mapsShare';
 import EmailAuth from '@/features/auth/EmailAuth';
+import { homeDestination } from '@/features/workspace/homeDestinations';
 
 // 로그인 화면 전용 디자인 토큰 규격을 정의한다.
 const loginTheme = {
@@ -47,6 +48,11 @@ export function resolveCurrentOsPlatform(): OsPlatform {
 // 실제 제공하는 이메일 인증과 여행 둘러보기를 안내한다.
 export default function LoginScreen() {
   const router = useRouter();
+  // 홈에서 시작한 여행 생성 의도만 고정 경로로 복원한다.
+  const { next, destination: selectedDestination } = useLocalSearchParams<{
+    next?: string;
+    destination?: string;
+  }>();
   const { currentUser, loginAsGuest, logout } = useTripStore();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -61,7 +67,19 @@ export default function LoginScreen() {
     void pendingAuthDestination()
       .then((destination) => {
         // 인증 전에 받은 초대 링크로 복귀한다.
-        router.replace(destination);
+        router.replace(
+          destination === '/(tabs)' && next === 'new-trip'
+            ? homeDestination(selectedDestination)
+              ? {
+                  pathname: '/new-trip',
+                  params: {
+                    destination:
+                      homeDestination(selectedDestination)?.key || '',
+                  },
+                }
+              : '/new-trip'
+            : destination,
+        );
       })
       .catch(() => {
         // 저장소 오류가 있어도 여행 허브에 진입할 수 있다.
@@ -79,7 +97,7 @@ export default function LoginScreen() {
     try {
       if (currentUser && currentUser.authProvider !== 'guest') await logout();
       await loginAsGuest(currentOs);
-      router.replace('/(tabs)/community');
+      router.replace('/(tabs)');
     } catch {
       // 기기 저장 실패는 웹에서도 확인할 수 있다.
       setAuthError('기기 저장소 또는 세션을 확인해 주세요.');
@@ -145,6 +163,12 @@ export default function LoginScreen() {
             날짜별로 여행을 계획하고 친구를 초대하세요.{'\n'}사진과 비용을
             남기면 여행의 이야기가 쌓여요.
           </Text>
+          {next === 'new-trip' && (
+            <Text style={styles.serviceDescription}>
+              {homeDestination(selectedDestination)?.city || '새 여행'} 계획을
+              저장하려면 로그인해 주세요. 로그인 후 날짜 선택으로 이어집니다.
+            </Text>
+          )}
         </View>
 
         {/* 기존 세션이 유지되어 있는 경우 빠른 이어하기 카드 */}

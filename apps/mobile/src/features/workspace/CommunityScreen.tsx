@@ -183,7 +183,21 @@ export default function CommunityScreen() {
           </Text>
         )}
         {query.data?.pages[0]?.length === 0 && (
-          <Text>아직 공개된 여행 기록이 없습니다.</Text>
+          <View style={styles.card}>
+            <Text style={styles.title}>아직 공개된 여행 기록이 없습니다</Text>
+            <Text style={styles.subtitle}>
+              먼저 나의 여행을 계획해 보세요. 여행을 마친 뒤 공개할 기록을
+              선택해 이곳에 나눌 수 있어요.
+            </Text>
+            <Action
+              label="홈에서 여행 시작하기"
+              variant="primary"
+              onPress={() => {
+                // 공개 글이 없어도 여행 계획의 시작점으로 안내한다.
+                return router.push('/(tabs)');
+              }}
+            />
+          </View>
         )}
         {query.data?.pages.flat().map((post) => (
           <View key={post.id} style={styles.card}>

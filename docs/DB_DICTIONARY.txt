@@ -1058,6 +1058,18 @@ isActual=true인 기존 WorkspaceExpense만 BigInt 센트 합산, 다른 통화�
 사진 조회는 기존 멤버 권한 및 60초 서명 URL 사용. 공개 선택은 기존 community.publish 계약 유지.
 
 ======================================================================
+
+[2026-10-06 공개 홈 / 여행 생성 목적지 입력]
+DB명: 기존 Cloudflare D1 여행 DB 유지. 테이블·컬럼·제약조건 변경 없음.
+HomeDestination: DB에 저장하지 않는 앱 선택지 객체.
+key(string, tokyo/osaka/jeju/seoul 고정 허용값), city/country(string),
+timezone(IANA string), currency(KRW/JPY), icon(Ionicons 이름 string).
+URL destination(string, 선택): homeDestination 허용값만 생성 폼 초기값에 적용.
+URL next(string, 선택): new-trip 값만 로그인 후 고정 /new-trip 복귀를 허용.
+외부 URL 복귀는 허용하지 않으며 초대·지도 공유 인증 복귀를 먼저 처리한다.
+HomeProps: userId(string, 실제 인증 UUID 또는 빈 문자열), trips(PersistedTrip[]|undefined),
+loading(boolean), error(string), onReload(조회 재시도 콜백). UI 전용, DB 저장 안 함.
+공개 홈·커뮤니티 진입은 인증 불필요. 개인 여행 조회·생성·수정은 기존 서버 인증·멤버십 유지.
 [현재 운영 명세 v3.0 / 2026-10-06 / Cloudflare D1·R2 전환]
 ======================================================================
 현재 MVP의 인증·여행·사진·게시물은 아래 D1 DB와 비공개 R2를 사용한다.

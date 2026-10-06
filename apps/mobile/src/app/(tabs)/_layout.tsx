@@ -1,8 +1,5 @@
-import { Redirect, Tabs } from 'expo-router';
+import { Tabs } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTripStore } from '@/stores/useTripStore';
-import { useAuthReady } from '@/features/auth/AuthBridge';
-import { ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { colors } from '@/constants/theme';
@@ -26,20 +23,7 @@ function TabBarIcon({
 export default function TabLayout() {
   // 시스템 바가 호출된 동안에는 하단 안전 영역만큼 탭을 올린다.
   const insets = useSafeAreaInsets();
-  // 로그인이나 명시적인 둘러보기 없이 탭으로 바로 진입하지 않는다.
-  const user = useTripStore((state) => {
-    // 로그인 상태만 구독한다.
-    return state.currentUser;
-  });
-  const ready = useAuthReady((state) => {
-    // 세션 복원 전에는 로그인 실패로 처리하지 않는다.
-    return state.ready;
-  });
-  // 저장된 실제 세션의 초기 복원을 기다린다.
-  if (!ready)
-    return <ActivityIndicator accessibilityLabel="로그인 상태 확인 중" />;
-  // 복원되지 않은 세션은 로그인 화면에서 확인하게 한다.
-  if (!user) return <Redirect href="/login" />;
+  // 홈·공개 피드는 로그인 전에도 제공하고 비공개 조회·쓰기는 각 화면에서 인증한다.
   return (
     <Tabs
       screenOptions={{
@@ -63,9 +47,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: '내 여행',
+          title: '홈',
           tabBarIcon: ({ color, size }) => (
-            <TabBarIcon name="airplane-outline" color={color} size={size} />
+            <TabBarIcon name="home-outline" color={color} size={size} />
           ),
         }}
       />

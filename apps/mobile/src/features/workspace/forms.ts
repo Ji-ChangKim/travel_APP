@@ -4,6 +4,7 @@ import {
   type WorkspaceCommand,
 } from '@wherego/validation';
 import type { WorkspaceSnapshot, WorkspaceSchedule } from '@wherego/domain';
+import { homeDestination } from './homeDestinations';
 
 export type FormKind =
   | 'trip'
@@ -19,19 +20,19 @@ export interface PlanForm {
   values: Record<string, string>;
 }
 // 생성 페이지마다 별도의 멱등 키와 빈 여행 초안을 준비한다.
-export function newTripForm(): PlanForm {
+export function newTripForm(destination?: string): PlanForm {
   // 날짜와 목적지는 사용자가 선택하며 기존 항공편 등록 기본값을 유지한다.
   return {
     kind: 'trip',
     id: Crypto.randomUUID(),
     values: {
       title: '',
-      country: '',
-      city: '',
+      country: homeDestination(destination)?.country || '',
+      city: homeDestination(destination)?.city || '',
       startDate: '',
       endDate: '',
-      timezone: 'Asia/Seoul',
-      defaultCurrency: 'KRW',
+      timezone: homeDestination(destination)?.timezone || 'Asia/Seoul',
+      defaultCurrency: homeDestination(destination)?.currency || 'KRW',
       flightNumber: '',
       flightDeparture: 'ICN',
       flightArrival: '',
