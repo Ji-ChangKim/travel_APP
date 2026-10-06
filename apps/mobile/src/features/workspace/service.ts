@@ -1,4 +1,5 @@
 import * as ImagePicker from 'expo-image-picker';
+import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import * as Crypto from 'expo-crypto';
 import { File } from 'expo-file-system';
 import { Platform, Share } from 'react-native';
@@ -82,9 +83,54 @@ export function uploadImage(
 ): Promise<{ id: string; path: string; mimeType: 'image/jpeg' | 'image/png' }> {
   // 원본 업로드가 완료되기 전 DB 기록을 확정하지 않는다.
   return readImage(asset).then((bytes) => {
-    // MIME·용량 검사는 업로드 전에 수행한다.
-    return uploadBytes(tripId, bytes, asset.mimeType);
+    // 촬영 사진은 글자를 보존한 JPEG로 자동 압축한 뒤 용량을 다시 검사한다.
+    return preparedImage(asset, bytes).then((prepared) => {
+      // 업로드한 파일의 실제 시그니처로 확정 MIME을 결정한다.
+      return uploadBytes(tripId, prepared, imageMime(prepared));
+    });
   });
+}
+
+// 서버 제한을 넘는 실제 JPG/PNG 사진만 자동 압축한다.
+function preparedImage(
+  asset: ImagePicker.ImagePickerAsset,
+  bytes: ArrayBuffer,
+): Promise<ArrayBuffer> {
+  // 확장자를 바꾼 문서나 다른 파일은 이미지 처리기에 전달하지 않는다.
+  return imageMime(bytes) && bytes.byteLength > 4194304
+    ? compressedImage(asset)
+    : Promise.resolve(bytes);
+}
+
+// 긴 변을 최대2400px로 유지하며 인식용 사진을 JPEG로 저장한다.
+function compressedImage(
+  asset: ImagePicker.ImagePickerAsset,
+): Promise<ArrayBuffer> {
+  // 8MB 이상 PNG도 직접 선택할 수 있도록 글자를 읽을 해상도를 유지한다.
+  return ImageManipulator.manipulate(asset.uri)
+    .resize(
+      asset.width >= asset.height
+        ? { width: Math.min(asset.width, 2400) }
+        : { height: Math.min(asset.height, 2400) },
+    )
+    .renderAsync()
+    .then((image) => {
+      // 변환 결과를 읽은 후 렌더링 이미지 참조를 해제한다.
+      return image
+        .saveAsync({ format: SaveFormat.JPEG, compress: 0.9 })
+        .then((result) => {
+          // 갤러리 원본을 수정하지 않고 비공개 업로드용 사본만 읽는다.
+          return readImage({
+            ...asset,
+            uri: result.uri,
+            mimeType: 'image/jpeg',
+          });
+        })
+        .finally(() => {
+          // 반복 스캔에서 네이티브 이미지 메모리를 계속 보관하지 않는다.
+          return image.release();
+        });
+    });
 }
 // 검증한 원본을 고유 경로에 업로드한다.
 function uploadBytes(tripId: string, bytes: ArrayBuffer, mime?: string) {

@@ -33,6 +33,7 @@ for (const projectRoot of [repository, join(repository, 'apps/mobile')]) {
     for (const name of [
       'expo-navigation-bar',
       'expo-image-picker',
+      'expo-image-manipulator',
       'expo-web-browser',
       'expo-sharing',
       'expo-document-picker',

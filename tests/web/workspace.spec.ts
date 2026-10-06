@@ -14,133 +14,169 @@ const tinyPng = Buffer.from(
 );
 
 // 사진 업로드 뒤 인식된 결과를 입력 없이 여행 기록에 등록한다.
-test('영수증 자동 인식 → DAY3 등록 → 메뉴·장소·시간·지출 조회', ({ page }) => {
-  // 공급자 경계만 실제 사진 인식 결과로 고정하고 화면·저장 요청은 실제 구현을 사용한다.
-  return testSteps([
-    () => {
-      // 저장 및 인증 응답을 브라우저마다 격리한다.
-      return network(page);
-    },
-    () => {
-      // 사진에서 얻은 구조화 결과를 인식 응답으로 사용한다.
-      return page.route('**/receipts/ocr', (route) => {
-        // 인식 완료 전에는 장소나 지출을 생성하지 않는다.
-        return route.fulfill({ json: { data: receiptScan } });
-      });
-    },
-    () => {
-      // 사용자 로그인 화면을 통과한다.
-      return login(page);
-    },
-    () => {
-      // 여행을 생성하는 사용자 버튼을 누른다.
-      return page
-        .getByRole('button', { name: '새 여행 시작하기', exact: true })
-        .click();
-    },
-    () => {
-      // 영수증 날짜가 첫날이 아닌 여행을 만든다.
-      return fields(page, {
-        '나라 검색': '일본',
-        '도시 검색': '도쿄',
-        시작일: '2026-09-26',
-        종료일: '2026-09-29',
-      });
-    },
-    () => {
-      // 생성된 날짜별 DAY를 서버 응답으로 확인한다.
-      return page
-        .getByRole('button', { name: '확인하고 저장', exact: true })
-        .click();
-    },
-    () => {
-      // 실제 파일 선택기로 사진을 업로드한다.
-      return uploadReceiptPhoto(page);
-    },
-    () => {
-      // 수동 입력을 요구하지 않고 인식 내용이 표시돼야 한다.
-      return expect(
-        page.getByText('사진에서 읽은 내용이에요', { exact: true }),
-      ).toBeVisible();
-    },
-    () => {
-      // 결제 날짜를 첫 DAY로 바꾸지 않는다.
-      return expect(
-        page.getByText('DAY 3에 기록돼요', { exact: true }),
-      ).toBeVisible();
-    },
-    () => {
-      // 모든 내용을 다시 적는 입력창을 기본으로 열지 않는다.
-      return expect(
-        page.getByRole('textbox', { name: '영수증 상호', exact: true }),
-      ).toHaveCount(0);
-    },
-    () => {
-      // 메뉴 원문이 확인 화면에 자동으로 들어온다.
-      return expect(
-        page.getByText('みかんしぼり', { exact: true }),
-      ).toBeVisible();
-    },
-    () => {
-      // 사용자 확인 한 번으로 장소 기록과 지출을 등록한다.
-      return page
-        .getByRole('button', { name: '여행 기록에 등록', exact: true })
-        .click();
-    },
-    () => {
-      // 등록된 날짜로 바로 이동해 장소 기록을 보여준다.
-      return expect(
-        page.getByText('DAY 3 · 2026-09-28', { exact: true }),
-      ).toBeVisible();
-    },
-    () => {
-      // 입장 시간이 아닌 결제 시간이 일정에 연결된다.
-      return expect(
-        page.getByText('16:36 · Kagerou Cafe', { exact: true }),
-      ).toBeVisible();
-    },
-    () => {
-      // 등록 후 영수증의 메뉴와 실제 결제 금액을 확인한다.
-      return page
-        .getByRole('button', { name: '사진·영수증', exact: true })
-        .click();
-    },
-    () => {
-      // 총액과 세금·거스름돈을 혼동하지 않는다.
-      return expect(
-        page.getByText('Kagerou Cafe · 2026-09-28 · 2450 JPY', { exact: true }),
-      ).toBeVisible();
-    },
-    () => {
-      // 메뉴별 기록을 저장된 영수증에서 읽는다.
-      return expect(page.getByText(/みかんしぼり.*600/)).toBeVisible();
-    },
-    () => {
-      // 비용 탭에서도 같은 확정 지출을 읽는다.
-      return page.getByRole('button', { name: '비용', exact: true }).click();
-    },
-    () => {
-      // 한 번 등록한 영수증은 실제 지출 하나만 만든다.
-      return expect(
-        page.getByText('Kagerou Cafe · 2450 JPY · 실제', { exact: true }),
-      ).toBeVisible();
-    },
-  ]);
-});
+for (const largePhoto of [false, true])
+  test(`${largePhoto ? '8MB PNG 압축 후' : '일반 사진'} 영수증 자동 인식 → DAY3 등록 → 메뉴·장소·시간·지출 조회`, ({
+    page,
+  }) => {
+    // 공급자 경계만 실제 사진 인식 결과로 고정하고 화면·저장 요청은 실제 구현을 사용한다.
+    return testSteps([
+      () => {
+        // 저장 및 인증 응답을 브라우저마다 격리한다.
+        return network(page);
+      },
+      () => {
+        // 사진에서 얻은 구조화 결과를 인식 응답으로 사용한다.
+        return page.route('**/receipts/ocr', (route) => {
+          // 인식 완료 전에는 장소나 지출을 생성하지 않는다.
+          return route.fulfill({ json: { data: receiptScan } });
+        });
+      },
+      () => {
+        // 사용자 로그인 화면을 통과한다.
+        return login(page);
+      },
+      () => {
+        // 여행을 생성하는 사용자 버튼을 누른다.
+        return page
+          .getByRole('button', { name: '새 여행 시작하기', exact: true })
+          .click();
+      },
+      () => {
+        // 영수증 날짜가 첫날이 아닌 여행을 만든다.
+        return fields(page, {
+          '나라 검색': '일본',
+          '도시 검색': '도쿄',
+          시작일: '2026-09-26',
+          종료일: '2026-09-29',
+        });
+      },
+      () => {
+        // 생성된 날짜별 DAY를 서버 응답으로 확인한다.
+        return page
+          .getByRole('button', { name: '확인하고 저장', exact: true })
+          .click();
+      },
+      () => {
+        // 실제 파일 선택기로 사진을 업로드한다.
+        return uploadReceiptPhoto(page, largePhoto);
+      },
+      () => {
+        // 수동 입력을 요구하지 않고 인식 내용이 표시돼야 한다.
+        return expect(
+          page.getByText('사진에서 읽은 내용이에요', { exact: true }),
+        ).toBeVisible();
+      },
+      () => {
+        // 결제 날짜를 첫 DAY로 바꾸지 않는다.
+        return expect(
+          page.getByText('DAY 3에 기록돼요', { exact: true }),
+        ).toBeVisible();
+      },
+      () => {
+        // 모든 내용을 다시 적는 입력창을 기본으로 열지 않는다.
+        return expect(
+          page.getByRole('textbox', { name: '영수증 상호', exact: true }),
+        ).toHaveCount(0);
+      },
+      () => {
+        // 메뉴 원문이 확인 화면에 자동으로 들어온다.
+        return expect(
+          page.getByText('みかんしぼり', { exact: true }),
+        ).toBeVisible();
+      },
+      () => {
+        // 사용자 확인 한 번으로 장소 기록과 지출을 등록한다.
+        return page
+          .getByRole('button', { name: '여행 기록에 등록', exact: true })
+          .click();
+      },
+      () => {
+        // 등록된 날짜로 바로 이동해 장소 기록을 보여준다.
+        return expect(
+          page.getByText('DAY 3 · 2026-09-28', { exact: true }),
+        ).toBeVisible();
+      },
+      () => {
+        // 입장 시간이 아닌 결제 시간이 일정에 연결된다.
+        return expect(
+          page.getByText('16:36 · Kagerou Cafe', { exact: true }),
+        ).toBeVisible();
+      },
+      () => {
+        // 등록 후 영수증의 메뉴와 실제 결제 금액을 확인한다.
+        return page
+          .getByRole('button', { name: '사진·영수증', exact: true })
+          .click();
+      },
+      () => {
+        // 총액과 세금·거스름돈을 혼동하지 않는다.
+        return expect(
+          page.getByText('Kagerou Cafe · 2026-09-28 · 2450 JPY', {
+            exact: true,
+          }),
+        ).toBeVisible();
+      },
+      () => {
+        // 메뉴별 기록을 저장된 영수증에서 읽는다.
+        return expect(page.getByText(/みかんしぼり.*600/)).toBeVisible();
+      },
+      () => {
+        // 비용 탭에서도 같은 확정 지출을 읽는다.
+        return page.getByRole('button', { name: '비용', exact: true }).click();
+      },
+      () => {
+        // 한 번 등록한 영수증은 실제 지출 하나만 만든다.
+        return expect(
+          page.getByText('Kagerou Cafe · 2450 JPY · 실제', { exact: true }),
+        ).toBeVisible();
+      },
+    ]);
+  });
 
 // 브라우저 파일 선택을 실제 사진 업로드 버튼에 연결한다.
-function uploadReceiptPhoto(page: Page): Promise<void> {
+function uploadReceiptPhoto(page: Page, largePhoto = false): Promise<void> {
   // 파일 선택 이벤트를 놓치지 않도록 버튼 클릭과 함께 기다린다.
   return Promise.all([
     page.waitForEvent('filechooser'),
     page.getByRole('button', { name: '영수증 사진 선택', exact: true }).click(),
   ]).then(([chooser]) => {
     // 외부 인식은 별도 실제 이미지 검증으로 확인하고 UI 업로드는 작은 PNG로 실행한다.
-    return chooser.setFiles({
-      name: 'receipt.png',
-      mimeType: 'image/png',
-      buffer: tinyPng,
+    return Promise.all([
+      page.waitForRequest((request) => {
+        // 자동 압축 후 실제 업로드 본문과 MIME을 확인한다.
+        return request.method() === 'POST' && /\/files\//.test(request.url());
+      }),
+      chooser.setFiles({
+        name: 'receipt.png',
+        mimeType: 'image/png',
+        buffer: largePhoto
+          ? Buffer.concat([tinyPng, Buffer.alloc(8 * 1024 * 1024)])
+          : tinyPng,
+      }),
+    ]).then(([request]) => {
+      // 큰 PNG는 JPEG 사본으로 줄이고 작은 원본은 변경하지 않는다.
+      return verifyPhotoUpload(request, largePhoto);
     });
+  });
+}
+
+// 선택한 대용량 PNG가 서버 제한 안의 실제 이미지로 변환됐는지 검증한다.
+function verifyPhotoUpload(
+  request: import('@playwright/test').Request,
+  largePhoto: boolean,
+): void {
+  // MIME만 바꾸거나 큰 원본을 그대로 보내는 구현을 허용하지 않는다.
+  return expect({
+    mime: request.headers()['content-type'],
+    validSize: Boolean(
+      request.postDataBuffer()?.length &&
+      request.postDataBuffer()!.length <= 4194304,
+    ),
+    firstByte: request.postDataBuffer()?.[0],
+  }).toEqual({
+    mime: largePhoto ? 'image/jpeg' : 'image/png',
+    validSize: true,
+    firstByte: largePhoto ? 255 : 137,
   });
 }
 
@@ -575,8 +611,8 @@ async function network(
       json: {
         data: {
           id: path.split('/')[3],
-          path: `${path.split('/')[2]}/${path.split('/')[3]}.png`,
-          mimeType: 'image/png',
+          path: `${path.split('/')[2]}/${path.split('/')[3]}.${route.request().headers()['content-type'] === 'image/png' ? 'png' : 'jpg'}`,
+          mimeType: route.request().headers()['content-type'],
         },
       },
     });

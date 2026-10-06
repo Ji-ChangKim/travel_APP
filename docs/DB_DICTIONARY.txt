@@ -1293,6 +1293,7 @@ receipt.confirm 입력에도 위 속성을 저장하며 transactionDate와 dayId
 
 [화면 PlanForm receipt / DB에 저장하지 않는 화면 상태]
 receiptStatus string loading/ready/error/manual; receiptEditing string true/false.
+receiptError string: 공개 HTTP 상태에 따른 인식 복구 안내. 서버 설정·공급자 오류는 제외.
 items, warnings: 편집용 JSON 문자열. dayId는 실제 결제 날짜의 DAY 또는 빈 값.
 범위 밖·누락 날짜는 첫 DAY로 대체하지 않고 등록을 차단.
 ======================================================================

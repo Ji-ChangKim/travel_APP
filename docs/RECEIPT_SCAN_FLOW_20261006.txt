@@ -77,3 +77,14 @@ Cloudflare D1/R2/Worker 통합 테스트 3개 통과.
 최종 검증 결과와 배포 주소는 실제 배포 완료 후 아래에 기록한다.
 기존 설치된 APK는 웹 배포로 코드가 갱신되지 않으므로 새 Android 빌드가 필요하다.
 네이티브 카메라·Android 권한 안내는 실제 APK 기기 테스트가 필요하다.
+
+7. 실제 원본 업로드에서 발견한 용량 문제 수정
+첨부 PNG 원본은 8,163,822바이트로 기존 업로드 4MiB 제한에 막혔다.
+앱에서 긴 변 최대2400px·JPEG 품질90%의 업로드용 사본으로 자동 변환한다.
+작은 JPG/PNG는 재압축하지 않고 갤러리 원본도 수정하지 않는다.
+서버 4MiB 제한은 유지하고 압축 결과도 동일한 MIME·용량 검사로 검증한다.
+추가 파일: apps/mobile/src/features/workspace/service.ts(자동 변환),
+apps/mobile/package.json, package.json, package-lock.json(Expo 호환 이미지 처리 모듈),
+tests/release/native-linking.test.mjs(루트/모바일 EAS 압축 모듈 연결 검사).
+설치 명령: 각 프로젝트에서 npx expo install expo-image-manipulator.
+공식 API: https://docs.expo.dev/versions/latest/sdk/imagemanipulator/
