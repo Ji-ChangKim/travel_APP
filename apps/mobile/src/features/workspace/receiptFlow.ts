@@ -22,6 +22,8 @@ export function receiptForm(
     values: {
       mediaId,
       receiptStatus: status,
+      receiptConfirmed: 'false',
+      keepPhoto: '',
       merchant: draft?.merchant || '',
       address: draft?.address || '',
       transactionDate: draft?.transactionDate || '',
@@ -40,6 +42,50 @@ export function receiptForm(
       warnings: JSON.stringify(draft?.warnings || []),
     },
   };
+}
+
+// 인식 결과나 연결 일정을 바꾸면 이전 정보 확인을 무효화한다.
+export function receiptConfirmationValues(
+  key: string,
+  value: string,
+): Record<string, string> {
+  // 사진 보관 선택은 독립적으로 유지하되 수정된 정보는 다시 확인한다.
+  return key === 'receiptConfirmed'
+    ? {
+        receiptConfirmed: value,
+        ...(value === 'false'
+          ? { receiptEditing: 'true' }
+          : { receiptEditing: 'false' }),
+      }
+    : [
+          'merchant',
+          'address',
+          'transactionDate',
+          'transactionTime',
+          'amount',
+          'currency',
+          'category',
+          'items',
+          'details',
+          'dayId',
+          'scheduleId',
+        ].includes(key) ||
+        (key === 'receiptEditing' && value === 'true')
+      ? { receiptConfirmed: 'false' }
+      : {};
+}
+
+// 두 가지 사용자 선택을 모두 마친 영수증만 저장할 수 있다.
+export function receiptCanSave(form: PlanForm): boolean {
+  // 날짜·필수 정보·인식 상태와 명시적인 사진 선택을 함께 확인한다.
+  return Boolean(
+    form.values.dayId &&
+    form.values.merchant &&
+    form.values.amount &&
+    ['ready', 'manual'].includes(form.values.receiptStatus || '') &&
+    form.values.receiptConfirmed === 'true' &&
+    ['true', 'false'].includes(form.values.keepPhoto || ''),
+  );
 }
 
 // 폼에 보존한 메뉴별 후보를 런타임 검증하여 읽는다.

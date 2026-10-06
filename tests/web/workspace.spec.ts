@@ -14,8 +14,12 @@ const tinyPng = Buffer.from(
 );
 
 // 사진 업로드 뒤 인식된 결과를 입력 없이 여행 기록에 등록한다.
-for (const largePhoto of [false, true])
-  test(`${largePhoto ? '8MB PNG 압축 후' : '일반 사진'} 영수증 자동 인식 → DAY3 등록 → 메뉴·장소·시간·지출 조회`, ({
+for (const { largePhoto, keepPhoto } of [
+  { largePhoto: false, keepPhoto: true },
+  { largePhoto: true, keepPhoto: true },
+  { largePhoto: false, keepPhoto: false },
+])
+  test(`${largePhoto ? '8MB PNG 압축 후' : '일반 사진'} 영수증 ${keepPhoto ? '사진 보관' : '정보만 저장'} → DAY3 등록 → 메뉴·장소·시간·지출 조회`, ({
     page,
   }) => {
     // 공급자 경계만 실제 사진 인식 결과로 고정하고 화면·저장 요청은 실제 구현을 사용한다.
@@ -57,6 +61,24 @@ for (const largePhoto of [false, true])
           .click();
       },
       () => {
+        // 촬영 전 실제 앱 안내 화면을 먼저 보여준다.
+        return page
+          .getByRole('button', { name: '영수증 촬영', exact: true })
+          .click();
+      },
+      () => {
+        // 촬영 안내에는 정보 처리와 사진 보관 선택이 설명되어 있다.
+        return expect(
+          page.getByText('영수증 한 장으로 기록해요', { exact: true }),
+        ).toBeVisible();
+      },
+      () => {
+        // 촬영 취소는 인식이나 등록을 시작하지 않는다.
+        return page
+          .getByRole('button', { name: '나중에 할게요', exact: true })
+          .click();
+      },
+      () => {
         // 실제 파일 선택기로 사진을 업로드한다.
         return uploadReceiptPhoto(page, largePhoto);
       },
@@ -85,9 +107,69 @@ for (const largePhoto of [false, true])
         ).toBeVisible();
       },
       () => {
-        // 사용자 확인 한 번으로 장소 기록과 지출을 등록한다.
+        // 선택 전에는 일정 등록을 진행할 수 없다.
+        return expect(
+          page.getByRole('button', { name: '일정에 추가하기', exact: true }),
+        ).toBeDisabled();
+      },
+      () => {
+        // 아니요는 정보를 버리지 않고 수정 화면으로 돌아간다.
         return page
-          .getByRole('button', { name: '여행 기록에 등록', exact: true })
+          .getByRole('button', { name: '아니요, 수정할게요', exact: true })
+          .click();
+      },
+      () => {
+        // 인식한 값을 다시 입력할 필요 없이 확인한다.
+        return expect(
+          page.getByLabel('영수증 상호', { exact: true }),
+        ).toHaveValue('Kagerou Cafe');
+      },
+      () => {
+        // 사진 선택 전에는 정보 확인만으로 등록되지 않는다.
+        return page
+          .getByRole('button', {
+            name: '맞아요, 일정에 추가할게요',
+            exact: true,
+          })
+          .click();
+      },
+      () => {
+        // 보관 선택을 자동 동의로 채우지 않는다.
+        return expect(
+          page.getByRole('button', { name: '일정에 추가하기', exact: true }),
+        ).toBeDisabled();
+      },
+      () => {
+        // 두 번째 선택만 먼저 완료한다.
+        return page
+          .getByRole('button', {
+            name: keepPhoto
+              ? '네, 사진도 보관할게요'
+              : '아니요, 정보만 저장할게요',
+            exact: true,
+          })
+          .click();
+      },
+      () => {
+        // 이미 확인했더라도 수정 시작은 이전 동의를 무효화한다.
+        return page
+          .getByRole('button', { name: '인식 내용 수정', exact: true })
+          .click();
+      },
+      () => {
+        // 재확인 없이 변경된 정보가 저장되지 않는다.
+        return expect(
+          page.getByRole('button', { name: '일정에 추가하기', exact: true }),
+        ).toBeDisabled();
+      },
+      () => {
+        // 확인한 정보와 사진 보관 여부를 각각 선택한다.
+        return confirmReceiptChoices(page, keepPhoto);
+      },
+      () => {
+        // 두 선택을 마친 후에만 장소 기록과 지출을 등록한다.
+        return page
+          .getByRole('button', { name: '일정에 추가하기', exact: true })
           .click();
       },
       () => {
@@ -101,6 +183,10 @@ for (const largePhoto of [false, true])
         return expect(
           page.getByText('16:36 · Kagerou Cafe', { exact: true }),
         ).toBeVisible();
+      },
+      () => {
+        // 저장 후 새로고침에서도 사진 선택과 영수증 정보가 유지된다.
+        return page.reload();
       },
       () => {
         // 등록 후 영수증의 메뉴와 실제 결제 금액을 확인한다.
@@ -119,6 +205,12 @@ for (const largePhoto of [false, true])
       () => {
         // 메뉴별 기록을 저장된 영수증에서 읽는다.
         return expect(page.getByText(/みかんしぼり.*600/)).toBeVisible();
+      },
+      () => {
+        // 사진을 제외해도 등록 내역은 남고 원본 표시 여부만 달라진다.
+        return expect(
+          page.getByText('비공개 영수증', { exact: true }),
+        ).toHaveCount(keepPhoto ? 1 : 0);
       },
       () => {
         // 비용 탭에서도 같은 확정 지출을 읽는다.
@@ -158,6 +250,25 @@ function uploadReceiptPhoto(page: Page, largePhoto = false): Promise<void> {
       return verifyPhotoUpload(request, largePhoto);
     });
   });
+}
+
+// 정보 확인과 사진 보관을 사용자 버튼으로 각각 선택한다.
+function confirmReceiptChoices(page: Page, keepPhoto: boolean): Promise<void> {
+  // 자동 동의 없이 두 선택을 순서대로 진행한다.
+  return page
+    .getByRole('button', { name: '맞아요, 일정에 추가할게요', exact: true })
+    .click()
+    .then(() => {
+      // 사진을 남기는 경우와 정보만 남기는 경우를 구분한다.
+      return page
+        .getByRole('button', {
+          name: keepPhoto
+            ? '네, 사진도 보관할게요'
+            : '아니요, 정보만 저장할게요',
+          exact: true,
+        })
+        .click();
+    });
 }
 
 // 선택한 대용량 PNG가 서버 제한 안의 실제 이미지로 변환됐는지 검증한다.
@@ -835,12 +946,19 @@ async function network(
           scheduleId,
           date: command.input.transactionDate,
         });
-        snapshot.media = snapshot.media.map((media) => {
-          // 원본은 확인한 장소 기록의 ID에 연결한다.
-          return media.id === command.input.mediaId
-            ? { ...media, scheduleId }
-            : media;
-        });
+        snapshot.media = snapshot.media
+          .filter((media) => {
+            // 정보만 저장하면 원본 참조를 남기지 않는다.
+            return (
+              command.input.keepPhoto || media.id !== command.input.mediaId
+            );
+          })
+          .map((media) => {
+            // 원본은 확인한 장소 기록의 ID에 연결한다.
+            return media.id === command.input.mediaId
+              ? { ...media, scheduleId }
+              : media;
+          });
         snapshot.expenses.push({
           id: command.input.id,
           dayId: command.input.dayId,
@@ -1321,8 +1439,9 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
   });
   await page.getByRole('button', { name: 'JPY', exact: true }).click();
   await page.getByRole('button', { name: '도쿄 식당', exact: true }).click();
+  await confirmReceiptChoices(page, true);
   await page
-    .getByRole('button', { name: '여행 기록에 등록', exact: true })
+    .getByRole('button', { name: '일정에 추가하기', exact: true })
     .click();
   // 확인한 영수증 원본과 내역은 사진 영역에서 조회한다.
   await page.getByRole('button', { name: '사진·영수증', exact: true }).click();

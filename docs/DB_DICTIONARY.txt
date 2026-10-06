@@ -1297,3 +1297,26 @@ receiptError string: 공개 HTTP 상태에 따른 인식 복구 안내. 서버 �
 items, warnings: 편집용 JSON 문자열. dayId는 실제 결제 날짜의 DAY 또는 빈 값.
 범위 밖·누락 날짜는 첫 DAY로 대체하지 않고 등록을 차단.
 ======================================================================
+
+[2026-10-06 영수증 정보 확인·사진 보관 선택 / D1 wherego-staging]
+DB 테이블 trips: snapshot TEXT(JSON)의 receipts[].keepPhoto boolean 추가.
+WorkspaceReceipt.mediaId: 기존 UUID string 유지. 원본의 출처 식별자로 보존하며 파일 존재·접근 권한을 의미하지 않음.
+WorkspaceReceipt.keepPhoto: optional boolean. 저장한 신규 기록은 true/false, 기존 기록의 조회 기본값은 true.
+기존 APK가 영수증 UUID 계약 변경 때문에 여행 전체를 읽지 못하는 일을 방지함. 미보관 시 실제 미디어 참조와 R2 사진은 제거.
+scheduleId, merchant, date, amount, currency, details, address, transactionTime, items, category는 사진 선택과 무관하게 유지.
+receipt.confirm.input.keepPhoto: optional boolean, 미전달 시 이전 앱 호환 동작은 true. 새 앱에서는 기본 선택 없이 반드시 true/false를 선택.
+미전달 필드를 요청 본문에 추가하지 않아 이전 앱의 저장 재시도 해시도 유지.
+사진 미보관 저장 시 snapshot.media에서 해당 원본만 제거하고 receipt·PLACE 일정·실제 비용을 같은 CAS batch로 확정.
+uploads.deleted_at INTEGER|null: 미보관 원본의 삭제 표식을 동일 CAS batch에서 확정하여 동시 재등록을 방지.
+receipt_scans: 해당 trip_id,media_id의 인식 초안을 동일 CAS batch에서 제거. 테이블·컬럼 추가는 없음.
+mutation_requests.result TEXT(JSON)의 discardedReceiptPath?: string: 서버가 확인한 UUID/UUID.jpg|png 경로.
+사진 미보관 요청의 확정 결과에만 기록하며 동일 멱등 키 재시도에도 R2 삭제를 재개할 수 있게 함.
+R2 삭제는 DB 확정 후 실행하며 완료 전에는 등록 성공으로 응답하지 않음. 미디어 참조 제거 즉시 기존 서명 URL 접근도 차단.
+사진 보관 요청과 이전 앱 요청은 기존 원본 연결을 유지. 원본은 커뮤니티 공개 대상에서 계속 제외.
+
+[PlanForm receipt / 화면 전용 상태]
+receiptConfirmed string 'false'|'true': 처음에는 false; 수정할게요 선택 또는 인식 값·연결 일정 수정 시 false로 초기화.
+keepPhoto string ''|'true'|'false': 처음에는 빈 값, 사진 보관 선택 전에는 등록 버튼과 저장 명령 모두 차단.
+receiptEditing true: 아니요 선택 시 틀린 항목 수정으로 이동하며 기존 인식값을 보존.
+정보 확인과 사진 보관 선택 후 일정에 추가하기로 최종 등록. 선택만으로 일정·비용을 저장하지 않음.
+======================================================================

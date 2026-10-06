@@ -1,4 +1,4 @@
-import { receiptItems } from './receiptFlow';
+import { receiptItems, receiptCanSave } from './receiptFlow';
 import * as Crypto from 'expo-crypto';
 import {
   workspaceCommandSchema,
@@ -92,7 +92,15 @@ export function formCommand(
   snapshot: WorkspaceSnapshot,
 ): WorkspaceCommand {
   // 저장 전 공통 Zod 검증을 적용한다.
-  return workspaceCommandSchema.parse(commandValue(form, snapshot));
+  return form.kind === 'receipt' && !receiptCanSave(form)
+    ? requireReceiptChoices()
+    : workspaceCommandSchema.parse(commandValue(form, snapshot));
+}
+
+// 확인 선택이 없는 직접 저장 호출도 사용자 안내로 차단한다.
+function requireReceiptChoices(): never {
+  // 사진 보관 여부를 기본값으로 동의한 것처럼 처리하지 않는다.
+  throw new Error('영수증 정보를 확인하고 사진 보관 여부를 선택해 주세요.');
 }
 // 각 화면 폼을 정확한 서버 명령으로 매핑한다.
 function commandValue(form: PlanForm, snapshot: WorkspaceSnapshot) {
@@ -134,6 +142,7 @@ function commandValue(form: PlanForm, snapshot: WorkspaceSnapshot) {
               id: form.id,
               dayId: form.values.dayId,
               mediaId: form.values.mediaId,
+              keepPhoto: form.values.keepPhoto === 'true',
               ...(form.values.scheduleId
                 ? { scheduleId: form.values.scheduleId }
                 : {}),

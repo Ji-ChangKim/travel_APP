@@ -1,0 +1,82 @@
+TripPrint 영수증 촬영·확인·사진 보관 선택 변경 보고서
+작성일: 2026-10-06
+
+1. 사용자 흐름
+- 영수증 촬영 버튼 → 촬영 안내 → 기기 카메라 또는 앨범 선택 → 인식 중 하루 안내 → 인식된 사진·장소·구매일시·메뉴·금액 확인.
+- 질문 1: 영수증 정보가 맞나요?
+  Y: 맞아요, 일정에 추가할게요 → 사진 보관 선택으로 진행. 이 선택만으로 저장하지 않음.
+  N: 아니요, 수정할게요 → 인식값을 유지한 수정 화면으로 이동. 장소·날짜·메뉴·금액 등 잘못 읽은 항목만 수정.
+- 질문 2: 영수증 사진도 함께 보관할까요?
+  Y: 네, 사진도 보관할게요 → 장소·메뉴·실제 지출과 비공개 원본을 함께 보관.
+  N: 아니요, 정보만 저장할게요 → 장소·메뉴·실제 지출은 보존하고 등록 후 인식용 원본을 삭제.
+- 마지막 일정에 추가하기 버튼 → 선택한 DAY에 새 장소 기록을 생성하거나 선택한 기존 일정에 연결 → 해당 날짜의 일정 화면으로 이동.
+- 정보 확인과 사진 보관은 모두 미선택 상태로 시작. 두 선택과 필수 정보가 없으면 버튼과 저장 명령을 모두 차단.
+- 확인한 값 또는 연결 일정을 수정하면 이전 정보 확인을 무효화하고 다시 확인하도록 함. 사진 보관 선택은 별도로 유지.
+- 취소는 일정·실제 지출을 생성하지 않음. 인식에 필요한 사진 전송을 촬영 안내에서 설명하며 최종 미보관 선택 시 삭제.
+- 영수증 원본은 나와 여행 친구에게만 표시하며 커뮤니티 공개 대상에서 제외.
+
+2. 실제 저장 처리
+- receipt.confirm.keepPhoto(optional boolean) 추가. 이전 앱에서 전달하지 않은 필드는 본문·멱등 해시에 추가하지 않고 기존 사진 보관 동작 유지.
+- 새 앱은 기본 동의를 두지 않고 true/false를 직접 선택하게 함.
+- 정보만 저장할 때 WorkspaceReceipt.keepPhoto=false, snapshot.media에서 해당 원본 제거. 기존 APK도 여행을 읽을 수 있게 mediaId는 출처 UUID로 유지하며 원본 접근 권한으로 사용하지 않음.
+- 일정·영수증·실제 비용, 업로드 삭제 표식, 인식 캐시 제거를 동일 D1 CAS batch에서 확정.
+- DB 확정 후 R2 원본 삭제 완료까지 기다리고 성공 응답. 삭제 실패·응답 유실 시 같은 멱등 키로 재시도하여 사진 정리를 재개.
+- 삭제 표식으로 동일 원본의 동시 재등록을 방지. 참조 제거 즉시 이전 서명 URL 접근 차단.
+- 사진 없는 영수증도 사진·영수증 영역에서 메뉴·주소·결제일시를 조회하고 기록·지출을 함께 삭제할 수 있음.
+- DB 신규 테이블·마이그레이션 없음. JSON 객체와 명령 계약 변경은 DB_DICTIONARY.txt에 기록.
+
+3. 화면 및 미리보기
+- 촬영 전 안내 화면: 영수증 전체, 상호·날짜·메뉴·합계가 잘리지 않는 촬영 방법, 밝기·개인정보 가리기, 카메라·앨범·나중에 버튼.
+- 기기 촬영 자체는 Expo의 시스템 카메라 화면을 사용. 촬영 전 앱 안내 화면과 최종 확인 화면은 앱에서 제공.
+- outputs/TripPrint-pages의 기존 영수증 인식·결과·메뉴·일정 등록 캡처를 새 앱으로 교체하고 정보 확인·사진 선택·사진 없는 저장 결과를 추가.
+- 미리보기 43개 화면. 새 영수증 흐름 8개 캡처, 화면 실행 오류 0.
+- 실제 사용자 첨부 영수증과 동일 구조화 인식 결과를 HTTP 미리보기 응답으로 사용. 화면 버튼·라우터·폼은 실제 앱 번들로 실행. 캡처에서는 실제 서버 계정·사진·여행을 생성하지 않음.
+- Android 기기 카메라 권한·시스템 촬영 화면은 별도 실기기 검증 대상. 웹 캡처를 네이티브 카메라 검증으로 표시하지 않음.
+
+4. 관련 TC 추가 검사 기준
+- RC-01 촬영 안내와 카메라/앨범/나중에 선택. 취소 후 일정·비용 미생성.
+- RC-02 인식 대기·실패 중 최종 등록 차단.
+- RC-03 정보 확인 미선택 또는 사진 보관 미선택 상태에서 등록 차단.
+- RC-04 정보 확인 N 선택 시 인식값 보존과 수정 화면 이동.
+- RC-05 Y 확인 후 금액·날짜·메뉴·연결 일정 수정 시 재확인 필요.
+- RC-06 사진 보관 Y: 원본 조회, 일정·메뉴·실제 비용 연결, 커뮤니티 원본 제외.
+- RC-07 사진 보관 N: 원본·인식 캐시 삭제, 사진 없는 정보 조회, 새로고침 후 내용 유지.
+- RC-08 동일 키 재시도에서 중복 일정·비용 미생성 및 원본 재등록 차단.
+- 문구 제안(영문 UI 구현 전 검수용):
+  영수증 정보가 맞나요? → Is the receipt information correct?
+  맞아요, 일정에 추가할게요 → Yes, add it to my itinerary
+  아니요, 수정할게요 → No, let me edit it
+  영수증 사진도 함께 보관할까요? → Would you like to keep the receipt photo too?
+  네, 사진도 보관할게요 → Yes, keep the photo
+  아니요, 정보만 저장할게요 → No, save the details only
+  일정에 추가하기 → Add to itinerary
+
+5. 변경 파일 전체
+- apps/mobile/src/features/workspace/ReceiptCapture.tsx: 촬영 안내 및 카메라·앨범·취소 UI 신설.
+- apps/mobile/src/features/workspace/ReceiptConfirmation.tsx: 정보 확인과 사진 보관의 두 질문 UI 신설.
+- apps/mobile/src/features/workspace/PlanEditor.tsx: 확인 UI, 최종 버튼 차단, 아니요 선택 시 수정 영역 이동.
+- apps/mobile/src/features/workspace/WorkspaceScreen.tsx: 촬영 안내 연결, 수정 후 확인 무효화, 사진 없는 영수증 조회·삭제.
+- apps/mobile/src/features/workspace/receiptFlow.ts: 미선택 기본값, 재확인 상태와 등록 가능 조건.
+- apps/mobile/src/features/workspace/forms.ts: 사진 선택 저장 계약 및 확인 없는 직접 저장 차단.
+- packages/domain/src/workspace.ts: WorkspaceReceipt.keepPhoto 보관 여부 추가, 기존 mediaId UUID 계약 유지.
+- packages/validation/src/workspace.ts: keepPhoto 입력 검증과 사진 없는 조회 계약.
+- apps/api/src/cloudModel.ts: 보관 선택별 영수증·미디어·비용 저장 후보 및 원본 정리 경로.
+- apps/api/src/cloudStore.ts: 동일 CAS batch의 삭제 표식·인식 캐시 정리.
+- apps/api/src/cloudRpc.ts: 확정 후 R2 원본 삭제와 멱등 재시도 연결.
+- apps/mobile/public/release.json: test-1-receipt-confirm 배포 식별자.
+- tests/web/workspace.spec.ts: 촬영 취소·확인 차단·수정 재확인·두 보관 경로·새로고침 검증.
+- tests/cloud/runtime.test.mjs: 실제 D1/R2에서 미보관 원본·캐시 삭제, 재시도 및 재등록 차단 검증.
+- scripts/build-page-gallery.mjs: 새 촬영·확인·사진 선택 화면의 사용자 안내 문구.
+- docs/DB_DICTIONARY.txt: 변경된 객체·명령 속성·제약과 저장 의미 갱신.
+- docs/RECEIPT_CONFIRM_FLOW_20261006.txt: 이 보고서와 관련 검사 기준.
+- outputs/TripPrint-pages: 새/교체 PNG 캡처와 manifest 및 갤러리 HTML. 기존 미추적 미리보기 상태 유지.
+- .release/page-gallery/capture-receipt-choices.mjs: 실제 앱에서 새 흐름을 촬영하는 내부 보조 도구. 배포에 포함하지 않음.
+
+6. 검증 이력
+- D1/R2 로컬 Workers 통합 테스트 4개 통과. 사진 보관 기존 경로와 정보만 저장 신규 경로를 함께 확인.
+- Chrome 웹 흐름 테스트 17개 통과. 촬영 안내 취소, 일반 사진/8MB 자동 압축, DAY3 연결, 정보 확인 N, 미선택 등록 차단, 수정 후 재확인과 두 보관 선택 확인.
+- 최종 문구·수정 화면 이동·새로고침 및 기존 UUID 호환을 반영한 웹 번들에서 영수증 3개 핵심 시나리오 재검증 통과.
+- 최종 API의 D1/R2 통합 4개 재검증 통과. 기존 사진 보관, 신규 미보관 삭제·재시도·재등록 차단을 함께 확인.
+- 웹 빌드 18개 정적 경로 출력 성공. release:artifacts의 진입·rewrite·테스트 설정 미포함 검사 통과.
+- 최종 npm run check: TypeScript 엄격 모드, ESLint 경고 0, Prettier 모두 통과(종료 코드 0).
+- 미리보기 생성 뒤 발견한 HTML 서식 오류는 4개 HTML에만 Prettier를 적용해 정리. 서비스 기능·내용 변경 없음.

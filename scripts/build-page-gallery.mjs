@@ -7,6 +7,22 @@ const manifest = JSON.parse(
 
 // 미리보기에서도 서비스의 다음 행동만 안내한다.
 const screenCopy = {
+  'receipt-capture': [
+    '영수증 한 장으로 기록해요',
+    '촬영 방법을 확인하고 카메라 또는 앨범으로 영수증을 가져오세요.',
+  ],
+  'receipt-confirm': [
+    '영수증 정보가 맞나요?',
+    '장소·결제 일시·메뉴·금액을 확인하고, 틀린 내용만 수정하세요.',
+  ],
+  'receipt-photo-choice': [
+    '사진도 함께 보관할까요?',
+    '사진도 보관하거나 정보만 저장할 수 있어요. 커뮤니티에는 원본을 공개하지 않아요.',
+  ],
+  'receipt-info-only': [
+    '정보만 남긴 여행 기록',
+    '원본 사진 없이도 장소·메뉴·결제 일시·실제 지출을 다시 볼 수 있어요.',
+  ],
   'first-visit-home': [
     '어디로 떠나볼까요?',
     '가고 싶은 도시를 고르고 나만의 여행을 시작해 보세요.',
@@ -209,6 +225,31 @@ writeFileSync(join(output, 'index.html'), html(manifest.shots));
 writeFileSync(join(output, 'overview.html'), html(overviewShots, true));
 console.info(
   `주요 페이지 12종 및 전체 화면 ${manifest.shots.length}개 갤러리 생성`,
+);
+
+// 영수증 촬영부터 정보 확인과 저장 결과까지 한곳에서 살펴본다.
+writeFileSync(
+  join(output, 'receipt.html'),
+  html(
+    [
+      'receipt-capture',
+      'receipt-loading',
+      'receipt-editor',
+      'receipt-items',
+      'receipt-confirm',
+      'receipt-photo-choice',
+      'receipt-registered',
+      'receipt-info-only',
+      'receipt-saved',
+      'receipt-cost',
+    ].map((key) => {
+      // 촬영·두 가지 확인 질문·보관 선택별 결과를 사용자 순서로 정렬한다.
+      return manifest.shots.find((item) => {
+        // 해당 단계의 실제 앱 캡처 한 장을 선택한다.
+        return item.key === key;
+      });
+    }),
+  ).replaceAll('TripPrint 화면 둘러보기', '영수증 한 장으로 남기는 여행'),
 );
 
 // 하루 상태 화면만 별도의 비교 페이지로 제공한다.

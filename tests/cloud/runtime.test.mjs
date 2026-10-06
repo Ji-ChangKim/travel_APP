@@ -904,6 +904,178 @@ function receiptScanBoundaries() {
     });
 }
 
+// 사진을 보관하지 않는 등록은 실제 R2와 캐시에서도 원본을 제거한다.
+test('정보만 저장한 영수증은 원본·캐시 삭제 후 같은 키 재시도에도 한 번만 등록된다', () => {
+  // 기존 보관 시나리오와 다른 원본으로 선택별 저장을 비교한다.
+  return receiptWithoutPhoto(randomUUID(), randomUUID(), randomUUID());
+});
+
+// 실제 업로드·확인 명령과 저장 후 재시도를 한 인수 흐름으로 실행한다.
+function receiptWithoutPhoto(mediaId, receiptId, key) {
+  // 앞서 검증한 여행에 새 원본만 추가한다.
+  return request(
+    `/files/${state.trip}/${mediaId}`,
+    'POST',
+    png,
+    state.users[0],
+    { 'Content-Type': 'image/png' },
+  )
+    .then((response) => {
+      // 원본이 실제 생성된 201 응답만 읽는다.
+      return json(response, 201);
+    })
+    .then((body) => {
+      // 실제 업로드 메타데이터를 영수증 용도로 등록한다.
+      return save('media.register', { ...body.data, purpose: 'receipt' });
+    })
+    .then(() => {
+      // 원본과 함께 정리할 인식 캐시의 DB를 조회한다.
+      return mf.getD1Database('DB');
+    })
+    .then((db) => {
+      // 캐시 삭제 여부를 확인할 해당 사진의 초안 한 개를 준비한다.
+      return db
+        .prepare(
+          'INSERT INTO receipt_scans(trip_id,media_id,draft,created_at) VALUES(?,?,?,?)',
+        )
+        .bind(state.trip, mediaId, '{}', Date.now())
+        .run();
+    })
+    .then(() => {
+      // 사진을 남기지 않는 확정 요청과 동일 키 재시도를 실행한다.
+      return saveWithoutPhoto(mediaId, receiptId, key, state.version);
+    })
+    .then(() => {
+      // 저장한 여행을 실제 API에서 다시 조회한다.
+      return request(
+        `/api/v1/trips/${state.trip}/workspace`,
+        'GET',
+        undefined,
+        state.users[0],
+      );
+    })
+    .then(json)
+    .then((body) => {
+      // 같은 요청 재시도 뒤에도 사진 없는 영수증이 정확히 한 개여야 한다.
+      return assert.equal(
+        body.data.receipts.filter((item) => {
+          // 해당 확정 영수증의 사진 참조만 검사한다.
+          return (
+            item.id === receiptId &&
+            item.mediaId === mediaId &&
+            item.keepPhoto === false
+          );
+        }).length,
+        1,
+      );
+    })
+    .then(() => {
+      // 실제 런타임의 비공개 사진 버킷을 조회한다.
+      return mf.getR2Bucket('MEDIA');
+    })
+    .then((bucket) => {
+      // 삭제된 원본을 해당 경로로 다시 읽어본다.
+      return bucket.get(`${state.trip}/${mediaId}.png`);
+    })
+    .then((object) => {
+      // 단순 UI 숨김이 아니라 R2 원본이 없어야 한다.
+      return assert.equal(object, null);
+    })
+    .then(() => {
+      // 동시 재등록 차단 표식을 실제 DB에서 확인한다.
+      return mf.getD1Database('DB');
+    })
+    .then((db) => {
+      // 해당 원본의 업로드 삭제 시각을 조회한다.
+      return db
+        .prepare('SELECT deleted_at FROM uploads WHERE path=?')
+        .bind(`${state.trip}/${mediaId}.png`)
+        .first();
+    })
+    .then((row) => {
+      // 삭제 예정 표식도 커밋되어야 한다.
+      return assert.ok(row.deleted_at);
+    })
+    .then(() => {
+      // 인식 초안도 남아 있지 않은지 DB를 다시 조회한다.
+      return mf.getD1Database('DB');
+    })
+    .then((db) => {
+      // 해당 여행과 원본의 캐시만 조회한다.
+      return db
+        .prepare('SELECT 1 FROM receipt_scans WHERE trip_id=? AND media_id=?')
+        .bind(state.trip, mediaId)
+        .first();
+    })
+    .then((row) => {
+      // 정보만 저장한 인식 캐시는 없어야 한다.
+      return assert.equal(row, null);
+    })
+    .then(() => {
+      // 삭제된 원본의 동일 ID 재등록을 요청한다.
+      return command('media.register', {
+        id: mediaId,
+        path: `${state.trip}/${mediaId}.png`,
+        mimeType: 'image/png',
+        purpose: 'receipt',
+      });
+    })
+    .then((response) => {
+      // 삭제된 파일을 등록 성공으로 되살리지 못해야 한다.
+      return assert.equal(response.status, 422);
+    });
+}
+
+// 기록 확정과 응답 유실에 해당하는 같은 요청 재전송을 비교한다.
+function saveWithoutPhoto(mediaId, id, key, version) {
+  // 사진 미보관 명령을 같은 본문·키·이전 버전으로 다시 호출한다.
+  return command(
+    'receipt.confirm',
+    {
+      id,
+      mediaId,
+      dayId: state.day,
+      merchant: '사진 없는 카페',
+      transactionDate: '2026-10-06',
+      amount: '12.50',
+      currency: 'USD',
+      keepPhoto: false,
+    },
+    state.users[0],
+    version,
+    key,
+  )
+    .then(json)
+    .then((body) => {
+      // 확정된 여행 버전을 다음 요청의 기준으로 갱신한다.
+      return (state.version = body.data.tripVersion);
+    })
+    .then(() => {
+      // 응답 유실에 해당하는 같은 본문과 이전 버전을 재전송한다.
+      return command(
+        'receipt.confirm',
+        {
+          id,
+          mediaId,
+          dayId: state.day,
+          merchant: '사진 없는 카페',
+          transactionDate: '2026-10-06',
+          amount: '12.50',
+          currency: 'USD',
+          keepPhoto: false,
+        },
+        state.users[0],
+        version,
+        key,
+      );
+    })
+    .then(json)
+    .then((body) => {
+      // 새 일정 생성 대신 확정된 결과가 재생되어야 한다.
+      return assert.equal(body.meta.replayed, true);
+    });
+}
+
 test('D1 인증 요청 제한은 여러 Worker 요청에서도 유지된다', () => {
   // 신뢰하는 Cloudflare IP 헤더로 동일 IP의 과도한 인증을 검사한다.
   return Array.from({ length: 11 })

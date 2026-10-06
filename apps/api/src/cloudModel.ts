@@ -544,16 +544,22 @@ function receiptChange(
               address: input.address,
             },
           ],
-      media: s.media.map((media) => {
-        // 확정한 영수증 원본을 같은 장소 기록에 연결한다.
-        return media.id === input.mediaId ? { ...media, scheduleId } : media;
-      }),
+      media: s.media
+        .filter((media) => {
+          // 정보만 저장할 때 인식용 사진의 영구 참조를 제거한다.
+          return input.keepPhoto !== false || media.id !== input.mediaId;
+        })
+        .map((media) => {
+          // 확정한 영수증 원본을 같은 장소 기록에 연결한다.
+          return media.id === input.mediaId ? { ...media, scheduleId } : media;
+        }),
       receipts: [
         ...s.receipts,
         {
           id: input.id,
           scheduleId,
           mediaId: input.mediaId,
+          keepPhoto: input.keepPhoto !== false,
           merchant: input.merchant,
           date: input.transactionDate,
           amount: input.amount,
@@ -580,7 +586,18 @@ function receiptChange(
         },
       ],
     },
-    { id: input.id, scheduleId },
+    {
+      id: input.id,
+      scheduleId,
+      ...(input.keepPhoto !== false
+        ? {}
+        : {
+            discardedReceiptPath: s.media.find((media) => {
+              // 성공한 동일 요청의 재시도에서도 지울 원본 경로를 보존한다.
+              return media.id === input.mediaId;
+            })!.path,
+          }),
+    },
   );
 }
 

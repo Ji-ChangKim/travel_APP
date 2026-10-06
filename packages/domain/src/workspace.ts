@@ -38,6 +38,8 @@ export interface WorkspaceReceipt {
   id: string;
   scheduleId: string;
   mediaId: string;
+  // 원본 식별자는 유지하며 사진을 실제 보관했는지는 별도로 표시한다.
+  keepPhoto?: boolean;
   merchant: string;
   date: string;
   amount: string;

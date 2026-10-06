@@ -1,6 +1,8 @@
 import ReceiptReview from './ReceiptReview';
+import ReceiptConfirmation from './ReceiptConfirmation';
+import { receiptCanSave } from './receiptFlow';
 import { Modal, ScrollView, Text, View } from 'react-native';
-import type { ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { WorkspaceSnapshot } from '@wherego/domain';
 import { Action, Field, ServerPhoto, styles } from './ui';
@@ -77,11 +79,27 @@ export default function PlanEditor({
   onReceipt: (camera: boolean) => void;
   onRescan: () => void;
 }) {
+  // 아니요 선택 시 수정할 정보를 화면 위에서 바로 확인할 수 있게 한다.
+  const receiptScroll = useRef<ScrollView>(null);
+  // 선택값을 반영한 다음 수정 화면의 시작으로 이동한다.
+  function chooseReceiptValue(key: string, value: string) {
+    // 사진 선택은 위치를 유지하고 정보 수정 선택만 위로 이동한다.
+    return Promise.resolve(onChange(key, value)).then(() => {
+      // 새 입력 필드가 배치된 프레임에서 이동한다.
+      return key === 'receiptConfirmed' && value === 'false'
+        ? requestAnimationFrame(() => {
+            // 잘못 인식된 항목의 확인·수정 영역으로 돌아간다.
+            return receiptScroll.current?.scrollTo({ y: 0, animated: true });
+          })
+        : undefined;
+    });
+  }
   // 실패해도 같은 폼 입력값과 원본을 유지한다.
   return (
     <EditorSurface form={form} onClose={onClose}>
       <SafeAreaView style={styles.modal}>
         <ScrollView
+          ref={receiptScroll}
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
         >
@@ -435,12 +453,16 @@ export default function PlanEditor({
                   </Text>
                 </View>
               )}
-              {form.kind === 'receipt' && (
-                <Text style={styles.subtitle}>
-                  결제 날짜에 맞는 장소 기록, 메뉴와 실제 지출, 원본 영수증을
-                  함께 저장합니다. 등록 전에는 여행 기록이 바뀌지 않아요.
-                </Text>
-              )}
+              {form.kind === 'receipt' &&
+                ['ready', 'manual'].includes(
+                  form.values.receiptStatus || '',
+                ) && (
+                  <ReceiptConfirmation
+                    form={form}
+                    busy={busy}
+                    onChange={chooseReceiptValue}
+                  />
+                )}
               {form.kind === 'period' && (
                 <Text style={styles.subtitle}>
                   DAY 순서와 일정은 유지되며 날짜가 이동합니다. 기록이 있는
@@ -464,18 +486,11 @@ export default function PlanEditor({
                   : form?.kind === 'publish'
                     ? '확인하고 게시'
                     : form?.kind === 'receipt'
-                      ? '여행 기록에 등록'
+                      ? '일정에 추가하기'
                       : '확인하고 저장'
               }
               disabled={
-                busy ||
-                (form?.kind === 'receipt' &&
-                  (!form.values.dayId ||
-                    !form.values.merchant ||
-                    !form.values.amount ||
-                    !['ready', 'manual'].includes(
-                      form.values.receiptStatus || '',
-                    )))
+                busy || (form?.kind === 'receipt' && !receiptCanSave(form))
               }
               onPress={onSave}
             />

@@ -1,5 +1,10 @@
 import ReceiptDetails from './ReceiptDetails';
-import { receiptForm, receiptDateValues } from './receiptFlow';
+import {
+  receiptForm,
+  receiptDateValues,
+  receiptConfirmationValues,
+} from './receiptFlow';
+import ReceiptCapture from './ReceiptCapture';
 import HaruState from '@/components/HaruState';
 import { useRef, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
@@ -170,6 +175,7 @@ function WorkspaceContent({
   );
   const [busy, setBusy] = useState(false);
   const [scanning, setScanning] = useState(false);
+  const [showReceiptCapture, setShowReceiptCapture] = useState(false);
   const [hasPending, setHasPending] = useState(false);
   const [error, setError] = useState('');
   const [checklist, setChecklist] = useState('');
@@ -366,6 +372,9 @@ function WorkspaceContent({
             values: {
               ...previous.values,
               [key]: value,
+              ...(previous.kind === 'receipt'
+                ? receiptConfirmationValues(key, value)
+                : {}),
               ...(previous.kind === 'trip' &&
               key === 'country' &&
               previous.values.country !== value
@@ -431,6 +440,15 @@ function WorkspaceContent({
         return setScanning(false);
       });
   }
+  // 사용자 선택 사진을 비공개 저장하고 용도 메타데이터를 등록한다.
+  function captureReceipt(camera: boolean): Promise<void> {
+    // 안내 화면 닫기와 실제 선택을 순서대로 진행한다.
+    return Promise.resolve(setShowReceiptCapture(false)).then(() => {
+      // 미리보기용 인식 결과를 만드는 대신 실제 이미지 선택을 시작한다.
+      return photo('receipt', camera);
+    });
+  }
+
   // 사용자 선택 사진을 비공개 저장하고 용도 메타데이터를 등록한다.
   function photo(
     purpose: 'photo' | 'receipt',
@@ -785,8 +803,8 @@ function WorkspaceContent({
                       label="영수증 촬영"
                       disabled={!writable || busy || scanning || hasPending}
                       onPress={() => {
-                        // QR 대신 사진 촬영으로 인식한다.
-                        photo('receipt', true);
+                        // 촬영 안내를 확인한 뒤 실제 기기 카메라로 진행한다.
+                        return setShowReceiptCapture(true);
                       }}
                     />
                     <Action
@@ -999,6 +1017,36 @@ function WorkspaceContent({
                 {activeSection === 'photos' && (
                   <View style={styles.card}>
                     <Text style={styles.title}>사진 · 영수증</Text>
+                    {snapshot.receipts
+                      .filter((item) => {
+                        // 원본을 보관하지 않은 기록도 다시 조회할 수 있다.
+                        return item.keepPhoto === false;
+                      })
+                      .map((item) => (
+                        <View key={item.id} style={styles.card}>
+                          <Text style={styles.title}>
+                            {item.merchant} · {item.date} · {item.amount}{' '}
+                            {item.currency}
+                          </Text>
+                          <Text style={styles.subtitle}>
+                            정보만 저장한 영수증
+                          </Text>
+                          <ReceiptDetails receipt={item} />
+                          <Action
+                            label="영수증 기록·지출 삭제"
+                            disabled={
+                              !writable || busy || scanning || hasPending
+                            }
+                            onPress={() => {
+                              // 사진 보관 여부와 무관하게 기록과 지출을 함께 삭제한다.
+                              return command({
+                                operation: 'receipt.delete',
+                                input: { id: item.id },
+                              });
+                            }}
+                          />
+                        </View>
+                      ))}
                     {snapshot.media.map((media) => (
                       <View key={media.id} style={{ gap: 10 }}>
                         <ServerPhoto
@@ -1287,6 +1335,22 @@ function WorkspaceContent({
         )}
         {busy && <Text>여행에 반영하고 있어요…</Text>}
       </ScrollView>
+      <ReceiptCapture
+        visible={showReceiptCapture}
+        busy={busy || scanning}
+        onClose={() => {
+          // 취소는 업로드나 일정 변경을 만들지 않는다.
+          return setShowReceiptCapture(false);
+        }}
+        onCapture={() => {
+          // 촬영 안내를 닫은 다음 시스템 카메라를 요청한다.
+          return captureReceipt(true);
+        }}
+        onLibrary={() => {
+          // 이미 찍은 영수증도 동일한 확인 절차로 연결한다.
+          return captureReceipt(false);
+        }}
+      />
       <PlanEditor
         onRescan={() => {
           // 현재 확인 중인 원본 하나만 다시 요청한다.

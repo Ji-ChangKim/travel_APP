@@ -223,6 +223,29 @@ function persistChange(
 function changeStatements(m: Mutation, change: Change): D1PreparedStatement[] {
   // 여행 스냅샷과 권한 인덱스의 불일치를 원자 batch로 방지한다.
   return [
+    ...(typeof change.result.discardedReceiptPath === 'string'
+      ? [
+          guarded(
+            m,
+            change.snapshot,
+            'UPDATE uploads SET deleted_at=coalesce(deleted_at,?) WHERE path=? AND trip_id=? AND EXISTS(SELECT 1 FROM trips WHERE id=? AND last_key=?)',
+            [
+              Date.now(),
+              change.result.discardedReceiptPath,
+              change.snapshot.trip.id,
+            ],
+          ),
+          guarded(
+            m,
+            change.snapshot,
+            'DELETE FROM receipt_scans WHERE trip_id=? AND media_id=? AND EXISTS(SELECT 1 FROM trips WHERE id=? AND last_key=?)',
+            [
+              change.snapshot.trip.id,
+              change.result.discardedReceiptPath.split('/')[1]!.split('.')[0]!,
+            ],
+          ),
+        ]
+      : []),
     guarded(
       m,
       change.snapshot,

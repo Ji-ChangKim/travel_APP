@@ -23,6 +23,8 @@ import {
 } from './cloudStore';
 import { rejectRequest } from './errors';
 import type { VerifiedSession } from './types';
+import { z } from 'zod';
+import { mediaBucket } from './cloudMedia';
 
 // API 계약을 D1 명령과 조회로 연결한다.
 export function cloudRpc(
@@ -98,12 +100,50 @@ function dispatch(actor: Actor, name: string, args: Args): Promise<unknown> {
       return digest(
         JSON.stringify({ name, args: { ...args, p_key: undefined } }),
       ).then((hash) => {
-        /* 입력 해시로 같은 키의 본문 재사용을 막는다. */ return mutate(
+        /* 입력 해시로 같은 키의 본문 재사용을 막는다. */ return completeMutation(
           { ...actor, args, hash, key: String(args.p_key) },
           name,
         );
       });
   }
+}
+
+// DB 확정 이후에만 사용자가 보관하지 않기로 한 원본을 정리한다.
+function completeMutation(m: Mutation, name: string): Promise<unknown> {
+  // 응답 유실이나 삭제 실패 뒤 같은 키를 재시도해도 일정을 중복 생성하지 않는다.
+  return mutate(m, name).then((result) => {
+    // 커밋 결과 또는 동일 커밋 재생 결과의 정리 경로만 사용한다.
+    return discardReceiptPhoto(m, result);
+  });
+}
+
+// 정보만 저장한 확정 영수증의 R2 원본과 인식 캐시를 제거한다.
+function discardReceiptPhoto(m: Mutation, result: unknown): Promise<unknown> {
+  // 다른 명령이나 사진 보관 선택에서는 파일을 삭제하지 않는다.
+  return m.args.p_operation === 'receipt.confirm' &&
+    (m.args.p_input as Record<string, unknown>).keepPhoto === false
+    ? eraseReceiptPhoto(
+        m,
+        z
+          .object({
+            data: z.object({
+              discardedReceiptPath: z
+                .string()
+                .regex(/^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png)$/),
+            }),
+          })
+          .parse(result).data.discardedReceiptPath,
+      ).then(() => {
+        // 원본 삭제가 완료된 이후에만 성공 응답을 반환한다.
+        return result;
+      })
+    : Promise.resolve(result);
+}
+
+// 확정된 사용자 선택의 사진 한 장만 삭제한다.
+function eraseReceiptPhoto(m: Mutation, path: string): Promise<unknown> {
+  // 경로는 서버가 확정 결과에 기록한 값이며 사용자 입력 경로를 사용하지 않는다.
+  return mediaBucket(m.env).delete(path);
 }
 
 // 공개 게시물의 현재 차단 필터를 적용한다.
