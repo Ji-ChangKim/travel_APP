@@ -138,7 +138,7 @@ function SharedPlaceView({
       />
       {state.preview && (
         <>
-          <Text>{state.preview.query || 'Google 장소 ID를 확인했습니다.'}</Text>
+          <Text>{state.preview.query || '공유한 장소를 찾았어요.'}</Text>
           <Action
             label={
               state.preview.googlePlaceId

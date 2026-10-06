@@ -1,0 +1,66 @@
+TripPrint 사용자 관점 문구 정리 보고서
+작성일: 2026-10-06
+
+1. 요청과 적용 기준
+- 로그인 준비·공급자 연결·DB/API/세션 상태처럼 개발자가 설명하는 문구를 고객 화면에서 제거한다.
+- 각 화면은 여행자가 얻는 결과와 다음 행동을 안내한다.
+- 작동하는 로그인·여행 기능만 안내한다. 연결되지 않은 기능의 성공을 흉내 내지 않는다.
+- 기록의 공개 범위, 기기에서만 볼 수 있는 기록 등 선택에 필요한 정보는 쉬운 말로 유지한다.
+- 개발·검증 정보는 이 문서와 캡처 manifest에 보존하고 화면에 출력하지 않는다.
+
+2. 문구 변경 예시
+- 게스트 세션 활성 중 → 둘러보던 여행을 이어서 살펴보세요.
+- 여행 서버 저장·초대는 로그인 후 이용 → 로그인하면 여행을 저장하고 친구와 함께 계획할 수 있어요.
+- 소셜 로그인 연결 준비 → 로그인 요청 실패 시 이메일로 계속하도록 안내.
+- Google 장소 ID 확인 → 공유한 장소를 찾았어요.
+- 같은 요청으로 재시도 → 다시 저장하기.
+- 서버 응답·HTTP 상태 번호 → 작성한 내용이 남아 있다는 안내와 다시 시도할 행동.
+- 전체 화면 미리보기의 구현 상태·내부 경로·커밋·별도 연결 설명 → 여행 계획·사진과 영수증·발자국을 소개하는 문구.
+
+3. 수정 파일 전체
+- AGENTS.md: 앞으로도 사용자 관점의 문구와 실제 제공 기능만 안내하도록 규칙 추가.
+- apps/mobile/src/app/login.tsx: 로그인 이점, 둘러보기 버튼, 이어하기, 로딩·실패 안내 정리.
+- apps/mobile/src/app/auth/callback.tsx: 로그인 대기·실패·복귀 안내 정리. 영문 예외 원문 대신 한국어 복구 안내.
+- apps/mobile/src/app/(tabs)/my.tsx: 프로필 편집 실패에서 서버 설명 제거.
+- apps/mobile/src/features/auth/EmailAuth.tsx: 가입·로그인별 대기 안내, 로그인 재시작 안내, 네트워크·응답 오류 문구 정리.
+- apps/mobile/src/features/auth/model.ts: 설정·콜백·코드·식별자 검증 실패에서 고객 복귀 안내로 변경. 검증 조건은 유지.
+- apps/mobile/src/features/auth/oauth.ts: 공급자 준비 설명 대신 실제 이용 가능한 이메일 로그인으로 안내.
+- apps/mobile/src/services/cloudAuth.ts: 주소·토큰·연결 확인 실패를 로그인 실패·재시도 문구로 변경.
+- apps/mobile/src/services/guestAuthService.ts: 기본 소개에서 게스트 세션 용어 제거.
+- apps/mobile/src/features/workspace/service.ts: API 주소와 공유 주소 설정 실패를 불러오기·초대 재시도 안내로 변경.
+- apps/mobile/src/features/workspace/WorkspaceScreen.tsx: 저장 실패의 HTTP 번호·서버·동일 요청 용어 제거, 다시 저장하기 버튼과 반영 중 안내 적용.
+- apps/mobile/src/features/workspace/CommunityScreen.tsx: 공개 여행 조회 실패를 여행 이야기 재시도로 안내.
+- apps/mobile/src/features/workspace/SharedPlaceInput.tsx: 내부 장소 ID 대신 공유한 장소 확인 안내.
+- apps/mobile/src/features/workspace/PlaceSearch.tsx: 검색 실패에서 재검색·Google Maps 확인 행동 안내.
+- apps/mobile/src/features/workspace/InviteScreen.tsx: 권한 적용 설명 대신 친구와 함께 여행에 참여하는 흐름 안내.
+- apps/mobile/src/features/trail/TrailScreen.tsx: 이전 기기 기록의 저장 범위를 쉬운 말로 설명하고 OCR/GPS 구현 상태 문구 제거.
+- apps/mobile/public/release.json: 웹 배포 식별자 test-1-service-copy.
+- tests/web/workspace.spec.ts: 바뀐 버튼명 반영. 기존 로그인·오류 복귀 테스트에서 고객 문구와 실제 이메일 로그인 복귀 확인.
+- scripts/build-page-gallery.mjs: 미리보기 생성기를 버전 관리. 39개 화면 설명을 사용자 관점으로 작성하고 내부 경로·공급자 준비·구현 상태 설명 제거.
+- docs/USER_FACING_COPY_20261006.txt: 이 보고서.
+
+4. 미리보기 산출물
+- outputs/TripPrint-pages/index.html: 39개 화면 둘러보기.
+- outputs/TripPrint-pages/overview.html: 12개 주요 페이지 개요.
+- outputs/TripPrint-pages/haru.html: 하루 로딩·오류·빈 기록 안내.
+- outputs/TripPrint-pages/TripPrint_all-pages-overview_1440.png: 개요 이미지.
+- 실제 앱 UI의 33개 화면을 새 웹 번들로 다시 촬영했다.
+- 영수증 6개 화면은 앞선 실제 첨부 사진 스캔·저장 검증의 원본 캡처를 유지했다. 이번 문구 작업에서 OCR을 다시 실행하지 않았다.
+- 캡처 도구는 이미지 디코딩 완료 후 촬영하도록 보완했다. 하루가 부분적으로만 보이는 미리보기를 다시 촬영했다.
+- 내부 검증 도구: .release/page-gallery/capture.mjs, .release/page-gallery/build-gallery.mjs, .release/page-gallery/render.mjs, .release/workspace-copy.config.ts, .release/verify-home-release.mjs.
+
+5. 검증 결과
+- npm run test:auth: 16개 통과.
+- Chrome 웹 흐름 테스트: 16개 통과. 실제 배포용 웹 번들, 외부 HTTP 응답만 fixture로 격리.
+- 로그인 실패·재시도, 실제 세션 응답 후 진입, 회원가입, 게스트 둘러보기, 초대 복귀, 저장 재시도, 일반/8MB 영수증 스캔, 날짜별 등록, 커뮤니티 공유 확인.
+- npm run mobile:build:web: 18개 정적 경로 출력 성공.
+- npm run release:artifacts: 웹 진입·rewrite·테스트 설정 미포함 검사 통과.
+- npm run check: TypeScript 엄격 모드·ESLint 경고 0·Prettier 모두 통과.
+- 미리보기: 12개 주요 페이지·39개 화면·이미지 확대와 닫기 확인.
+
+6. 배포 및 데이터 범위
+- 배포 대상: https://wherego-staging.pages.dev
+- 배포 완료 검증: 확인 중.
+- 변경 범위는 프런트엔드 문구와 미리보기이다. DB 테이블·컬럼·도메인 객체 구조와 API 명령 계약은 변경하지 않았다.
+- 실제 제공 중인 이메일 가입·로그인과 게스트 둘러보기를 유지했다. Google OAuth를 연결한 작업으로 표시하지 않는다.
+

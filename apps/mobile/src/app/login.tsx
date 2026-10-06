@@ -100,9 +100,12 @@ export default function LoginScreen() {
       router.replace('/(tabs)');
     } catch {
       // 기기 저장 실패는 웹에서도 확인할 수 있다.
-      setAuthError('기기 저장소 또는 세션을 확인해 주세요.');
+      setAuthError('둘러보기를 시작하지 못했어요. 잠시 후 다시 시도해 주세요.');
       // 저장 실패 후 성공 화면으로 이동하지 않는다.
-      Alert.alert('둘러보기 실패', '기기 저장소 또는 세션을 확인해 주세요.');
+      Alert.alert(
+        '둘러보기 실패',
+        '둘러보기를 시작하지 못했어요. 잠시 후 다시 시도해 주세요.',
+      );
     } finally {
       // 실패한 뒤에도 다시 시도할 수 있다.
       setIsLoading(false);
@@ -187,8 +190,8 @@ export default function LoginScreen() {
                 </Text>
                 <Text style={styles.sessionDescText}>
                   {currentUser.authProvider === 'guest'
-                    ? '기기에 저장된 게스트 세션 활성 중'
-                    : `${currentUser.authProvider?.toUpperCase()} 연동 세션 유지 중`}
+                    ? '둘러보던 여행을 이어서 살펴보세요.'
+                    : '나의 여행을 이어서 기록해 보세요.'}
                 </Text>
               </View>
             </View>
@@ -227,7 +230,7 @@ export default function LoginScreen() {
         {isLoading ? (
           <View style={styles.loadingWrap}>
             <ActivityIndicator size="large" color={loginTheme.primary} />
-            <Text style={styles.loadingText}>로그인 처리 중입니다...</Text>
+            <Text style={styles.loadingText}>여행을 열고 있어요…</Text>
           </View>
         ) : (
           /* 플랫폼별 인증 버튼 영역 */
@@ -273,13 +276,10 @@ export default function LoginScreen() {
                 size={18}
                 color={loginTheme.textSecondary}
               />
-              <Text style={styles.guestBtnText}>
-                로그인 없이 게스트로 둘러보기
-              </Text>
+              <Text style={styles.guestBtnText}>로그인 없이 둘러보기</Text>
             </TouchableOpacity>
             <Text style={styles.guestNoticeText}>
-              게스트는 둘러보기용입니다. 여행 서버 저장·초대는 로그인 후 이용할
-              수 있습니다.
+              로그인하면 여행을 저장하고 친구와 함께 계획할 수 있어요.
             </Text>
           </View>
         )}

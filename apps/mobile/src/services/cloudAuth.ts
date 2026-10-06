@@ -37,7 +37,7 @@ export function authBaseUrl(): string {
       process.env.EXPO_PUBLIC_API_URL,
     )
     ? process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, '')
-    : fail('여행 서버 주소가 준비되지 않았습니다.');
+    : fail('지금은 로그인할 수 없어요. 잠시 후 다시 시도해 주세요.');
 }
 // 안전한 인증 안내만 전달한다.
 function fail(message: string): never {
@@ -111,7 +111,7 @@ export function emailSession(
           /* 서명된 응답 헤더 토큰을 저장한다. */ return acceptSession(
             z.object({ user: cloudUserSchema }).parse(data).user,
             response.headers.get('set-auth-token') ||
-              fail('로그인 세션을 확인하지 못했습니다. 다시 시도해 주세요.'),
+              fail('로그인을 완료하지 못했어요. 다시 시도해 주세요.'),
           );
         });
   });
@@ -153,7 +153,9 @@ export function getCloudSession(): Promise<CloudSession | null> {
               ? writeToken(null).then(() => {
                   /* 거부된 토큰을 제거한다. */ return notifySession(null);
                 })
-              : fail('로그인 서버 연결을 확인해 주세요.');
+              : fail(
+                  '로그인 상태를 확인하지 못했어요. 잠시 후 다시 시도해 주세요.',
+                );
         });
   });
 }

@@ -18,10 +18,10 @@ export default function AuthCallbackScreen() {
     sb_flow_id?: string;
   }>();
   const router = useRouter();
-  const [message, setMessage] = useState('로그인을 확인하고 있습니다.');
+  const [message, setMessage] = useState('로그인하고 있어요');
   const [failed, setFailed] = useState(false);
 
-  // 콜백 코드를 실제 Supabase 세션으로 교환한다.
+  // 로그인 상태를 확인하고 원래 여행 화면으로 돌아간다.
   useEffect(() => {
     // 언마운트한 콜백 화면은 네비게이션하지 않는다.
     let active = true;
@@ -48,9 +48,9 @@ export default function AuthCallbackScreen() {
         // 공급자 원문 대신 서비스의 안전한 메시지를 보여준다.
         if (active) {
           setMessage(
-            error instanceof Error
+            error instanceof Error && /[가-힣]/.test(error.message)
               ? error.message
-              : '로그인에 실패했습니다. 다시 시도해 주세요.',
+              : '로그인을 완료하지 못했어요. 다시 시도해 주세요.',
           );
           setFailed(true);
         }

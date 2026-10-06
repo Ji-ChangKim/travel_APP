@@ -27,7 +27,7 @@ export function apiBaseUrl(): string {
   // 설정 누락 시 존재하지 않는 예제 API로 저장하지 않는다.
   return (
     process.env.EXPO_PUBLIC_API_URL ||
-    fail('여행 서버 주소가 준비되지 않았습니다.')
+    fail('여행을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.')
   );
 }
 // 사용자에게 안전한 서비스 실패를 전달한다.
@@ -244,9 +244,7 @@ export function inviteWebUrl(token: string): string {
   // 외부 기기에서 접속 가능한 배포 주소를 설정해야 한다.
   return process.env.EXPO_PUBLIC_AUTH_WEB_REDIRECT_URL
     ? `${process.env.EXPO_PUBLIC_AUTH_WEB_REDIRECT_URL.replace(/\/auth\/callback\/?$/, '')}/invite#token=${encodeURIComponent(token)}`
-    : fail(
-        '공유할 웹 주소를 먼저 설정해 주세요. 초대는 서버에 저장되어 있습니다.',
-      );
+    : fail('초대 링크를 만들지 못했어요. 잠시 후 다시 시도해 주세요.');
 }
 // 비공개 사진은 짧은 서명 URL로 표시한다.
 export function signedMedia(

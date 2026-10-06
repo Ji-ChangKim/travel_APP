@@ -80,14 +80,16 @@ export function workspaceError(error: unknown): string {
             : error.status === 503
               ? '잠시 연결할 수 없어요. 조금 뒤에 다시 시도해 주세요.'
               : error.status === 422
-                ? '입력값과 연결할 날짜·일정을 확인해 주세요.'
-                : `저장 요청을 확인하지 못했습니다 (${error.status}). 같은 요청으로 재시도해 주세요.`
+                ? '날짜와 입력한 내용을 확인해 주세요.'
+                : '저장하지 못했어요. 입력한 내용은 그대로 있으니 다시 저장해 주세요.'
     : error instanceof TypeError
-      ? '서버 응답을 확인하지 못했습니다. 연결을 확인하고 같은 요청으로 재시도해 주세요.'
+      ? '연결이 끊겼어요. 입력한 내용은 그대로 있으니 다시 시도해 주세요.'
       : error instanceof Error
         ? error.name === 'ZodError'
           ? '날짜, 필수 항목, 금액 형식을 확인해 주세요.'
-          : error.message
+          : /[가-힣]/.test(error.message)
+            ? error.message
+            : '진행하지 못했어요. 잠시 후 다시 시도해 주세요.'
         : '연결을 확인하고 재시도해 주세요.';
 }
 // 소수 금액을 정수 센트로 합산해 통화별로 표시한다.
@@ -1276,14 +1278,14 @@ function WorkspaceContent({
         )}
         {hasPending && !busy && (
           <Action
-            label="같은 요청으로 재시도"
+            label="다시 저장하기"
             onPress={() => {
               // 저장 여부가 불확실한 요청을 중복 생성하지 않는다.
               if (pending.current) execute(pending.current);
             }}
           />
         )}
-        {busy && <Text>요청을 확인하고 있습니다…</Text>}
+        {busy && <Text>여행에 반영하고 있어요…</Text>}
       </ScrollView>
       <PlanEditor
         onRescan={() => {

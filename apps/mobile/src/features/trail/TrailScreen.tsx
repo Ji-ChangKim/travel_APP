@@ -148,11 +148,9 @@ function Workspace({ model }: { model: Model }) {
           </Text>
         </View>
         <View style={styles.banner}>
-          <Text style={styles.bannerTitle}>이 기기에 저장되는 여행 콘텐츠</Text>
+          <Text style={styles.bannerTitle}>이 기기에 남긴 여행</Text>
           <Text style={styles.small}>
-            계정과 연동되지 않은 이 기기의 초안입니다. 다른 기기와 공유되지
-            않습니다. 영수증은 사용자 확인 기록이며 방문 인증을 의미하지
-            않습니다.
+            여기에 남긴 기록은 이 기기에서만 볼 수 있어요.
           </Text>
         </View>
         <View style={styles.row}>
@@ -790,8 +788,7 @@ function EditorPanel({ model }: { model: Model }) {
       {model.editor[0] === 'receipt' ? (
         <View style={styles.section}>
           <Text style={styles.small}>
-            원본을 첨부하고 내역을 확인해 입력하세요. 자동 OCR·GPS 인증은
-            제공하지 않습니다.
+            영수증 사진과 결제 내역을 남겨 지난 여행을 정리해 보세요.
           </Text>
           <View style={styles.row}>
             {(['KRW', 'JPY', 'USD'] as const).map((currency) => {

@@ -77,9 +77,7 @@ function assertConfiguration(valid: boolean): void {
   // 누락 설정을 임시 사용자 생성으로 우회하지 않는다.
   return valid
     ? undefined
-    : failAuth(
-        '로그인 연결 설정이 준비되지 않았습니다. 관리자에게 문의해 주세요.',
-      );
+    : failAuth('로그인을 시작하지 못했어요. 잠시 후 다시 시도해 주세요.');
 }
 
 // 콜백 주소와 PKCE 코드를 검증한다.
@@ -101,9 +99,7 @@ function validateFlowIds(ids: string[]): string | undefined {
     ? undefined
     : ids.length === 1 && /^[a-zA-Z0-9_-]{8,64}$/.test(ids[0] || '')
       ? ids[0]
-      : failAuth(
-          '로그인 요청 식별자가 올바르지 않습니다. 다시 로그인해 주세요.',
-        );
+      : failAuth('로그인이 만료됐어요. 다시 로그인해 주세요.');
 }
 
 // 리디렉션 대상과 오류 응답을 검사한다.
@@ -112,16 +108,12 @@ function validateCallback(callback: URL, expected: URL): string {
   return callback.protocol !== expected.protocol ||
     callback.host !== expected.host ||
     callback.pathname !== expected.pathname
-    ? failAuth('로그인 복귀 주소가 일치하지 않습니다.')
+    ? failAuth('로그인을 완료하지 못했어요. 다시 로그인해 주세요.')
     : callback.searchParams.has('error') ||
         callback.searchParams.has('error_code')
-      ? failAuth(
-          '소셜 로그인이 취소되었거나 승인되지 않았습니다. 다시 시도해 주세요.',
-        )
+      ? failAuth('로그인이 취소됐어요. 다시 로그인해 주세요.')
       : callback.searchParams.getAll('code').length !== 1
-        ? failAuth(
-            '로그인 인증 코드가 올바르지 않습니다. 다시 로그인해 주세요.',
-          )
+        ? failAuth('로그인이 만료됐어요. 다시 로그인해 주세요.')
         : requireCode(callback.searchParams.get('code'));
 }
 
@@ -151,7 +143,7 @@ function requireCode(code: string | null): string {
   // 임의 토큰이나 사용자 ID로 로그인하지 않는다.
   return code && code.length <= 4096
     ? code
-    : failAuth('로그인 인증 코드가 없습니다. 다시 로그인해 주세요.');
+    : failAuth('다시 로그인하고 여행을 이어가세요.');
 }
 
 // 사용자에게 안전한 인증 오류를 전달한다.

@@ -86,8 +86,7 @@ function finishEmail(
           mode: 'login',
           password: '',
           confirmation: '',
-          notice:
-            '이메일의 인증 링크를 확인한 뒤 로그인해 주세요. 기존 계정이라면 로그인으로 진행해 주세요.',
+          notice: '이메일과 비밀번호로 로그인하고 여행을 시작해 주세요.',
         });
 }
 
@@ -96,11 +95,17 @@ function showEmailError(set: ChangeState, error: unknown): void {
   // 원본 서버 응답과 비밀번호는 화면에 출력하지 않는다.
   return patchState(set, {
     error:
-      error instanceof ZodError
-        ? error.issues[0]?.message || '입력값을 확인해 주세요.'
-        : error instanceof Error
-          ? error.message
-          : '연결을 확인하고 다시 시도해 주세요.',
+      error instanceof TypeError ||
+      (error instanceof Error &&
+        ['AbortError', 'TimeoutError'].includes(error.name))
+        ? '연결이 끊겼어요. 잠시 후 다시 시도해 주세요.'
+        : error instanceof ZodError
+          ? /[가-힣]/.test(error.issues[0]?.message || '')
+            ? error.issues[0]!.message
+            : '로그인을 완료하지 못했어요. 잠시 후 다시 시도해 주세요.'
+          : error instanceof Error && /[가-힣]/.test(error.message)
+            ? error.message
+            : '연결을 확인하고 다시 시도해 주세요.',
   });
 }
 
@@ -261,7 +266,9 @@ function EmailForm({
           <Action
             label={
               state.busy
-                ? '인증 중…'
+                ? state.mode === 'signup'
+                  ? '가입하고 있어요…'
+                  : '로그인하고 있어요…'
                 : state.mode === 'login'
                   ? '이메일 로그인'
                   : '회원가입'

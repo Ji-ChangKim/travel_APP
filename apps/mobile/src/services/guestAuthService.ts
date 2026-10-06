@@ -64,7 +64,7 @@ export function generateGuestProfile(osPlatform: OsPlatform): Profile {
     id: guestId,
     nickname: '게스트 여행자',
     avatarUrl: null,
-    bio: '환영합니다! 둘러보기 게스트 세션입니다.',
+    bio: '여행의 순간을 TripPrint에 남겨보세요.',
     travelStyles: ['자유여행'],
     phone: null,
     osPlatform,

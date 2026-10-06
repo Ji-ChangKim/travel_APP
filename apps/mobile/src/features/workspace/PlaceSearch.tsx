@@ -62,7 +62,7 @@ export default function PlaceSearch({
         // 실패에서도 검색어와 작성 내용은 유지한다.
         if (current === request.current)
           setError(
-            '지도 검색을 사용할 수 없습니다. 연결을 확인하거나 외부 지도에서 확인해 주세요.',
+            '장소 검색을 완료하지 못했어요. 다시 검색하거나 Google Maps에서 확인해 주세요.',
           );
       })
       .finally(() => {

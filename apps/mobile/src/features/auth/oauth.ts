@@ -7,18 +7,16 @@ export function socialRedirectUrl(): string {
   // 실제 배포 주소와 앱 scheme만 사용한다.
   return Platform.OS === 'web'
     ? process.env.EXPO_PUBLIC_AUTH_WEB_REDIRECT_URL ||
-        failAuth('웹 로그인 복귀 주소가 설정되지 않았습니다.')
+        failAuth('로그인을 시작하지 못했어요. 잠시 후 다시 시도해 주세요.')
     : 'travelapp://auth/callback';
 }
-// 아직 연결하지 않은 제공자를 명시적으로 안내한다.
+// 로그인을 시작하지 못하면 가능한 로그인 방법으로 안내한다.
 export function signInWithSocial(
   _provider: SocialProvider,
 ): Promise<CloudSession | null> {
   // 공급자 자격 증명 없이 가짜 세션을 생성하지 않는다.
   return Promise.reject(
-    new Error(
-      '소셜 로그인은 연결 준비 중입니다. 이메일 로그인을 이용해 주세요.',
-    ),
+    new Error('로그인을 시작하지 못했어요. 이메일로 계속해 주세요.'),
   );
 }
 // 이전 제공자 교환 상태를 새 계정에 재사용하지 않는다.
@@ -33,9 +31,7 @@ export function completeSocialAuth(_url: string): Promise<CloudSession> {
     // 연결되지 않은 소셜 콜백은 로그인 화면으로 복귀한다.
     return (
       session ||
-      failAuth(
-        '로그인 세션을 확인하지 못했습니다. 이메일 로그인을 이용해 주세요.',
-      )
+      failAuth('다시 로그인해 주세요. 이메일로 여행을 이어갈 수 있어요.')
     );
   });
 }

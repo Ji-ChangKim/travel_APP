@@ -93,8 +93,8 @@ export default function InviteScreen() {
     <SafeAreaView style={[styles.screen, styles.content]}>
       <Text style={styles.header}>여행 초대</Text>
       <Text style={styles.subtitle}>
-        받은 공유 링크를 붙여넣고 참여해 주세요. 로그인 후 초대에 지정된 보기
-        또는 편집 권한이 적용됩니다.
+        친구가 보낸 링크로 여행에 참여해 보세요. 함께 일정을 확인하고 여행을
+        준비할 수 있어요.
       </Text>
       <Field
         label="초대 링크"

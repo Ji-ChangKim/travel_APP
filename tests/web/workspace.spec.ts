@@ -291,9 +291,19 @@ test('게스트 둘러보기는 인증 배지·가짜 권한 설정을 표시하
     return route.fulfill({ json: { data: [] } });
   });
   await page.goto('/login');
-  await page
-    .getByText('로그인 없이 게스트로 둘러보기', { exact: true })
-    .click();
+  // 개발 상태를 노출하지 않고 실제 저장·동행의 로그인 이점을 안내한다.
+  await expect(
+    page.getByText('로그인하면 여행을 저장하고 친구와 함께 계획할 수 있어요.', {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(/연결 준비|서버 저장|세션 활성|세션 유지/),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole('button', { name: /Google.*로그인|구글.*로그인/ }),
+  ).toHaveCount(0);
+  await page.getByText('로그인 없이 둘러보기', { exact: true }).click();
   await expect(
     page.getByRole('button', { name: '도쿄 선택', exact: true }),
   ).toBeVisible();
@@ -1641,6 +1651,31 @@ test('하루 오류 안내 → 공개 피드 재시도 → 빈 기록 시작 →
       // 새 여행 행동이 복귀 후에도 유지되는지 확인한다.
       return expect(
         page.getByRole('button', { name: '새 여행 시작하기', exact: true }),
+      ).toBeVisible();
+    },
+    () => {
+      // 세션 없는 로그인 복귀에서 실제 복구 행동을 제공한다.
+      return page.goto('/auth/callback');
+    },
+    () => {
+      // 구현 상태 대신 사용자가 이어갈 로그인 방법을 안내한다.
+      return expect(
+        page.getByText(
+          '다시 로그인해 주세요. 이메일로 여행을 이어갈 수 있어요.',
+          { exact: true },
+        ),
+      ).toBeVisible();
+    },
+    () => {
+      // 오류 화면에서 로그인 버튼이 실제 로그인 페이지를 연다.
+      return page
+        .getByRole('button', { name: '로그인으로 돌아가기', exact: true })
+        .click();
+    },
+    () => {
+      // 로그인 복귀 후 작동하는 이메일 로그인 진입을 확인한다.
+      return expect(
+        page.getByRole('button', { name: '이메일로 계속하기', exact: true }),
       ).toBeVisible();
     },
   ]);

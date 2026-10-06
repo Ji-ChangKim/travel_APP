@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "release": "test-1-receipt-scan",
+  "release": "test-1-service-copy",
   "environment": "staging",
   "releaseDate": "2026-10-06",
   "webOrigin": "https://wherego-staging.pages.dev",

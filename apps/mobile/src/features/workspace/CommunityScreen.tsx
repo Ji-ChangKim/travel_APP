@@ -93,7 +93,9 @@ export default function CommunityScreen() {
             .then((response) => {
               // 설정 또는 API 실패를 빈 커뮤니티로 표시하지 않는다.
               if (!response.ok)
-                throw new Error('커뮤니티 서버에 연결할 수 없습니다.');
+                throw new Error(
+                  '여행 이야기를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.',
+                );
               // 공개 계약만 다음 처리로 전달한다.
               return response.json();
             })
