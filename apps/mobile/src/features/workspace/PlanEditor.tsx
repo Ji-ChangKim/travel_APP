@@ -4,7 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import type { WorkspaceSnapshot } from '@wherego/domain';
 import { Action, Field, ServerPhoto, styles } from './ui';
 import type { PlanForm } from './forms';
-import { DateField, DestinationFields, FlightFields } from './TravelInputs';
+import { DateField } from './TravelInputs';
+import TripFields from './TripFields';
 import PlaceSearch from './PlaceSearch';
 import GooglePlace from './GooglePlace';
 
@@ -107,10 +108,7 @@ export default function PlanEditor({
                 />
               )}
               {form.kind === 'trip' && (
-                <>
-                  <FlightFields values={form.values} onChange={onChange} />
-                  <DestinationFields values={form.values} onChange={onChange} />
-                </>
+                <TripFields values={form.values} onChange={onChange} />
               )}
               {form.kind === 'schedule' && (
                 <>
@@ -173,7 +171,15 @@ export default function PlanEditor({
                     Boolean(labels[key]) &&
                     !(
                       form.kind === 'trip' &&
-                      ['country', 'city', 'title'].includes(key)
+                      [
+                        'country',
+                        'city',
+                        'title',
+                        'startDate',
+                        'endDate',
+                        'timezone',
+                        'defaultCurrency',
+                      ].includes(key)
                     ) &&
                     key !== 'sortOrder'
                   );
@@ -214,16 +220,6 @@ export default function PlanEditor({
                     />
                   ),
                 )}
-              {form.kind === 'trip' && (
-                <Field
-                  label="여행 타이틀 (비우면 자동 생성)"
-                  value={form.values.title || ''}
-                  onChange={(next) => {
-                    // 제목은 목적지와 날짜를 선택한 뒤 선택적으로 지정한다.
-                    onChange('title', next);
-                  }}
-                />
-              )}
               {['schedule', 'receipt'].includes(form.kind) && (
                 <View style={styles.card}>
                   <Text style={styles.title}>여행 날짜 선택</Text>
@@ -262,7 +258,7 @@ export default function PlanEditor({
                   ))}
                 </View>
               )}
-              {['trip', 'expense', 'receipt'].includes(form.kind) && (
+              {['expense', 'receipt'].includes(form.kind) && (
                 <View style={styles.row}>
                   {['KRW', 'JPY', 'USD'].map((currency) => (
                     <Action
@@ -422,6 +418,7 @@ export default function PlanEditor({
           )}
           <View style={styles.row}>
             <Action
+              variant="primary"
               label={
                 busy
                   ? '저장 중…'

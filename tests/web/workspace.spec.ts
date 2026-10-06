@@ -12,6 +12,130 @@ const tinyPng = Buffer.from(
   'base64',
 );
 
+// 날짜별 화면 동작 검증에 사용할 서버 응답 DAY를 준비한다.
+function fixtureDays(
+  startDate: string,
+  endDate: string,
+): WorkspaceSnapshot['days'] {
+  // 첫 DAY 식별자를 유지하고 여행 기간만큼 서로 다른 날짜를 생성한다.
+  return Array.from(
+    { length: (Date.parse(endDate) - Date.parse(startDate)) / 86400000 + 1 },
+    (_, index) => {
+      // 날짜 선택이 서버로 전달되는 실제 DAY를 구분한다.
+      return {
+        id:
+          index === 0
+            ? day
+            : `00000000-0000-4000-8000-${String(11 + index).padStart(12, '0')}`,
+        dayNumber: index + 1,
+        tripDate: new Date(Date.parse(startDate) + index * 86400000)
+          .toISOString()
+          .slice(0, 10),
+      };
+    },
+  );
+}
+
+test('항공편 없이 여행 생성 → DAY2 일정 저장 → 날짜 필터 → 서버 통계 일치', async ({
+  page,
+}) => {
+  // 사용자 버튼으로 만든 여행의 날짜와 통계가 같은 서버 원본을 사용하는지 검증한다.
+  await network(page);
+  await login(page);
+  await page
+    .getByRole('button', { name: '새 여행 시작하기', exact: true })
+    .click();
+  await fields(page, {
+    '나라 검색': '일본',
+    '도시 검색': '도쿄',
+    시작일: '2026-11-10',
+    종료일: '2026-11-12',
+  });
+  const creation = page.waitForRequest((request) => {
+    // 항공 입력을 요구하지 않은 실제 생성 요청을 확인한다.
+    return (
+      request.method() === 'POST' && request.url().endsWith('/api/v1/trips')
+    );
+  });
+  await page
+    .getByRole('button', { name: '확인하고 저장', exact: true })
+    .click();
+  expect((await creation).postDataJSON().flight).toBeUndefined();
+  await page.getByRole('button', { name: 'DAY 2', exact: true }).click();
+  await expect(
+    page.getByText('DAY 2 · 2026-11-11', { exact: true }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: '일정 추가', exact: true }).click();
+  await fields(page, { 제목: '둘째 날 산책', '지역명·주소': '도쿄' });
+  const schedule = page.waitForRequest((request) => {
+    // 선택 날짜가 새 일정의 부모 DAY로 전송되어야 한다.
+    return request.method() === 'POST' && request.url().endsWith('/commands');
+  });
+  await page
+    .getByRole('button', { name: '확인하고 저장', exact: true })
+    .click();
+  expect((await schedule).postDataJSON().input.dayId).toBe(
+    '00000000-0000-4000-8000-000000000012',
+  );
+  await expect(
+    page.getByText('시간 미정 · 둘째 날 산책', { exact: true }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'DAY 1', exact: true }).click();
+  await expect(
+    page.getByText('시간 미정 · 둘째 날 산책', { exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole('button', { name: 'DAY 2', exact: true }).click();
+  await expect(
+    page.getByText('시간 미정 · 둘째 날 산책', { exact: true }),
+  ).toBeVisible();
+  await page.goto('/my');
+  await expect(
+    page
+      .getByText('총 여행', { exact: true })
+      .locator('..')
+      .getByText('1', { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByText('예정된 여행', { exact: true })
+      .locator('..')
+      .getByText('1', { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByText('완성된 발자국', { exact: true })
+      .locator('..')
+      .getByText('0', { exact: true }),
+  ).toBeVisible();
+});
+
+test('게스트 둘러보기는 인증 배지·가짜 권한 설정을 표시하지 않는다', async ({
+  page,
+}) => {
+  // 미인증 사용자도 공개 피드를 보고 계정 상태를 정확하게 이해할 수 있어야 한다.
+  await network(page);
+  await page.route('**/api/auth/get-session', (route) => {
+    // 서버의 미인증 상태만 반환하고 앱 사용자 상태는 직접 주입하지 않는다.
+    return route.fulfill({ json: null });
+  });
+  await page.route('**/public/community?*', (route) => {
+    // 게스트의 공개 조회는 인증 자료 없이 처리한다.
+    return route.fulfill({ json: { data: [] } });
+  });
+  await page.goto('/login');
+  await page
+    .getByText('로그인 없이 게스트로 둘러보기', { exact: true })
+    .click();
+  await expect(page.getByText('여행 커뮤니티', { exact: true })).toBeVisible();
+  await page.goto('/my');
+  await expect(page.getByText('둘러보기', { exact: true })).toBeVisible();
+  await expect(
+    page.getByText('로그인 전 둘러보기 중입니다', { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText('인증됨', { exact: true })).toHaveCount(0);
+  await expect(page.getByRole('switch')).toHaveCount(0);
+});
+
 test('폐기한 DB 코드만 정리하고 로그인 세션과 프로필 편집은 유지한다', ({
   page,
 }) => {
@@ -177,7 +301,7 @@ async function network(
           version: 1,
         },
         myRole: 'owner',
-        days: [{ id: day, dayNumber: 1, tripDate: input.startDate }],
+        days: fixtureDays(input.startDate, input.endDate),
         itinerary: [],
         expenses: [],
         checklists: [],
@@ -312,7 +436,12 @@ async function network(
       snapshot.trip.version++;
       if (command.operation === 'schedule.save')
         snapshot.itinerary = [
-          { ...command.input, timeSlot: command.input.timeSlot || null },
+          {
+            ...command.input,
+            timeSlot: command.input.timeSlot || null,
+            memo: command.input.memo || null,
+            googlePlaceId: command.input.googlePlaceId || undefined,
+          },
         ];
       if (command.operation === 'expense.save')
         snapshot.expenses.push({
@@ -415,7 +544,7 @@ async function network(
     });
   });
 }
-// 실제 소셜 버튼과 SDK의 인증 콜백을 통과한다.
+// 실제 이메일 폼과 서버 인증 응답을 통과한다.
 async function login(page: Page): Promise<void> {
   // 서버 세션을 React 상태·저장소에 직접 주입하지 않는다.
   await page.goto('/login');
@@ -683,12 +812,6 @@ test('Google Maps 공유 → 로그인 → 새 여행 → 장소 확인 → 일�
     () => {
       // 화면 버튼으로 현재 사용자 동작을 진행한다.
       return page
-        .getByRole('button', { name: '항공편 없이 여행 만들기', exact: true })
-        .click();
-    },
-    () => {
-      // 화면 버튼으로 현재 사용자 동작을 진행한다.
-      return page
         .getByRole('button', { name: '확인하고 저장', exact: true })
         .click();
     },
@@ -760,12 +883,9 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
     시작일: '2026-11-10',
     종료일: '2026-11-10',
     '현지 시간대': 'Asia/Tokyo',
-    '기본 통화': 'KRW',
   });
-  // 항공편 없는 여행의 명시적 건너뛰기도 유지한다.
-  await page
-    .getByRole('button', { name: '항공편 없이 여행 만들기', exact: true })
-    .click();
+  // 수동 비용 검증에 사용할 기본 통화는 선택 버튼으로 지정한다.
+  await page.getByRole('button', { name: 'KRW', exact: true }).click();
   await page
     .getByRole('button', { name: '확인하고 저장', exact: true })
     .click();
@@ -797,6 +917,7 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
   await expect(
     page.getByText('12:30 · 도쿄 식당', { exact: true }),
   ).toBeVisible();
+  await page.getByRole('button', { name: '비용', exact: true }).click();
   await page.getByRole('button', { name: '비용 추가', exact: true }).click();
   await fields(page, { 제목: '교통', 금액: '1000' });
   await page
@@ -826,6 +947,8 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
   await page
     .getByRole('button', { name: '확인하고 저장', exact: true })
     .click();
+  // 확인한 영수증 원본과 내역은 사진 영역에서 조회한다.
+  await page.getByRole('button', { name: '사진·영수증', exact: true }).click();
   await expect(
     page.getByText('라멘 식당 · 2026-11-10 · 2500 JPY', { exact: true }),
   ).toBeVisible();
@@ -833,6 +956,7 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
   await expect(
     page.getByText('12:30 · 도쿄 식당', { exact: true }),
   ).toBeVisible();
+  await page.getByRole('button', { name: '여행 설정', exact: true }).click();
   await page
     .getByRole('button', { name: '여행 정보 / 종료 상태', exact: true })
     .click();
@@ -902,7 +1026,7 @@ test('인증되지 않은 앱 탭 진입은 로그인 화면으로 이동한다'
   await page.goto('/footprints');
   await expect(page).toHaveURL(/\/login$/);
   await expect(
-    page.getByText('Google 계정으로 계속하기 · 준비 중', { exact: true }),
+    page.getByRole('button', { name: '이메일로 계속하기', exact: true }),
   ).toBeVisible();
 });
 
@@ -917,6 +1041,10 @@ test('항공편 등록에서 도착 나라·도시를 채우고 달력 날짜와
       name: '새 여행 시작하기',
       exact: true,
     })
+    .click();
+  // 선택 항공편을 사용하는 여행에서만 공항 입력을 펼친다.
+  await page
+    .getByRole('button', { name: '항공편 추가 (선택)', exact: true })
     .click();
   await page.getByLabel('항공 편명 (예: KE123)', { exact: true }).fill('ke123');
   await page
@@ -1043,6 +1171,7 @@ test('초대 링크를 로그인 과정에서 보존한다', async ({ page }) =>
   await expect(
     page.getByRole('button', { name: '일정 추가', exact: true }),
   ).toBeDisabled();
+  await page.getByRole('button', { name: '비용', exact: true }).click();
   await expect(
     page.getByRole('button', { name: '비용 추가', exact: true }),
   ).toBeDisabled();

@@ -49,7 +49,17 @@ function applyProfile(
 // 서버 세션을 재확인한다.
 function restore(clear: () => void, started = authRevision()): Promise<void> {
   // 실패를 인증 성공으로 만들지 않는다.
-  return getCloudSession()
+  return useTripStore
+    .getState()
+    .initGuestSession()
+    .catch(() => {
+      // 기기 저장소 실패가 실제 계정 인증 확인을 막지 않게 한다.
+      return null;
+    })
+    .then(() => {
+      // 직접 페이지를 열어도 게스트 복원 후 실제 서버 계정을 우선 확인한다.
+      return getCloudSession();
+    })
     .then((session) => {
       // 오래된 복원 결과가 새로 로그인한 계정을 덮어쓰지 못한다.
       return started !== authRevision()

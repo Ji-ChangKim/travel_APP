@@ -36,6 +36,11 @@ import PlanEditor from './PlanEditor';
 import GooglePlace from './GooglePlace';
 import { countryDefaults, travelCountries } from './countries';
 import { useSharedSchedule } from './useSharedSchedule';
+import {
+  tripStatusLabel,
+  memberRoleLabel,
+  workspaceSections,
+} from './presentation';
 
 // API 실패를 입력 보존·재인증·충돌 안내로 바꾼다.
 export function workspaceError(error: unknown): string {
@@ -126,7 +131,10 @@ function WorkspaceContent({
     // 게스트는 서버 작성 권한을 갖지 않는다.
     return state.currentUser;
   });
-  const { id } = useLocalSearchParams<{ id?: string }>();
+  const { id, section } = useLocalSearchParams<{
+    id?: string;
+    section?: string;
+  }>();
   const router = useRouter();
   const cache = useQueryClient();
   const userId = user && user.authProvider !== 'guest' ? user.id : '';
@@ -139,6 +147,12 @@ function WorkspaceContent({
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [checklist, setChecklist] = useState('');
+  // 여행 계획과 현장 기록을 작업별 영역으로 나눈다.
+  const [activeSection, setActiveSection] = useState(
+    section === 'share' ? 'share' : 'itinerary',
+  );
+  const [selectedDay, setSelectedDay] = useState('');
+  const [showTripSettings, setShowTripSettings] = useState(false);
   const pending = useRef<null | (() => Promise<unknown>)>(null);
   const trips = useQuery({
     queryKey: foundationQueryKey(userId, 'trips'),
@@ -514,50 +528,70 @@ function WorkspaceContent({
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.header}>
-          TripPrint · {id ? '여행 계획' : '내 여행'}
-        </Text>
+        {id && (
+          <Action
+            label="내 여행 목록"
+            variant="quiet"
+            onPress={() => {
+              // 상세 페이지에서도 명시적인 돌아가기 경로를 제공한다.
+              return router.replace('/(tabs)');
+            }}
+          />
+        )}
+        <Text style={styles.header}>{id ? '나의 여행' : '내 여행'}</Text>
         <Text style={styles.subtitle}>
           함께 계획하고, 사진과 비용으로 여행을 기록하세요.
         </Text>
-        <View style={styles.row}>
+        {!id && userId && (
           <Action
-            label="Google Maps 장소 가져오기"
+            label="새 여행 시작하기"
+            variant="primary"
+            disabled={busy || scanning || hasPending}
             onPress={() => {
-              // 지도에서 공유한 장소를 내 여행에 추가한다.
-              return router.push('/import-place');
+              // 여행 생성 전용 페이지로 이동한다.
+              router.push('/new-trip');
             }}
           />
-          <Action
-            label="커뮤니티"
-            onPress={() => {
-              // 완료된 여행의 공개 기록으로 이동한다.
-              router.push('/(tabs)/community');
-            }}
-          />
-          <Action
-            label="초대 링크로 참여"
-            onPress={() => {
-              // 붙여넣기 또는 받은 링크에서 참여한다.
-              router.push('/invite');
-            }}
-          />
-          {id && (
+        )}
+        {!id && (
+          <View style={styles.row}>
             <Action
-              label="내 여행 목록"
+              label="Google Maps 장소 가져오기"
               onPress={() => {
-                // 서버 여행 목록으로 돌아간다.
-                router.replace('/(tabs)');
+                // 지도에서 공유한 장소를 내 여행에 추가한다.
+                return router.push('/import-place');
               }}
             />
-          )}
-        </View>
+            <Action
+              label="커뮤니티"
+              onPress={() => {
+                // 완료된 여행의 공개 기록으로 이동한다.
+                router.push('/(tabs)/community');
+              }}
+            />
+            <Action
+              label="초대 링크로 참여"
+              onPress={() => {
+                // 붙여넣기 또는 받은 링크에서 참여한다.
+                router.push('/invite');
+              }}
+            />
+            {id && (
+              <Action
+                label="내 여행 목록"
+                onPress={() => {
+                  // 서버 여행 목록으로 돌아간다.
+                  router.replace('/(tabs)');
+                }}
+              />
+            )}
+          </View>
+        )}
         {!userId ? (
           <View style={styles.card}>
             <Text style={styles.title}>로그인하고 여행을 시작하세요</Text>
             <Text>
-              카카오·구글·애플 로그인으로 여행과 동행 정보를 안전하게
-              저장합니다.
+              이메일로 로그인하면 여행을 저장하고 친구와 함께 계획할 수 있어요.
             </Text>
             <Action
               label="로그인 / 회원가입"
@@ -569,7 +603,14 @@ function WorkspaceContent({
           </View>
         ) : (
           <>
-            <Action label="새로고침" disabled={busy} onPress={reload} />
+            {!id && (
+              <Action
+                label="새로고침"
+                variant="quiet"
+                disabled={busy}
+                onPress={reload}
+              />
+            )}
             {(trips.isLoading || workspace.isLoading) && (
               <Text>여행을 불러오는 중입니다.</Text>
             )}
@@ -580,14 +621,6 @@ function WorkspaceContent({
             )}
             {!id && (
               <>
-                <Action
-                  label="새 여행 시작하기"
-                  disabled={busy || scanning || hasPending}
-                  onPress={() => {
-                    // 여행 생성 전용 페이지로 이동한다.
-                    router.push('/new-trip');
-                  }}
-                />
                 {trips.data?.length === 0 && (
                   <Text>아직 여행이 없습니다. 첫 여행을 만들어 보세요.</Text>
                 )}
@@ -600,7 +633,9 @@ function WorkspaceContent({
                     <Text>
                       {trip.startDate} ~ {trip.endDate}
                     </Text>
-                    <Text style={styles.badge}>{trip.status}</Text>
+                    <Text style={styles.badge}>
+                      {tripStatusLabel(trip.status)}
+                    </Text>
                     <Action
                       label="여행 열기"
                       onPress={() => {
@@ -626,11 +661,11 @@ function WorkspaceContent({
                     {snapshot.trip.country} · {snapshot.trip.city}
                   </Text>
                   <Text>
-                    {snapshot.trip.startDate} ~ {snapshot.trip.endDate} ·{' '}
-                    {snapshot.trip.timezone}
+                    {snapshot.trip.startDate} ~ {snapshot.trip.endDate}
                   </Text>
                   <Text style={styles.badge}>
-                    내 권한 {snapshot.myRole} · {snapshot.trip.status}
+                    {tripStatusLabel(snapshot.trip.status)} ·{' '}
+                    {memberRoleLabel(snapshot.myRole)}
                   </Text>
                   {snapshot.trip.status === 'COMPLETED' && (
                     <Action
@@ -642,6 +677,17 @@ function WorkspaceContent({
                     />
                   )}
                   {owner && (
+                    <Action
+                      label="여행 설정"
+                      variant="quiet"
+                      selected={showTripSettings}
+                      onPress={() => {
+                        // 목적지와 기간 관리는 필요할 때만 펼친다.
+                        return setShowTripSettings(!showTripSettings);
+                      }}
+                    />
+                  )}
+                  {owner && showTripSettings && (
                     <Action
                       label="여행 정보 / 종료 상태"
                       disabled={busy || scanning || hasPending}
@@ -660,7 +706,7 @@ function WorkspaceContent({
                       }}
                     />
                   )}
-                  {owner && (
+                  {owner && showTripSettings && (
                     <Action
                       label="여행 기간 변경"
                       disabled={busy || scanning || hasPending}
@@ -678,392 +724,517 @@ function WorkspaceContent({
                     />
                   )}
                 </View>
-                <View style={styles.row}>
-                  <Action
-                    label="일정 추가"
-                    disabled={!writable || busy || scanning || hasPending}
-                    onPress={() => {
-                      // 첫 DAY를 기본 선택하되 사용자에게 날짜 선택을 제공한다.
-                      edit(scheduleForm(snapshot));
-                    }}
-                  />
-                  <Action
-                    label="비용 추가"
-                    disabled={!writable || busy || scanning || hasPending}
-                    onPress={() => {
-                      // 실제 비용과 예상 비용은 명시적으로 구분한다.
-                      edit({
-                        kind: 'expense',
-                        id: Crypto.randomUUID(),
-                        values: {
-                          title: '',
-                          amount: '',
-                          currency: snapshot.trip.defaultCurrency,
-                          isActual: 'true',
-                          category: 'etc',
-                          scheduleId: '',
-                        },
-                      });
-                    }}
-                  />
-                  <Action
-                    label="사진 추가"
-                    disabled={!writable || busy || scanning || hasPending}
-                    onPress={() => {
-                      // 사진은 멤버만 읽는 비공개 원본으로 업로드한다.
-                      photo('photo');
-                    }}
-                  />
-                  <Action
-                    label="영수증 촬영"
-                    disabled={!writable || busy || scanning || hasPending}
-                    onPress={() => {
-                      // QR 대신 사진 촬영으로 인식한다.
-                      photo('receipt', true);
-                    }}
-                  />
-                  <Action
-                    label="영수증 사진 선택"
-                    disabled={!writable || busy || scanning || hasPending}
-                    onPress={() => {
-                      // 기존 촬영 영수증도 같은 확인 절차를 사용한다.
-                      photo('receipt');
-                    }}
-                  />
-                </View>
-                {snapshot.days.map((day) => (
-                  <View key={day.id} style={styles.card}>
-                    <Text style={styles.title}>
-                      DAY {day.dayNumber} · {day.tripDate}
-                    </Text>
-                    {snapshot.itinerary
-                      .filter((item) => {
-                        // 날짜별 정렬은 서버에서 확정한 순서를 따른다.
-                        return item.dayId === day.id;
-                      })
-                      .map((item) => (
-                        <View key={item.id} style={{ gap: 8 }}>
-                          <Text style={styles.title}>
-                            {item.timeSlot || '시간 미정'} · {item.title}
-                          </Text>
-                          <Text>{item.address || '지역명 미등록'}</Text>
-                          {item.googlePlaceId && (
-                            <GooglePlace
-                              userId={userId}
-                              placeId={item.googlePlaceId}
-                              label={item.title}
-                            />
-                          )}
-                          {item.memo && <Text>{item.memo}</Text>}
-                          <View style={styles.row}>
-                            <Action
-                              label="이 일정에서 사진 촬영"
-                              disabled={
-                                !writable || busy || scanning || hasPending
-                              }
-                              onPress={() => {
-                                // 맛집·관광지 현장에서 촬영한 사진을 현재 일정에 연결한다.
-                                return photo('photo', true, item.id);
-                              }}
-                            />
-                            <Action
-                              label="이 일정에 사진 추가"
-                              disabled={
-                                !writable || busy || scanning || hasPending
-                              }
-                              onPress={() => {
-                                // 일정과 같은 여행에만 사진을 연결한다.
-                                photo('photo', false, item.id);
-                              }}
-                            />
-                            <Action
-                              label="일정 수정"
-                              disabled={
-                                !writable || busy || scanning || hasPending
-                              }
-                              onPress={() => {
-                                // 기존 일정 ID를 유지한다.
-                                edit(scheduleForm(snapshot, item));
-                              }}
-                            />
-                            <Action
-                              label="일정 삭제"
-                              disabled={
-                                !writable || busy || scanning || hasPending
-                              }
-                              onPress={() => {
-                                // 영수증 연결 일정의 삭제는 서버 FK가 보호한다.
-                                command({
-                                  operation: 'schedule.delete',
-                                  input: { id: item.id },
-                                });
-                              }}
-                            />
-                          </View>
-                        </View>
-                      ))}
-                  </View>
-                ))}
-                <View style={styles.card}>
-                  <Text style={styles.title}>비용</Text>
-                  <Text>실제: {totals(snapshot.expenses, true)}</Text>
-                  <Text>예상: {totals(snapshot.expenses, false)}</Text>
-                  {snapshot.expenses.map((item) => (
-                    <View key={item.id}>
-                      <Text>
-                        {item.title} · {item.amount} {item.currency} ·{' '}
-                        {item.isActual ? '실제' : '예상'}
-                      </Text>
-                      {item.source === 'manual' && (
-                        <View style={styles.row}>
-                          <Action
-                            label="비용 수정"
-                            disabled={
-                              !writable || busy || scanning || hasPending
-                            }
-                            onPress={() => {
-                              // 정수 통화는 편집 시 불필요한 소수점 00을 제거한다.
-                              edit({
-                                kind: 'expense',
-                                id: item.id,
-                                values: {
-                                  title: item.title,
-                                  amount:
-                                    item.currency === 'USD'
-                                      ? item.amount
-                                      : item.amount.split('.')[0]!,
-                                  currency: item.currency,
-                                  isActual: String(item.isActual),
-                                  category: item.category,
-                                  scheduleId: item.scheduleId || '',
-                                },
-                              });
-                            }}
-                          />
-                          <Action
-                            label="비용 삭제"
-                            disabled={
-                              !writable || busy || scanning || hasPending
-                            }
-                            onPress={() => {
-                              // 영수증 비용은 영수증 기록 삭제로만 제거한다.
-                              command({
-                                operation: 'expense.delete',
-                                input: { id: item.id },
-                              });
-                            }}
-                          />
-                        </View>
-                      )}
-                    </View>
-                  ))}
-                </View>
-                <View style={styles.card}>
-                  <Text style={styles.title}>사진 · 영수증</Text>
-                  {snapshot.media.map((media) => (
-                    <View key={media.id} style={{ gap: 10 }}>
-                      <ServerPhoto
-                        userId={userId}
-                        tripId={snapshot.trip.id}
-                        mediaId={media.id}
-                      />
-                      <Text>
-                        {media.purpose === 'receipt'
-                          ? '비공개 영수증'
-                          : '여행 사진'}
-                      </Text>
-                      {media.purpose === 'receipt' &&
-                        !snapshot.receipts.some((item) => {
-                          // 확정 기록이 없는 원본은 인식·수동 확인을 재개할 수 있다.
-                          return item.mediaId === media.id;
-                        }) && (
-                          <Action
-                            label="영수증 확인 / 인식 재시도"
-                            disabled={
-                              !writable || busy || scanning || hasPending
-                            }
-                            onPress={() => {
-                              // 같은 원본에서 확인 폼을 다시 작성한다.
-                              void receipt(media.id).catch(
-                                (failure: unknown) => {
-                                  // 취소·실패를 사용자에게 안내한다.
-                                  setError(workspaceError(failure));
-                                },
-                              );
-                            }}
-                          />
-                        )}
-                      {snapshot.receipts
-                        .filter((item) => {
-                          // 원본과 확정 기록을 함께 표시한다.
-                          return item.mediaId === media.id;
-                        })
-                        .map((item) => (
-                          <View key={item.id}>
-                            <Text>
-                              {item.merchant} · {item.date} · {item.amount}{' '}
-                              {item.currency}
-                            </Text>
-                            <Action
-                              label="영수증 기록·지출 삭제"
-                              disabled={
-                                !writable || busy || scanning || hasPending
-                              }
-                              onPress={() => {
-                                // 기록과 실제 비용을 한 트랜잭션에서 제거한다.
-                                command({
-                                  operation: 'receipt.delete',
-                                  input: { id: item.id },
-                                });
-                              }}
-                            />
-                          </View>
-                        ))}
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ gap: 8 }}
+                  accessibilityLabel="여행 작업 영역"
+                >
+                  {workspaceSections
+                    .filter(([key]) => {
+                      // 공개 영역은 여행 소유자에게만 제공한다.
+                      return key !== 'share' || owner;
+                    })
+                    .map(([key, label]) => (
                       <Action
-                        label="사진 등록 삭제"
-                        disabled={!writable || busy || scanning || hasPending}
+                        key={key}
+                        label={label}
+                        selected={activeSection === key}
                         onPress={() => {
-                          // 게시 사진과 영수증 참조는 서버가 삭제를 제한한다.
-                          command(
-                            {
-                              operation: 'media.delete',
-                              input: { id: media.id },
-                            },
-                            (result) => {
-                              // 참조 해제를 확인한 뒤 같은 경로의 실제 원본도 제거한다.
-                              return removeImage(result.path!);
-                            },
-                          );
+                          // 다른 영역의 원본과 입력을 유지하며 선택한 내용만 표시한다.
+                          return setActiveSection(key);
                         }}
                       />
-                    </View>
-                  ))}
-                </View>
-                <View style={styles.card}>
-                  <Text style={styles.title}>준비물</Text>
-                  {snapshot.checklists.map((item) => (
+                    ))}
+                </ScrollView>
+                {['itinerary', 'expenses', 'photos'].includes(
+                  activeSection,
+                ) && (
+                  <View style={styles.row}>
+                    {activeSection === 'itinerary' && (
+                      <Action
+                        variant="primary"
+                        label="일정 추가"
+                        disabled={!writable || busy || scanning || hasPending}
+                        onPress={() => {
+                          // 첫 DAY를 기본 선택하되 사용자에게 날짜 선택을 제공한다.
+                          edit(scheduleForm(snapshot, undefined, selectedDay));
+                        }}
+                      />
+                    )}
+                    {activeSection === 'expenses' && (
+                      <Action
+                        variant="primary"
+                        label="비용 추가"
+                        disabled={!writable || busy || scanning || hasPending}
+                        onPress={() => {
+                          // 실제 비용과 예상 비용은 명시적으로 구분한다.
+                          edit({
+                            kind: 'expense',
+                            id: Crypto.randomUUID(),
+                            values: {
+                              title: '',
+                              amount: '',
+                              currency: snapshot.trip.defaultCurrency,
+                              isActual: 'true',
+                              category: 'etc',
+                              scheduleId: '',
+                            },
+                          });
+                        }}
+                      />
+                    )}
+                    {activeSection === 'photos' && (
+                      <Action
+                        variant="primary"
+                        label="사진 추가"
+                        disabled={!writable || busy || scanning || hasPending}
+                        onPress={() => {
+                          // 사진은 멤버만 읽는 비공개 원본으로 업로드한다.
+                          photo('photo');
+                        }}
+                      />
+                    )}
                     <Action
-                      key={item.id}
-                      label={`${item.isCompleted ? '✓ ' : '□ '}${item.title}`}
+                      label="영수증 촬영"
                       disabled={!writable || busy || scanning || hasPending}
                       onPress={() => {
-                        // 권한·버전 검증을 포함해 완료 상태를 저장한다.
-                        check(item);
+                        // QR 대신 사진 촬영으로 인식한다.
+                        photo('receipt', true);
                       }}
                     />
-                  ))}
-                  {writable && (
-                    <>
-                      <Field
-                        label="새 준비물"
-                        value={checklist}
-                        onChange={setChecklist}
-                      />
-                      <Action
-                        label="준비물 추가"
-                        disabled={busy || scanning || hasPending}
-                        onPress={addCheck}
-                      />
-                    </>
-                  )}
-                </View>
-                <View style={styles.card}>
-                  <Text style={styles.title}>동행</Text>
-                  {snapshot.members.map((member) => (
-                    <View key={member.memberId}>
-                      <Text>
-                        {member.nickname} · {member.role}
-                        {member.isMe ? ' (나)' : ''}
-                      </Text>
-                      {owner && member.role !== 'owner' && (
-                        <View style={styles.row}>
-                          <Action
-                            label={
-                              member.role === 'viewer'
-                                ? '편집자로 변경'
-                                : '뷰어로 변경'
-                            }
-                            disabled={busy || scanning || hasPending}
-                            onPress={() => {
-                              // 소유자 역할은 변경할 수 없다.
-                              command({
-                                operation: 'member.role',
-                                input: {
-                                  userId: member.userId,
-                                  role:
-                                    member.role === 'viewer'
-                                      ? 'editor'
-                                      : 'viewer',
-                                },
-                              });
-                            }}
-                          />
-                          <Action
-                            label="동행 참여 해제"
-                            disabled={busy || scanning || hasPending}
-                            onPress={() => {
-                              // 수락한 이전 초대도 함께 취소한다.
-                              command({
-                                operation: 'member.remove',
-                                input: { userId: member.userId },
-                              });
-                            }}
-                          />
-                        </View>
-                      )}
-                    </View>
-                  ))}
-                  {owner && (
-                    <>
-                      <View style={styles.row}>
+                    <Action
+                      label="영수증 사진 선택"
+                      disabled={!writable || busy || scanning || hasPending}
+                      onPress={() => {
+                        // 기존 촬영 영수증도 같은 확인 절차를 사용한다.
+                        photo('receipt');
+                      }}
+                    />
+                  </View>
+                )}
+                {activeSection === 'itinerary' && (
+                  <>
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={{ gap: 8 }}
+                      accessibilityLabel="여행 날짜 선택"
+                    >
+                      {snapshot.days.map((day) => (
                         <Action
-                          label="편집 초대 공유"
-                          disabled={busy || scanning || hasPending}
+                          key={day.id}
+                          label={`DAY ${day.dayNumber}`}
+                          selected={
+                            day.id === (selectedDay || snapshot.days[0]?.id)
+                          }
                           onPress={() => {
-                            // 공동 작성 가능한 초대를 발급한다.
-                            invite('editor');
+                            // 선택한 날짜의 일정만 보여준다.
+                            return setSelectedDay(day.id);
                           }}
                         />
+                      ))}
+                    </ScrollView>
+                    <Action
+                      label="Google Maps 장소 가져오기"
+                      variant="quiet"
+                      onPress={() => {
+                        // 저장한 지도 장소를 여행에 가져오는 확인 화면을 연다.
+                        return router.push('/import-place');
+                      }}
+                    />
+                    {snapshot.days
+                      .filter((day) => {
+                        // 기간 변경으로 선택 날짜가 사라지면 첫 날짜를 표시한다.
+                        return (
+                          day.id ===
+                          (snapshot.days.some((item) => {
+                            // 선택 날짜가 최신 여행에 남아 있는지 확인한다.
+                            return item.id === selectedDay;
+                          })
+                            ? selectedDay
+                            : snapshot.days[0]?.id)
+                        );
+                      })
+                      .map((day) => (
+                        <View key={day.id} style={styles.card}>
+                          <Text style={styles.title}>
+                            DAY {day.dayNumber} · {day.tripDate}
+                          </Text>
+                          {!snapshot.itinerary.some((item) => {
+                            // 장소가 없는 날짜에는 다음 행동을 안내한다.
+                            return item.dayId === day.id;
+                          }) && (
+                            <Text style={styles.subtitle}>
+                              이날의 첫 장소를 추가해 보세요. 숙소, 맛집,
+                              관광지와 이동을 함께 계획할 수 있어요.
+                            </Text>
+                          )}
+                          {snapshot.itinerary
+                            .filter((item) => {
+                              // 날짜별 정렬은 서버에서 확정한 순서를 따른다.
+                              return item.dayId === day.id;
+                            })
+                            .map((item) => (
+                              <View key={item.id} style={{ gap: 8 }}>
+                                <Text style={styles.title}>
+                                  {item.timeSlot || '시간 미정'} · {item.title}
+                                </Text>
+                                <Text>{item.address || '지역명 미등록'}</Text>
+                                {item.googlePlaceId && (
+                                  <GooglePlace
+                                    userId={userId}
+                                    placeId={item.googlePlaceId}
+                                    label={item.title}
+                                  />
+                                )}
+                                {item.memo && <Text>{item.memo}</Text>}
+                                <View style={styles.row}>
+                                  <Action
+                                    label="이 일정에서 사진 촬영"
+                                    disabled={
+                                      !writable ||
+                                      busy ||
+                                      scanning ||
+                                      hasPending
+                                    }
+                                    onPress={() => {
+                                      // 맛집·관광지 현장에서 촬영한 사진을 현재 일정에 연결한다.
+                                      return photo('photo', true, item.id);
+                                    }}
+                                  />
+                                  <Action
+                                    label="이 일정에 사진 추가"
+                                    disabled={
+                                      !writable ||
+                                      busy ||
+                                      scanning ||
+                                      hasPending
+                                    }
+                                    onPress={() => {
+                                      // 일정과 같은 여행에만 사진을 연결한다.
+                                      photo('photo', false, item.id);
+                                    }}
+                                  />
+                                  <Action
+                                    label="일정 수정"
+                                    disabled={
+                                      !writable ||
+                                      busy ||
+                                      scanning ||
+                                      hasPending
+                                    }
+                                    onPress={() => {
+                                      // 기존 일정 ID를 유지한다.
+                                      edit(scheduleForm(snapshot, item));
+                                    }}
+                                  />
+                                  <Action
+                                    variant="danger"
+                                    label="일정 삭제"
+                                    disabled={
+                                      !writable ||
+                                      busy ||
+                                      scanning ||
+                                      hasPending
+                                    }
+                                    onPress={() => {
+                                      // 영수증 연결 일정의 삭제는 서버 FK가 보호한다.
+                                      command({
+                                        operation: 'schedule.delete',
+                                        input: { id: item.id },
+                                      });
+                                    }}
+                                  />
+                                </View>
+                              </View>
+                            ))}
+                        </View>
+                      ))}
+                  </>
+                )}
+                {activeSection === 'expenses' && (
+                  <View style={styles.card}>
+                    <Text style={styles.title}>비용</Text>
+                    <Text>실제: {totals(snapshot.expenses, true)}</Text>
+                    <Text>예상: {totals(snapshot.expenses, false)}</Text>
+                    {snapshot.expenses.map((item) => (
+                      <View key={item.id}>
+                        <Text>
+                          {item.title} · {item.amount} {item.currency} ·{' '}
+                          {item.isActual ? '실제' : '예상'}
+                        </Text>
+                        {item.source === 'manual' && (
+                          <View style={styles.row}>
+                            <Action
+                              label="비용 수정"
+                              disabled={
+                                !writable || busy || scanning || hasPending
+                              }
+                              onPress={() => {
+                                // 정수 통화는 편집 시 불필요한 소수점 00을 제거한다.
+                                edit({
+                                  kind: 'expense',
+                                  id: item.id,
+                                  values: {
+                                    title: item.title,
+                                    amount:
+                                      item.currency === 'USD'
+                                        ? item.amount
+                                        : item.amount.split('.')[0]!,
+                                    currency: item.currency,
+                                    isActual: String(item.isActual),
+                                    category: item.category,
+                                    scheduleId: item.scheduleId || '',
+                                  },
+                                });
+                              }}
+                            />
+                            <Action
+                              variant="danger"
+                              label="비용 삭제"
+                              disabled={
+                                !writable || busy || scanning || hasPending
+                              }
+                              onPress={() => {
+                                // 영수증 비용은 영수증 기록 삭제로만 제거한다.
+                                command({
+                                  operation: 'expense.delete',
+                                  input: { id: item.id },
+                                });
+                              }}
+                            />
+                          </View>
+                        )}
+                      </View>
+                    ))}
+                  </View>
+                )}
+                {activeSection === 'photos' && (
+                  <View style={styles.card}>
+                    <Text style={styles.title}>사진 · 영수증</Text>
+                    {snapshot.media.map((media) => (
+                      <View key={media.id} style={{ gap: 10 }}>
+                        <ServerPhoto
+                          userId={userId}
+                          tripId={snapshot.trip.id}
+                          mediaId={media.id}
+                        />
+                        <Text>
+                          {media.purpose === 'receipt'
+                            ? '비공개 영수증'
+                            : '여행 사진'}
+                        </Text>
+                        {media.purpose === 'receipt' &&
+                          !snapshot.receipts.some((item) => {
+                            // 확정 기록이 없는 원본은 인식·수동 확인을 재개할 수 있다.
+                            return item.mediaId === media.id;
+                          }) && (
+                            <Action
+                              label="영수증 확인 / 인식 재시도"
+                              disabled={
+                                !writable || busy || scanning || hasPending
+                              }
+                              onPress={() => {
+                                // 같은 원본에서 확인 폼을 다시 작성한다.
+                                void receipt(media.id).catch(
+                                  (failure: unknown) => {
+                                    // 취소·실패를 사용자에게 안내한다.
+                                    setError(workspaceError(failure));
+                                  },
+                                );
+                              }}
+                            />
+                          )}
+                        {snapshot.receipts
+                          .filter((item) => {
+                            // 원본과 확정 기록을 함께 표시한다.
+                            return item.mediaId === media.id;
+                          })
+                          .map((item) => (
+                            <View key={item.id}>
+                              <Text>
+                                {item.merchant} · {item.date} · {item.amount}{' '}
+                                {item.currency}
+                              </Text>
+                              <Action
+                                variant="danger"
+                                label="영수증 기록·지출 삭제"
+                                disabled={
+                                  !writable || busy || scanning || hasPending
+                                }
+                                onPress={() => {
+                                  // 기록과 실제 비용을 한 트랜잭션에서 제거한다.
+                                  command({
+                                    operation: 'receipt.delete',
+                                    input: { id: item.id },
+                                  });
+                                }}
+                              />
+                            </View>
+                          ))}
                         <Action
-                          label="보기 초대 공유"
-                          disabled={busy || scanning || hasPending}
+                          variant="danger"
+                          label="사진 등록 삭제"
+                          disabled={!writable || busy || scanning || hasPending}
                           onPress={() => {
-                            // 읽기 전용 역할을 서버에 기록한다.
-                            invite('viewer');
+                            // 게시 사진과 영수증 참조는 서버가 삭제를 제한한다.
+                            command(
+                              {
+                                operation: 'media.delete',
+                                input: { id: media.id },
+                              },
+                              (result) => {
+                                // 참조 해제를 확인한 뒤 같은 경로의 실제 원본도 제거한다.
+                                return removeImage(result.path!);
+                              },
+                            );
                           }}
                         />
                       </View>
-                      {snapshot.invites.map((item) => (
-                        <View key={item.id}>
-                          <Text>
-                            {item.role} · 만료 {item.expiresAt.slice(0, 10)} ·{' '}
-                            {item.revokedAt
-                              ? '취소됨'
-                              : item.usedAt
-                                ? '수락됨'
-                                : '대기 중'}
-                          </Text>
-                          {!item.revokedAt && (
+                    ))}
+                  </View>
+                )}
+                {activeSection === 'preparation' && (
+                  <View style={styles.card}>
+                    <Text style={styles.title}>준비물</Text>
+                    {snapshot.checklists.map((item) => (
+                      <Action
+                        key={item.id}
+                        label={`${item.isCompleted ? '✓ ' : '□ '}${item.title}`}
+                        disabled={!writable || busy || scanning || hasPending}
+                        onPress={() => {
+                          // 권한·버전 검증을 포함해 완료 상태를 저장한다.
+                          check(item);
+                        }}
+                      />
+                    ))}
+                    {writable && (
+                      <>
+                        <Field
+                          label="새 준비물"
+                          value={checklist}
+                          onChange={setChecklist}
+                        />
+                        <Action
+                          label="준비물 추가"
+                          disabled={busy || scanning || hasPending}
+                          onPress={addCheck}
+                        />
+                      </>
+                    )}
+                  </View>
+                )}
+                {activeSection === 'companions' && (
+                  <View style={styles.card}>
+                    <Text style={styles.title}>동행</Text>
+                    {snapshot.members.map((member) => (
+                      <View key={member.memberId}>
+                        <Text>
+                          {member.nickname} · {memberRoleLabel(member.role)}
+                          {member.isMe ? ' (나)' : ''}
+                        </Text>
+                        {owner && member.role !== 'owner' && (
+                          <View style={styles.row}>
                             <Action
-                              label="초대 취소"
+                              label={
+                                member.role === 'viewer'
+                                  ? '편집자로 변경'
+                                  : '보기 전용으로 변경'
+                              }
                               disabled={busy || scanning || hasPending}
                               onPress={() => {
-                                // 링크를 즉시 더 이상 수락할 수 없게 한다.
+                                // 소유자 역할은 변경할 수 없다.
                                 command({
-                                  operation: 'invite.revoke',
-                                  input: { id: item.id },
+                                  operation: 'member.role',
+                                  input: {
+                                    userId: member.userId,
+                                    role:
+                                      member.role === 'viewer'
+                                        ? 'editor'
+                                        : 'viewer',
+                                  },
                                 });
                               }}
                             />
-                          )}
+                            <Action
+                              variant="danger"
+                              label="동행 참여 해제"
+                              disabled={busy || scanning || hasPending}
+                              onPress={() => {
+                                // 수락한 이전 초대도 함께 취소한다.
+                                command({
+                                  operation: 'member.remove',
+                                  input: { userId: member.userId },
+                                });
+                              }}
+                            />
+                          </View>
+                        )}
+                      </View>
+                    ))}
+                    {owner && (
+                      <>
+                        <View style={styles.row}>
+                          <Action
+                            label="편집 초대 공유"
+                            disabled={busy || scanning || hasPending}
+                            onPress={() => {
+                              // 공동 작성 가능한 초대를 발급한다.
+                              invite('editor');
+                            }}
+                          />
+                          <Action
+                            label="보기 초대 공유"
+                            disabled={busy || scanning || hasPending}
+                            onPress={() => {
+                              // 읽기 전용 역할을 서버에 기록한다.
+                              invite('viewer');
+                            }}
+                          />
                         </View>
-                      ))}
-                    </>
-                  )}
-                </View>
-                {owner && (
+                        {snapshot.invites.map((item) => (
+                          <View key={item.id}>
+                            <Text>
+                              {memberRoleLabel(item.role)} · 만료{' '}
+                              {item.expiresAt.slice(0, 10)} ·{' '}
+                              {item.revokedAt
+                                ? '취소됨'
+                                : item.usedAt
+                                  ? '수락됨'
+                                  : '대기 중'}
+                            </Text>
+                            {!item.revokedAt && (
+                              <Action
+                                variant="danger"
+                                label="초대 취소"
+                                disabled={busy || scanning || hasPending}
+                                onPress={() => {
+                                  // 링크를 즉시 더 이상 수락할 수 없게 한다.
+                                  command({
+                                    operation: 'invite.revoke',
+                                    input: { id: item.id },
+                                  });
+                                }}
+                              />
+                            )}
+                          </View>
+                        ))}
+                      </>
+                    )}
+                  </View>
+                )}
+                {owner && activeSection === 'share' && (
                   <View style={styles.card}>
                     <Text style={styles.title}>여행을 커뮤니티에 공유</Text>
+                    <Action
+                      label="커뮤니티"
+                      variant="quiet"
+                      onPress={() => {
+                        // 공개된 여행을 확인할 수 있는 피드로 이동한다.
+                        return router.push('/(tabs)/community');
+                      }}
+                    />
                     <Text>
                       여행을 종료한 뒤 공개할 일정·사진·금액을 확인해 주세요.
                     </Text>
@@ -1095,6 +1266,7 @@ function WorkspaceContent({
                     />
                     {snapshot.postId && (
                       <Action
+                        variant="danger"
                         label="커뮤니티 게시 철회"
                         disabled={busy || scanning || hasPending}
                         onPress={() => {

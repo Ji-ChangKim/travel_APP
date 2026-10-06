@@ -15,10 +15,14 @@ export function Action({
   label,
   onPress,
   disabled = false,
+  variant = 'secondary',
+  selected = false,
 }: {
   label: string;
   onPress: () => void;
   disabled?: boolean;
+  variant?: 'primary' | 'secondary' | 'danger' | 'quiet';
+  selected?: boolean;
 }) {
   // 처리 중 중복 클릭을 실제 disabled 상태로 차단한다.
   return (
@@ -26,10 +30,25 @@ export function Action({
       accessibilityRole="button"
       accessibilityLabel={label}
       disabled={disabled}
+      accessibilityState={{ disabled, selected }}
       onPress={onPress}
-      style={[styles.button, disabled && { opacity: 0.45 }]}
+      style={[
+        styles.button,
+        variant === 'quiet' && styles.quietButton,
+        (variant === 'primary' || selected) && styles.primaryButton,
+        variant === 'danger' && styles.dangerButton,
+        disabled && { opacity: 0.45 },
+      ]}
     >
-      <Text style={styles.buttonText}>{label}</Text>
+      <Text
+        style={[
+          styles.buttonText,
+          (variant === 'primary' || selected) && styles.primaryButtonText,
+          variant === 'danger' && styles.dangerButtonText,
+        ]}
+      >
+        {label}
+      </Text>
     </Pressable>
   );
 }
@@ -124,9 +143,16 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 12,
     borderRadius: 10,
-    backgroundColor: '#C84432',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#D9DDE3',
   },
-  buttonText: { fontWeight: '700', color: '#FFFFFF' },
+  primaryButton: { backgroundColor: '#C84432', borderColor: '#C84432' },
+  dangerButton: { backgroundColor: '#FFF0ED', borderColor: '#F2C2B9' },
+  quietButton: { backgroundColor: 'transparent', borderColor: 'transparent' },
+  buttonText: { fontWeight: '600', color: '#203247' },
+  primaryButtonText: { color: '#FFFFFF' },
+  dangerButtonText: { color: '#B42318' },
   label: { fontSize: 13, fontWeight: '600', color: '#59677A' },
   input: {
     borderWidth: 1,

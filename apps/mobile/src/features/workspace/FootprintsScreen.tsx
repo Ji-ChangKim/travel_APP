@@ -7,7 +7,7 @@ import { useTripStore } from '@/stores/useTripStore';
 import { serverOptions } from './service';
 import { Action, styles } from './ui';
 
-// 여행 기록은 별도의 수동 여행 폼 대신 저장된 여행과 항공편에서 시작한다.
+// 완료된 서버 여행을 발자국 다이어리 목록으로 제공한다.
 export default function FootprintsScreen() {
   // 현재 계정의 서버 여행만 조회한다.
   const user = useTripStore((state) => {
@@ -34,13 +34,6 @@ export default function FootprintsScreen() {
           여행이 끝나면 일정과 사진, 먹은 음식과 비용이 하나의 다이어리가
           됩니다.
         </Text>
-        <Action
-          label="이 기기에 저장한 이전 기록 보기"
-          onPress={() => {
-            // 기존 로컬 원본은 지우거나 서버 기록으로 가장하지 않는다.
-            router.push('/local-records');
-          }}
-        />
         {!userId ? (
           <Action
             label="로그인하고 여행 기록 시작"
@@ -52,10 +45,10 @@ export default function FootprintsScreen() {
         ) : (
           <>
             <Action
-              label="항공편 등록하고 여행 시작"
+              label="내 여행 계획 보기"
               onPress={() => {
-                // 여행 생성은 내 여행의 단일 입력 흐름을 사용한다.
-                router.push('/new-trip');
+                // 예정과 진행 중 여행은 계획 목록에서 이어서 작성한다.
+                return router.push('/(tabs)');
               }}
             />
             {query.isLoading && <Text>여행 기록을 불러오는 중입니다.</Text>}
@@ -73,42 +66,45 @@ export default function FootprintsScreen() {
                 />
               </View>
             )}
-            {query.data?.length === 0 && (
-              <Text>아직 여행 기록이 없습니다. 첫 항공편을 등록해 보세요.</Text>
-            )}
-            {query.data?.map((trip) => (
-              <View key={trip.id} style={styles.card}>
-                <Text style={styles.title}>{trip.title}</Text>
-                <Text>
-                  {trip.country} · {trip.city}
-                </Text>
-                <Text>
-                  {trip.startDate} ~ {trip.endDate}
-                </Text>
-                <Text>
-                  {trip.status === 'COMPLETED'
-                    ? '완료된 여행'
-                    : trip.status === 'IN_PROGRESS'
-                      ? '여행 중'
-                      : '예정된 여행'}
-                </Text>
-                <Action
-                  label={
-                    trip.status === 'COMPLETED'
-                      ? `발자국 보기: ${trip.title}`
-                      : `기록 보기: ${trip.title}`
-                  }
-                  onPress={() => {
-                    // 같은 여행의 항공편·일정·영수증·사진을 연다.
-                    router.push(
-                      trip.status === 'COMPLETED'
-                        ? `/diary/${trip.id}`
-                        : `/trips/${trip.id}`,
-                    );
-                  }}
-                />
-              </View>
-            ))}
+            {query.isSuccess &&
+              !query.data.some((trip) => {
+                // 아직 종료되지 않은 여행을 완성된 기록으로 표시하지 않는다.
+                return trip.status === 'COMPLETED';
+              }) && (
+                <View style={styles.card}>
+                  <Text style={styles.title}>
+                    여행이 끝나면 발자국이 남아요
+                  </Text>
+                  <Text style={styles.subtitle}>
+                    여행 중 남긴 사진과 음식, 비용을 날짜별로 모아 나만의
+                    다이어리로 간직하세요.
+                  </Text>
+                </View>
+              )}
+            {query.data
+              ?.filter((trip) => {
+                // 완료 여행만 이 계정의 발자국 목록에 포함한다.
+                return trip.status === 'COMPLETED';
+              })
+              .map((trip) => (
+                <View key={trip.id} style={styles.card}>
+                  <Text style={styles.title}>{trip.title}</Text>
+                  <Text>
+                    {trip.country} · {trip.city}
+                  </Text>
+                  <Text>
+                    {trip.startDate} ~ {trip.endDate}
+                  </Text>
+                  <Action
+                    variant="primary"
+                    label={`발자국 보기: ${trip.title}`}
+                    onPress={() => {
+                      // 선택한 완료 여행의 다이어리를 연다.
+                      return router.push(`/diary/${trip.id}`);
+                    }}
+                  />
+                </View>
+              ))}
           </>
         )}
       </ScrollView>

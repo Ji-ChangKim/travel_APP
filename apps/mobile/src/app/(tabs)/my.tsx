@@ -4,7 +4,6 @@ import {
   Modal,
   ScrollView,
   StyleSheet,
-  Switch,
   Text,
   TextInput,
   TouchableOpacity,
@@ -13,10 +12,14 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useQuery } from '@tanstack/react-query';
+import { foundationQueryKey, listServerTrips } from '@wherego/api-client';
 
 import { colors } from '@/constants/theme';
 import { updateUserProfile } from '@/services/profileService';
 import { useTripStore } from '@/stores/useTripStore';
+import { serverOptions } from '@/features/workspace/service';
+import { Action } from '@/features/workspace/ui';
 
 // 여행 스타일 선택 옵션 목록을 정의한다.
 const TRAVEL_STYLE_OPTIONS = [
@@ -35,9 +38,17 @@ export default function MyScreen() {
   const router = useRouter();
   const { trips, visits, currentUser, updateProfile, logout } = useTripStore();
 
-  const [isGpsEnabled, setIsGpsEnabled] = useState(true);
-  const [isOfflineCacheEnabled, setIsOfflineCacheEnabled] = useState(true);
-  const [isNotificationEnabled, setIsNotificationEnabled] = useState(false);
+  // 활동 통계도 내 여행과 동일한 계정별 서버 원본을 조회한다.
+  const userId = currentUser?.authProvider !== 'guest' ? currentUser?.id : '';
+  const serverTrips = useQuery({
+    queryKey: foundationQueryKey(userId || '', 'trips'),
+    enabled: Boolean(userId),
+    queryFn: () => {
+      // 게스트의 기기 초안을 계정의 여행 통계에 합산하지 않는다.
+      return serverOptions(userId!).then(listServerTrips);
+    },
+    retry: false,
+  });
 
   // 프로필 편집 모달 및 폼 상태를 관리한다.
   const [isProfileEditModalOpen, setIsProfileEditModalOpen] =
@@ -154,11 +165,15 @@ export default function MyScreen() {
                   {currentUser?.nickname || '여행자'}
                 </Text>
                 <View style={styles.authBadge}>
-                  <Text style={styles.authBadgeText}>인증됨</Text>
+                  <Text style={styles.authBadgeText}>
+                    {userId ? '내 계정' : '둘러보기'}
+                  </Text>
                 </View>
               </View>
               <Text style={styles.userEmail}>
-                {currentUser ? '로그인 세션 활성' : '게스트 모드'}
+                {userId
+                  ? '여행과 기록을 계정에 보관합니다'
+                  : '로그인 전 둘러보기 중입니다'}
               </Text>
             </View>
             <TouchableOpacity
@@ -196,78 +211,74 @@ export default function MyScreen() {
         </View>
 
         {/* 여행 활동 통계 요약 */}
-        <View style={styles.summaryBox}>
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryNum}>{trips.length}</Text>
-            <Text style={styles.summaryText}>총 여행</Text>
+        {userId ? (
+          <View style={styles.summaryBox}>
+            <View style={styles.summaryItem}>
+              <Text style={styles.summaryNum}>
+                {serverTrips.isSuccess ? serverTrips.data.length : '—'}
+              </Text>
+              <Text style={styles.summaryText}>총 여행</Text>
+            </View>
+            <View style={styles.summaryDivider} />
+            <View style={styles.summaryItem}>
+              <Text style={styles.summaryNum}>
+                {serverTrips.isSuccess
+                  ? serverTrips.data.filter((trip) => {
+                      // 앞으로 떠날 여행만 예정 통계에 포함한다.
+                      return (
+                        trip.status === 'PLANNED' || trip.status === 'DRAFT'
+                      );
+                    }).length
+                  : '—'}
+              </Text>
+              <Text style={styles.summaryText}>예정된 여행</Text>
+            </View>
+            <View style={styles.summaryDivider} />
+            <View style={styles.summaryItem}>
+              <Text style={styles.summaryNum}>
+                {serverTrips.isSuccess
+                  ? serverTrips.data.filter((trip) => {
+                      // 발자국 목록과 동일하게 완료 여행만 집계한다.
+                      return trip.status === 'COMPLETED';
+                    }).length
+                  : '—'}
+              </Text>
+              <Text style={styles.summaryText}>완성된 발자국</Text>
+            </View>
           </View>
-          <View style={styles.summaryDivider} />
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryNum}>{visits.length}</Text>
-            <Text style={styles.summaryText}>기록된 발자국</Text>
-          </View>
-          <View style={styles.summaryDivider} />
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryNum}>
-              {trips.filter((t) => t.status === 'COMPLETED').length}
-            </Text>
-            <Text style={styles.summaryText}>완료된 여정</Text>
-          </View>
-        </View>
-
-        {/* 앱 및 기능 권한 설정 */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>기능 및 권한 설정</Text>
+        ) : (
           <View style={styles.card}>
-            <View style={styles.settingRow}>
-              <View style={styles.settingTextGroup}>
-                <Text style={styles.settingTitle}>GPS 방문 체크인 권한</Text>
-                <Text style={styles.settingDesc}>
-                  장소 반경 200m 이내 자동 인증에 활용됩니다.
-                </Text>
-              </View>
-              <Switch
-                value={isGpsEnabled}
-                onValueChange={setIsGpsEnabled}
-                trackColor={{ false: colors.border, true: colors.accent }}
-              />
-            </View>
-
-            <View style={styles.divider} />
-
-            <View style={styles.settingRow}>
-              <View style={styles.settingTextGroup}>
-                <Text style={styles.settingTitle}>
-                  오프라인 로컬 저장 (SQLite)
-                </Text>
-                <Text style={styles.settingDesc}>
-                  인터넷이 불안정한 곳에서도 일정을 조회합니다.
-                </Text>
-              </View>
-              <Switch
-                value={isOfflineCacheEnabled}
-                onValueChange={setIsOfflineCacheEnabled}
-                trackColor={{ false: colors.border, true: colors.accent }}
-              />
-            </View>
-
-            <View style={styles.divider} />
-
-            <View style={styles.settingRow}>
-              <View style={styles.settingTextGroup}>
-                <Text style={styles.settingTitle}>여행 일정 알림</Text>
-                <Text style={styles.settingDesc}>
-                  방문 예정 시간 30분 전 알림
-                </Text>
-              </View>
-              <Switch
-                value={isNotificationEnabled}
-                onValueChange={setIsNotificationEnabled}
-                trackColor={{ false: colors.border, true: colors.accent }}
-              />
-            </View>
+            <Text style={styles.settingTitle}>나의 여행을 한곳에</Text>
+            <Text style={styles.settingDesc}>
+              로그인하면 여행 계획을 저장하고 친구와 함께 작성할 수 있어요.
+            </Text>
+            <Action
+              label="로그인 / 회원가입"
+              variant="primary"
+              onPress={() => {
+                // 실제 계정 인증 화면으로 이동한다.
+                return router.push('/login');
+              }}
+            />
           </View>
-        </View>
+        )}
+        {userId && serverTrips.isError && (
+          <View style={styles.card}>
+            <Text accessibilityRole="alert" style={styles.settingDesc}>
+              여행 통계를 불러오지 못했어요. 다시 시도해 주세요.
+            </Text>
+            <Action
+              label="여행 통계 다시 불러오기"
+              onPress={() => {
+                // 실패한 계정 통계 요청만 다시 실행한다.
+                return void serverTrips.refetch();
+              }}
+            />
+          </View>
+        )}
+        {userId && serverTrips.isPending && (
+          <Text style={styles.settingDesc}>나의 여행을 불러오고 있어요.</Text>
+        )}
 
         {/* 사용자가 확인할 앱 버전만 표시한다. */}
         <View style={styles.section}>
@@ -277,6 +288,15 @@ export default function MyScreen() {
               <Text style={styles.infoLabel}>앱 버전</Text>
               <Text style={styles.infoValue}>v0.1.0</Text>
             </View>
+            {(trips.length > 0 || visits.length > 0) && (
+              <Action
+                label="이 기기에 저장한 이전 기록 보기"
+                onPress={() => {
+                  // 기존 기기 기록이 실제로 있는 경우에만 보존 화면을 제공한다.
+                  return router.push('/local-records');
+                }}
+              />
+            )}
           </View>
         </View>
 

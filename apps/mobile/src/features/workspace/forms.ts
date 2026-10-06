@@ -36,7 +36,7 @@ export function newTripForm(): PlanForm {
       flightDeparture: 'ICN',
       flightArrival: '',
       flightTime: '',
-      flightSkipped: 'false',
+      flightSkipped: 'true',
     },
   };
 }
@@ -44,13 +44,21 @@ export function newTripForm(): PlanForm {
 export function scheduleForm(
   snapshot: WorkspaceSnapshot,
   item?: WorkspaceSchedule,
+  selectedDay?: string,
 ): PlanForm {
   // 수정은 기존 UUID를 유지한다.
   return {
     kind: 'schedule',
     id: item?.id || Crypto.randomUUID(),
     values: {
-      dayId: item?.dayId || snapshot.days[0]?.id || '',
+      dayId:
+        item?.dayId ||
+        snapshot.days.find((day) => {
+          // 현재 선택한 날짜가 여행에 있는 경우 새 일정의 기본값으로 사용한다.
+          return day.id === selectedDay;
+        })?.id ||
+        snapshot.days[0]?.id ||
+        '',
       title: item?.title || '',
       type: item?.type || 'PLACE',
       timeSlot: item?.timeSlot || '',

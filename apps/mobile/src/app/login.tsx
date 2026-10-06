@@ -15,8 +15,6 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import type { OsPlatform } from '@wherego/domain';
-import { signInWithSocial } from '@/features/auth/oauth';
-import type { SocialProvider } from '@/features/auth/model';
 
 import { useTripStore } from '@/stores/useTripStore';
 import { pendingAuthDestination } from '@/features/workspace/mapsShare';
@@ -31,9 +29,6 @@ const loginTheme = {
   textMuted: '#9CA3AF',
   primary: '#C84432',
   border: '#E5E7EB',
-  kakao: '#FEE500',
-  kakaoText: '#191919',
-  apple: '#000000',
   googleBg: '#FFFFFF',
   googleBorder: '#D1D5DB',
   googleText: '#374151',
@@ -49,8 +44,8 @@ export function resolveCurrentOsPlatform(): OsPlatform {
   return 'web';
 }
 
-// 비밀번호 없이 OS 맞춤 소셜 및 게스트 원클릭 인증 화면을 렌더링한다.
-export default function SocialAuthScreen() {
+// 실제 제공하는 이메일 인증과 여행 둘러보기를 안내한다.
+export default function LoginScreen() {
   const router = useRouter();
   const { currentUser, loginAsGuest, logout } = useTripStore();
 
@@ -74,35 +69,6 @@ export default function SocialAuthScreen() {
       });
   };
 
-  // 소셜 로그인(구글/카톡/애플)을 처리하고 OS 및 제공자 정보를 기록한다.
-  const handleSocialAuth = async (provider: SocialProvider) => {
-    // 새 요청에서 이전 오류 안내를 제거한다.
-    setAuthError('');
-    // 로딩 인디케이터 상태를 활성화한다.
-    setIsLoading(true);
-    // 세션 발급에 성공한 경우에만 앱을 시작한다.
-    try {
-      if (await signInWithSocial(provider)) navigateToTabs();
-    } catch (error) {
-      // 웹의 Alert 지원 여부와 관계없이 실패 이유를 표시한다.
-      setAuthError(
-        error instanceof Error
-          ? error.message
-          : '로그인에 실패했습니다. 다시 시도해 주세요.',
-      );
-      // 연결 누락·공급자 거부·교환 실패를 사용자에게 알린다.
-      Alert.alert(
-        '로그인 실패',
-        error instanceof Error
-          ? error.message
-          : '로그인에 실패했습니다. 다시 시도해 주세요.',
-      );
-    } finally {
-      // 취소 또는 실패한 경우에도 버튼을 다시 사용할 수 있다.
-      setIsLoading(false);
-    }
-  };
-
   // 게스트 둘러보기 로그인을 처리하고 기기 저장소에 영구 보존한다.
   const handleGuestAuth = async () => {
     // 이전 인증 오류를 새 둘러보기 요청과 구분한다.
@@ -113,7 +79,7 @@ export default function SocialAuthScreen() {
     try {
       if (currentUser && currentUser.authProvider !== 'guest') await logout();
       await loginAsGuest(currentOs);
-      navigateToTabs();
+      router.replace('/(tabs)/community');
     } catch {
       // 기기 저장 실패는 웹에서도 확인할 수 있다.
       setAuthError('기기 저장소 또는 세션을 확인해 주세요.');
@@ -147,7 +113,7 @@ export default function SocialAuthScreen() {
       {emailOpen && (
         <EmailAuth
           onClose={() => {
-            // 인증 입력 모달을 닫고 소셜 로그인 화면으로 돌아간다.
+            // 인증 입력 모달을 닫고 로그인 안내 화면으로 돌아간다.
             return setEmailOpen(false);
           }}
           onAuthenticated={navigateToTabs}
@@ -172,27 +138,13 @@ export default function SocialAuthScreen() {
 
           <Text style={styles.brandSubtitle}>여행의 발자취를 남기다.</Text>
 
-          {/* OS 플랫폼 표시 배지 */}
-          <View style={styles.osBadgeWrap}>
-            <Ionicons
-              name={
-                currentOs === 'ios'
-                  ? 'logo-apple'
-                  : currentOs === 'android'
-                    ? 'logo-android'
-                    : 'globe-outline'
-              }
-              size={12}
-              color={loginTheme.textSecondary}
-            />
-            <Text style={styles.osBadgeText}>
-              {currentOs === 'ios'
-                ? 'iOS 맞춤 로그인'
-                : currentOs === 'android'
-                  ? 'Android 맞춤 로그인'
-                  : '웹 환경'}
-            </Text>
-          </View>
+          <Text style={styles.serviceTitle}>
+            함께 세운 계획이,{'\n'}나만의 발자국으로.
+          </Text>
+          <Text style={styles.serviceDescription}>
+            날짜별로 여행을 계획하고 친구를 초대하세요.{'\n'}사진과 비용을
+            남기면 여행의 이야기가 쌓여요.
+          </Text>
         </View>
 
         {/* 기존 세션이 유지되어 있는 경우 빠른 이어하기 카드 */}
@@ -259,7 +211,13 @@ export default function SocialAuthScreen() {
             <TouchableOpacity
               accessibilityRole="button"
               accessibilityLabel="이메일로 계속하기"
-              style={styles.googleBtn}
+              style={[
+                styles.googleBtn,
+                {
+                  backgroundColor: loginTheme.primary,
+                  borderColor: loginTheme.primary,
+                },
+              ]}
               onPress={() => {
                 // 실제 이메일 로그인·회원가입 입력을 연다.
                 return setEmailOpen(true);
@@ -270,48 +228,10 @@ export default function SocialAuthScreen() {
                 size={18}
                 color={loginTheme.primary}
               />
-              <Text style={styles.googleBtnText}>이메일로 계속하기</Text>
+              <Text style={[styles.googleBtnText, { color: '#FFFFFF' }]}>
+                이메일로 계속하기
+              </Text>
             </TouchableOpacity>
-            {/* 1. 공통: 카카오톡 로그인 (AOS & iOS 공통 1순위) */}
-            <TouchableOpacity
-              style={styles.kakaoBtn}
-              onPress={() => handleSocialAuth('kakao')}
-              activeOpacity={0.88}
-            >
-              <Ionicons
-                name="chatbubble"
-                size={18}
-                color={loginTheme.kakaoText}
-              />
-              <Text style={styles.kakaoBtnText}>카카오톡 로그인 · 준비 중</Text>
-            </TouchableOpacity>
-
-            {/* 2. AOS(Android): Google 로그인 */}
-            {
-              <TouchableOpacity
-                style={styles.googleBtn}
-                onPress={() => handleSocialAuth('google')}
-                activeOpacity={0.88}
-              >
-                <Ionicons name="logo-google" size={18} color="#EA4335" />
-                <Text style={styles.googleBtnText}>
-                  Google 계정으로 계속하기 · 준비 중
-                </Text>
-              </TouchableOpacity>
-            }
-
-            {/* 3. iOS: Apple 로그인 */}
-            {(currentOs === 'ios' || currentOs === 'web') && (
-              <TouchableOpacity
-                style={styles.appleBtn}
-                onPress={() => handleSocialAuth('apple')}
-                activeOpacity={0.88}
-              >
-                <Ionicons name="logo-apple" size={20} color="#FFFFFF" />
-                <Text style={styles.appleBtnText}>Apple 로그인 · 준비 중</Text>
-              </TouchableOpacity>
-            )}
-
             <View style={styles.dividerRow}>
               <View style={styles.dividerLine} />
               <Text style={styles.dividerText}>또는</Text>
@@ -340,10 +260,11 @@ export default function SocialAuthScreen() {
           </View>
         )}
 
-        {/* 하단 약관 안내 문구 */}
+        {/* 기록의 비공개 기본값과 사용자 공개 선택을 안내한다. */}
         <View style={styles.footerWrap}>
           <Text style={styles.footerText}>
-            시작 시 TripPrint의 이용약관 및 개인정보 처리방침에 동의하게 됩니다.
+            여행 기록은 기본적으로 비공개입니다. 커뮤니티에 공개할 내용은 직접
+            선택할 수 있어요.
           </Text>
         </View>
       </ScrollView>
@@ -353,6 +274,21 @@ export default function SocialAuthScreen() {
 
 // 화면 스타일 규격
 const styles = StyleSheet.create({
+  serviceTitle: {
+    fontSize: 25,
+    lineHeight: 35,
+    fontWeight: '800',
+    color: '#203247',
+    textAlign: 'center',
+    marginTop: 20,
+  },
+  serviceDescription: {
+    fontSize: 14,
+    lineHeight: 23,
+    color: '#59677A',
+    textAlign: 'center',
+    marginTop: 12,
+  },
   safeArea: {
     flex: 1,
     backgroundColor: loginTheme.bg,
@@ -377,21 +313,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     textAlign: 'center',
     marginTop: 4,
-  },
-  osBadgeWrap: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    backgroundColor: '#EEF2F6',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginTop: 12,
-  },
-  osBadgeText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: loginTheme.textSecondary,
   },
   sessionCard: {
     backgroundColor: loginTheme.cardBg,
@@ -474,25 +395,6 @@ const styles = StyleSheet.create({
     gap: 12,
     marginVertical: 20,
   },
-  kakaoBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: loginTheme.kakao,
-    height: 52,
-    borderRadius: 14,
-    gap: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  kakaoBtnText: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: loginTheme.kakaoText,
-  },
   googleBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -508,20 +410,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: loginTheme.googleText,
-  },
-  appleBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: loginTheme.apple,
-    height: 50,
-    borderRadius: 14,
-    gap: 10,
-  },
-  appleBtnText: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#FFFFFF',
   },
   dividerRow: {
     flexDirection: 'row',

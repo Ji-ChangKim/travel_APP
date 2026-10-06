@@ -72,7 +72,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="footprints"
         options={{
-          title: '발자취',
+          title: '발자국',
           tabBarIcon: ({ color, size }) => (
             <TabBarIcon name="footsteps-outline" color={color} size={size} />
           ),

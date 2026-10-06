@@ -122,6 +122,20 @@ function DiaryBook({
         ]}
       >
         <Text style={styles.badge}>TripPrint / 나의 발자국</Text>
+        {snapshot.media
+          .filter((media) => {
+            // 영수증 대신 사용자가 촬영한 여행 사진을 표지로 사용한다.
+            return media.purpose === 'photo';
+          })
+          .slice(0, 1)
+          .map((media) => (
+            <ServerPhoto
+              key={media.id}
+              userId={userId}
+              tripId={snapshot.trip.id}
+              mediaId={media.id}
+            />
+          ))}
         <Text style={[styles.header, { fontSize: 32 }]}>
           {snapshot.trip.title}
         </Text>
@@ -271,7 +285,12 @@ function DiaryView({
             }
             onPress={() => {
               // 게시물 작성은 기존 여행의 명시적 공개 선택 화면을 사용한다.
-              return router.push(`/trips/${id}`);
+              return router.push(
+                query.data?.myRole === 'owner' &&
+                  query.data.trip.status === 'COMPLETED'
+                  ? `/trips/${id}?section=share`
+                  : `/trips/${id}`,
+              );
             }}
           />
         )}

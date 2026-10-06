@@ -396,10 +396,6 @@ export function DestinationFields({
             />
           ))}
       </View>
-      <Text style={styles.subtitle}>
-        외교부 전 지역 여행금지 국가는 목록에서 제외했습니다. 기준일:{' '}
-        {travelPolicy.checkedAt}
-      </Text>
       {selected && restrictedRegions[selected.code] && (
         <Text style={styles.error}>
           일부 지역 여행금지: {restrictedRegions[selected.code]}. 여행 지역을
@@ -407,21 +403,18 @@ export function DestinationFields({
         </Text>
       )}
       <Action
-        label="외교부 여행금지 현황 확인"
+        label="여행지 안전 정보 확인"
+        variant="quiet"
         onPress={() => {
           // 변경될 수 있는 지역별 여행금지 현황을 공식 페이지에서 확인한다.
           void Linking.openURL(travelPolicy.source);
         }}
       />
-      <Text style={styles.subtitle}>
-        현지 시간대를 확인해 주세요. 비용 기록 통화는 KRW·JPY·USD 중 선택할 수
-        있습니다.
-      </Text>
     </View>
   );
 }
 
-// 첫 여행 일정으로 저장할 항공편을 먼저 등록한다.
+// 항공편이 준비된 여행에만 선택적으로 첫 이동 일정을 추가한다.
 export function FlightFields({
   values,
   onChange,
@@ -432,69 +425,81 @@ export function FlightFields({
   // 개인 예약 번호나 여권 정보는 수집하지 않는다.
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>1. 항공편 등록</Text>
-      <Text style={styles.subtitle}>
-        편명과 출발·도착 공항을 확인해 주세요. 출발일에 첫 이동 일정으로
-        저장합니다. 운항 정보는 자동 조회하지 않습니다.
-      </Text>
-      <Field
-        label="항공 편명 (예: KE123)"
-        value={values.flightNumber || ''}
-        onChange={(value) => {
-          // 편명은 공백을 제거한 대문자로 정규화한다.
-          onChange('flightNumber', value.replace(/\s/g, '').toUpperCase());
-        }}
-      />
-      {['flightDeparture', 'flightArrival'].map((key) => (
-        <View key={key}>
-          <Field
-            label={
-              key === 'flightDeparture' ? '출발 공항 코드' : '도착 공항 코드'
-            }
-            value={values[key] || ''}
-            onChange={(value) => {
-              // 국제 공항 코드를 대문자로 입력한다.
-              onChange(key, value.trim().toUpperCase());
-            }}
-          />
-          <View style={styles.row}>
-            {airports.map((airport) => (
-              <Action
-                key={airport}
-                label={`${values[key] === airport ? '✓ ' : ''}${airportInfo[airport]?.name || airport} (${airport})`}
-                onPress={() => {
-                  // 공항 코드 하나를 선택한다.
-                  selectAirport(key, airport, onChange);
-                }}
-              />
-            ))}
-          </View>
-        </View>
-      ))}
-      <DateField
-        label="출발 시각 (선택, HH:mm)"
-        mode="time"
-        value={values.flightTime || ''}
-        onChange={(value) => {
-          // 확인한 출발 현지 시각만 저장한다.
-          onChange('flightTime', value);
-        }}
-      />
       <Action
-        label="항공편 없이 여행 만들기"
+        label={
+          values.flightSkipped === 'true'
+            ? '항공편 추가 (선택)'
+            : '항공편 없이 여행 만들기'
+        }
+        selected={values.flightSkipped !== 'true'}
         onPress={() => {
-          // 항공편이 없는 여행도 명시적으로 생성할 수 있다.
-          onChange(
+          // 항공편을 선택한 경우에만 항공 입력과 저장을 활성화한다.
+          return onChange(
             'flightSkipped',
             values.flightSkipped === 'true' ? 'false' : 'true',
           );
         }}
       />
-      <Text>
-        {values.flightSkipped === 'true'
-          ? '항공편은 이번 여행에 저장하지 않습니다.'
-          : '항공편을 첫 일정으로 저장합니다.'}
-      </Text>
+      {values.flightSkipped !== 'true' && (
+        <>
+          <Text style={styles.title}>항공편 등록</Text>
+          <Text style={styles.subtitle}>
+            편명과 출발·도착 공항을 확인해 주세요. 출발일에 첫 이동 일정으로
+            저장합니다. 운항 정보는 자동 조회하지 않습니다.
+          </Text>
+          <Field
+            label="항공 편명 (예: KE123)"
+            value={values.flightNumber || ''}
+            onChange={(value) => {
+              // 편명은 공백을 제거한 대문자로 정규화한다.
+              onChange('flightNumber', value.replace(/\s/g, '').toUpperCase());
+            }}
+          />
+          {['flightDeparture', 'flightArrival'].map((key) => (
+            <View key={key}>
+              <Field
+                label={
+                  key === 'flightDeparture'
+                    ? '출발 공항 코드'
+                    : '도착 공항 코드'
+                }
+                value={values[key] || ''}
+                onChange={(value) => {
+                  // 국제 공항 코드를 대문자로 입력한다.
+                  onChange(key, value.trim().toUpperCase());
+                }}
+              />
+              <View style={styles.row}>
+                {airports.map((airport) => (
+                  <Action
+                    key={airport}
+                    label={`${values[key] === airport ? '✓ ' : ''}${airportInfo[airport]?.name || airport} (${airport})`}
+                    onPress={() => {
+                      // 공항 코드 하나를 선택한다.
+                      selectAirport(key, airport, onChange);
+                    }}
+                  />
+                ))}
+              </View>
+            </View>
+          ))}
+          <DateField
+            label="출발 시각 (선택, HH:mm)"
+            mode="time"
+            value={values.flightTime || ''}
+            onChange={(value) => {
+              // 확인한 출발 현지 시각만 저장한다.
+              onChange('flightTime', value);
+            }}
+          />
+        </>
+      )}
+      {values.flightSkipped === 'true' && (
+        <Text style={styles.subtitle}>
+          항공편이 없어도 여행을 시작할 수 있어요. 이동 일정은 나중에 추가할 수
+          있습니다.
+        </Text>
+      )}
     </View>
   );
 }
