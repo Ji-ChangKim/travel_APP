@@ -5,22 +5,46 @@
   "compatibility_date": "2026-10-02",
   "compatibility_flags": ["nodejs_compat"],
   // MVP에서는 OCR 키 없이 수동 영수증 입력을 테스트한다.
-  "secrets": { "required": [] },
+  "secrets": { "required": ["AUTH_SECRET"] },
   // 실제 프로젝트 주소와 공개 API 키는 로컬 설정 또는 환경별 vars에서 주입한다.
   "vars": {
     "SUPABASE_URL": "",
+    "AUTH_BASE_URL": "https://wherego-api-staging.gametps.workers.dev",
     "SUPABASE_ANON_KEY": "",
     "ALLOWED_ORIGINS": "http://localhost:8081,http://localhost:19006",
   },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "wherego-staging",
+      "database_id": "1c6b34d4-cbfa-45b2-8859-6531b1f95ac9",
+      "migrations_dir": "migrations",
+    },
+  ],
+  "r2_buckets": [
+    { "binding": "MEDIA", "bucket_name": "tripprint-staging-private" },
+  ],
   "observability": { "enabled": true, "head_sampling_rate": 1 },
   "env": {
     "staging": {
-      "secrets": { "required": [] },
+      "secrets": { "required": ["AUTH_SECRET"] },
       "name": "wherego-api-staging",
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "wherego-staging",
+          "database_id": "1c6b34d4-cbfa-45b2-8859-6531b1f95ac9",
+          "migrations_dir": "migrations",
+        },
+      ],
+      "r2_buckets": [
+        { "binding": "MEDIA", "bucket_name": "tripprint-staging-private" },
+      ],
       "vars": {
         "SUPABASE_URL": "",
+        "AUTH_BASE_URL": "https://wherego-api-staging.gametps.workers.dev",
         "SUPABASE_ANON_KEY": "",
-        "ALLOWED_ORIGINS": "",
+        "ALLOWED_ORIGINS": "https://wherego-staging.pages.dev",
       },
     },
     "production": {
@@ -28,6 +52,7 @@
       "name": "wherego-api-production",
       "vars": {
         "SUPABASE_URL": "",
+        "AUTH_BASE_URL": "",
         "SUPABASE_ANON_KEY": "",
         "ALLOWED_ORIGINS": "",
       },

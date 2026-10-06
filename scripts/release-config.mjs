@@ -1,5 +1,4 @@
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
-import { Buffer } from 'node:buffer';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 
@@ -34,33 +33,6 @@ function isDeployUrl(url) {
   );
 }
 
-// 앱에 포함되는 키는 publishable 또는 기존 anon JWT로 제한한다.
-function isPublicKey(value = '') {
-  // 관리자 키와 테스트 키를 번들에 넣지 않는다.
-  return (
-    !/fixture|your_|example/i.test(value) &&
-    (/^sb_publishable_[A-Za-z0-9_-]{20,}$/.test(value) || isAnonJwt(value))
-  );
-}
-
-// 기존 Supabase 공개 JWT의 역할과 만료 시간을 확인한다.
-function isAnonJwt(value) {
-  // 이 검사는 서명이나 원격 프로젝트 존재 여부를 검증하지 않는다.
-  try {
-    // 서버 관리자 역할의 JWT를 공개 키로 사용할 수 없다.
-    return (
-      /^[\w-]+\.[\w-]+\.[\w-]+$/.test(value) &&
-      JSON.parse(Buffer.from(value.split('.')[1], 'base64url')).role ===
-        'anon' &&
-      JSON.parse(Buffer.from(value.split('.')[1], 'base64url')).exp >
-        Date.now() / 1000
-    );
-  } catch {
-    // 잘못된 JWT는 공개 키로 인정하지 않는다.
-    return false;
-  }
-}
-
 // OAuth 복귀 주소와 초대 링크의 웹 기본 주소를 일치시킨다.
 function isCallback(env) {
   // 현재 라우팅은 도메인 루트에 배포하는 구성을 사용한다.
@@ -75,6 +47,10 @@ function isCallback(env) {
 export function getReleaseIssues(env) {
   // 앱과 Worker 설정은 검증한 동일 공개 값을 공유한다.
   return [
+    ...(env.EXPO_PUBLIC_BACKEND === 'cloudflare' &&
+    env.RELEASE_ENV === 'production'
+      ? ['RELEASE_ENV: 운영 D1·R2 바인딩을 별도로 구성한 후 배포 필요']
+      : []),
     ...issue(
       ['staging', 'production'].includes(env.RELEASE_ENV),
       'RELEASE_ENV: staging 또는 production 필요',
@@ -88,12 +64,8 @@ export function getReleaseIssues(env) {
       'EXPO_PUBLIC_API_URL: HTTPS origin 필요',
     ),
     ...issue(
-      isOrigin(env.EXPO_PUBLIC_SUPABASE_URL),
-      'EXPO_PUBLIC_SUPABASE_URL: HTTPS origin 필요',
-    ),
-    ...issue(
-      isPublicKey(env.EXPO_PUBLIC_SUPABASE_ANON_KEY),
-      'EXPO_PUBLIC_SUPABASE_ANON_KEY: 실제 공개 키 필요',
+      env.EXPO_PUBLIC_BACKEND === 'cloudflare',
+      'EXPO_PUBLIC_BACKEND: 현재 앱은 cloudflare 필요',
     ),
     ...issue(
       isCallback(env),
@@ -136,10 +108,16 @@ function configureWorker(template, env) {
     name: `wherego-api-${env.RELEASE_ENV}`,
     env: undefined,
     secrets: template.env[env.RELEASE_ENV].secrets,
+    d1_databases: template.env[env.RELEASE_ENV].d1_databases?.map((binding) => {
+      // 생성 설정 파일의 위치에 맞게 마이그레이션 디렉터리를 지정한다.
+      return { ...binding, migrations_dir: '../migrations' };
+    }),
+    r2_buckets: template.env[env.RELEASE_ENV].r2_buckets,
     vars: {
-      SUPABASE_URL: env.EXPO_PUBLIC_SUPABASE_URL,
-      SUPABASE_ANON_KEY: env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
+      AUTH_BASE_URL: env.EXPO_PUBLIC_API_URL,
       ALLOWED_ORIGINS: env.RELEASE_WEB_ORIGIN,
+      SUPABASE_URL: '',
+      SUPABASE_ANON_KEY: '',
     },
   };
 }

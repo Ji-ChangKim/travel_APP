@@ -1,7 +1,7 @@
-# 테스트 프로젝트 주소와 공개 anon/publishable 키만 입력한다. 관리자 키는 사용하지 않는다.
-SUPABASE_URL="https://YOUR_PROJECT.supabase.co"
-SUPABASE_ANON_KEY="YOUR_PUBLIC_API_KEY"
+# 로컬 개발용 비밀은 .dev.vars에만 입력한다. 최소 32바이트 난수를 생성한다.
+AUTH_SECRET=""
+AUTH_BASE_URL="http://localhost:8787"
 ALLOWED_ORIGINS="http://localhost:8081,http://localhost:19006"
-# OCR 공급자 비밀 키는 앱에 넣지 않는다. 미설정 시 수동 입력을 제공한다.
+# 미설정 시 실제 지도 검색·자동 OCR은 사용할 수 없고 수동 입력은 가능하다.
 GOOGLE_VISION_API_KEY=""
 GOOGLE_PLACES_API_KEY=""

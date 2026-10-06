@@ -5,8 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { getMvpIssues } from '../../scripts/mvp-config.mjs';
 
 const publicSettings = {
-  EXPO_PUBLIC_SUPABASE_URL: 'https://abcdefghijk.supabase.co',
-  EXPO_PUBLIC_SUPABASE_ANON_KEY: 'sb_publishable_abcdefghijklmnopqrstuvwxyz',
+  EXPO_PUBLIC_BACKEND: 'cloudflare',
   EXPO_PUBLIC_API_URL: 'https://travel-stage.workers.dev',
   EXPO_PUBLIC_AUTH_WEB_REDIRECT_URL:
     'https://travel-stage.pages.dev/auth/callback',
@@ -27,8 +26,7 @@ function runHook(profile, settings) {
       encoding: 'utf8',
       env: {
         ...process.env,
-        EXPO_PUBLIC_SUPABASE_URL: '',
-        EXPO_PUBLIC_SUPABASE_ANON_KEY: '',
+        EXPO_PUBLIC_BACKEND: '',
         EXPO_PUBLIC_API_URL: '',
         EXPO_PUBLIC_AUTH_WEB_REDIRECT_URL: '',
         ...settings,
@@ -55,12 +53,12 @@ test('preview의 공개 설정이 맞으면 EAS hook 통과', () => {
   assert.equal(runHook('preview', publicSettings).status, 0);
 });
 
-test('APK 검사는 공개 값 4개로 통과하고 OCR·스토어·Pages 계정 값을 요구하지 않음', () => {
+test('APK 검사는 공개 값 3개로 통과하고 OCR·스토어·Pages 계정 값을 요구하지 않음', () => {
   // EAS 로그인 여부와 공개 설정 검사는 서로 다른 단계다.
   assert.deepEqual(getMvpIssues(publicSettings), []);
 });
 
-test('빈 설정과 휴대폰 localhost 및 테스트 키 거부', () => {
+test('빈 설정과 휴대폰 localhost 및 이전 백엔드 거부', () => {
   // 설정 없이 기능 테스트 APK 준비 완료로 판단하지 않는다.
   assert.ok(getMvpIssues({}).length);
   // 휴대폰은 PC localhost에 연결할 수 없다.
@@ -70,11 +68,11 @@ test('빈 설정과 휴대폰 localhost 및 테스트 키 거부', () => {
       EXPO_PUBLIC_API_URL: 'http://localhost:8787',
     }).length,
   );
-  // 브라우저 fixture 키를 설치 앱에 포함하지 않는다.
+  // 이전 백엔드 설정으로 현재 앱의 빌드를 통과시키지 않는다.
   assert.ok(
     getMvpIssues({
       ...publicSettings,
-      EXPO_PUBLIC_SUPABASE_ANON_KEY: 'sb_publishable_fixture',
+      EXPO_PUBLIC_BACKEND: 'supabase',
     }).length,
   );
 });

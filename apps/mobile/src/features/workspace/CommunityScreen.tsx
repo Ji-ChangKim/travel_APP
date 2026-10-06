@@ -14,7 +14,7 @@ import {
   requestFoundation,
   foundationQueryKey,
 } from '@wherego/api-client';
-import { supabase } from '@/services/supabase';
+
 import { useTripStore } from '@/stores/useTripStore';
 import { apiBaseUrl, serverOptions } from './service';
 import { workspaceError } from './WorkspaceScreen';
@@ -26,15 +26,20 @@ function PublicPhoto({ path, userId }: { path: string; userId: string }) {
     queryKey: foundationQueryKey(userId || 'public', 'community-photo', path),
     queryFn: () => {
       // 공개 항목의 비공개 원본은 60초 서명 링크로 읽는다.
-      return supabase.storage
-        .from('trip-private')
-        .createSignedUrl(path, 60)
-        .then(({ data, error }) => {
-          // 접근 철회를 빈 성공 URL로 바꾸지 않는다.
-          if (error) throw new Error('사진을 불러오지 못했습니다.');
-          // 정책을 통과한 URL만 화면으로 전달한다.
-          return data.signedUrl;
-        });
+      return fetch(
+        `${apiBaseUrl()}/public/media/url?path=${encodeURIComponent(path)}`,
+        { signal: AbortSignal.timeout(15000) },
+      ).then((response) => {
+        // 실제 서버 공개 권한 검사에 성공한 주소만 표시한다.
+        return response.ok
+          ? response.json().then((value: unknown) => {
+              // 서명 URL 응답만 읽는다.
+              return z
+                .object({ data: z.object({ url: z.string().url() }) })
+                .parse(value).data.url;
+            })
+          : Promise.reject(new Error('사진을 불러오지 못했습니다.'));
+      });
     },
     retry: false,
     staleTime: 30000,

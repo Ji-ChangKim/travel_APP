@@ -61,6 +61,21 @@ export function scheduleForm(
     },
   };
 }
+
+// 공유 장소 후보를 새 일정 폼의 임시 입력으로 연결한다.
+export function sharedScheduleForm(
+  snapshot: WorkspaceSnapshot,
+  text: string,
+): PlanForm {
+  // 후보는 일정 저장 전까지 폼 메모리에만 보관한다.
+  return withSharedText(scheduleForm(snapshot), text);
+}
+
+// 일정 초안 하나에 화면 전용 공유문을 추가한다.
+function withSharedText(form: PlanForm, text: string): PlanForm {
+  // 원래 일정의 날짜와 UUID를 유지한다.
+  return { ...form, values: { ...form.values, sharedMapsText: text } };
+}
 // 문자열 폼을 명령별 입력 계약으로 변환한다.
 export function formCommand(
   form: PlanForm,
@@ -76,7 +91,7 @@ function commandValue(form: PlanForm, snapshot: WorkspaceSnapshot) {
     ? {
         operation: 'schedule.save',
         input: {
-          ...form.values,
+          ...scheduleValues(form.values),
           id: form.id,
           sortOrder: Number(form.values.sortOrder),
         },
@@ -137,4 +152,17 @@ function commandValue(form: PlanForm, snapshot: WorkspaceSnapshot) {
                   includeCosts: form.values.includeCosts === 'true',
                 },
               };
+}
+
+// 화면 전용 공유 입력은 서버 일정 저장 계약에서 제외한다.
+function scheduleValues(
+  values: Record<string, string>,
+): Record<string, string> {
+  // 기존 일정 필드만 검증·저장하고 공유 원문은 남기지 않는다.
+  return Object.fromEntries(
+    Object.entries(values).filter(([key]) => {
+      // 가져오기 UI에서만 사용한 값은 영구 저장하지 않는다.
+      return key !== 'sharedMapsText';
+    }),
+  );
 }

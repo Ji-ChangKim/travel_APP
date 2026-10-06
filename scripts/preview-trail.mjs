@@ -39,8 +39,8 @@ function existingFile(candidate) {
     ? candidate
     : fs.existsSync(`${candidate}.html`)
       ? `${candidate}.html`
-      : /[\\/]trips[\\/][0-9a-f-]{36}$/.test(candidate)
-        ? path.join(root, 'trips', '[id].html')
+      : /[\\/](?:trips|diary)[\\/][0-9a-f-]{36}$/.test(candidate)
+        ? path.join(path.dirname(candidate), '[id].html')
         : null;
 }
 

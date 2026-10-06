@@ -1,0 +1,183 @@
+{
+  "brand": "TripPrint",
+  "revision": "v2",
+  "method": "imagegen reference + editable native SVG + browser PNG export",
+  "assets": [
+    {
+      "name": "symbol-coral-clean",
+      "width": 1024,
+      "height": 1024,
+      "pngSha256": "0bb1c66ba78f9937767c31d38a7064461047dea40dc6ad0715180d361e254d64",
+      "png": "TripPrint_symbol-coral-clean_1024x1024.png",
+      "svg": "TripPrint_symbol-coral-clean_1024x1024.svg"
+    },
+    {
+      "name": "symbol-white",
+      "width": 1024,
+      "height": 1024,
+      "pngSha256": "a2d059967ca0bc51148bfaa3206de8698efba3b847e4a7565166012c13cbea3c",
+      "png": "TripPrint_symbol-white_1024x1024.png",
+      "svg": "TripPrint_symbol-white_1024x1024.svg"
+    },
+    {
+      "name": "symbol-navy",
+      "width": 1024,
+      "height": 1024,
+      "pngSha256": "c59ee1424e4f641df757c47e374afe6b694ddd77c739bf3da7857c86afe1017d",
+      "png": "TripPrint_symbol-navy_1024x1024.png",
+      "svg": "TripPrint_symbol-navy_1024x1024.svg"
+    },
+    {
+      "name": "app-icon",
+      "width": 1024,
+      "height": 1024,
+      "pngSha256": "02640b856155d000aa6a4b68c50509e37540876fa96bc7821022635e41dbe6a0",
+      "png": "TripPrint_app-icon_1024x1024.png",
+      "svg": "TripPrint_app-icon_1024x1024.svg"
+    },
+    {
+      "name": "play-store-icon",
+      "width": 512,
+      "height": 512,
+      "pngSha256": "a07e764e94137a3686b52f8aab8df6ac1cfb05efaed55714012d6ecaffc64a7f",
+      "png": "TripPrint_play-store-icon_512x512.png",
+      "svg": "TripPrint_play-store-icon_512x512.svg"
+    },
+    {
+      "name": "android-foreground",
+      "width": 1024,
+      "height": 1024,
+      "pngSha256": "a2d059967ca0bc51148bfaa3206de8698efba3b847e4a7565166012c13cbea3c",
+      "png": "TripPrint_android-foreground_1024x1024.png",
+      "svg": "TripPrint_android-foreground_1024x1024.svg"
+    },
+    {
+      "name": "android-monochrome",
+      "width": 1024,
+      "height": 1024,
+      "pngSha256": "a2d059967ca0bc51148bfaa3206de8698efba3b847e4a7565166012c13cbea3c",
+      "png": "TripPrint_android-monochrome_1024x1024.png",
+      "svg": "TripPrint_android-monochrome_1024x1024.svg"
+    },
+    {
+      "name": "splash-symbol",
+      "width": 1024,
+      "height": 1024,
+      "pngSha256": "0bb1c66ba78f9937767c31d38a7064461047dea40dc6ad0715180d361e254d64",
+      "png": "TripPrint_splash-symbol_1024x1024.png",
+      "svg": "TripPrint_splash-symbol_1024x1024.svg"
+    },
+    {
+      "name": "favicon-32",
+      "width": 32,
+      "height": 32,
+      "pngSha256": "42e6764bf2a4f3bd3a31568033f554770657a504c70f3f1fcdc0201bb8c725c0",
+      "png": "TripPrint_favicon-32_32x32.png",
+      "svg": "TripPrint_favicon-32_32x32.svg"
+    },
+    {
+      "name": "favicon-64",
+      "width": 64,
+      "height": 64,
+      "pngSha256": "eb595377140fe5231636f88ad73409e892b8332a88239f3bdf4e816a4d739eaf",
+      "png": "TripPrint_favicon-64_64x64.png",
+      "svg": "TripPrint_favicon-64_64x64.svg"
+    },
+    {
+      "name": "logo-horizontal",
+      "width": 1024,
+      "height": 320,
+      "pngSha256": "89731f3c93eee8511eff201160e5318f80f098897140cb77557f975c1409ad15",
+      "png": "TripPrint_logo-horizontal_1024x320.png",
+      "svg": "TripPrint_logo-horizontal_1024x320.svg"
+    },
+    {
+      "name": "logo-horizontal-white",
+      "width": 1024,
+      "height": 320,
+      "pngSha256": "b5069792b0c3059e26a1fa57c715671ddbc895e2a7264f75f2013c4e7e43013a",
+      "png": "TripPrint_logo-horizontal-white_1024x320.png",
+      "svg": "TripPrint_logo-horizontal-white_1024x320.svg"
+    },
+    {
+      "name": "logo-horizontal-navy",
+      "width": 1024,
+      "height": 320,
+      "pngSha256": "5110cfa47a735d56ffcf4b2a82dded17149b700d51263b7fec239201f5ca5931",
+      "png": "TripPrint_logo-horizontal-navy_1024x320.png",
+      "svg": "TripPrint_logo-horizontal-navy_1024x320.svg"
+    },
+    {
+      "name": "monogram-tp",
+      "width": 512,
+      "height": 512,
+      "pngSha256": "217661bcf8b4536c785127a6f5b6823bc048533bcae5fbe5127053a5f6f3a285",
+      "png": "TripPrint_monogram-tp_512x512.png",
+      "svg": "TripPrint_monogram-tp_512x512.svg"
+    },
+    {
+      "name": "ui-place",
+      "width": 256,
+      "height": 256,
+      "pngSha256": "478f21512880f588e607572ae8ec16820810c7b50a4328fda274007ac832a063",
+      "png": "TripPrint_ui-place_256x256.png",
+      "svg": "TripPrint_ui-place_256x256.svg"
+    },
+    {
+      "name": "ui-route",
+      "width": 256,
+      "height": 256,
+      "pngSha256": "0f3305235bbd46fbb6183d237a5b13bed1ce0d27295d58ba520650a65eadc2d7",
+      "png": "TripPrint_ui-route_256x256.png",
+      "svg": "TripPrint_ui-route_256x256.svg"
+    },
+    {
+      "name": "ui-camera",
+      "width": 256,
+      "height": 256,
+      "pngSha256": "c44c636397bb1b46e7bf49d9b6699bdfa43d2ccfa20fd058ca8c9a363ed8df42",
+      "png": "TripPrint_ui-camera_256x256.png",
+      "svg": "TripPrint_ui-camera_256x256.svg"
+    },
+    {
+      "name": "ui-record",
+      "width": 256,
+      "height": 256,
+      "pngSha256": "b2516b5a48e55f67e009fb0da14b33704a8b23e9bd30cb6b1057088604f2b51a",
+      "png": "TripPrint_ui-record_256x256.png",
+      "svg": "TripPrint_ui-record_256x256.svg"
+    },
+    {
+      "name": "ui-map",
+      "width": 256,
+      "height": 256,
+      "pngSha256": "fdb25cb4683b4856867cc360b7eaa832b93fd92a94b4ebddd14269861066ad86",
+      "png": "TripPrint_ui-map_256x256.png",
+      "svg": "TripPrint_ui-map_256x256.svg"
+    },
+    {
+      "name": "ui-flight",
+      "width": 256,
+      "height": 256,
+      "pngSha256": "6a84591f2ae11236d665fb7a4889a5dd1afd82d23b3159e6b58c16e72a09260f",
+      "png": "TripPrint_ui-flight_256x256.png",
+      "svg": "TripPrint_ui-flight_256x256.svg"
+    },
+    {
+      "name": "logo-stacked",
+      "width": 768,
+      "height": 768,
+      "pngSha256": "0d5c8b840ecd8a5fb24455798559a8cebce05879c34755c940991d166f4f6b66",
+      "png": "TripPrint_logo-stacked_768x768.png",
+      "svg": "TripPrint_logo-stacked_768x768.svg"
+    },
+    {
+      "name": "splash-portrait",
+      "width": 1080,
+      "height": 1920,
+      "pngSha256": "99bcd0e11b6b5a845fb36e80b8f5f0fb29ba3f9d68ce6b4a4969ba27a078f0e8",
+      "png": "TripPrint_splash-portrait_1080x1920.png",
+      "svg": "TripPrint_splash-portrait_1080x1920.svg"
+    }
+  ]
+}

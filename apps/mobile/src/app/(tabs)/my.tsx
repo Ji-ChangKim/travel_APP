@@ -83,34 +83,43 @@ export default function MyScreen() {
   };
 
   // 프로필 정보 수정을 서버 및 스토어에 반영한다.
-  const handleSaveProfile = async () => {
-    if (!editNickname.trim()) {
-      Alert.alert('알림', '닉네임을 1자 이상 입력해 주세요.');
-      return;
-    }
-
-    setIsSavingProfile(true);
-    const updates = {
-      nickname: editNickname.trim(),
-      bio: editBio.trim() || null,
-      travelStyles: editTravelStyles,
-    };
-
-    // 로컬 스토어에 즉시 반영한다.
-    updateProfile(updates);
-
-    // Supabase 서버와 동기화를 시도한다 (실제 사용자 ID가 있는 경우).
-    if (currentUser?.id) {
-      try {
-        await updateUserProfile(currentUser.id, updates);
-      } catch {
-        // 서버 동기화 실패 시에도 로컬 상태는 유지됨을 안내한다.
-      }
-    }
-
-    setIsSavingProfile(false);
-    setIsProfileEditModalOpen(false);
-    Alert.alert('저장 완료', '프로필 정보가 안전하게 저장되었습니다.');
+  const handleSaveProfile = () => {
+    // 실제 서버 저장이 끝나야 완료 안내를 표시한다.
+    return !editNickname.trim() || !currentUser
+      ? Alert.alert('알림', '로그인과 닉네임을 확인해 주세요.')
+      : (setIsSavingProfile(true),
+        (currentUser.authProvider === 'guest'
+          ? Promise.resolve({
+              ...currentUser,
+              nickname: editNickname.trim(),
+              bio: editBio.trim() || null,
+              travelStyles: editTravelStyles,
+            })
+          : updateUserProfile(currentUser.id, {
+              nickname: editNickname.trim(),
+              bio: editBio.trim() || null,
+              travelStyles: editTravelStyles,
+            })
+        )
+          .then((profile) => {
+            // 서버 확정 결과를 반영하고 편집 화면을 닫는다.
+            return (
+              updateProfile(profile),
+              setIsProfileEditModalOpen(false),
+              Alert.alert('저장 완료', '프로필을 저장했습니다.')
+            );
+          })
+          .catch(() => {
+            // 실패한 입력은 유지하고 재시도를 안내한다.
+            return Alert.alert(
+              '저장 실패',
+              '서버 연결을 확인하고 다시 시도해 주세요.',
+            );
+          })
+          .finally(() => {
+            // 다시 저장할 수 있게 잠금을 해제한다.
+            return setIsSavingProfile(false);
+          }));
   };
 
   // 보안 스토리지에서 암호화된 DB 코드를 읽어와 상태를 갱신한다.

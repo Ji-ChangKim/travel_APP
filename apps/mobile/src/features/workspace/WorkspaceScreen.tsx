@@ -35,6 +35,7 @@ import { scheduleForm, formCommand, newTripForm, type PlanForm } from './forms';
 import PlanEditor from './PlanEditor';
 import GooglePlace from './GooglePlace';
 import { countryDefaults, travelCountries } from './countries';
+import { useSharedSchedule } from './useSharedSchedule';
 
 // API 실패를 입력 보존·재인증·충돌 안내로 바꾼다.
 export function workspaceError(error: unknown): string {
@@ -99,17 +100,27 @@ export default function WorkspaceScreen({
     // 게스트와 로그인 계정의 작성 상태를 분리한다.
     return state.currentUser?.id || 'public';
   });
-  const { id } = useLocalSearchParams<{ id?: string }>();
+  const { id, importPlace } = useLocalSearchParams<{
+    id?: string;
+    importPlace?: string;
+  }>();
   // React key로 이전 계정의 입력·요청 클로저를 남기지 않는다.
   return (
     <WorkspaceContent
-      key={`${userId}:${creating ? 'new' : id || 'list'}`}
+      key={`${userId}:${creating ? 'new' : id || 'list'}:${importPlace || ''}`}
       creating={creating}
+      importing={importPlace === '1'}
     />
   );
 }
 // 한 계정·한 여행의 서버 조회와 작성 명령을 연결한다.
-function WorkspaceContent({ creating }: { creating: boolean }) {
+function WorkspaceContent({
+  creating,
+  importing,
+}: {
+  creating: boolean;
+  importing: boolean;
+}) {
   // 서버 자료의 기준 계정과 현재 경로를 구독한다.
   const user = useTripStore((state) => {
     // 게스트는 서버 작성 권한을 갖지 않는다.
@@ -157,6 +168,8 @@ function WorkspaceContent({ creating }: { creating: boolean }) {
     snapshot.trip.status !== 'ARCHIVED',
   );
   const owner = snapshot?.myRole === 'owner';
+  // 권한·화면 해제·개발 모드 재구독을 고려해 후보를 일정 확인 폼으로 인계한다.
+  useSharedSchedule(snapshot, writable, importing, setForm, setError);
   // 성공한 변경 이후 현재 계정의 서버 자료를 다시 읽는다.
   function refresh(): Promise<unknown> {
     // 목록·상세·공개 피드의 낡은 결과를 무효화한다.
@@ -278,7 +291,7 @@ function WorkspaceContent({ creating }: { creating: boolean }) {
           .then((result) => {
             // 확인된 서버 여행 ID로 이동한다.
             router.replace(
-              `/trips/${z.object({ trip: workspaceTripSchema }).parse(result.data).trip.id}`,
+              `/trips/${z.object({ trip: workspaceTripSchema }).parse(result.data).trip.id}${importing ? '?importPlace=1' : ''}`,
             );
           });
       });
@@ -502,12 +515,19 @@ function WorkspaceContent({ creating }: { creating: boolean }) {
         keyboardShouldPersistTaps="handled"
       >
         <Text style={styles.header}>
-          WHEREGO · {id ? '여행 계획' : '내 여행'}
+          TripPrint · {id ? '여행 계획' : '내 여행'}
         </Text>
         <Text style={styles.subtitle}>
           함께 계획하고, 사진과 비용으로 여행을 기록하세요.
         </Text>
         <View style={styles.row}>
+          <Action
+            label="Google Maps 장소 가져오기"
+            onPress={() => {
+              // 지도에서 공유한 장소를 내 여행에 추가한다.
+              return router.push('/import-place');
+            }}
+          />
           <Action
             label="커뮤니티"
             onPress={() => {
@@ -594,6 +614,12 @@ function WorkspaceContent({ creating }: { creating: boolean }) {
             )}
             {snapshot && (
               <>
+                {importing && !writable && (
+                  <Text accessibilityRole="alert" style={styles.error}>
+                    읽기 전용 또는 보관된 여행에는 장소를 추가할 수 없습니다.
+                    편집 가능한 여행을 선택해 주세요.
+                  </Text>
+                )}
                 <View style={styles.card}>
                   <Text style={styles.title}>{snapshot.trip.title}</Text>
                   <Text>
@@ -606,6 +632,15 @@ function WorkspaceContent({ creating }: { creating: boolean }) {
                   <Text style={styles.badge}>
                     내 권한 {snapshot.myRole} · {snapshot.trip.status}
                   </Text>
+                  {snapshot.trip.status === 'COMPLETED' && (
+                    <Action
+                      label="발자국 다이어리 보기"
+                      onPress={() => {
+                        // 종료된 여행의 일정·사진·비용을 날짜별로 읽는다.
+                        return router.push(`/diary/${snapshot.trip.id}`);
+                      }}
+                    />
+                  )}
                   {owner && (
                     <Action
                       label="여행 정보 / 종료 상태"
@@ -721,6 +756,16 @@ function WorkspaceContent({ creating }: { creating: boolean }) {
                           )}
                           {item.memo && <Text>{item.memo}</Text>}
                           <View style={styles.row}>
+                            <Action
+                              label="이 일정에서 사진 촬영"
+                              disabled={
+                                !writable || busy || scanning || hasPending
+                              }
+                              onPress={() => {
+                                // 맛집·관광지 현장에서 촬영한 사진을 현재 일정에 연결한다.
+                                return photo('photo', true, item.id);
+                              }}
+                            />
                             <Action
                               label="이 일정에 사진 추가"
                               disabled={

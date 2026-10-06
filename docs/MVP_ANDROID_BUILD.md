@@ -1,102 +1,42 @@
-# WHEREGO Android MVP 테스트 빌드
+# TripPrint Android MVP 빌드
 
-2026-10-03. 이번 목표는 **Expo EAS preview에서 APK를 생성하고 Android 휴대폰에 내려받아 기능을 테스트하는 것**이다. 스토어 심사·스토어 제출·운영 공개는 이번 작업 범위에 포함하지 않는다. 내부 APK도 실제 로그인과 공유 데이터를 테스트하려면 테스트 서버가 필요하다.
+2026-10-06. 현재 MVP는 Cloudflare D1·R2와 실제 이메일 로그인으로 동작한다. [웹](https://wherego-staging.pages.dev), [전환·배포 보고](CLOUDFLARE_MVP_DEPLOYMENT_20261006.md).
 
-## MVP에 포함한 기능
+APK는 Expo EAS preview에서 생성한다. 현재 Android Hermes 번들/네이티브 연결 검사는 통과했고, 실제 APK 빌드는 Expo 로그인 완료를 기다린다. `.hbc`는 설치 파일이 아니다.
 
-- 실제 소셜 계정 로그인과 로그아웃. 최초 연결한 제공자부터 검증하고 나머지는 미검증으로 기록한다.
-- 여행·날짜별 일정·비용·지역·사진 저장 및 다른 계정/기기 조회.
-- 초대 링크 생성·공유·로그인 복귀·참여와 편집자/뷰어 권한.
-- 영수증 사진 촬영·선택·확인 후 일정/실제 지출에 추가.
-- 종료 여행의 선택 일정/사진/비용 공개와 철회·신고·차단.
+1. 프로젝트 루트에서 `npx --yes eas-cli login`으로 직접 로그인한다. 비밀번호와 토큰은 Git이나 채팅에 올리지 않는다.
+2. `npx --yes eas-cli whoami`로 확인한다. 기존 owner `rupang`, project `3b23b462-262c-4b64-aff2-5fb03280e6b5` 접근 권한이 필요하다.
+3. `npm run mvp:check`, `npm run mvp:prepare`로 실제 공개 설정과 Android 번들을 확인한다.
+4. `npm run mobile:build:apk`로 preview APK를 빌드한다. 최초 서명 키가 없으면 EAS keystore 생성/권한 설정이 필요할 수 있다.
+5. EAS의 완료된 빌드에서 APK를 받아 Android 기기에 설치하고 카메라·공유 인텐트·로그인 복원·동행 초대를 검증한다.
 
-영수증 OCR 키는 staging에서 선택 사항이다. 없으면 사진을 보며 직접 입력하고, 키를 연결한 이후 자동 인식 후보를 검증한다. 인식 성공을 임의 생성하지 않는다. production Worker의 필수 OCR 선언은 유지한다.
+`apps/mobile/eas.json` preview에는 다음 공개 값이 이미 고정돼 있다. Supabase 공개 키는 필요하지 않다.
 
-## 여기서 준비한 것과 외부에서 필요한 것
+- `EXPO_PUBLIC_BACKEND=cloudflare`
+- `EXPO_PUBLIC_API_URL=https://wherego-api-staging.gametps.workers.dev`
+- `EXPO_PUBLIC_AUTH_WEB_REDIRECT_URL=https://wherego-staging.pages.dev/auth/callback`
+- `EXPO_NO_DOTENV=1`
 
-| 여기서 처리                                            | 외부 접근이 필요한 작업                             |
-| ------------------------------------------------------ | --------------------------------------------------- |
-| SDK 57 권장 패치 버전 적용, 코드·SQL/API·설정 테스트   | Expo 계정 직접 로그인, 기존 프로젝트 접근 권한      |
-| Android 번들/Hermes 컴파일, Android 네이티브 생성 검사 | APK 서명 키 확인 또는 EAS keystore 생성 선택        |
-| preview APK/빌드 번호/개발 .env 제외 설정              | EAS preview 공개 환경 값 4개 등록                   |
-| MVP 환경 사전 검사와 EAS hook                          | Supabase 테스트 프로젝트와 실제 소셜 제공자 설정    |
-| 비정상 Android 딥링크 크기·인코딩 검사                 | 휴대폰에서 접근 가능한 API·웹 주소와 실제 서버 적용 |
-| staging OCR 키 선택 사항으로 변경                      | 테스트 폰 설치·카메라/공유/인증 복귀 인수           |
+서버 `AUTH_SECRET`과 Google 공급자 비밀은 앱에 넣지 않는다. 자동 Google Places/Vision과 소셜 인증은 현재 미연결이고, 수동 일정·사진·영수증 확인 저장을 사용할 수 있다. 현재 배포는 MVP 스테이징이며 Play Store 제출/심사/운영 공개는 완료하지 않았다.
 
-키·비밀번호·Expo 인증 코드를 채팅에 보내지 않는다. 플랫폼 로그인은 직접 수행하고, 공개 설정은 로컬 환경 파일이나 EAS 콘솔에 넣는다.
+## Android 1차 테스트 케이스
 
-## 최소 외부 준비
+[TripPrint Android MVP TC](../outputs/01a10ed6-dad9-7bb0-b46f-02dec62a5c9e/TripPrint_Android_MVP_TC_20261006.xlsx)에 실행 가능한 62개 케이스를 정리했다. P0 28개를 먼저 실행한 뒤 나머지 입력 검증·복원·예외·사용성 케이스를 진행한다. 테스트안내 시트에 APK URL·EAS Build ID·versionCode·기기·테스터를 입력하고 TC 시트의 상태·실제 결과·일시·증거를 기록한다.
 
-1. 루트 터미널에서 `npm run eas:login`으로 로그인한다. 현재 최초 확인 결과는 `Not logged in`이었다.
-2. 기존 owner `rupang`, EAS project ID `3b23b462-262c-4b64-aff2-5fb03280e6b5`에 접근 가능한지 확인한다. 새 프로젝트 ID를 임의 발급하지 않는다.
-3. Supabase 테스트 프로젝트를 만들고 SQL 6개·프로필 트리거·RLS·private Storage를 적용한다. 최소 한 소셜 제공자를 연결해 실제 가입을 확인한다.
-4. 휴대폰에서 접근 가능한 HTTPS API와 테스트 웹을 연결한다. `localhost`는 사용할 수 없다. 초대 링크와 웹 OAuth 복귀 주소는 실제 테스트 웹 주소를 사용한다.
-5. EAS 프로젝트의 `preview` 환경에 다음 공개 값 4개를 등록한다.
+계정 A는 소유자, B는 조회자, C는 비멤버/편집자 검사를 위한 독립 테스트 계정이다. 동행 권한·동시 편집은 기기 2대 또는 별도 웹 프로필로 확인한다. 사진은 현재 `tripprint-staging-private` 비공개 R2에 연결된다. 웹/API QA가 필요한 케이스는 실행 환경 열에 표시했다.
 
-| 값                                  | 대상                                     |
-| ----------------------------------- | ---------------------------------------- |
-| `EXPO_PUBLIC_SUPABASE_URL`          | 실제 테스트 Supabase URL                 |
-| `EXPO_PUBLIC_SUPABASE_ANON_KEY`     | 같은 프로젝트의 anon/publishable 공개 키 |
-| `EXPO_PUBLIC_API_URL`               | 휴대폰에서 접근 가능한 HTTPS API origin  |
-| `EXPO_PUBLIC_AUTH_WEB_REDIRECT_URL` | 테스트 웹 origin + `/auth/callback`      |
+2026-10-06 재확인한 `eas-cli whoami`는 `Not logged in`이었다. 현재 실기기 TC는 모두 미실행이며 이전 자동 검사나 Android 번들 성공을 실기기 통과로 처리하지 않는다. 실제 소셜 성공·자동 OCR/Places·메일·즐겨찾기 전체 동기화·iOS 실기기 배포는 연결·기획 후 별도 검사한다.
 
-OAuth 제공자 callback은 Supabase가 안내한 `/auth/v1/callback` 주소다. Supabase Redirect URLs에는 실제 웹 복귀 주소와 `travelapp://auth/callback`을 등록한다. [서비스 설정](APP_SERVICES_SETUP.md), [제공자 설정](SOCIAL_AUTH_SETUP.md).
+EAS preview APK를 설치해 테스트하는 방식은 [Expo 내부 배포 문서](https://docs.expo.dev/build/internal-distribution/)와 [APK 생성 문서](https://docs.expo.dev/build-reference/apk/)를 따른다.
 
-## 로컬 준비 명령
+## 이전 시작 화면이 나오는 경우
 
-`.env.mvp.example`을 참고해 루트 `.env.mvp`에 공개 값을 입력한다. 기존 파일은 덮어쓰지 않는다. 이 파일은 Git에서 제외된다. EAS preview 설정은 별도로 등록해야 한다.
+2026-10-06 루트 EAS 설정이 예전 `src/app/index.tsx`를 선택하는 문제를 실제 Expo CLI 경로 검사로 재현했다. 현재 루트 설정은 `apps/mobile/src/app`을 명시하여 모바일 경로에서 실행한 빌드와 동일한 TripPrint 화면을 사용한다. `npm run test:release`에서 두 빌드 경로를 모두 검사한다. 루트 preview 빌드에도 공개 백엔드 설정 검사를 적용했다.
 
-```powershell
-Copy-Item -LiteralPath .env.mvp.example -Destination .env.mvp
-npm run mvp:check
-npm run mvp:prepare
-```
+GitHub 연결로 빌드할 때는 최신 변경을 커밋·푸시하고 Expo 프로젝트의 GitHub 설정에서 Base directory를 `apps/mobile`, 브랜치를 `main`, Build profile을 `preview`로 지정한다. [Expo 모노레포 빌드 문서](https://docs.expo.dev/build-reference/build-with-monorepos/)에서 권장하는 앱 디렉터리를 기준으로 빌드한다. 루트 설정의 경로 지정은 기존 루트 빌드와의 호환용이다.
 
-- `mvp:check`: 실제 공개 값 4개의 형식과 HTTPS·복귀 주소·공개 키 종류를 검사한다. 스토어 계정, Cloudflare 프로젝트명, OCR 키는 요구하지 않는다. 원격 프로젝트 존재·실제 인증 성공을 확인하는 검사는 아니다.
-- `mvp:prepare`: 공개 설정 검사를 통과한 뒤 Android export와 Hermes 컴파일을 수행한다. 결과는 `apps/mobile/.release/android`다. APK 서명·EAS 업로드는 수행하지 않는다.
-- `mvp:bundle:android`: 설정 없는 상태에서도 코드 컴파일만 진단하는 명령이다. 성공해도 기능 테스트 가능한 실제 서버 연결을 보장하지 않는다.
-- EAS `preview`의 post-install hook도 공개 설정을 검사한다. 설정이 없으면 Gradle APK 작업을 계속하지 않는다. 다른 EAS 프로필은 이 MVP hook의 검사 대상에서 제외한다.
+완료된 APK에는 빌드 당시 소스가 들어 있다. Git 푸시나 웹/API 배포로 기존 APK가 바뀌지는 않는다. 수정 후 새 EAS preview 빌드를 생성하고, 새 Build ID의 APK를 설치해야 한다. 로컬에서는 프로젝트 루트에서 `npm --workspace=@wherego/mobile run build:apk -- --clear-cache`로 빌드한다. EAS 빌드 상세의 Git commit hash와 실제 최신 커밋을 비교하고, 설치 후 TripPrint 아이콘 → 브랜드 로딩 → 로그인 화면을 확인한다. 로그인 세션이 있으면 여행 화면으로 이동한다.
 
-## APK 생성·다운로드·설치
+사용자가 제시한 Build ID `dc9129fa-2494-44f3-b9d0-87c27932ca37`의 소스 커밋과 작업 디렉터리는 현재 CLI 계정이 로그아웃되어 확인하지 못했다. 위 문제는 로컬에서 재현한 원인이며, 해당 원격 빌드의 사용 소스는 별도 확인이 필요하다.
 
-공개 환경과 프로젝트 접근을 확인한 뒤 루트에서 실행한다.
-
-```powershell
-npm run mobile:build:apk
-```
-
-이 명령은 `apps/mobile`의 EAS `preview` 프로필로 실제 Android 클라우드 빌드를 시작한다. `distribution: internal`, `buildType: apk`, preview 환경, 자동 빌드 번호 증가를 사용한다. 개발 서버가 필요한 development client 빌드가 아니다. EAS 서버에서 로컬 개발 .env를 읽지 않도록 `EXPO_NO_DOTENV=1`을 설정했다.
-
-1. CLI에서 프로젝트와 keystore를 확인한다. 기존 설치 앱이 있다면 서명 키의 일치 여부를 확인한다.
-2. 빌드 링크에서 결과가 `Finished`인지 확인한다. 실패 시 해당 로그로 원인을 수정한다.
-3. Android 휴대폰에서 빌드 링크의 APK를 내려받아 설치한다. 설치 앱 출처 허용이 필요한 경우 사용할 다운로드 앱의 설정을 확인한다.
-4. 실제 폰에서 아래 순서로 확인한다. 빌드 번호·링크·기기·미검증 기능을 [체크리스트](BUILD_CHECKLIST.md)에 기록한다.
-
-| 확인                         | 기대 결과                             |
-| ---------------------------- | ------------------------------------- |
-| 설치/시작/재실행             | 크래시 없이 실행, 로그인 세션 복원    |
-| 실제 로그인/취소/로그아웃    | 가입 UUID 유지, 가짜 로그인 없음      |
-| 여행→일정→사진→비용 저장     | 재실행/다른 기기에서도 서버 기록 조회 |
-| A 초대→B 참여                | 복귀 후 명시적 수락, 뷰어 쓰기 거부   |
-| 카메라/사진 권한 거부와 허용 | 재시도 가능, JPG/PNG만 업로드         |
-| 영수증 확인·수동 입력        | 실제 금액/일정 연결, 중복 저장 없음   |
-| 완료 여행 공개·철회          | 선택 자료만 공개, 영수증 원본 비공개  |
-
-## 보안 점검과 현재 제한
-
-Android export/Hermes 컴파일과 Expo native config introspection은 통과했다. config 평가에서 package·travelapp 스킴·마이크 권한 제거와 Camera 라이브러리 선언을 확인했다. 실제 합쳐진 APK manifest와 설치 동작은 EAS 빌드 후 검증한다. 로컬 prebuild는 공식 템플릿으로 재시도했지만 생성 단계에서 종료 코드 1로 중단되어 완료를 확인하지 못했다. Expo doctor의 온라인 스키마 조회도 TLS 오류로 미완료다. 이 결과를 네이티브 APK 빌드 성공으로 취급하지 않는다.
-
-SDK 호환 패치 후에도 audit 보고는 31건(high 19, moderate 12)이다. 다음은 현재 의존 경로와 인수 판단이며 취약점 제거 완료를 뜻하지 않는다.
-
-| 패키지                 | 확인한 경로와 조치                                                                                                                                                                                                                                                                   |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `decode-uri-component` | Expo Router→query-string 경로. 수정 버전 0.5.0은 ESM이며 기존 query-string 7은 CommonJS require를 사용한다. 강제 override 대신 Android 외부 링크를 Router 파싱 전에 길이 16KiB 및 정상 퍼센트 인코딩으로 제한했다. 웹 입력 전체와 모든 중첩 디코딩 경로의 위험을 제거한 것은 아니다. |
-| `braces`               | Expo/Metro의 파일 패턴 처리 경로. 현재 advisory에 수정 버전 없음. 미검증 override나 외부 입력을 받는 빌드 서버 변경은 하지 않았다.                                                                                                                                                   |
-| `node-forge`           | Expo CLI/코드 서명 도구 경로. 현재 advisory에 수정 버전 없음. 앱 코드·Worker에서 직접 사용하지 않는다. 경로 확인을 전체 공급망 안전 검증으로 간주하지 않는다.                                                                                                                        |
-| `uuid`                 | xcode의 프로젝트 생성 경로에서 v4 호출 확인. advisory 대상의 v3/v5/v6 외부 버퍼 사용과 구분했다. iOS 네이티브 인수는 이번 Android 범위 밖이다.                                                                                                                                       |
-
-[decode-uri-component advisory](https://github.com/advisories/GHSA-vcc3-ghjq-m6fr), [braces advisory](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm), [node-forge advisory](https://github.com/advisories/GHSA-86w9-cpqp-85rv), [uuid advisory](https://github.com/advisories/GHSA-w5hq-g745-h8pq).
-
-실제 Supabase·소셜 제공자·스캔 정확도·설치 앱 동작은 아직 인수하지 않았다. 계정 삭제·정책·스토어 정보 작성은 이번 APK 생성 조건에 포함하지 않는다. 테스트용 데이터와 지정한 테스트 계정을 사용하고, 운영 공개 전 준비는 [배포 문서](DEPLOYMENT.md)에 남긴다.
-
-공식 참고: [EAS 모노레포](https://docs.expo.dev/build-reference/build-with-monorepos/), [APK 내부 배포](https://docs.expo.dev/build/internal-distribution/), [EAS 환경](https://docs.expo.dev/eas/environment-variables/), [빌드 hook](https://docs.expo.dev/build-reference/npm-hooks/).
+수정 검증: `npm run check` 전체 통과, `npm run test:release` 20/20 통과. 루트에서도 실제 공개 스테이징 설정으로 Android Hermes export를 성공했다. 소스맵에 현재 `apps/mobile/src/app/index.tsx`, `login.tsx`, `TripPrintLoading.tsx`가 포함되고 이전 루트 시작 화면은 포함되지 않는 것을 확인했다. 로고 PNG도 내보낸 자산에 포함됐다. 검증 번들은 `.release/android-root/_expo/static/js/android/entry-c80d3159bd0c01e783dba84dd8a2587f.hbc`이며 APK나 실기기 테스트 성공을 의미하지 않는다.

@@ -120,4 +120,5 @@ export {
   trailReceiptSchema,
 } from './trail';
 export * from './workspace';
+export * from './mapsShare';
 export { isCalendarDate } from './foundation';

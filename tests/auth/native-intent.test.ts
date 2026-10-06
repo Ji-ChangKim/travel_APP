@@ -2,6 +2,14 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { redirectSystemPath } from '../../apps/mobile/src/app/+native-intent';
 
+test('Google Maps OS 공유 인텐트는 전용 장소 가져오기 페이지로 이동한다', () => {
+  // 인증·초대 경로와 공유 인텐트를 구분한다.
+  return assert.equal(
+    redirectSystemPath({ path: 'travelapp://expo-sharing', initial: true }),
+    '/import-place',
+  );
+});
+
 test('정상 인증 코드와 초대 토큰은 초기·재진입 모두 원문 보존', () => {
   // 인증 코드를 임의 디코딩하거나 재인코딩하지 않는다.
   assert.equal(

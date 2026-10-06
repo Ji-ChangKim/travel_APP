@@ -1,0 +1,10 @@
+{
+  "version": "0.1.0",
+  "release": "test-1-branding",
+  "environment": "staging",
+  "releaseDate": "2026-10-06",
+  "webOrigin": "https://wherego-staging.pages.dev",
+  "apiOrigin": "https://wherego-api-staging.gametps.workers.dev",
+  "brand": "TripPrint",
+  "brandAssets": "v2"
+}

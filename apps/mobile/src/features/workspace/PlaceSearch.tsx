@@ -5,6 +5,7 @@ import { GoogleAttribution, googlePlaceSchema } from './GooglePlace';
 import { requestFoundation } from '@wherego/api-client';
 import { serverOptions } from './service';
 import { Action, Field, styles } from './ui';
+import SharedPlaceInput from './SharedPlaceInput';
 
 const resultSchema = z.array(googlePlaceSchema);
 type Place = z.infer<typeof resultSchema>[number];
@@ -15,11 +16,13 @@ export default function PlaceSearch({
   city,
   disabled,
   onSelect,
+  initialShare,
 }: {
   userId: string;
   city: string;
   disabled: boolean;
   onSelect: (placeId: string, authoredTitle: string) => void;
+  initialShare?: string;
 }) {
   // 검색 결과는 현재 팝업에만 보관한다.
   const [query, setQuery] = useState('');
@@ -70,6 +73,13 @@ export default function PlaceSearch({
   // 검색과 원본 지도 확인을 입력 폼보다 먼저 제공한다.
   return (
     <View style={styles.card}>
+      <SharedPlaceInput
+        userId={userId}
+        disabled={disabled}
+        initialText={initialShare}
+        onQuery={change}
+        onSelect={onSelect}
+      />
       <Text style={styles.title}>Google Maps에서 장소 검색</Text>
       <Field label="장소 검색어" value={query} onChange={change} />
       <View style={styles.row}>

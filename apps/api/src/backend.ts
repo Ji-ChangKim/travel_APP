@@ -2,6 +2,8 @@ import { createClient, type User } from '@supabase/supabase-js';
 import { z } from 'zod';
 import { errorStatuses, rejectRequest } from './errors';
 import type { VerifiedSession } from './types';
+import { cloudSession } from './cloudAuth';
+import { cloudRpc } from './cloudRpc';
 
 // 설정 누락은 샘플 서버에 연결하지 않고 명시적으로 거부한다.
 const settingsSchema = z.object({
@@ -111,12 +113,14 @@ export function verifySession(
   fetcher: typeof fetch,
 ): Promise<VerifiedSession> {
   // 실제 검증 결과를 현재 요청 세션으로 반환한다.
-  return backendClient(env, bearerToken(header), fetcher)
-    .auth.getUser(bearerToken(header))
-    .then((result) => {
-      // 토큰과 검증 사용자 하나를 묶는다.
-      return verifiedUser(bearerToken(header), result);
-    });
+  return env.DB
+    ? cloudSession(env, bearerToken(header))
+    : backendClient(env, bearerToken(header), fetcher)
+        .auth.getUser(bearerToken(header))
+        .then((result) => {
+          // 토큰과 검증 사용자 하나를 묶는다.
+          return verifiedUser(bearerToken(header), result);
+        });
 }
 
 // DB의 제한된 오류 코드만 외부 계약으로 매핑한다.
@@ -149,7 +153,9 @@ export function runRpc(
   fetcher: typeof fetch,
 ): Promise<unknown> {
   // JWT 전달로 DB의 auth.uid 및 RLS/명령 권한 검사를 유지한다.
-  return Promise.resolve(
-    backendClient(env, session.token, fetcher).rpc(name, args),
-  ).then(unwrapRpc);
+  return env.DB
+    ? cloudRpc(env, session, name, args)
+    : Promise.resolve(
+        backendClient(env, session.token, fetcher).rpc(name, args),
+      ).then(unwrapRpc);
 }

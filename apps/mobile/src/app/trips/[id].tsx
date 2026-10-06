@@ -197,7 +197,7 @@ export function TripDetailPrototypeScreen() {
     if (!trip) return;
 
     const inviteCode = trip.inviteCode || 'WHEREGO';
-    const shareMessage = `[WHEREGO] '${trip.title}' 여행에 초대합니다!\n초대 코드: ${inviteCode}\n앱의 [내 여행 > 코드 참여]에서 코드를 입력하면 함께 일정을 계획할 수 있습니다.`;
+    const shareMessage = `[TripPrint] '${trip.title}' 여행에 초대합니다!\n초대 코드: ${inviteCode}\n앱의 [내 여행 > 코드 참여]에서 코드를 입력하면 함께 일정을 계획할 수 있습니다.`;
 
     try {
       await Share.share({

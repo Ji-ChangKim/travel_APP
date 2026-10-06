@@ -2,7 +2,11 @@
 
 여행을 계획하고, 동행자와 일정을 공유하고, 다녀온 이야기를 기록하는 APP/WEB 프로젝트입니다.
 
-Expo + React Native + TypeScript를 사용해 Android, iOS, 웹에서 같은 화면 코드를 사용합니다. 소셜 인증, 서버 여행·일정·비용·초대, 비공개 사진·영수증 확인, 종료 여행 커뮤니티 게시를 구현했습니다. 실제 Supabase/제공자 콘솔·OCR·실기기 인수는 환경 준비 후 진행합니다. [서비스 연결 절차](docs/APP_SERVICES_SETUP.md)를 먼저 확인하세요.
+2026-10-06 MVP 보완: 이메일 로그인/가입, Google Maps 공유 장소 가져오기, 완료 여행 발자국 다이어리. 범위·변경 파일·실서비스 연결·검증 결과는 [MVP 구현 보고](docs/MVP_IMPLEMENTATION_20261006.md)를 확인하세요. `npm start`와 `npm run web`는 현재 MVP가 있는 `apps/mobile`을 실행합니다.
+
+현재 MVP는 Cloudflare Workers + D1 + 비공개 R2 + Better Auth 이메일 로그인으로 동작합니다. [배포된 웹](https://wherego-staging.pages.dev)에서 확인할 수 있습니다. 실제 배포·검증·변경 파일·APK 및 공급자 연결 상태는 [Cloudflare 전환·배포 보고](docs/CLOUDFLARE_MVP_DEPLOYMENT_20261006.md)를 확인하세요. 소셜 로그인과 자동 Google OCR/장소 검색은 공급자 설정을 기다리고 있습니다.
+
+1차 테스트 준비본은 `0.1.0 / test-1`입니다. [테스트 안내](docs/TEST_1_RELEASE.md)에 접속 방법·시나리오·배포 기록·미연결 범위를 정리했습니다. [배포 버전 확인](https://wherego-staging.pages.dev/release.json)에서 현재 공개된 버전을 확인할 수 있습니다.
 
 지도는 Google Places 검색과 Google Maps 앱·웹 열기를 사용합니다. [설정 및 변경 보고](docs/GOOGLE_MAPS_SETUP.md)를 확인하세요.
 
@@ -42,7 +46,7 @@ npm start
 
 ### 배포 프로세스 상세 가이드
 
-현재 목표는 Expo에서 내려받아 Android 실기기에 설치하는 MVP APK입니다. [Android MVP 빌드 절차](docs/MVP_ANDROID_BUILD.md)와 [체크리스트](docs/BUILD_CHECKLIST.md)를 먼저 확인하세요. 공개 값 4개를 준비해 `npm run mvp:check`, `npm run mvp:prepare`로 검사하고, Expo 로그인·preview 환경 등록 후 `npm run mobile:build:apk`를 실행합니다. 스토어 심사·제출은 이번 범위에 포함하지 않습니다.
+현재 목표는 Expo에서 내려받아 Android 실기기에 설치하는 MVP APK입니다. [Android MVP 빌드 절차](docs/MVP_ANDROID_BUILD.md)와 [체크리스트](docs/BUILD_CHECKLIST.md)를 먼저 확인하세요. Cloudflare 공개 API와 웹 주소를 준비해 `npm run mvp:check`, `npm run mvp:prepare`로 검사하고, Expo 로그인·preview 환경 등록 후 `npm run mobile:build:apk`를 실행합니다. 스토어 심사·제출은 이번 범위에 포함하지 않습니다.
 
 자세한 빌드 및 배포 절차는 [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) 문서를 참고하세요.
 

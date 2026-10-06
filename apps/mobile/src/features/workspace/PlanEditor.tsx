@@ -140,6 +140,7 @@ export default function PlanEditor({
                     userId={userId}
                     city={snapshot?.trip.city || ''}
                     disabled={busy}
+                    initialShare={form.values.sharedMapsText}
                     onSelect={(placeId, authoredTitle) => {
                       // 사용자 제목과 구글 장소 ID만 영구 기록에 포함한다.
                       onChange('googlePlaceId', placeId);

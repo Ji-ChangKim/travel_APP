@@ -7,11 +7,13 @@ import {
   receiptOcrSchema,
   reportSchema,
   workspaceCommandSchema,
+  type WorkspaceCommand,
 } from '@wherego/validation';
 import { backendClient, runRpc } from './backend';
 import { rejectRequest } from './errors';
 import type { ApiEnvironment } from './types';
 import { scanReceipt } from './ocr';
+import { signedFile } from './cloudMedia';
 type Ctx = Context<ApiEnvironment>;
 
 // 상위 크기 제한을 거친 JSON을 읽는다.
@@ -86,7 +88,7 @@ function command(fetcher: typeof fetch, c: Ctx): Promise<Response> {
 function executeCommand(
   fetcher: typeof fetch,
   c: Ctx,
-  input: z.infer<typeof workspaceCommandSchema>,
+  input: WorkspaceCommand,
 ): Promise<unknown> {
   // 역할 검사는 모든 명령에서 DB가 수행한다.
   return runRpc(
@@ -224,9 +226,14 @@ function mediaUrl(fetcher: typeof fetch, c: Ctx): Promise<Response> {
     })
     .then((path) => {
       // 현재 사용자 JWT의 Storage 정책을 적용한다.
-      return backendClient(c.env, c.get('session').token, fetcher)
-        .storage.from('trip-private')
-        .createSignedUrl(path, 60);
+      return c.env.DB
+        ? signedFile(c.env, path, c.get('session').userId).then((url) => {
+            // 기존 응답 계약으로 실제 R2 URL을 전달한다.
+            return { error: null, data: { signedUrl: url } };
+          })
+        : backendClient(c.env, c.get('session').token, fetcher)
+            .storage.from('trip-private')
+            .createSignedUrl(path, 60);
     })
     .then((result) => {
       // 실패한 파일 발급을 성공 URL로 안내하지 않는다.

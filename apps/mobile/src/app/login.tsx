@@ -2,7 +2,9 @@ import { useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Image,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -17,16 +19,17 @@ import { signInWithSocial } from '@/features/auth/oauth';
 import type { SocialProvider } from '@/features/auth/model';
 
 import { useTripStore } from '@/stores/useTripStore';
-import { pendingInvite } from '@/features/workspace/invite';
+import { pendingAuthDestination } from '@/features/workspace/mapsShare';
+import EmailAuth from '@/features/auth/EmailAuth';
 
 // 로그인 화면 전용 디자인 토큰 규격을 정의한다.
 const loginTheme = {
-  bg: '#FAFBFC',
+  bg: '#FFF9F3',
   cardBg: '#FFFFFF',
-  textPrimary: '#111827',
+  textPrimary: '#203247',
   textSecondary: '#6B7280',
   textMuted: '#9CA3AF',
-  primary: '#E84025',
+  primary: '#C84432',
   border: '#E5E7EB',
   kakao: '#FEE500',
   kakaoText: '#191919',
@@ -54,15 +57,16 @@ export default function SocialAuthScreen() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   // 웹과 모바일에서 인증 실패를 동일하게 보여준다.
   const [authError, setAuthError] = useState('');
+  const [emailOpen, setEmailOpen] = useState(false);
   const currentOs = resolveCurrentOsPlatform();
 
   // 메인 여행 대시보드 화면으로 라우팅한다.
   const navigateToTabs = () => {
     // 탭 네비게이션 화면으로 교체 이동한다.
-    void pendingInvite()
-      .then((invite) => {
+    void pendingAuthDestination()
+      .then((destination) => {
         // 인증 전에 받은 초대 링크로 복귀한다.
-        router.replace(invite ? '/invite' : '/(tabs)');
+        router.replace(destination);
       })
       .catch(() => {
         // 저장소 오류가 있어도 여행 허브에 진입할 수 있다.
@@ -140,27 +144,33 @@ export default function SocialAuthScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      {emailOpen && (
+        <EmailAuth
+          onClose={() => {
+            // 인증 입력 모달을 닫고 소셜 로그인 화면으로 돌아간다.
+            return setEmailOpen(false);
+          }}
+          onAuthenticated={navigateToTabs}
+        />
+      )}
       <StatusBar style="dark" />
-      <View style={styles.container}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.container,
+          { flexGrow: 1, flex: undefined },
+        ]}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* 상단 브랜드 및 슬로건 히어로 섹션 */}
         <View style={styles.heroSection}>
-          <View style={styles.logoBox}>
-            <Ionicons name="location-sharp" size={32} color="#FF5436" />
-            <View style={styles.logoBadge}>
-              <Ionicons name="airplane" size={11} color="#FFFFFF" />
-            </View>
-          </View>
+          <Image
+            source={require('../../assets/brand/tripprint-v1/TripPrint_logo-stacked_768x768.png')}
+            style={styles.brandLogo}
+            resizeMode="contain"
+            accessibilityLabel="TripPrint 트립프린트"
+          />
 
-          <View style={styles.brandTitleRow}>
-            <Text style={styles.brandTitle}>WHEREGO</Text>
-            <View style={styles.koreanBadge}>
-              <Text style={styles.koreanBadgeText}>웨어고</Text>
-            </View>
-          </View>
-
-          <Text style={styles.brandSubtitle}>
-            간편한 소셜 연동으로 시작하는 스마트 여행 일정
-          </Text>
+          <Text style={styles.brandSubtitle}>여행의 발자취를 남기다.</Text>
 
           {/* OS 플랫폼 표시 배지 */}
           <View style={styles.osBadgeWrap}>
@@ -246,6 +256,22 @@ export default function SocialAuthScreen() {
         ) : (
           /* 플랫폼별 인증 버튼 영역 */
           <View style={styles.buttonGroup}>
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel="이메일로 계속하기"
+              style={styles.googleBtn}
+              onPress={() => {
+                // 실제 이메일 로그인·회원가입 입력을 연다.
+                return setEmailOpen(true);
+              }}
+            >
+              <Ionicons
+                name="mail-outline"
+                size={18}
+                color={loginTheme.primary}
+              />
+              <Text style={styles.googleBtnText}>이메일로 계속하기</Text>
+            </TouchableOpacity>
             {/* 1. 공통: 카카오톡 로그인 (AOS & iOS 공통 1순위) */}
             <TouchableOpacity
               style={styles.kakaoBtn}
@@ -257,7 +283,7 @@ export default function SocialAuthScreen() {
                 size={18}
                 color={loginTheme.kakaoText}
               />
-              <Text style={styles.kakaoBtnText}>카카오톡으로 계속하기</Text>
+              <Text style={styles.kakaoBtnText}>카카오톡 로그인 · 준비 중</Text>
             </TouchableOpacity>
 
             {/* 2. AOS(Android): Google 로그인 */}
@@ -269,7 +295,7 @@ export default function SocialAuthScreen() {
               >
                 <Ionicons name="logo-google" size={18} color="#EA4335" />
                 <Text style={styles.googleBtnText}>
-                  Google 계정으로 계속하기
+                  Google 계정으로 계속하기 · 준비 중
                 </Text>
               </TouchableOpacity>
             }
@@ -282,7 +308,7 @@ export default function SocialAuthScreen() {
                 activeOpacity={0.88}
               >
                 <Ionicons name="logo-apple" size={20} color="#FFFFFF" />
-                <Text style={styles.appleBtnText}>Apple로 계속하기</Text>
+                <Text style={styles.appleBtnText}>Apple 로그인 · 준비 중</Text>
               </TouchableOpacity>
             )}
 
@@ -317,10 +343,10 @@ export default function SocialAuthScreen() {
         {/* 하단 약관 안내 문구 */}
         <View style={styles.footerWrap}>
           <Text style={styles.footerText}>
-            시작 시 WHEREGO의 이용약관 및 개인정보 처리방침에 동의하게 됩니다.
+            시작 시 TripPrint의 이용약관 및 개인정보 처리방침에 동의하게 됩니다.
           </Text>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -344,57 +370,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 36,
   },
-  logoBox: {
-    width: 68,
-    height: 68,
-    borderRadius: 20,
-    backgroundColor: '#1E2430',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    elevation: 4,
-    position: 'relative',
-  },
-  logoBadge: {
-    position: 'absolute',
-    bottom: -2,
-    right: -2,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: loginTheme.primary,
-    borderWidth: 2,
-    borderColor: loginTheme.bg,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  brandTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 6,
-  },
-  brandTitle: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: loginTheme.textPrimary,
-    letterSpacing: -0.5,
-  },
-  koreanBadge: {
-    backgroundColor: '#E5E7EB',
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-    borderRadius: 6,
-  },
-  koreanBadgeText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: loginTheme.textSecondary,
-  },
+  brandLogo: { width: 250, height: 210 },
   brandSubtitle: {
     fontSize: 14,
     color: loginTheme.textSecondary,

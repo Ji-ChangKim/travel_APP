@@ -12,10 +12,10 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
+    "start": "npm --workspace=@wherego/mobile run start",
+    "android": "npm --workspace=@wherego/mobile run android",
+    "ios": "npm --workspace=@wherego/mobile run ios",
+    "web": "npm --workspace=@wherego/mobile run web",
     "mobile": "npm --workspace=@wherego/mobile run start",
     "mobile:web": "npm --workspace=@wherego/mobile run web",
     "mobile:doctor": "npm --workspace=@wherego/mobile run doctor",
@@ -45,7 +45,10 @@
     "build:apk": "npm --workspace=@wherego/mobile run build:apk",
     "build:all": "npm --workspace=@wherego/mobile run build:all",
     "eas:login": "npx --yes eas-cli login",
-    "doctor": "npx expo-doctor"
+    "eas-build-post-install": "node scripts/check-mvp-build.mjs --preview-only",
+    "doctor": "npx expo-doctor",
+    "test:cloud": "npm run api:build:test && node --test tests/cloud/runtime.test.mjs",
+    "api:build:test": "npm --workspace=@wherego/api run build:test"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",

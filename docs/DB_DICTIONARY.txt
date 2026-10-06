@@ -1013,3 +1013,212 @@ restrictedRegions: Record<string,string>, 일부 지역 금지 대상 14개 국�
 일부 지역 금지 국가는 검색에 유지하고 선택 후 금지 지역·공식 현황 링크를 표시.
 출처: https://0404.go.kr/bbs/contsPst/MST0000000000101/1/detail
 정책은 2026-10-05 확인한 정적 스냅샷으로 자동 갱신되지 않음. 변경 시 countries.ts와 본 명세를 함께 갱신.
+
+[v2.1 MVP 이메일 인증·Google 공유·발자국 / 2026-10-06]
+DB명: 기존 Supabase PostgreSQL (public/auth/wherego_private). 신규 테이블·컬럼·마이그레이션 없음.
+이메일 계정은 auth.users / public.profiles의 기존 UUID와 auth_provider='email'을 사용.
+가입 nickname string: trim 2~30자. email string: trim 유효 이메일 최대254자.
+신규 password string: 8~128자, confirmation과 일치. 기존 로그인 password는 1~128자.
+비밀번호·confirmation은 모달 메모리 입력만 사용하며 DB·일반 기기 저장·로그·URL에 기록하지 않음.
+Supabase SDK Auth 반환 객체: user User|null, session Session|null, error Error|null.
+user만 반환된 이메일 확인 대기는 로그인 완료로 처리하지 않음. 세션 갱신·복원은 기존 AuthBridge 사용.
+
+GoogleMapsSharePreview: 앱/API 메모리 전용 객체. DB 저장 테이블 없음.
+query: string trim 최대200자. 공유 URL에 사용자가 제공한 query/q 또는 /maps/place/ 경로의 검색 후보.
+googlePlaceId: string ^[A-Za-z0-9_-]{1,200}$ 또는 빈 문자열.
+query/googlePlaceId 중 하나 필수. 좌표·문서화되지 않은 data URL 조각은 장소 ID로 추측하지 않음.
+GET /api/v1/places/import?text=공유문: 실제 로그인 필수, 입력 최대4096자, HTTPS Google 지도 링크 정확히 하나.
+허용 호스트: maps.app.goo.gl, goo.gl(/maps/단축코드), google.com, www.google.com,
+  maps.google.com, www.google.co.kr, www.google.co.jp(/maps 경로만).
+임의 포트·userinfo·다른 호스트 거부. 단축 주소는 HEAD/manual redirect, 매 Location 주소 재검증.
+단축 주소 요청 최대4회, 전체 제한시간10초. 사용자 JWT·쿠키·Google 키 전달 없음.
+지도 페이지 본문 수집·Google 목록 전체 동기화 없음. 이름 후보는 기존 Places 검색으로 확인.
+DB 저장은 기존 schedule.save + itinerary_google_places.place_id 연결 사용. 후보 확인 전 DB 쓰기 없음.
+PlanForm.values.sharedMapsText: string, 일정 작성 모달 메모리 전용. formCommand에서 제외하여 서버 계약·DB에 저장하지 않음.
+PendingMapsShare: 임시 공유 객체 {text:string 검증된 Google URL 최대4096자, savedAt:number Unix milliseconds}.
+저장 키 wherego-pending-map-share. 웹 sessionStorage / 네이티브 SecureStore, 유효기간1시간, 미래 저장시각 거부.
+인증 복귀 우선순위: 기존 초대 → 대기 지도 공유 → 내 여행. 공개된 장소 URL만 임시 저장.
+일정 폼으로 인계하거나 가져오기 취소 시 임시 후보와 OS 공유 캐시 삭제.
+Android expo-sharing: text/plain 단일 공유 인텐트. travelapp://expo-sharing → /import-place.
+iOS/web: 링크 붙여넣기 제공. iOS 공유 확장은 이번 MVP 설정에 포함하지 않음.
+
+발자국 다이어리: 기존 WorkspaceSnapshot으로 구성하는 조회 화면. DB 저장·별도 공개 사본 자동 생성 없음.
+/diary/{tripId}: 실제 멤버십 검증, COMPLETED 여행만 날짜별 다이어리 표시.
+WorkspaceSchedule.type: 기존 PLACE/TRANSPORT/STAY/RESERVATION/TODO/MEMO 유지.
+DiaryCostSummary: 메모리 배열 {currency:KRW|JPY|USD, amount:string 두 자리 소수}.
+isActual=true인 기존 WorkspaceExpense만 BigInt 센트 합산, 다른 통화·예상비용·영수증 원본 합산 제외.
+영수증 지출은 기존 expenses에 저장된 금액을 한 번만 합산. 음식·구매 내용은 WorkspaceReceipt.details 표시.
+사진은 purpose='photo'만 일정별/미연결 목록에 표시. 영수증 원본 사진은 여행 사진에 포함하지 않음.
+사진 조회는 기존 멤버 권한 및 60초 서명 URL 사용. 공개 선택은 기존 community.publish 계약 유지.
+
+======================================================================
+[현재 운영 명세 v3.0 / 2026-10-06 / Cloudflare D1·R2 전환]
+======================================================================
+현재 MVP의 인증·여행·사진·게시물은 아래 D1 DB와 비공개 R2를 사용한다.
+앞선 Supabase 명세와 supabase/migrations는 이전 백엔드 회귀검사·자료로 보존한다.
+기존 Supabase 실제 데이터의 백업을 제공받지 않았으므로 이번 배포는 신규 D1이다.
+
+DB명: wherego-staging
+DB ID: 1c6b34d4-cbfa-45b2-8859-6531b1f95ac9
+엔진: Cloudflare D1 (SQLite), 모든 외부 입력은 prepared statement bind 사용.
+원자성: 여행 snapshot·버전·멤버 인덱스·초대·게시물·요청 결과는 D1.batch 트랜잭션.
+DB 직접 접근 키는 앱에 존재하지 않는다. Worker가 매 요청 세션/멤버십을 검증한다.
+마이그레이션: apps/api/migrations/0001_cloud_storage.sql ~ 0003_upload_deletion.sql.
+인증 공급자: Better Auth 1.7.7, 이메일/비밀번호, 서명 Bearer, 세션 7일.
+이메일 소유권 검증·비밀번호 재설정 메일·소셜 OAuth 공급자는 아직 미연결이다.
+
+[테이블 user / 인증 계정]
+id TEXT PK: crypto.randomUUID() 실제 회원 식별자.
+name TEXT NOT NULL: 공개 닉네임. 프로필 편집 API는 1~50자 검사.
+email TEXT NOT NULL UNIQUE: 표준 인증이 정규화·검증하는 이메일 로그인 주소.
+emailVerified INTEGER NOT NULL DEFAULT 0: 이메일 확인 여부. 현재 가입은 미확인 상태.
+image TEXT NULL: 아바타 주소. 현재 별도 아바타 업로드는 미제공.
+createdAt INTEGER NOT NULL / updatedAt INTEGER NOT NULL: 인증 어댑터의 UTC 밀리초.
+
+[테이블 session / 서버 세션]
+id TEXT PK: 세션 UUID.
+expiresAt INTEGER NOT NULL: UTC 밀리초 만료 시각.
+token TEXT NOT NULL UNIQUE: 서버 내부 난수 세션 토큰. 응답 Bearer는 AUTH_SECRET 서명.
+createdAt / updatedAt INTEGER NOT NULL: 세션 생성·갱신 시각.
+ipAddress TEXT NULL / userAgent TEXT NULL: 인증 서버의 접속 메타데이터.
+userId TEXT NOT NULL FK user(id) ON DELETE CASCADE: 세션 계정. session_user 인덱스.
+로그아웃은 서버 세션을 철회하며 기기 SecureStore/웹 localStorage 토큰을 제거한다.
+
+[테이블 account / 로그인 자격 증명]
+id TEXT PK: 자격 증명 UUID.
+accountId TEXT NOT NULL / providerId TEXT NOT NULL: 계정·공급자 식별자; 현재 credential.
+userId TEXT NOT NULL FK user(id) ON DELETE CASCADE: 회원. account_user 인덱스.
+password TEXT NULL: Better Auth의 표준 scrypt 해시. 평문 비밀번호 저장 안 함.
+accessToken / refreshToken / idToken TEXT NULL: 향후 외부 공급자 연동 필드; 현재 미사용.
+accessTokenExpiresAt / refreshTokenExpiresAt INTEGER NULL: 향후 외부 토큰 UTC 밀리초.
+scope TEXT NULL: 향후 공급자 권한 범위.
+createdAt / updatedAt INTEGER NOT NULL: 생성·갱신 UTC 밀리초.
+
+[테이블 verification / 인증 검증]
+id TEXT PK / identifier TEXT NOT NULL / value TEXT NOT NULL: 표준 인증의 검증 레코드.
+expiresAt / createdAt / updatedAt INTEGER NOT NULL: UTC 밀리초.
+verification_identifier 인덱스. 현재 확인 메일 발송 기능은 연결하지 않았다.
+
+[테이블 rateLimit / 인증 요청 제한]
+id TEXT PK: 표준 인증 제한 레코드 UUID.
+key TEXT NOT NULL UNIQUE: 신뢰하는 cf-connecting-ip 및 인증 엔드포인트 기반 키.
+count INTEGER NOT NULL: 현재 창의 요청 횟수.
+lastRequest INTEGER NOT NULL: 창의 기준 UTC 밀리초; rate_limit_last_request 인덱스.
+기본 60회/60초, 이메일 로그인 10회/60초, 가입 5회/60초. 서버 인스턴스 교체에도 유지.
+
+[테이블 trips / 여행 집계]
+id TEXT PK: 여행 UUID.
+owner_id TEXT NOT NULL FK user(id): 여행 소유자.
+version INTEGER NOT NULL CHECK >0: 낙관적 잠금 버전, 최초 1, 확정 변경마다 +1.
+snapshot TEXT NOT NULL CHECK json_valid: WorkspaceSnapshot JSON. 금액은 십진 문자열.
+last_key TEXT NOT NULL: actor UUID:request UUID. CAS 성공의 부수 저장 조건에 사용.
+UPDATE WHERE version=? 방식으로 경쟁 저장을 거부한다. 요청 키 재생은 버전 증가 없음.
+
+[테이블 trip_members / 멤버십 조회 인덱스]
+trip_id TEXT NOT NULL FK trips(id) ON DELETE CASCADE.
+user_id TEXT NOT NULL FK user(id) ON DELETE CASCADE.
+role TEXT NOT NULL CHECK owner/editor/viewer: 소유자는 제거·권한 강등 불가.
+PK(trip_id,user_id), members_user(user_id,trip_id) 인덱스.
+snapshot.members와 같은 batch에서 갱신. UUID를 아는 비멤버도 조회 불가.
+
+[테이블 mutation_requests / 멱등 명령]
+actor_id TEXT NOT NULL FK user(id) ON DELETE CASCADE.
+request_key TEXT NOT NULL: 입력 Idempotency-Key UUID. PK(actor_id,request_key).
+input_hash TEXT NOT NULL: 계약명·입력·대상·버전의 SHA-256. 다른 본문 재사용은 409.
+result TEXT NOT NULL CHECK json_valid: 확정한 응답 JSON; tripId/tripVersion 및 명령 결과.
+created_at INTEGER NOT NULL: UTC 밀리초.
+이 테이블은 Worker 전용 비공개 저장이다. 초대 생성 재시도를 위해 결과에는 초대 토큰도
+포함된다. invites 검색 테이블은 토큰 해시만 저장한다. 일반 조회/로그에 원문 미노출.
+
+[테이블 invites / 한 번용 공유 초대]
+id TEXT PK: 초대 UUID.
+trip_id TEXT NOT NULL FK trips(id) ON DELETE CASCADE; invites_trip 인덱스.
+token_hash TEXT NOT NULL UNIQUE: 32바이트 보안 난수 토큰의 SHA-256.
+role TEXT NOT NULL CHECK editor/viewer: 수락 시 허용할 역할.
+expires_at INTEGER NOT NULL: 발급 시각 +24시간, UTC 밀리초.
+revoked_at INTEGER NULL / used_at INTEGER NULL: 철회·소비 UTC 밀리초.
+used_by TEXT NULL FK user(id): 소비한 회원. 사용·철회·만료는 CAS 조건에서 다시 확인.
+소유자만 생성·철회. 기존 멤버의 역할은 초대로 덮어쓰지 않는다.
+
+[테이블 posts / 발자국 공개 스냅샷]
+id TEXT PK: 게시물 UUID.
+trip_id TEXT NOT NULL UNIQUE FK trips(id) ON DELETE CASCADE: 여행당 게시물 한 개.
+author_id TEXT NOT NULL FK user(id): 실제 여행 소유자.
+published_at INTEGER NOT NULL: UTC 밀리초; posts_recent DESC 인덱스.
+snapshot TEXT NOT NULL CHECK json_valid: CommunityPost JSON.
+COMPLETED 여행의 소유자만 게시한다. 선택 일정과 일반 사진만 공개하고 비용은 명시
+동의 시 통화별 실제 지출만 집계한다. 영수증 원본·일정 메모는 공개 객체에서 제외.
+철회 시 posts 행을 지운다. 기존 이미지 서명 URL도 현재 공개 여부를 재검사한다.
+
+[테이블 uploads / 비공개 원본 메타데이터]
+path TEXT PK: trip UUID/media UUID.jpg 또는 .png. 클라이언트 임의 경로 금지.
+trip_id TEXT NOT NULL FK trips(id) ON DELETE CASCADE.
+actor_id TEXT NOT NULL FK user(id): 실제 업로드 회원.
+mime TEXT NOT NULL CHECK image/jpeg 또는 image/png: 파일 시그니처로 서버가 판단.
+size INTEGER NOT NULL CHECK 1~4194304: 4MiB 제한.
+created_at INTEGER NOT NULL: UTC 밀리초.
+deleted_at INTEGER NULL: 원본 정리 전 원자적 삭제 예정 표식. 재등록 CAS는 NULL만 허용.
+원본의 DB 등록은 업로드 계정·여행·MIME을 대조한다. 등록 참조가 있는 사진과 확정
+영수증 원본은 삭제할 수 없다. 삭제 표식은 R2 정리 실패 시 재시도에도 유지된다.
+
+[테이블 blocks / 본인 차단 목록]
+actor_id TEXT NOT NULL FK user(id) ON DELETE CASCADE.
+blocked_id TEXT NOT NULL FK user(id) ON DELETE CASCADE.
+PK(actor_id,blocked_id). 본인 커뮤니티 조회에만 필터 적용.
+
+[테이블 reports / 게시물 신고]
+id TEXT PK: 신고 UUID.
+actor_id TEXT NOT NULL FK user(id): 신고자.
+post_id TEXT NOT NULL FK posts(id) ON DELETE CASCADE: 현재 존재하는 공개 글.
+reason TEXT NOT NULL CHECK length 1~500: 신고 이유.
+created_at INTEGER NOT NULL: UTC 밀리초.
+운영자 검토 UI는 MVP 이후 과제이며 저장 성공을 처리 완료로 안내하지 않는다.
+
+[테이블 profiles / 본인 상세 프로필]
+user_id TEXT PK FK user(id) ON DELETE CASCADE.
+details TEXT NOT NULL DEFAULT '{}' CHECK json_valid: {bio,travelStyles}.
+bio: string|null, 최대 300자. travelStyles: string[], 최대20개, 각 최대50자.
+닉네임은 user.name에 저장하고 details는 같은 D1.batch에서 확정한다.
+프로필 API는 본인만 접근. 클라이언트는 서버 확정 뒤 저장 완료를 표시한다.
+
+[R2 버킷]
+버킷명: tripprint-staging-private / Worker 바인딩: MEDIA.
+위치: APAC. 기본 저장 클래스: Standard. r2.dev 공개 접근: 비활성.
+2026-10-06 브랜드명 변경: 기존 wherego-staging-private(객체0개,0B)에서 전환.
+Worker MEDIA 연결 재배포 및 검증 완료. 기존 빈 버킷 삭제 완료.
+접근: 비공개. S3 액세스 키 또는 공개 버킷 주소는 앱에 없음.
+객체 key: trip UUID/media UUID.jpg|png.
+httpMetadata.contentType: 실제 JPEG/PNG. customMetadata.actor: 업로드 회원 UUID.
+생성 전용 conditional put으로 덮어쓰기 금지. 4MiB 초과와 잘못된 시그니처는 거부.
+조회 URL: Worker HMAC SHA-256 서명, 60초 만료, 경로·계정·만료에 결합.
+요청 시 현재 멤버십 또는 게시물의 photoPaths를 재확인. Cache-Control:no-store, nosniff.
+
+[WorkspaceSnapshot / 기존 공통 도메인 계약 유지]
+trip: id,ownerId,title,country,city,startDate,endDate,timezone,defaultCurrency,coverColor,
+status(DRAFT/PLANNED/IN_PROGRESS/COMPLETED/ARCHIVED),version. 날짜 최대90일.
+days[]: id(UUID),dayNumber(number),tripDate(YYYY-MM-DD). 날짜 유지 시 ID 재사용.
+itinerary[]: id,dayId,title,type,timeSlot(string|null),sortOrder,memo(string|null),address,
+googlePlaceId?(검증된 Google 장소 식별자). 최초 항공편은 첫 DAY의 TRANSPORT로 저장.
+expenses[]: id,dayId|null,scheduleId|null,title,amount(정밀 십진 문자열),currency(KRW/JPY/USD),
+isActual(boolean),category,source(manual/receipt). 원화·엔 소수 불가, 달러 소수 최대2자리.
+checklists[]: id,title,isCompleted(boolean). 완료 상태를 명시적으로 저장하며 toggle 안 함.
+members[]: memberId,userId,nickname,role,isMe. isMe/myRole은 요청 계정 기준으로 계산.
+media[]: id,path,purpose(photo/receipt),scheduleId|null. 실제 업로드만 참조 가능.
+receipts[]: id,scheduleId,mediaId,merchant,date,amount,currency,details. 원본당 확정 한 번.
+확정은 일정·실제 비용·영수증을 동일 여행 batch에서 저장한다. receipt ID와 비용 ID 동일.
+invites[]: id,role,expiresAt,revokedAt|null,usedAt|null. 원문 토큰 제외.
+postId: 공개 게시물 UUID|null. 사진 삭제 시 게시물 철회로 기존 공개 참조도 제거.
+
+[CommunityPost / 공개 계약 유지]
+id,authorId,author,title,body,publishedAt,photoPaths[];
+snapshot: country,city,startDate,endDate,itinerary[{title,date,timeSlot,address}],
+costs{KRW?,JPY?,USD?}(문자열). 비용 집계는 BigInt로 정밀도를 보존한다.
+
+[CloudUser / CloudSession / 인증 클라이언트 객체]
+CloudUser: id(UUID),name,email,image?(string|null),createdAt/updatedAt(string|number).
+CloudSession: user(CloudUser),access_token(서명된 서버 Bearer).
+토큰 기기 키: wherego.cloud.session.v1. 네이티브 SecureStore / 웹 Origin localStorage.
+인증 이벤트 revision(number): 이전 비동기 복원이 새 계정을 덮어쓰는 것을 방지.
+App Profile: 실제 UUID와 닉네임, avatarUrl|null, authProvider=email, osPlatform,
+createdAt,updatedAt,lastSignInAt; 상세 bio/travelStyles는 본인 D1 조회로 복원.
+======================================================================

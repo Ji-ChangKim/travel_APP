@@ -32,80 +32,50 @@ async function network(
   const requests = new Map<string, unknown>();
   const user = {
     id: owner,
-    aud: 'authenticated',
-    role: 'authenticated',
+    name: '검증 여행자',
     email: 'fixture@example.test',
-    is_anonymous: false,
-    app_metadata: { provider: 'google' },
-    user_metadata: { name: '검증 여행자' },
-    created_at: '2026-10-03T00:00:00Z',
+    createdAt: '2026-10-03T00:00:00Z',
+    updatedAt: '2026-10-03T00:00:00Z',
   };
-  await page.route('https://wherego-test.supabase.co/**', async (route) => {
-    // OAuth는 실제 PKCE URL과 코드 교환을 사용하되 외부 계정만 fixture다.
-    const url = new URL(route.request().url());
-    if (url.pathname.endsWith('/authorize')) {
-      // 등록된 복귀 URL·challenge를 확인한 뒤 콜백으로 이동한다.
-      expect(url.searchParams.get('provider')).toBe('google');
-      expect(url.searchParams.get('code_challenge')).toBeTruthy();
-      const callback = new URL(url.searchParams.get('redirect_to')!);
-      callback.searchParams.set('code', 'fixture-code');
-      await route.fulfill({
-        status: 302,
-        headers: { Location: callback.toString() },
+  await page.route('**/api/auth/**', async (route) => {
+    // 표준 인증 REST 요청만 외부 네트워크 경계에서 대체한다.
+    const path = new URL(route.request().url()).pathname;
+    if (path.endsWith('/sign-in/email') || path.endsWith('/sign-up/email')) {
+      // 실제 사용자 이메일 폼이 서버 요청으로 이어져야 한다.
+      expect(route.request().postDataJSON()).toMatchObject({
+        email: 'fixture@example.test',
+        password: 'password123',
       });
-      return;
+      if (path.endsWith('/sign-up/email'))
+        expect(route.request().postDataJSON().name).toBe('첫 여행자');
+      return route.fulfill({
+        headers: { 'set-auth-token': 'fixture-signed-session' },
+        json: { token: 'fixture-session', user },
+      });
     }
-    if (url.pathname.endsWith('/token')) {
-      // 실제 SDK가 브라우저에 보관한 verifier를 제출해야 한다.
-      expect(route.request().postDataJSON().code_verifier).toBeTruthy();
-      await route.fulfill({
-        json: {
-          access_token: `${Buffer.from('{"alg":"HS256"}').toString('base64url')}.${Buffer.from(JSON.stringify({ sub: owner, exp: Math.floor(Date.now() / 1000) + 3600 })).toString('base64url')}.fixture`,
-          refresh_token: 'fixture-refresh',
-          token_type: 'bearer',
-          expires_in: 3600,
-          user,
+    if (path.endsWith('/get-session'))
+      return route.fulfill({ json: { user, session: { id: owner } } });
+    return route.fulfill({ json: {} });
+  });
+  await page.route('**/files/**', async (route) => {
+    // 파일 선택은 실제 인증된 R2 업로드 요청으로 이어진다.
+    const path = new URL(route.request().url()).pathname;
+    expect(route.request().headers().authorization).toMatch(/^Bearer /);
+    expect(route.request().postDataBuffer()?.length).toBeGreaterThan(0);
+    return route.fulfill({
+      status: 201,
+      json: {
+        data: {
+          id: path.split('/')[3],
+          path: `${path.split('/')[2]}/${path.split('/')[3]}.png`,
+          mimeType: 'image/png',
         },
-      });
-      return;
-    }
-    if (url.pathname.endsWith('/user')) {
-      await route.fulfill({ json: user });
-      return;
-    }
-    if (
-      url.pathname.includes('/object/sign/') &&
-      route.request().method() === 'POST'
-    ) {
-      await route.fulfill({
-        json: {
-          signedURL: '/object/sign/trip-private/fixture.png?token=fixture',
-        },
-      });
-      return;
-    }
-    if (
-      route.request().method() === 'POST' &&
-      url.pathname.includes('/object/trip-private/')
-    ) {
-      // 파일 선택은 실제 업로드 요청 본문으로 이어져야 한다.
-      expect(route.request().postDataBuffer()?.length).toBeGreaterThan(0);
-      await route.fulfill({
-        json: {
-          Key: url.pathname.replace('/storage/v1/object/', ''),
-          Id: crypto.randomUUID(),
-        },
-      });
-      return;
-    }
-    if (url.pathname.includes('/object/sign/')) {
-      await route.fulfill({ body: tinyPng, contentType: 'image/png' });
-      return;
-    }
-    await route.fulfill({
-      status: 404,
-      json: { message: 'fixture not found' },
+      },
     });
+  });
+  await page.route('https://wherego-test.supabase.co/**', async (route) => {
+    // 이전 이미지 fixture 주소만 표시용 바이트로 반환한다.
+    return route.fulfill({ body: tinyPng, contentType: 'image/png' });
   });
   // JSON 응답의 공통 envelope를 유지한다.
   async function respond(
@@ -178,6 +148,17 @@ async function network(
       await respond(route, [
         { id: 'fixture-place', title: '도쿄 식당', address: '도쿄' },
       ]);
+      return;
+    }
+    if (path === '/api/v1/places/import') {
+      // 공유 링크 후보만 반환하고 일정은 확인 전까지 생성하지 않는다.
+      expect(new URL(route.request().url()).searchParams.get('text')).toBe(
+        'https://maps.app.goo.gl/fixture',
+      );
+      await respond(route, {
+        query: '도쿄 식당',
+        googlePlaceId: 'fixture-place',
+      });
       return;
     }
     if (path === '/api/v1/trips') {
@@ -369,7 +350,7 @@ async function network(
 async function login(page: Page): Promise<void> {
   // 서버 세션을 React 상태·저장소에 직접 주입하지 않는다.
   await page.goto('/login');
-  await page.getByText('Google 계정으로 계속하기', { exact: true }).click();
+  await emailLogin(page);
   await expect(
     page.getByRole('button', {
       name: '새 여행 시작하기',
@@ -377,6 +358,319 @@ async function login(page: Page): Promise<void> {
     }),
   ).toBeVisible();
 }
+
+// 로그인 화면에서 실제 이메일 입력과 버튼만 사용한다.
+function emailLogin(page: Page): Promise<void> {
+  // 인증 토큰과 계정 상태를 직접 주입하지 않는다.
+  return page
+    .getByRole('button', { name: '이메일로 계속하기', exact: true })
+    .click()
+    .then(() => {
+      /* 폼에 사용자 정보를 입력한다. */ return fields(page, {
+        이메일: 'fixture@example.test',
+        비밀번호: 'password123',
+      });
+    })
+    .then(() => {
+      /* 실제 로그인 버튼으로 세션을 발급받는다. */ return page
+        .getByRole('button', { name: '이메일 로그인', exact: true })
+        .click();
+    });
+}
+// 각 단일 명령 테스트 단계를 이전 단계 완료 뒤에 실행한다.
+function testSteps(steps: (() => Promise<unknown>)[]): Promise<void> {
+  // 입력·클릭·응답 검증을 사용자 흐름 순서대로 연결한다.
+  return steps.reduce<Promise<void>>((previous, step) => {
+    // 현재 단계의 검증이 실패하면 후속 단계를 실행하지 않는다.
+    return previous.then(step).then(() => {
+      // 각 단계의 반환값은 다음 단계에 전달하지 않는다.
+      return undefined;
+    });
+  }, Promise.resolve());
+}
+
+// 새 이메일 계정은 확인 대기 안내 후 사용자가 직접 로그인해야 한다.
+test('이메일 가입 입력을 검증하고 실제 세션 발급 후 재조회에서도 로그인한다', ({
+  page,
+}) => {
+  // 가입 폼을 실제 사용자 입력으로 검증한다.
+  return testSteps([
+    () => {
+      /* 외부 HTTP 경계만 격리한다. */ return network(page);
+    },
+    () => {
+      /* 로그인 화면을 연다. */ return page.goto('/login');
+    },
+    () => {
+      /* 이메일 폼을 연다. */ return page
+        .getByRole('button', { name: '이메일로 계속하기', exact: true })
+        .click();
+    },
+    () => {
+      /* 가입 모드로 전환한다. */ return page
+        .getByRole('button', { name: '이메일로 회원가입', exact: true })
+        .click();
+    },
+    () => {
+      /* 가입 정보를 입력한다. */ return fields(page, {
+        이메일: 'fixture@example.test',
+        닉네임: '첫 여행자',
+        비밀번호: 'password123',
+        '비밀번호 확인': 'different',
+      });
+    },
+    () => {
+      /* 잘못된 확인 값으로 제출한다. */ return page
+        .getByRole('button', { name: '회원가입', exact: true })
+        .click();
+    },
+    () => {
+      /* 입력 검증이 서버 전송을 막는지 확인한다. */ return expect(
+        page.getByRole('alert'),
+      ).toContainText('비밀번호 확인이 일치하지 않습니다.');
+    },
+    () => {
+      /* 비밀번호 확인을 수정한다. */ return page
+        .getByLabel('비밀번호 확인', { exact: true })
+        .fill('password123');
+    },
+    () => {
+      /* 실제 가입 요청을 제출한다. */ return page
+        .getByRole('button', { name: '회원가입', exact: true })
+        .click();
+    },
+    () => {
+      /* 발급 세션이 있어야 여행에 진입한다. */ return expect(
+        page.getByRole('button', { name: '새 여행 시작하기', exact: true }),
+      ).toBeVisible();
+    },
+    () => {
+      /* 서버 세션 복원을 확인한다. */ return page.reload();
+    },
+    () => {
+      /* 재조회 후에도 로그인 상태여야 한다. */ return expect(
+        page.getByRole('button', { name: '새 여행 시작하기', exact: true }),
+      ).toBeVisible({ timeout: 10000 });
+    },
+  ]);
+});
+// 잘못된 이메일 계정 응답은 안전한 안내를 표시하고 동일 입력으로 재시도한다.
+test('이메일 로그인 실패는 입력을 유지하고 실제 세션 성공 후만 여행에 진입한다', async ({
+  page,
+}) => {
+  // 단일 명령 검증 단계를 사용자 흐름 순서대로 실행한다.
+  return testSteps([
+    () => {
+      // 외부 인증·API 응답 경계만 테스트 환경으로 분리한다.
+      return network(page);
+    },
+    () => {
+      // 첫 인증 실패 응답을 HTTP 경계에 설정한다.
+      return page.route('**/api/auth/sign-in/email', async (route) => {
+        // 한 번 실패한 뒤에는 기존 SDK 인증 fixture를 사용한다.
+        return route
+          .fulfill({
+            status: 400,
+            json: {
+              code: 'invalid_credentials',
+              msg: 'fixture internal error',
+            },
+          })
+          .then(() => {
+            // 첫 실패 이후에는 기본 인증 응답 경계로 복귀한다.
+            return page.unroute('**/api/auth/sign-in/email');
+          });
+      });
+    },
+    () => {
+      // 실제 앱 경로를 사용자 브라우저에서 연다.
+      return page.goto('/login');
+    },
+    () => {
+      // 화면 버튼으로 현재 사용자 동작을 진행한다.
+      return page
+        .getByRole('button', { name: '이메일로 계속하기', exact: true })
+        .click();
+    },
+    () => {
+      // 사용자 입력으로 폼 값을 작성한다.
+      return fields(page, {
+        이메일: 'fixture@example.test',
+        비밀번호: 'password123',
+      });
+    },
+    () => {
+      // 화면 버튼으로 현재 사용자 동작을 진행한다.
+      return page
+        .getByRole('button', { name: '이메일 로그인', exact: true })
+        .click();
+    },
+    () => {
+      // 화면 또는 응답의 인수 조건을 검증한다.
+      return expect(page.getByRole('alert')).toContainText(
+        '이메일과 비밀번호를 확인하고 다시 시도해 주세요.',
+      );
+    },
+    () => {
+      // 화면 또는 응답의 인수 조건을 검증한다.
+      return expect(page.getByLabel('이메일', { exact: true })).toHaveValue(
+        'fixture@example.test',
+      );
+    },
+    () => {
+      // 화면 또는 응답의 인수 조건을 검증한다.
+      return expect(page.getByText('fixture internal error')).toHaveCount(0);
+    },
+    () => {
+      // 화면 또는 응답의 인수 조건을 검증한다.
+      return expect(page).toHaveURL(/\/login$/);
+    },
+    () => {
+      // 화면 버튼으로 현재 사용자 동작을 진행한다.
+      return page
+        .getByRole('button', { name: '이메일 로그인', exact: true })
+        .click();
+    },
+    () => {
+      // 화면 또는 응답의 인수 조건을 검증한다.
+      return expect(
+        page.getByRole('button', { name: '새 여행 시작하기', exact: true }),
+      ).toBeVisible();
+    },
+  ]);
+});
+
+// 로그인 전 공유 후보를 보관하고 새 여행 일정으로 확인 저장한다.
+test('Google Maps 공유 → 로그인 → 새 여행 → 장소 확인 → 일정 저장', async ({
+  page,
+}) => {
+  // 단일 명령 검증 단계를 사용자 흐름 순서대로 실행한다.
+  return testSteps([
+    () => {
+      // 외부 인증·API 응답 경계만 테스트 환경으로 분리한다.
+      return network(page);
+    },
+    () => {
+      // 실제 앱 경로를 사용자 브라우저에서 연다.
+      return page.goto('/import-place');
+    },
+    () => {
+      // 사용자 입력으로 폼 값을 작성한다.
+      return page
+        .getByLabel('받은 Google Maps 링크', { exact: true })
+        .fill('https://maps.app.goo.gl/fixture');
+    },
+    () => {
+      // 화면 버튼으로 현재 사용자 동작을 진행한다.
+      return page
+        .getByRole('button', { name: '로그인하고 장소 가져오기', exact: true })
+        .click();
+    },
+    () => {
+      // 화면 버튼으로 현재 사용자 동작을 진행한다.
+      return page
+        .getByRole('button', { name: '이메일로 계속하기', exact: true })
+        .click();
+    },
+    () => {
+      // 사용자 입력으로 폼 값을 작성한다.
+      return fields(page, {
+        이메일: 'fixture@example.test',
+        비밀번호: 'password123',
+      });
+    },
+    () => {
+      // 화면 버튼으로 현재 사용자 동작을 진행한다.
+      return page
+        .getByRole('button', { name: '이메일 로그인', exact: true })
+        .click();
+    },
+    () => {
+      // 화면 또는 응답의 인수 조건을 검증한다.
+      return expect(page).toHaveURL(/\/import-place$/);
+    },
+    () => {
+      // 화면 또는 응답의 인수 조건을 검증한다.
+      return expect(
+        page.getByLabel('받은 Google Maps 링크', { exact: true }),
+      ).toHaveValue('https://maps.app.goo.gl/fixture');
+    },
+    () => {
+      // 화면 버튼으로 현재 사용자 동작을 진행한다.
+      return page
+        .getByRole('button', { name: '새 여행 만들기', exact: true })
+        .click();
+    },
+    () => {
+      // 사용자 입력으로 폼 값을 작성한다.
+      return fields(page, {
+        '여행 타이틀 (비우면 자동 생성)': '공유한 도쿄 여행',
+        '나라 검색': '일본',
+        '도시 검색': '도쿄',
+        시작일: '2026-11-10',
+        종료일: '2026-11-10',
+      });
+    },
+    () => {
+      // 화면 버튼으로 현재 사용자 동작을 진행한다.
+      return page
+        .getByRole('button', { name: '항공편 없이 여행 만들기', exact: true })
+        .click();
+    },
+    () => {
+      // 화면 버튼으로 현재 사용자 동작을 진행한다.
+      return page
+        .getByRole('button', { name: '확인하고 저장', exact: true })
+        .click();
+    },
+    () => {
+      // 화면 또는 응답의 인수 조건을 검증한다.
+      return expect(
+        page.getByLabel('Google Maps 공유 링크', { exact: true }),
+      ).toHaveValue('https://maps.app.goo.gl/fixture');
+    },
+    () => {
+      // 화면 버튼으로 현재 사용자 동작을 진행한다.
+      return page
+        .getByRole('button', { name: '공유 링크 확인', exact: true })
+        .click();
+    },
+    () => {
+      // 화면 버튼으로 현재 사용자 동작을 진행한다.
+      return page
+        .getByRole('button', { name: '이 장소 선택', exact: true })
+        .click();
+    },
+    () => {
+      // 화면 또는 응답의 인수 조건을 검증한다.
+      return expect(page.getByLabel('제목', { exact: true })).toHaveValue(
+        '도쿄 식당',
+      );
+    },
+    () => {
+      // 화면 버튼으로 현재 사용자 동작을 진행한다.
+      return page
+        .getByRole('button', { name: '확인하고 저장', exact: true })
+        .click();
+    },
+    () => {
+      // 화면 또는 응답의 인수 조건을 검증한다.
+      return expect(
+        page.getByText('시간 미정 · 도쿄 식당', { exact: true }),
+      ).toBeVisible();
+    },
+    () => {
+      // 브라우저 재조회로 세션과 서버 자료 복원을 확인한다.
+      return page.reload();
+    },
+    () => {
+      // 화면 또는 응답의 인수 조건을 검증한다.
+      return expect(
+        page.getByText('시간 미정 · 도쿄 식당', { exact: true }),
+      ).toBeVisible();
+    },
+  ]);
+});
 // 서버 저장·응답 유실 복구·파일 선택·수동 OCR 확인·공개를 사용자 흐름으로 검증한다.
 test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택 게시 → 웹 재조회', async ({
   page,
@@ -477,6 +771,30 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
   await page
     .getByRole('button', { name: '확인하고 저장', exact: true })
     .click();
+  // 완료 여행은 원본 일정·음식·실제 비용을 다이어리로 읽고 직접 링크 재조회도 지원한다.
+  await page
+    .getByRole('button', { name: '발자국 다이어리 보기', exact: true })
+    .click();
+  await expect(
+    page.getByText('음식·구매 기록: 라멘 2그릇', { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText('총 실제 비용 2500.00 JPY', { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText('총 실제 비용 1000.00 KRW', { exact: true }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByText('음식·구매 기록: 라멘 2그릇', { exact: true }),
+  ).toBeVisible();
+  await page.screenshot({
+    path: 'test-results/workspace-diary.png',
+    fullPage: true,
+  });
+  await page
+    .getByRole('button', { name: '공유할 내용 선택하러 가기', exact: true })
+    .click();
   await page
     .getByRole('button', { name: '공개 내용 작성', exact: true })
     .click();
@@ -515,7 +833,7 @@ test('인증되지 않은 앱 탭 진입은 로그인 화면으로 이동한다'
   await page.goto('/footprints');
   await expect(page).toHaveURL(/\/login$/);
   await expect(
-    page.getByText('Google 계정으로 계속하기', { exact: true }),
+    page.getByText('Google 계정으로 계속하기 · 준비 중', { exact: true }),
   ).toBeVisible();
 });
 
@@ -640,7 +958,7 @@ test('초대 링크를 로그인 과정에서 보존한다', async ({ page }) =>
   await page
     .getByRole('button', { name: '로그인하고 참여', exact: true })
     .click();
-  await page.getByText('Google 계정으로 계속하기', { exact: true }).click();
+  await emailLogin(page);
   await expect(page).toHaveURL(/\/invite$/);
   await expect(
     page.getByRole('button', { name: '초대 확인하고 참여', exact: true }),

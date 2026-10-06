@@ -10,7 +10,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { completeSocialAuth, socialRedirectUrl } from '@/features/auth/oauth';
 import { colors } from '@/constants/theme';
-import { pendingInvite } from '@/features/workspace/invite';
+import { pendingAuthDestination } from '@/features/workspace/mapsShare';
 
 // 웹 및 모바일 OAuth의 공통 복귀 화면을 제공한다.
 export default function AuthCallbackScreen() {
@@ -43,10 +43,10 @@ export default function AuthCallbackScreen() {
           ).toString()}`;
     // 브라우저 처리와 겹치는 코드는 서비스에서 한 번만 교환한다.
     completeSocialAuth(callbackUrl)
-      .then(pendingInvite)
-      .then((invite) => {
+      .then(pendingAuthDestination)
+      .then((destination) => {
         // 교환에 성공한 화면만 내 여행으로 이동한다.
-        if (active) router.replace(invite ? '/invite' : '/(tabs)');
+        if (active) router.replace(destination);
       })
       .catch((error: unknown) => {
         // 공급자 원문 대신 서비스의 안전한 메시지를 보여준다.

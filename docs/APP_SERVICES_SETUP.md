@@ -1,5 +1,7 @@
 # WHEREGO 실제 서비스 연결 절차
 
+> 2026-10-06 현재 MVP는 Cloudflare D1·R2로 전환·배포했다. 현재 절차와 검증은 [Cloudflare 배포 보고](CLOUDFLARE_MVP_DEPLOYMENT_20261006.md)와 [Android 빌드](MVP_ANDROID_BUILD.md)를 따른다. 아래 Supabase 절차는 이전 구성 자료이며 현재 앱에는 적용하지 않는다.
+
 현재 대상은 [Android MVP APK](MVP_ANDROID_BUILD.md) 내부 테스트다. staging에서는 OCR 키를 생략하고 영수증 수동 입력을 먼저 검증할 수 있으며, 키를 연결해야 자동 인식을 검증할 수 있다. 스토어 심사 준비는 이번 APK 빌드 조건에 포함하지 않는다.
 
 2026-10-03. 여행·일정·초대·사진·영수증·커뮤니티의 앱/API/SQL은 로컬 구현했다. 실제 계정과 콘솔이 아직 준비되지 않아 원격 적용·제공자 인증·실기기 인수는 남아 있다. 아래 순서로 테스트 환경을 준비한다. 키·비밀번호를 채팅이나 Git에 올리지 않는다.

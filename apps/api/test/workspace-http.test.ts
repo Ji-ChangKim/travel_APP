@@ -6,6 +6,7 @@ import { accounts } from './database';
 const trip = '00000000-0000-4000-8000-000000000010';
 const media = '00000000-0000-4000-8000-000000000011';
 const env: Env = {
+  AUTH_BASE_URL: 'https://api.test',
   SUPABASE_URL: 'https://fixture.supabase.co',
   SUPABASE_ANON_KEY: 'sb_publishable_fixture',
   ALLOWED_ORIGINS: 'http://localhost:8081',

@@ -5,6 +5,7 @@ import { isCalendarDate } from '@wherego/validation';
 import { runRpc } from './backend';
 import { rejectRequest } from './errors';
 import type { VerifiedSession } from './types';
+import { mediaBucket } from './cloudMedia';
 
 // 원본·공급자 응답을 제한된 메모리 안에서 읽는다.
 function readChunks(
@@ -211,25 +212,43 @@ function analyzeRegisteredMedia(
   fetcher: typeof fetch,
 ): Promise<ReceiptDraft> {
   // 사진을 영수증인 것처럼 선택하거나 외부 경로를 가져오지 않는다.
-  return fetcher(
-    `${env.SUPABASE_URL}/storage/v1/object/authenticated/trip-private/${
-      snapshot.media.find((item) => {
-        // 파일 ID와 영수증 목적을 동시에 확인한다.
-        return item.id === mediaId && item.purpose === 'receipt';
-      })?.path || rejectRequest('RESOURCE_NOT_FOUND')
-    }`,
-    {
-      headers: {
-        apikey: env.SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${session.token}`,
-      },
-      signal: AbortSignal.timeout(10000),
-    },
+  return (
+    env.DB
+      ? mediaBucket(env)
+          .get(
+            snapshot.media.find((item) => {
+              // 실제 등록한 영수증 원본만 R2에서 선택한다.
+              return item.id === mediaId && item.purpose === 'receipt';
+            })?.path || rejectRequest('RESOURCE_NOT_FOUND'),
+          )
+          .then((object) => {
+            // 원본 크기를 다시 확인하고 공급자에 보낼 바이트만 읽는다.
+            return !object || object.size > 4194304
+              ? rejectRequest('RESOURCE_NOT_FOUND')
+              : object.arrayBuffer().then((bytes) => {
+                  // MIME 시그니처는 인식 요청 함수에서 재확인한다.
+                  return new Uint8Array(bytes);
+                });
+          })
+      : fetcher(
+          `${env.SUPABASE_URL}/storage/v1/object/authenticated/trip-private/${
+            snapshot.media.find((item) => {
+              // 파일 ID와 영수증 목적을 동시에 확인한다.
+              return item.id === mediaId && item.purpose === 'receipt';
+            })?.path || rejectRequest('RESOURCE_NOT_FOUND')
+          }`,
+          {
+            headers: {
+              apikey: env.SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${session.token}`,
+            },
+            signal: AbortSignal.timeout(10000),
+          },
+        ).then((response) => {
+          // 실제 바이트 수를 4MiB로 제한한다.
+          return readBounded(response, 4194304);
+        })
   )
-    .then((response) => {
-      // 실제 바이트 수를 4MiB로 제한한다.
-      return readBounded(response, 4194304);
-    })
     .then((bytes) => {
       // 실제 공급자에 보낼 원본만 전달한다.
       return detectText(env, bytes, fetcher);

@@ -4,6 +4,7 @@ import { createApp } from '../src/app';
 import { accounts, tripInput } from './database';
 
 const env: Env = {
+  AUTH_BASE_URL: 'https://api.test',
   GOOGLE_VISION_API_KEY: '',
   SUPABASE_URL: 'https://example.supabase.co',
   SUPABASE_ANON_KEY: 'sb_publishable_test',

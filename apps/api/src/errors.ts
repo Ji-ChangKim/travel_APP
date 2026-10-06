@@ -46,7 +46,7 @@ export function publicError(error: Error): ApiError {
   // 알려진 오류와 입력 검증 오류만 공개한다.
   return error instanceof ApiError
     ? error
-    : error instanceof ZodError
+    : error instanceof ZodError || error.name === 'ZodError'
       ? new ApiError('VALIDATION_FAILED', '입력값을 확인해 주세요.')
       : new ApiError('INTERNAL_ERROR');
 }

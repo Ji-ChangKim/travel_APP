@@ -29,9 +29,10 @@ export default function FootprintsScreen() {
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.header}>나의 여행 기록</Text>
+        <Text style={styles.header}>나의 발자국</Text>
         <Text style={styles.subtitle}>
-          항공편으로 시작한 여행에 장소와 영수증, 사진을 쌓아 보세요.
+          여행이 끝나면 일정과 사진, 먹은 음식과 비용이 하나의 다이어리가
+          됩니다.
         </Text>
         <Action
           label="이 기기에 저장한 이전 기록 보기"
@@ -54,7 +55,7 @@ export default function FootprintsScreen() {
               label="항공편 등록하고 여행 시작"
               onPress={() => {
                 // 여행 생성은 내 여행의 단일 입력 흐름을 사용한다.
-                router.push('/(tabs)');
+                router.push('/new-trip');
               }}
             />
             {query.isLoading && <Text>여행 기록을 불러오는 중입니다.</Text>}
@@ -92,10 +93,18 @@ export default function FootprintsScreen() {
                       : '예정된 여행'}
                 </Text>
                 <Action
-                  label={`기록 보기: ${trip.title}`}
+                  label={
+                    trip.status === 'COMPLETED'
+                      ? `발자국 보기: ${trip.title}`
+                      : `기록 보기: ${trip.title}`
+                  }
                   onPress={() => {
                     // 같은 여행의 항공편·일정·영수증·사진을 연다.
-                    router.push(`/trips/${trip.id}`);
+                    router.push(
+                      trip.status === 'COMPLETED'
+                        ? `/diary/${trip.id}`
+                        : `/trips/${trip.id}`,
+                    );
                   }}
                 />
               </View>

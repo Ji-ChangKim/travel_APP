@@ -27,6 +27,8 @@ jobs:
 
       - name: DB·API 기반 검증
         run: npm run test:foundation
+      - name: 실제 Workers D1·R2·인증 통합 검증
+        run: npm run test:cloud
 
       - name: 인증 및 배포 설정 검증
         run: npm run test:auth && npm run test:release

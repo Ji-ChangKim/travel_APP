@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>TripPrint 브랜드 자산 v2</title>
+    <style>
+      @font-face {
+        font-family: Brand;
+        src: url(fonts/PretendardVariable.woff2);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 40px;
+        background: #fff9f3;
+        color: #203247;
+        font-family: Brand, sans-serif;
+      }
+      h1 {
+        margin: 0 0 8px;
+      }
+      p {
+        line-height: 1.6;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 20px;
+      }
+      .card {
+        padding: 16px;
+        border-radius: 20px;
+        background: white;
+        border: 1px solid #eedfd2;
+      }
+      .art {
+        height: 220px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        background: repeating-conic-gradient(#f5efe8 0% 25%, #fff 0% 50%)
+          50%/20px 20px;
+      }
+      .inverse {
+        background: #203247;
+      }
+      .art img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+      .label {
+        font-weight: 700;
+        margin-top: 12px;
+      }
+      .size {
+        font-size: 13px;
+        margin-top: 4px;
+      }
+      .loader {
+        display: flex;
+        align-items: center;
+        gap: 32px;
+        margin: 24px 0 32px;
+        padding: 24px;
+        background: white;
+        border-radius: 20px;
+      }
+      .loader img {
+        width: 120px;
+        height: 120px;
+      }
+      .dots {
+        display: flex;
+        gap: 8px;
+        margin-top: 14px;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #c84432;
+        animation: pulse 1.2s infinite;
+      }
+      .dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+      @keyframes pulse {
+        0%,
+        80%,
+        100% {
+          opacity: 0.3;
+          transform: translateY(0);
+        }
+        40% {
+          opacity: 1;
+          transform: translateY(-4px);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .dot {
+          animation: none;
+          opacity: 1;
+        }
+      }
+      @media (max-width: 800px) {
+        .grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        body {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>TripPrint · 트립프린트</h1>
+    <p>
+      브랜드 자산 v2 — 공통 심볼에서 파생한 22종 PNG·SVG. 앱 아이콘과 네이티브
+      시작 화면용 심볼, 편집 로고를 분리했습니다.
+    </p>
+    <section class="loader" aria-label="로딩 화면 동작 예시">
+      <img
+        src="TripPrint_symbol-coral-clean_1024x1024.png"
+        alt="TripPrint 여행 심볼"
+      />
+      <div>
+        <strong>여행을 준비하고 있어요</strong>
+        <div class="dots" role="progressbar" aria-label="준비 중">
+          <span class="dot"></span><span class="dot"></span
+          ><span class="dot"></span>
+        </div>
+        <p>로딩은 진행 중 상태만 표시하며 가짜 완료율을 표시하지 않습니다.</p>
+      </div>
+    </section>
+    <div class="grid">
+      <section class="card">
+        <div class="art">
+          <img
+            src="TripPrint_symbol-coral-clean_1024x1024.png"
+            alt="symbol-coral-clean"
+          />
+        </div>
+        <div class="label">symbol-coral-clean</div>
+        <div class="size">
+          1024 × 1024 ·
+          <a href="TripPrint_symbol-coral-clean_1024x1024.svg">SVG</a> /
+          <a href="TripPrint_symbol-coral-clean_1024x1024.png">PNG</a>
+        </div>
+      </section>
+      <section class="card">
+        <div class="art inverse">
+          <img src="TripPrint_symbol-white_1024x1024.png" alt="symbol-white" />
+        </div>
+        <div class="label">symbol-white</div>
+        <div class="size">
+          1024 × 1024 · <a href="TripPrint_symbol-white_1024x1024.svg">SVG</a> /
+          <a href="TripPrint_symbol-white_1024x1024.png">PNG</a>
+        </div>
+      </section>
+      <section class="card">
+        <div class="art">
+          <img src="TripPrint_symbol-navy_1024x1024.png" alt="symbol-navy" />
+        </div>
+        <div class="label">symbol-navy</div>
+        <div class="size">
+          1024 × 1024 · <a href="TripPrint_symbol-navy_1024x1024.svg">SVG</a> /
+          <a href="TripPrint_symbol-navy_1024x1024.png">PNG</a>
+        </div>
+      </section>
+      <section class="card">
+        <div class="art">
+          <img src="TripPrint_app-icon_1024x1024.png" alt="app-icon" />
+        </div>
+        <div class="label">app-icon</div>
+        <div class="size">
+          1024 × 1024 · <a href="TripPrint_app-icon_1024x1024.svg">SVG</a> /
+          <a href="TripPrint_app-icon_1024x1024.png">PNG</a>
+        </div>
+      </section>
+      <section class="card">
+        <div class="art">
+          <img
+            src="TripPrint_play-store-icon_512x512.png"
+            alt="play-store-icon"
+          />
+        </div>
+        <div class="label">play-store-icon</div>
+        <div class="size">
+          512 × 512 · <a href="TripPrint_play-store-icon_512x512.svg">SVG</a> /
+          <a href="TripPrint_play-store-icon_512x512.png">PNG</a>
+        </div>
+      </section>
+      <section class="card">
+        <div class="art inverse">
+          <img
+            src="TripPrint_android-foreground_1024x1024.png"
+            alt="android-foreground"
+          />
+        </div>
+        <div class="label">android-foreground</div>
+        <div class="size">
+          1024 × 1024 ·
+          <a href="TripPrint_android-foreground_1024x1024.svg">SVG</a> /
+          <a href="TripPrint_android-foreground_1024x1024.png">PNG</a>
+        </div>
+      </section>
+      <section class="card">
+        <div class="art inverse">
+          <img
+            src="TripPrint_android-monochrome_1024x1024.png"
+            alt="android-monochrome"
+          />
+        </div>
+        <div class="label">android-monochrome</div>
+        <div class="size">
+          1024 × 1024 ·
+          <a href="TripPrint_android-monochrome_1024x1024.svg">SVG</a> /
+          <a href="TripPrint_android-monochrome_1024x1024.png">PNG</a>
+        </div>
+      </section>
+      <section class="card">
+        <div class="art">
+          <img
+            src="TripPrint_splash-symbol_1024x1024.png"
+            alt="splash-symbol"
+          />
+        </div>
+        <div class="label">splash-symbol</div>
+        <div class="size">
+          1024 × 1024 ·
+          <a href="TripPrint_splash-symbol_1024x1024.svg">SVG</a> /
+          <a href="TripPrint_splash-symbol_1024x1024.png">PNG</a>
+        </div>
+      </section>
+      <section class="card">
+        <div class="art">
+          <img src="TripPrint_favicon-32_32x32.png" alt="favicon-32" />
+        </div>
+        <div class="label">favicon-32</div>
+        <div class="size">
+          32 × 32 · <a href="TripPrint_favicon-32_32x32.svg">SVG</a> /
+          <a href="TripPrint_favicon-32_32x32.png">PNG</a>
+        </div>
+      </section>
+      <section class="card">
+        <div class="art">
+          <img src="TripPrint_favicon-64_64x64.png" alt="favicon-64" />
+        </div>
+        <div class="label">favicon-64</div>
+        <div class="size">
+          64 × 64 · <a href="TripPrint_favicon-64_64x64.svg">SVG</a> /
+          <a href="TripPrint_favicon-64_64x64.png">PNG</a>
+        </div>
+      </section>
+      <section class="card">
+        <div class="art">
+          <img
+            src="TripPrint_logo-horizontal_1024x320.png"
+            alt="logo-horizontal"
+          />
+        </div>
+        <div class="label">logo-horizontal</div>
+        <div class="size">
+          1024 × 320 ·
+          <a href="TripPrint_logo-horizontal_1024x320.svg">SVG</a> /
+          <a href="TripPrint_logo-horizontal_1024x320.png">PNG</a>
+        </div>
+      </section>
+      <section class="card">
+        <div class="art inverse">
+          <img
+            src="TripPrint_logo-horizontal-white_1024x320.png"
+            alt="logo-horizontal-white"
+          />
+        </div>
+        <div class="label">logo-horizontal-white</div>
+        <div class="size">
+          1024 × 320 ·
+          <a href="TripPrint_logo-horizontal-white_1024x320.svg">SVG</a> /
+          <a href="TripPrint_logo-horizontal-white_1024x320.png">PNG</a>
+        </div>
+      </section>
+      <section class="card">
+        <div class="art">
+          <img
+            src="TripPrint_logo-horizontal-navy_1024x320.png"
+            alt="logo-horizontal-navy"
+          />
+        </div>
+        <div class="label">logo-horizontal-navy</div>
+        <div class="size">
+          1024 × 320 ·
+          <a href="TripPrint_logo-horizontal-navy_1024x320.svg">SVG</a> /
+          <a href="TripPrint_logo-horizontal-navy_1024x320.png">PNG</a>
+        </div>
+      </section>
+      <section class="card">
+        <div class="art">
+          <img src="TripPrint_monogram-tp_512x512.png" alt="monogram-tp" />
+        </div>
+        <div class="label">monogram-tp</div>
+        <div class="size">
+          512 × 512 · <a href="TripPrint_monogram-tp_512x512.svg">SVG</a> /
+          <a href="TripPrint_monogram-tp_512x512.png">PNG</a>
+        </div>
+      </section>
+      <section class="card">
+        <div class="art">
+          <img src="TripPrint_ui-place_256x256.png" alt="ui-place" />
+        </div>
+        <div class="label">ui-place</div>
+        <div class="size">
+          256 × 256 · <a href="TripPrint_ui-place_256x256.svg">SVG</a> /
+          <a href="TripPrint_ui-place_256x256.png">PNG</a>
+        </div>
+      </section>
+      <section class="card">
+        <div class="art">
+          <img src="TripPrint_ui-route_256x256.png" alt="ui-route" />
+        </div>
+        <div class="label">ui-route</div>
+        <div class="size">
+          256 × 256 · <a href="TripPrint_ui-route_256x256.svg">SVG</a> /
+          <a href="TripPrint_ui-route_256x256.png">PNG</a>
+        </div>
+      </section>
+      <section class="card">
+        <div class="art">
+          <img src="TripPrint_ui-camera_256x256.png" alt="ui-camera" />
+        </div>
+        <div class="label">ui-camera</div>
+        <div class="size">
+          256 × 256 · <a href="TripPrint_ui-camera_256x256.svg">SVG</a> /
+          <a href="TripPrint_ui-camera_256x256.png">PNG</a>
+        </div>
+      </section>
+      <section class="card">
+        <div class="art">
+          <img src="TripPrint_ui-record_256x256.png" alt="ui-record" />
+        </div>
+        <div class="label">ui-record</div>
+        <div class="size">
+          256 × 256 · <a href="TripPrint_ui-record_256x256.svg">SVG</a> /
+          <a href="TripPrint_ui-record_256x256.png">PNG</a>
+        </div>
+      </section>
+      <section class="card">
+        <div class="art">
+          <img src="TripPrint_ui-map_256x256.png" alt="ui-map" />
+        </div>
+        <div class="label">ui-map</div>
+        <div class="size">
+          256 × 256 · <a href="TripPrint_ui-map_256x256.svg">SVG</a> /
+          <a href="TripPrint_ui-map_256x256.png">PNG</a>
+        </div>
+      </section>
+      <section class="card">
+        <div class="art">
+          <img src="TripPrint_ui-flight_256x256.png" alt="ui-flight" />
+        </div>
+        <div class="label">ui-flight</div>
+        <div class="size">
+          256 × 256 · <a href="TripPrint_ui-flight_256x256.svg">SVG</a> /
+          <a href="TripPrint_ui-flight_256x256.png">PNG</a>
+        </div>
+      </section>
+      <section class="card">
+        <div class="art">
+          <img src="TripPrint_logo-stacked_768x768.png" alt="logo-stacked" />
+        </div>
+        <div class="label">logo-stacked</div>
+        <div class="size">
+          768 × 768 · <a href="TripPrint_logo-stacked_768x768.svg">SVG</a> /
+          <a href="TripPrint_logo-stacked_768x768.png">PNG</a>
+        </div>
+      </section>
+      <section class="card">
+        <div class="art">
+          <img
+            src="TripPrint_splash-portrait_1080x1920.png"
+            alt="splash-portrait"
+          />
+        </div>
+        <div class="label">splash-portrait</div>
+        <div class="size">
+          1080 × 1920 ·
+          <a href="TripPrint_splash-portrait_1080x1920.svg">SVG</a> /
+          <a href="TripPrint_splash-portrait_1080x1920.png">PNG</a>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

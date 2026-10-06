@@ -6,35 +6,19 @@ import type { FoundationClientOptions } from '@wherego/api-client';
 import { getServerMediaUrl, requestFoundation } from '@wherego/api-client';
 import { z } from 'zod';
 import type { ReceiptDraft } from '@wherego/domain';
-import { supabase } from '@/services/supabase';
-import { requireAuthConfiguration } from '@/features/auth/model';
+import { getCloudSession } from '@/services/cloudAuth';
 
 // 현재 SDK 세션과 화면 계정이 일치할 때만 API 옵션을 만든다.
 export function serverOptions(
   userId: string,
 ): Promise<FoundationClientOptions> {
-  // 세션 만료를 임시 사용자 ID로 우회하지 않는다.
-  return Promise.resolve()
-    .then(() => {
-      // 공개 설정이 준비되었는지 먼저 검사한다.
-      return requireAuthConfiguration(
-        process.env.EXPO_PUBLIC_SUPABASE_URL,
-        process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
-      );
-    })
-    .then(() => {
-      // 저장된 세션의 사용자와 토큰을 SDK에서 읽는다.
-      return supabase.auth.getSession();
-    })
-    .then(({ data, error }) => {
-      // 사용자 입력으로 다른 계정 토큰을 대체하지 않는다.
-      return error ||
-        !data.session ||
-        data.session.user.id !== userId ||
-        data.session.user.is_anonymous
-        ? fail('로그인이 만료되었습니다. 다시 로그인해 주세요.')
-        : { baseUrl: apiBaseUrl(), accessToken: data.session.access_token };
-    });
+  // 실제 서버 세션의 사용자와 화면 계정이 일치해야 한다.
+  return getCloudSession().then((session) => {
+    // 다른 계정과 만료 토큰을 저장 요청에 사용하지 않는다.
+    return !session || session.user.id !== userId
+      ? fail('로그인이 만료되었습니다. 다시 로그인해 주세요.')
+      : { baseUrl: apiBaseUrl(), accessToken: session.access_token };
+  });
 }
 // 명시한 실제 API 주소만 사용한다.
 export function apiBaseUrl(): string {
@@ -126,15 +110,22 @@ function imageMime(buffer: ArrayBuffer): 'image/jpeg' | 'image/png' {
 }
 // 등록 참조를 지운 파일 원본 하나를 제거한다.
 export function removeImage(path: string): Promise<void> {
-  // Storage 정책이 다른 여행·등록 중 파일의 삭제를 차단한다.
-  return supabase.storage
-    .from('trip-private')
-    .remove([path])
-    .then(({ error }) => {
-      // 실패는 같은 삭제 명령의 재시도로 복구한다.
-      if (error)
-        fail('원본 삭제를 확인하지 못했습니다. 같은 요청으로 재시도해 주세요.');
-    });
+  // 서버가 업로드 소유권과 등록 참조를 검사한다.
+  return getCloudSession().then((session) => {
+    // 실제 토큰을 파일 정리 요청에 전달한다.
+    return !session
+      ? fail('다시 로그인해 주세요.')
+      : fetch(`${apiBaseUrl()}/files?path=${encodeURIComponent(path)}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${session.access_token}` },
+          signal: AbortSignal.timeout(15000),
+        }).then((response) => {
+          // 실패는 원본 삭제 성공으로 표시하지 않는다.
+          return response.ok
+            ? undefined
+            : fail('원본 삭제를 확인하지 못했습니다. 다시 시도해 주세요.');
+        });
+  });
 }
 // 실제 Storage 업로드의 확정 메타데이터를 반환한다.
 function putImage(
@@ -143,20 +134,39 @@ function putImage(
   bytes: ArrayBuffer,
   mimeType: 'image/jpeg' | 'image/png',
 ): Promise<{ id: string; path: string; mimeType: 'image/jpeg' | 'image/png' }> {
-  // 파일 덮어쓰기를 허용하지 않으며 정책이 사용자 권한을 검사한다.
-  return supabase.storage
-    .from('trip-private')
-    .upload(
-      `${tripId}/${id}.${mimeType === 'image/png' ? 'png' : 'jpg'}`,
-      bytes,
-      { contentType: mimeType, upsert: false },
-    )
-    .then(({ data, error }) => {
-      // 실패를 사진 등록 성공으로 처리하지 않는다.
-      return error || !data
-        ? fail('사진 업로드에 실패했습니다. 연결과 파일 형식을 확인해 주세요.')
-        : { id, path: data.path, mimeType };
-    });
+  // 서명된 세션으로 Worker를 통해 비공개 R2에 업로드한다.
+  return getCloudSession().then((session) => {
+    // 인증 없는 원본을 서버에 전송하지 않는다.
+    return !session
+      ? fail('다시 로그인해 주세요.')
+      : fetch(`${apiBaseUrl()}/files/${tripId}/${id}`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            'Content-Type': mimeType,
+          },
+          body: bytes,
+          signal: AbortSignal.timeout(30000),
+        }).then((response) => {
+          // 서버 확정 경로와 MIME만 등록에 사용한다.
+          return response.ok
+            ? response.json().then((value: unknown) => {
+                // 클라이언트가 경로를 임의 대체하지 않는다.
+                return z
+                  .object({
+                    data: z.object({
+                      id: z.string().uuid(),
+                      path: z.string(),
+                      mimeType: z.enum(['image/jpeg', 'image/png']),
+                    }),
+                  })
+                  .parse(value).data;
+              })
+            : fail(
+                '사진 업로드에 실패했습니다. 연결과 파일 형식을 확인해 주세요.',
+              );
+        });
+  });
 }
 // 등록한 영수증 사진의 인식 초안을 요청한다.
 export function scanServerReceipt(
@@ -187,7 +197,7 @@ export function scanServerReceipt(
 export function shareInvite(title: string, token: string): Promise<unknown> {
   // 실제 웹 복귀 기본 경로를 사용하는 HTTPS 링크를 만든다.
   return Share.share({
-    title: 'WHEREGO 여행 초대',
+    title: 'TripPrint 여행 초대',
     message: `${title}에 초대합니다.\n${inviteWebUrl(token)}`,
   });
 }
