@@ -23,6 +23,11 @@ npm run release:prepare: 실제 공개 설정으로 18개 정적 경로, 배포 
 Android Hermes 번들 빌드: 통과. APK 빌드와 구분한다.
 모바일 웹 화면 28개 캡처: 완료. 샘플 응답을 사용하는 화면 검증이며 실제 서버 데이터는 변경하지 않았다.
 웹 배포 대상: https://wherego-staging.pages.dev (기존 테스트 배포 프로젝트).
+웹 배포 완료: https://36c446c4.wherego-staging.pages.dev
+배포 소스 커밋: cd6391305203386ee0ae8d3cd67c78ccf81d7ebe (main 원격 반영 완료).
+실제 공개 주소 검증: release.json 식별자와 웹 번들 SHA256 일치, 게스트 커뮤니티 진입, 마이페이지 직접 진입·새로고침 모두 통과.
+전체 화면 갤러리: outputs/TripPrint-pages/index.html, 28개 캡처와 12개 주요 페이지 개요 및 확대 보기 검증 완료.
+실제 배포 검증 증빙: .release/service-flow/verification.json (기기 로컬 파일).
 Expo whoami: Not logged in. 새로운 APK 생성과 Android 실기기 인수는 아직 완료되지 않았다.
 
 제공 범위
