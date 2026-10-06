@@ -11,6 +11,7 @@ import {
   authRevision,
 } from '@/services/cloudAuth';
 import { fetchUserProfile } from '@/services/profileService';
+import { clearLegacyDbCode } from '@/services/legacyStorage';
 export const useAuthReady = create<{ ready: boolean }>(() => {
   /* 초기 확인 전 인증 결정을 보류한다. */ return { ready: false };
 });
@@ -114,6 +115,10 @@ function connectAuth(
 ): () => void {
   // 최초 복원 후 두 구독을 정리한다.
   return (
+    void clearLegacyDbCode().catch(() => {
+      // 저장소 접근이 차단돼도 인증 복원을 막지 않으며 다음 시작 때 재시도한다.
+      return undefined;
+    }),
     void restore(clear),
     () => {
       /* 중복 이벤트를 방지한다. */ return void (unsubscribe(),

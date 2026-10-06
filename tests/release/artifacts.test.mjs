@@ -44,6 +44,13 @@ test('테스트 인증 설정과 서버 비밀 키를 배포 청크에서 거부
       'https://wherego-test.supabase.co',
       'sb_publishable_fixture',
       'sb_secret_test_only',
+      'DEFAULT_DB_SECURITY_CODE',
+      'INTERNAL_SECRET_SALT',
+      'DB 보안 연동 코드',
+      'Base64 XOR',
+      'AUTH_SECRET',
+      'SUPABASE_SERVICE_ROLE_KEY',
+      'CLOUDFLARE_API_TOKEN',
     ].every(hasUnsafeReleaseValues),
   );
 });

@@ -9,7 +9,7 @@
 [ 목차 ]
 1. 데이터베이스 개요 및 공통 Enum 타입
 2. 기존 DB 테이블별 컬럼 명세 (13개 테이블, 5절 후 15개, 8절 후 public 총 20개)
-3. 프론트엔드 TypeScript 도메인 객체(Entity) 명세 (13개 엔티티)
+3. 프론트엔드 TypeScript 도메인 객체(Entity) 명세 (12개 엔티티)
 4. 변경 이력 및 관리 지침
 5. M0/M1 실제 마이그레이션·도메인 변경 명세 (2026-10-02)
 6. 발자취 기기 저장·도메인 객체 명세 (2026-10-02)
@@ -277,7 +277,7 @@ created_at   | TIMESTAMPTZ  | NO   | NOW()             |                        
 3. 프론트엔드 TypeScript 도메인 객체(Entity) 명세 (13개 엔티티)
 ================================================================================
 
-패키지 위치: packages/domain/src/index.ts 및 apps/mobile/src/services/securityService.ts
+패키지 위치: packages/domain/src/index.ts
 
 1) Profile
    - id: string               -> profiles.id
@@ -404,12 +404,13 @@ created_at   | TIMESTAMPTZ  | NO   | NOW()             |                        
     - permissions: 'read_only'-> share_links.permissions
     - createdAt: string       -> share_links.created_at
 
-13) DatabaseSecurityKey (DB 보안 연동 코드)
-    - storageKey: string       -> 'wherego_encrypted_db_code'
-    - defaultCode: string      -> '24541c7e-d148-46d9-80ef-f647ad649eb1'
-    - cipherPayload: string    -> Base64 인코딩 XOR 대칭키 암호문
-    - storageTarget: string    -> 모바일: Expo SecureStore / 웹: localStorage
-    - description: string      -> DB 연동 인증용 보안 키 (암호화 읽기/쓰기 보장)
+폐기 객체) DatabaseSecurityKey — 2026-10-06 제거
+    - DB명/테이블명: 해당 없음. 서버 DB 인증에 사용되지 않은 로컬 저장 값이었다.
+    - 기본 코드·복호화·화면 표시·사용자 입력·XOR/Base64 처리 기능을 모두 제거했다.
+    - 기존 storageKey: wherego_encrypted_db_code (string, 로컬 저장 키).
+    - 저장 위치: 웹 localStorage / 모바일 Expo SecureStore.
+    - 정리 방법: 앱 시작 시 legacyStorage.clearLegacyDbCode로 해당 항목만 삭제.
+    - 로그인 세션과 여행 기록 키는 삭제하지 않으며 서버 DB 스키마 변경은 없다.
 
 ================================================================================
 4. 변경 이력 및 관리 지침
@@ -424,9 +425,14 @@ created_at   | TIMESTAMPTZ  | NO   | NOW()             |                        
   - Supabase auth.users 신규 가입 연동 자동 트리거(handle_new_user) 명세 추가.
   - trips.invite_code, expenses, checklists 테이블 DDL 및 RLS 정책 보완.
 
-* [2026-09-22] v1.1 업데이트:
-  - DB 보안 연동 코드(24541c7e-d148-46d9-80ef-f647ad649eb1) 암호화 입출력
-    모듈(securityService) 및 DatabaseSecurityKey 객체 명세 추가.
+* [2026-10-06] 사용자 화면의 개발용 보안 기능 제거:
+  - DB 연동에 쓰이지 않는 고정 코드와 securityService를 제거했다.
+  - 마이페이지의 코드 공개·입력·암호화 검증 및 개발용 백엔드 안내를 삭제했다.
+  - 이전 로컬 저장 값 삭제만 legacyStorage에 유지한다.
+
+* [2026-09-22] v1.1 업데이트 (2026-10-06 폐기):
+  - 과거 로컬 DB 코드 저장 모듈과 DatabaseSecurityKey 명세를 추가했으나,
+    실제 서버 인증에 사용되지 않고 부적절한 사용자 화면 노출을 유발하여 제거했다.
 
 * [2026-09-22] 최초 문서 생성 (v1.0):
   - Supabase 11개 마이그레이션 테이블(profiles, trips, trip_members, trip_days,

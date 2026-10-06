@@ -11,6 +11,75 @@ const tinyPng = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a/Z8AAAAASUVORK5CYII=',
   'base64',
 );
+
+test('폐기한 DB 코드만 정리하고 로그인 세션과 프로필 편집은 유지한다', ({
+  page,
+}) => {
+  // 실제 이전 저장 항목을 가진 브라우저에서 사용자 화면과 인증 회귀를 확인한다.
+  return testSteps([
+    () => {
+      // 기존 기기의 폐기 대상 항목만 준비한다.
+      return page.addInitScript(() => {
+        // 실제 키 값 대신 검사 전용 문자열을 저장한다.
+        return localStorage.setItem(
+          'wherego_encrypted_db_code',
+          'obsolete-fixture-payload',
+        );
+      });
+    },
+    () => {
+      // 실제 서버 쓰기 없이 인증 HTTP 경계만 분리한다.
+      return network(page);
+    },
+    () => {
+      // 사용자 이메일 폼을 통해 로그인한다.
+      return login(page);
+    },
+    () => {
+      // 서버 복원과 저장 항목 정리가 함께 실행되는 마이페이지를 연다.
+      return page.goto('/my');
+    },
+    () => {
+      // 유효한 계정의 프로필 표시가 유지되어야 한다.
+      return expect(
+        page.getByText('검증 여행자', { exact: true }),
+      ).toBeVisible();
+    },
+    () => {
+      // 폐기 항목 삭제가 로그인 토큰까지 삭제하지 않는지 확인한다.
+      return expect(
+        page.evaluate(() => {
+          // 저장된 원문을 반환하지 않고 삭제와 세션 유지 여부만 검사한다.
+          return {
+            legacyRemoved:
+              localStorage.getItem('wherego_encrypted_db_code') === null,
+            sessionPreserved: Boolean(
+              localStorage.getItem('wherego.cloud.session.v1'),
+            ),
+          };
+        }),
+      ).resolves.toEqual({ legacyRemoved: true, sessionPreserved: true });
+    },
+    () => {
+      // 일반 사용자에게 개발용 코드나 백엔드 검증 기능을 노출하지 않는다.
+      return expect(
+        page.getByText(
+          /DB 보안|보안 검증|새 코드 입력|Supabase|백엔드 아키텍처/,
+        ),
+      ).toHaveCount(0);
+    },
+    () => {
+      // 사용자가 프로필을 수정하는 정상 동작을 유지한다.
+      return page.getByText('수정', { exact: true }).click();
+    },
+    () => {
+      // 개발용 UI 제거가 프로필 입력 기능을 깨뜨리지 않았는지 확인한다.
+      return expect(page.getByPlaceholder('닉네임 입력')).toHaveValue(
+        '검증 여행자',
+      );
+    },
+  ]);
+});
 // 실제 폼을 작성하는 테스트 헬퍼를 제공한다.
 async function fields(
   page: Page,
