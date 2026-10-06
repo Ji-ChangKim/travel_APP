@@ -35,6 +35,11 @@ npx playwright test --config=playwright.workspace.config.ts: 최종 공개 설�
 실제 모바일 웹 화면 29개 캡처 및 주요 페이지 개요·확대/닫기 검증 완료. 캡처의 여행 데이터는 샘플 HTTP 응답이며 서버 자료를 변경하지 않았다.
 npm run release:check / npm run release:artifacts: 설정·정적 경로·rewrite·테스트 설정/서버 키 미포함 검사 통과.
 배포 식별자: test-1-purposeful-home. 새 APK 생성은 이번 웹 검증에 포함하지 않는다.
+Git main 반영 소스: 55eaa258322f372d15b7211c0d92aa623ec22843.
+웹 배포 완료: https://563d2346.wherego-staging.pages.dev
+테스트 주소: https://wherego-staging.pages.dev/?release=test-1-purposeful-home
+실제 테스트 주소 검증: 첫 방문 홈·목적지 로그인 전달·마이페이지 직접 진입·새로고침·배포 번들 SHA256 일치 통과. 렌더링 오류 0, 익명 개인 여행 API 요청 0.
+검증 증빙: .release/home-flow/verification.json, 전체 화면: outputs/TripPrint-pages/index.html (29개).
 
 수정 파일
 apps/mobile/src/app/index.tsx
