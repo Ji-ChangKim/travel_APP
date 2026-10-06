@@ -7,7 +7,7 @@ import {
 import ReceiptCapture from './ReceiptCapture';
 import HaruState from '@/components/HaruState';
 import { useRef, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -41,7 +41,10 @@ import {
 import { Action, Field, ServerPhoto, styles } from './ui';
 import { scheduleForm, formCommand, newTripForm, type PlanForm } from './forms';
 import PlanEditor from './PlanEditor';
-import GooglePlace from './GooglePlace';
+import { Ionicons } from '@expo/vector-icons';
+import TripHubActions from './TripHubActions';
+import TripTimeline, { TripDayStrip, HubTab } from './TripTimeline';
+import { tripHubStyles as hub } from './tripHubStyles';
 import HomeScreen from './HomeScreen';
 import { countryDefaults, travelCountries } from './countries';
 import { useSharedSchedule } from './useSharedSchedule';
@@ -590,9 +593,9 @@ function WorkspaceContent({
     );
   // 저장된 실제 자료만 화면에 표시한다.
   return (
-    <SafeAreaView style={styles.screen}>
+    <SafeAreaView style={hub.screen}>
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={hub.content}
         keyboardShouldPersistTaps="handled"
       >
         {id && (
@@ -605,10 +608,6 @@ function WorkspaceContent({
             }}
           />
         )}
-        <Text style={styles.header}>{id ? '나의 여행' : '여행 계획'}</Text>
-        <Text style={styles.subtitle}>
-          함께 계획하고, 사진과 비용으로 여행을 기록하세요.
-        </Text>
         {!userId ? (
           <View style={styles.card}>
             <Text style={styles.title}>로그인하고 여행을 시작하세요</Text>
@@ -659,15 +658,35 @@ function WorkspaceContent({
                     편집 가능한 여행을 선택해 주세요.
                   </Text>
                 )}
-                <View style={styles.card}>
-                  <Text style={styles.title}>{snapshot.trip.title}</Text>
-                  <Text>
+                <View style={hub.tripHeader}>
+                  <View style={hub.titleRow}>
+                    <Text style={hub.tripTitle}>{snapshot.trip.title}</Text>
+                    {owner && (
+                      <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel="여행 설정"
+                        accessibilityState={{ expanded: showTripSettings }}
+                        style={hub.settings}
+                        onPress={() => {
+                          // 소유자의 설정 메뉴만 제목 옆에서 펼친다.
+                          return setShowTripSettings(!showTripSettings);
+                        }}
+                      >
+                        <Ionicons
+                          name="settings-outline"
+                          size={20}
+                          color="#697581"
+                        />
+                      </Pressable>
+                    )}
+                  </View>
+                  <Text style={hub.meta}>
                     {snapshot.trip.country} · {snapshot.trip.city}
                   </Text>
-                  <Text>
+                  <Text style={hub.meta}>
                     {snapshot.trip.startDate} ~ {snapshot.trip.endDate}
                   </Text>
-                  <Text style={styles.badge}>
+                  <Text style={hub.status}>
                     {tripStatusLabel(snapshot.trip.status)} ·{' '}
                     {memberRoleLabel(snapshot.myRole)}
                   </Text>
@@ -677,17 +696,6 @@ function WorkspaceContent({
                       onPress={() => {
                         // 종료된 여행의 일정·사진·비용을 날짜별로 읽는다.
                         return router.push(`/diary/${snapshot.trip.id}`);
-                      }}
-                    />
-                  )}
-                  {owner && (
-                    <Action
-                      label="여행 설정"
-                      variant="quiet"
-                      selected={showTripSettings}
-                      onPress={() => {
-                        // 목적지와 기간 관리는 필요할 때만 펼친다.
-                        return setShowTripSettings(!showTripSettings);
                       }}
                     />
                   )}
@@ -740,7 +748,7 @@ function WorkspaceContent({
                       return key !== 'share' || owner;
                     })
                     .map(([key, label]) => (
-                      <Action
+                      <HubTab
                         key={key}
                         label={label}
                         selected={activeSection === key}
@@ -751,21 +759,65 @@ function WorkspaceContent({
                       />
                     ))}
                 </ScrollView>
-                {['itinerary', 'expenses', 'photos'].includes(
-                  activeSection,
-                ) && (
+                {activeSection === 'itinerary' && (
+                  <>
+                    <TripDayStrip
+                      days={snapshot.days}
+                      selected={
+                        snapshot.days.find((day) => {
+                          // 여행 기간 변경으로 사라진 선택 날짜는 첫 날짜로 복구한다.
+                          return day.id === selectedDay;
+                        })?.id ||
+                        snapshot.days[0]?.id ||
+                        ''
+                      }
+                      onSelect={setSelectedDay}
+                    />
+                    {snapshot.days
+                      .filter((day) => {
+                        // 기간 변경으로 선택 날짜가 사라지면 첫 날짜를 표시한다.
+                        return (
+                          day.id ===
+                          (snapshot.days.some((item) => {
+                            // 선택 날짜가 최신 여행에 남아 있는지 확인한다.
+                            return item.id === selectedDay;
+                          })
+                            ? selectedDay
+                            : snapshot.days[0]?.id)
+                        );
+                      })
+                      .map((day) => (
+                        <TripTimeline
+                          key={day.id}
+                          snapshot={snapshot}
+                          userId={userId}
+                          day={day}
+                          disabled={!writable || busy || scanning || hasPending}
+                          onCapture={(item) => {
+                            // 실제 카메라 사진을 선택한 장소에 연결한다.
+                            return photo('photo', true, item.id);
+                          }}
+                          onPhoto={(item) => {
+                            // 기존 앨범 사진을 선택한 장소에 연결한다.
+                            return photo('photo', false, item.id);
+                          }}
+                          onEdit={(item) => {
+                            // 기존 일정의 편집 입력을 구성한다.
+                            return edit(scheduleForm(snapshot, item));
+                          }}
+                          onDelete={(item) => {
+                            // 영수증 연결 보호가 적용된 삭제 명령을 실행한다.
+                            return command({
+                              operation: 'schedule.delete',
+                              input: { id: item.id },
+                            });
+                          }}
+                        />
+                      ))}
+                  </>
+                )}
+                {['expenses', 'photos'].includes(activeSection) && (
                   <View style={styles.row}>
-                    {activeSection === 'itinerary' && (
-                      <Action
-                        variant="primary"
-                        label="일정 추가"
-                        disabled={!writable || busy || scanning || hasPending}
-                        onPress={() => {
-                          // 첫 DAY를 기본 선택하되 사용자에게 날짜 선택을 제공한다.
-                          edit(scheduleForm(snapshot, undefined, selectedDay));
-                        }}
-                      />
-                    )}
                     {activeSection === 'expenses' && (
                       <Action
                         variant="primary"
@@ -818,144 +870,14 @@ function WorkspaceContent({
                   </View>
                 )}
                 {activeSection === 'itinerary' && (
-                  <>
-                    <ScrollView
-                      horizontal
-                      showsHorizontalScrollIndicator={false}
-                      contentContainerStyle={{ gap: 8 }}
-                      accessibilityLabel="여행 날짜 선택"
-                    >
-                      {snapshot.days.map((day) => (
-                        <Action
-                          key={day.id}
-                          label={`DAY ${day.dayNumber}`}
-                          selected={
-                            day.id === (selectedDay || snapshot.days[0]?.id)
-                          }
-                          onPress={() => {
-                            // 선택한 날짜의 일정만 보여준다.
-                            return setSelectedDay(day.id);
-                          }}
-                        />
-                      ))}
-                    </ScrollView>
-                    <Action
-                      label="Google Maps 장소 가져오기"
-                      variant="quiet"
-                      onPress={() => {
-                        // 저장한 지도 장소를 여행에 가져오는 확인 화면을 연다.
-                        return router.push('/import-place');
-                      }}
-                    />
-                    {snapshot.days
-                      .filter((day) => {
-                        // 기간 변경으로 선택 날짜가 사라지면 첫 날짜를 표시한다.
-                        return (
-                          day.id ===
-                          (snapshot.days.some((item) => {
-                            // 선택 날짜가 최신 여행에 남아 있는지 확인한다.
-                            return item.id === selectedDay;
-                          })
-                            ? selectedDay
-                            : snapshot.days[0]?.id)
-                        );
-                      })
-                      .map((day) => (
-                        <View key={day.id} style={styles.card}>
-                          <Text style={styles.title}>
-                            DAY {day.dayNumber} · {day.tripDate}
-                          </Text>
-                          {!snapshot.itinerary.some((item) => {
-                            // 장소가 없는 날짜에는 다음 행동을 안내한다.
-                            return item.dayId === day.id;
-                          }) && (
-                            <Text style={styles.subtitle}>
-                              이날의 첫 장소를 추가해 보세요. 숙소, 맛집,
-                              관광지와 이동을 함께 계획할 수 있어요.
-                            </Text>
-                          )}
-                          {snapshot.itinerary
-                            .filter((item) => {
-                              // 날짜별 정렬은 서버에서 확정한 순서를 따른다.
-                              return item.dayId === day.id;
-                            })
-                            .map((item) => (
-                              <View key={item.id} style={{ gap: 8 }}>
-                                <Text style={styles.title}>
-                                  {item.timeSlot || '시간 미정'} · {item.title}
-                                </Text>
-                                <Text>{item.address || '지역명 미등록'}</Text>
-                                {item.googlePlaceId && (
-                                  <GooglePlace
-                                    userId={userId}
-                                    placeId={item.googlePlaceId}
-                                    label={item.title}
-                                  />
-                                )}
-                                {item.memo && <Text>{item.memo}</Text>}
-                                <View style={styles.row}>
-                                  <Action
-                                    label="이 일정에서 사진 촬영"
-                                    disabled={
-                                      !writable ||
-                                      busy ||
-                                      scanning ||
-                                      hasPending
-                                    }
-                                    onPress={() => {
-                                      // 맛집·관광지 현장에서 촬영한 사진을 현재 일정에 연결한다.
-                                      return photo('photo', true, item.id);
-                                    }}
-                                  />
-                                  <Action
-                                    label="이 일정에 사진 추가"
-                                    disabled={
-                                      !writable ||
-                                      busy ||
-                                      scanning ||
-                                      hasPending
-                                    }
-                                    onPress={() => {
-                                      // 일정과 같은 여행에만 사진을 연결한다.
-                                      photo('photo', false, item.id);
-                                    }}
-                                  />
-                                  <Action
-                                    label="일정 수정"
-                                    disabled={
-                                      !writable ||
-                                      busy ||
-                                      scanning ||
-                                      hasPending
-                                    }
-                                    onPress={() => {
-                                      // 기존 일정 ID를 유지한다.
-                                      edit(scheduleForm(snapshot, item));
-                                    }}
-                                  />
-                                  <Action
-                                    variant="danger"
-                                    label="일정 삭제"
-                                    disabled={
-                                      !writable ||
-                                      busy ||
-                                      scanning ||
-                                      hasPending
-                                    }
-                                    onPress={() => {
-                                      // 영수증 연결 일정의 삭제는 서버 FK가 보호한다.
-                                      command({
-                                        operation: 'schedule.delete',
-                                        input: { id: item.id },
-                                      });
-                                    }}
-                                  />
-                                </View>
-                              </View>
-                            ))}
-                        </View>
-                      ))}
-                  </>
+                  <Action
+                    label="Google Maps 장소 가져오기"
+                    variant="quiet"
+                    onPress={() => {
+                      // 장소의 공유 링크를 가져오는 실제 도구를 연다.
+                      return router.push('/import-place');
+                    }}
+                  />
                 )}
                 {activeSection === 'expenses' && (
                   <View style={styles.card}>
@@ -1335,6 +1257,23 @@ function WorkspaceContent({
         )}
         {busy && <Text>여행에 반영하고 있어요…</Text>}
       </ScrollView>
+      {snapshot && activeSection === 'itinerary' && (
+        <TripHubActions
+          disabled={!writable || busy || scanning || hasPending}
+          onAdd={() => {
+            // 선택 중인 실제 날짜의 일정 추가 폼을 연다.
+            return edit(scheduleForm(snapshot, undefined, selectedDay));
+          }}
+          onCapture={() => {
+            // 기존 영수증 촬영 흐름을 시작한다.
+            return setShowReceiptCapture(true);
+          }}
+          onLibrary={() => {
+            // 앨범의 영수증을 기존 인식·확인 흐름으로 보낸다.
+            return photo('receipt');
+          }}
+        />
+      )}
       <ReceiptCapture
         visible={showReceiptCapture}
         busy={busy || scanning}

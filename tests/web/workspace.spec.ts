@@ -467,13 +467,7 @@ test('첫 진입 홈 → 목적지 선택 → 인증 복귀 → 여행 생성 �
         .click();
     },
     () => {
-      // 여행을 저장할 때만 인증을 요청한다.
-      return page
-        .getByRole('button', { name: '새 여행 시작하기', exact: true })
-        .click();
-    },
-    () => {
-      // 인증 화면에 선택 목적지와 복귀 의도가 함께 전달되어야 한다.
+      // 도시를 누르는 한 번의 행동으로 인증 화면에 목적지와 복귀 의도를 전달한다.
       return expect(page).toHaveURL(
         /\/login\?next=new-trip&destination=tokyo$/,
       );

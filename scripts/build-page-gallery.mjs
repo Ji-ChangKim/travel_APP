@@ -24,8 +24,16 @@ const screenCopy = {
     '원본 사진 없이도 장소·메뉴·결제 일시·실제 지출을 다시 볼 수 있어요.',
   ],
   'first-visit-home': [
-    '어디로 떠나볼까요?',
-    '가고 싶은 도시를 고르고 나만의 여행을 시작해 보세요.',
+    '첫 여행을 시작하는 홈',
+    '새 여행을 시작하거나 도시를 눌러 바로 계획을 만드세요.',
+  ],
+  'home-returning': [
+    '이어서 떠나는 여행',
+    '여행 중인 일정을 먼저 열고 다른 여행도 이어서 준비하세요.',
+  ],
+  'home-load-error': [
+    '내 여행 다시 불러오기',
+    '불러오기를 다시 시도하거나 새 여행을 시작하세요.',
   ],
   login: [
     '여행을 이어가기',
@@ -51,8 +59,8 @@ const screenCopy = {
     '여행 날짜와 항공편을 한곳에 모아두세요.',
   ],
   'trip-detail': [
-    '날짜별 여행 일정',
-    '오늘의 장소와 이동, 먹고 싶은 메뉴를 함께 살펴보세요.',
+    '날짜별 여행 타임라인',
+    '날짜를 고르고 장소·사진·실제 지출을 함께 확인하세요.',
   ],
   'schedule-editor': [
     '가고 싶은 장소 추가',
@@ -223,6 +231,21 @@ if (
   throw new Error('갤러리 캡처 누락 또는 실행 오류');
 writeFileSync(join(output, 'index.html'), html(manifest.shots));
 writeFileSync(join(output, 'overview.html'), html(overviewShots, true));
+// 첫 방문·재방문·조회 실패와 여행 허브를 한 페이지에서 비교한다.
+writeFileSync(
+  join(output, 'home.html'),
+  html(
+    manifest.shots.filter((item) => {
+      // 현재 촬영된 홈·재방문·허브·조회 오류 화면만 비교한다.
+      return [
+        'first-visit-home',
+        'home-returning',
+        'trip-detail',
+        'home-load-error',
+      ].includes(item.key);
+    }),
+  ).replaceAll('TripPrint 화면 둘러보기', '여행을 시작하고 이어가는 TripPrint'),
+);
 console.info(
   `주요 페이지 12종 및 전체 화면 ${manifest.shots.length}개 갤러리 생성`,
 );
