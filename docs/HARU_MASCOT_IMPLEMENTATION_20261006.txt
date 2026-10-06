@@ -74,3 +74,19 @@ WorkspaceScreen.tsx의 서비스 일시 중단(503) 문구를
 - 갤러리용 .release/page-gallery/capture.mjs / build-gallery.mjs / render.mjs 보완.
   격리된 캡처 도구는 배포·커밋 대상에서 제외하며 저장소 외 사용자 원본도 포함하지 않는다.
 - Android APK는 이번 웹 배포로 교체되지 않는다. 새 네이티브 설치본에는 EAS 재빌드가 필요하다.
+
+배포 확인 (2026-10-06 18:07 KST)
+Git 소스: 354062ebd2f44c7c5d72536248166773cfdc6ebd (main 푸시 완료).
+배포: https://d0621e0e.wherego-staging.pages.dev
+테스트 주소: https://wherego-staging.pages.dev/?release=test-1-haru
+공개 주소에서 배포 식별자·진입 번들 파일명·SHA256 일치 확인.
+SHA256: 90aba307333c1ee3628bbf98966caefd90e1705b53ce84525237a40e3bf336b9
+첫 방문·목적지 로그인 전달·마이 직접 진입·새로고침 통과.
+잘못된 주소에서 하루 오류 PNG 디코딩 및 홈 복귀 통과.
+화면 실행 오류 0, 익명 개인 여행 API 요청 0.
+검증 증빙: .release/home-flow/verification.json
+최종 비교 화면: outputs/TripPrint-pages/TripPrint_Haru_states-overview_1440.png
+하루 전용 미리보기: http://127.0.0.1:8791/haru.html
+전체 갤러리 ZIP: .release/page-gallery/TripPrint_pages-gallery.zip
+최종 자산과 전체 생성/추출 프롬프트: apps/mobile/assets/brand/haru-v1/manifest.json
+추가 로컬 도구: .release/verify-home-release.mjs / .release/page-gallery/render-haru.mjs
