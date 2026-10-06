@@ -44,4 +44,14 @@ TripPrint 앱 더미 데이터 제거 기록
 - 최종 npm run check: TypeScript 엄격 모드, ESLint 경고 0, Prettier 모두 통과 (종료 코드 0).
 - 더미 검출을 포함한 배포 산출물 관련 테스트 5개 통과.
 - 공개 미리보기 HTML·manifest에 과거 샘플 제목·계정·영수증 더미 장소 문자열 없음 확인.
-- 배포 결과는 공개 주소 확인 후 아래에 기록.
+- 변경 소스: fdf40e6, 기존 main 저장소에 푸시 완료.
+- 테스트 웹: https://wherego-staging.pages.dev
+- 고정 배포: https://4be0af40.wherego-staging.pages.dev
+- 식별자: test-1-no-dummy.
+- 번들: entry-2cb1e446bd322195a4bffc211bba22ad.js
+- SHA256: 68f027ff400b64ac9754ce578eed610042c86302e6f46880a0cf1001f60bf6bf
+- 삭제한 샘플 모듈은 현재 앱 경로에서 사용하지 않으므로 JS 번들 해시는 직전과 동일. 앱 실행 경로의 실제 데이터 조회 방식을 더미로 대체하지 않음.
+- 공개 별칭에서 배포 식별자·로컬 번들 SHA256 일치, 첫 방문·목적지 전달·로그인·복구·새로고침 검증 통과.
+- 렌더링 오류 0, 익명 개인 여행 API 조회 없음. .release/no-dummy-live/verification.json에 결과 보존.
+- 미리보기: http://127.0.0.1:8791/home.html?data=real#screens
+- 설치 APK 재빌드·기존 사용자 데이터 삭제는 수행하지 않음.
