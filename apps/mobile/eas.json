@@ -49,6 +49,20 @@
     }
   },
   "submit": {
+    "play-internal": {
+      "android": {
+        "applicationId": "com.tripprint.app",
+        "track": "internal",
+        "releaseStatus": "completed"
+      }
+    },
+    "play-internal-draft": {
+      "android": {
+        "applicationId": "com.tripprint.app",
+        "track": "internal",
+        "releaseStatus": "draft"
+      }
+    },
     "production": {}
   }
 }
