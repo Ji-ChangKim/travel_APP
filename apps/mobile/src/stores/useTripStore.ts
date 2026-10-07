@@ -12,14 +12,11 @@ import type {
   Visit,
 } from '@wherego/domain';
 
-import {
-  clearGuestSession,
-  generateGuestProfile,
-  loadStoredGuestSession,
-  saveGuestSession,
-} from '@/services/guestAuthService';
+import { clearGuestSession } from '@/services/guestAuthService';
 import { signOutUser } from '@/services/authService';
 import { accountChangeState } from '@/features/auth/model';
+import { guestSession } from '@/services/guestSession';
+import { cloudProfile, getCloudSession } from '@/services/cloudAuth';
 
 // 일차 계산 결과 데이터 구조를 정의한다.
 export interface CalculatedDay {
@@ -162,27 +159,23 @@ export const useTripStore = create<TripState>((set, get) => ({
   visits: [],
 
   // 게스트 둘러보기 세션을 기기 안전 저장소에 영구 보관하여 앱 삭제 전까지 유지한다.
-  loginAsGuest: async (osPlatform) => {
-    const guestProfile = generateGuestProfile(osPlatform);
-    get().setCurrentUser(guestProfile);
-    await saveGuestSession(guestProfile);
-    return guestProfile;
+  loginAsGuest: (osPlatform) => {
+    // 서버 발급 세션만 게스트 회원으로 사용한다.
+    return guestSession().then((session) => {
+      // 인증 이벤트와 동일한 프로필을 반환한다.
+      return cloudProfile(session.user, osPlatform);
+    });
   },
 
   // 기기 안전 저장소에서 기존 게스트 세션을 조회하여 복원한다.
-  initGuestSession: async () => {
-    // 실제 로그인 세션을 게스트 복원으로 덮어쓰지 않는다.
-    if (get().currentUser?.authProvider !== 'guest' && get().currentUser)
-      return null;
-    const saved = await loadStoredGuestSession();
-    if (
-      saved &&
-      (!get().currentUser || get().currentUser?.authProvider === 'guest')
-    ) {
-      get().setCurrentUser(saved);
-      return saved;
-    }
-    return null;
+  initGuestSession: () => {
+    // 이전 로컬 식별값 대신 서버가 확인한 익명 회원만 복원한다.
+    return getCloudSession().then((session) => {
+      // 현재 서버 세션이 익명 회원인지 확인한다.
+      return session?.user.isAnonymous
+        ? cloudProfile(session.user, 'web')
+        : null;
+    });
   },
 
   // 인증된 사용자 프로필 객체로 전역 상태를 직접 갱신한다.

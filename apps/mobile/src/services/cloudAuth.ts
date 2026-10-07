@@ -10,6 +10,7 @@ const cloudUserSchema = z.object({
   image: z.string().nullable().optional(),
   createdAt: z.union([z.string(), z.number()]),
   updatedAt: z.union([z.string(), z.number()]),
+  isAnonymous: z.boolean().optional(),
 });
 export type CloudUser = z.infer<typeof cloudUserSchema>;
 export type CloudSession = { user: CloudUser; access_token: string };
@@ -89,35 +90,45 @@ export function emailSession(
   name?: string,
 ): Promise<CloudSession> {
   // 비밀번호는 지정된 인증 서버로만 보낸다.
-  return fetch(`${authBaseUrl()}/api/auth/${mode}/email`, {
-    method: 'POST',
-    headers: authHeaders(),
-    body: JSON.stringify({
-      email: email.trim(),
-      password,
-      ...(mode === 'sign-up'
-        ? { name: name?.trim() || email.split('@')[0] || '여행자' }
-        : {}),
-    }),
-    signal: AbortSignal.timeout(30000),
-  }).then((response) => {
-    /* 발급 토큰과 사용자를 함께 검사한다. */ return !response.ok
-      ? fail(
-          response.status === 429
-            ? '요청이 많습니다. 잠시 후 다시 시도해 주세요.'
-            : '이메일과 비밀번호를 확인하고 다시 시도해 주세요.',
-        )
-      : response.json().then((data: unknown) => {
-          /* 서명된 응답 헤더 토큰을 저장한다. */ return acceptSession(
-            z.object({ user: cloudUserSchema }).parse(data).user,
-            response.headers.get('set-auth-token') ||
-              fail('로그인을 완료하지 못했어요. 다시 시도해 주세요.'),
-          );
-        });
-  });
+  return readToken()
+    .then((token) =>
+      fetch(`${authBaseUrl()}/api/auth/${mode}/email`, {
+        method: 'POST',
+        headers: {
+          ...authHeaders(),
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+          ...(mode === 'sign-up'
+            ? { name: name?.trim() || email.split('@')[0] || '여행자' }
+            : {}),
+        }),
+        signal: AbortSignal.timeout(30000),
+      }),
+    )
+    .then((response) => {
+      /* 발급 토큰과 사용자를 함께 검사한다. */ return !response.ok
+        ? fail(
+            response.status === 429
+              ? '요청이 많습니다. 잠시 후 다시 시도해 주세요.'
+              : '이메일과 비밀번호를 확인하고 다시 시도해 주세요.',
+          )
+        : response.json().then((data: unknown) => {
+            /* 서명된 응답 헤더 토큰을 저장한다. */ return acceptSession(
+              z.object({ user: cloudUserSchema }).parse(data).user,
+              response.headers.get('set-auth-token') ||
+                fail('로그인을 완료하지 못했어요. 다시 시도해 주세요.'),
+            );
+          });
+    });
 }
 // 발급 세션 저장이 끝난 뒤 이벤트를 보낸다.
-function acceptSession(user: CloudUser, token: string): Promise<CloudSession> {
+export function acceptSession(
+  user: CloudUser,
+  token: string,
+): Promise<CloudSession> {
   // 저장 실패를 로그인 성공으로 처리하지 않는다.
   return writeToken(token).then(() => {
     /* 실제 발급 사용자만 전달한다. */ return notifySession({
@@ -206,7 +217,8 @@ export function cloudProfile(user: CloudUser, osPlatform: OsPlatform): Profile {
     id: user.id,
     nickname: user.name,
     avatarUrl: user.image || null,
-    authProvider: 'email',
+    authProvider: user.isAnonymous ? 'guest' : 'email',
+    onboardingCompleted: Boolean(user.isAnonymous),
     osPlatform,
     createdAt: new Date(user.createdAt).toISOString(),
     updatedAt: new Date(user.updatedAt).toISOString(),

@@ -9,6 +9,12 @@ const inputSchema = z
     nickname: z.string().trim().min(1).max(50),
     bio: z.string().max(300).nullable().optional(),
     travelStyles: z.array(z.string().max(50)).max(20).optional(),
+    gender: z.enum(['female', 'male', 'unspecified']).optional(),
+    birthDate: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .refine(validBirthDate)
+      .optional(),
   })
   .strict();
 type ProfileRow = {
@@ -18,6 +24,13 @@ type ProfileRow = {
   createdAt: number;
   updatedAt: number;
   details: string | null;
+  isAnonymous: number;
+  gender: string | null;
+  birth_date: string | null;
+  onboarding_completed_at: number | null;
+  providerId: string | null;
+  accountId: string | null;
+  linkedAt: number | null;
 };
 
 // 현재 계정의 프로필을 D1에서 조회한다.
@@ -25,7 +38,7 @@ function profile(c: Ctx): Promise<Response> {
   // 사용자 ID는 실제 인증된 세션에서만 선택한다.
   return database(c.env)
     .prepare(
-      'SELECT u.id,u.name,u.image,u.createdAt,u.updatedAt,p.details FROM user u LEFT JOIN profiles p ON p.user_id=u.id WHERE u.id=?',
+      'SELECT u.id,u.name,u.image,u.createdAt,u.updatedAt,u.isAnonymous,p.details,p.gender,p.birth_date,p.onboarding_completed_at,a.providerId,a.accountId,a.createdAt AS linkedAt FROM user u LEFT JOIN profiles p ON p.user_id=u.id LEFT JOIN account a ON a.id=(SELECT id FROM account WHERE userId=u.id ORDER BY createdAt DESC,id DESC LIMIT 1) WHERE u.id=?',
     )
     .bind(c.get('session').userId)
     .first<ProfileRow>()
@@ -37,7 +50,18 @@ function profile(c: Ctx): Promise<Response> {
               id: row.id,
               nickname: row.name,
               avatarUrl: row.image,
-              authProvider: 'email',
+              authProvider: row.isAnonymous
+                ? 'guest'
+                : row.providerId === 'credential'
+                  ? 'email'
+                  : row.providerId,
+              linkedId: row.accountId || row.id,
+              linkedAt: new Date(row.linkedAt || row.createdAt).toISOString(),
+              gender: row.gender,
+              birthDate: row.birth_date,
+              onboardingCompleted: Boolean(
+                row.isAnonymous || row.onboarding_completed_at,
+              ),
               osPlatform: 'web',
               createdAt: new Date(row.createdAt).toISOString(),
               updatedAt: new Date(row.updatedAt).toISOString(),
@@ -74,16 +98,34 @@ function save(c: Ctx, input: z.infer<typeof inputSchema>): Promise<unknown> {
       .bind(input.nickname, Date.now(), c.get('session').userId),
     database(c.env)
       .prepare(
-        'INSERT INTO profiles(user_id,details) VALUES(?,?) ON CONFLICT(user_id) DO UPDATE SET details=excluded.details',
+        `INSERT INTO profiles(user_id,details,gender,birth_date,onboarding_completed_at) VALUES(?,?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET
+        details=json_patch(details,excluded.details),gender=coalesce(excluded.gender,gender),birth_date=coalesce(excluded.birth_date,birth_date),
+        onboarding_completed_at=coalesce(onboarding_completed_at,excluded.onboarding_completed_at)`,
       )
       .bind(
         c.get('session').userId,
         JSON.stringify({
-          bio: input.bio || null,
-          travelStyles: input.travelStyles || [],
+          ...(input.bio !== undefined ? { bio: input.bio } : {}),
+          ...(input.travelStyles !== undefined
+            ? { travelStyles: input.travelStyles }
+            : {}),
         }),
+        input.gender || null,
+        input.birthDate || null,
+        input.gender && input.birthDate ? Date.now() : null,
       ),
   ]);
+}
+
+// 존재하는 달력 날짜와 오늘 이전의 생년월일만 허용한다.
+function validBirthDate(value: string): boolean {
+  // 윤년·월말을 자동 보정한 날짜와 미래 날짜를 저장하지 않는다.
+  return (
+    Number.isFinite(Date.parse(value)) &&
+    new Date(value).toISOString().slice(0, 10) === value &&
+    value <= new Date().toISOString().slice(0, 10) &&
+    value >= '1900-01-01'
+  );
 }
 
 // 현재 로그인 계정의 조회와 수정 경로를 등록한다.

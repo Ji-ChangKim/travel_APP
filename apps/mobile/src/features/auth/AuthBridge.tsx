@@ -21,7 +21,7 @@ function applySession(clear: () => void, session: CloudSession | null): void {
   return applyProfile(
     clear,
     session
-      ? cloudProfile(
+      ? restoredProfile(
           session.user,
           Platform.OS === 'ios'
             ? 'ios'
@@ -32,34 +32,37 @@ function applySession(clear: () => void, session: CloudSession | null): void {
       : null,
   );
 }
+
+// 같은 계정의 전경 복원에서는 이미 확인한 개인정보 설정 상태를 유지한다.
+function restoredProfile(
+  user: CloudSession['user'],
+  os: Parameters<typeof cloudProfile>[1],
+  previous = useTripStore.getState().currentUser,
+) {
+  // 새로운 계정 UUID에는 이전 회원의 상세 프로필을 섞지 않는다.
+  return previous?.id === user.id
+    ? {
+        ...previous,
+        ...cloudProfile(user, os),
+        authProvider: previous.authProvider,
+        onboardingCompleted: previous.onboardingCompleted,
+      }
+    : cloudProfile(user, os);
+}
 // 계정이 바뀌면 캐시를 제거한다.
 function applyProfile(
   clear: () => void,
   next: ReturnType<typeof cloudProfile> | null,
 ): void {
-  // 명시적인 게스트 상태는 로그인과 별개로 보존한다.
+  // 서버 세션이 없는 기기 게스트를 인증 회원으로 유지하지 않는다.
   return void (useAuthReady.setState({ ready: true }),
-  !next && useTripStore.getState().currentUser?.authProvider === 'guest'
-    ? undefined
-    : (useTripStore.getState().currentUser?.id !== next?.id
-        ? clear()
-        : undefined,
-      useTripStore.getState().setCurrentUser(next)));
+  (useTripStore.getState().currentUser?.id !== next?.id ? clear() : undefined,
+  useTripStore.getState().setCurrentUser(next)));
 }
 // 서버 세션을 재확인한다.
 function restore(clear: () => void, started = authRevision()): Promise<void> {
   // 실패를 인증 성공으로 만들지 않는다.
-  return useTripStore
-    .getState()
-    .initGuestSession()
-    .catch(() => {
-      // 기기 저장소 실패가 실제 계정 인증 확인을 막지 않게 한다.
-      return null;
-    })
-    .then(() => {
-      // 직접 페이지를 열어도 게스트 복원 후 실제 서버 계정을 우선 확인한다.
-      return getCloudSession();
-    })
+  return getCloudSession()
     .then((session) => {
       // 오래된 복원 결과가 새로 로그인한 계정을 덮어쓰지 못한다.
       return started !== authRevision()

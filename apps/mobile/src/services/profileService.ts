@@ -8,7 +8,12 @@ const profileSchema = z.object({
   avatarUrl: z.string().nullable(),
   bio: z.string().nullable().optional(),
   travelStyles: z.array(z.string()).optional(),
-  authProvider: z.literal('email'),
+  authProvider: z.enum(['email', 'google', 'kakao', 'naver', 'apple', 'guest']),
+  linkedId: z.string(),
+  linkedAt: z.string(),
+  gender: z.enum(['female', 'male', 'unspecified']).nullable(),
+  birthDate: z.string().nullable(),
+  onboardingCompleted: z.boolean(),
   osPlatform: z.enum(['web', 'ios', 'android']),
   createdAt: z.string(),
   updatedAt: z.string(),
@@ -30,7 +35,13 @@ export function fetchUserProfile(userId: string): Promise<Profile | null> {
 // 서버에서 확정한 프로필만 화면에 반영한다.
 export function updateUserProfile(
   userId: string,
-  updates: { nickname?: string; bio?: string | null; travelStyles?: string[] },
+  updates: {
+    nickname?: string;
+    bio?: string | null;
+    travelStyles?: string[];
+    gender?: NonNullable<Profile['gender']>;
+    birthDate?: string;
+  },
 ): Promise<Profile> {
   // 서버 오류에서는 로컬 프로필을 성공 상태로 만들지 않는다.
   return serverOptions(userId)

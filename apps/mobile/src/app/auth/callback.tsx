@@ -6,7 +6,7 @@ import { Action, styles } from '@/features/workspace/ui';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { completeSocialAuth, socialRedirectUrl } from '@/features/auth/oauth';
-import { pendingAuthDestination } from '@/features/workspace/mapsShare';
+import { authenticatedDestination } from '@/features/auth/destination';
 
 // 웹 및 모바일 OAuth의 공통 복귀 화면을 제공한다.
 export default function AuthCallbackScreen() {
@@ -39,7 +39,10 @@ export default function AuthCallbackScreen() {
           ).toString()}`;
     // 브라우저 처리와 겹치는 코드는 서비스에서 한 번만 교환한다.
     completeSocialAuth(callbackUrl)
-      .then(pendingAuthDestination)
+      .then(() => {
+        // 신규 SNS 회원은 개인정보 설정을 먼저 진행한다.
+        return authenticatedDestination();
+      })
       .then((destination) => {
         // 교환에 성공한 화면만 내 여행으로 이동한다.
         if (active) router.replace(destination);

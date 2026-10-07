@@ -9,3 +9,11 @@ export interface ApiEnvironment {
   Bindings: Env & { GOOGLE_PLACES_API_KEY?: string };
   Variables: { requestId: string; session: VerifiedSession };
 }
+// 미등록 SNS의 비밀 키는 배포 필수 값으로 강제하지 않는다.
+declare global {
+  interface Env {
+    GOOGLE_CLIENT_SECRET?: string;
+    KAKAO_CLIENT_SECRET?: string;
+    NAVER_CLIENT_SECRET?: string;
+  }
+}

@@ -1,8 +1,8 @@
+import Modal from '@/components/AppModal';
 import { useEffect, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import {
   Image,
-  Modal,
   Linking,
   ScrollView,
   StyleSheet,

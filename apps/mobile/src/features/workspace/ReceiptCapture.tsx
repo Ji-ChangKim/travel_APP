@@ -1,4 +1,5 @@
-import { Modal, ScrollView, Text, View } from 'react-native';
+import Modal from '@/components/AppModal';
+import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Action, styles } from './ui';

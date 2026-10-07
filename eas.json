@@ -22,8 +22,15 @@
       "env": {
         "EXPO_NO_DOTENV": "1",
         "EXPO_PUBLIC_BACKEND": "cloudflare",
-        "EXPO_PUBLIC_API_URL": "https://wherego-api-staging.gametps.workers.dev",
-        "EXPO_PUBLIC_AUTH_WEB_REDIRECT_URL": "https://wherego-staging.pages.dev/auth/callback"
+        "EXPO_PUBLIC_API_URL": "https://tripprint-api-staging.gametps.workers.dev",
+        "EXPO_PUBLIC_AUTH_WEB_REDIRECT_URL": "https://tripprint-staging.pages.dev/auth/callback"
+      }
+    },
+    "play-internal": {
+      "extends": "preview",
+      "distribution": "store",
+      "android": {
+        "buildType": "app-bundle"
       }
     },
     "production": {

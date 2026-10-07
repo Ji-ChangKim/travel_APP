@@ -21,12 +21,10 @@ type Destination =
 
 // 실제 계정만 가져오기 대상 여행을 읽을 수 있게 한다.
 function useImportUser(): string {
-  // 게스트는 공유문을 입력할 수 있지만 서버 여행을 읽지 않는다.
+  // 서버 인증을 마친 게스트와 일반 회원의 여행만 읽는다.
   return useTripStore((state) => {
     // 실제 로그인 계정 UUID로 조회와 상태를 분리한다.
-    return state.currentUser && state.currentUser.authProvider !== 'guest'
-      ? state.currentUser.id
-      : '';
+    return state.currentUser ? state.currentUser.id : '';
   });
 }
 

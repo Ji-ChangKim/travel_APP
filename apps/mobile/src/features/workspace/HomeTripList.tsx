@@ -4,6 +4,7 @@ import type { useRouter } from 'expo-router';
 import type { listServerTrips } from '@wherego/api-client';
 import { tripStatusLabel } from './presentation';
 import { homeStyles as s } from './homeStyles';
+import { departureReminder, localToday } from './homeDates';
 
 type Trips = Awaited<ReturnType<typeof listServerTrips>>;
 
@@ -18,8 +19,14 @@ export function continuingTrips(trips: Trips | undefined): Trips {
     .sort((left, right) => {
       // 여행 중에는 현장 기록으로 가장 빨리 돌아간다.
       return (
-        Number(right.status === 'IN_PROGRESS') -
-          Number(left.status === 'IN_PROGRESS') ||
+        Number(
+          right.startDate <= localToday() && right.endDate >= localToday(),
+        ) -
+          Number(
+            left.startDate <= localToday() && left.endDate >= localToday(),
+          ) ||
+        Number(left.endDate < localToday()) -
+          Number(right.endDate < localToday()) ||
         left.startDate.localeCompare(right.startDate)
       );
     });
@@ -39,7 +46,7 @@ export default function HomeTripList({
       <Text style={s.sectionTitle}>
         {trips[0]?.status === 'IN_PROGRESS'
           ? '지금 여행 중'
-          : '이어서 준비할 여행'}
+          : '다가오는 나의 여행'}
       </Text>
       {trips[0] && <PrimaryTrip trip={trips[0]} router={router} />}
       {trips.slice(1).map((trip) => (
@@ -58,6 +65,9 @@ export default function HomeTripList({
             <Text style={s.linkText}>{trip.title}</Text>
             <Text style={s.supporting}>
               {trip.city} · {trip.startDate}
+            </Text>
+            <Text style={s.ticketStatus}>
+              {departureReminder(trip.startDate, trip.endDate)}
             </Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color="#697581" />
@@ -92,6 +102,9 @@ function PrimaryTrip({
       </View>
       <Text style={s.ticketCity}>{trip.city}</Text>
       <Text style={s.ticketTitle}>{trip.title}</Text>
+      <Text style={s.ticketStatus}>
+        {departureReminder(trip.startDate, trip.endDate)}
+      </Text>
       <View style={s.ticketFooter}>
         <Text style={s.ticketDate}>
           {trip.startDate} — {trip.endDate}

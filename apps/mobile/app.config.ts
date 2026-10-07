@@ -16,7 +16,8 @@ const config: ExpoConfig = {
     buildNumber: '1',
   },
   android: {
-    package: 'com.travelapp.mobile',
+    // Play Console에 등록된 TripPrint 앱과 동일한 Android 식별자로 빌드한다.
+    package: 'com.tripprint.app',
     versionCode: 1,
     adaptiveIcon: {
       backgroundColor: '#FF6B57',
@@ -36,6 +37,8 @@ const config: ExpoConfig = {
     '@react-native-community/datetimepicker',
     'expo-router',
     'expo-web-browser',
+    // 출발일 알림과 Android 알림 권한을 네이티브 빌드에 등록한다.
+    'expo-notifications',
     // Android 공유 시트에서 Google Maps 텍스트 링크를 받을 수 있게 한다.
     [
       'expo-sharing',

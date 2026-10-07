@@ -65,6 +65,7 @@ before(() => {
         '0002_auth_rate_limit.sql',
         '0003_upload_deletion.sql',
         '0004_receipt_scans.sql',
+        '0005_member_onboarding.sql',
       ]
         .map((file) => {
           /* 배포 마이그레이션을 순서대로 읽는다. */ return readFileSync(
@@ -1097,3 +1098,425 @@ test('D1 인증 요청 제한은 여러 Worker 요청에서도 유지된다', ()
       );
     });
 });
+
+// 서버 발급 게스트로 저장한 여행은 계정 연결 후에도 같은 ID로 이어져야 한다.
+test('게스트 회원 저장 → 프로필 검증 → 이메일 연결 → 여행 소유권 이전 및 이전 토큰 철회', () => {
+  // 실제 인증 HTTP와 D1 원자 이전을 하나의 인수 흐름으로 검사한다.
+  return guestAccount().then((guest) =>
+    guestTravel(guest).then((tripId) =>
+      request(
+        '/api/auth/sign-up/email',
+        'POST',
+        {
+          email: 'linked@example.test',
+          password: 'strong-link-password!',
+          name: '연결한 여행자',
+        },
+        guest,
+      )
+        .then((response) => accountResponse(response))
+        .then((member) => verifyLinkedTravel(guest, member, tripId)),
+    ),
+  );
+});
+
+// 게스트 회원과 서명된 토큰이 서버에서 발급되었는지 검사한다.
+function guestAccount() {
+  // 로컬 프로필을 인증 자료로 주입하지 않는다.
+  return request('/api/auth/sign-in/anonymous', 'POST', {})
+    .then(accountResponse)
+    .then((guest) =>
+      request('/api/v1/profile', 'GET', undefined, guest)
+        .then(json)
+        .then((body) => {
+          // 게스트의 ID·연동 정보·가입 절차 생략은 서버 원본이어야 한다.
+          return (
+            assert.equal(body.data.id, guest.id),
+            assert.equal(body.data.authProvider, 'guest'),
+            assert.equal(body.data.linkedId, guest.id),
+            assert.equal(body.data.onboardingCompleted, true),
+            guest
+          );
+        }),
+    );
+}
+
+// 실제 서버 응답의 회원 ID와 서명 헤더 토큰을 검사한다.
+function accountResponse(response) {
+  // 실패한 인증의 JSON을 로그인 완료로 쓰지 않는다.
+  return json(response).then((body) => {
+    // 서명된 헤더를 필수로 확인한다.
+    return (
+      assert.ok(response.headers.get('set-auth-token')),
+      { id: body.user.id, token: response.headers.get('set-auth-token') }
+    );
+  });
+}
+
+// 기존 동행에게 연결할 때 두 권한을 병합하고 멤버를 중복 생성하지 않는다.
+test('게스트를 이미 참여한 회원에 연결해 소유자·편집자 권한을 보존한다', () => {
+  // 같은 여행에 기존 회원이 있는 두 경우를 실제 인증 연결로 검사한다.
+  return checkMemberCollision('owner').then(() => {
+    // 편집자와 조회자 충돌도 더 높은 실제 권한으로 병합한다.
+    return checkMemberCollision('editor');
+  });
+});
+
+// 기존 회원과 게스트가 같은 여행에 참여한 상태에서 계정 연결을 검사한다.
+function checkMemberCollision(role) {
+  // 이전 테스트에서 발급한 실제 계정에 이메일 로그인으로 연결한다.
+  return guestAccount().then((guest) =>
+    guestTravel(guest).then((trip) =>
+      seedMemberCollision(guest, trip, role)
+        .then(() => {
+          // 게스트 토큰을 인증 서버가 확인하도록 헤더로 전달한다.
+          return request(
+            '/api/auth/sign-in/email',
+            'POST',
+            {
+              email: 'user0@example.test',
+              password: 'a-strong-test-password!',
+            },
+            guest,
+          );
+        })
+        .then(accountResponse)
+        .then((member) =>
+          request(`/api/v1/trips/${trip}/workspace`, 'GET', undefined, member),
+        )
+        .then(json)
+        .then((body) => {
+          // 스냅샷과 권한 인덱스가 같은 회원 역할과 한 개의 멤버를 유지한다.
+          return (
+            assert.equal(body.data.myRole, role),
+            assert.equal(
+              body.data.members.filter(
+                (entry) => entry.userId === state.users[0].id,
+              ).length,
+              1,
+            ),
+            assert.equal(
+              body.data.members.find(
+                (entry) => entry.userId === state.users[0].id,
+              ).role,
+              role,
+            ),
+            assert.equal(body.data.trip.version, 2)
+          );
+        }),
+    ),
+  );
+}
+
+// 권한 충돌의 초기 상태만 D1에 구성하고 실제 이전은 HTTP로 실행한다.
+function seedMemberCollision(guest, trip, role) {
+  // 소유권이 다른 여행의 편집자 연결도 함께 검사한다.
+  return mf.getD1Database('DB').then((db) =>
+    db.batch([
+      db
+        .prepare('UPDATE trip_members SET role=? WHERE trip_id=? AND user_id=?')
+        .bind(role, trip, guest.id),
+      db
+        .prepare('INSERT INTO trip_members(trip_id,user_id,role) VALUES(?,?,?)')
+        .bind(trip, state.users[0].id, 'viewer'),
+      ...(role === 'editor'
+        ? [
+            db
+              .prepare(
+                'INSERT INTO trip_members(trip_id,user_id,role) VALUES(?,?,?)',
+              )
+              .bind(trip, state.users[1].id, 'owner'),
+          ]
+        : []),
+      db
+        .prepare(
+          "UPDATE trips SET owner_id=?,snapshot=json_set(snapshot,'$.trip.ownerId',?,'$.members',json(?)) WHERE id=?",
+        )
+        .bind(
+          role === 'owner' ? guest.id : state.users[1].id,
+          role === 'owner' ? guest.id : state.users[1].id,
+          JSON.stringify([
+            {
+              memberId: randomUUID(),
+              isMe: false,
+              userId: guest.id,
+              nickname: '게스트',
+              role,
+            },
+            {
+              userId: state.users[0].id,
+              memberId: randomUUID(),
+              isMe: false,
+              nickname: '기존 회원',
+              role: 'viewer',
+            },
+            ...(role === 'editor'
+              ? [
+                  {
+                    userId: state.users[1].id,
+                    memberId: randomUUID(),
+                    isMe: false,
+                    nickname: '원래 소유자',
+                    role: 'owner',
+                  },
+                ]
+              : []),
+          ]),
+          trip,
+        ),
+    ]),
+  );
+}
+
+// 게스트도 인증된 일반 여행 생성 경로를 사용할 수 있어야 한다.
+function guestTravel(guest) {
+  // 동행 권한과 여행 원본은 서버의 실제 UUID를 사용한다.
+  return request(
+    '/api/v1/trips',
+    'POST',
+    {
+      title: '게스트 부산 여행',
+      country: '대한민국',
+      city: '부산',
+      startDate: '2026-11-10',
+      endDate: '2026-11-12',
+      timezone: 'Asia/Seoul',
+    },
+    guest,
+    { 'Idempotency-Key': randomUUID() },
+  )
+    .then((response) => json(response, 201))
+    .then((body) => {
+      // 같은 여행 ID가 연결 후에도 보존되어야 한다.
+      return body.data.tripId;
+    });
+}
+
+// 연결한 회원의 정보·권한·개인정보 입력을 실제 API로 검증한다.
+function verifyLinkedTravel(guest, member, tripId) {
+  // 이전 계정 토큰의 접근은 연결 완료 시 철회되어야 한다.
+  return request('/api/v1/profile', 'GET', undefined, member)
+    .then(json)
+    .then((body) => {
+      // 신규 일반 회원은 세 가지 설정을 완료해야 한다.
+      return (
+        assert.equal(body.data.authProvider, 'email'),
+        assert.equal(body.data.onboardingCompleted, false)
+      );
+    })
+    .then(() =>
+      request(
+        '/api/v1/profile',
+        'PATCH',
+        { nickname: '부산 여행자', gender: 'female', birthDate: '2025-02-30' },
+        member,
+      ),
+    )
+    .then((response) => {
+      // 달력 자동 보정으로 불가능한 생일을 수락하지 않는다.
+      return assert.equal(response.status, 422);
+    })
+    .then(() =>
+      request(
+        '/api/v1/profile',
+        'PATCH',
+        {
+          nickname: '부산 여행자',
+          gender: 'unspecified',
+          birthDate: '1996-02-29',
+          bio: '기존 소개',
+        },
+        member,
+      ),
+    )
+    .then(json)
+    .then((body) => {
+      // 유효 윤년 생일과 성별 비선택도 설정을 마칠 수 있어야 한다.
+      return (
+        assert.equal(body.data.birthDate, '1996-02-29'),
+        assert.equal(body.data.gender, 'unspecified'),
+        assert.equal(body.data.onboardingCompleted, true)
+      );
+    })
+    .then(() =>
+      request('/api/v1/profile', 'PATCH', { nickname: '새 이름' }, member),
+    )
+    .then(json)
+    .then((body) => {
+      // 닉네임만 변경할 때 상세 프로필을 삭제하지 않는다.
+      return (
+        assert.equal(body.data.birthDate, '1996-02-29'),
+        assert.equal(body.data.bio, '기존 소개')
+      );
+    })
+    .then(() =>
+      request(`/api/v1/trips/${tripId}/workspace`, 'GET', undefined, member),
+    )
+    .then(json)
+    .then((body) => {
+      // 실제 스냅샷과 멤버 권한은 새 회원에게 함께 이전되어야 한다.
+      return (
+        assert.equal(body.data.trip.ownerId, member.id),
+        assert.equal(body.data.myRole, 'owner'),
+        assert.equal(body.data.trip.version, 2),
+        assert.equal(body.data.members.length, 1),
+        assert.equal(body.data.members[0].userId, member.id)
+      );
+    })
+    .then(() =>
+      request(`/api/v1/trips/${tripId}/workspace`, 'GET', undefined, guest),
+    )
+    .then((response) => {
+      // 철회된 게스트 토큰은 여행에 다시 접근할 수 없어야 한다.
+      return assert.equal(response.status, 401);
+    })
+    .then(() =>
+      request(
+        '/api/v1/profile',
+        'PATCH',
+        { nickname: '새 이름', gender: 'male', birthDate: '2999-01-01' },
+        member,
+      ),
+    )
+    .then((response) => {
+      // 미래 날짜도 회원 정보로 저장하지 않는다.
+      return assert.equal(response.status, 422);
+    });
+}
+
+// 공급자 키가 없는 환경은 SNS 로그인과 임의 복귀를 수락하지 않는다.
+test('미등록 SNS는 사용 불가로 응답하고 외부 Origin 준비를 거부한다', () => {
+  // 설정 상태와 실제 인증 가능 상태가 일치하는지 검사한다.
+  return request('/api/social/providers')
+    .then(json)
+    .then((body) => {
+      // 비밀이나 가짜 로그인 성공 값을 공개하지 않는다.
+      return assert.deepEqual(body, {
+        google: false,
+        kakao: false,
+        naver: false,
+      });
+    })
+    .then(() =>
+      request('/api/social/prepare', 'POST', {
+        provider: 'google',
+        challenge: 'a'.repeat(43),
+        redirectUri: 'travelapp://auth/callback',
+      }),
+    )
+    .then((response) => {
+      // 미등록 공급자의 외부 로그인을 시작하지 않는다.
+      return assert.equal(response.status, 503);
+    })
+    .then(() =>
+      request(
+        '/api/social/prepare',
+        'POST',
+        {
+          provider: 'google',
+          challenge: 'a'.repeat(43),
+          redirectUri: 'travelapp://auth/callback',
+        },
+        undefined,
+        { Origin: 'https://evil.test' },
+      ),
+    )
+    .then((response) => {
+      // Origin 거부는 공급자 설정 유무보다 먼저 검사한다.
+      return assert.equal(response.status, 403);
+    });
+});
+
+// 실제 서명 세션과 준비 레코드로 일회용 인증 코드의 기기 결합을 검증한다.
+test('SNS 일회용 교환은 틀린 검증자·재사용·만료를 거부한다', () => {
+  // 제공자 성공을 가장하지 않고 교환 경계만 실제 DB에서 검사한다.
+  return signup(8)
+    .then(() => seedHandoff(state.users[8]))
+    .then((code) =>
+      request('/api/social/exchange', 'POST', {
+        code,
+        verifier: 'wrong'.repeat(13),
+      })
+        .then((response) => {
+          // 틀린 기기의 검증자로 정상 코드를 소비하지 않는다.
+          return assert.equal(response.status, 401);
+        })
+        .then(() =>
+          request('/api/social/exchange', 'POST', {
+            code,
+            verifier: 'valid'.repeat(13),
+          }),
+        )
+        .then(json)
+        .then((body) => {
+          // 인증 서버가 확인한 회원과 서명된 토큰만 응답한다.
+          return (
+            assert.equal(body.user.id, state.users[8].id),
+            assert.equal(body.token, state.users[8].token)
+          );
+        })
+        .then(() =>
+          request('/api/social/exchange', 'POST', {
+            code,
+            verifier: 'valid'.repeat(13),
+          }),
+        )
+        .then((response) => {
+          // 성공한 코드는 다시 교환할 수 없어야 한다.
+          return assert.equal(response.status, 401);
+        })
+        .then(() => seedHandoff(state.users[8], -1))
+        .then((expired) =>
+          request('/api/social/exchange', 'POST', {
+            code: expired,
+            verifier: 'valid'.repeat(13),
+          }),
+        )
+        .then((response) => {
+          // 기기 검증자가 맞아도 만료한 코드는 거부한다.
+          return assert.equal(response.status, 401);
+        }),
+    );
+});
+
+// 교환 경계용 일회용 코드 해시를 실제 D1에 저장한다.
+function seedHandoff(user, lifetime = 60000, code = randomUUID()) {
+  // 민감한 세션 값은 테스트 출력에 기록하지 않는다.
+  return mf
+    .getD1Database('DB')
+    .then((db) =>
+      Promise.all([pkceDigest(code), pkceDigest('valid'.repeat(13))]).then(
+        ([hash, challenge]) =>
+          db
+            .prepare(
+              'INSERT INTO oauth_handoffs(id,provider,challenge,redirect_uri,session_token,code_hash,expires_at,launched_at) VALUES(?,?,?,?,?,?,?,?)',
+            )
+            .bind(
+              randomUUID(),
+              'google',
+              challenge,
+              'travelapp://auth/callback',
+              user.token,
+              hash,
+              Date.now() + lifetime,
+              Date.now(),
+            )
+            .run(),
+      ),
+    )
+    .then(() => {
+      // 원문 코드는 앱 복귀처럼 교환 요청에만 사용한다.
+      return code;
+    });
+}
+
+// 테스트의 verifier 해시도 서버와 같은 표준 형식으로 만든다.
+function pkceDigest(value) {
+  // 평문 검증자 비교로 보안 검증을 우회하지 않는다.
+  return crypto.subtle
+    .digest('SHA-256', new TextEncoder().encode(value))
+    .then((digest) => {
+      // SHA-256을 표준 base64url 문자열로 변환한다.
+      return Buffer.from(digest).toString('base64url');
+    });
+}

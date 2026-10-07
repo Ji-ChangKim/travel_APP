@@ -1328,3 +1328,76 @@ DB명: 없음 (미사용 메모리 저장 모듈 apps/mobile/src/services/travel
 제약: initialTrips·initialMemories 샘플 객체와 가상 동행·장소·추억을 초기 주입하지 않음.
 서버 trips·posts·user 테이블의 스키마와 실제 사용자 저장 기록은 변경 없음.
 ======================================================================
+
+======================================================================
+[2026-10-07 로그인 순서·SNS 연결·게스트 회원·회원 설정]
+DB명: Cloudflare D1 wherego-staging (운영 환경은 설정한 D1 DB).
+마이그레이션: apps/api/migrations/0005_member_onboarding.sql.
+
+테이블 user: Better Auth 회원 원본.
+id TEXT PRIMARY KEY: 서버 보안 난수 UUID 회원 고유 식별값. SNS 식별값과 분리.
+name TEXT NOT NULL: APP 닉네임, 프로필 API 입력 1~50자(trim).
+email TEXT NOT NULL UNIQUE: 인증용 이메일. 게스트/이메일 미제공 네이버는 비전송용 주소.
+emailVerified INTEGER NOT NULL DEFAULT 0: 공급자가 검증한 이메일 여부.
+image TEXT NULL: 아바타 주소.
+createdAt/updatedAt INTEGER NOT NULL: UTC 밀리초 생성/수정 시각.
+isAnonymous INTEGER NOT NULL DEFAULT 0: 추가 컬럼, Better Auth boolean 변환, 게스트 회원이면 1.
+
+테이블 account: 실제 인증 라이브러리가 확인한 연동 플랫폼 및 연동 식별값.
+id TEXT PK UUID, userId TEXT NOT NULL FK user(id) ON DELETE CASCADE.
+providerId TEXT NOT NULL: google/kakao/naver/credential 등 실제 제공자 코드.
+accountId TEXT NOT NULL: 플랫폼 고유 연동 ID; credential의 식별값은 라이브러리 원본.
+UNIQUE(providerId,accountId): 이번 추가 인덱스 account_identity, 플랫폼 계정의 중복 귀속 방지.
+createdAt INTEGER NOT NULL: 최초 연동 UTC 밀리초. updatedAt INTEGER NOT NULL: 연동 수정 시각.
+accessToken/refreshToken/idToken TEXT NULL: 제공자 토큰, 서버에서만 보관, 앱 프로필/화면/로그로 응답하지 않음.
+accessTokenExpiresAt/refreshTokenExpiresAt INTEGER NULL, scope TEXT NULL, password TEXT NULL: 기존 표준 인증 계약 유지.
+게스트는 SNS 연동 전 account 행이 없으며 user.id를 앱의 linkedId로 반환.
+
+테이블 profiles: 회원 본인만 조회할 수 있는 앱 프로필.
+user_id TEXT PK FK user(id) ON DELETE CASCADE.
+details TEXT NOT NULL DEFAULT '{}' CHECK(json_valid(details)): 기존 bio:string|null(최대300자),travelStyles:string[](최대20개, 각50자).
+수정 시 json_patch 병합으로 전달하지 않은 상세 항목을 보존하며 null은 항목 제거 의미.
+gender TEXT NULL CHECK IN female/male/unspecified: 추가 컬럼, 성별 미선택 상태는 NULL, '선택 안 함'은 unspecified.
+birth_date TEXT NULL: 추가 컬럼, YYYY-MM-DD, API에서 1900-01-01~오늘 실제 달력 날짜 검증; 불가능한 날짜·미래 날짜 거부.
+onboarding_completed_at INTEGER NULL: 추가 컬럼, nickname+gender+birthDate 저장 성공 시 UTC 밀리초로 확정.
+기존 이메일 회원의 profiles 행과 완료 시각은 마이그레이션에서 생성/보존. 게스트는 프로필 설정 없이 이용 가능.
+성별·생년월일은 커뮤니티 공개 객체에 포함하지 않으며 본인 인증 조회에만 제공.
+
+테이블 guest_links: 게스트 기록 연결의 단일 대상 잠금.
+guest_id TEXT PK FK user(id): 인증 서버가 확인한 게스트 UUID.
+member_id TEXT NOT NULL FK user(id): 연결한 정식 회원 UUID.
+linked_at INTEGER NOT NULL: 연결 UTC 밀리초.
+같은 대상의 재시도만 허용. 다른 회원으로 중복 연결 시 NOT NULL 제약으로 전체 batch 실패.
+연결 batch에서 trips.owner_id/snapshot.trip.ownerId/snapshot.members,trip_members,posts.author_id/snapshot.authorId,
+uploads.actor_id,invites.used_by를 갱신하고 guest session 행을 제거. 여행 version 증가로 이전 편집 충돌을 감지.
+여행 ID·일정·비용·사진 경로·회원 자신의 기존 여행은 보존. 동일 여행에 새 회원이 이미 참가한 경우 역할을 병합.
+
+테이블 oauth_handoffs: 앱/브라우저 사이 SNS 인증 준비 및 일회용 교환.
+id TEXT PK: 보안 난수 UUID 준비 ID.
+provider TEXT NOT NULL CHECK IN google/kakao/naver: 선택한 플랫폼.
+challenge TEXT NOT NULL: 기기에 보관한 verifier의 SHA-256 base64url(43자).
+redirect_uri TEXT NOT NULL: travelapp://auth/callback 또는 허용 Origin + /auth/callback 고정 주소.
+guest_token TEXT NULL: 검증한 기존 게스트의 서명 토큰. 브라우저 인증을 시작할 때 서버 안에서만 사용.
+session_token TEXT NULL: SDK가 검증한 서명 session cookie, 교환 응답 본문 이외에는 미공개.
+code_hash TEXT UNIQUE NULL: 일회용 교환 UUID 코드의 SHA-256 base64url. 코드 원문 저장하지 않음.
+expires_at INTEGER NOT NULL: 준비 10분, 완료 교환 60초, UTC 밀리초.
+launched_at INTEGER NULL: 브라우저 시작 시 UTC 밀리초. 조건부 UPDATE RETURNING으로 한 번만 시작.
+인덱스 oauth_handoffs_expiry(expires_at). 준비 요청에서 만료한 레코드 제거.
+코드 해시+challenge+만료 검사 후 DELETE RETURNING으로 한 번만 소비. 틀린 verifier는 정상 코드를 소모하지 않음.
+state cookie/제공자 코드 검증은 Better Auth가 수행. bearer 토큰은 복귀 URL에 넣지 않음.
+
+객체 Profile (packages/domain/src/index.ts):
+id UUID string, nickname string, avatarUrl string|null, 기존 bio/travelStyles/osPlatform/생성시각 유지.
+authProvider enum email/google/kakao/naver/guest/apple, optional 기존 객체 호환. naver 추가.
+linkedId optional string: 제공자 계정 ID 또는 미연동 게스트 UUID.
+linkedAt optional ISO string: 실제 account.createdAt 또는 guest user.createdAt.
+gender optional female/male/unspecified|null; birthDate optional YYYY-MM-DD|null.
+onboardingCompleted optional boolean: guest 또는 profiles.onboarding_completed_at 존재 시 true.
+객체 CloudUser.isAnonymous optional boolean: 인증 서버의 실제 게스트 상태.
+서버 profile 응답은 위 신규 항목을 항상 포함. 앱의 임의 ID/성별/플랫폼 입력으로 회원 식별값을 수정할 수 없음.
+
+기기 객체/DB 없음: tripprint.oauth.verifier.v1 SecureStore 또는 웹 sessionStorage 검증자 string.
+tripprint.notifications.asked.v1 SecureStore 'true': 알림 권한 안내의 나중에/허용 선택을 기억.
+알림 예약 identifier tripprint:{userId}:{tripId}: 실제 예정 여행의 출발일 09:00 기기 시간대 로컬 알림.
+알림 권한은 운영체제 원본으로 확인하며 계정 종료 후 기존 회원의 예약은 철회.
+======================================================================

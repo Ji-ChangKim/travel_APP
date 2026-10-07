@@ -1,5 +1,17 @@
 # TripPrint Android MVP 빌드
 
+## Play Console 패키지명 일치
+
+2026-10-07 사용자가 제공한 Play Console 화면의 앱은 `TripPrint: 여행을 기록하자`, Android 패키지명은 `com.tripprint.app`이다. 루트 `app.config.ts`와 `apps/mobile/app.config.ts`의 `android.package`를 모두 `com.tripprint.app`으로 변경했다. 루트 또는 모바일 디렉터리에서 빌드해도 같은 Play 앱 식별자를 사용한다. 기기에 표시되는 이름은 `TripPrint`이며, iOS 식별자·앱 복귀 scheme·Expo 프로젝트 ID는 기존 설정을 사용한다.
+
+이 수정은 다음 Android 빌드에 적용된다. 기존 APK는 바뀌지 않으며, 이전 `com.travelapp.mobile` 설치본과 새 설치본은 Android에서 서로 다른 앱으로 취급된다. 이전 설치본의 기기 저장 정보와 로그인 상태가 새 앱으로 자동 이전되지는 않는다. Play Console 업로드용 AAB도 `com.tripprint.app`과 해당 앱의 업로드 서명 키로 새로 빌드해야 한다. 이번 수정은 실제 APK/AAB 생성이나 Play Console 업로드를 실행하지 않는다. 구글 웹 OAuth 클라이언트의 서버 콜백 주소는 패키지명 변경으로 바뀌지 않는다.
+
+아래는 2026-10-06 빌드 준비 기록이다. 최신 Google 로그인과 TripPrint 서버·웹 주소 적용 상태는 [로그인·회원 설정 적용 안내](AUTH_ONBOARDING.md)를 확인한다.
+
+2026-10-07 Play Console 내부 테스트용 `play-internal` AAB 프로필을 루트와 모바일 EAS 설정에 추가했다. 실제 내부 테스트 설치를 위한 최신 절차는 [Google·Play 내부 테스트](GOOGLE_PLAY_INTERNAL_TEST.md)를 따른다. `npm run mobile:build:play-internal`은 테스트 서버 설정으로 AAB를 생성하고, `npm run mobile:build:apk`는 직접 설치용 APK를 생성한다. 현재 Expo CLI 로그인을 기다리므로 두 빌드 모두 아직 실행하지 않았다.
+
+## 기존 빌드 준비 기록
+
 2026-10-06. 현재 MVP는 Cloudflare D1·R2와 실제 이메일 로그인으로 동작한다. [웹](https://wherego-staging.pages.dev), [전환·배포 보고](CLOUDFLARE_MVP_DEPLOYMENT_20261006.md).
 
 APK는 Expo EAS preview에서 생성한다. 현재 Android Hermes 번들/네이티브 연결 검사는 통과했고, 실제 APK 빌드는 Expo 로그인 완료를 기다린다. `.hbc`는 설치 파일이 아니다.

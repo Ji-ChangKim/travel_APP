@@ -16,7 +16,8 @@ const config: ExpoConfig = {
     buildNumber: '1',
   },
   android: {
-    package: 'com.travelapp.mobile',
+    // Play Console에 등록된 TripPrint 앱과 동일한 Android 식별자로 빌드한다.
+    package: 'com.tripprint.app',
     versionCode: 1,
     adaptiveIcon: {
       backgroundColor: '#FF6B57',
@@ -38,6 +39,8 @@ const config: ExpoConfig = {
     // 루트에서 EAS를 실행해도 예전 src/app 대신 현재 모바일 앱을 빌드한다.
     ['expo-router', { root: './apps/mobile/src/app' }],
     'expo-web-browser',
+    // 출발일 알림과 Android 알림 권한을 네이티브 빌드에 등록한다.
+    'expo-notifications',
     // 루트에서 생성하는 네이티브 설정도 동일한 지도 링크 공유를 지원한다.
     [
       'expo-sharing',

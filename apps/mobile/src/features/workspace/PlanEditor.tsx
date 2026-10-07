@@ -1,7 +1,8 @@
+import Modal from '@/components/AppModal';
 import ReceiptReview from './ReceiptReview';
 import ReceiptConfirmation from './ReceiptConfirmation';
 import { receiptCanSave } from './receiptFlow';
-import { Modal, ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { useRef, type ReactNode } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { WorkspaceSnapshot } from '@wherego/domain';

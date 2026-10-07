@@ -34,9 +34,7 @@ function useDiaryUser(): string {
   // 게스트에게 다른 계정의 캐시를 보여주지 않는다.
   return useTripStore((state) => {
     // 실제 로그인 세션 계정만 서버 조회 키로 사용한다.
-    return state.currentUser && state.currentUser.authProvider !== 'guest'
-      ? state.currentUser.id
-      : '';
+    return state.currentUser ? state.currentUser.id : '';
   });
 }
 

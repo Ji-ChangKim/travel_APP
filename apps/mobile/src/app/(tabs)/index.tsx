@@ -1,7 +1,7 @@
+import Modal from '@/components/AppModal';
 import { useState } from 'react';
 import {
   Alert,
-  Modal,
   ScrollView,
   StyleSheet,
   Text,

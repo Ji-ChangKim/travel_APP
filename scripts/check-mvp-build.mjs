@@ -2,12 +2,14 @@ import { getMvpIssues } from './mvp-config.mjs';
 
 // 계정이나 비밀 값 없이 APK에 포함될 공개 설정을 확인한다.
 function check() {
-  // 기존 개발·운영 프로필의 실행 조건을 이번 MVP 작업으로 바꾸지 않는다.
+  // APK와 Play 내부 테스트 AAB에 같은 공개 서버 설정 검사를 적용한다.
   if (
     process.argv.includes('--preview-only') &&
-    process.env.EAS_BUILD_PROFILE !== 'preview'
+    !['preview', 'play-internal'].includes(process.env.EAS_BUILD_PROFILE)
   )
-    return Promise.resolve('MVP 검사는 preview 프로필에만 적용합니다.');
+    return Promise.resolve(
+      'MVP 검사는 preview와 play-internal 프로필에 적용합니다.',
+    );
   // EAS도 동일 검사를 수행하여 빈 로그인 화면 APK를 방지한다.
   return getMvpIssues(process.env).length
     ? Promise.reject(new Error(getMvpIssues(process.env).join('\n')))

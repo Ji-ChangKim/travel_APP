@@ -3,6 +3,10 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationBar } from 'expo-navigation-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { View } from 'react-native';
+import GlobalNavigation from '@/components/GlobalNavigation';
+import AuthGate from '@/features/auth/AuthGate';
+import NotificationPermission from '@/features/notifications/NotificationPermission';
 
 import { colors } from '@/constants/theme';
 import AuthBridge from '@/features/auth/AuthBridge';
@@ -23,12 +27,17 @@ export default function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <AuthBridge />
       <SafeAreaProvider>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: colors.background },
-          }}
-        />
+        <AuthGate />
+        <View style={{ flex: 1 }}>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: colors.background },
+            }}
+          />
+          <NotificationPermission />
+        </View>
+        <GlobalNavigation />
         <StatusBar style="dark" />
         <NavigationBar hidden />
       </SafeAreaProvider>

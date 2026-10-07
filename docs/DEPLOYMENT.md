@@ -1,4 +1,6 @@
-# WHEREGO 배포 준비와 실행
+# TripPrint 배포 준비와 실행
+
+2026-10-07: 현재 Cloudflare D1·R2·Better Auth 구성과 TripPrint 새 주소 전환 상태는 [로그인·회원 설정 적용 안내](AUTH_ONBOARDING.md)를 따른다. 사용자 승인 후 `tripprint-api-staging`과 `tripprint-staging.pages.dev` 배포 및 테스트 D1 회원 설정 변경을 완료했다. `tripprint-api-production`은 미배포 목표다. [Google·Play 내부 테스트](GOOGLE_PLAY_INTERNAL_TEST.md)에 실제 계정 로그인과 AAB 준비 절차를 기록한다. 아래 Supabase 중심의 2026-10-03 기록은 당시 준비 내역이다.
 
 빌드 단계별 완료 여부는 [빌드 준비 체크리스트](BUILD_CHECKLIST.md)에 기록한다.
 
@@ -11,7 +13,7 @@
 | 대상    | 준비한 구성                                                  | 외부 준비                                                            |
 | ------- | ------------------------------------------------------------ | -------------------------------------------------------------------- |
 | 웹      | Expo static export, `apps/mobile/dist`, 여행 UUID rewrite    | Cloudflare Pages 별도 staging/production 프로젝트, 실제 HTTPS 도메인 |
-| API     | `wherego-api-staging` / `wherego-api-production` Workers     | Cloudflare 계정, Worker secret, API 주소                             |
+| API     | `tripprint-api-staging` / `tripprint-api-production` Workers | Cloudflare 계정, Worker secret, API 주소                             |
 | DB·사진 | Supabase SQL 6개, RLS, private Storage                       | 환경별 프로젝트, 마이그레이션 적용, 백업                             |
 | 로그인  | 카카오·구글·애플 PKCE 및 복귀 화면                           | 제공자 콘솔, Supabase 제공자 설정, redirect allowlist                |
 | OCR     | Vision 서버 어댑터, 실패 시 수동 입력                        | Google Cloud Vision 활성화, 서버 전용 키                             |

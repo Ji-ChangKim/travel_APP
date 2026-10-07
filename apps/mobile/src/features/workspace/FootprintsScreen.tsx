@@ -16,7 +16,7 @@ export default function FootprintsScreen() {
     return state.currentUser;
   });
   const router = useRouter();
-  const userId = user && user.authProvider !== 'guest' ? user.id : '';
+  const userId = user?.id || '';
   const query = useQuery({
     queryKey: foundationQueryKey(userId, 'trips'),
     enabled: Boolean(userId),

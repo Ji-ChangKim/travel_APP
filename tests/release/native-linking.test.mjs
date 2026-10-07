@@ -38,6 +38,7 @@ for (const projectRoot of [repository, join(repository, 'apps/mobile')]) {
       'expo-sharing',
       'expo-document-picker',
       'expo-crypto',
+      'expo-notifications',
     ]) {
       assert.ok(
         modules.some((item) => item.packageName === name),

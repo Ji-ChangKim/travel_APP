@@ -1,7 +1,7 @@
+import Modal from '@/components/AppModal';
 import { useMemo, useState } from 'react';
 import {
   Alert,
-  Modal,
   ScrollView,
   Share,
   StyleSheet,

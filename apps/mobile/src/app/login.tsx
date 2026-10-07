@@ -17,7 +17,8 @@ import { StatusBar } from 'expo-status-bar';
 import type { OsPlatform } from '@wherego/domain';
 
 import { useTripStore } from '@/stores/useTripStore';
-import { pendingAuthDestination } from '@/features/workspace/mapsShare';
+import { authenticatedDestination } from '@/features/auth/destination';
+import SocialButtons from '@/features/auth/SocialButtons';
 import EmailAuth from '@/features/auth/EmailAuth';
 import { homeDestination } from '@/features/workspace/homeDestinations';
 
@@ -64,26 +65,16 @@ export default function LoginScreen() {
   // 메인 여행 대시보드 화면으로 라우팅한다.
   const navigateToTabs = () => {
     // 탭 네비게이션 화면으로 교체 이동한다.
-    void pendingAuthDestination()
+    void authenticatedDestination(next, selectedDestination)
       .then((destination) => {
         // 인증 전에 받은 초대 링크로 복귀한다.
-        router.replace(
-          destination === '/(tabs)' && next === 'new-trip'
-            ? homeDestination(selectedDestination)
-              ? {
-                  pathname: '/new-trip',
-                  params: {
-                    destination:
-                      homeDestination(selectedDestination)?.key || '',
-                  },
-                }
-              : '/new-trip'
-            : destination,
-        );
+        router.replace(destination);
       })
       .catch(() => {
         // 저장소 오류가 있어도 여행 허브에 진입할 수 있다.
-        router.replace('/(tabs)');
+        setAuthError(
+          '계정을 확인하지 못했어요. 이어서 시작하기를 눌러 다시 시도해 주세요.',
+        );
       });
   };
 
@@ -97,7 +88,7 @@ export default function LoginScreen() {
     try {
       if (currentUser && currentUser.authProvider !== 'guest') await logout();
       await loginAsGuest(currentOs);
-      router.replace('/(tabs)');
+      navigateToTabs();
     } catch {
       // 기기 저장 실패는 웹에서도 확인할 수 있다.
       setAuthError('둘러보기를 시작하지 못했어요. 잠시 후 다시 시도해 주세요.');
@@ -235,6 +226,7 @@ export default function LoginScreen() {
         ) : (
           /* 플랫폼별 인증 버튼 영역 */
           <View style={styles.buttonGroup}>
+            <SocialButtons onAuthenticated={navigateToTabs} />
             <TouchableOpacity
               accessibilityRole="button"
               accessibilityLabel="이메일로 계속하기"
@@ -265,8 +257,10 @@ export default function LoginScreen() {
               <View style={styles.dividerLine} />
             </View>
 
-            {/* 4. 공통: 게스트 로그인 (클라이언트 기기 SecureStore 영구 저장) */}
+            {/* 서버 게스트 계정으로 시작하고 인증 정보를 기기에 보관한다. */}
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel="게스트로 시작하기"
               style={styles.guestBtn}
               onPress={handleGuestAuth}
               activeOpacity={0.8}
@@ -276,10 +270,12 @@ export default function LoginScreen() {
                 size={18}
                 color={loginTheme.textSecondary}
               />
-              <Text style={styles.guestBtnText}>로그인 없이 둘러보기</Text>
+              <Text style={styles.guestBtnText}>게스트로 시작하기</Text>
             </TouchableOpacity>
             <Text style={styles.guestNoticeText}>
-              로그인하면 여행을 저장하고 친구와 함께 계획할 수 있어요.
+              게스트도 여행을 저장할 수 있어요. 마이에서 계정을 연결하면 다른
+              기기에서도 여행을 이어갈 수 있어요. 연결 전에는 앱 삭제나 로그아웃
+              시 계정을 다시 찾을 수 없어요.
             </Text>
           </View>
         )}

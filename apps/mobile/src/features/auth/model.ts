@@ -1,12 +1,15 @@
 import type { User } from '@supabase/supabase-js';
 import type { AuthProvider, OsPlatform, Profile } from '@wherego/domain';
 
-export type SocialProvider = 'kakao' | 'google' | 'apple';
+export type SocialProvider = 'kakao' | 'google' | 'naver';
 
 // 제공자 응답을 앱에서 지원하는 인증 유형으로 제한한다.
 function resolveProvider(provider: unknown): AuthProvider {
   // 이메일 사용자를 게스트로 잘못 표시하지 않는다.
-  return provider === 'kakao' || provider === 'google' || provider === 'apple'
+  return provider === 'kakao' ||
+    provider === 'google' ||
+    provider === 'naver' ||
+    provider === 'apple'
     ? provider
     : 'email';
 }

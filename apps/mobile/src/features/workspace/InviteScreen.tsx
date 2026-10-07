@@ -55,7 +55,7 @@ export default function InviteScreen() {
       })
       .then(() => {
         // 게스트에게 실제 계정 인증을 요구한다.
-        if (!user || user.authProvider === 'guest') {
+        if (!user) {
           // 초대를 잃지 않고 로그인 화면으로 이동한다.
           router.push('/login');
           return null;
@@ -109,11 +109,7 @@ export default function InviteScreen() {
       />
       <Action
         label={
-          busy
-            ? '확인 중…'
-            : user && user.authProvider !== 'guest'
-              ? '초대 확인하고 참여'
-              : '로그인하고 참여'
+          busy ? '확인 중…' : user ? '초대 확인하고 참여' : '로그인하고 참여'
         }
         disabled={busy}
         onPress={accept}

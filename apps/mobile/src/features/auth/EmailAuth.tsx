@@ -1,3 +1,4 @@
+import Modal from '@/components/AppModal';
 import {
   useRef,
   useState,
@@ -5,7 +6,7 @@ import {
   type SetStateAction,
   type RefObject,
 } from 'react';
-import { ScrollView, Modal, Text, TextInput, View } from 'react-native';
+import { ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Action, styles } from '@/features/workspace/ui';
 import { signInWithEmail, signUpWithEmail } from '@/services/authService';

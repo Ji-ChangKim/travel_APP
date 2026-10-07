@@ -1,7 +1,7 @@
+import Modal from '@/components/AppModal';
 import { useState } from 'react';
 import {
   Alert,
-  Modal,
   ScrollView,
   StyleSheet,
   Text,
@@ -54,7 +54,7 @@ function MyContent() {
   const { trips, visits, currentUser, updateProfile, logout } = useTripStore();
 
   // 활동 통계도 내 여행과 동일한 계정별 서버 원본을 조회한다.
-  const userId = currentUser?.authProvider !== 'guest' ? currentUser?.id : '';
+  const userId = currentUser?.id || '';
   const serverTrips = useQuery({
     queryKey: foundationQueryKey(userId || '', 'trips'),
     enabled: Boolean(userId),
@@ -99,19 +99,11 @@ function MyContent() {
     return !editNickname.trim() || !currentUser
       ? Alert.alert('알림', '로그인과 닉네임을 확인해 주세요.')
       : (setIsSavingProfile(true),
-        (currentUser.authProvider === 'guest'
-          ? Promise.resolve({
-              ...currentUser,
-              nickname: editNickname.trim(),
-              bio: editBio.trim() || null,
-              travelStyles: editTravelStyles,
-            })
-          : updateUserProfile(currentUser.id, {
-              nickname: editNickname.trim(),
-              bio: editBio.trim() || null,
-              travelStyles: editTravelStyles,
-            })
-        )
+        updateUserProfile(currentUser.id, {
+          nickname: editNickname.trim(),
+          bio: editBio.trim() || null,
+          travelStyles: editTravelStyles,
+        })
           .then((profile) => {
             // 서버 확정 결과를 반영하고 편집 화면을 닫는다.
             return (
@@ -181,14 +173,18 @@ function MyContent() {
                 </Text>
                 <View style={styles.authBadge}>
                   <Text style={styles.authBadgeText}>
-                    {userId ? '내 계정' : '둘러보기'}
+                    {currentUser?.authProvider === 'guest'
+                      ? '게스트'
+                      : '내 계정'}
                   </Text>
                 </View>
               </View>
               <Text style={styles.userEmail}>
-                {userId
-                  ? '여행과 기록을 계정에 보관합니다'
-                  : '로그인 전 둘러보기 중입니다'}
+                {currentUser?.authProvider === 'guest'
+                  ? '계정을 연결하면 다른 기기에서도 이어갈 수 있어요'
+                  : userId
+                    ? '여행과 기록을 계정에 보관합니다'
+                    : '로그인 전 둘러보기 중입니다'}
               </Text>
             </View>
             <TouchableOpacity
@@ -224,6 +220,26 @@ function MyContent() {
             </View>
           ) : null}
         </View>
+
+        {currentUser?.authProvider === 'guest' && (
+          <View style={styles.card}>
+            <Text style={styles.settingTitle}>
+              게스트 여행을 내 계정에 연결하기
+            </Text>
+            <Text style={styles.settingDesc}>
+              지금 저장한 일정과 사진을 그대로 이어가세요. 계정을 연결하기
+              전에는 앱 삭제나 로그아웃 시 게스트 계정을 다시 찾을 수 없어요.
+            </Text>
+            <Action
+              label="계정 연결하기"
+              variant="primary"
+              onPress={() => {
+                // 게스트 세션을 유지한 채 실제 계정 인증을 시작한다.
+                return router.push('/login');
+              }}
+            />
+          </View>
+        )}
 
         {/* 여행 활동 통계 요약 */}
         {userId ? (

@@ -172,7 +172,7 @@ function WorkspaceContent({
   }>();
   const router = useRouter();
   const cache = useQueryClient();
-  const userId = user && user.authProvider !== 'guest' ? user.id : '';
+  const userId = user?.id || '';
   const [form, setForm] = useState<PlanForm | null>(
     creating ? () => newTripForm(destination) : null,
   );

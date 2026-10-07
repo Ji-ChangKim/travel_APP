@@ -9,6 +9,7 @@ import { Action } from './ui';
 import { homeDestinations } from './homeDestinations';
 import HomeTripList, { continuingTrips } from './HomeTripList';
 import { homeStyles as s } from './homeStyles';
+import HomeExplore from './HomeExplore';
 
 interface HomeProps {
   userId: string;
@@ -90,6 +91,19 @@ function HomeContent({
             </Pressable>
           )}
         </View>
+        <View style={s.section}>
+          <Text style={s.headline}>다음 여행을 계획해 볼까요?</Text>
+          <Text style={s.supporting}>
+            새 일정을 만들고, 다가오는 여행과 다른 여행자의 발자국을 확인하세요.
+          </Text>
+          <HomeButton
+            label="새 일정 만들기"
+            onPress={() => {
+              // 로그인 또는 게스트 선택을 마친 뒤 새 여행을 작성한다.
+              return startTrip(router, userId);
+            }}
+          />
+        </View>
         {!ready || loading ? (
           <HaruState
             kind="loading"
@@ -107,23 +121,15 @@ function HomeContent({
         ) : continuingTrips(trips).length > 0 ? (
           <HomeTripList trips={continuingTrips(trips)} router={router} />
         ) : (
-          <FirstTrip
-            onStart={() => {
-              // 첫 여행의 목적지와 기간을 정하는 화면으로 이동한다.
-              return startTrip(router, userId);
-            }}
-          />
+          <View style={s.section}>
+            <Text style={s.sectionTitle}>다가오는 나의 여행</Text>
+            <Text style={s.supporting}>
+              예정된 여행이 아직 없어요. 새 일정을 만들고 날짜와 도시를 골라
+              보세요.
+            </Text>
+          </View>
         )}
-        {(continuingTrips(trips).length > 0 || Boolean(error)) && (
-          <HomeButton
-            label="새 여행 시작하기"
-            secondary
-            onPress={() => {
-              // 기존 여행을 유지하면서 별도의 여행을 만든다.
-              return startTrip(router, userId);
-            }}
-          />
-        )}
+        <HomeExplore userId={userId} />
         <View style={s.section}>
           <Text style={s.sectionTitle}>어디로 떠나고 싶나요?</Text>
           <Text style={s.supporting}>
@@ -158,24 +164,6 @@ function HomeContent({
             return router.push('/invite');
           }}
         />
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="커뮤니티"
-          style={s.community}
-          onPress={() => {
-            // 인기나 가상 후기를 만들지 않고 실제 공개 기록을 연다.
-            return router.push('/(tabs)/community');
-          }}
-        >
-          <View style={s.communityCopy}>
-            <Text style={s.communityEyebrow}>여행자의 발자국</Text>
-            <Text style={s.communityTitle}>
-              다음 여행의 힌트를{'\n'}다른 여행에서 찾아보세요.
-            </Text>
-            <Text style={s.supporting}>공개된 일정과 기록 둘러보기</Text>
-          </View>
-          <Ionicons name="arrow-forward" size={24} color="#203247" />
-        </Pressable>
         {trips?.some((trip) => {
           // 완료한 여행이 있을 때만 기록 바로가기를 표시한다.
           return trip.status === 'COMPLETED';
@@ -219,32 +207,6 @@ function HomeContent({
         />
       </ScrollView>
     </SafeAreaView>
-  );
-}
-
-// 처음 온 사용자에게 여행을 만드는 한 가지 주 행동을 제시한다.
-function FirstTrip({ onStart }: { onStart: () => void }) {
-  // 설명 카드나 가상 일정 대신 브랜드 문장과 하루를 짧게 보여준다.
-  return (
-    <View style={s.welcome}>
-      <Text style={s.eyebrow}>Leave your TripPrint.</Text>
-      <Text style={s.headline}>떠나는 순간부터,{'\n'}나만의 발자국까지.</Text>
-      <View style={s.welcomeBottom}>
-        <View style={s.welcomeCopy}>
-          <Text style={s.welcomeTitle}>함께 떠나볼까요?</Text>
-          <Text style={s.supporting}>
-            일정과 사진, 쓴 비용까지{'\n'}한 여행에 차곡차곡.
-          </Text>
-        </View>
-        <Image
-          source={require('../../../assets/brand/haru-v1/TripPrint_Haru_loading_1233x1275.png')}
-          style={s.haru}
-          resizeMode="contain"
-          accessibilityLabel="캐리어와 함께 걷는 하루"
-        />
-      </View>
-      <HomeButton label="새 여행 시작하기" onPress={onStart} />
-    </View>
   );
 }
 

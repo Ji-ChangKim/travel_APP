@@ -26,6 +26,10 @@ export default function TabLayout() {
   // 홈·공개 피드는 로그인 전에도 제공하고 비공개 조회·쓰기는 각 화면에서 인증한다.
   return (
     <Tabs
+      tabBar={() => {
+        // 모든 페이지의 하단 메뉴는 루트 레이아웃이 한 번만 렌더링한다.
+        return null;
+      }}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.accent,

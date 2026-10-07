@@ -33,7 +33,8 @@ export type VerificationMethod = 'gps' | 'manual' | 'receipt';
 export type OsPlatform = 'android' | 'ios' | 'web';
 
 // 사용자 인증 제공자 유형을 구분한다.
-export type AuthProvider = 'google' | 'kakao' | 'apple' | 'email' | 'guest';
+export type AuthProvider =
+  'google' | 'kakao' | 'naver' | 'apple' | 'email' | 'guest';
 
 // 사용자 기본 프로필 정보를 정의한다.
 export interface Profile {
@@ -45,6 +46,11 @@ export interface Profile {
   phone?: string | null;
   osPlatform?: OsPlatform;
   authProvider?: AuthProvider;
+  linkedId?: string;
+  linkedAt?: string;
+  gender?: 'female' | 'male' | 'unspecified' | null;
+  birthDate?: string | null;
+  onboardingCompleted?: boolean;
   lastSignInAt?: string;
   createdAt: string;
   updatedAt: string;

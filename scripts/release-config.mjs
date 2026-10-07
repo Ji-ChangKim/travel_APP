@@ -105,7 +105,7 @@ function configureWorker(template, env) {
     ...template,
     $schema: '../node_modules/wrangler/config-schema.json',
     main: '../src/index.ts',
-    name: `wherego-api-${env.RELEASE_ENV}`,
+    name: template.env[env.RELEASE_ENV].name,
     env: undefined,
     secrets: template.env[env.RELEASE_ENV].secrets,
     d1_databases: template.env[env.RELEASE_ENV].d1_databases?.map((binding) => {
@@ -115,6 +115,19 @@ function configureWorker(template, env) {
     r2_buckets: template.env[env.RELEASE_ENV].r2_buckets,
     ai: template.env[env.RELEASE_ENV].ai,
     vars: {
+      // 등록을 마친 공급자의 공개 식별값만 배포 설정에 유지한다.
+      GOOGLE_CLIENT_ID:
+        env.GOOGLE_CLIENT_ID ||
+        template.env[env.RELEASE_ENV].vars.GOOGLE_CLIENT_ID ||
+        '',
+      KAKAO_CLIENT_ID:
+        env.KAKAO_CLIENT_ID ||
+        template.env[env.RELEASE_ENV].vars.KAKAO_CLIENT_ID ||
+        '',
+      NAVER_CLIENT_ID:
+        env.NAVER_CLIENT_ID ||
+        template.env[env.RELEASE_ENV].vars.NAVER_CLIENT_ID ||
+        '',
       AUTH_BASE_URL: env.EXPO_PUBLIC_API_URL,
       ALLOWED_ORIGINS: env.RELEASE_WEB_ORIGIN,
       SUPABASE_URL: '',

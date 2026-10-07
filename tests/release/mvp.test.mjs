@@ -53,6 +53,17 @@ test('preview의 공개 설정이 맞으면 EAS hook 통과', () => {
   assert.equal(runHook('preview', publicSettings).status, 0);
 });
 
+test('Play 내부 테스트도 서버 설정 누락을 거부하고 정상 설정을 허용한다', () => {
+  // AAB 프로필이 APK와 동일한 사전 검사 없이 만들어지는 회귀를 방지한다.
+  return assert.deepEqual(
+    [
+      runHook('play-internal', {}).status,
+      runHook('play-internal', publicSettings).status,
+    ],
+    [1, 0],
+  );
+});
+
 test('APK 검사는 공개 값 3개로 통과하고 OCR·스토어·Pages 계정 값을 요구하지 않음', () => {
   // EAS 로그인 여부와 공개 설정 검사는 서로 다른 단계다.
   assert.deepEqual(getMvpIssues(publicSettings), []);

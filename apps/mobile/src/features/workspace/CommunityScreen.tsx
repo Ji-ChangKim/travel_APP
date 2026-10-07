@@ -7,7 +7,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { z } from 'zod';
 import { communityPostSchema } from '@wherego/validation';
 import {
@@ -68,8 +68,9 @@ export default function CommunityScreen() {
     // 게시자 차단은 본인 계정으로만 저장한다.
     return state.currentUser;
   });
-  const userId = user && user.authProvider !== 'guest' ? user.id : '';
+  const userId = user?.id || '';
   const router = useRouter();
+  const { postId } = useLocalSearchParams<{ postId?: string }>();
   const cache = useQueryClient();
   const [reportId, setReportId] = useState('');
   const [reason, setReason] = useState('');
@@ -218,86 +219,94 @@ export default function CommunityScreen() {
             />
           </HaruState>
         )}
-        {query.data?.pages.flat().map((post) => (
-          <View key={post.id} style={styles.card}>
-            <Text style={styles.title}>{post.title}</Text>
-            <Text>
-              {post.author} · {post.publishedAt.slice(0, 10)}
-            </Text>
-            <Text>
-              {post.snapshot.country} · {post.snapshot.city}
-            </Text>
-            <Text>
-              {post.snapshot.startDate} ~ {post.snapshot.endDate}
-            </Text>
-            <Text>{post.body}</Text>
-            {post.snapshot.itinerary.map((item, index) => (
-              <View key={`${post.id}-${index}`}>
-                <Text>
-                  {item.date} · {item.timeSlot || '시간 미정'} · {item.title}
-                </Text>
-                <Text>{item.address}</Text>
-              </View>
-            ))}
-            {Object.entries(post.snapshot.costs).map(([currency, amount]) => (
-              <Text key={currency}>
-                실제 비용 {amount} {currency}
+        {query.data?.pages
+          .flat()
+          .sort((left, right) => {
+            // 홈에서 선택한 공개 여행을 목록 맨 위에 펼친다.
+            return Number(right.id === postId) - Number(left.id === postId);
+          })
+          .map((post) => (
+            <View key={post.id} style={styles.card}>
+              <Text style={styles.title}>{post.title}</Text>
+              <Text>
+                {post.author} · {post.publishedAt.slice(0, 10)}
               </Text>
-            ))}
-            {post.photoPaths.map((path) => (
-              <PublicPhoto key={path} path={path} userId={userId} />
-            ))}
-            <View style={styles.row}>
-              <Action
-                label="게시물 신고"
-                disabled={busy}
-                onPress={() => {
-                  // 신고 사유를 사용자에게 직접 입력받는다.
-                  setReportId(post.id);
-                }}
-              />
-              {post.authorId !== userId && (
+              <Text>
+                {post.snapshot.country} · {post.snapshot.city}
+              </Text>
+              <Text>
+                {post.snapshot.startDate} ~ {post.snapshot.endDate}
+              </Text>
+              <Text>{post.body}</Text>
+              {post.snapshot.itinerary.map((item, index) => (
+                <View key={`${post.id}-${index}`}>
+                  <Text>
+                    {item.date} · {item.timeSlot || '시간 미정'} · {item.title}
+                  </Text>
+                  <Text>{item.address}</Text>
+                </View>
+              ))}
+              {Object.entries(post.snapshot.costs).map(([currency, amount]) => (
+                <Text key={currency}>
+                  실제 비용 {amount} {currency}
+                </Text>
+              ))}
+              {post.photoPaths.map((path) => (
+                <PublicPhoto key={path} path={path} userId={userId} />
+              ))}
+              <View style={styles.row}>
                 <Action
-                  label="작성자 차단"
+                  label="게시물 신고"
                   disabled={busy}
                   onPress={() => {
-                    // 차단은 본인 피드에만 적용된다.
-                    moderation('/community/blocks', { userId: post.authorId });
+                    // 신고 사유를 사용자에게 직접 입력받는다.
+                    setReportId(post.id);
                   }}
                 />
+                {post.authorId !== userId && (
+                  <Action
+                    label="작성자 차단"
+                    disabled={busy}
+                    onPress={() => {
+                      // 차단은 본인 피드에만 적용된다.
+                      moderation('/community/blocks', {
+                        userId: post.authorId,
+                      });
+                    }}
+                  />
+                )}
+              </View>
+              {reportId === post.id && (
+                <>
+                  <Field
+                    label="신고 사유"
+                    value={reason}
+                    onChange={setReason}
+                    multiline
+                  />
+                  <Action
+                    label="신고 접수"
+                    disabled={busy || !reason.trim()}
+                    onPress={() => {
+                      // 공개 글과 사유만 전송한다.
+                      moderation('/community/reports', {
+                        postId: post.id,
+                        reason: reason.trim(),
+                      });
+                    }}
+                  />
+                  <Action
+                    label="신고 취소"
+                    disabled={busy}
+                    onPress={() => {
+                      // 미전송 신고 입력을 닫는다.
+                      setReportId('');
+                    }}
+                  />
+                </>
               )}
             </View>
-            {reportId === post.id && (
-              <>
-                <Field
-                  label="신고 사유"
-                  value={reason}
-                  onChange={setReason}
-                  multiline
-                />
-                <Action
-                  label="신고 접수"
-                  disabled={busy || !reason.trim()}
-                  onPress={() => {
-                    // 공개 글과 사유만 전송한다.
-                    moderation('/community/reports', {
-                      postId: post.id,
-                      reason: reason.trim(),
-                    });
-                  }}
-                />
-                <Action
-                  label="신고 취소"
-                  disabled={busy}
-                  onPress={() => {
-                    // 미전송 신고 입력을 닫는다.
-                    setReportId('');
-                  }}
-                />
-              </>
-            )}
-          </View>
-        ))}
+          ))}
         {query.hasNextPage && (
           <Action
             label="더 보기"

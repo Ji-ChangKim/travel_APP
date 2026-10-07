@@ -42,7 +42,7 @@ for (const { largePhoto, keepPhoto } of [
       () => {
         // 여행을 생성하는 사용자 버튼을 누른다.
         return page
-          .getByRole('button', { name: '새 여행 시작하기', exact: true })
+          .getByRole('button', { name: '새 일정 만들기', exact: true })
           .click();
       },
       () => {
@@ -322,7 +322,7 @@ test('항공편 없이 여행 생성 → DAY2 일정 저장 → 날짜 필터 �
   await network(page);
   await login(page);
   await page
-    .getByRole('button', { name: '새 여행 시작하기', exact: true })
+    .getByRole('button', { name: '새 일정 만들기', exact: true })
     .click();
   await fields(page, {
     '나라 검색': '일본',
@@ -388,157 +388,160 @@ test('항공편 없이 여행 생성 → DAY2 일정 저장 → 날짜 필터 �
   ).toBeVisible();
 });
 
-test('게스트 둘러보기는 인증 배지·가짜 권한 설정을 표시하지 않는다', async ({
+test('게스트 서버 로그인 → 일정 생성 중 하단 메뉴 유지 → 계정 연결 진입', ({
   page,
 }) => {
-  // 미인증 사용자도 공개 피드를 보고 계정 상태를 정확하게 이해할 수 있어야 한다.
-  await network(page);
-  await page.route('**/api/auth/get-session', (route) => {
-    // 서버의 미인증 상태만 반환하고 앱 사용자 상태는 직접 주입하지 않는다.
-    return route.fulfill({ json: null });
-  });
-  await page.route('**/public/community?*', (route) => {
-    // 게스트의 공개 조회는 인증 자료 없이 처리한다.
-    return route.fulfill({ json: { data: [] } });
-  });
-  await page.goto('/login');
-  // 개발 상태를 노출하지 않고 실제 저장·동행의 로그인 이점을 안내한다.
-  await expect(
-    page.getByText('로그인하면 여행을 저장하고 친구와 함께 계획할 수 있어요.', {
-      exact: true,
-    }),
-  ).toBeVisible();
-  await expect(
-    page.getByText(/연결 준비|서버 저장|세션 활성|세션 유지/),
-  ).toHaveCount(0);
-  await expect(
-    page.getByRole('button', { name: /Google.*로그인|구글.*로그인/ }),
-  ).toHaveCount(0);
-  await page.getByText('로그인 없이 둘러보기', { exact: true }).click();
-  await expect(
-    page.getByRole('button', { name: '도쿄 선택', exact: true }),
-  ).toBeVisible();
-  await page.getByRole('button', { name: '커뮤니티', exact: true }).click();
-  await expect(
-    page.getByText('아직 공개된 여행 기록이 없습니다', { exact: true }),
-  ).toBeVisible();
-  await page
-    .getByRole('button', { name: '홈에서 여행 시작하기', exact: true })
-    .click();
-  await expect(
-    page.getByRole('button', { name: '도쿄 선택', exact: true }),
-  ).toBeVisible();
-  await page.goto('/my');
-  await expect(page.getByText('둘러보기', { exact: true })).toBeVisible();
-  await expect(
-    page.getByText('로그인 전 둘러보기 중입니다', { exact: true }),
-  ).toBeVisible();
-  await expect(page.getByText('인증됨', { exact: true })).toHaveCount(0);
-  await expect(page.getByRole('switch')).toHaveCount(0);
-});
-
-test('첫 진입 홈 → 목적지 선택 → 인증 복귀 → 여행 생성 → 기존 여행 재개', ({
-  page,
-}) => {
-  // 처음 온 사용자가 빈 목록 없이 실제 여행 생성까지 이어지는지 검증한다.
+  // 게스트는 반복 로그인 안내 없이 저장을 시작한다.
   return testSteps([
     () => {
-      // 첫 진입에서는 토큰·게스트 사용자 상태를 주입하지 않는다.
-      return network(page);
+      /* 외부 응답만 격리한다. */ return network(page);
     },
     () => {
-      // 앱의 시작 주소에서 공개 홈까지 실제 라우팅한다.
-      return page.goto('/');
+      /* 최초 실행 주소를 연다. */ return page.goto('/');
     },
     () => {
-      // 로그인 전에도 목적지 선택이라는 첫 행동을 제공한다.
-      return expect(
-        page.getByRole('button', { name: '도쿄 선택', exact: true }),
+      /* 로그인 선택이 먼저 나와야 한다. */ return expect(page).toHaveURL(
+        /\/login$/,
+      );
+    },
+    () => {
+      /* 미등록 SNS는 사용할 수 없다. */ return expect(
+        page.getByRole('button', { name: '구글로 계속하기', exact: true }),
+      ).toBeDisabled();
+    },
+    () => {
+      /* 서버 게스트 계정으로 시작한다. */ return page
+        .getByRole('button', { name: '게스트로 시작하기', exact: true })
+        .click();
+    },
+    () => {
+      /* 실제 홈으로 이어져야 한다. */ return expect(
+        page.getByRole('button', { name: '새 일정 만들기', exact: true }),
       ).toBeVisible();
     },
     () => {
-      // 선택 전 새로고침해도 로그인 장벽으로 되돌아가지 않는다.
-      return page.reload();
+      /* 로그인을 다시 요구하지 않고 작성한다. */ return page
+        .getByRole('button', { name: '새 일정 만들기', exact: true })
+        .click();
     },
     () => {
-      // 다시 진입한 공개 홈에서 목적지를 선택한다.
-      return page
+      /* 작성 화면에서도 메뉴가 보여야 한다. */ return expect(
+        page.getByRole('button', { name: '마이 탭', exact: true }),
+      ).toBeInViewport();
+    },
+    () => {
+      /* 화면 전체 메뉴로 마이에 이동한다. */ return page
+        .getByRole('button', { name: '마이 탭', exact: true })
+        .click();
+    },
+    () => {
+      /* 연결 절차가 남아 있어야 한다. */ return expect(
+        page.getByRole('button', { name: '계정 연결하기', exact: true }),
+      ).toBeVisible();
+    },
+    () => {
+      /* 기존 게스트 세션을 유지한 채 연결한다. */ return page
+        .getByRole('button', { name: '계정 연결하기', exact: true })
+        .click();
+    },
+    () => {
+      /* 인증 선택으로 이동한다. */ return expect(page).toHaveURL(/\/login$/);
+    },
+  ]);
+});
+test('최초 로그인 선택 → 홈 목적지 → 상세·편집·스크롤 중 하단 메뉴 유지', ({
+  page,
+}) => {
+  // 회원 선택 후 같은 저장 여행으로 다시 돌아온다.
+  return testSteps([
+    () => {
+      /* 외부 응답만 격리한다. */ return network(page);
+    },
+    () => {
+      /* 앱 최초 주소를 연다. */ return page.goto('/');
+    },
+    () => {
+      /* 로그인 선택부터 진행한다. */ return expect(page).toHaveURL(/\/login$/);
+    },
+    () => {
+      /* 초기 메뉴는 표시하면서 이동을 제한한다. */ return expect(
+        page.getByRole('button', { name: '홈 탭', exact: true }),
+      ).toBeDisabled();
+    },
+    () => {
+      /* 실제 이메일 폼을 사용한다. */ return emailLogin(page);
+    },
+    () => {
+      /* 인증한 홈의 목적지를 선택한다. */ return page
         .getByRole('button', { name: '도쿄 선택', exact: true })
         .click();
     },
     () => {
-      // 도시를 누르는 한 번의 행동으로 인증 화면에 목적지와 복귀 의도를 전달한다.
-      return expect(page).toHaveURL(
-        /\/login\?next=new-trip&destination=tokyo$/,
-      );
+      /* 목적지를 다시 입력하지 않는다. */ return expect(
+        page.getByLabel('도시 검색', { exact: true }),
+      ).toHaveValue('도쿄');
     },
     () => {
-      // 실제 이메일 폼으로 인증을 완료한다.
-      return emailLogin(page);
+      /* 여행 기간을 설정한다. */ return fields(page, {
+        시작일: '2026-11-10',
+        종료일: '2026-11-12',
+      });
     },
     () => {
-      // 로그인 뒤 홈에서 다시 시작하도록 강요하지 않는다.
-      return expect(page).toHaveURL(/\/new-trip\?destination=tokyo$/);
-    },
-    () => {
-      // 국가 선택을 로그인 뒤 다시 입력하지 않아야 한다.
-      return expect(page.getByLabel('나라 검색', { exact: true })).toHaveValue(
-        '일본',
-      );
-    },
-    () => {
-      // 고른 도시가 실제 생성 입력에 이어져야 한다.
-      return expect(page.getByLabel('도시 검색', { exact: true })).toHaveValue(
-        '도쿄',
-      );
-    },
-    () => {
-      // 해당 국가의 기본 현지 시간대도 함께 적용한다.
-      return expect(
-        page.getByLabel('현지 시간대', { exact: true }),
-      ).toHaveValue('Asia/Tokyo');
-    },
-    () => {
-      // 홈에서 선택한 여행의 기간만 직접 입력해 생성한다.
-      return fields(page, { 시작일: '2026-11-10', 종료일: '2026-11-12' });
-    },
-    () => {
-      // 실제 생성 API 계약과 멱등 키 검사는 네트워크 경계에서 수행한다.
-      return page
+      /* 서버에 여행을 저장한다. */ return page
         .getByRole('button', { name: '확인하고 저장', exact: true })
         .click();
     },
     () => {
-      // 저장된 여행의 DAY별 상세 화면까지 도착해야 한다.
-      return expect(
+      /* 저장한 상세 화면으로 이어진다. */ return expect(
         page.getByRole('button', { name: 'DAY 1', exact: true }),
       ).toBeVisible();
     },
     () => {
-      // 목록 복귀를 사용해 재방문 상태를 확인한다.
-      return page
-        .getByRole('button', { name: '내 여행 목록', exact: true })
+      /* 앱 내부 편집 창을 연다. */ return page
+        .getByRole('button', { name: '일정 추가', exact: true })
         .click();
     },
     () => {
-      // 기존 여행을 가진 사용자는 홈에서 재개할 여행을 먼저 본다.
-      return expect(
-        page.getByText('이어서 준비할 여행', { exact: true }).last(),
+      /* 편집 중에도 메뉴가 보인다. */ return expect(
+        page.getByRole('button', { name: '홈 탭', exact: true }),
+      ).toBeInViewport();
+    },
+    () => {
+      /* 메뉴를 선택하면 편집 화면을 떠날 수 있다. */ return page
+        .getByRole('button', { name: '홈 탭', exact: true })
+        .click();
+    },
+    () => {
+      /* 화면 전환이 끝난 홈의 출발 안내를 확인한다. */ return expect(
+        page.getByText('다가오는 나의 여행', { exact: true }).last(),
       ).toBeVisible();
     },
     () => {
-      // 기존 여행 재개는 실제 저장 여행 ID로 이동한다.
-      return page
+      /* 페이지 아래로 스크롤한다. */ return page.mouse.wheel(0, 1800);
+    },
+    () => {
+      /* 스크롤 뒤에도 하단 메뉴가 화면에 있다. */ return expect(
+        page.getByRole('button', { name: '마이 탭', exact: true }),
+      ).toBeInViewport();
+    },
+    () => {
+      /* 같은 여행을 다시 연다. */ return page
         .getByRole('button', { name: '여행 열기', exact: true })
         .click();
     },
     () => {
-      // 빈 새 여행 폼을 열지 않고 원래 여행 상세를 재개한다.
-      return expect(page).toHaveURL(new RegExp(`/trips/${trip}$`));
+      /* 기존 UUID로 이동한다. */ return expect(page).toHaveURL(
+        new RegExp(`/trips/${trip}$`),
+      );
+    },
+    () => {
+      /* 상세 메뉴의 배치를 저장한다. */ return page.screenshot({
+        path: 'test-results/feedback-trip-navigation.png',
+      });
     },
   ]);
 });
-
 test('내 여행 조회 실패에도 홈의 시작 행동을 유지하고 재조회할 수 있다', ({
   page,
 }) => {
@@ -686,6 +689,15 @@ async function network(
   let post: CommunityPost | null = null;
   let dropped = false;
   const requests = new Map<string, unknown>();
+  let guest = false;
+  let completed = true;
+  let profileDetails = {
+    nickname: '검증 여행자',
+    bio: null as string | null,
+    travelStyles: [] as string[],
+    gender: 'unspecified',
+    birthDate: '1990-01-01',
+  };
   const user = {
     id: owner,
     name: '검증 여행자',
@@ -697,6 +709,8 @@ async function network(
     // 표준 인증 REST 요청만 외부 네트워크 경계에서 대체한다.
     const path = new URL(route.request().url()).pathname;
     if (path.endsWith('/sign-in/email') || path.endsWith('/sign-up/email')) {
+      guest = false;
+      completed = !path.endsWith('/sign-up/email');
       // 실제 사용자 이메일 폼이 서버 요청으로 이어져야 한다.
       expect(route.request().postDataJSON()).toMatchObject({
         email: 'fixture@example.test',
@@ -712,9 +726,27 @@ async function network(
         json: { token: 'fixture-session', user },
       });
     }
+    if (path.endsWith('/sign-in/anonymous')) {
+      // 서버가 발급한 게스트도 실제 로그인 계약을 사용한다.
+      return (
+        (guest = true),
+        route.fulfill({
+          headers: { 'set-auth-token': 'fixture-signed-session' },
+          json: { user: { ...user, isAnonymous: true, name: '게스트 여행자' } },
+        })
+      );
+    }
     if (path.endsWith('/get-session'))
-      return route.fulfill({ json: { user, session: { id: owner } } });
+      return route.fulfill({
+        json: { user: { ...user, isAnonymous: guest }, session: { id: owner } },
+      });
     return route.fulfill({ json: {} });
+  });
+  await page.route('**/api/social/providers', (route) => {
+    // 미등록 SNS 버튼의 비활성화를 검사한다.
+    return route.fulfill({
+      json: { google: false, kakao: false, naver: false },
+    });
   });
   await page.route('**/files/**', async (route) => {
     // 파일 선택은 실제 인증된 R2 업로드 요청으로 이어진다.
@@ -752,6 +784,30 @@ async function network(
     // 화면 요청의 실제 JWT·버전·멱등 키를 검증한다.
     expect(route.request().headers().authorization).toMatch(/^Bearer /);
     const path = new URL(route.request().url()).pathname;
+    if (path === '/api/v1/profile') {
+      // 신규 가입과 본인 프로필 조회를 실제 화면 계약으로 검사한다.
+      return (
+        route.request().method() === 'PATCH'
+          ? ((profileDetails = {
+              ...profileDetails,
+              ...route.request().postDataJSON(),
+            }),
+            (completed = true))
+          : undefined,
+        respond(route, {
+          id: owner,
+          ...profileDetails,
+          avatarUrl: null,
+          authProvider: guest ? 'guest' : 'email',
+          linkedId: owner,
+          linkedAt: user.createdAt,
+          osPlatform: 'web',
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+          onboardingCompleted: guest || completed,
+        })
+      );
+    }
     if (path === '/api/v1/trips' && route.request().method() === 'POST') {
       // 사용자 입력이 유효한 서버 생성 계약인지 확인한다.
       const input = persistedTripCreateSchema.parse(
@@ -1037,7 +1093,7 @@ async function login(page: Page): Promise<void> {
   await emailLogin(page);
   await expect(
     page.getByRole('button', {
-      name: '새 여행 시작하기',
+      name: '새 일정 만들기',
       exact: true,
     }),
   ).toBeVisible();
@@ -1124,8 +1180,31 @@ test('이메일 가입 입력을 검증하고 실제 세션 발급 후 재조회
         .click();
     },
     () => {
+      // 계정 인증 후 프로필 설정이 먼저 나와야 한다.
+      return expect(page).toHaveURL(/\/profile-setup/);
+    },
+    () => {
+      // 닉네임과 실제 생년월일을 설정한다.
+      return fields(page, {
+        닉네임: '첫 여행자',
+        '생년월일 (YYYY-MM-DD)': '1996-02-29',
+      });
+    },
+    () => {
+      // 비공개 성별 선택을 지정한다.
+      return page
+        .getByRole('button', { name: '선택 안 함', exact: true })
+        .click();
+    },
+    () => {
+      // 저장한 이후에 홈으로 진입한다.
+      return page
+        .getByRole('button', { name: '설정하고 여행 시작하기', exact: true })
+        .click();
+    },
+    () => {
       /* 발급 세션이 있어야 여행에 진입한다. */ return expect(
-        page.getByRole('button', { name: '새 여행 시작하기', exact: true }),
+        page.getByRole('button', { name: '새 일정 만들기', exact: true }),
       ).toBeVisible();
     },
     () => {
@@ -1133,7 +1212,7 @@ test('이메일 가입 입력을 검증하고 실제 세션 발급 후 재조회
     },
     () => {
       /* 재조회 후에도 로그인 상태여야 한다. */ return expect(
-        page.getByRole('button', { name: '새 여행 시작하기', exact: true }),
+        page.getByRole('button', { name: '새 일정 만들기', exact: true }),
       ).toBeVisible({ timeout: 10000 });
     },
   ]);
@@ -1218,7 +1297,7 @@ test('이메일 로그인 실패는 입력을 유지하고 실제 세션 성공 
     () => {
       // 화면 또는 응답의 인수 조건을 검증한다.
       return expect(
-        page.getByRole('button', { name: '새 여행 시작하기', exact: true }),
+        page.getByRole('button', { name: '새 일정 만들기', exact: true }),
       ).toBeVisible();
     },
   ]);
@@ -1237,18 +1316,6 @@ test('Google Maps 공유 → 로그인 → 새 여행 → 장소 확인 → 일�
     () => {
       // 실제 앱 경로를 사용자 브라우저에서 연다.
       return page.goto('/import-place');
-    },
-    () => {
-      // 사용자 입력으로 폼 값을 작성한다.
-      return page
-        .getByLabel('받은 Google Maps 링크', { exact: true })
-        .fill('https://maps.app.goo.gl/fixture');
-    },
-    () => {
-      // 화면 버튼으로 현재 사용자 동작을 진행한다.
-      return page
-        .getByRole('button', { name: '로그인하고 장소 가져오기', exact: true })
-        .click();
     },
     () => {
       // 화면 버튼으로 현재 사용자 동작을 진행한다.
@@ -1274,10 +1341,10 @@ test('Google Maps 공유 → 로그인 → 새 여행 → 장소 확인 → 일�
       return expect(page).toHaveURL(/\/import-place$/);
     },
     () => {
-      // 화면 또는 응답의 인수 조건을 검증한다.
-      return expect(
-        page.getByLabel('받은 Google Maps 링크', { exact: true }),
-      ).toHaveValue('https://maps.app.goo.gl/fixture');
+      // 로그인 후 원래 장소 가져오기 화면에서 링크를 입력한다.
+      return page
+        .getByLabel('받은 Google Maps 링크', { exact: true })
+        .fill('https://maps.app.goo.gl/fixture');
     },
     () => {
       // 화면 버튼으로 현재 사용자 동작을 진행한다.
@@ -1358,7 +1425,7 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
   await login(page);
   await page
     .getByRole('button', {
-      name: '새 여행 시작하기',
+      name: '새 일정 만들기',
       exact: true,
     })
     .click();
@@ -1489,7 +1556,7 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
   await page
     .getByRole('button', { name: '확인하고 게시', exact: true })
     .click();
-  await page.getByRole('button', { name: '커뮤니티', exact: true }).click();
+  await page.getByRole('button', { name: '커뮤니티 탭', exact: true }).click();
   await expect(
     page.getByText('함께 다녀온 도쿄 여행', { exact: true }),
   ).toBeVisible();
@@ -1507,23 +1574,26 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
     fullPage: true,
   });
 });
-// 로그인 전 공개 화면과 비공개 여행 조회 권한을 구분한다.
-test('인증 전 발자국은 설명만 제공하고 사용자 확인 후 로그인으로 이동한다', async ({
-  page,
-}) => {
-  // 로그인 전에는 개인 여행 자료 대신 사용 목적과 시작 경로를 제공한다.
-  await network(page);
-  await page.goto('/footprints');
-  await expect(page.getByText('나의 발자국', { exact: true })).toBeVisible();
-  await page
-    .getByRole('button', { name: '로그인하고 여행 기록 시작', exact: true })
-    .click();
-  await expect(page).toHaveURL(/\/login$/);
-  await expect(
-    page.getByRole('button', { name: '이메일로 계속하기', exact: true }),
-  ).toBeVisible();
+// 직접 비공개 화면을 열어도 최초 로그인 선택으로 안내한다.
+test('인증 전 발자국 직접 링크는 로그인 선택으로 돌아간다', ({ page }) => {
+  // 비공개 화면에서 반복 로그인 안내를 받지 않게 한다.
+  return testSteps([
+    () => {
+      /* 외부 응답을 격리한다. */ return network(page);
+    },
+    () => {
+      /* 개인 목록의 주소를 직접 연다. */ return page.goto('/footprints');
+    },
+    () => {
+      /* 로그인 선택으로 이동한다. */ return expect(page).toHaveURL(/\/login$/);
+    },
+    () => {
+      /* 게스트도 시작할 수 있다. */ return expect(
+        page.getByRole('button', { name: '게스트로 시작하기', exact: true }),
+      ).toBeVisible();
+    },
+  ]);
 });
-
 test('항공편 등록에서 도착 나라·도시를 채우고 달력 날짜와 함께 저장 요청한다', async ({
   page,
 }) => {
@@ -1532,7 +1602,7 @@ test('항공편 등록에서 도착 나라·도시를 채우고 달력 날짜와
   await login(page);
   await page
     .getByRole('button', {
-      name: '새 여행 시작하기',
+      name: '새 일정 만들기',
       exact: true,
     })
     .click();
@@ -1584,7 +1654,7 @@ test('새 여행 페이지에서 국가 검색과 달력 입력을 제공하고 
   await network(page);
   await login(page);
   await page
-    .getByRole('button', { name: '새 여행 시작하기', exact: true })
+    .getByRole('button', { name: '새 일정 만들기', exact: true })
     .click();
   await expect(page).toHaveURL(/\/new-trip$/);
   await expect(page.getByRole('dialog')).toHaveCount(0);
@@ -1634,7 +1704,7 @@ test('새 여행 페이지에서 국가 검색과 달력 입력을 제공하고 
   );
   await page.getByRole('button', { name: '취소', exact: true }).click();
   await expect(
-    page.getByRole('button', { name: '새 여행 시작하기', exact: true }),
+    page.getByRole('button', { name: '새 일정 만들기', exact: true }),
   ).toBeVisible();
   await expect(page).not.toHaveURL(/\/new-trip$/);
 });
@@ -1643,12 +1713,7 @@ test('초대 링크를 로그인 과정에서 보존한다', async ({ page }) =>
   // 실제 링크·로그인 버튼·콜백만 사용한다.
   await network(page);
   await page.goto(`/invite#token=${'a'.repeat(64)}`);
-  await expect(
-    page.getByRole('textbox', { name: '초대 링크', exact: true }),
-  ).toHaveValue('a'.repeat(64));
-  await page
-    .getByRole('button', { name: '로그인하고 참여', exact: true })
-    .click();
+  await expect(page).toHaveURL(/\/login\?/);
   await emailLogin(page);
   await expect(page).toHaveURL(/\/invite$/);
   await expect(
@@ -1682,14 +1747,11 @@ test('하루 오류 안내 → 공개 피드 재시도 → 빈 기록 시작 →
     },
     () => {
       // 게스트에게 개인 데이터 조회 권한을 부여하지 않는다.
-      return page.route('**/api/auth/get-session', (route) => {
-        // 미인증 조회 응답 하나를 반환한다.
-        return route.fulfill({ json: null });
-      });
+      return login(page);
     },
     () => {
       // 공개 서버 오류를 성공한 빈 기록으로 오인하지 않도록 한다.
-      return page.route('**/public/community?*', (route) => {
+      return page.route('**/api/v1/community*', (route) => {
         // 실패 응답은 재시도 전까지 유지한다.
         return route.fulfill({
           status: 503,
@@ -1715,7 +1777,7 @@ test('하루 오류 안내 → 공개 피드 재시도 → 빈 기록 시작 →
     },
     () => {
       // 네트워크가 복구된 이후의 실제 공개 응답을 제공한다.
-      return page.route('**/public/community?*', (route) => {
+      return page.route('**/api/v1/community*', (route) => {
         // 현재 공개 글이 없는 응답을 반환한다.
         return route.fulfill({ json: { data: [] } });
       });
@@ -1763,7 +1825,7 @@ test('하루 오류 안내 → 공개 피드 재시도 → 빈 기록 시작 →
     () => {
       // 새 여행 행동이 복귀 후에도 유지되는지 확인한다.
       return expect(
-        page.getByRole('button', { name: '새 여행 시작하기', exact: true }),
+        page.getByRole('button', { name: '새 일정 만들기', exact: true }),
       ).toBeVisible();
     },
     () => {
@@ -1773,10 +1835,9 @@ test('하루 오류 안내 → 공개 피드 재시도 → 빈 기록 시작 →
     () => {
       // 구현 상태 대신 사용자가 이어갈 로그인 방법을 안내한다.
       return expect(
-        page.getByText(
-          '다시 로그인해 주세요. 이메일로 여행을 이어갈 수 있어요.',
-          { exact: true },
-        ),
+        page.getByText('로그인이 만료됐어요. 다시 로그인해 주세요.', {
+          exact: true,
+        }),
       ).toBeVisible();
     },
     () => {

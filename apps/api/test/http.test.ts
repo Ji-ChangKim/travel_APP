@@ -4,6 +4,9 @@ import { createApp } from '../src/app';
 import { accounts, tripInput } from './database';
 
 const env: Env = {
+  GOOGLE_CLIENT_ID: '',
+  KAKAO_CLIENT_ID: '',
+  NAVER_CLIENT_ID: '',
   AUTH_BASE_URL: 'https://api.test',
   GOOGLE_VISION_API_KEY: '',
   SUPABASE_URL: 'https://example.supabase.co',

@@ -25,8 +25,11 @@ test('Worker는 실제 D1·R2·AUTH_SECRET과 공개 주소만 사용한다', ()
   return assert.deepEqual(
     projectConfig(workerConfig({ ...valid, AUTH_SECRET: 'private-value' })),
     {
-      name: 'wherego-api-staging',
+      name: 'tripprint-api-staging',
       vars: {
+        GOOGLE_CLIENT_ID: '',
+        KAKAO_CLIENT_ID: '',
+        NAVER_CLIENT_ID: '',
         AUTH_BASE_URL: valid.EXPO_PUBLIC_API_URL,
         ALLOWED_ORIGINS: valid.RELEASE_WEB_ORIGIN,
         SUPABASE_URL: '',
@@ -40,6 +43,35 @@ test('Worker는 실제 D1·R2·AUTH_SECRET과 공개 주소만 사용한다', ()
     },
   );
 });
+
+// 배포 결과에서 실제 서버 연결에 필요한 항목만 비교한다.
+test('SNS 공개 식별값은 배포에 유지하고 미등록 비밀 키를 필수로 강제하지 않는다', () => {
+  // 키 등록 전에도 게스트·이메일을 배포할 수 있고 비밀 원문은 설정에서 제외한다.
+  return checkSocialConfig(
+    workerConfig({
+      ...valid,
+      GOOGLE_CLIENT_ID: 'google-client',
+      KAKAO_CLIENT_ID: 'kakao-client',
+      NAVER_CLIENT_ID: 'naver-client',
+      NAVER_CLIENT_SECRET: 'private-provider-secret',
+    }),
+  );
+});
+
+// 생성 설정의 공개 키와 비밀 분리를 한 계약으로 검사한다.
+function checkSocialConfig(config) {
+  // SNS 미등록이 기본 인증 배포를 차단하지 않는다.
+  return (
+    assert.equal(config.vars.GOOGLE_CLIENT_ID, 'google-client'),
+    assert.equal(config.vars.KAKAO_CLIENT_ID, 'kakao-client'),
+    assert.equal(config.vars.NAVER_CLIENT_ID, 'naver-client'),
+    assert.deepEqual(config.secrets.required, ['AUTH_SECRET']),
+    assert.equal(
+      JSON.stringify(config).includes('private-provider-secret'),
+      false,
+    )
+  );
+}
 
 // 배포 결과에서 실제 서버 연결에 필요한 항목만 비교한다.
 function projectConfig(config) {

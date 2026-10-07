@@ -1,10 +1,10 @@
 {
   "version": "0.1.0",
-  "release": "test-1-no-dummy",
+  "release": "test-1-google-auth",
   "environment": "staging",
-  "releaseDate": "2026-10-06",
-  "webOrigin": "https://wherego-staging.pages.dev",
-  "apiOrigin": "https://wherego-api-staging.gametps.workers.dev",
+  "releaseDate": "2026-10-07",
+  "webOrigin": "https://tripprint-staging.pages.dev",
+  "apiOrigin": "https://tripprint-api-staging.gametps.workers.dev",
   "brand": "TripPrint",
   "brandAssets": "v2"
 }
