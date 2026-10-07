@@ -35,6 +35,10 @@ Play 내부 테스트에 업로드하는 파일은 AAB다. Google Play가 기기
 
 루트와 모바일 `eas.json`에 `play-internal` 프로필을 추가했다. `preview`의 테스트 서버 공개 설정·버전 번호 자동 증가·preview 환경을 상속하고 `distribution: store`, `android.buildType: app-bundle`을 사용한다. 기존 운영 production 프로필을 테스트 서버로 바꾸지 않는다. EAS 빌드 hook은 `preview`와 `play-internal` 모두에서 서버 공개 설정 누락을 차단한다.
 
+Expo의 **GitHub에서 빌드를 시작하세요** 화면에서도 같은 프로필을 사용할 수 있다. GitHub 빌드에 사용할 Android 이미지는 `latest`로 지정했다. 입력값은 기본 디렉터리 `apps/mobile`, 플랫폼 Android, Git 참조 `main`, EAS 빌드 프로필 `play-internal`, 환경 `Preview`다. 한국어 자동 번역 화면에서는 Preview가 **시사**로 표시될 수 있다. EAS 제출은 체크하지 않고 완성된 AAB를 Play Console에 직접 업로드한다. 현재 빌드 설정은 배포된 staging 서버를 사용한다.
+
+GitHub 빌드는 Android 서명 자격 증명이 미리 준비되어 있어야 한다. 서명 키가 없거나 초기 설정 오류가 나오면 아래 터미널 빌드 절차로 서명 키 설정과 첫 빌드를 완료한 뒤 GitHub 빌드를 사용한다.
+
 1. 프로젝트 루트 터미널에서 `npm run eas:login`을 실행해 직접 로그인한다. 비밀번호는 채팅에 보내지 않는다. 연결된 Expo 프로젝트 소유자는 `rupang`이며 ID는 `3b23b462-262c-4b64-aff2-5fb03280e6b5`다.
 2. 해당 계정에서 프로젝트 접근과 `com.tripprint.app`의 Android 업로드 서명 키를 확인한다. 기존 Play 업로드 키가 있으면 그 키를 사용한다. 처음 빌드하는 경우 EAS의 keystore 생성 절차를 따른다. 서명 키 파일·비밀번호를 Git에 넣지 않는다.
 3. 실제 Google 로그인 검증 후 `npm run mobile:build:play-internal`로 AAB를 생성한다.

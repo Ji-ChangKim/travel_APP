@@ -33,6 +33,7 @@
       "extends": "preview",
       "distribution": "store",
       "android": {
+        "image": "latest",
         "buildType": "app-bundle"
       }
     },
