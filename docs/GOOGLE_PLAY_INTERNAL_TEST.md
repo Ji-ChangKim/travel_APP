@@ -48,34 +48,12 @@ GitHub 빌드는 Android 서명 자격 증명이 미리 준비되어 있어야 �
 
 Play Console에 서비스를 업로드하는 계정 인증·테스터 목록·업로드 서명 키 확인이 필요하다. 현재 코드 설정만으로 Play Console 출시가 완료되지는 않는다. 첫 업로드는 콘솔에서 진행할 수 있으며, Play API 서비스 계정 키가 없는 상태를 자동 제출 성공으로 표시하지 않는다.
 
-## GitHub Actions에서 직접 실행하고 확인하기
+## EAS 없이 GitHub에서 직접 빌드하기
 
-`.github/workflows/play-internal.yml`의 **Android Play Internal**은 `workflow_dispatch` 실행 버튼으로만 시작한다. main 푸시와 PR은 이 앱 제출 workflow를 실행하지 않는다. main의 코드 품질·인증·릴리스 검사를 통과하면 `apps/mobile`에서 AAB 빌드를 완료할 때까지 기다린다. 결과에서 완료된 Android 빌드 ID 하나를 검증하고 그 ID를 EAS Submit에 지정한다. 제출도 완료할 때까지 기다리며 실패하면 해당 실행은 실패로 기록한다. `--latest`로 다른 실행의 산출물을 제출하지 않는다.
+현재 기본 workflow는 GitHub 실행 환경에서 Gradle로 APK·AAB를 빌드한다. 이전 EXPO_TOKEN 검사와 EAS Build·Submit 호출을 제거했다. Expo 라이브러리는 유지하며 로컬 CLI는 네이티브 프로젝트 생성에만 사용한다. 위 EAS 프로필과 명령은 선택 가능한 기존 경로다.
 
-처음 한 번 준비할 항목:
+실행 화면에서 artifact_type=apk, submit_play 체크 해제로 계정 인증 없이 직접 설치 파일을 만들 수 있다. Play AAB에는 업로드 서명이, 자동 제출에는 Google 서비스 계정 JSON이 필요하다. 결과는 GitHub 실행의 Artifacts와 Play Console에서 확인한다.
 
-1. Expo에서 `com.tripprint.app`의 업로드 서명 키와 첫 Android 빌드를 준비한다. 기존 업로드 키가 있으면 유지한다.
-2. [Expo 계정 설정](https://expo.dev/settings/access-tokens)에서 프로젝트 접근 권한이 있는 계정의 Access Token을 생성한다. [저장소 Actions Secrets](https://github.com/Ji-ChangKim/travel_APP/settings/secrets/actions)에 `EXPO_TOKEN`이라는 Repository secret으로 저장한다. 토큰 원문을 코드·채팅·로그에 넣지 않는다.
-3. Google Cloud에서 **Google Play Android Developer API**를 활성화하고 서비스 계정을 만든다. **IAM 및 관리자 → 서비스 계정 → 해당 계정 → 키 → 키 추가 → 새 키 만들기 → JSON**으로 제출용 키를 발급한다. 서비스 계정 키는 이전에 받은 로그인 OAuth 클라이언트 JSON과 다르다.
-4. Play Console의 **사용자 및 권한 → 새 사용자 초대**에서 서비스 계정 이메일을 추가한다. TripPrint 앱에 필요한 앱 정보 보기와 테스트 트랙 출시 권한을 부여한다. 테스터 목록은 사람이 콘솔에서 관리한다.
-5. Expo 프로젝트의 **Credentials → Android → com.tripprint.app → Service Credentials → Add a Google Service Account Key**에 JSON을 업로드한다. 이 구성은 키를 EAS에서 관리하므로 제출 JSON을 GitHub 저장소나 Actions Secrets에 추가하지 않는다.
-
-[Android Play Internal 실행 화면](https://github.com/Ji-ChangKim/travel_APP/actions/workflows/play-internal.yml)에서 **Run workflow → Branch: main → release_status → Run workflow**를 선택한다.
-
-| release_status | Play에 반영되는 결과         | 설치 확인                                                          |
-| -------------- | ---------------------------- | ------------------------------------------------------------------ |
-| `draft`        | 내부 테스트 초안에 AAB 등록  | Play Console에서 초안을 검토하고 내부 테스트 출시를 완료한 뒤 설치 |
-| `completed`    | 내부 테스트 트랙에 출시 요청 | 콘솔의 처리·심사와 배포 상태를 확인한 뒤 테스터 참여 링크로 설치   |
-
-처음에는 `draft`를 선택해 앱 초안과 서명·콘솔 설정을 확인한다. 준비된 앱의 후속 배포에는 `completed`를 선택할 수 있다. 새로운 버전을 올릴 때마다 EAS의 원격 versionCode가 증가한다. 기존 초안이나 미완료 출시가 있으면 먼저 해당 버전의 상태를 콘솔에서 확인한다.
-
-배포 후 확인 위치:
-
-- **GitHub → Actions → Android Play Internal → 실행 기록 → build-and-submit**: 실패한 단계와 로그, Summary의 Build ID·제출 상태를 확인한다. 녹색 성공은 선택한 상태로 제출 명령이 성공했다는 의미다. 실제 설치 가능 여부는 Play의 상태로 확인한다.
-- **Expo 프로젝트 → Builds / Submissions**: Build ID가 같은 Android AAB와 제출 작업 결과를 확인한다. 빌드 성공과 제출 성공은 각각 확인한다.
-- **Play Console → TripPrint → 테스트 및 출시 → 테스트 → 내부 테스트 → 버전**: versionCode와 초안·출시 상태를 확인한다. 전체 트랙의 결과는 **최신 버전 및 번들**, 심사·출시 진행은 **게시 개요**에서 확인한다.
-- **Play Console → 내부 테스트 → 테스터**: 휴대폰의 Play 계정을 목록에 추가하고 참여 링크를 복사한다. 휴대폰에서 같은 계정으로 참여해 설치 또는 업데이트한다.
-
-GitHub Actions와 EAS Submit은 AAB 빌드·업로드·내부 테스트 등록을 자동화한다. 공개 운영 트랙 승격은 이 workflow에 포함하지 않는다. Google 심사 승인을 보장하지 않으며, 첫 내부 출시도 콘솔 상태에 따라 심사가 필요할 수 있다. Actions·EAS 빌드는 계정의 실행 시간과 빌드 한도를 사용한다. 토큰·제출 자격 등록과 실제 workflow 실행·Play 제출은 아직 확인하지 않았다.
+자세한 실행값·Secrets·버전 코드·배포 확인은 [GitHub 직접 Android 빌드 안내](ANDROID_GITHUB_BUILD.md)를 따른다.
 
 참고: [Expo APK와 AAB](https://docs.expo.dev/build-reference/apk/), [Google Play 내부 테스트](https://support.google.com/googleplay/android-developer/answer/9845334?hl=ko), [Expo Android 제출](https://docs.expo.dev/submit/android/).

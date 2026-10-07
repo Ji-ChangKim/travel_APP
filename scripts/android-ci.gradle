@@ -1,0 +1,19 @@
+// 생성된 Android 프로젝트의 최종 DSL에 CI 버전과 선택한 업로드 서명을 적용한다.
+gradle.beforeProject { project ->
+    // Android 앱 플러그인이 있는 모듈만 빌드 설정을 연결한다.
+    project.pluginManager.withPlugin('com.android.application') {
+        // 기본 템플릿 설정이 끝난 뒤 release 서명을 덮어써 테스트 키의 Play 제출을 방지한다.
+        project.extensions.getByName('androidComponents').finalizeDsl { android ->
+            // 공개 버전 코드는 검증된 CI 값으로 설정하고 비밀은 환경 변수에서만 읽는다.
+            android.defaultConfig.versionCode = Integer.parseInt(System.getenv('TRIPPRINT_ANDROID_VERSION_CODE'))
+            if (System.getenv('TRIPPRINT_ANDROID_SIGNING') == 'upload') {
+                def upload = android.signingConfigs.maybeCreate('tripprintUpload')
+                upload.storeFile = new File(System.getenv('TRIPPRINT_KEYSTORE_FILE'))
+                upload.storePassword = System.getenv('ANDROID_KEYSTORE_PASSWORD')
+                upload.keyAlias = System.getenv('ANDROID_KEY_ALIAS')
+                upload.keyPassword = System.getenv('ANDROID_KEY_PASSWORD')
+                android.buildTypes.getByName('release').signingConfig = upload
+            }
+        }
+    }
+}
