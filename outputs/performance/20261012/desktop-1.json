@@ -1,0 +1,380 @@
+{
+  "profile": "desktop",
+  "run": 1,
+  "entry": {
+    "navigationMs": 431.30000019073486,
+    "fcpMs": 500,
+    "lcpMs": 500,
+    "layoutShiftSum": 0.00009084134993298143
+  },
+  "homeReadyMs": 254.25440000000071,
+  "homePhotosReadyMs": 813.1196,
+  "frameSamples": 948,
+  "frameIntervalP95Ms": 16.800000000000182,
+  "frameOver50Ms": 0,
+  "observedPositions": ["1 / 3", "2 / 3", "3 / 3"],
+  "interactionDurationP95Ms": 112,
+  "longTaskCount": 5,
+  "longTaskMaxMs": 152,
+  "longTaskOver50TotalMs": 227,
+  "discoveryRequests": 1,
+  "communityRequests": 2,
+  "memoryBefore": [
+    {
+      "name": "Timestamp",
+      "value": 2252996.003906
+    },
+    {
+      "name": "AudioHandlers",
+      "value": 0
+    },
+    {
+      "name": "AudioWorkletProcessors",
+      "value": 0
+    },
+    {
+      "name": "Documents",
+      "value": 1
+    },
+    {
+      "name": "Frames",
+      "value": 1
+    },
+    {
+      "name": "JSEventListeners",
+      "value": 305
+    },
+    {
+      "name": "LayoutObjects",
+      "value": 324
+    },
+    {
+      "name": "MediaKeySessions",
+      "value": 0
+    },
+    {
+      "name": "MediaKeys",
+      "value": 0
+    },
+    {
+      "name": "Nodes",
+      "value": 364
+    },
+    {
+      "name": "Resources",
+      "value": 7
+    },
+    {
+      "name": "ContextLifecycleStateObservers",
+      "value": 11
+    },
+    {
+      "name": "V8PerContextDatas",
+      "value": 2
+    },
+    {
+      "name": "WorkerGlobalScopes",
+      "value": 0
+    },
+    {
+      "name": "UACSSResources",
+      "value": 0
+    },
+    {
+      "name": "RTCPeerConnections",
+      "value": 0
+    },
+    {
+      "name": "ResourceFetchers",
+      "value": 1
+    },
+    {
+      "name": "AdSubframes",
+      "value": 0
+    },
+    {
+      "name": "DetachedScriptStates",
+      "value": 0
+    },
+    {
+      "name": "ArrayBufferContents",
+      "value": 0
+    },
+    {
+      "name": "LayoutCount",
+      "value": 16
+    },
+    {
+      "name": "RecalcStyleCount",
+      "value": 20
+    },
+    {
+      "name": "LayoutDuration",
+      "value": 0.254039
+    },
+    {
+      "name": "RecalcStyleDuration",
+      "value": 0.009607
+    },
+    {
+      "name": "DevToolsCommandDuration",
+      "value": 0.051884
+    },
+    {
+      "name": "ScriptDuration",
+      "value": 0.448222
+    },
+    {
+      "name": "V8CompileDuration",
+      "value": 0.000089
+    },
+    {
+      "name": "TaskDuration",
+      "value": 1.013893
+    },
+    {
+      "name": "TaskOtherDuration",
+      "value": 0.250052
+    },
+    {
+      "name": "ThreadTime",
+      "value": 0.882454
+    },
+    {
+      "name": "ProcessTime",
+      "value": 1.417137
+    },
+    {
+      "name": "JSHeapUsedSize",
+      "value": 10632844
+    },
+    {
+      "name": "JSHeapTotalSize",
+      "value": 11595776
+    },
+    {
+      "name": "FirstMeaningfulPaint",
+      "value": 0
+    },
+    {
+      "name": "DomContentLoaded",
+      "value": 2252994.788748
+    },
+    {
+      "name": "NavigationStart",
+      "value": 2252994.359985
+    }
+  ],
+  "memoryAfter": [
+    {
+      "name": "Timestamp",
+      "value": 2253015.639742
+    },
+    {
+      "name": "AudioHandlers",
+      "value": 0
+    },
+    {
+      "name": "AudioWorkletProcessors",
+      "value": 0
+    },
+    {
+      "name": "Documents",
+      "value": 1
+    },
+    {
+      "name": "Frames",
+      "value": 1
+    },
+    {
+      "name": "JSEventListeners",
+      "value": 317
+    },
+    {
+      "name": "LayoutObjects",
+      "value": 324
+    },
+    {
+      "name": "MediaKeySessions",
+      "value": 0
+    },
+    {
+      "name": "MediaKeys",
+      "value": 0
+    },
+    {
+      "name": "Nodes",
+      "value": 379
+    },
+    {
+      "name": "Resources",
+      "value": 7
+    },
+    {
+      "name": "ContextLifecycleStateObservers",
+      "value": 11
+    },
+    {
+      "name": "V8PerContextDatas",
+      "value": 2
+    },
+    {
+      "name": "WorkerGlobalScopes",
+      "value": 0
+    },
+    {
+      "name": "UACSSResources",
+      "value": 0
+    },
+    {
+      "name": "RTCPeerConnections",
+      "value": 0
+    },
+    {
+      "name": "ResourceFetchers",
+      "value": 1
+    },
+    {
+      "name": "AdSubframes",
+      "value": 0
+    },
+    {
+      "name": "DetachedScriptStates",
+      "value": 0
+    },
+    {
+      "name": "ArrayBufferContents",
+      "value": 0
+    },
+    {
+      "name": "LayoutCount",
+      "value": 35
+    },
+    {
+      "name": "RecalcStyleCount",
+      "value": 72
+    },
+    {
+      "name": "LayoutDuration",
+      "value": 0.278422
+    },
+    {
+      "name": "RecalcStyleDuration",
+      "value": 0.013271
+    },
+    {
+      "name": "DevToolsCommandDuration",
+      "value": 0.140184
+    },
+    {
+      "name": "ScriptDuration",
+      "value": 0.667723
+    },
+    {
+      "name": "V8CompileDuration",
+      "value": 0.000089
+    },
+    {
+      "name": "TaskDuration",
+      "value": 1.810083
+    },
+    {
+      "name": "TaskOtherDuration",
+      "value": 0.710394
+    },
+    {
+      "name": "ThreadTime",
+      "value": 1.642178
+    },
+    {
+      "name": "ProcessTime",
+      "value": 2.798669
+    },
+    {
+      "name": "JSHeapUsedSize",
+      "value": 11235568
+    },
+    {
+      "name": "JSHeapTotalSize",
+      "value": 12120064
+    },
+    {
+      "name": "FirstMeaningfulPaint",
+      "value": 0
+    },
+    {
+      "name": "DomContentLoaded",
+      "value": 2252994.788748
+    },
+    {
+      "name": "NavigationStart",
+      "value": 2252994.359985
+    }
+  ],
+  "errors": [],
+  "longTasks": [
+    {
+      "start": 278.80000019073486,
+      "duration": 152
+    },
+    {
+      "start": 437.40000009536743,
+      "duration": 90
+    },
+    {
+      "start": 573.8000001907349,
+      "duration": 87
+    },
+    {
+      "start": 752.3000001907349,
+      "duration": 93
+    },
+    {
+      "start": 863.5999999046326,
+      "duration": 55
+    }
+  ],
+  "eventDurations": [
+    112, 112, 112, 24, 24, 24, 32, 32, 32, 24, 24, 24, 24, 24, 24, 24, 24, 24,
+    24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24,
+    24, 24, 24, 24, 24, 80, 80, 80
+  ],
+  "resources": [
+    {
+      "path": "/_expo/static/js/web/entry-93d711158b8ff38f863bfe605b7c5cd2.js",
+      "bytes": 2263332,
+      "durationMs": 61.59999990463257
+    },
+    {
+      "path": "/favicon.ico",
+      "bytes": 0,
+      "durationMs": 6.5
+    },
+    {
+      "path": "/assets/__node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Ionicons.b4eb097d35f44ed943676fd56f6bdc51.ttf",
+      "bytes": 389724,
+      "durationMs": 111.69999980926514
+    },
+    {
+      "path": "/assets/assets/brand/haru-v1/TripPrint_Haru_loading_1233x1275.e82e2cd8d749494cecf9e13d944c91be.png",
+      "bytes": 1163240,
+      "durationMs": 97.69999980926514
+    },
+    {
+      "path": "/assets/assets/brand/haru-v1/TripPrint_Haru_empty_1024x1536.77e63952fce366565ad7d3e6c4989be6.png",
+      "bytes": 1793767,
+      "durationMs": 79.5
+    },
+    {
+      "path": "/assets/assets/brand/tripprint-v1/TripPrint_logo-horizontal_1024x320.8b72eeca75e3c2f429451ed54f854883.png",
+      "bytes": 14943,
+      "durationMs": 20.799999713897705
+    },
+    {
+      "path": "/favicon.ico",
+      "bytes": 0,
+      "durationMs": 5.299999713897705
+    }
+  ],
+  "documentElements": 221
+}

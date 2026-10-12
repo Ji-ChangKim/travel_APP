@@ -1,0 +1,62 @@
+{
+  "generatedAt": "2026-10-12T02:18:40.476Z",
+  "candidate": {
+    "version": "0.1.0",
+    "release": "mvp-0.1.0-internal-candidate-20261012",
+    "environment": "staging",
+    "releaseDate": "2026-10-12",
+    "webOrigin": "https://tripprint-staging.pages.dev",
+    "apiOrigin": "https://tripprint-api-staging.gametps.workers.dev",
+    "brand": "TripPrint",
+    "brandAssets": "v2"
+  },
+  "sourceHead": "935272bd03beeb647ece87663af283aaeed888b1",
+  "sourceState": "Local working tree with uncommitted changes; sourceHead alone does not identify this candidate.",
+  "artifacts": [
+    {
+      "path": "apps/mobile/dist/_expo/static/js/web/entry-93d711158b8ff38f863bfe605b7c5cd2.js",
+      "bytes": 2263332,
+      "sha256": "b9a398c75a894f4696a4fb1f052ec768c0111c5f4a2ce559ea8924bc4af90346"
+    },
+    {
+      "path": "apps/mobile/.release/android/_expo/static/js/android/entry-414a83d1038a1f5311c3eb3732a4c263.hbc",
+      "bytes": 4010469,
+      "sha256": "db95c95b6dac9193360173e877e0ca88552c7c29645903b94f7dd3631a1d532a"
+    },
+    {
+      "path": "apps/mobile/dist/release.json",
+      "bytes": 307,
+      "sha256": "09e0bcb195b444bb86b146de557c28a95b1a198052fe369040479a97a148e851"
+    },
+    {
+      "path": "apps/api/.release/wrangler.json",
+      "bytes": 1083,
+      "sha256": "cd81e42f47f9b7384972c96e84d247c479c43c0f124888c7f48271209480295a"
+    },
+    {
+      "path": "apps/api/migrations/0006_unique_nicknames.sql",
+      "bytes": 1197,
+      "sha256": "e5e08a6c3969a0718d0288e881f1434e4e1d6463a94c1bf5dbbba7c4d79a00d4"
+    }
+  ],
+  "verification": {
+    "check": "passed",
+    "auth": 24,
+    "release": 30,
+    "foundation": 65,
+    "cloudLocal": 11,
+    "browser": 28,
+    "totalTests": 158,
+    "releasePrepare": "passed",
+    "androidHermesExport": "passed",
+    "performance": "Six fresh Chrome sessions, desktop and 4x CPU/limited network; see results.json for limits and slower measurements."
+  },
+  "pending": [
+    "Commit/build source selection",
+    "Remote 0006 migration and API/web deployment",
+    "Signed AAB with existing upload key and higher Play versionCode",
+    "Play internal test upload/tester installation",
+    "Real Google sign-in/app return and native Android performance acceptance"
+  ],
+  "installedAppArtifact": null
+}
