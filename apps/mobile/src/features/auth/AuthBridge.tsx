@@ -12,25 +12,28 @@ import {
 } from '@/services/cloudAuth';
 import { fetchUserProfile } from '@/services/profileService';
 import { clearLegacyDbCode } from '@/services/legacyStorage';
+import { loadStoredGuestSession } from '@/services/guestAuthService';
 export const useAuthReady = create<{ ready: boolean }>(() => {
   /* 초기 확인 전 인증 결정을 보류한다. */ return { ready: false };
 });
 // 서버 세션을 화면 상태에 투영한다.
 function applySession(clear: () => void, session: CloudSession | null): void {
   // 이전 계정 데이터는 새 계정에 노출하지 않는다.
-  return applyProfile(
-    clear,
-    session
-      ? restoredProfile(
-          session.user,
-          Platform.OS === 'ios'
-            ? 'ios'
-            : Platform.OS === 'android'
-              ? 'android'
-              : 'web',
-        )
-      : null,
-  );
+  return session
+    ? applyProfile(
+        clear,
+        session
+          ? restoredProfile(
+              session.user,
+              Platform.OS === 'ios'
+                ? 'ios'
+                : Platform.OS === 'android'
+                  ? 'android'
+                  : 'web',
+            )
+          : null,
+      )
+    : void restoreLocalGuest(clear, authRevision());
 }
 
 // 같은 계정의 전경 복원에서는 이미 확인한 개인정보 설정 상태를 유지한다.
@@ -62,39 +65,75 @@ function applyProfile(
 // 서버 세션을 재확인한다.
 function restore(clear: () => void, started = authRevision()): Promise<void> {
   // 실패를 인증 성공으로 만들지 않는다.
-  return getCloudSession()
+  return prepareLocalGuest(clear, started)
+    .then(getCloudSession)
     .then((session) => {
       // 오래된 복원 결과가 새로 로그인한 계정을 덮어쓰지 못한다.
       return started !== authRevision()
         ? undefined
-        : (applySession(clear, session),
-          session
-            ? fetchUserProfile(session.user.id)
-                .then((profile) => {
-                  // 상세 조회 중 계정이 바뀌면 이전 프로필을 적용하지 않는다.
-                  return started === authRevision() && profile
-                    ? applyProfile(clear, {
-                        ...profile,
-                        osPlatform:
-                          Platform.OS === 'ios'
-                            ? 'ios'
-                            : Platform.OS === 'android'
-                              ? 'android'
-                              : 'web',
-                      })
-                    : undefined;
-                })
-                .catch(() => {
-                  // 상세 조회 실패에서도 확인된 기본 인증 프로필을 유지한다.
-                  return undefined;
-                })
-            : undefined);
+        : session
+          ? (applySession(clear, session),
+            fetchUserProfile(session.user.id)
+              .then((profile) => {
+                // 상세 조회 중 계정이 바뀌면 이전 프로필을 적용하지 않는다.
+                return started === authRevision() && profile
+                  ? applyProfile(clear, {
+                      ...profile,
+                      osPlatform:
+                        Platform.OS === 'ios'
+                          ? 'ios'
+                          : Platform.OS === 'android'
+                            ? 'android'
+                            : 'web',
+                    })
+                  : undefined;
+              })
+              .catch(() => {
+                // 상세 조회 실패에서도 확인된 기본 인증 프로필을 유지한다.
+                return undefined;
+              }))
+          : restoreLocalGuest(clear, started);
     })
     .catch(() => {
       /* 계정 전환 이후의 오래된 오류도 현재 계정을 지우지 않는다. */ return started ===
         authRevision()
-        ? applySession(clear, null)
+        ? restoreLocalGuest(clear, started)
         : undefined;
+    });
+}
+
+// 이미 선택한 기기 게스트는 네트워크 확인을 기다리지 않고 연다.
+function prepareLocalGuest(clear: () => void, started: number): Promise<void> {
+  // 일반 회원을 저장된 다른 게스트로 바꾸지 않는다.
+  return loadStoredGuestSession()
+    .then((profile) => {
+      // 로그인 진행 중인 계정에는 오래된 복원 결과를 적용하지 않는다.
+      return profile &&
+        started === authRevision() &&
+        (!useTripStore.getState().currentUser ||
+          useTripStore.getState().currentUser?.id === profile.id)
+        ? applyProfile(clear, profile)
+        : undefined;
+    })
+    .catch(() => {
+      // 로컬 프로필 손상은 서버 인증 확인까지 이어서 처리한다.
+      return undefined;
+    });
+}
+
+// 온라인 세션을 확인할 수 없어도 현재 기기의 게스트 기록을 연다.
+function restoreLocalGuest(clear: () => void, started: number): Promise<void> {
+  // 기기 프로필은 원격 서버 인증을 대신하지 않는다.
+  return loadStoredGuestSession()
+    .then((profile) => {
+      // 읽는 동안 로그인한 회원을 이전 게스트로 덮어쓰지 않는다.
+      return started === authRevision()
+        ? applyProfile(clear, profile)
+        : undefined;
+    })
+    .catch(() => {
+      // 파손된 프로필에서는 임의 계정이나 빈 여행을 만들지 않는다.
+      return started === authRevision() ? applyProfile(clear, null) : undefined;
     });
 }
 // 앱 인증 이벤트를 연결한다.

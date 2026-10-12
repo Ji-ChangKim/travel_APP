@@ -1,7 +1,9 @@
 import type { Profile } from '@wherego/domain';
 import { z } from 'zod';
-import { requestFoundation } from '@wherego/api-client';
+import { requestFoundation, FoundationClientError } from '@wherego/api-client';
 import { serverOptions } from '@/features/workspace/service';
+import { useTripStore } from '@/stores/useTripStore';
+import { saveGuestSession } from './guestAuthService';
 const profileSchema = z.object({
   id: z.string().uuid(),
   nickname: z.string(),
@@ -29,7 +31,8 @@ export function fetchUserProfile(userId: string): Promise<Profile | null> {
       );
     })
     .then((response) => {
-      /* 서버 계약을 검증한다. */ return profileSchema.parse(response.data);
+      // 현재 게스트의 복원 닉네임도 서버 확정 값과 맞춘다.
+      return savedProfile(profileSchema.parse(response.data));
     });
 }
 // 서버에서 확정한 프로필만 화면에 반영한다.
@@ -53,6 +56,31 @@ export function updateUserProfile(
       );
     })
     .then((response) => {
-      /* 확정한 프로필만 반환한다. */ return profileSchema.parse(response.data);
+      // 게스트 닉네임 변경도 DB 확정 뒤 기기 복원 프로필에 반영한다.
+      return savedProfile(profileSchema.parse(response.data));
+    })
+    .catch((error: unknown) => {
+      // 다른 계정의 정보와 원본 서버 오류를 숨긴다.
+      return error instanceof FoundationClientError && error.status === 409
+        ? Promise.reject(
+            new Error(
+              '이미 사용 중인 닉네임이에요. 다른 닉네임을 입력해 주세요.',
+            ),
+          )
+        : Promise.reject(error);
     });
+}
+
+// 기기 복원에서도 서버가 확정한 게스트 닉네임을 유지한다.
+function savedProfile(profile: Profile): Promise<Profile> {
+  // 일반 회원 프로필을 게스트 저장소에 넣지 않는다.
+  return (
+    profile.authProvider === 'guest' &&
+    useTripStore.getState().currentUser?.id === profile.id
+      ? saveGuestSession(profile)
+      : Promise.resolve()
+  ).then(() => {
+    // 보존 실패를 프로필 저장 완료로 표시하지 않는다.
+    return profile;
+  });
 }

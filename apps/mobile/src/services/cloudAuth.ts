@@ -2,6 +2,7 @@ import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import { z } from 'zod';
 import type { Profile, OsPlatform } from '@wherego/domain';
+import { clearGuestSession, saveGuestSession } from './guestAuthService';
 const tokenKey = 'wherego.cloud.session.v1';
 const cloudUserSchema = z.object({
   id: z.string().uuid(),
@@ -111,9 +112,11 @@ export function emailSession(
     .then((response) => {
       /* 발급 토큰과 사용자를 함께 검사한다. */ return !response.ok
         ? fail(
-            response.status === 429
-              ? '요청이 많습니다. 잠시 후 다시 시도해 주세요.'
-              : '이메일과 비밀번호를 확인하고 다시 시도해 주세요.',
+            response.status === 409
+              ? '이미 사용 중인 닉네임이에요. 다른 닉네임을 입력해 주세요.'
+              : response.status === 429
+                ? '요청이 많습니다. 잠시 후 다시 시도해 주세요.'
+                : '이메일과 비밀번호를 확인하고 다시 시도해 주세요.',
           )
         : response.json().then((data: unknown) => {
             /* 서명된 응답 헤더 토큰을 저장한다. */ return acceptSession(
@@ -131,10 +134,26 @@ export function acceptSession(
 ): Promise<CloudSession> {
   // 저장 실패를 로그인 성공으로 처리하지 않는다.
   return writeToken(token).then(() => {
-    /* 실제 발급 사용자만 전달한다. */ return notifySession({
-      user,
-      access_token: token,
-    })!;
+    // 회원 선택 뒤 이전 게스트가 자동 복원되지 않게 현재 기기 선택을 저장한다.
+    return (
+      user.isAnonymous
+        ? saveGuestSession(
+            cloudProfile(
+              user,
+              Platform.OS === 'ios'
+                ? 'ios'
+                : Platform.OS === 'android'
+                  ? 'android'
+                  : 'web',
+            ),
+          )
+        : clearGuestSession()
+    ).then(() => {
+      /* 실제 발급 사용자만 전달한다. */ return notifySession({
+        user,
+        access_token: token,
+      })!;
+    });
   });
 }
 // 서버에서 토큰의 만료·철회를 확인한다.

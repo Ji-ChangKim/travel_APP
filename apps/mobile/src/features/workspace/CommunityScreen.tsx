@@ -9,17 +9,13 @@ import {
 } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { z } from 'zod';
-import { communityPostSchema } from '@wherego/validation';
-import {
-  getCommunity,
-  requestFoundation,
-  foundationQueryKey,
-} from '@wherego/api-client';
+import { requestFoundation, foundationQueryKey } from '@wherego/api-client';
 
 import { useTripStore } from '@/stores/useTripStore';
 import { apiBaseUrl, serverOptions } from './service';
 import { workspaceError } from './WorkspaceScreen';
 import { Action, Field, styles } from './ui';
+import { loadCommunity } from './communityService';
 // 사용자가 공개 선택한 여행 사진만 표시한다.
 function PublicPhoto({ path, userId }: { path: string; userId: string }) {
   // 철회 이후 신규 서명 URL은 Storage 정책에서 거부된다.
@@ -82,30 +78,7 @@ export default function CommunityScreen() {
     initialPageParam: 0,
     queryFn: ({ pageParam }) => {
       // 로그인 계정은 차단 필터를, 게스트는 익명 공개 피드를 사용한다.
-      return userId
-        ? serverOptions(userId).then((options) => {
-            // 본인의 차단을 적용한 서버 페이지를 읽는다.
-            return getCommunity(options, pageParam);
-          })
-        : fetch(
-            `${apiBaseUrl().replace(/\/$/, '')}/public/community?offset=${pageParam}`,
-            { signal: AbortSignal.timeout(15000) },
-          )
-            .then((response) => {
-              // 설정 또는 API 실패를 빈 커뮤니티로 표시하지 않는다.
-              if (!response.ok)
-                throw new Error(
-                  '여행 이야기를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.',
-                );
-              // 공개 계약만 다음 처리로 전달한다.
-              return response.json();
-            })
-            .then((payload) => {
-              // 임의 게시 객체를 런타임 검증한다.
-              return z
-                .object({ data: z.array(communityPostSchema) })
-                .parse(payload).data;
-            });
+      return loadCommunity(userId, pageParam);
     },
     getNextPageParam: (last, pages) => {
       // 빈 페이지에서 더 읽기를 종료한다.
@@ -119,7 +92,7 @@ export default function CommunityScreen() {
   function moderation(path: string, input: Record<string, string>): void {
     // 인증 없는 사용자는 먼저 로그인한다.
     if (!userId) {
-      router.push('/login');
+      router.push({ pathname: '/login', params: { next: 'community' } });
       return;
     }
     if (busy) return;

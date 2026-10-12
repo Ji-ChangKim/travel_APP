@@ -1,5 +1,6 @@
 import type { Context } from 'hono';
 import { ZodError } from 'zod';
+import { WorkspaceModelError } from '@wherego/validation';
 import type { ApiEnvironment } from './types';
 
 // 외부 응답에 사용할 오류와 HTTP 상태를 고정한다.
@@ -9,6 +10,7 @@ export const errorStatuses = {
   ROLE_FORBIDDEN: 403,
   RESOURCE_NOT_FOUND: 404,
   VERSION_CONFLICT: 409,
+  NICKNAME_TAKEN: 409,
   REQUEST_KEY_REUSED: 409,
   REQUEST_KEY_EXPIRED: 409,
   TRIP_ARCHIVED: 409,
@@ -47,9 +49,11 @@ export function publicError(error: Error): ApiError {
   // 알려진 오류와 입력 검증 오류만 공개한다.
   return error instanceof ApiError
     ? error
-    : error instanceof ZodError || error.name === 'ZodError'
-      ? new ApiError('VALIDATION_FAILED', '입력값을 확인해 주세요.')
-      : new ApiError('INTERNAL_ERROR');
+    : error instanceof WorkspaceModelError
+      ? new ApiError(error.code)
+      : error instanceof ZodError || error.name === 'ZodError'
+        ? new ApiError('VALIDATION_FAILED', '입력값을 확인해 주세요.')
+        : new ApiError('INTERNAL_ERROR');
 }
 
 // 공개 오류 한 개를 HTTP 응답으로 렌더링한다.

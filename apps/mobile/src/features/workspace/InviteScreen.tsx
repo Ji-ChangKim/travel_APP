@@ -55,7 +55,7 @@ export default function InviteScreen() {
       })
       .then(() => {
         // 게스트에게 실제 계정 인증을 요구한다.
-        if (!user) {
+        if (!user || user.authProvider === 'guest') {
           // 초대를 잃지 않고 로그인 화면으로 이동한다.
           router.push('/login');
           return null;

@@ -112,11 +112,13 @@ function MyContent() {
               Alert.alert('저장 완료', '프로필을 저장했습니다.')
             );
           })
-          .catch(() => {
+          .catch((error: unknown) => {
             // 실패한 입력은 유지하고 재시도를 안내한다.
             return Alert.alert(
               '저장 실패',
-              '연결이 끊겼어요. 잠시 후 다시 시도해 주세요.',
+              error instanceof Error && /[가-힣]/.test(error.message)
+                ? error.message
+                : '연결이 끊겼어요. 잠시 후 다시 시도해 주세요.',
             );
           })
           .finally(() => {
@@ -181,7 +183,7 @@ function MyContent() {
               </View>
               <Text style={styles.userEmail}>
                 {currentUser?.authProvider === 'guest'
-                  ? '계정을 연결하면 다른 기기에서도 이어갈 수 있어요'
+                  ? '게스트 여행은 이 기기에만 보관합니다'
                   : userId
                     ? '여행과 기록을 계정에 보관합니다'
                     : '로그인 전 둘러보기 중입니다'}
@@ -227,11 +229,11 @@ function MyContent() {
               게스트 여행을 내 계정에 연결하기
             </Text>
             <Text style={styles.settingDesc}>
-              지금 저장한 일정과 사진을 그대로 이어가세요. 계정을 연결하기
-              전에는 앱 삭제나 로그아웃 시 게스트 계정을 다시 찾을 수 없어요.
+              회원가입 후에는 새 여행을 계정에 보관할 수 있어요. 기존 게스트
+              여행은 이 기기에 남으며 자동으로 다른 기기에 옮겨지지 않아요.
             </Text>
             <Action
-              label="계정 연결하기"
+              label="로그인 / 회원가입"
               variant="primary"
               onPress={() => {
                 // 게스트 세션을 유지한 채 실제 계정 인증을 시작한다.

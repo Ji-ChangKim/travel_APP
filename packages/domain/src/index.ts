@@ -218,3 +218,7 @@ export type {
   ReceiptItem,
   ReceiptCategory,
 } from './workspace';
+export {
+  discoveryDestinations,
+  type DiscoveryDestination,
+} from './destinations';

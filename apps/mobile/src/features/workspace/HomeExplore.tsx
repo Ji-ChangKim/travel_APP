@@ -2,7 +2,7 @@ import { Pressable, Text, View } from 'react-native';
 import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { getCommunity, foundationQueryKey } from '@wherego/api-client';
-import { serverOptions } from './service';
+import { loadCommunity } from './communityService';
 import { homeStyles as s } from './homeStyles';
 import { Action } from './ui';
 
@@ -12,14 +12,10 @@ export default function HomeExplore({ userId }: { userId: string }) {
   return (
     <ExploreContent
       query={useQuery({
-        queryKey: foundationQueryKey(userId, 'home-community'),
-        enabled: Boolean(userId),
+        queryKey: foundationQueryKey(userId || 'public', 'home-community'),
         queryFn: () => {
           // 가상의 인기 여행 대신 공개 서버 원본을 읽는다.
-          return serverOptions(userId).then((options) => {
-            // 최근 공개 여행의 첫 페이지를 읽는다.
-            return getCommunity(options, 0);
-          });
+          return loadCommunity(userId);
         },
         retry: false,
       })}

@@ -9,9 +9,29 @@ import { z } from 'zod';
 import { receiptDraftSchema } from '@wherego/validation';
 import type { ReceiptDraft } from '@wherego/domain';
 import { getCloudSession } from '@/services/cloudAuth';
+import { useTripStore } from '@/stores/useTripStore';
+import { guestWorkspaceOptions } from '@/services/guestWorkspaceClient';
+import { saveGuestImage } from '@/services/guestMedia';
 
 // 현재 SDK 세션과 화면 계정이 일치할 때만 API 옵션을 만든다.
 export function serverOptions(
+  userId: string,
+): Promise<FoundationClientOptions> {
+  // 기기 게스트의 여행 원본은 인증 서버가 아닌 로컬 문서에 보관한다.
+  return useTripStore.getState().currentUser?.id === userId &&
+    useTripStore.getState().currentUser?.authProvider === 'guest'
+    ? Promise.resolve(
+        guestWorkspaceOptions(
+          userId,
+          apiBaseUrl(),
+          authenticatedServerOptions.bind(null, userId),
+        ),
+      )
+    : authenticatedServerOptions(userId);
+}
+
+// 외부 검색·계정 관리는 실제 서버 세션으로 인증한다.
+function authenticatedServerOptions(
   userId: string,
 ): Promise<FoundationClientOptions> {
   // 실제 서버 세션의 사용자와 화면 계정이 일치해야 한다.
@@ -86,7 +106,14 @@ export function uploadImage(
     // 촬영 사진은 글자를 보존한 JPEG로 자동 압축한 뒤 용량을 다시 검사한다.
     return preparedImage(asset, bytes).then((prepared) => {
       // 업로드한 파일의 실제 시그니처로 확정 MIME을 결정한다.
-      return uploadBytes(tripId, prepared, imageMime(prepared));
+      return useTripStore.getState().currentUser?.authProvider === 'guest'
+        ? saveGuestImage(
+            useTripStore.getState().currentUser!.id,
+            tripId,
+            prepared,
+            imageMime(prepared),
+          )
+        : uploadBytes(tripId, prepared, imageMime(prepared));
     });
   });
 }

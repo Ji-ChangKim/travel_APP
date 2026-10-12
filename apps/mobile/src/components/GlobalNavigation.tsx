@@ -4,6 +4,7 @@ import { usePathname, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTripStore } from '@/stores/useTripStore';
 import { colors } from '@/constants/theme';
+import { isPublicBrowsePath } from '@/features/auth/publicRoutes';
 
 const items = [
   {
@@ -85,10 +86,10 @@ function NavigationContent({
           accessibilityRole="button"
           accessibilityLabel={`${item.label} 탭`}
           accessibilityState={{
-            disabled: !allowed,
+            disabled: !allowed && !isPublicBrowsePath(item.match),
             selected: path === item.match,
           }}
-          disabled={!allowed}
+          disabled={!allowed && !isPublicBrowsePath(item.match)}
           onPress={() => {
             // 같은 탭 재선택 시에도 상세 화면을 닫고 탭의 첫 화면으로 이동한다.
             return router.replace(item.path);
@@ -99,7 +100,7 @@ function NavigationContent({
             alignItems: 'center',
             justifyContent: 'center',
             gap: 3,
-            opacity: allowed ? 1 : 0.55,
+            opacity: allowed || isPublicBrowsePath(item.match) ? 1 : 0.55,
           }}
         >
           <Ionicons

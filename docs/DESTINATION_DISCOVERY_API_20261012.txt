@@ -1,0 +1,106 @@
+TripPrint 메인 여행지 탐색 공개 API 연동 보고
+기준일: 2026-10-12 (한국 시간)
+
+1. 목적과 이번 연결 범위
+
+사용자 게시물이 없는 초기에도 여행지를 탐색할 수 있도록 메인 상단에 여행지 소개를 추가했다.
+사용자 확인: 공공데이터포털 인증키는 아직 없으므로 인증키 없이 사용할 수 있는 공개 API부터 연결한다.
+
+- 이달의 여행 아이디어: 12개월별 3개 도시를 편집 선정. 국가·도시·여행 테마·실제 도시 사진을 제공한다.
+- 도시 소개: 한국어 위키백과 Action API에서 실제 문서 소개를 읽는다.
+- 도시 사진: Wikimedia Commons API에서 대표 이미지와 저작자·라이선스를 확인한다.
+- 많이 읽힌 도시 TOP 3: 선정 8개 도시의 한국어 위키백과 문서 조회 수를 같은 완료 월로 비교한다.
+- 더 많이 읽힌 도시: 두 완료 월의 조회 증가율을 비교한다. 이전 달 최소 100회인 도시만 포함한다.
+- 도시 카드 → 상세 소개·출처 확인 → 해당 도시 여행 계획하기 → 인증 후 목적지 유지로 연결한다.
+
+이 순위는 실제 한국인 여행객 수·항공권 예약·출국 순위가 아니다.
+화면에 '위키백과에서 많이 읽힌 도시', 집계 기간, 선정 후보 8개, 문서 조회 수임을 명시했다.
+월별 아이디어 역시 편집 선정이며 API가 자동으로 산출한 계절·날씨 추천으로 표시하지 않는다.
+나고야·방콕·상하이는 10월 편집 아이디어에 포함한다. 세 도시를 실제 방문객 TOP 3로 표시하지 않는다.
+
+2. 외부 API와 운영 기준
+
+한국어 위키백과 Action API:
+https://ko.wikipedia.org/w/api.php
+action=query, format=json, formatversion=2, prop=extracts|pageimages|info,
+exintro=1, explaintext=1, exchars=300, piprop=name, inprop=url.
+고정 8개 도시의 소개와 대표 파일명을 한 번에 조회한다. 임의 사용자 검색·URL 프록시를 제공하지 않는다.
+
+Wikimedia Commons Action API:
+https://commons.wikimedia.org/w/api.php
+prop=imageinfo, iiprop=url|extmetadata, iiurlwidth=640,
+iiextmetadatafilter=Artist|LicenseShortName|LicenseUrl.
+원문 파일명을 기준으로 저작자·라이선스·썸네일을 조회한다. 검증하지 못한 사진은 제외한다.
+위키백과 소개에는 기여자·원문·CC BY-SA 4.0을, 사진에는 저작자·파일 출처·실제 라이선스를 표시한다.
+
+Wikimedia Analytics:
+https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/ko.wikipedia.org/all-access/user/{문서}/monthly/{이전월첫날00}/{최근월말일00}
+공급자의 월간 요청은 종료일이 월말이어야 최근 월 전체를 집계한다.
+월초 1~3일에는 집계 지연을 고려해 비교 범위를 한 달 더 이전으로 이동한다.
+한 도시라도 통계나 소개가 누락되면 전체 TOP 3와 증가율을 보류한다. 오류·누락을 0으로 바꾸지 않는다.
+
+공급자 요청에는 프로젝트 User-Agent와 JSON Accept만 설정한다. 사용자 토큰·프로필·여행을 보내지 않는다.
+사진은 앱이 Wikimedia 이미지 호스트에서 읽으므로 해당 이미지 호스트에 일반 이미지 요청이 발생한다.
+각 JSON 요청은 8초 시간 제한, 실제 본문 512KiB 상한, 리디렉션 거부를 적용한다.
+월간 통계 요청은 4개씩 처리한다. 정상 탐색 응답은 지역 캐시 6시간, 부분 통계 응답은 15분 보관한다.
+개인별 쿼리로 캐시 키를 분할하지 않는다. 캐시 실패는 원본 조회를 막지 않는다.
+
+3. 수정 및 추가 파일
+
+- packages/domain/src/destinations.ts, index.ts: 8개 도시와 공통 생성 기본값.
+- packages/validation/src/discovery.ts, index.ts: 도시 키·통계·소개·사진·출처 URL 응답 검증 계약.
+- packages/validation/package.json, package-lock.json: 기존 공통 도메인 패키지의 런타임 의존 관계 명시.
+- apps/api/src/discoveryProvider.ts: 공식 소개·사진 메타데이터·월간 조회 API 호출 및 공급자 검증.
+- apps/api/src/discovery.ts: 공개 데이터 조합, 후보 전체 확보 검사, 순위·증가율 계산, 지역 캐시.
+- apps/api/src/app.ts: GET /public/discovery 공개 경로 등록. 개인 여행 인증 정책 유지.
+- apps/mobile/src/features/workspace/discoveryService.ts: 인증 없는 공개 탐색 조회.
+- apps/mobile/src/features/workspace/HomeDiscovery.tsx: 월별 카드·조회 통계·도시 상세·출처·계획 진입.
+- apps/mobile/src/features/workspace/discoveryStyles.ts: 카드·사진·통계·상세 화면 스타일.
+- apps/mobile/src/features/workspace/HomeScreen.tsx: 여행지 탐색을 메인 상단에 배치.
+- apps/mobile/src/features/workspace/homeDestinations.ts: 신규 도시를 기존 여행 생성 허용 목록에 추가.
+- apps/api/test/discovery.test.ts: 완료 월·공개 인증 경계·누락·본문 상한·라이선스·목적지 생성 계약 검사.
+- tests/web/workspace.spec.ts: 카드 상세→게스트 시작→동일 목적지 계획, API 실패/부분 통계 복구 사용자 검사.
+- scripts/verify-discovery-live.ts: 실제 공개 API 읽기 검증. .release/discovery-live.json에 공개 결과 저장.
+- docs/DB_DICTIONARY.txt: 신규 객체·필드·타입·제약·캐시·편집 선정 기준 기록.
+- README.md 및 이 보고: 현재 연결 범위와 배포 상태 안내.
+- docs/PLAY_INTERNAL_READINESS_20261012.txt: 최신 탐색 기능과 검증 보고 연결.
+- outputs/discovery/20261012-home-live.png, 20261012-detail-live.png: 실제 공개 응답을 사용한 로컬 화면 확인 자료.
+
+DB 테이블·마이그레이션·유료 공급자 키·외부 패키지를 추가하지 않았다.
+기존 앱의 기록 통화 지원은 KRW/JPY/USD다. 일본은 JPY, 신규 비일본 탐색 도시는 USD 기본값을 사용한다.
+현지 통화 지원이나 자동 환전을 추가한 것이 아니다. 모든 탐색 도시의 생성 계약을 검사한다.
+기존 로그인 디자인·기기 게스트·비회원 공개 탐색 작업은 유지했다.
+
+4. 검증 상태
+
+- 실제 공개 API 읽기: 도시 소개 8개, 저작자·라이선스 확인 사진 7개, 2026-08/09 두 완료 월 통계 확보.
+- 실제 데이터 결과는 .release/discovery-live.json에 보관한다. 테스트용 응답을 실제 연결 증거로 사용하지 않았다.
+- npm run check: TypeScript 엄격 검사·ESLint·Prettier 모두 통과.
+- npm run test:foundation: 65개 통과. 신규 공개 탐색 API 검사 7개 포함.
+- npm run test:workspace:web: 브라우저 사용자 흐름 25개 통과. 일반 웹 번들 복원 완료.
+- npm run api:build: Worker dry-run 빌드 통과. 원격 배포는 수행하지 않음.
+- npm run mvp:prepare: Android Hermes 번들 1개, 모듈 1,597개, 자산 52개 생성 통과.
+  이 검사는 APK/AAB 설치·실기기 실행 검사를 대신하지 않는다.
+- npx --no-install tsx scripts/verify-discovery-live.ts: 실제 공개 API 응답 검증 통과.
+  2026-09 문서 조회 TOP 3는 나고야·싱가포르·도쿄, 증가 도시는 나고야·오사카로 확인됨.
+- 실제 응답 파일을 로컬 웹 화면에 연결해 Wikimedia 사진 로딩과 도시 상세 출처 표시를 확인했다.
+  outputs/discovery의 두 화면 자료는 이 실제 응답 기반이며, 원격 배포 완료 증거가 아니다.
+- git diff --check: 통과.
+
+5. 남은 범위
+
+- 공공데이터포털 인증키·활용 승인 이후 실제 항공/관광 통계 API를 별도로 연결해야 한다.
+  항공 여객 통계에는 외국인·비관광 목적·왕복 집계 등이 포함될 수 있으므로 한국인 관광객 수로 이름을 바꾸지 않는다.
+- 실제 방문객 순위를 추가할 때 국가/도시 단위, 출발 범위, 집계 기간, 국적, 관광 목적 여부를 먼저 확인한다.
+- 이번 변경을 원격 Worker·웹이나 Play 내부 테스트 앱에 배포하지 않았다. 새 공개 API와 앱을 함께 배포해야 한다.
+- 앞선 기기 게스트 작업의 0006_unique_nicknames.sql 원격 적용도 별도로 남아 있다.
+
+공식 참고:
+https://www.mediawiki.org/wiki/API:TextExtracts
+https://www.mediawiki.org/wiki/API:Imageinfo
+https://doc.wikimedia.org/generated-data-platform/aqs/analytics-api/reference/page-views.html
+https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy
+https://developers.cloudflare.com/workers/runtime-apis/cache/
+
+최종 확인: 코드·자동 검사 90개·웹/Android 번들·Worker dry-run·실제 공개 API 응답 및 화면 확인 완료.
+원격 API/앱 배포와 Play 내부 테스트 실기기 인수는 미실시.

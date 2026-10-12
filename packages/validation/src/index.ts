@@ -122,3 +122,13 @@ export {
 export * from './workspace';
 export * from './mapsShare';
 export { isCalendarDate } from './foundation';
+export * from './workspaceModel';
+export {
+  discoverySchema,
+  discoveryCitySchema,
+  discoveryImageSchema,
+  discoveryKeySchema,
+  discoveryUrl,
+  type DestinationDiscovery,
+  type DiscoveryCity,
+} from './discovery';

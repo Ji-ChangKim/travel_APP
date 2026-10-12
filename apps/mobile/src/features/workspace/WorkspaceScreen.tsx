@@ -53,6 +53,7 @@ import {
   memberRoleLabel,
   workspaceSections,
 } from './presentation';
+import { isMembershipRequired } from '@/services/guestWorkspaceClient';
 
 // 실패한 인식 초안에 공개 상태에 따른 복구 안내만 추가한다.
 function receiptScanFailure(
@@ -76,29 +77,31 @@ function receiptScanFailure(
 // API 실패를 입력 보존·재인증·충돌 안내로 바꾼다.
 export function workspaceError(error: unknown): string {
   // 내부 SQL과 인증 토큰은 표시하지 않는다.
-  return error instanceof FoundationClientError
-    ? error.status === 409
-      ? '다른 동행이 내용을 변경했습니다. 새로고침 후 다시 작성해 주세요.'
-      : error.status === 401
-        ? '로그인이 만료되었습니다. 다시 로그인해 주세요.'
-        : error.status === 403
-          ? '이 여행을 변경할 권한이 없습니다.'
-          : error.status === 410
-            ? '초대가 만료되었거나 취소되었습니다.'
-            : error.status === 503
-              ? '잠시 연결할 수 없어요. 조금 뒤에 다시 시도해 주세요.'
-              : error.status === 422
-                ? '날짜와 입력한 내용을 확인해 주세요.'
-                : '저장하지 못했어요. 입력한 내용은 그대로 있으니 다시 저장해 주세요.'
-    : error instanceof TypeError
-      ? '연결이 끊겼어요. 입력한 내용은 그대로 있으니 다시 시도해 주세요.'
-      : error instanceof Error
-        ? error.name === 'ZodError'
-          ? '날짜, 필수 항목, 금액 형식을 확인해 주세요.'
-          : /[가-힣]/.test(error.message)
-            ? error.message
-            : '진행하지 못했어요. 잠시 후 다시 시도해 주세요.'
-        : '연결을 확인하고 재시도해 주세요.';
+  return isMembershipRequired(error)
+    ? '이 기능은 회원가입 후 사용할 수 있어요. 기기의 여행 기록은 그대로 보관돼요.'
+    : error instanceof FoundationClientError
+      ? error.status === 409
+        ? '다른 동행이 내용을 변경했습니다. 새로고침 후 다시 작성해 주세요.'
+        : error.status === 401
+          ? '로그인이 만료되었습니다. 다시 로그인해 주세요.'
+          : error.status === 403
+            ? '이 여행을 변경할 권한이 없습니다.'
+            : error.status === 410
+              ? '초대가 만료되었거나 취소되었습니다.'
+              : error.status === 503
+                ? '잠시 연결할 수 없어요. 조금 뒤에 다시 시도해 주세요.'
+                : error.status === 422
+                  ? '날짜와 입력한 내용을 확인해 주세요.'
+                  : '저장하지 못했어요. 입력한 내용은 그대로 있으니 다시 저장해 주세요.'
+      : error instanceof TypeError
+        ? '연결이 끊겼어요. 입력한 내용은 그대로 있으니 다시 시도해 주세요.'
+        : error instanceof Error
+          ? error.name === 'ZodError'
+            ? '날짜, 필수 항목, 금액 형식을 확인해 주세요.'
+            : /[가-힣]/.test(error.message)
+              ? error.message
+              : '진행하지 못했어요. 잠시 후 다시 시도해 주세요.'
+          : '연결을 확인하고 재시도해 주세요.';
 }
 // 소수 금액을 정수 센트로 합산해 통화별로 표시한다.
 function totals(expenses: WorkspaceExpense[], actual: boolean): string {
@@ -407,9 +410,13 @@ function WorkspaceContent({
   // 등록한 비공개 원본의 인식 상태를 확인 화면에 연결한다.
   function receipt(mediaId: string): Promise<unknown> {
     // 권한·일정 스냅샷이 있는 현재 화면만 인식 요청을 시작한다.
-    return scanning || !snapshot
-      ? Promise.resolve()
-      : beginReceiptScan(mediaId);
+    return user?.authProvider === 'guest' && snapshot
+      ? Promise.resolve(
+          setForm(receiptForm(snapshot, mediaId, undefined, 'manual')),
+        )
+      : scanning || !snapshot
+        ? Promise.resolve()
+        : beginReceiptScan(mediaId);
   }
   // 인식 중 화면과 실제 서버 요청 하나를 연결한다.
   function beginReceiptScan(mediaId: string): Promise<unknown> {
@@ -598,6 +605,21 @@ function WorkspaceContent({
         contentContainerStyle={hub.content}
         keyboardShouldPersistTaps="handled"
       >
+        {user?.authProvider === 'guest' && (
+          <View style={styles.card}>
+            <Text>
+              게스트 여행은 이 기기에만 저장돼요. 다른 기기에서는 볼 수 없으며
+              앱이나 저장 데이터를 삭제하면 복구할 수 없어요.
+            </Text>
+            <Action
+              label="로그인 / 회원가입"
+              onPress={() => {
+                // 기기 여행을 자동 업로드하지 않고 회원 인증을 선택하게 한다.
+                return router.push('/login');
+              }}
+            />
+          </View>
+        )}
         {id && (
           <Action
             label="내 여행 목록"

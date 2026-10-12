@@ -1396,8 +1396,113 @@ onboardingCompleted optional boolean: guest 또는 profiles.onboarding_completed
 객체 CloudUser.isAnonymous optional boolean: 인증 서버의 실제 게스트 상태.
 서버 profile 응답은 위 신규 항목을 항상 포함. 앱의 임의 ID/성별/플랫폼 입력으로 회원 식별값을 수정할 수 없음.
 
-기기 객체/DB 없음: tripprint.oauth.verifier.v1 SecureStore 또는 웹 sessionStorage 검증자 string.
+기기 인증 객체: tripprint.oauth.verifier.v1 SecureStore 또는 웹 sessionStorage 검증자 string.
 tripprint.notifications.asked.v1 SecureStore 'true': 알림 권한 안내의 나중에/허용 선택을 기억.
 알림 예약 identifier tripprint:{userId}:{tripId}: 실제 예정 여행의 출발일 09:00 기기 시간대 로컬 알림.
 알림 권한은 운영체제 원본으로 확인하며 계정 종료 후 기존 회원의 예약은 철회.
+======================================================================
+
+======================================================================
+2026-10-12 기기 게스트 및 전체 회원 닉네임 고유성
+
+DB명: Cloudflare D1 wherego-staging (운영은 해당 환경 DB). 스키마 파일: apps/api/migrations/0006_unique_nicknames.sql.
+테이블명: user (기존 인증 회원 테이블 공용).
+id TEXT PRIMARY KEY: 게스트·회원의 서버 발급 UUID. 닉네임 자체를 계정 식별자나 인증 비밀로 사용하지 않는다.
+name TEXT NOT NULL: 전체 회원·게스트 공개 닉네임. 새 게스트는 Quest-[A-Z0-9]{6}.
+isAnonymous INTEGER NOT NULL DEFAULT 0: 1=구글 인증 없는 기기 게스트, 0=이메일·소셜 회원.
+email TEXT NOT NULL UNIQUE: 게스트는 Better Auth 생성 자리표시자 주소. Google 계정 연결을 의미하지 않는다.
+createdAt / updatedAt INTEGER NOT NULL: 생성·갱신 UTC 밀리초. 기존 session 테이블로 서버 세션을 관리한다.
+인덱스 user_nickname_unique: UNIQUE INDEX user(lower(trim(name))). 회원·게스트·모든 인증 방식 공통.
+앞뒤 공백 제거 및 ASCII 대소문자를 무시한 비교. 영문 대문자/소문자만 다른 닉네임은 중복.
+신규 이메일 가입·SNS 초기 이름·게스트 이름 발급·프로필 수정에서 고유성 확인. DB 제약이 동시 요청의 최종 중복을 차단한다.
+게스트 접미사 문자 집합 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789, 6자리: 총 36^6=2,176,782,336 조합.
+난수는 Web Crypto 거절 표본 추출로 생성하며, 기존 회원이 같은 형식의 이름을 사용하면 해당 후보도 제외한다.
+후보 사전 중복 시 제한 횟수 내 재생성. 동시 INSERT 충돌은 DB에서 거부하며 실패를 성공으로 처리하지 않는다.
+마이그레이션은 기존 동일 닉네임의 첫 계정을 유지하고 이후 계정에 UUID 접미사를 붙여 구분한다.
+기존 user.name 앞뒤 공백도 제거한다. 기존 posts.snapshot.author와 trips.snapshot.members[].nickname을 계정 이름과 맞춘다.
+여행 snapshot.trip.version 및 trips.version을 함께 1 증가시켜 이전 화면의 저장 충돌을 감지한다.
+이전 계정 UUID·여행 ID·세션·여행 내용은 보존한다. 최종 고유 인덱스 생성 실패 시 전체 적용을 롤백해야 한다.
+
+객체명: StoredGuestProfile (apps/mobile/src/services/guestAuthService.ts).
+저장소: Android/iOS SecureStore, 웹 localStorage. 키 wherego_guest_profile_session.
+id UUID string NOT NULL: 실제 D1 발급 게스트. 임의 날짜 기반 guest-* ID 사용 금지.
+nickname string length 1~50 NOT NULL: DB에서 발급·변경 확정한 닉네임.
+authProvider literal 'guest' NOT NULL; createdAt / updatedAt ISO string NOT NULL.
+active boolean NOT NULL DEFAULT true: 현재 기기에서 게스트로 이어갈지 여부. 회원 로그인·로그아웃 시 false.
+active=false는 프로필·여행 원본 삭제를 뜻하지 않는다. 같은 기기에서 게스트 재선택 시 기존 게스트를 다시 연다.
+로컬 복원은 원격 API 로그인 성공이 아니다. 장소 검색·프로필 수정 등 서버 기능은 별도의 유효한 서버 세션 필요.
+
+객체명: GuestWorkspace (apps/mobile/src/services/guestWorkspaceModel.ts).
+DB 없음: 게스트 계정 관리만 D1에 저장하며, 이 문서 및 사진은 서버에 보내지 않는다.
+웹 키 tripprint-guest-{userId}; 네이티브 Paths.document/tripprint-guest-{userId}.json.
+version literal 1 NOT NULL: 로컬 문서 형식 버전.
+ownerId UUID string NOT NULL: 문서 소유 게스트 UUID. 현재 프로필 UUID와 일치해야 한다.
+trips WorkspaceSnapshot[] NOT NULL: 기존 WorkspaceSnapshot과 동일한 여행·DAY·항공편·일정·비용·준비물·사진·영수증 구조.
+requests Record<UUID,{signature:string,data:Record<string,unknown>}> NOT NULL:
+  키=Idempotency-Key UUID, signature=경로·메서드·본문·버전의 JSON 문자열, data=성공 응답.
+  동일 요청 재시도는 기존 결과를 반환. 같은 키의 다른 입력은 409 REQUEST_KEY_REUSED.
+  여행 변경과 요청 기록을 하나의 파일/키에 저장. 버전 충돌은 409 VERSION_CONFLICT.
+files Record<string,{uri:string,mimeType:'image/jpeg'|'image/png'}> NOT NULL:
+  키={tripUUID}/{mediaUUID}.jpg 또는 .png, 등록할 기기 사진·영수증의 원본 위치.
+  웹 uri=data:image/...;base64 원본, 네이티브 uri=기기 문서 파일.
+  네이티브 파일명 tripprint-guest-photo-{guestUUID}-{mediaUUID}.jpg 또는 .png.
+  서버의 signed URL이나 R2 업로드 경로를 원본으로 사용하지 않는다.
+  명시적 사진 삭제와 영수증 정보만 저장 선택 후 참조와 원본을 제거한다.
+네이티브 JSON은 .pending.json을 먼저 쓴 다음 overwrite 이동한다. 계정별 쓰기 큐로 동시에 오는 변경을 직렬화한다.
+읽기 오류와 쓰기 오류는 성공으로 바꾸거나 기존 여행을 빈 문서로 덮어쓰지 않는다.
+앱의 Android allowBackup=false. 다른 기기에서 같은 이름을 입력해도 여행을 복원하는 로그인 수단이 없다.
+게스트의 초대·동행 변경·커뮤니티 공개는 403 MEMBERSHIP_REQUIRED. 개인 여행 원본을 자동 서버 업로드하지 않는다.
+게스트 영수증은 기기 사진 보관 후 직접 입력·확정. 자동 OCR 업로드는 수행하지 않는다.
+회원으로 전환해도 기존 기기 여행을 자동 업로드하지 않으며, 같은 기기에서 게스트를 다시 선택하면 이어갈 수 있다.
+
+공통 여행 규칙: packages/validation/src/workspaceModel.ts.
+Snapshot=WorkspaceSnapshot, Change={snapshot,result,post?,invite?}; WorkspaceId=()=>string UUID 생성기 주입.
+WorkspaceModelError.code enum ROLE_FORBIDDEN/TRIP_ARCHIVED/VALIDATION_FAILED.
+서버는 Web Crypto, 앱은 Expo Crypto를 사용하며 동일한 생성·변경 규칙을 검증한다. 저장소별 인증·원자성 처리는 분리한다.
+======================================================================
+======================================================================
+2026-10-12 메인 여행지 탐색 공개 API 객체
+
+DB명/테이블명: 신규 DB 테이블 없음. Cloudflare 지역 Cache API tripprint-discovery-v1에 공개 공급자 응답만 임시 보관.
+경로 GET /public/discovery: 로그인·익명 계정 발급 없이 조회. 개인 여행·프로필·토큰을 공급자 조회에 사용하지 않음.
+캐시 키 /_discovery-cache/v1/{이전완료월}_{최근완료월}: 사용자 쿼리·인증 헤더와 무관한 동일 키.
+정상 통계 캐시 21,600초, 부분 통계 캐시 900초. 실패 응답은 저장하지 않음. 클라이언트 조회 staleTime 1,800,000ms.
+
+객체 DiscoveryDestination (packages/domain/src/destinations.ts): 고정 후보 8개.
+key literal tokyo/osaka/nagoya/bangkok/shanghai/taipei/danang/singapore UNIQUE: 생성 폼으로 전달할 검증 키.
+city/country string NOT NULL: 앱의 여행 국가·도시 입력값. article string NOT NULL: 한국어 위키백과 원문 제목.
+timezone IANA string NOT NULL: 기존 여행 생성 검증이 지원하는 시간대. 다낭은 Asia/Saigon.
+currency JPY|USD NOT NULL: 앱에서 지원하는 기록 통화 기본값. 일본 JPY, 그 외 신규 탐색 도시 USD.
+  현지 통화나 자동 환전 정보를 의미하지 않음. 기존 지원 KRW/JPY/USD 범위를 확장하지 않음.
+theme string NOT NULL: 운영자가 작성한 여행 아이디어. 실시간 인기·날씨·항공권 정보를 의미하지 않음.
+
+객체 DestinationDiscovery (packages/validation/src/discovery.ts).
+fetchedAt ISO UTC datetime NOT NULL: 공식 공급자에서 읽은 시각. 캐시 조회에서는 원본 조회 시각 유지.
+period / previousPeriod YYYY-MM string NOT NULL: 최근 및 이전 완료 월. UTC 월초 1~3일에는 집계 지연을 고려해 한 달 더 이전 범위 사용.
+statisticsAvailable boolean NOT NULL: 선정 8개 도시 모두 소개와 두 달 조회 버킷을 확보한 경우만 true.
+cities DiscoveryCity[] NOT NULL length 1~8: 실제 문서가 존재하는 도시만 포함.
+mostRead discoveryKey[] NOT NULL length 0~3: 같은 후보군의 최근 완료 월 문서 조회 상위 3개.
+rising discoveryKey[] NOT NULL length 0~3: 이전 완료 월 100회 이상이고 조회 수가 증가한 도시의 증가율 상위 3개.
+통계 일부 누락 시 mostRead/rising은 모두 빈 배열이며 누락 값을 0으로 채우지 않음.
+이 순위는 한국어 위키백과 문서 조회 통계다. 한국인 방문객·예약·출국 순위로 해석하지 않음.
+
+객체 DiscoveryCity.
+key discoveryKey NOT NULL: 고정 카탈로그 키.
+excerpt string NOT NULL length 1~1000: API exintro/explaintext/exchars=300 원문 소개 일부. HTML 렌더링 없음.
+sourceUrl HTTPS URL NOT NULL: ko.wikipedia.org 원문 문서 링크. 위키백과 기여자·CC BY-SA 4.0 표기.
+image DiscoveryImage|null: 라이선스·저작자·허용 호스트 검증을 통과한 사진만 포함.
+currentViews / previousViews integer >=0|null: Wikimedia Analytics all-access/user 월간 문서 조회 수.
+  봇 집계를 제외하며 실제 0회와 API 버킷 누락(null)을 구분. 월간 종료일은 최근 완료 월의 말일.
+
+객체 DiscoveryImage.
+url HTTPS URL NOT NULL: upload.wikimedia.org 또는 thumb.wikimedia.org 썸네일만 허용.
+sourceUrl HTTPS URL NOT NULL: commons.wikimedia.org의 파일 출처 페이지.
+author string NOT NULL length 1~500: extmetadata.Artist HTML 태그 제거 후 일반 텍스트 표시.
+license string NOT NULL length 1~100: CC BY/CC BY-SA 1.0~4.0, CC0 또는 Public domain 허용 목록.
+licenseUrl HTTPS URL NOT NULL: creativecommons.org. URL·저작자 누락과 비상업/불명 라이선스는 사진 제외.
+사진 요청 실패는 원문 소개·여행 생성 흐름을 막지 않음. 원본 이미지는 DB/R2에 복사하지 않음.
+
+화면 편집 데이터: apps/mobile/src/features/workspace/HomeDiscovery.tsx ideas 배열.
+12개월별 도시 키 3개. '이달의 여행 아이디어'는 편집 선정이며 계절·기후 API 추천이나 실제 방문 순위가 아님.
+도시 상세에서 선택한 키는 기존 로그인/게스트 시작을 거쳐 new-trip?destination={key}로 유지.
 ======================================================================

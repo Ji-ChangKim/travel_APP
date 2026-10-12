@@ -19,6 +19,8 @@ const config: ExpoConfig = {
     // Play Console에 등록된 TripPrint 앱과 동일한 Android 식별자로 빌드한다.
     package: 'com.tripprint.app',
     versionCode: 1,
+    // 기기 전용 게스트 기록을 Android 자동 백업에 포함하지 않는다.
+    allowBackup: false,
     adaptiveIcon: {
       backgroundColor: '#FF6B57',
       foregroundImage:

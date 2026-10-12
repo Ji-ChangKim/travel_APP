@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <!-- Android Studio의 Run 버튼으로 앱 모듈을 빌드하고 기본 화면을 실행한다. -->
+  <configuration default="false" name="TripPrint" type="AndroidRunConfigurationType" factoryName="Android App">
+    <module name="TripPrint.app" />
+    <option name="DEPLOY" value="true" />
+    <option name="DEPLOY_APK_FROM_BUNDLE" value="false" />
+    <option name="MODE" value="default_activity" />
+    <method v="2">
+      <option name="Android.Gradle.BeforeRunTask" enabled="true" />
+    </method>
+  </configuration>
+</component>

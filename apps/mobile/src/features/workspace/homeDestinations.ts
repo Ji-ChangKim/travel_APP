@@ -1,3 +1,5 @@
+import { discoveryDestinations } from '@wherego/domain';
+
 // 첫 화면의 목적지 선택은 인기 순위가 아닌 여행 생성 입력 예시다.
 export const homeDestinations = [
   {
@@ -32,6 +34,15 @@ export const homeDestinations = [
     currency: 'KRW',
     icon: 'map-outline',
   },
+  ...discoveryDestinations
+    .filter((destination) => {
+      // 기존 선택지와 중복되지 않는 탐색 도시를 생성 폼에서도 제공한다.
+      return destination.key !== 'tokyo' && destination.key !== 'osaka';
+    })
+    .map((destination) => {
+      // 나라·도시·시간대·통화를 카탈로그에서 그대로 전달한다.
+      return { ...destination, icon: 'map-outline' as const };
+    }),
 ] as const;
 
 // URL의 목적지 입력을 앱이 제공하는 고정 선택지로 한정한다.

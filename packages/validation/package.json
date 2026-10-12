@@ -5,6 +5,7 @@
   "types": "src/index.ts",
   "private": true,
   "dependencies": {
+    "@wherego/domain": "^0.1.0",
     "zod": "^3.24.2"
   }
 }

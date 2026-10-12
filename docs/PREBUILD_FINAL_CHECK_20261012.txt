@@ -1,0 +1,125 @@
+TripPrint 빌드 전 최종 점검
+점검일: 2026-10-12 / Windows 로컬 작업 디렉터리 기준
+
+1. 최종 판정
+자동 코드·기능 검사는 통과했다. Windows 네이티브 컴파일과 Android Studio Sync는 실패했다.
+현재 위치에서 Run 버튼 빌드 및 Play 배포 준비 완료로 판정하지 않는다.
+staging에는 새 여행지 API와 이번 웹 후보가 아직 적용되지 않았다.
+
+2. 이번에 다시 실행한 검사
+- npm run check: 통과, 종료 코드 0. TypeScript / ESLint / Prettier 모두 통과.
+- npm run mvp:check: 통과. 공개 설정 검사이며 원격 기능 성공을 의미하지 않는다.
+- npm run release:check: 통과. 로컬 배포 설정 검사이며 업로드 서명 확인은 아니다.
+- npm run test:auth: 24개 통과.
+- npm run test:release: 30개 통과.
+- npm run test:foundation: 65개 통과.
+- npm run test:cloud: 11개 통과. 로컬 Workers / D1 / R2 런타임 검증이다.
+- npm run test:workspace:web: 28개 통과. 테스트 웹 번들 생성과 검사 후 일반 웹 번들 복원까지 종료 코드 0.
+  추천 슬라이드 자동 순환·멈춤·직접 이동, 동작 줄이기, 백그라운드,
+  게스트 기기 저장, 회원 여행·일정·영수증·커뮤니티 흐름 등을 포함한다.
+- 총 자동 테스트: 158개 통과. 실제 Google 동의·Android 촬영·실기기 성능 인수를 대신하지 않는다.
+- git diff --check 및 git diff --cached --check: 오류 없음.
+- 추적 중인 .env / .env.mvp / .env.release / *.jks / *.keystore 파일: 없음.
+  전체 비밀 문자열 검사나 GitHub Secrets 확인으로 확대 해석하지 않는다.
+
+실행 환경 주의:
+샌드박스의 자동 연결 검사는 모듈 목록이 비어 2개 실패했고, 로컬 Workers는 시작에 실패했다.
+동일 검사 코드를 변경하지 않고 정상 권한 환경에서 재실행하여 각각 30개 / 11개 통과를 확인했다.
+실패를 무시하거나 테스트 조건을 완화하지 않았다.
+
+3. Android 환경 및 실제 실패 원인
+- 네이티브 프로젝트: apps/mobile/android. 저장소 루트의 android 폴더가 아니다.
+- Android 앱 식별자: com.tripprint.app / versionName 0.1.0 / 로컬 versionCode 1.
+- Gradle 9.3.1 / Microsoft JDK 21.0.8 / SDK API 36 / Build Tools 36.0.0.
+- NDK 27.1.12297006 / CMake 3.22.1 설치 확인.
+- 생성 manifest: allowBackup=false, travelapp 딥링크, 기본 Activity, text/plain 공유 인텐트 확인.
+- 기존 :app:tasks 성공은 작업 등록 확인이다. APK 컴파일 성공을 뜻하지 않는다.
+- Android Studio 실제 Sync: 12분 23초 후 실패. react-native-worklets C++ PCH 컴파일에서
+  한글 경로가 잘못 인코딩되어 WorkletsPCH.h를 열지 못했다.
+- android.overridePathCheck=true는 AGP 사전 검사만 우회한다. 위 C++ 오류를 해결하지 못한다.
+- 이전 assembleDebug는 의존성 다운로드에서 장시간 대기했다. 스레드 덤프를 확인한 뒤
+  이번 작업이 시작한 CLI 빌드 프로세스만 중단했다. APK 생성은 확인되지 않았다.
+- T: 가상 드라이브로 원본을 연결해 C++ 모듈을 재검증했다.
+  첫 검사 2분 22초 실패, 자동 연결 캐시를 백업하고 재생성한 검사도 53초 후 같은 오류로 실패했다.
+  앱 루트는 T:로 바뀌었지만 Expo 자동 연결의 의존성 경로가 실제 J: 한글 경로로 돌아갔다.
+  따라서 이 프로젝트에서는 subst만으로 해결됐다고 안내하지 않는다.
+- 실험 생성 캐시는 .release에 보관하고 원래 자동 연결 캐시를 복원했다. T: 매핑도 해제했다.
+- Android Studio의 TripPrint.app Run 설정 파일은 존재하나, Sync 실패로 실제 모듈 연결은 미검증이다.
+- 설치 가능한 APK/AAB, 에뮬레이터 앱 실행, Android 성능: 이번 점검에서 성공 증거 없음.
+
+다음 Windows 빌드 조치:
+원본 미커밋 변경을 보존한 영문·공백 없는 실제 경로의 별도 체크아웃/복사본에서
+의존성을 새로 설치하고 Expo prebuild 및 Gradle assembleDebug를 검증해야 한다.
+예: J:/travel_APP 또는 C:/src/travel_APP. 가상 드라이브나 원본을 가리키는 junction만으로 대체하지 않는다.
+원본 작업 디렉터리는 이동하지 않았다. 새 경로를 마련한 후 Android Studio에서 해당 apps/mobile/android를 연다.
+JDK 21과 SDK 경로를 연결하고 Sync 성공 → TripPrint 앱 모듈 선택 → 기기 선택 → Run 순으로 검증한다.
+개발용 debug 실행에는 .env.mvp 공개 설정을 사용하는 Metro가 필요하다.
+현재 이전 Metro 프로세스는 CI 모드로 시작되어 reload가 비활성화되어 있다. 개발 시 CI 없이 재시작한다.
+Play용 빌드는 기존 GitHub Linux Gradle 경로를 사용할 수 있으나 현재 미커밋 소스를 반영한 새 실행이 필요하다.
+
+4. 원격 읽기 점검
+- staging API /health: HTTP 200, status=ok.
+- staging API /public/discovery: HTTP 404. 새 추천 여행지 API 미반영.
+- staging 웹 /release.json: HTTP 200, release=test-1-google-auth / releaseDate=2026-10-07.
+- 로컬 후보: mvp-0.1.0-internal-candidate-20261012 / releaseDate=2026-10-12.
+- 새 닉네임 고유 제약 migration 0006 및 API 원격 적용 완료는 확인하지 않았다.
+  현재 원격 DB를 직접 조회하거나 변경하지 않았다.
+- Google 로그인 계정 선택·동의·앱 복귀와 실제 Places 조회는 실기기 인수가 남아 있다.
+
+5. Play 내부 테스트 전 남은 항목
+차단 / 확인 필요:
+1) 로컬 Windows 네이티브 경로 문제 해결 및 실제 APK 시작 검증.
+2) 새 API·0006 migration·동일 웹 후보 staging 적용 후 추천 API와 게스트 닉네임 발급 검증.
+3) 현재 소스를 반영한 AAB 빌드, 기존 Play 업로드 키 서명, Play 최고값보다 큰 versionCode 확인.
+   로컬 versionCode=1을 그대로 기존 Play 업데이트에 제출하지 않는다.
+4) 내부 테스터 설치, Google 가입·재로그인, 게스트 오프라인 기록, 영수증 촬영,
+   커뮤니티 게시·다른 계정 조회·철회 및 비공개 접근 거부 검증.
+5) 동일 설치 빌드의 콜드 시작·프레임·메모리 등 Android 성능 측정.
+
+기존 미완료 범위:
+- Google 계정 저장 목록 직접 동기화.
+- 이메일 소유 확인, 비밀번호 재설정/계정 복구, 회원 탈퇴·관련 데이터 삭제.
+- 실제 한국인 방문객 TOP 3 통계 API. 현재 탐색 통계는 위키백과 관심 지표다.
+세부 근거와 요구사항은 PLAY_INTERNAL_READINESS_20261012.txt를 함께 확인한다.
+
+Expo 버전 검사:
+expo install --check는 패치 업데이트 4개를 권고하며 종료 코드 1이었다.
+expo 57.0.26 → ~57.0.27
+expo-image-manipulator 57.0.20 → ~57.0.21
+expo-linking 57.0.11 → ~57.0.12
+expo-router 57.0.24 → ~57.0.25
+이번 검사 중 의존성 버전은 변경하지 않았다. 현재 C++ 경로 오류의 수정으로 취급하지 않는다.
+패치 업데이트를 적용하면 npx expo install을 사용하고 네이티브 재생성·자동 검사를 다시 진행한다.
+
+6. 이번 변경 내역
+- 이 최종 점검 보고서를 추가했다.
+- ANDROID_STUDIO_LINK_CHECK_20261012.txt에 SDK 설치 및 실제 Sync/C++ 실패 후속 결과를 추가했다.
+- 임시 T: 매핑 생성·검증·해제를 수행했다. 자동 연결 캐시는 백업 후 원상 복원했다.
+- 자동 검사 로그, 일반 웹 번들, Gradle/CMake 생성 캐시와 진단 자료가 갱신됐다.
+- 앱 소스, DB 모델, 의존성 선언, Run 설정, JDK/SDK 설정은 이번 턴에 수정하지 않았다.
+- 기존 staged/unstaged 작업은 보존했다. 커밋·푸시·원격 배포·Play 제출은 실행하지 않았다.
+
+7. 진단 자료 (Git 제외)
+.release/final-check.log
+.release/final-release.log
+.release/final-cloud-retry.log
+.release/final-workspace-web.log
+.release/final-gradle-threads.txt
+.release/final-native-path-check.log
+.release/final-native-path-retry.log
+.release/android-studio-debug-build.log
+인증 24개 및 서버 기능 65개 검사는 실행 도구 출력에서 통과를 확인했다.
+
+참고 공식 문서:
+https://docs.swmansion.com/react-native-reanimated/docs/guides/building-on-windows/
+https://developer.android.com/build/jdks
+https://docs.expo.dev/guides/local-app-development/
+
+2026-10-12 실제 영문 경로 후속 검증
+- 위 Windows 네이티브 빌드 차단 판정은 한글 원본 경로에서의 기록이다.
+- 실제 빌드 복사본 J:/travel_APP에서 의존성 재설치·prebuild 후 ARM64/x86_64 전체 debug APK 빌드에 성공했다.
+- API 37 x86_64 에뮬레이터 설치와 TripPrint 시작 화면 렌더링을 확인했다.
+- 복사본 npm run check / npm run mvp:check도 통과했다.
+- 원본 경로를 이동한 것은 아니며 복사본은 원본과 자동 동기화되지 않는다.
+- Play 서명 AAB·원격 API 배포·인증 및 전체 이용 사이클 인수 미완료 상태는 그대로다.
+- 상세 결과와 Android Studio 사용 경로: ANDROID_WINDOWS_ASCII_FIX_20261012.txt.

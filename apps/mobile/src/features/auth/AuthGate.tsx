@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { usePathname, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthReady } from './AuthBridge';
+import { isPublicBrowsePath } from './publicRoutes';
 import { useTripStore } from '@/stores/useTripStore';
 import { fetchUserProfile } from '@/services/profileService';
 import * as Linking from 'expo-linking';
@@ -74,7 +75,9 @@ function useGateEffects(
         path !== '/login' &&
         path !== '/'
         ? !user
-          ? routeToLogin(path, url, router)
+          ? isPublicBrowsePath(path)
+            ? undefined
+            : routeToLogin(path, url, router)
           : !user.onboardingCompleted &&
               profile?.id === user.id &&
               !profile.onboardingCompleted &&

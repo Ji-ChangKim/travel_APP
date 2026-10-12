@@ -64,7 +64,9 @@ export default function ReceiptReview({
             : '사진에서 읽은 내용이에요'}
         </Text>
         <Text style={styles.subtitle}>
-          맞게 읽었는지 확인하면 장소와 실제 지출이 함께 기록돼요.
+          {form.values.receiptStatus === 'manual'
+            ? '영수증 정보를 입력하고 확인하면 장소와 실제 지출이 함께 기록돼요.'
+            : '맞게 읽었는지 확인하면 장소와 실제 지출이 함께 기록돼요.'}
         </Text>
         <Text style={styles.title}>
           {form.values.merchant || '상호 확인 필요'}

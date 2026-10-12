@@ -3,6 +3,7 @@ import type { Hono, Context } from 'hono';
 import { database } from './cloudStore';
 import { rejectRequest } from './errors';
 import type { ApiEnvironment } from './types';
+import { nicknameExists } from './nicknames';
 type Ctx = Context<ApiEnvironment>;
 const inputSchema = z
   .object({
@@ -92,29 +93,57 @@ function update(c: Ctx): Promise<Response> {
 // 검증한 본인 프로필 값을 확정한다.
 function save(c: Ctx, input: z.infer<typeof inputSchema>): Promise<unknown> {
   // 닉네임 저장 성공 전 화면 상태를 변경하지 않는다.
-  return database(c.env).batch([
-    database(c.env)
-      .prepare('UPDATE user SET name=?,updatedAt=? WHERE id=?')
-      .bind(input.nickname, Date.now(), c.get('session').userId),
-    database(c.env)
-      .prepare(
-        `INSERT INTO profiles(user_id,details,gender,birth_date,onboarding_completed_at) VALUES(?,?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET
+  return nicknameExists(c.env, input.nickname, c.get('session').userId).then(
+    (exists) => {
+      // 닉네임 변경도 가입과 같은 고유 제약을 적용한다.
+      return exists
+        ? rejectRequest('NICKNAME_TAKEN')
+        : persistProfile(c, input);
+    },
+  );
+}
+
+// 검증한 이름과 개인정보를 같은 원자 저장으로 확정한다.
+function persistProfile(
+  c: Ctx,
+  input: z.infer<typeof inputSchema>,
+): Promise<unknown> {
+  // 경합 중 고유 인덱스에 거부된 변경도 안전한 중복 오류로 전달한다.
+  return database(c.env)
+    .batch([
+      database(c.env)
+        .prepare('UPDATE user SET name=?,updatedAt=? WHERE id=?')
+        .bind(input.nickname, Date.now(), c.get('session').userId),
+      database(c.env)
+        .prepare(
+          `INSERT INTO profiles(user_id,details,gender,birth_date,onboarding_completed_at) VALUES(?,?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET
         details=json_patch(details,excluded.details),gender=coalesce(excluded.gender,gender),birth_date=coalesce(excluded.birth_date,birth_date),
         onboarding_completed_at=coalesce(onboarding_completed_at,excluded.onboarding_completed_at)`,
-      )
-      .bind(
+        )
+        .bind(
+          c.get('session').userId,
+          JSON.stringify({
+            ...(input.bio !== undefined ? { bio: input.bio } : {}),
+            ...(input.travelStyles !== undefined
+              ? { travelStyles: input.travelStyles }
+              : {}),
+          }),
+          input.gender || null,
+          input.birthDate || null,
+          input.gender && input.birthDate ? Date.now() : null,
+        ),
+    ])
+    .catch((error: unknown) => {
+      // SQL 원문을 숨기고 실제 중복인 경우에만 중복 안내로 변환한다.
+      return nicknameExists(
+        c.env,
+        input.nickname,
         c.get('session').userId,
-        JSON.stringify({
-          ...(input.bio !== undefined ? { bio: input.bio } : {}),
-          ...(input.travelStyles !== undefined
-            ? { travelStyles: input.travelStyles }
-            : {}),
-        }),
-        input.gender || null,
-        input.birthDate || null,
-        input.gender && input.birthDate ? Date.now() : null,
-      ),
-  ]);
+      ).then((exists) => {
+        // 다른 저장 실패는 중복 오류로 오인하지 않는다.
+        return exists ? rejectRequest('NICKNAME_TAKEN') : Promise.reject(error);
+      });
+    });
 }
 
 // 존재하는 달력 날짜와 오늘 이전의 생년월일만 허용한다.

@@ -12,11 +12,15 @@ import type {
   Visit,
 } from '@wherego/domain';
 
-import { clearGuestSession } from '@/services/guestAuthService';
+import {
+  clearGuestSession,
+  loadStoredGuestSession,
+  saveGuestSession,
+} from '@/services/guestAuthService';
 import { signOutUser } from '@/services/authService';
 import { accountChangeState } from '@/features/auth/model';
 import { guestSession } from '@/services/guestSession';
-import { cloudProfile, getCloudSession } from '@/services/cloudAuth';
+import { cloudProfile } from '@/services/cloudAuth';
 
 // 일차 계산 결과 데이터 구조를 정의한다.
 export interface CalculatedDay {
@@ -160,22 +164,31 @@ export const useTripStore = create<TripState>((set, get) => ({
 
   // 게스트 둘러보기 세션을 기기 안전 저장소에 영구 보관하여 앱 삭제 전까지 유지한다.
   loginAsGuest: (osPlatform) => {
-    // 서버 발급 세션만 게스트 회원으로 사용한다.
-    return guestSession().then((session) => {
-      // 인증 이벤트와 동일한 프로필을 반환한다.
-      return cloudProfile(session.user, osPlatform);
-    });
+    // 최초 발급 후에는 이 기기의 게스트 UUID와 여행을 다시 사용한다.
+    return loadStoredGuestSession(false)
+      .then((stored) => {
+        // 서버 등록이 필요한 최초 시작에만 온라인 세션을 발급받는다.
+        return (
+          stored ||
+          guestSession().then((session) => {
+            // 실제 DB 사용자로부터만 기기 프로필을 만든다.
+            return cloudProfile(session.user, osPlatform);
+          })
+        );
+      })
+      .then((profile) => {
+        // 기기 저장 성공 뒤에만 게스트 여행 화면을 허용한다.
+        return saveGuestSession(profile).then(() => {
+          // 오프라인 재진입을 원격 API 인증 성공으로 취급하지 않는다.
+          return (get().setCurrentUser(profile), profile);
+        });
+      });
   },
 
   // 기기 안전 저장소에서 기존 게스트 세션을 조회하여 복원한다.
   initGuestSession: () => {
-    // 이전 로컬 식별값 대신 서버가 확인한 익명 회원만 복원한다.
-    return getCloudSession().then((session) => {
-      // 현재 서버 세션이 익명 회원인지 확인한다.
-      return session?.user.isAnonymous
-        ? cloudProfile(session.user, 'web')
-        : null;
-    });
+    // 로컬 여행 복원은 서버 토큰의 유효 여부와 분리한다.
+    return loadStoredGuestSession();
   },
 
   // 인증된 사용자 프로필 객체로 전역 상태를 직접 갱신한다.
@@ -205,12 +218,13 @@ export const useTripStore = create<TripState>((set, get) => ({
   // 로그아웃을 수행하고 기기 게스트 세션을 해제한다.
   logout: () => {
     // 실제 Auth 세션 종료 실패를 호출자에게 전달한다.
-    return signOutUser()
+    return clearGuestSession()
+      .then(signOutUser)
       .then(({ error }) => {
         // 세션 종료를 성공한 것처럼 표시하지 않는다.
         if (error) throw error;
-        // 게스트 저장소도 정리한다.
-        return clearGuestSession();
+        // 기기 여행 원본은 삭제하지 않는다.
+        return undefined;
       })
       .then(() => {
         // 계정과 계정 소유 메모리 데이터를 함께 초기화한다.

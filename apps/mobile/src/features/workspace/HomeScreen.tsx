@@ -10,6 +10,7 @@ import { homeDestinations } from './homeDestinations';
 import HomeTripList, { continuingTrips } from './HomeTripList';
 import { homeStyles as s } from './homeStyles';
 import HomeExplore from './HomeExplore';
+import HomeDiscovery from './HomeDiscovery';
 
 interface HomeProps {
   userId: string;
@@ -53,7 +54,7 @@ function startTrip(
   );
 }
 
-// 홈의 주 행동과 실제 내 여행을 먼저 배치한다.
+// 여행지를 탐색한 뒤 계획과 실제 내 여행으로 이어지는 홈을 제공한다.
 function HomeContent({
   userId,
   trips,
@@ -91,6 +92,13 @@ function HomeContent({
             </Pressable>
           )}
         </View>
+        <HomeDiscovery
+          disabled={!ready || loading}
+          onPlan={(key) => {
+            // 도시를 살펴본 뒤 같은 목적지의 실제 여행 생성으로 이동한다.
+            return startTrip(router, userId, key);
+          }}
+        />
         <View style={s.section}>
           <Text style={s.headline}>다음 여행을 계획해 볼까요?</Text>
           <Text style={s.supporting}>

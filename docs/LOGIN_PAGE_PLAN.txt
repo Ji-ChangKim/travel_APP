@@ -1,0 +1,54 @@
+TripPrint 로그인 화면 작업 계획 — 2026-10-08
+
+1. 화면 목적
+처음 방문한 여행자가 Google 계정 또는 이메일로 가입·로그인하고 여행을 시작한다.
+사용자 제공 시안의 아이보리 배경, 여행 이미지, 산호색 제목 강조, 둥근 버튼을 React Native 화면에 적용한다.
+제공한 01_LoginPage_icon.png 원본을 앱에 포함하고 정사각 썸네일로 표시한다.
+
+2. 노출할 인증 방법
+Google 계정으로 계속하기: 기존 서버 OAuth와 시스템 인증 브라우저·앱 복귀를 사용한다.
+이메일 계정으로 로그인 / 회원가입: 기존 실제 이메일 인증 서비스를 사용한다.
+Apple은 진입 화면에서 숨겨 실행할 수 없게 한다. 카카오·네이버·게스트 신규 시작도 노출하지 않는다.
+기존 게스트의 기록과 마이의 계정 연결 절차는 유지한다.
+
+3. 기능 상태와 복귀
+Google 이용 가능 여부 확인, 조회 실패 재시도, 인증 중 표시, 취소·실패 후 재시도를 제공한다.
+같은 프레임의 중복 클릭과 Google 인증 중 이메일·계정 전환을 차단한다.
+이메일 입력 검증, 로그인·가입 전환, 비밀번호 확인, 요청 실패 시 입력 보존을 유지한다.
+새 회원은 닉네임·성별·생년월일 설정으로, 기존 회원은 원래 요청한 여행·초대·장소 가져오기로 이동한다.
+로그인된 계정은 이어서 시작하거나 명시적으로 다른 계정으로 전환할 수 있다.
+기존 최상위 하단 메뉴는 로그인·이메일 입력 화면에서도 유지한다.
+
+4. 설정 및 적용 범위
+Google의 기존 클라이언트·콜백·비밀 키·회원 DB 설정을 재사용한다. 새로운 인증 공급자나 키를 추가하지 않는다.
+Google G는 공식 브랜드 자료를 사용한다: https://developers.google.com/identity/branding-guidelines
+앱 버전은 Expo 앱 설정의 실제 값을 표시한다.
+약관·개인정보 처리방침·고객지원의 확정된 공개 경로가 없으므로 가짜 링크나 동의 문구를 넣지 않는다.
+화면과 인증 요청 제어만 수정하며 DB·도메인 모델은 변경하지 않는다.
+
+5. 검증
+npm run check, 인증 단위 검증, 실제 폼·HTTP 경계의 Playwright 검증을 수행한다.
+좁은 화면의 로그인·이메일 입력·오류·하단 메뉴 배치를 React Native 웹 출력으로 확인한다.
+실제 Google 계정 인증 및 Android 설치 기기의 키보드·시스템 인증 브라우저 복귀는 별도 실기기 확인이 필요하다.
+
+6. 적용 내역
+apps/mobile/src/app/login.tsx: 여행 이미지·슬로건·두 인증 버튼·실제 버전·기존 계정 이어하기를 구성했다. 게스트 신규 시작과 불필요한 구분선을 제거했다. 이메일 입력 중 뒤 화면은 접근성 탐색에서 제외했다.
+apps/mobile/src/features/auth/GoogleLogin.tsx: Google 한 가지 인증만 표시하고 이용 가능 여부 조회·로딩·재시도를 연결했다.
+apps/mobile/src/features/auth/SocialButtons.tsx: Google·카카오·네이버를 함께 표시하던 컴포넌트를 제거하고 GoogleLogin으로 교체했다.
+apps/mobile/src/features/auth/LoginButton.tsx: 시안의 둥근 버튼과 실제 비활성·처리 중·접근성 상태를 공통으로 표시한다.
+apps/mobile/src/features/auth/loginStyles.ts: 로그인·이메일 폼에 동일한 아이보리·산호색·간격을 적용했다.
+apps/mobile/src/features/auth/useLoginController.ts: Google 요청·이어서 시작하기·로그아웃에 하나의 요청 잠금을 적용하고 안전한 오류 안내를 연결했다.
+apps/mobile/src/features/auth/EmailAuth.tsx: 실제 인증 서비스와 입력 검증은 유지하고 버튼·입력 스타일, 상단 뒤로가기, 키보드 대응, 가입 비밀번호 자동 완성, 요청 중 Android 뒤로가기 차단을 적용했다.
+apps/mobile/assets/brand/tripprint-v1/TripPrint_login-hero.png: 사용자 제공 여행 이미지 원본을 포함했다.
+apps/mobile/assets/brand/tripprint-v1/Google_G.png: Google 공식 G 이미지를 포함했다.
+tests/web/workspace.spec.ts: 변경된 버튼 이름과 노출 정책을 반영했다. 좁은 화면·이메일 모드 전환·비밀번호 해제·Google 중복 클릭과 요청 중 이메일 전환 차단·실패 후 재시도를 검증했다.
+
+7. 확인된 결과
+npm run check: TypeScript·ESLint·Prettier 모두 통과.
+npm run mvp:bundle:android: Android Hermes 번들 생성 성공. 여행 이미지와 Google G가 Android 에셋에 포함됨을 확인했다. APK 설치 결과나 Play 제출 결과는 아니다.
+npm run test:auth: 17개 통과.
+npm run test:workspace:web: 20개 통과. 테스트 브라우저에서 HTTP 응답만 격리했으며 실제 Google 계정 인증 결과를 뜻하지 않는다.
+320px·390px 로그인 화면과 320px 이메일 회원가입 화면에서 이미지·버튼·상단 뒤로가기·하단 메뉴 배치를 확인했다.
+공개 테스트 API의 /api/social/providers에서 google=true, kakao=false, naver=false를 확인했다.
+DB 구조·회원 저장 계약·Google 비밀 키·공급자 등록 설정은 이번 화면 작업에서 변경하지 않았다.
+수정 사항은 로컬 작업 공간에 반영했다. 이번 작업에서는 Git 커밋·푸시, 웹/API 배포, APK/AAB 생성·제출을 실행하지 않았다.

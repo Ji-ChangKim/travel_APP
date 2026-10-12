@@ -4,6 +4,11 @@ import { linkGuest } from './guestLink';
 import { naverOAuth, socialProviders } from './socialProviders';
 import { rejectRequest } from './errors';
 import type { VerifiedSession } from './types';
+import {
+  availableGuestNickname,
+  checkedSignupNickname,
+  checkedSocialNickname,
+} from './nicknames';
 
 // 요청의 D1 연결로 표준 이메일 인증과 서명된 세션을 구성한다.
 export function cloudAuth(env: Env, callbackState?: string) {
@@ -20,6 +25,25 @@ export function cloudAuth(env: Env, callbackState?: string) {
       env.AUTH_BASE_URL,
     ],
     emailAndPassword: { enabled: true, minPasswordLength: 8 },
+    databaseHooks: {
+      user: {
+        create: {
+          before: (user, context) => {
+            // 인증 방식별 고유 닉네임을 사용자 INSERT 전에 결정한다.
+            return (
+              context?.path === '/sign-in/anonymous'
+                ? availableGuestNickname(env)
+                : context?.path === '/sign-up/email'
+                  ? checkedSignupNickname(env, user.name)
+                  : checkedSocialNickname(env, user.name)
+            ).then((name) => {
+              // 최종 중복 생성은 DB 고유 제약에서 차단한다.
+              return { data: { ...user, name } };
+            });
+          },
+        },
+      },
+    },
     session: { expiresIn: 604800, updateAge: 86400 },
     advanced: {
       database: { generateId: newAuthId },
@@ -42,8 +66,8 @@ export function cloudAuth(env: Env, callbackState?: string) {
       anonymous({
         disableDeleteAnonymousUser: true,
         generateName: () => {
-          // 게스트임을 쉽게 알아볼 수 있는 초기 닉네임을 제공한다.
-          return '게스트 여행자';
+          // DB 등록 전에 전체 회원과 겹치지 않는 게스트 이름을 발급한다.
+          return availableGuestNickname(env);
         },
         onLinkAccount: ({ anonymousUser, newUser }) => {
           // 인증 서버가 확인한 두 계정 사이에서만 기존 기록을 이전한다.

@@ -1,8 +1,8 @@
 {
   "version": "0.1.0",
-  "release": "test-1-google-auth",
+  "release": "mvp-0.1.0-internal-candidate-20261012",
   "environment": "staging",
-  "releaseDate": "2026-10-07",
+  "releaseDate": "2026-10-12",
   "webOrigin": "https://tripprint-staging.pages.dev",
   "apiOrigin": "https://tripprint-api-staging.gametps.workers.dev",
   "brand": "TripPrint",

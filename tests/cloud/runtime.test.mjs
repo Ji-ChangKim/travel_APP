@@ -24,7 +24,7 @@ const mf = new Miniflare(
         ),
         compatibilityDate: '2026-10-02',
         compatibilityFlags: ['nodejs_compat'],
-        d1Databases: { DB: 'integration' },
+        d1Databases: { DB: 'integration', LEGACY_DB: 'legacy-nicknames' },
         r2Buckets: ['MEDIA'],
         bindings: {
           AUTH_SECRET: 'integration-secret-only-012345678901234567890123456789',
@@ -66,6 +66,7 @@ before(() => {
         '0003_upload_deletion.sql',
         '0004_receipt_scans.sql',
         '0005_member_onboarding.sql',
+        '0006_unique_nicknames.sql',
       ]
         .map((file) => {
           /* 배포 마이그레이션을 순서대로 읽는다. */ return readFileSync(
@@ -87,6 +88,216 @@ before(() => {
 });
 after(() => {
   /* 테스트 Workers 프로세스를 종료한다. */ return mf.dispose();
+});
+
+// 기존 중복 닉네임이 있는 DB에서도 새 고유 제약을 적용할 수 있어야 한다.
+test('닉네임 마이그레이션은 기존 중복을 정리하고 여행·공개 이름과 버전을 맞춘다', () => {
+  // 운영 DB와 분리한 로컬 D1에 이전 스키마를 준비한다.
+  return mf.getD1Database('LEGACY_DB').then((db) => {
+    // 기존 회원 두 명과 여행을 가진 상태를 실제 SQLite에서 검증한다.
+    return prepareLegacyNicknames(db)
+      .then(() => {
+        // 배포 파일 그대로 고유 제약과 표시 이름 변경을 적용한다.
+        return db.batch(
+          migrationSql('0006_unique_nicknames.sql').map((sql) => {
+            // 문자열 조립한 별도 스키마를 테스트하지 않는다.
+            return db.prepare(sql);
+          }),
+        );
+      })
+      .then(() => {
+        // 계정 이름·여행 버전·공개 작성자 이름을 함께 읽는다.
+        return Promise.all([
+          db.prepare('SELECT id,name FROM user ORDER BY createdAt,id').all(),
+          db.prepare('SELECT snapshot,version FROM trips').first(),
+          db.prepare('SELECT snapshot FROM posts').first(),
+        ]);
+      })
+      .then(([users, tripRow, postRow]) => {
+        // 첫 계정은 보존하며 중복 계정만 구분된 이름으로 바뀐다.
+        return (
+          assert.equal(users.results[0].name, '같은 이름'),
+          assert.notEqual(users.results[0].name, users.results[1].name),
+          assert.equal(tripRow.version, 2),
+          assert.equal(JSON.parse(tripRow.snapshot).trip.version, 2),
+          assert.equal(
+            JSON.parse(tripRow.snapshot).members[0].nickname,
+            users.results[1].name,
+          ),
+          assert.equal(
+            JSON.parse(postRow.snapshot).author,
+            users.results[1].name,
+          )
+        );
+      });
+  });
+});
+
+// 기존 배포 SQL 파일을 실행 가능한 명령으로 읽는다.
+function migrationSql(file) {
+  // 테스트용으로 고유 제약을 생략하거나 변형하지 않는다.
+  return readFileSync(
+    new URL('../../apps/api/migrations/' + file, import.meta.url),
+    'utf8',
+  )
+    .replace(/--[^\n]*/g, '')
+    .split(';')
+    .filter((sql) => {
+      // 빈 명령은 제외한다.
+      return sql.trim();
+    });
+}
+
+// 고유 닉네임 도입 전의 중복 계정과 연결된 기록을 준비한다.
+function prepareLegacyNicknames(
+  db,
+  first = randomUUID(),
+  second = randomUUID(),
+  journey = randomUUID(),
+) {
+  // 실제 초기 스키마에 의도한 과거 중복만 생성한다.
+  return db
+    .batch(
+      [
+        '0001_cloud_storage.sql',
+        '0002_auth_rate_limit.sql',
+        '0003_upload_deletion.sql',
+        '0004_receipt_scans.sql',
+        '0005_member_onboarding.sql',
+      ]
+        .flatMap(migrationSql)
+        .map((sql) => {
+          // 이전 버전 마이그레이션도 같은 D1 엔진에서 실행한다.
+          return db.prepare(sql);
+        }),
+    )
+    .then(() => {
+      // 회원 이름 외의 ID·여행 데이터는 마이그레이션 후에도 유지되어야 한다.
+      return db.batch([
+        db
+          .prepare(
+            'INSERT INTO user(id,name,email,createdAt,updatedAt) VALUES(?,?,?,?,?)',
+          )
+          .bind(first, ' 같은 이름 ', 'legacy-first@example.test', 1, 1),
+        db
+          .prepare(
+            'INSERT INTO user(id,name,email,createdAt,updatedAt) VALUES(?,?,?,?,?)',
+          )
+          .bind(second, '같은 이름', 'legacy-second@example.test', 2, 2),
+        db
+          .prepare(
+            'INSERT INTO trips(id,owner_id,version,snapshot,last_key) VALUES(?,?,?,?,?)',
+          )
+          .bind(
+            journey,
+            second,
+            1,
+            JSON.stringify({
+              trip: { id: journey, ownerId: second, version: 1 },
+              members: [
+                { userId: second, nickname: '같은 이름', role: 'owner' },
+              ],
+            }),
+            randomUUID(),
+          ),
+        db
+          .prepare(
+            'INSERT INTO posts(id,trip_id,author_id,published_at,snapshot) VALUES(?,?,?,?,?)',
+          )
+          .bind(
+            randomUUID(),
+            journey,
+            second,
+            1,
+            JSON.stringify({ author: '같은 이름', body: '보존하는 공개 내용' }),
+          ),
+      ]);
+    });
+}
+
+// 회원과 게스트가 같은 DB 고유 닉네임 규칙을 사용하는지 검사한다.
+test('게스트 이름 발급과 회원 가입·변경의 전역 닉네임 중복 차단', () => {
+  // 테스트 요청 제한은 기존 인증 인수와 별도의 IP로 격리한다.
+  return Promise.all([
+    request('/api/auth/sign-in/anonymous', 'POST', {}, undefined, {
+      'CF-Connecting-IP': '203.0.113.110',
+    }),
+    request('/api/auth/sign-in/anonymous', 'POST', {}, undefined, {
+      'CF-Connecting-IP': '203.0.113.111',
+    }),
+  ])
+    .then((responses) => {
+      // 실제 발급된 세션과 사용자만 중복 검사에 사용한다.
+      return Promise.all(
+        responses.map((response) => {
+          // 성공 응답의 이름 형식을 확인하고 원문 토큰은 출력하지 않는다.
+          return json(response).then((body) => {
+            // 인증 계정 DB의 익명 상태와 규칙을 확인한다.
+            return (
+              assert.match(body.user.name, /^Quest-[A-Z0-9]{6}$/),
+              assert.equal(body.user.isAnonymous, true),
+              {
+                id: body.user.id,
+                nickname: body.user.name,
+                token: response.headers.get('set-auth-token'),
+              }
+            );
+          });
+        }),
+      );
+    })
+    .then((guests) => {
+      // 서로 다른 게스트와 회원이 같은 닉네임을 차지할 수 없다.
+      return (
+        assert.notEqual(guests[0].nickname, guests[1].nickname),
+        Promise.all([
+          request(
+            '/api/auth/sign-up/email',
+            'POST',
+            {
+              name: guests[0].nickname.toLowerCase(),
+              email: 'nickname-collision@example.test',
+              password: 'a-strong-test-password!',
+            },
+            undefined,
+            { 'CF-Connecting-IP': '203.0.113.112' },
+          ).then((response) => {
+            // 게스트 이름을 회원 가입에서 다시 사용하는 것을 거부한다.
+            return (
+              assert.equal(response.status, 409),
+              response.json().then((body) => {
+                // 공개 중복 코드만 응답한다.
+                return assert.equal(body.code, 'NICKNAME_TAKEN');
+              })
+            );
+          }),
+          request(
+            '/api/v1/profile',
+            'PATCH',
+            { nickname: ` ${guests[0].nickname} ` },
+            guests[1],
+          ).then((response) => {
+            // 앞뒤 공백으로 닉네임 중복을 우회할 수 없다.
+            return (
+              assert.equal(response.status, 409),
+              response.json().then((body) => {
+                // 프로필 API도 같은 중복 오류를 사용한다.
+                return assert.equal(body.error.code, 'NICKNAME_TAKEN');
+              })
+            );
+          }),
+          mf.getD1Database('DB').then((db) => {
+            // 직접 SQL 쓰기에도 고유 제약이 적용되어 동시 요청을 보호한다.
+            return assert.rejects(
+              db
+                .prepare('UPDATE user SET name=? WHERE id=?')
+                .bind(guests[0].nickname, guests[1].id)
+                .run(),
+            );
+          }),
+        ])
+      );
+    });
 });
 
 // 실제 Worker HTTP 경계에서 요청을 실행한다.
@@ -124,13 +335,19 @@ function json(response, status = 200) {
 }
 
 // 로그인 서버에서 실제 회원과 서명 토큰을 생성한다.
-function signup(index) {
+function signup(index, headers = {}) {
   // 비밀번호를 표준 인증 엔드포인트에 등록한다.
-  return request('/api/auth/sign-up/email', 'POST', {
-    email: `user${index}@example.test`,
-    password: 'a-strong-test-password!',
-    name: `여행자 ${index}`,
-  }).then((response) => {
+  return request(
+    '/api/auth/sign-up/email',
+    'POST',
+    {
+      email: `user${index}@example.test`,
+      password: 'a-strong-test-password!',
+      name: `여행자 ${index}`,
+    },
+    undefined,
+    headers,
+  ).then((response) => {
     /* 실제 발급 토큰을 보관한다. */ return response.json().then((body) => {
       /* 회원 생성 성공을 검사한다. */ return (
         assert.equal(response.status, 200, JSON.stringify(body)),
@@ -1518,5 +1735,80 @@ function pkceDigest(value) {
     .then((digest) => {
       // SHA-256을 표준 base64url 문자열로 변환한다.
       return Buffer.from(digest).toString('base64url');
+    });
+}
+
+test('회원 비밀번호 해시·서명 없는 토큰·변조 세션·만료 세션을 검증한다', () => {
+  // 표준 가입으로 발급한 실제 세션과 D1 원본을 대조한다.
+  return signup(9, { 'CF-Connecting-IP': '203.0.113.100' })
+    .then(() => signup(10, { 'CF-Connecting-IP': '203.0.113.100' }))
+    .then(verifyPasswordHashes)
+    .then(() => mf.getD1Database('DB'))
+    .then((db) =>
+      db
+        .prepare('SELECT token FROM session WHERE userId=?')
+        .bind(state.users[9].id)
+        .first(),
+    )
+    .then((session) =>
+      request('/api/v1/trips', 'GET', undefined, { token: session.token }),
+    )
+    .then((response) => {
+      // DB의 서명 없는 원문 세션 토큰도 API 인증으로 수락하지 않는다.
+      return assert.equal(response.status, 401);
+    })
+    .then(() =>
+      request('/api/v1/trips', 'GET', undefined, {
+        token: `${state.users[9].token}tampered`,
+      }),
+    )
+    .then((response) => {
+      // 기존 회원 ID가 있어도 변조한 서명은 거부한다.
+      return assert.equal(response.status, 401);
+    })
+    .then(() => request('/api/v1/trips', 'GET', undefined, state.users[9]))
+    .then(json)
+    .then(() => mf.getD1Database('DB'))
+    .then((db) =>
+      db
+        .prepare('UPDATE session SET expiresAt=? WHERE userId=?')
+        .bind(Date.now() - 60000, state.users[9].id)
+        .run(),
+    )
+    .then(() => request('/api/v1/trips', 'GET', undefined, state.users[9]))
+    .then((response) => {
+      // 서명이 유효해도 서버에서 만료된 세션은 사용할 수 없다.
+      return assert.equal(response.status, 401);
+    });
+});
+
+// 같은 비밀번호로 가입한 두 회원의 저장값을 민감한 출력 없이 확인한다.
+function verifyPasswordHashes() {
+  // 계정별 소금값과 해시가 적용되어 원문·동일 해시를 저장하지 않아야 한다.
+  return mf
+    .getD1Database('DB')
+    .then((db) =>
+      db
+        .prepare(
+          "SELECT password FROM account WHERE providerId='credential' AND userId IN (?,?)",
+        )
+        .bind(state.users[9].id, state.users[10].id)
+        .all(),
+    )
+    .then(({ results }) => {
+      // 실패 진단에도 비밀번호나 해시 원문을 포함하지 않는다.
+      return assert.ok(
+        results.length === 2 &&
+          results.every((row) => {
+            // 비밀번호 원문이 아닌 계정별 해시만 저장되어야 한다.
+            return (
+              typeof row.password === 'string' &&
+              row.password.length > 64 &&
+              row.password !== 'a-strong-test-password!'
+            );
+          }) &&
+          results[0].password !== results[1].password,
+        '서로 다른 회원의 비밀번호는 원문과 다른 개별 해시로 보관해야 한다.',
+      );
     });
 }

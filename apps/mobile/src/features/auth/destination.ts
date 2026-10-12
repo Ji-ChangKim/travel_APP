@@ -53,8 +53,11 @@ export function completedDestination(
           pathname: '/new-trip',
           params: { destination: homeDestination(destination)?.key || '' },
         }
-      : pending === '/(tabs)' && (next === 'invite' || next === 'import-place')
-        ? `/${next}`
-        : pending;
+      : pending === '/(tabs)' && next === 'community'
+        ? '/(tabs)/community'
+        : pending === '/(tabs)' &&
+            (next === 'invite' || next === 'import-place')
+          ? `/${next}`
+          : pending;
   });
 }

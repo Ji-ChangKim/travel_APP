@@ -6,9 +6,19 @@ import {
   type SetStateAction,
   type RefObject,
 } from 'react';
-import { ScrollView, Text, TextInput, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Action, styles } from '@/features/workspace/ui';
+import { Ionicons } from '@expo/vector-icons';
+import LoginButton from './LoginButton';
+import { loginStyles as styles } from './loginStyles';
 import { signInWithEmail, signUpWithEmail } from '@/services/authService';
 import { emailLoginSchema, emailSignupSchema } from './email';
 import { ZodError } from 'zod';
@@ -150,6 +160,7 @@ function AuthInput({
   value,
   secret = false,
   email = false,
+  newPassword = false,
   disabled,
   onChange,
 }: {
@@ -157,6 +168,7 @@ function AuthInput({
   value: string;
   secret?: boolean;
   email?: boolean;
+  newPassword?: boolean;
   disabled: boolean;
   onChange: (value: string) => void;
 }) {
@@ -173,7 +185,13 @@ function AuthInput({
         autoCorrect={false}
         keyboardType={email ? 'email-address' : 'default'}
         autoComplete={
-          email ? 'email' : secret ? 'current-password' : 'nickname'
+          email
+            ? 'email'
+            : secret
+              ? newPassword
+                ? 'new-password'
+                : 'current-password'
+              : 'nickname'
         }
         editable={!disabled}
         style={styles.input}
@@ -200,110 +218,134 @@ function EmailForm({
   return (
     <Modal
       animationType="slide"
-      onRequestClose={state.busy ? undefined : onClose}
+      onRequestClose={
+        state.busy
+          ? () => {
+              // 실제 인증 요청 중에는 뒤로가기를 소비하여 중복 요청을 막는다.
+              return undefined;
+            }
+          : onClose
+      }
     >
-      <SafeAreaView style={styles.screen}>
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={styles.content}
-        >
-          <Text style={styles.header}>
-            {state.mode === 'login' ? '이메일로 로그인' : '여행자 회원가입'}
-          </Text>
-          <Text style={styles.subtitle}>
-            나의 여행을 저장하고, 친구와 함께 계획해 보세요.
-          </Text>
-          <AuthInput
-            label="이메일"
-            value={state.email}
-            email
-            disabled={state.busy}
-            onChange={(value) => {
-              // 이메일 입력 하나를 변경한다.
-              return changeField(set, 'email', value);
-            }}
-          />
-          {state.mode === 'signup' && (
-            <AuthInput
-              label="닉네임"
-              value={state.nickname}
-              disabled={state.busy}
-              onChange={(value) => {
-                // 가입 프로필의 표시 이름을 변경한다.
-                return changeField(set, 'nickname', value);
-              }}
-            />
-          )}
-          <AuthInput
-            label="비밀번호"
-            value={state.password}
-            secret
-            disabled={state.busy}
-            onChange={(value) => {
-              // 비밀번호는 현재 모달 메모리에만 저장한다.
-              return changeField(set, 'password', value);
-            }}
-          />
-          {state.mode === 'signup' && (
-            <AuthInput
-              label="비밀번호 확인"
-              value={state.confirmation}
-              secret
-              disabled={state.busy}
-              onChange={(value) => {
-                // 신규 비밀번호 확인값만 변경한다.
-                return changeField(set, 'confirmation', value);
-              }}
-            />
-          )}
-          {state.error && (
-            <Text style={styles.error} accessibilityRole="alert">
-              {state.error}
-            </Text>
-          )}
-          {state.notice && (
-            <Text accessibilityRole="alert">{state.notice}</Text>
-          )}
-          <Action
-            label={
-              state.busy
-                ? state.mode === 'signup'
-                  ? '가입하고 있어요…'
-                  : '로그인하고 있어요…'
-                : state.mode === 'login'
-                  ? '이메일 로그인'
-                  : '회원가입'
-            }
-            disabled={state.busy}
-            onPress={() => {
-              // 현재 모드의 실제 인증을 실행한다.
-              return submitEmail(state, set, lock, onAuthenticated);
-            }}
-          />
-          <Action
-            label={
-              state.mode === 'login'
-                ? '이메일로 회원가입'
-                : '이미 계정이 있어요'
-            }
-            disabled={state.busy}
-            onPress={() => {
-              // 모드 전환 시 민감 입력과 오류 안내를 비운다.
-              return patchState(set, {
-                mode: state.mode === 'login' ? 'signup' : 'login',
-                password: '',
-                confirmation: '',
-                error: '',
-                notice: '',
-              });
-            }}
-          />
-          <Action
-            label="로그인 화면으로 돌아가기"
+      <SafeAreaView style={styles.screen} edges={['top', 'left', 'right']}>
+        <View style={styles.formNavigation}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="로그인 화면으로 돌아가기"
+            accessibilityState={{ disabled: state.busy }}
             disabled={state.busy}
             onPress={onClose}
-          />
-        </ScrollView>
+            style={[styles.backButton, state.busy && styles.disabled]}
+          >
+            <Ionicons name="arrow-back" size={22} color="#715D58" />
+            <Text style={styles.label}>돌아가기</Text>
+          </Pressable>
+        </View>
+        <KeyboardAvoidingView
+          style={styles.screen}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={styles.formContent}
+          >
+            <Text style={styles.formHeader}>
+              {state.mode === 'login' ? '이메일로 로그인' : '여행자 회원가입'}
+            </Text>
+            <Text style={styles.formSubtitle}>
+              나의 여행을 저장하고, 친구와 함께 계획해 보세요.
+            </Text>
+            <AuthInput
+              label="이메일"
+              value={state.email}
+              email
+              disabled={state.busy}
+              onChange={(value) => {
+                // 이메일 입력 하나를 변경한다.
+                return changeField(set, 'email', value);
+              }}
+            />
+            {state.mode === 'signup' && (
+              <AuthInput
+                label="닉네임"
+                value={state.nickname}
+                disabled={state.busy}
+                onChange={(value) => {
+                  // 가입 프로필의 표시 이름을 변경한다.
+                  return changeField(set, 'nickname', value);
+                }}
+              />
+            )}
+            <AuthInput
+              label="비밀번호"
+              value={state.password}
+              secret
+              newPassword={state.mode === 'signup'}
+              disabled={state.busy}
+              onChange={(value) => {
+                // 비밀번호는 현재 모달 메모리에만 저장한다.
+                return changeField(set, 'password', value);
+              }}
+            />
+            {state.mode === 'signup' && (
+              <AuthInput
+                label="비밀번호 확인"
+                value={state.confirmation}
+                secret
+                newPassword
+                disabled={state.busy}
+                onChange={(value) => {
+                  // 신규 비밀번호 확인값만 변경한다.
+                  return changeField(set, 'confirmation', value);
+                }}
+              />
+            )}
+            {state.error && (
+              <Text style={styles.error} accessibilityRole="alert">
+                {state.error}
+              </Text>
+            )}
+            {state.notice && (
+              <Text accessibilityRole="alert">{state.notice}</Text>
+            )}
+            <LoginButton
+              variant="primary"
+              busy={state.busy}
+              label={
+                state.busy
+                  ? state.mode === 'signup'
+                    ? '가입하고 있어요…'
+                    : '로그인하고 있어요…'
+                  : state.mode === 'login'
+                    ? '이메일 로그인'
+                    : '회원가입'
+              }
+              disabled={state.busy}
+              onPress={() => {
+                // 현재 모드의 실제 인증을 실행한다.
+                return submitEmail(state, set, lock, onAuthenticated);
+              }}
+            />
+            <LoginButton
+              label={
+                state.mode === 'login'
+                  ? '이메일로 회원가입'
+                  : '이미 계정이 있어요'
+              }
+              disabled={state.busy}
+              onPress={() => {
+                // 모드 전환 시 민감 입력과 오류 안내를 비운다.
+                return patchState(set, {
+                  mode: state.mode === 'login' ? 'signup' : 'login',
+                  password: '',
+                  confirmation: '',
+                  error: '',
+                  notice: '',
+                });
+              }}
+            />
+          </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </Modal>
   );
