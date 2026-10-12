@@ -41,7 +41,7 @@ const ideas: CityKey[][] = [
   ['bangkok', 'singapore', 'tokyo'],
 ];
 
-// 첫 메인에서 여행지 탐색을 여행 생성보다 먼저 제공한다.
+// 홈에서는 여행지 카드만 제공하고 원문 소개는 상세에서 읽는다.
 export default function HomeDiscovery(props: Props) {
   // 공용 조회 키에 사용자나 세션을 포함하지 않는다.
   return (
@@ -84,15 +84,9 @@ function DiscoverySections({
   // 콘텐츠가 없을 때 가상의 인기 순위로 화면을 채우지 않는다.
   return (
     <View style={s.section}>
-      <Text style={s.eyebrow}>여행의 시작은 새로운 발견</Text>
-      <Text style={s.headline}>
-        {new Date().getMonth() + 1}월, 어디로 떠날까요?
-      </Text>
-      <Text style={s.supporting}>
-        도시의 이야기를 살펴보고, 마음에 드는 곳을 골라보세요.
-      </Text>
+      <Text style={s.title}>{new Date().getMonth() + 1}월의 여행지</Text>
       {query.isPending ? (
-        <Text style={s.supporting}>여행지를 둘러볼 준비를 하고 있어요.</Text>
+        <Text style={s.caption}>여행지 불러오는 중…</Text>
       ) : query.data ? (
         <>
           {query.isError && (
@@ -101,29 +95,24 @@ function DiscoverySections({
               보여드려요.
             </Text>
           )}
-          <Text style={s.title}>이달의 여행 아이디어</Text>
-          <Text style={s.caption}>
-            TripPrint 편집 선정 · 도시 소개는 위키백과에서 제공해요.
-          </Text>
           <CityCards
             cities={monthlyCities(query.data)}
             onSelect={selection[1]}
             blocked={selection[0] !== null}
           />
-          <ReadTrends data={query.data} onSelect={selection[1]} />
-          <Action
-            label="여행지 정보 새로고침"
-            onPress={() => {
-              // 외부 소개와 집계가 실패했을 때 같은 공개 조회를 다시 실행한다.
-              return void query.refetch();
-            }}
-          />
+          {query.isError && (
+            <Action
+              label="여행지 다시 불러오기"
+              onPress={() => {
+                // 캐시된 여행지를 읽으면서 실패한 갱신만 다시 시도한다.
+                return void query.refetch();
+              }}
+            />
+          )}
         </>
       ) : (
         <>
-          <Text style={s.supporting}>
-            여행지를 불러오지 못했어요. 연결을 확인하고 다시 둘러보세요.
-          </Text>
+          <Text style={s.supporting}>여행지를 불러오지 못했어요.</Text>
           <Action
             label="여행지 다시 불러오기"
             onPress={() => {
@@ -250,127 +239,6 @@ function CityImageContent({
     <View style={[s.photo, s.placeholder]}>
       <Text style={s.city}>{destination(city.key).city}</Text>
     </View>
-  );
-}
-
-// 읽기 통계의 범위와 실제 여행객 수의 차이를 설명한다.
-function ReadTrends({
-  data,
-  onSelect,
-}: {
-  data: DestinationDiscovery;
-  onSelect: (city: DiscoveryCity) => void;
-}) {
-  // 일부 도시 통계가 누락되면 남은 도시만으로 순위를 만들지 않는다.
-  return data.statisticsAvailable ? (
-    <View style={s.section}>
-      <Text style={s.title}>위키백과에서 많이 읽힌 도시 TOP 3</Text>
-      <Text style={s.caption}>
-        {data.period} · 한국어 위키백과 · 선정한 {discoveryDestinations.length}
-        개 도시 비교{`\n`}문서 조회 수이며 실제 여행객 수나 예약 순위가
-        아니에요.
-      </Text>
-      <TrendRows
-        keys={data.mostRead}
-        data={data}
-        onSelect={onSelect}
-        rising={false}
-      />
-      {data.rising.length > 0 && (
-        <>
-          <Text style={s.title}>지난달보다 더 많이 읽힌 도시</Text>
-          <Text style={s.caption}>
-            {data.previousPeriod} 대비 {data.period} 문서 조회 증가율 · 이전 달
-            100회 이상
-          </Text>
-          <TrendRows
-            keys={data.rising}
-            data={data}
-            onSelect={onSelect}
-            rising
-          />
-        </>
-      )}
-      <Text style={s.caption}>
-        Wikimedia Analytics · 불러온 날 {data.fetchedAt.slice(0, 10)}
-      </Text>
-    </View>
-  ) : (
-    <Text style={s.supporting}>
-      도시 조회 통계를 불러오지 못했어요. 여행지 정보 새로고침으로 다시 확인해
-      주세요.
-    </Text>
-  );
-}
-
-// 동일 응답의 도시만 조회 수·증가율과 함께 연결한다.
-function TrendRows({
-  keys,
-  data,
-  onSelect,
-  rising,
-}: {
-  keys: CityKey[];
-  data: DestinationDiscovery;
-  onSelect: (city: DiscoveryCity) => void;
-  rising: boolean;
-}) {
-  // 실제 조회 버킷이 있는 도시만 사용자에게 표시한다.
-  return (
-    <View>
-      {keys.map((key, index) => {
-        // API 키와 상세 원문의 일치 여부를 다시 확인한다.
-        return (
-          <TrendCity
-            key={key}
-            city={data.cities.find((city) => {
-              // 같은 데이터에 있는 문서만 연다.
-              return city.key === key;
-            })!}
-            rank={index + 1}
-            rising={rising}
-            onSelect={onSelect}
-          />
-        );
-      })}
-    </View>
-  );
-}
-
-// 통계 값 하나와 도시 상세 이동을 한 줄로 제공한다.
-function TrendCity({
-  city,
-  rank,
-  rising,
-  onSelect,
-}: {
-  city: DiscoveryCity;
-  rank: number;
-  rising: boolean;
-  onSelect: (city: DiscoveryCity) => void;
-}) {
-  // 제목과 달리 방문객 수로 오해할 수 있는 명수 단위는 사용하지 않는다.
-  return (
-    <Pressable
-      style={s.trend}
-      accessibilityRole="button"
-      accessibilityLabel={`${destination(city.key).city} 조회 통계와 소개`}
-      onPress={() => {
-        // 인기와 증가율 어느 목록에서도 동일한 원문을 연다.
-        return onSelect(city);
-      }}
-    >
-      <Text style={s.rank}>{rank}</Text>
-      <View style={s.trendCopy}>
-        <Text style={s.city}>{destination(city.key).city}</Text>
-        <Text style={s.caption}>{destination(city.key).country}</Text>
-      </View>
-      <Text style={s.metric}>
-        {rising
-          ? `+${((city.currentViews! / city.previousViews! - 1) * 100).toFixed(1)}%`
-          : `${city.currentViews!.toLocaleString('ko-KR')}회`}
-      </Text>
-    </Pressable>
   );
 }
 

@@ -269,7 +269,14 @@ function discoveryWithCache(
       // CORS와 요청 식별자는 현재 앱 요청에 맞춰 새로 만든다.
       return c.json({ data, meta: { requestId: c.get('requestId') } });
     })
-    .catch(() => {
+    .catch((error: unknown) => {
+      // 공개 응답에는 숨기고 서버 로그에는 실패 종류만 기록한다.
+      console.error(
+        JSON.stringify({
+          event: 'discovery_failed',
+          kind: error instanceof Error ? error.name : 'unknown',
+        }),
+      );
       // 공급자 원본 오류와 내부 경로를 숨기고 재시도 가능한 오류만 보낸다.
       return rejectRequest('BACKEND_UNAVAILABLE');
     });

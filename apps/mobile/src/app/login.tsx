@@ -3,7 +3,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import Constants from 'expo-constants';
 import GoogleLogin from '@/features/auth/GoogleLogin';
 import EmailAuth from '@/features/auth/EmailAuth';
 import LoginButton from '@/features/auth/LoginButton';
@@ -42,10 +41,46 @@ function LoginHero({
       </Text>
       {next === 'new-trip' ? (
         <Text style={styles.context}>
-          {homeDestination(destination)?.city || '새 여행'} 계획을 저장하고
-          여행을 시작하세요.{'\n'}로그인 또는 게스트 시작 후 날짜를 선택해요.
+          {homeDestination(destination)?.city || '새 여행'} 여행 계획을
+          이어가요.
         </Text>
       ) : null}
+    </View>
+  );
+}
+
+// 게스트 선택에 필요한 저장 범위와 시작 버튼만 하나의 카드에 모은다.
+function GuestStart({
+  controller,
+}: {
+  controller: ReturnType<typeof useLoginController>;
+}) {
+  // 계정을 만들지 않은 여행도 이 기기에서 바로 시작할 수 있다.
+  return (
+    <View style={styles.guestCard}>
+      <View style={styles.guestHeading}>
+        <View style={styles.guestIcon} accessible={false}>
+          <Ionicons name="compass-outline" size={23} color="#527C9C" />
+        </View>
+        <View style={styles.guestCopy}>
+          <Text style={styles.guestTitle}>가볍게 여행을 시작해요</Text>
+          <Text style={styles.guestDescription}>
+            가입 없이 시작해요. 기록은 이 기기에만 저장돼요.
+          </Text>
+        </View>
+      </View>
+      <LoginButton
+        label={
+          controller.operation === 'guest'
+            ? '게스트를 시작하고 있어요…'
+            : '게스트로 시작하기'
+        }
+        variant="primary"
+        busy={controller.operation === 'guest'}
+        disabled={controller.busy || controller.emailOpen}
+        onPress={controller.startGuest}
+        trailing={<Ionicons name="arrow-forward" size={18} color="#FFFFFF" />}
+      />
     </View>
   );
 }
@@ -90,7 +125,7 @@ function ExistingSession({
   ) : null;
 }
 
-// 로그인 화면에는 Google과 이메일 인증 두 가지만 노출한다.
+// Google·이메일 로그인과 게스트·공개 탐색 진입을 표시한다.
 export default function LoginScreen() {
   // 인증 전에 고른 여행의 고정 복귀 경로만 전달한다.
   const { next, destination } = useLocalSearchParams<{
@@ -101,9 +136,9 @@ export default function LoginScreen() {
   const signedInMember = Boolean(
     controller.currentUser && controller.currentUser.authProvider !== 'guest',
   );
-  // 전체 화면 메뉴는 루트 레이아웃에 유지하고 입력 화면만 전환한다.
+  // 인증 화면은 하단 메뉴 없이 로그인 선택과 입력에 집중한다.
   return (
-    <SafeAreaView style={styles.screen} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.screen}>
       <StatusBar style="dark" />
       <ScrollView
         contentContainerStyle={styles.container}
@@ -131,19 +166,8 @@ export default function LoginScreen() {
           />
           {!controller.currentUser && (
             <>
-              <LoginButton
-                label={
-                  controller.operation === 'guest'
-                    ? '게스트를 시작하고 있어요…'
-                    : '게스트로 시작하기'
-                }
-                disabled={controller.busy || controller.emailOpen}
-                onPress={controller.startGuest}
-              />
-              <Text style={styles.footerText}>
-                게스트 여행은 이 기기에만 저장돼요. 앱이나 저장 데이터를
-                삭제하면 복구할 수 없어요.
-              </Text>
+              <View style={styles.guestDivider} accessible={false} />
+              <GuestStart controller={controller} />
               <LoginButton
                 label="로그인 없이 여행 발자국 둘러보기"
                 disabled={controller.busy || controller.emailOpen}
@@ -154,17 +178,6 @@ export default function LoginScreen() {
           {controller.error ? (
             <Text accessibilityRole="alert" style={styles.error}>
               {controller.error}
-            </Text>
-          ) : null}
-        </View>
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            여행 기록은 기본적으로 비공개예요.{'\n'}공유할 이야기는 직접
-            선택하세요.
-          </Text>
-          {Constants.expoConfig?.version ? (
-            <Text style={styles.footerText}>
-              TripPrint v{Constants.expoConfig.version}
             </Text>
           ) : null}
         </View>

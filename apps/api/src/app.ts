@@ -20,6 +20,7 @@ import { cloudAuth } from './cloudAuth';
 import { registerMediaRoutes } from './cloudMedia';
 import { registerProfileRoutes } from './cloudProfiles';
 import { registerDiscoveryRoutes } from './discovery';
+import { startupManifest } from './startup';
 
 type ApiContext = Context<ApiEnvironment>;
 
@@ -313,6 +314,7 @@ export function createApp(fetcher: typeof fetch = fetch): Hono<ApiEnvironment> {
                 );
               })
               .get('/health', health)
+              .get('/public/startup', startupManifest)
               .get('/api/v1/me', getMe.bind(null, fetcher))
               .get('/api/v1/places/search', searchPlaces.bind(null, fetcher))
               .get('/api/v1/places/import', importMapsShare.bind(null, fetcher))

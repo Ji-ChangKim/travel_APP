@@ -1,11 +1,29 @@
 import { useState, type Dispatch, type SetStateAction } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { StatusBar } from 'expo-status-bar';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTripStore } from '@/stores/useTripStore';
 import { updateUserProfile } from '@/services/profileService';
 import { completedDestination } from '@/features/auth/destination';
-import { Action, Field, styles } from '@/features/workspace/ui';
+import AuthInput from '@/features/auth/AuthInput';
+import BirthDateInput from '@/features/auth/BirthDateInput';
+import LoginButton from '@/features/auth/LoginButton';
+import {
+  AuthNavigation,
+  ProfilePrivacy,
+  SignupProgress,
+  TravelerPortrait,
+} from '@/features/auth/AuthFormChrome';
+import { loginStyles as styles } from '@/features/auth/loginStyles';
 import { workspaceError } from '@/features/workspace/WorkspaceScreen';
 import type { Profile } from '@wherego/domain';
 import { useQueryClient } from '@tanstack/react-query';
@@ -70,59 +88,107 @@ function ProfileFields({
   busy: [busy],
   error: [error],
   onSave,
+  router,
+  params,
 }: FormProps & { onSave: () => void }) {
   // 성별과 생년월일은 동행이나 공개 여행 목록에 표시하지 않는다.
   return (
-    <SafeAreaView edges={['top', 'left', 'right']} style={styles.screen}>
-      <ScrollView
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
+    <SafeAreaView style={styles.screen}>
+      <StatusBar style="dark" />
+      <AuthNavigation
+        title="회원가입"
+        disabled={busy}
+        onBack={() => {
+          // 인증 전에 선택했던 여행을 보존하고 로그인 선택으로 돌아간다.
+          return router.replace({ pathname: '/login', params });
+        }}
+      />
+      <KeyboardAvoidingView
+        style={styles.screen}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <Text style={styles.title}>여행에서 사용할 나의 이름</Text>
-        <Text>
-          닉네임은 동행에게 보여요. 성별과 생년월일은 다른 여행자에게 공개하지
-          않아요.
-        </Text>
-        <Field label="닉네임" value={nickname} onChange={setNickname} />
-        <Text style={styles.label}>성별</Text>
-        <View style={{ flexDirection: 'row', gap: 8 }}>
-          {(
-            [
-              { value: 'female', label: '여성' },
-              { value: 'male', label: '남성' },
-              { value: 'unspecified', label: '선택 안 함' },
-            ] as const
-          ).map((choice) => (
-            // 성별을 밝히지 않는 선택으로도 설정을 마칠 수 있다.
-            <Action
-              key={choice.value}
-              label={choice.label}
-              selected={gender === choice.value}
+        <ScrollView
+          contentContainerStyle={styles.formContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          <SignupProgress step={2} />
+          <ProfilePrivacy />
+          <TravelerPortrait />
+          <AuthInput
+            label="닉네임"
+            placeholder="여행에서 사용할 이름"
+            hint="2~30자로 입력해 주세요."
+            maxLength={30}
+            value={nickname}
+            disabled={busy}
+            onChange={setNickname}
+          />
+          <View style={styles.field}>
+            <Text style={styles.label}>성별</Text>
+            <View style={styles.genderGroup}>
+              {(
+                [
+                  { value: 'female', label: '여성' },
+                  { value: 'male', label: '남성' },
+                  { value: 'unspecified', label: '선택 안 함' },
+                ] as const
+              ).map((choice) => (
+                // 성별을 밝히지 않는 선택으로도 설정을 마칠 수 있다.
+                <Pressable
+                  key={choice.value}
+                  accessibilityRole="button"
+                  accessibilityLabel={choice.label}
+                  accessibilityState={{
+                    selected: gender === choice.value,
+                    disabled: busy,
+                  }}
+                  disabled={busy}
+                  style={[
+                    styles.genderOption,
+                    gender === choice.value && styles.genderSelected,
+                    busy && styles.disabled,
+                  ]}
+                  onPress={() => {
+                    // 지정한 성별 항목 하나만 변경한다.
+                    return setGender(choice.value);
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.genderText,
+                      gender === choice.value && styles.genderSelectedText,
+                    ]}
+                  >
+                    {choice.label}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+          <BirthDateInput
+            value={birthDate}
+            onChange={setBirthDate}
+            disabled={busy}
+          />
+          {error ? (
+            <Text accessibilityRole="alert" style={styles.error}>
+              {error}
+            </Text>
+          ) : null}
+          <View style={styles.formFooter}>
+            <LoginButton
+              label={busy ? '저장하고 있어요' : '설정하고 여행 시작하기'}
+              variant="primary"
               disabled={busy}
-              onPress={() => {
-                // 지정한 성별 항목 하나만 변경한다.
-                return setGender(choice.value);
-              }}
+              busy={busy}
+              trailing={
+                <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
+              }
+              onPress={onSave}
             />
-          ))}
-        </View>
-        <Field
-          label="생년월일 (YYYY-MM-DD)"
-          value={birthDate}
-          onChange={setBirthDate}
-        />
-        {error ? (
-          <Text accessibilityRole="alert" style={styles.error}>
-            {error}
-          </Text>
-        ) : null}
-        <Action
-          label={busy ? '저장하고 있어요' : '설정하고 여행 시작하기'}
-          variant="primary"
-          disabled={busy}
-          onPress={onSave}
-        />
-      </ScrollView>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

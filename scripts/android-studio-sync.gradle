@@ -1,0 +1,48 @@
+import groovy.json.JsonSlurper
+
+// Windows의 공백 경로에서도 Android Studio 동기화용 빈 PCH를 생성한다.
+if (System.getProperty("os.name").toLowerCase(java.util.Locale.ROOT).contains("windows")) {
+    // Expo 모듈의 기본 작업 등록이 끝난 뒤 동기화 작업만 보정한다.
+    gradle.projectsEvaluated {
+        def expoCore = rootProject.findProject(":expo-modules-core")
+        if (expoCore == null) return
+        expoCore.tasks.matching { task -> task.name == "generateStubPCH" }.configureEach { task ->
+            // 실제 앱 빌드의 Ninja PCH 생성 작업과 의존성은 유지한다.
+            task.setActions([])
+            task.doLast {
+                def cxxDir = expoCore.file(".cxx")
+                if (!cxxDir.exists()) return
+                // CMake가 기록한 각 ABI의 동기화용 헤더만 처리한다.
+                cxxDir.eachFileRecurse { file ->
+                    if (file.name != "compile_commands.json") return
+                    new JsonSlurper().parseText(file.getText("UTF-8")).each { entry ->
+                        if (!entry.file.endsWith("cmake_pch.hxx.cxx")) return
+                        def source = new File(entry.file)
+                        def pch = new File(entry.file.substring(0, entry.file.length() - 4) + ".pch")
+                        if (!pch.exists() || pch.length() == 0) {
+                            // SDK 경로의 따옴표를 보존하고 옵션 값만 따로 추출한다.
+                            def compiler = (entry.command =~ /^(?:"([^"]+)"|(\S+))/)[0]
+                            def target = (entry.command =~ /--target=(?:"([^"]+)"|(\S+))/)[0]
+                            def sysroot = (entry.command =~ /--sysroot=(?:"([^"]+)"|(\S+))/)[0]
+                            pch.parentFile.mkdirs()
+                            def header = new File(pch.parentFile, "stub_pch.hxx")
+                            header.setText("", "UTF-8")
+                            // 전체 명령을 공백으로 나누지 않고 파일 경로를 각각 전달한다.
+                            def process = new ProcessBuilder([
+                                compiler[1] ?: compiler[2],
+                                "--target=" + (target[1] ?: target[2]),
+                                "--sysroot=" + (sysroot[1] ?: sysroot[2]),
+                                "-x", "c++-header", "-o", pch.absolutePath, header.absolutePath
+                            ]).directory(new File(entry.directory)).redirectErrorStream(true).start()
+                            process.outputStream.close()
+                            def output = process.inputStream.getText("UTF-8")
+                            if (process.waitFor() != 0) throw new GradleException("동기화용 PCH 생성 실패: " + output)
+                        }
+                        // 다음 실제 빌드에서는 Ninja가 정상 PCH를 다시 생성한다.
+                        pch.setLastModified(source.lastModified() - 1)
+                    }
+                }
+            }
+        }
+    }
+}

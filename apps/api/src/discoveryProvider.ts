@@ -63,7 +63,7 @@ export function readDiscoveryJson(
   return fetcher(url, {
     headers: { 'User-Agent': agent, Accept: 'application/json' },
     signal: AbortSignal.timeout(8000),
-    redirect: 'error',
+    redirect: 'manual',
   })
     .then((response) => {
       // 압축 여부와 Content-Length에 관계없이 실제 본문 크기를 제한한다.

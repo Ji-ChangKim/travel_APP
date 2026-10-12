@@ -3,7 +3,6 @@ import { StyleSheet } from 'react-native';
 // 여행지 사진과 탐색 제목을 메인의 첫 시각 요소로 배치한다.
 export const discoveryStyles = StyleSheet.create({
   section: { gap: 12 },
-  eyebrow: { fontSize: 12, color: '#9A4E3E' },
   headline: {
     fontSize: 28,
     lineHeight: 38,
@@ -12,11 +11,10 @@ export const discoveryStyles = StyleSheet.create({
     letterSpacing: -0.8,
   },
   title: {
-    fontSize: 18,
+    fontSize: 19,
     lineHeight: 26,
     fontWeight: '700',
     color: '#203247',
-    marginTop: 8,
   },
   supporting: { fontSize: 14, lineHeight: 23, color: '#536373' },
   caption: { fontSize: 12, lineHeight: 19, color: '#697581', flexShrink: 1 },
@@ -40,27 +38,15 @@ export const discoveryStyles = StyleSheet.create({
   },
   card: {
     width: '100%',
-    minHeight: 326,
-    borderRadius: 16,
+    minHeight: 252,
+    borderRadius: 20,
     overflow: 'hidden',
     backgroundColor: '#F5F6F7',
   },
-  photo: { width: '100%', height: 160, backgroundColor: '#E7EDF0' },
+  photo: { width: '100%', height: 176, backgroundColor: '#E7EDF0' },
   placeholder: { alignItems: 'center', justifyContent: 'center' },
-  cardCopy: { padding: 16, gap: 6 },
+  cardCopy: { padding: 14, gap: 4 },
   city: { fontSize: 18, fontWeight: '700', color: '#203247', lineHeight: 26 },
-  trend: {
-    minHeight: 70,
-    paddingVertical: 12,
-    flexDirection: 'row',
-    gap: 14,
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#EDF0F2',
-  },
-  rank: { width: 22, color: '#C84432', fontSize: 20, fontWeight: '700' },
-  trendCopy: { flex: 1 },
-  metric: { fontSize: 14, color: '#9A4E3E', fontWeight: '600' },
   backdrop: {
     flex: 1,
     backgroundColor: '#00000066',

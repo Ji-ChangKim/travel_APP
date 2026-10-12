@@ -261,3 +261,16 @@ test('공급자 실패와 초과 본문은 공개 503이며 원문 오류를 노
   assert.equal(oversized.status, 503);
   assert.ok(!(await oversized.text()).includes('xxxx'));
 });
+
+// Workers에서 지원하는 manual 모드는 외부 리다이렉트를 따라가지 않는다.
+test('공급자 리다이렉트는 다른 호스트를 호출하지 않고 503으로 거부한다', async () => {
+  // redirect:error를 지원하지 않는 Workers 환경에서도 요청을 생성할 수 있어야 한다.
+  const calls: Request[] = [];
+  const response = await createApp(fixture(calls, { pageStatus: 302 })).request(
+    '/public/discovery',
+    {},
+    {},
+  );
+  assert.equal(response.status, 503);
+  assert.ok(calls.every((request) => request.redirect === 'manual'));
+});

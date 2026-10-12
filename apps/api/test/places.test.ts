@@ -117,3 +117,34 @@ test('구글 장소 상세는 고정 경로와 필드 마스크로 조회한다'
     false,
   );
 });
+// 지도 공급자의 리다이렉트도 다른 호스트로 따라가지 않는다.
+test('장소 검색·상세는 Workers 호환 모드로 리다이렉트를 거부한다', async () => {
+  // 인증 응답만 성공시키고 외부 장소 응답은 리다이렉트로 고정한다.
+  for (const path of [
+    '/api/v1/places/search?q=도쿄',
+    '/api/v1/places/test-place',
+  ]) {
+    const calls: Request[] = [];
+    const redirecting: typeof fetch = async (input, init) => {
+      calls.push(new Request(input, init));
+      return String(input).includes('/auth/v1/user')
+        ? Response.json({
+            id: accounts.owner,
+            is_anonymous: false,
+            aud: 'authenticated',
+          })
+        : new Response(null, {
+            status: 302,
+            headers: { Location: 'https://evil.example' },
+          });
+    };
+    const response = await createApp(redirecting).request(
+      path,
+      { headers: { Authorization: 'Bearer fixture-token' } },
+      env,
+    );
+    assert.equal(response.status, 503);
+    assert.equal(calls.length, 2);
+    assert.equal(calls[1]!.redirect, 'manual');
+  }
+});

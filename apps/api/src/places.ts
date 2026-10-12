@@ -84,7 +84,7 @@ export function searchPlaces(
           pageSize: 10,
         }),
         signal: AbortSignal.timeout(10000),
-        redirect: 'error',
+        redirect: 'manual',
       })
         .then((response) => {
           // 공급자 응답은 크기 상한을 적용해 읽는다.
@@ -123,7 +123,7 @@ export function getGooglePlace(
         {
           headers: googleHeaders(c.env.GOOGLE_PLACES_API_KEY, ''),
           signal: AbortSignal.timeout(10000),
-          redirect: 'error',
+          redirect: 'manual',
         },
       )
         .then((response) => {

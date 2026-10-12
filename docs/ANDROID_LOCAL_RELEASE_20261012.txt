@@ -1,0 +1,120 @@
+Android 로컬 배포 점검 (2026-10-12)
+
+1. 작업 경로
+현재 Git 프로젝트: J:/002. Project_Service/travel_APP
+전체 경로에 한글이 없으며 main과 origin/main은 1e930ada5a4a6e54caf4a70ab5e05aac2e284c6f로 일치했다.
+기존 J:/개인 프로젝트/App/travel_APP 경로는 더 이상 존재하지 않는다.
+J:/002. Project_Service/travel_APP_bulid는 비어 있으며 이번 빌드에 사용하지 않는다.
+이번 작업에서 소스 폴더를 다른 위치로 복사·이동하지 않는다.
+기존 사용자가 수정한 .idea 파일은 보존한다.
+
+2. 로컬 환경 복구
+이동된 프로젝트의 Android 폴더에는 .gradle만 있었고, 의존성 설치도 불완전해 @expo/cli를 찾지 못했다.
+첫 npm ci는 node_modules/ajv/scripts의 ENOTEMPTY 오류로 실패했다.
+실행 중인 다른 npm 설치가 없는 것을 확인하고 불완전한 node_modules와 apps/api/node_modules를
+.release/dependency-backup-20261012-1451 아래에 보존한 후 같은 잠금 파일로 재설치했다.
+EAS preview의 공개 staging 값만 .env.mvp와 .env.release에 복원했다.
+전역 네트워크·보안 설정은 변경하지 않았다.
+
+3. 로컬 서명
+사용자 확인: Play에 AAB를 처음 업로드하기 전이며 로컬 업로드 서명 키를 새로 준비한다.
+키 폴더: docs/98. keys/android-upload-20261012 (Git 제외 확인).
+tripprint-upload.jks: RSA 3072비트, 유효기간 10000일.
+credentials.json: 로컬 빌드용 키 경로·암호·alias. 암호 원문을 보고서나 로그에 남기지 않는다.
+upload-cert.pem: 공개 업로드 인증서.
+인증서 SHA-256: B6:2E:CF:B0:35:DF:A4:FA:9C:5B:0D:59:80:E9:A7:B6:0E:24:85:B1:80:10:09:D9:E9:FB:2C:54:E8:08:BF:27
+키 파일과 암호 파일은 함께 별도 안전한 위치에 보관해야 이후 앱 업데이트를 서명할 수 있다.
+이 업로드 키를 Google Play의 앱 서명 키와 혼동하지 않는다.
+
+4. 배포 방식
+GitHub Actions는 사용하지 않고 이 PC에서 Gradle로 빌드한다.
+이번에 시작했던 Actions 실행 38209412702는 사용자 요청에 맞춰 취소 완료했다.
+해당 실행의 코드·릴리스·서버·웹 사용자 흐름 검증 단계는 통과했지만 전체 빌드 결과는 취소다.
+로컬 빌드와 Play Console 수동 업로드에는 GitHub Secrets나 Play 서비스 계정 JSON이 필요하지 않다.
+GitHub Secrets 및 Environment는 조회 시 모두 비어 있었으나 현재 수동 배포의 차단 조건이 아니다.
+Google OAuth 로그인용 JSON은 Play 업로드 서명 키 또는 Play 서비스 계정 JSON이 아니다.
+
+5. 연결 서버 최초 확인
+/health: HTTP 200.
+/public/discovery?month=10: HTTP 404.
+웹 release.json은 2026-10-07 test-1-google-auth로 남아 있다.
+최신 추천 API 및 0006_unique_nicknames.sql 반영 상태는 후속 검증이 필요하다.
+
+6. 결과
+최종 상태: 사용자 요청에 따라 빌드 준비만 완료했고, 진행 중인 빌드는 중지했다. APK/AAB 생성 및 Play 업로드는 사용자가 Android Studio에서 직접 진행한다.
+서명 키 생성만으로 APK/AAB 빌드나 Play 내부 테스트 출시가 완료된 것은 아니다.
+
+빌드 저장 규칙: Android Studio/Gradle assembleDebug·assembleRelease·bundleDebug·bundleRelease 완료 후 J:/002. Project_Service/travel_APP_bulid로 복사. 이름 TripPrint_YYMMDD_Ver00~Ver99. 한국 날짜 기준 매일 Ver00부터 시작하고 기존 파일명은 건너뜀. 같은 Gradle 실행·같은 variant의 APK/AAB는 번호를 공유함. Expo config plugin으로 prebuild 후에도 연결 유지.
+7. 서버·웹 최종 반영 (2026-10-12)
+D1 wherego-staging: 0006_unique_nicknames.sql 적용 완료. 닉네임 UNIQUE 인덱스 1개, 중복 닉네임 그룹 0개, 미적용 마이그레이션 없음.
+민감한 계정 정보가 들어 있는 전체 DB의 로컬 SQL 내보내기는 자동 승인 심사에서 거부되어 실행하지 않았다. 대신 원격 Time Travel 복원 지점 메타데이터만 .release/d1-restore-point-before-0006.json에 보관했다.
+최종 API Worker 버전: 9c126ae8-ac69-4aa3-97cb-7f6dd9620fdb.
+/health: HTTP 200. /public/discovery?month=10: HTTP 200, 실제 도시 8개, 2026-09 월간 조회 통계 사용 가능.
+Workers fetch에서 redirect:error를 지원하지 않아 발생하던 503을 redirect:manual로 수정. readBounded의 HTTP 성공 판정이 3xx를 거부하므로 다른 호스트로 리다이렉트를 따라가지 않는다.
+서버 실패 로그는 오류 종류만 기록하며 외부 공급자 본문을 앱 응답에 노출하지 않는다.
+/api/social/providers: Google 활성, Kakao/Naver 비활성. 기존 인증 설정·비밀 값 유지.
+웹 배포: https://8815d9b9.tripprint-staging.pages.dev
+기본 웹 주소의 release.json: mvp-0.1.0-internal-candidate-20261012로 갱신.
+
+8. 빌드 파일 자동 저장 변경
+apps/mobile/app.config.ts: withAndroidBuildExport 플러그인 연결.
+apps/mobile/plugins/withAndroidBuildExport.cjs: Expo prebuild 시 app/build.gradle에 공통 내보내기 스크립트를 중복 없이 연결.
+scripts/android-export.gradle: Android Studio/Gradle의 assembleDebug·assembleRelease·bundleDebug·bundleRelease 성공 후 완성된 산출물만 내보내기.
+scripts/export-android-build.mjs: 한국 날짜 YYMMDD, 날짜별 Ver00~Ver99 자동 번호, 같은 실행·같은 variant의 APK/AAB 번호 공유, 파일 덮어쓰기 금지, 동시 번호 예약 잠금.
+출력 폴더: J:/002. Project_Service/travel_APP_bulid
+예시: TripPrint_261012_Ver00.apk / TripPrint_261012_Ver00.aab
+파일명의 VerNN은 보관 번호이며 앱의 Play versionCode·표시 버전과 별개이다.
+번호 예약용 .tripprint-build-index.json은 출력 폴더에서 자동 관리한다.
+현재 생성된 네이티브 Gradle 파일에도 연결하여 prebuild 전까지 기다리지 않고 사용할 수 있다.
+원본 APK/AAB는 Android Gradle Plugin이 지정한 산출물 폴더에 유지한다. IDE 실행에서는 APK가 intermediates/apk 아래에 생성될 수 있다.
+
+9. 검증 결과
+npm run check: 타입·린트·서식 통과.
+추천 API 회귀 검사 8개 통과 (Workers 호환 리다이렉트 거부 검사 포함).
+빌드 내보내기 검사 6개 통과 (임시 폴더 실제 복사·APK/AAB 번호 공유·다음 번호·기존 파일 보호 포함).
+릴리스 검사 전체 35개 통과.
+Gradle assembleRelease + bundleRelease dry-run --offline: BUILD SUCCESSFUL, 내보내기 Gradle 구문·작업 연결 확인.
+실제 APK/AAB 빌드는 사용자 최종 지시로 중단했다. 산출물 생성·서명 검증·앱 실행 검증은 아직 완료하지 않았다.
+
+추가 검증: Google 장소 검색·상세에도 redirect:manual 적용. 추천·장소 API 회귀 검사 총 13개 통과. 수정 후 서버 재배포 완료.
+추가 검증: 삭제한 산출물의 번호도 예약 기록으로 보호하며 내보내기 검사 총 6개 통과.
+네트워크 복구: 정체된 React Native release AAR을 공식 Maven에서 이어받고 SHA-1 대조 후 로컬 Gradle 캐시에 저장. 첫 Gradle 실행은 중단하고 자동 내보내기 설정을 포함한 새 빌드로 재시도.
+10. 사용자 최종 지시: 빌드 준비만 완료 (2026-10-12)
+사용자 요청으로 진행 중이던 실제 Gradle 빌드를 중지했다. 사용자가 Android Studio에서 직접 빌드한다.
+별도로 시작한 테스트 에뮬레이터 emulator-5560도 종료했다. 기존 사용자 AVD와 데이터는 변경하지 않았다.
+APK/AAB 생성 완료·실행 테스트·Play 업로드 완료로 보고하지 않는다.
+Android Studio 실행 설정, SDK/JDK 연결, 네이티브 android 폴더, Gradle 스크립트, 로컬 업로드 키, 자동 산출물 저장 설정은 준비되었다.
+apps/mobile/.env.local에 EAS preview와 같은 공개 API 주소를 추가해 Android Studio/Metro에서 사용할 수 있게 했다. 이 파일은 Git 제외 대상이며 비밀 키를 넣지 않았다.
+Run ▶는 선택한 Build Variant의 APK를 빌드·설치한다. debug 실행 시 Metro가 필요하며 저장소 루트에서 npm start로 실행한다.
+Play 제출용 AAB는 Android Studio 메뉴 Build > Generate Signed Bundle / APK > Android App Bundle에서 release를 선택한다.
+서명 파일은 docs/98. keys/android-upload-20261012/tripprint-upload.jks, alias는 tripprint-upload이다. 암호는 같은 폴더 credentials.json에만 보관한다.
+빌드 성공 후 지정한 travel_APP_bulid 폴더로 자동 복사된다. 빌드 중단 상태이므로 이번 APK/AAB 산출물은 아직 없다.
+11. Android Studio 동기화 오류 수정 (2026-10-12)
+증상: Gradle sync failed, :expo-modules-core:generateStubPCH 실패, clang++ no such file or directory.
+원인: Expo 기본 스크립트가 entry.command를 공백으로 split하여 J:/002. Project_Service 경로와 따옴표를 잘못 분리한다. 원본 경로가 ASCII여도 이 동기화 단계는 공백을 처리하지 못한다.
+scripts/android-studio-sync.gradle 추가: Windows에서 Expo 동기화용 빈 PCH 생성 작업만 보정. 컴파일러·target·sysroot를 추출하고 출력·입력 경로를 ProcessBuilder의 개별 인자로 전달한다. 정상 빌드에서는 Ninja가 실제 PCH를 생성하도록 원본보다 오래된 타임스탬프를 유지한다.
+apps/mobile/plugins/withAndroidStudioSync.cjs 추가 및 app.config.ts 연결: Expo prebuild가 루트 build.gradle의 보정 스크립트 연결을 유지한다.
+현재 apps/mobile/android/build.gradle에도 연결했다. node_modules의 원본 Expo 파일은 수정하지 않았다.
+검증: 새 플러그인과 app.config.ts의 린트·서식 검사 및 git diff --check 통과.
+첫 검증은 의존성이 Worklets 네이티브 컴파일을 시작하여 중지했다. 이후 기존 CMake 설정을 사용하는 PCH 전용 검증으로 범위를 좁혔다.
+최종 검증: :expo-modules-core:generateStubPCH -x :expo-modules-core:configureCMakeDebug --offline 성공. BUILD SUCCESSFUL in 1m 25s, 33개 작업 중 동기화용 PCH 작업 1개 실행, 나머지 32개 up-to-date.
+Debug arm64-v8a·armeabi-v7a 등에서 실제 빈 PCH 파일이 생성됨을 확인했다.
+이번 검증에서 앱 APK/AAB 생성·설치·배포는 실행하지 않았다. Android Studio 전체 UI 동기화 완료 여부는 사용자가 Try Again으로 확인한다.
+사용자 다음 동작: 현재 파란 배너의 Try Again 클릭 → Gradle 동기화 완료 → TripPrint와 기기 선택 → Run ▶.
+
+12. Android Studio APK 내보내기 오류 수정 (2026-10-12)
+증상: :app:assembleDebug 마지막 동작에서 scripts/android-export.gradle 15행의 "완성된 Android 산출물이 없습니다" 오류.
+원인: 자동 저장 스크립트가 app/build/outputs/apk/debug/app-debug.apk로 위치를 고정했다. 실제 Android Studio 빌드는 app/build/intermediates/apk/debug/app-debug.apk에 생성했다.
+확인: 기존 실제 APK 189,374,382바이트, output-metadata.json은 variantName debug, applicationId com.tripprint.app, versionCode 1, versionName 0.1.0을 기록한다.
+수정 파일: scripts/android-export.gradle. androidComponents의 variant.artifacts로 APK 디렉터리와 AAB 파일을 조회한다. APK 파일명은 BuiltArtifactsLoader의 메타데이터에서 읽는다. 출력 경로 추측이나 이전 APK 재귀 검색을 사용하지 않는다.
+기존 Expo 플러그인 연결 및 export-android-build.mjs의 날짜·번호·잠금·덮어쓰기 보호 규칙은 유지한다.
+외부 apply 스크립트의 클래스 로더 제약을 고려하여 앱 Android 플러그인의 클래스 로더에서 SingleArtifact 객체를 가져온다.
+단일 APK가 없거나 APK가 여러 개면 명확한 오류를 내어 모호한 파일을 임의로 복사하지 않는다. 현재 프로젝트는 단일 APK이며 ABI 분할 출력 설정이 없다.
+검증: 내보내기 회귀 검사 6개 통과. 사용자 기존 APK를 임시 폴더에 TripPrint_261012_Ver00.apk로 복사하고 원본·복사본 SHA-256 일치 확인. 검증 임시 폴더는 삭제했다.
+자동 승인 심사는 assembleDebug를 사용하는 내보내기 전용 검증 명령을 앱 빌드 가능성을 이유로 거부하여 실행하지 않았다. 대신 앱 작업을 실행하지 않는 Gradle help 설정 검사와 임시 복사 검사로 범위를 제한했다.
+이번 작업에서는 앱 컴파일·설치·Play 업로드를 수행하지 않는다. 최종 전체 빌드는 사용자가 Android Studio에서 진행한다.
+사용자 다음 동작: Gradle Sync 후 Run ▶ 재실행. 정상 완료 시 J:/002. Project_Service/travel_APP_bulid에 TripPrint_YYMMDD_VerNN.apk로 자동 보관된다.
+추가 검증 완료: 기기 API 37을 지정한 Gradle help --offline 설정 검사 BUILD SUCCESSFUL in 1m 4s. 33개 작업 중 도움말 1개만 실행했고 나머지 플러그인 작업 32개는 up-to-date, 앱 작업 실행 없음.
+AGP APK provider와 packageDebug의 출력 디렉터리가 모두 실제 intermediates/apk/debug를 반환하며 BuiltArtifactsLoader로 기존 app-debug.apk를 읽는 것까지 확인했다. APK 완료 작업에 내보내기 동작 1개가 연결됨을 확인했다.
+AAB provider는 debug·release·debugOptimized 각각의 outputs/bundle 경로를 반환한다. 실제 AAB 생성·서명 검증은 이번 작업 범위에 포함하지 않았다.
+검증 명령의 -Pandroid.injected.build.api=37 등의 프로젝트 속성은 PowerShell에서 각각 따옴표로 묶어 전달했다.

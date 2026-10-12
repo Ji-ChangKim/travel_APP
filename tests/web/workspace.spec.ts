@@ -47,6 +47,7 @@ test('공개 여행지 API → 원문 상세 → 로그인 없이 탐색 → 게
   page,
 }) => {
   // 외부 공급자에 개인 계정이 전달되지 않고 목적지가 인증 뒤에도 유지되는지 검증한다.
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await network(page);
   await page.clock.setFixedTime(new Date('2026-10-12T00:00:00Z'));
   await page.route('**/public/discovery', (route) => {
@@ -57,16 +58,36 @@ test('공개 여행지 API → 원문 상세 → 로그인 없이 탐색 → 게
     );
   });
   await page.goto('/community');
-  await page.getByRole('button', { name: '홈 탭', exact: true }).click();
-  await expect(
-    page.getByText('10월, 어디로 떠날까요?', { exact: true }),
-  ).toBeVisible();
+  await page.getByRole('button', { name: '내 여행', exact: true }).click();
+  await expect(page.getByText('10월의 여행지', { exact: true })).toBeVisible();
   await expect(
     page.getByText('위키백과에서 많이 읽힌 도시 TOP 3', { exact: true }),
-  ).toBeVisible();
+  ).toHaveCount(0);
   await expect(
     page.getByText(/실제 여행객 수나 예약 순위가 아니에요/),
+  ).toHaveCount(0);
+  await expect(page.getByText(/TripPrint 편집 선정/)).toHaveCount(0);
+  await expect(
+    page.getByRole('button', { name: '여행지 정보 새로고침', exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole('button', { name: '초대 링크로 참여', exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole('button', { name: '여행 도구', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: '초대 링크로 참여', exact: true }),
   ).toBeVisible();
+  await expect(
+    page.getByRole('button', {
+      name: 'Google Maps 장소 가져오기',
+      exact: true,
+    }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: '여행 도구', exact: true }).click();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page
+    .getByRole('button', { name: '새 일정 만들기', exact: true })
+    .scrollIntoViewIfNeeded();
   await page.screenshot({ path: 'test-results/tripprint-discovery-home.png' });
   await page
     .getByRole('button', { name: '다음 추천 여행지', exact: true })
@@ -109,7 +130,7 @@ test('추천 슬라이드 자동 순환 → 일시정지 → 재생 → 수동 �
     return ((requests += 1), route.fulfill({ json: discoveryFixture() }));
   });
   await page.goto('/community');
-  await page.getByRole('button', { name: '홈 탭', exact: true }).click();
+  await page.getByRole('button', { name: '내 여행', exact: true }).click();
   await expect(page.getByTestId('destination-carousel-position')).toHaveText(
     '1 / 3',
   );
@@ -176,7 +197,7 @@ test('동작 줄이기 설정에서는 자동 이동을 멈추고 직접 여행�
     return route.fulfill({ json: discoveryFixture() });
   });
   await page.goto('/community');
-  await page.getByRole('button', { name: '홈 탭', exact: true }).click();
+  await page.getByRole('button', { name: '내 여행', exact: true }).click();
   await expect(page.getByTestId('destination-carousel-position')).toHaveText(
     '1 / 3',
   );
@@ -224,7 +245,7 @@ test('추천 슬라이드는 숨긴 브라우저 탭에서 멈추고 돌아온 �
     return route.fulfill({ json: discoveryFixture() });
   });
   await page.goto('/community');
-  await page.getByRole('button', { name: '홈 탭', exact: true }).click();
+  await page.getByRole('button', { name: '내 여행', exact: true }).click();
   await expect(page.getByTestId('destination-carousel-position')).toHaveText(
     '1 / 3',
   );
@@ -271,7 +292,7 @@ test('여행지 API 오류 → 재조회 → 소개 복구, 통계 누락은 TOP
     });
   });
   await page.goto('/community');
-  await page.getByRole('button', { name: '홈 탭', exact: true }).click();
+  await page.getByRole('button', { name: '내 여행', exact: true }).click();
   await expect(
     page.getByRole('button', { name: '여행지 다시 불러오기', exact: true }),
   ).toBeVisible();
@@ -298,9 +319,7 @@ test('여행지 API 오류 → 재조회 → 소개 복구, 통계 누락은 TOP
   await page
     .getByRole('button', { name: '여행지 다시 불러오기', exact: true })
     .click();
-  await expect(
-    page.getByText('이달의 여행 아이디어', { exact: true }),
-  ).toBeVisible();
+  await expect(page.getByTestId('destination-carousel')).toBeVisible();
   await expect(
     page.getByText('위키백과에서 많이 읽힌 도시 TOP 3', { exact: true }),
   ).toHaveCount(0);
@@ -574,8 +593,8 @@ test('로그인 없는 공개 발자국 → 재실행 → 홈 미리보기 → �
       return expect(page.getByText(/시간 미정 · 공개 산책/)).toBeVisible();
     },
     () => {
-      // 공개 홈은 로그인 없이 하단 메뉴로 이동할 수 있다.
-      return page.getByRole('button', { name: '홈 탭', exact: true }).click();
+      // 로그인 없는 공개 홈은 피드의 내 여행 버튼으로 이동한다.
+      return page.getByRole('button', { name: '내 여행', exact: true }).click();
     },
     () => {
       // 공개 홈 미리보기가 영구 로딩 상태에 남지 않는다.
@@ -600,10 +619,10 @@ test('로그인 없는 공개 발자국 → 재실행 → 홈 미리보기 → �
       ).resolves.toBe(false);
     },
     () => {
-      // 개인 발자국 메뉴는 공개 탐색 권한으로 열 수 없다.
+      // 로그인 전 공개 탐색에서도 개인 발자국 메뉴를 노출하지 않는다.
       return expect(
         page.getByRole('button', { name: '발자국 탭', exact: true }),
-      ).toBeDisabled();
+      ).toHaveCount(0);
     },
     () => {
       // 홈에서 고른 공개 게시물로 다시 이동한다.
@@ -708,12 +727,12 @@ test('로그인 없는 공개 피드 오류 → 다시 불러오기 → 빈 상�
   ]);
 });
 
-// 처음 방문한 여행자가 좁은 화면에서도 두 인증 방법과 하단 메뉴를 찾을 수 있다.
+// 처음 방문한 여행자가 좁은 화면에서도 하단 메뉴 없이 인증을 진행한다.
 for (const width of [320, 390])
   test(`로그인 시안 ${width}px → 이메일 입력·가입 전환 → 비밀번호 해제`, ({
     page,
   }) => {
-    // 실제 화면 입력을 통해 폼 수명과 하단 메뉴를 검증한다.
+    // 실제 화면 입력을 통해 폼 수명과 인증 중 메뉴 숨김을 검증한다.
     return testSteps([
       () => {
         // 테스트 브라우저의 가로 폭만 변경한다.
@@ -752,6 +771,18 @@ for (const width of [320, 390])
         ).toHaveCount(0);
       },
       () => {
+        // 게스트 시작 버튼은 로그인 전에도 작은 화면 안에서 선택할 수 있다.
+        return expect(
+          page.getByRole('button', { name: '게스트로 시작하기', exact: true }),
+        ).toBeInViewport();
+      },
+      () => {
+        // 로그인 선택 중에는 하단 메뉴로 인증을 건너뛰지 못한다.
+        return expect(
+          page.getByRole('button', { name: '홈 탭', exact: true }),
+        ).toHaveCount(0);
+      },
+      () => {
         // 첫 화면과 여행 이미지를 검토할 수 있도록 저장한다.
         return page.screenshot({
           path: `test-results/tripprint-login-${width}.png`,
@@ -767,10 +798,10 @@ for (const width of [320, 390])
           .click();
       },
       () => {
-        // 이메일 화면에서도 최상위 하단 메뉴가 남는다.
+        // 이메일 입력 중에는 하단 메뉴가 표시되지 않는다.
         return expect(
           page.getByRole('button', { name: '마이 탭', exact: true }),
-        ).toBeInViewport();
+        ).toHaveCount(0);
       },
       () => {
         // 이메일 인증의 필수 입력을 검증한다.
@@ -791,6 +822,18 @@ for (const width of [320, 390])
           .fill('temporary-password');
       },
       () => {
+        // 입력한 비밀번호를 사용자가 잠시 확인할 수 있다.
+        return page
+          .getByRole('button', { name: '비밀번호 보기', exact: true })
+          .click();
+      },
+      () => {
+        // 표시 전환은 기존 비밀번호를 바꾸지 않는다.
+        return expect(
+          page.getByLabel('비밀번호', { exact: true }),
+        ).toHaveAttribute('type', 'text');
+      },
+      () => {
         // 같은 이메일 화면에서 회원가입으로 전환한다.
         return page
           .getByRole('button', { name: '이메일로 회원가입', exact: true })
@@ -801,6 +844,12 @@ for (const width of [320, 390])
         return expect(page.getByLabel('비밀번호', { exact: true })).toHaveValue(
           '',
         );
+      },
+      () => {
+        // 모드를 바꾸면 비밀번호는 다시 숨겨진 상태로 시작한다.
+        return expect(
+          page.getByLabel('비밀번호', { exact: true }),
+        ).toHaveAttribute('type', 'password');
       },
       () => {
         // 회원가입 화면의 좁은 화면 배치를 검토한다.
@@ -1372,9 +1421,9 @@ test('최초 로그인은 Google·이메일 인증과 로그인 없는 공개 �
         .click();
     },
     () => {
-      /* 로그인 화면에서도 메뉴가 보여야 한다. */ return expect(
+      /* 로그인 선택 중에는 메뉴를 숨긴다. */ return expect(
         page.getByRole('button', { name: '마이 탭', exact: true }),
-      ).toBeInViewport();
+      ).toHaveCount(0);
     },
     () => {
       // 새로 제공하는 이메일 폼으로 실제 인증을 진행한다.
@@ -1402,9 +1451,9 @@ test('최초 로그인 선택 → 홈 목적지 → 상세·편집·스크롤 �
       /* 로그인 선택부터 진행한다. */ return expect(page).toHaveURL(/\/login$/);
     },
     () => {
-      /* 로그인 전에도 공개 홈은 이동할 수 있다. */ return expect(
+      /* 로그인 전에는 홈 탭을 노출하지 않는다. */ return expect(
         page.getByRole('button', { name: '홈 탭', exact: true }),
-      ).toBeEnabled();
+      ).toHaveCount(0);
     },
     () => {
       /* 실제 이메일 폼을 사용한다. */ return emailLogin(page);
@@ -2150,6 +2199,32 @@ test('이메일 가입 입력을 검증하고 실제 세션 발급 후 재조회
       return page
         .getByRole('button', { name: '선택 안 함', exact: true })
         .click();
+    },
+    () => {
+      // 가입 도중에도 여행 메뉴는 표시하지 않는다.
+      return expect(
+        page.getByRole('button', { name: '홈 탭', exact: true }),
+      ).toHaveCount(0);
+    },
+    () => {
+      // 설정 화면을 일반적인 휴대전화 너비에서 검토한다.
+      return page.setViewportSize({ width: 390, height: 844 });
+    },
+    () => {
+      // 실제 입력값과 선택 상태가 보이는 프로필 화면을 저장한다.
+      return page.screenshot({
+        path: 'test-results/tripprint-profile-390.png',
+      });
+    },
+    () => {
+      // 좁은 화면에서도 성별 선택과 생일 입력이 넘치지 않는지 검토한다.
+      return page.setViewportSize({ width: 320, height: 740 });
+    },
+    () => {
+      // 여행 시작 버튼이 포함된 좁은 설정 화면을 저장한다.
+      return page.screenshot({
+        path: 'test-results/tripprint-profile-320.png',
+      });
     },
     () => {
       // 저장한 이후에 홈으로 진입한다.

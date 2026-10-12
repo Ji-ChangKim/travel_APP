@@ -35,6 +35,8 @@ const config: ExpoConfig = {
   },
   // 파일 기반 화면 전환과 앱 시작 시 표시할 기본 이미지를 등록한다.
   plugins: [
+    './plugins/withAndroidBuildExport.cjs',
+    './plugins/withAndroidStudioSync.cjs',
     ['expo-navigation-bar', { hidden: true }],
     '@react-native-community/datetimepicker',
     'expo-router',

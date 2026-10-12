@@ -1,0 +1,41 @@
+// Android Studio와 Gradle이 제공하는 실제 산출물 위치를 사용한다.
+def tripprintBuildId = java.util.UUID.randomUUID().toString()
+def tripprintExporter = new File(rootProject.projectDir, "../../../scripts/export-android-build.mjs")
+def tripprintOutput = new File(rootProject.projectDir, "../../../../travel_APP_bulid").canonicalFile
+def tripprintNode = providers.environmentVariable("NODE_BINARY").orElse("node")
+
+// 외부 적용 스크립트에서도 앱 플러그인의 산출물 API를 불러온다.
+def tripprintArtifactClassLoader = androidComponents.class.classLoader
+def tripprintApkType = tripprintArtifactClassLoader.loadClass('com.android.build.api.artifact.SingleArtifact$APK').getField('INSTANCE').get(null)
+def tripprintBundleType = tripprintArtifactClassLoader.loadClass('com.android.build.api.artifact.SingleArtifact$BUNDLE').getField('INSTANCE').get(null)
+
+androidComponents.onVariants(androidComponents.selector().all()) { variant ->
+    def variantTaskName = variant.name.capitalize()
+    def apkDirectory = variant.artifacts.get(tripprintApkType)
+    def bundleFile = variant.artifacts.get(tripprintBundleType)
+    def artifactsLoader = variant.artifacts.getBuiltArtifactsLoader()
+
+    // 산출물 생성에 성공한 완료 작업에서만 복사한다.
+    tasks.matching { task -> task.name in ["assemble" + variantTaskName, "bundle" + variantTaskName] }.configureEach { task ->
+        task.outputs.upToDateWhen { false }
+        task.doLast {
+            def artifact
+            if (task.name.startsWith("bundle")) {
+                artifact = bundleFile.get().asFile
+            } else {
+                // IDE의 intermediates 경로와 파일명 변경도 APK 메타데이터로 처리한다.
+                def builtApks = artifactsLoader.load(apkDirectory.get())
+                if (builtApks == null || builtApks.elements.size() != 1) {
+                    throw new GradleException("내보낼 단일 APK를 확인할 수 없습니다: ${apkDirectory.get().asFile}. 분할 APK 대신 단일 APK로 빌드해 주세요.")
+                }
+                artifact = new File(builtApks.elements.first().outputFile)
+            }
+            if (!artifact.isFile()) throw new GradleException("완성된 Android 산출물이 없습니다: ${artifact}")
+            def result = providers.exec {
+                commandLine tripprintNode.get(), tripprintExporter.absolutePath, artifact.absolutePath, tripprintBuildId + "-" + variant.name
+            }.result.get()
+            result.assertNormalExitValue()
+            logger.lifecycle("TripPrint 빌드 저장 폴더: ${tripprintOutput}")
+        }
+    }
+}

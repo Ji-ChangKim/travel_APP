@@ -6,18 +6,16 @@ import {
   type SetStateAction,
   type RefObject,
 } from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import LoginButton from './LoginButton';
+import AuthInput from './AuthInput';
+import {
+  AuthNavigation,
+  SignupProgress,
+  TravelerPortrait,
+} from './AuthFormChrome';
 import { loginStyles as styles } from './loginStyles';
 import { signInWithEmail, signUpWithEmail } from '@/services/authService';
 import { emailLoginSchema, emailSignupSchema } from './email';
@@ -154,52 +152,6 @@ function submitEmail(
     : undefined;
 }
 
-// 안전한 키보드·자동 완성 속성을 가진 인증 입력을 표시한다.
-function AuthInput({
-  label,
-  value,
-  secret = false,
-  email = false,
-  newPassword = false,
-  disabled,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  secret?: boolean;
-  email?: boolean;
-  newPassword?: boolean;
-  disabled: boolean;
-  onChange: (value: string) => void;
-}) {
-  // 비밀번호는 숨겨서 표시하며 자동 대문자 변환을 사용하지 않는다.
-  return (
-    <View style={{ gap: 6 }}>
-      <Text style={styles.label}>{label}</Text>
-      <TextInput
-        accessibilityLabel={label}
-        value={value}
-        onChangeText={onChange}
-        secureTextEntry={secret}
-        autoCapitalize="none"
-        autoCorrect={false}
-        keyboardType={email ? 'email-address' : 'default'}
-        autoComplete={
-          email
-            ? 'email'
-            : secret
-              ? newPassword
-                ? 'new-password'
-                : 'current-password'
-              : 'nickname'
-        }
-        editable={!disabled}
-        style={styles.input}
-      />
-    </View>
-  );
-}
-
 // 작은 화면에서도 스크롤 가능한 이메일 인증 모달을 표시한다.
 function EmailForm({
   state,
@@ -227,20 +179,13 @@ function EmailForm({
           : onClose
       }
     >
-      <SafeAreaView style={styles.screen} edges={['top', 'left', 'right']}>
-        <View style={styles.formNavigation}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="로그인 화면으로 돌아가기"
-            accessibilityState={{ disabled: state.busy }}
-            disabled={state.busy}
-            onPress={onClose}
-            style={[styles.backButton, state.busy && styles.disabled]}
-          >
-            <Ionicons name="arrow-back" size={22} color="#715D58" />
-            <Text style={styles.label}>돌아가기</Text>
-          </Pressable>
-        </View>
+      <SafeAreaView style={styles.screen}>
+        <AuthNavigation
+          title={state.mode === 'login' ? '로그인' : '회원가입'}
+          disabled={state.busy}
+          onBack={onClose}
+          onClose={onClose}
+        />
         <KeyboardAvoidingView
           style={styles.screen}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -249,14 +194,17 @@ function EmailForm({
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={styles.formContent}
           >
-            <Text style={styles.formHeader}>
-              {state.mode === 'login' ? '이메일로 로그인' : '여행자 회원가입'}
-            </Text>
-            <Text style={styles.formSubtitle}>
-              나의 여행을 저장하고, 친구와 함께 계획해 보세요.
-            </Text>
+            {state.mode === 'signup' ? (
+              <>
+                <SignupProgress step={1} />
+                <TravelerPortrait />
+              </>
+            ) : (
+              <Text style={styles.formHeader}>이메일로 로그인</Text>
+            )}
             <AuthInput
               label="이메일"
+              placeholder="you@example.com"
               value={state.email}
               email
               disabled={state.busy}
@@ -268,6 +216,9 @@ function EmailForm({
             {state.mode === 'signup' && (
               <AuthInput
                 label="닉네임"
+                placeholder="여행에서 사용할 이름"
+                hint="2~30자로 입력해 주세요."
+                maxLength={30}
                 value={state.nickname}
                 disabled={state.busy}
                 onChange={(value) => {
@@ -277,7 +228,12 @@ function EmailForm({
               />
             )}
             <AuthInput
+              key={`${state.mode}-password`}
               label="비밀번호"
+              placeholder={
+                state.mode === 'signup' ? '8자 이상 입력' : '비밀번호 입력'
+              }
+              maxLength={128}
               value={state.password}
               secret
               newPassword={state.mode === 'signup'}
@@ -290,6 +246,8 @@ function EmailForm({
             {state.mode === 'signup' && (
               <AuthInput
                 label="비밀번호 확인"
+                placeholder="비밀번호 한 번 더 입력"
+                maxLength={128}
                 value={state.confirmation}
                 secret
                 newPassword
@@ -306,7 +264,9 @@ function EmailForm({
               </Text>
             )}
             {state.notice && (
-              <Text accessibilityRole="alert">{state.notice}</Text>
+              <Text accessibilityRole="alert" style={styles.status}>
+                {state.notice}
+              </Text>
             )}
             <LoginButton
               variant="primary"
@@ -321,6 +281,9 @@ function EmailForm({
                     : '회원가입'
               }
               disabled={state.busy}
+              trailing={
+                <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
+              }
               onPress={() => {
                 // 현재 모드의 실제 인증을 실행한다.
                 return submitEmail(state, set, lock, onAuthenticated);
