@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { flightDetailsSchema } from './flight';
 import {
   calendarDateSchema,
   decimalExpenseSchema,
@@ -11,6 +12,13 @@ const idInput = z.object({ id: foundationUuidSchema }).strict();
 const optionalId = foundationUuidSchema.optional();
 const title = z.string().trim().min(1).max(100);
 const roles = z.enum(['editor', 'viewer']);
+// 지도 위치는 위도·경도 쌍과 유효 범위를 함께 검사한다.
+export const scheduleLocationSchema = z
+  .object({
+    latitude: z.number().finite().min(-90).max(90),
+    longitude: z.number().finite().min(-180).max(180),
+  })
+  .strict();
 export const scheduleInputSchema = z
   .object({
     id: foundationUuidSchema,
@@ -24,12 +32,21 @@ export const scheduleInputSchema = z
     sortOrder: z.number().int().positive().max(10000),
     memo: z.string().max(300).default(''),
     address: z.string().max(200).default(''),
+    location: scheduleLocationSchema.nullable().optional(),
+    flight: flightDetailsSchema.nullable().optional(),
+    durationMinutes: z.number().int().min(1).max(1440).nullable().optional(),
+    afterScheduleId: foundationUuidSchema.nullable().optional(),
+    estimatedCost: decimalExpenseSchema.nullable().optional(),
     googlePlaceId: z
       .string()
       .regex(/^[A-Za-z0-9_-]{1,200}$|^$/)
       .optional(),
   })
-  .strict();
+  .strict()
+  .refine((input) => {
+    // 항공편 상세는 이동 일정에만 연결할 수 있다.
+    return !input.flight || input.type === 'TRANSPORT';
+  }, '항공편은 이동 일정으로 등록해 주세요.');
 export const expenseInputSchema = z
   .object({
     id: foundationUuidSchema,
@@ -82,7 +99,7 @@ export const receiptDraftSchema = z.object({
   transactionDate: z.union([calendarDateSchema, z.literal('')]),
   transactionTime: receiptTimeSchema.default(''),
   amount: z.string().regex(/^$|^\d{1,12}(?:\.\d{1,2})?$/),
-  currency: z.enum(['KRW', 'JPY', 'USD']),
+  currency: z.string().trim().max(12).default(''),
   category: receiptCategorySchema.default('etc'),
   items: z.array(receiptItemSchema).max(50).default([]),
   warnings: z.array(z.string().max(200)).max(12).default([]),
@@ -140,6 +157,23 @@ export const workspaceCommandSchema = z.discriminatedUnion('operation', [
     .object({ operation: z.literal('schedule.delete'), input: idInput })
     .strict(),
   z
+    .object({
+      operation: z.literal('schedule.reorder'),
+      input: z
+        .object({
+          dayId: foundationUuidSchema,
+          ids: z
+            .array(foundationUuidSchema)
+            .max(10000)
+            .refine((ids) => {
+              // 한 일정을 두 번 포함한 순서 변경은 거부한다.
+              return new Set(ids).size === ids.length;
+            }),
+        })
+        .strict(),
+    })
+    .strict(),
+  z
     .object({ operation: z.literal('expense.save'), input: expenseInputSchema })
     .strict(),
   z.object({ operation: z.literal('expense.delete'), input: idInput }).strict(),
@@ -150,7 +184,7 @@ export const workspaceCommandSchema = z.discriminatedUnion('operation', [
         .object({
           title: z.string().trim().min(1).max(50),
           country: z.string().trim().min(1).max(50),
-          city: z.string().trim().min(1).max(50),
+          city: z.string().trim().max(50),
           status: z.enum(['DRAFT', 'PLANNED', 'IN_PROGRESS', 'COMPLETED']),
         })
         .strict(),
@@ -283,6 +317,9 @@ export const workspaceSnapshotSchema = z.object({
       sortOrder: z.number(),
       memo: z.string().nullable(),
       address: z.string(),
+      location: scheduleLocationSchema.nullable().optional(),
+      flight: flightDetailsSchema.nullable().optional(),
+      durationMinutes: z.number().int().min(1).max(1440).nullable().optional(),
       googlePlaceId: z
         .string()
         .regex(/^[A-Za-z0-9_-]{1,200}$/)

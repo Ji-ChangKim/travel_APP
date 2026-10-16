@@ -56,6 +56,16 @@ export interface Profile {
   updatedAt: string;
 }
 
+// 본인 프로필 수정과 온보딩 완료 요청에서 허용하는 필드를 정의한다.
+export interface ProfileUpdate {
+  nickname?: string;
+  bio?: string | null;
+  travelStyles?: string[];
+  gender?: NonNullable<Profile['gender']>;
+  birthDate?: string | null;
+  onboardingCompleted?: true;
+}
+
 // 장소 마스터 정보를 정의한다.
 export interface Place {
   id: string;
@@ -205,6 +215,7 @@ export type {
   MutationResult,
   PersistedTrip,
   PersistedTripInput,
+  FlightDetails,
   SupportedCurrency,
 } from './foundation';
 export type {
@@ -222,3 +233,9 @@ export {
   discoveryDestinations,
   type DiscoveryDestination,
 } from './destinations';
+export {
+  tripLifecycle,
+  tripToday,
+  type TripLifecycle,
+  type TripTiming,
+} from './tripLifecycle';

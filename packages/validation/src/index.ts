@@ -1,5 +1,13 @@
 import { z } from 'zod';
+export * from './profile';
 export * from './startup';
+export { flightDetailsSchema } from './flight';
+export { tripFlightEntrySchema } from './flight';
+export {
+  flightLookupQuerySchema,
+  flightLookupCandidateSchema,
+  flightLookupResponseSchema,
+} from './flight';
 
 // 여행 생성 시 입력값의 유효성을 검증하는 스키마를 정의한다.
 export const tripCreateSchema = z
@@ -133,3 +141,5 @@ export {
   type DestinationDiscovery,
   type DiscoveryCity,
 } from './discovery';
+
+export * from './receiptReview';

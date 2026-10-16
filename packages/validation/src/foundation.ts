@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { tripFlightSchema, tripFlightEntrySchema } from './flight';
 
 // 달력 날짜를 UTC 왕복 결과로 검증해 존재하지 않는 날짜를 거부한다.
 export function isCalendarDate(value: string): boolean {
@@ -12,8 +13,18 @@ export function isCalendarDate(value: string): boolean {
 
 // 런타임이 지원하는 여행 시간대만 승인한다.
 export function isSupportedTimezone(value: string): boolean {
-  // 시간대 목록 또는 UTC와 비교해 잘못된 입력을 거부한다.
-  return value === 'UTC' || Intl.supportedValuesOf('timeZone').includes(value);
+  // Hermes에서 제공하지 않는 supportedValuesOf 대신 날짜 포매터로 검증한다.
+  try {
+    // 유효한 IANA 시간대만 생성되며 알 수 없는 지역은 RangeError로 거부된다.
+    return Boolean(
+      value &&
+      new Intl.DateTimeFormat('en', { timeZone: value }).resolvedOptions()
+        .timeZone,
+    );
+  } catch {
+    // 검증 오류를 통신 실패처럼 전파하지 않는다.
+    return false;
+  }
 }
 
 // 여행 기간 상한을 계산한다.
@@ -38,28 +49,11 @@ export const persistedTripCreateSchema = z
   .object({
     title: z.string().trim().max(50).optional(),
     country: z.string().trim().min(1).max(50),
-    city: z.string().trim().min(1).max(50),
+    city: z.string().trim().max(50).default(''),
     startDate: calendarDateSchema,
     endDate: calendarDateSchema,
-    flight: z
-      .object({
-        number: z
-          .string()
-          .trim()
-          .regex(/^[A-Z0-9]{2,3}[0-9]{1,4}[A-Z]?$/),
-        departure: z.string().regex(/^[A-Z]{3}$/),
-        arrival: z.string().regex(/^[A-Z]{3}$/),
-        time: z
-          .string()
-          .regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)
-          .or(z.literal('')),
-      })
-      .strict()
-      .refine((flight) => {
-        // 같은 출발·도착 공항은 항공편으로 등록하지 않는다.
-        return flight.departure !== flight.arrival;
-      })
-      .optional(),
+    flight: tripFlightSchema.optional(),
+    flights: z.array(tripFlightEntrySchema).max(30).optional(),
     timezone: z
       .string()
       .max(100)
@@ -74,7 +68,28 @@ export const persistedTripCreateSchema = z
   .refine(isAllowedTripPeriod, {
     message: '여행 기간은 시작일 포함 1~90일이어야 합니다.',
     path: ['endDate'],
-  });
+  })
+  .refine(
+    (value) => {
+      // 같은 역할의 출발편·도착편 중복과 여행 기간 밖의 항공편을 거부한다.
+      return (
+        !(value.flight && value.flights) &&
+        (value.flights || []).every(
+          (flight) =>
+            flight.date >= value.startDate && flight.date <= value.endDate,
+        ) &&
+        ['outbound', 'inbound'].every(
+          (role) =>
+            (value.flights || []).filter((flight) => flight.role === role)
+              .length <= 1,
+        )
+      );
+    },
+    {
+      message: '항공편의 출발일과 중복 등록 여부를 확인해 주세요.',
+      path: ['flights'],
+    },
+  );
 
 // 요청과 리소스 식별자는 UUID로 검증한다.
 export const foundationUuidSchema = z.string().uuid();

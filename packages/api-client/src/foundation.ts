@@ -24,11 +24,19 @@ export class FoundationClientError extends Error {
 
 // 공통 API 응답을 해석한다.
 function readResponse(response: Response): Promise<FoundationResponse> {
-  // 실패 응답은 별도 오류로 전달하며 자동 재시도하지 않는다.
-  return response.json().then((payload: FoundationResponse) => {
-    // 호출자가 입력 유지와 재인증/충돌 처리를 결정한다.
-    return response.ok ? payload : rejectResponse(response.status, payload);
-  });
+  // HTML·빈 오류 응답도 HTTP 상태를 보존해 입력 수정과 동일 요청 재시도를 구분한다.
+  return response.ok
+    ? response.json()
+    : response
+        .json()
+        .catch(() => {
+          // 중계 서버의 원문을 사용자 안내나 진단 데이터에 포함하지 않는다.
+          return null;
+        })
+        .then((payload: unknown) => {
+          // 오류를 성공 자료로 반환하거나 자동 저장 재시도를 시작하지 않는다.
+          return rejectResponse(response.status, payload);
+        });
 }
 
 // 공개 오류를 한 번 전달한다.

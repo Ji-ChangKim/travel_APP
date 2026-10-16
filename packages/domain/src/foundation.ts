@@ -6,6 +6,22 @@ export type SupportedCurrency = 'KRW' | 'JPY' | 'USD';
 // API 금액은 정밀도를 보존하는 십진 문자열을 사용한다.
 export type DecimalAmount = string;
 
+// 사용자가 확인해 입력한 항공편 정보만 보관한다.
+export interface FlightDetails {
+  number: string;
+  departure: string;
+  arrival: string;
+  departureTerminal?: string;
+  arrivalTerminal?: string;
+  arrivalTime?: string;
+  arrivalDate?: string;
+  durationMinutes?: number;
+  baggageKg?: number;
+  cabin?: string;
+  aircraftType?: string;
+  aircraftRegistration?: string;
+}
+
 // 서버 여행 생성의 입력 필드를 정의한다.
 export interface PersistedTripInput {
   title?: string;
@@ -17,7 +33,12 @@ export interface PersistedTripInput {
   defaultCurrency?: SupportedCurrency;
   coverColor?: string;
   // 사용자 확인 항공편이며 운항 조회 또는 예약 인증 결과가 아니다.
-  flight?: { number: string; departure: string; arrival: string; time: string };
+  flight?: FlightDetails & { time: string };
+  flights?: (FlightDetails & {
+    time: string;
+    date: string;
+    role: 'outbound' | 'inbound' | 'additional';
+  })[];
 }
 
 // 서버가 확정한 여행과 집계 버전을 정의한다.

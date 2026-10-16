@@ -1,4 +1,5 @@
 import type {
+  FlightDetails,
   PersistedTrip,
   MemberRole,
   SupportedCurrency,
@@ -16,6 +17,12 @@ export interface WorkspaceSchedule {
   memo: string | null;
   address: string;
   googlePlaceId?: string;
+  // 사용자가 지도에서 선택한 실제 위치만 선택적으로 보관한다.
+  location?: { latitude: number; longitude: number } | null;
+  // 생략은 이전 앱의 기록이며 null은 사용자가 항공편 연결을 해제한 상태다.
+  flight?: FlightDetails | null;
+  // 사용자가 정한 방문 체류시간이며 생략은 이전 기록, null은 미정이다.
+  durationMinutes?: number | null;
 }
 export interface WorkspaceMedia {
   id: string;
@@ -102,7 +109,7 @@ export interface ReceiptDraft {
   merchant: string;
   transactionDate: string;
   amount: string;
-  currency: SupportedCurrency;
+  currency: string;
   needsConfirmation: true;
   address: string;
   transactionTime: string;

@@ -29,11 +29,15 @@ export function discoveryUrl(hosts: string[]) {
 }
 
 export const discoveryImageSchema = z.object({
-  url: discoveryUrl(['upload.wikimedia.org', 'thumb.wikimedia.org']),
-  sourceUrl: discoveryUrl(['commons.wikimedia.org']),
+  url: discoveryUrl([
+    'upload.wikimedia.org',
+    'thumb.wikimedia.org',
+    'tripprint-staging.pages.dev',
+  ]),
+  sourceUrl: discoveryUrl(['commons.wikimedia.org', 'media.taiwan.net.tw']),
   author: z.string().min(1).max(500),
   license: z.string().min(1).max(100),
-  licenseUrl: discoveryUrl(['creativecommons.org']),
+  licenseUrl: discoveryUrl(['creativecommons.org', 'data.gov.tw']),
 });
 
 export const discoveryCitySchema = z.object({
