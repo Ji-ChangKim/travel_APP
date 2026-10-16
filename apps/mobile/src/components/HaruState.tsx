@@ -1,5 +1,7 @@
+import Text from '@/components/AppText';
+import { colors } from '@/constants/theme';
 import type { ReactNode } from 'react';
-import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
 
 // 상태에 맞는 하루의 포즈와 보조기기 설명을 선택한다.
 const poses = {
@@ -44,7 +46,7 @@ export default function HaruState({
         <View style={styles.heading}>
           {kind === 'loading' && (
             <ActivityIndicator
-              color="#C84432"
+              color={colors.primary}
               accessibilityLabel="불러오는 중"
             />
           )}
@@ -70,10 +72,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 24,
     gap: 12,
-    borderRadius: 24,
-    backgroundColor: '#FFF9F3',
+    borderRadius: 20,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: '#F1E7DE',
+    borderColor: colors.border,
   },
   compact: { flexDirection: 'row', padding: 14, gap: 14 },
   portrait: { width: 190, height: 210 },
@@ -86,12 +88,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     lineHeight: 28,
     fontWeight: '700',
-    color: '#203247',
+    color: colors.text,
     textAlign: 'center',
   },
   compactTitle: { fontSize: 15, lineHeight: 22, textAlign: 'left' },
   description: {
-    color: '#586878',
+    color: colors.muted,
     fontSize: 14,
     lineHeight: 22,
     textAlign: 'center',

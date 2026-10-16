@@ -21,4 +21,16 @@ export const colors = {
   starGold: '#FFB300',
   danger: '#E53935',
   dangerSoft: '#FFEBEE',
+  // Stitch 디자인 시스템 토큰 색상 (Warm Minimalist Wayfinder)
+  stitchCoral: '#FF6B4A',
+  stitchCoralSoft: '#FFF0ED',
+  stitchCoralDark: '#EA580C',
+  stitchSlate: '#0F172A',
+  stitchCyan: '#0284C7',
+  stitchCyanSoft: '#F0F9FF',
+  stitchBg: '#F8FAFC',
+  stitchBorder: '#E2E8F0',
+  stitchCard: '#FFFFFF',
+  stitchMuted: '#64748B',
+  stitchMutedLight: '#94A3B8',
 } as const;

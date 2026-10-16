@@ -1,5 +1,7 @@
+import Text from '@/components/AppText';
+import { travelDateRange } from './travelDateRange';
 import { useEffect, useState, type Dispatch, type SetStateAction } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
@@ -221,7 +223,8 @@ function ImportView({ controller }: { controller: Controller }) {
                 <View key={trip.id} style={styles.card}>
                   <Text style={styles.title}>{trip.title}</Text>
                   <Text>
-                    {trip.city} · {trip.startDate} ~ {trip.endDate}
+                    {trip.city} ·{' '}
+                    {travelDateRange(trip.startDate, trip.endDate)}
                   </Text>
                   <Action
                     label={`이 여행에 추가: ${trip.title}`}

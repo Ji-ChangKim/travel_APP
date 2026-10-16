@@ -1,30 +1,32 @@
-import { StyleSheet, Text, View } from 'react-native';
+import Text from '@/components/AppText';
+import { colors } from '@/constants/theme';
+import { StyleSheet, View } from 'react-native';
 
 // 앱의 3대 핵심 효용 단계 데이터를 정의한다.
 const steps = [
   {
     stepNumber: '01',
-    title: '항공권/호텔/동선 자동 연결 ✈️',
+    title: '도시와 날짜 정하기',
     description:
-      '문자, 카카오톡 알림톡 연결/캡처로 숙소·항공권 한 번에 모아 일정표로 자동 정리해요.',
-    badgeBg: '#EDF5FF',
-    badgeText: '#0066FF',
+      '여행 기간을 선택하면 날짜별 일정표가 생겨요. 항공편은 직접 입력하거나 건너뛸 수 있어요.',
+    badgeBg: colors.secondarySoft,
+    badgeText: colors.secondary,
   },
   {
     stepNumber: '02',
-    title: '지도 위 최적 동선 한눈에 확인 🗺️',
+    title: '장소와 일정 기록하기',
     description:
-      '거리 낭비 없는 효율적 이동 순서와 예상 대중교통 소요 시간을 실시간 계산해요.',
-    badgeBg: '#E0F7F6',
-    badgeText: '#00A896',
+      '날짜별로 방문할 장소를 적고 사진을 남겨 보세요. 연결한 장소는 Google Maps에서 열 수 있어요.',
+    badgeBg: colors.successSoft,
+    badgeText: colors.success,
   },
   {
     stepNumber: '03',
-    title: '영수증 캡처, 엔빵/정산까지 한 번에! 🧾',
+    title: '영수증과 비용 저장하기',
     description:
-      '여행 중 지출 영수증을 사진 찍으면 통화 환산/친구들과 1/N 정산 링크를 즉시 생성해요.',
-    badgeBg: '#FFF0ED',
-    badgeText: '#FF5C39',
+      '영수증의 날짜·금액을 확인해 일정과 지출에 추가해요. 실제 비용과 예상 비용은 통화별로 모아 볼 수 있어요.',
+    badgeBg: colors.selectedSurface,
+    badgeText: colors.primary,
   },
 ];
 
@@ -34,8 +36,12 @@ export default function HomeGuide() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>💡 TripPrint 활용 가이드</Text>
-        <Text style={styles.stepCount}>Easy 4-Steps</Text>
+        <Text accessibilityRole="header" numberOfLines={1} style={styles.title}>
+          여행 기록 가이드
+        </Text>
+        <Text numberOfLines={1} style={styles.stepCount}>
+          3단계 여행 기록
+        </Text>
       </View>
 
       <View style={styles.stepList}>
@@ -48,22 +54,13 @@ export default function HomeGuide() {
             </View>
 
             <View style={styles.stepContent}>
-              <Text style={styles.stepTitle}>{item.title}</Text>
+              <Text numberOfLines={1} style={styles.stepTitle}>
+                {item.title}
+              </Text>
               <Text style={styles.stepDescription}>{item.description}</Text>
             </View>
           </View>
         ))}
-      </View>
-
-      <View style={styles.reviewBanner}>
-        <Text style={styles.quoteIcon}>💬</Text>
-        <View style={styles.reviewContent}>
-          <Text style={styles.reviewText}>
-            &ldquo;이번 여행엔 어디로 갈까 고민하는 시간 절약할 수 있어서
-            좋았어요.&rdquo;
-          </Text>
-          <Text style={styles.reviewerText}>- TripPrint 얼리어답터 리뷰</Text>
-        </View>
       </View>
     </View>
   );
@@ -75,31 +72,34 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   header: {
+    gap: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   title: {
+    flexShrink: 1,
     fontSize: 19,
     lineHeight: 26,
     fontWeight: '800',
-    color: '#203247',
+    color: colors.text,
     letterSpacing: -0.4,
   },
   stepCount: {
-    fontSize: 13,
+    flexShrink: 0,
+    fontSize: 14,
     fontWeight: '700',
-    color: '#8A9BA8',
+    color: colors.muted,
   },
   stepList: {
     gap: 12,
   },
   stepCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 18,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#EDF0F2',
+    borderColor: colors.border,
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 14,
@@ -122,23 +122,23 @@ const styles = StyleSheet.create({
   stepTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#203247',
+    color: colors.text,
     letterSpacing: -0.2,
   },
   stepDescription: {
-    fontSize: 13,
-    lineHeight: 19,
-    color: '#697581',
+    fontSize: 14,
+    lineHeight: 22,
+    color: colors.muted,
   },
   reviewBanner: {
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.background,
     borderRadius: 16,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
     borderWidth: 1,
-    borderColor: '#E9ECEF',
+    borderColor: colors.border,
   },
   quoteIcon: {
     fontSize: 20,
@@ -148,15 +148,15 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   reviewText: {
-    fontSize: 13,
-    lineHeight: 19,
-    color: '#495057',
+    fontSize: 14,
+    lineHeight: 22,
+    color: colors.text,
     fontStyle: 'italic',
     fontWeight: '500',
   },
   reviewerText: {
-    fontSize: 11,
-    color: '#868E96',
+    fontSize: 14,
+    color: colors.muted,
     fontWeight: '600',
     marginTop: 2,
   },

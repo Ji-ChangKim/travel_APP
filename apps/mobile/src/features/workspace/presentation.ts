@@ -1,17 +1,10 @@
-// 여행 상태를 사용자에게 익숙한 문장으로 표시한다.
+import type { TripLifecycle } from '@wherego/domain';
+import { tripPhaseLabels } from './tripPresentation';
+
+// 편집 화면의 저장 상태 이름도 같은 공통 사전을 사용한다.
 export function tripStatusLabel(status: string): string {
-  // 서버의 상태 식별자를 화면에 그대로 노출하지 않는다.
-  return (
-    (
-      {
-        DRAFT: '준비 중',
-        PLANNED: '여행 예정',
-        IN_PROGRESS: '여행 중',
-        COMPLETED: '완료한 여행',
-        ARCHIVED: '보관한 여행',
-      } as Record<string, string>
-    )[status] || '여행 상태 확인 중'
-  );
+  // 알 수 없는 내부 식별자는 그대로 노출하지 않는다.
+  return tripPhaseLabels[status as TripLifecycle] || '여행 상태 확인 중';
 }
 
 // 동행의 역할을 할 수 있는 행동으로 설명한다.
@@ -31,6 +24,7 @@ export function memberRoleLabel(role: string): string {
 // 여행 상세의 작업 영역을 같은 순서와 이름으로 표시한다.
 export const workspaceSections = [
   ['itinerary', '일정'],
+  ['map', '지도'],
   ['expenses', '비용'],
   ['photos', '사진·영수증'],
   ['preparation', '준비물'],

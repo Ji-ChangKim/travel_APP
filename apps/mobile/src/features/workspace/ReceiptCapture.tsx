@@ -1,5 +1,7 @@
+import Text from '@/components/AppText';
+import { colors } from '@/constants/theme';
 import Modal from '@/components/AppModal';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Action, styles } from './ui';
@@ -26,7 +28,12 @@ export default function ReceiptCapture({
   });
   // 실제 카메라는 기기의 촬영 화면을 사용하며 이 화면에서는 결과를 만들지 않는다.
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
+    <Modal
+      accessibilityLabel="영수증 사진 선택"
+      visible={visible}
+      animationType="slide"
+      onRequestClose={onClose}
+    >
       <SafeAreaView style={styles.modal}>
         <ScrollView contentContainerStyle={styles.content}>
           <Text style={styles.label}>사진 촬영 → 정보 확인 → 일정 등록</Text>
@@ -40,17 +47,17 @@ export default function ReceiptCapture({
             style={{
               borderWidth: 2,
               borderStyle: 'dashed',
-              borderColor: '#FF6B57',
+              borderColor: colors.primary,
               borderRadius: 24,
               padding: 28,
               minHeight: 240,
               alignItems: 'center',
               justifyContent: 'center',
               gap: 14,
-              backgroundColor: '#FFF9F4',
+              backgroundColor: colors.background,
             }}
           >
-            <Ionicons name="receipt-outline" size={84} color="#FF6B57" />
+            <Ionicons name="receipt-outline" size={84} color={colors.primary} />
             <Text style={styles.title}>영수증 전체가 보이게 촬영해 주세요</Text>
             <Text style={styles.subtitle}>
               상호와 날짜, 메뉴, 합계가 잘리지 않게 담아주세요.

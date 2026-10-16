@@ -1,134 +1,107 @@
-import { useRef, useState } from 'react';
-import { Linking, Text, View } from 'react-native';
-import { z } from 'zod';
-import { GoogleAttribution, googlePlaceSchema } from './GooglePlace';
-import { requestFoundation } from '@wherego/api-client';
-import { serverOptions } from './service';
+import Text from '@/components/AppText';
+import { useState } from 'react';
+import { Linking, View } from 'react-native';
 import { Action, Field, styles } from './ui';
 import SharedPlaceInput from './SharedPlaceInput';
+import { ScheduleButton, ScheduleField } from './ScheduleControls';
+import { scheduleStyles as schedule } from './scheduleTheme';
 
-const resultSchema = z.array(googlePlaceSchema);
-type Place = z.infer<typeof resultSchema>[number];
-
-// 장소를 검색한 뒤 선택한 결과만 편집 중 일정에 반영한다.
+// 장소 확인은 외부 Google Maps와 사용자 공유 입력으로 연결한다.
 export default function PlaceSearch({
   userId,
   city,
   disabled,
   onSelect,
   initialShare,
+  compact = false,
+  value,
+  onQueryChange,
+  simple = false,
+  startExpanded = false,
 }: {
   userId: string;
   city: string;
   disabled: boolean;
   onSelect: (placeId: string, authoredTitle: string) => void;
   initialShare?: string;
+  compact?: boolean;
+  value?: string;
+  onQueryChange?: (value: string) => void;
+  simple?: boolean;
+  startExpanded?: boolean;
 }) {
-  // 검색 결과는 현재 팝업에만 보관한다.
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<Place[]>([]);
-  const [busy, setBusy] = useState(false);
+  // 입력 중 자동 검색이나 유료 Places 요청을 실행하지 않는다.
+  const [localQuery, setLocalQuery] = useState('');
+  const query = value ?? localQuery;
+  const setQuery = onQueryChange || setLocalQuery;
+  const Button = compact ? ScheduleButton : Action;
   const [error, setError] = useState('');
-  const request = useRef(0);
-  // 검색어 수정은 이전 검색 응답을 무효화한다.
-  function change(value: string): void {
-    // 이전 요청 결과를 새 검색어에 섞지 않는다.
-    request.current += 1;
-    setQuery(value);
-    setResults([]);
-    setBusy(false);
-    setError('');
-  }
-  // 서버 인증과 실제 지도 공급자 검색을 연결한다.
-  function search(): void {
-    // 현재 요청만 결과를 적용할 수 있다.
-    const current = ++request.current;
-    setBusy(true);
-    setError('');
-    serverOptions(userId)
-      .then((options) => {
-        // 여행 도시를 검색 문맥에 포함한다.
-        return requestFoundation(
-          options,
-          `/places/search?q=${encodeURIComponent(`${city} ${query.trim()}`.trim())}`,
-        );
-      })
-      .then((response) => {
-        // 늦게 도착한 이전 검색 결과는 버린다.
-        if (current === request.current)
-          setResults(resultSchema.parse(response.data));
-      })
-      .catch(() => {
-        // 실패에서도 검색어와 작성 내용은 유지한다.
-        if (current === request.current)
-          setError(
-            '장소 검색을 완료하지 못했어요. 다시 검색하거나 Google Maps에서 확인해 주세요.',
-          );
-      })
-      .finally(() => {
-        // 현재 검색의 로딩 상태만 해제한다.
-        if (current === request.current) setBusy(false);
-      });
-  }
-  // 검색과 원본 지도 확인을 입력 폼보다 먼저 제공한다.
+  const [expanded, setExpanded] = useState(
+    Boolean(initialShare) || startExpanded,
+  );
+  // 외부 지도에서 장소를 확인한 다음 사용자가 일정을 작성한다.
   return (
-    <View style={styles.card}>
-      <SharedPlaceInput
-        userId={userId}
-        disabled={disabled}
-        initialText={initialShare}
-        onQuery={change}
-        onSelect={onSelect}
-      />
-      <Text style={styles.title}>Google Maps에서 장소 검색</Text>
-      <Field label="장소 검색어" value={query} onChange={change} />
-      <View style={styles.row}>
-        <Action
-          label={busy ? '검색 중…' : '지도 검색'}
-          disabled={disabled || busy || query.trim().length < 2}
-          onPress={search}
+    <View style={compact ? { gap: 12 } : styles.card}>
+      {!compact && (
+        <Text style={styles.title} numberOfLines={1}>
+          여행할 장소 찾기
+        </Text>
+      )}
+      {compact ? (
+        <ScheduleField
+          label={simple ? '일정 제목' : '장소명 또는 일정 제목'}
+          accessibilityLabel="제목"
+          value={query}
+          onChange={setQuery}
+          placeholder="어디에 가고 싶으세요?"
         />
-        <Action
-          label="Google Maps 열기"
-          disabled={disabled || !query.trim()}
+      ) : (
+        <Field label="장소 검색어" value={query} onChange={setQuery} />
+      )}
+      {compact && !simple && (
+        <ScheduleButton
+          label={
+            expanded ? '지도 검색·링크 접기' : 'Google Maps로 찾거나 가져오기'
+          }
           onPress={() => {
-            // 공급자 실패에도 공식 지도에서 직접 확인할 수 있다.
-            void Linking.openURL(
-              `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${city} ${query}`)}`,
-            ).catch(() => {
-              // 외부 앱 실행 실패를 알려 준다.
-              setError('지도를 열지 못했습니다. 다시 시도해 주세요.');
-            });
+            // 직접 입력은 기본으로 두고 외부 지도 사용은 선택하게 한다.
+            return setExpanded(!expanded);
           }}
         />
-      </View>
-      {error && (
+      )}
+      {!simple && (!compact || expanded) && (
+        <>
+          <Button
+            label="Google Maps에서 찾기"
+            disabled={disabled || !query.trim()}
+            onPress={() => {
+              // Maps URL은 앱의 Places API를 호출하지 않는다.
+              return void Linking.openURL(
+                `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${city} ${query}`.trim())}`,
+              ).catch(() => {
+                // 입력을 유지하며 다시 시도할 수 있도록 안내한다.
+                return setError('지도를 열지 못했어요. 다시 시도해 주세요.');
+              });
+            }}
+          />
+          <Text style={compact ? schedule.meta : styles.subtitle}>
+            장소를 확인한 뒤 일정 제목을 입력하고 지도 위치를 선택해 주세요.
+          </Text>
+          <SharedPlaceInput
+            userId={userId}
+            disabled={disabled}
+            initialText={initialShare}
+            compact={compact}
+            onQuery={setQuery}
+            onSelect={onSelect}
+          />
+        </>
+      )}
+      {error ? (
         <Text accessibilityRole="alert" style={styles.error}>
           {error}
         </Text>
-      )}
-      {results.length > 0 && (
-        <View>
-          <Text>검색 결과 · 선택 후 내용을 확인해 주세요.</Text>
-          <GoogleAttribution />
-        </View>
-      )}
-      {results.map((place) => (
-        <View key={place.id}>
-          <Text>{place.address}</Text>
-          {place.attributions.length > 0 && (
-            <GoogleAttribution attributions={place.attributions} />
-          )}
-          <Action
-            label={`선택: ${place.title}`}
-            disabled={disabled}
-            onPress={() => {
-              // 공급자 이름·주소는 저장하지 않고 장소 ID와 사용자가 입력한 제목만 전달한다.
-              onSelect(place.id, query.trim().slice(0, 100));
-            }}
-          />
-        </View>
-      ))}
+      ) : null}
     </View>
   );
 }

@@ -1,5 +1,7 @@
+import Text from '@/components/AppText';
+import { colors } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 // 추천 템플릿 카드 데이터 모델을 정의한다.
 export interface RecommendationCourse {
@@ -24,8 +26,8 @@ export const recommendedCourses: RecommendationCourse[] = [
     title: '도쿄 감성 카페 & 디즈니',
     description:
       '내 취향 맞춤 여행지 둘러보고 디즈니 일정 둘러보기 SNS 핫플과 필수 명소 코스',
-    themeColor: '#FF6B4A',
-    bgLight: '#FFF2EE',
+    themeColor: colors.primary,
+    bgLight: colors.selectedSurface,
     icon: 'business-outline',
   },
   {
@@ -36,8 +38,8 @@ export const recommendedCourses: RecommendationCourse[] = [
     title: '에메랄드빛 제주 드라이브',
     description:
       '푸른 바다와 오름을 만끽하는 여유로운 휴식과 감성 로컬 카페 탐방',
-    themeColor: '#00AA6C',
-    bgLight: '#EDF9F4',
+    themeColor: colors.success,
+    bgLight: colors.successSoft,
     icon: 'sunny-outline',
   },
   {
@@ -47,8 +49,8 @@ export const recommendedCourses: RecommendationCourse[] = [
     locationDuration: '오사카 · 3박 4일',
     title: '오사카 미식 & 유니버설',
     description: '도톤보리 맛집 정복과 테마파크를 알차게 즐기는 핵심 100% 동선',
-    themeColor: '#FF9500',
-    bgLight: '#FFF8ED',
+    themeColor: colors.warning,
+    bgLight: colors.warningSoft,
     icon: 'restaurant-outline',
   },
 ];
@@ -59,7 +61,7 @@ interface Props {
   onViewAll?: () => void;
 }
 
-// 추천 코스를 가로 스크롤 캐러셀로 렌더링하고 템플릿 복사 시작을 연결한다.
+// 추천 코스를 가로 스크롤로 표시하고 여행 일정 선택을 연결한다.
 export default function HomeRecommendation({
   disabled,
   onSelectCourse,
@@ -85,7 +87,7 @@ export default function HomeRecommendation({
             ]}
           >
             <Text style={styles.viewAllText}>전체보기</Text>
-            <Ionicons name="chevron-forward" size={14} color="#697581" />
+            <Ionicons name="chevron-forward" size={14} color={colors.muted} />
           </Pressable>
         )}
       </View>
@@ -101,7 +103,7 @@ export default function HomeRecommendation({
             course={course}
             disabled={disabled}
             onSelect={() => {
-              // 선택한 코스의 템플릿으로 여행 생성을 시작한다.
+              // 선택한 여행 일정의 키를 기존 이동 동작에 전달한다.
               return onSelectCourse(course.key);
             }}
           />
@@ -121,7 +123,7 @@ function CourseCard({
   disabled: boolean;
   onSelect: () => void;
 }) {
-  // 개별 코스 카드의 썸네일과 설명 및 템플릿 복사 버튼을 반환한다.
+  // 코스의 썸네일과 설명 및 여행 일정 보기 버튼을 표시한다.
   return (
     <View style={styles.card}>
       <View style={[styles.thumbnailArea, { backgroundColor: course.bgLight }]}>
@@ -151,7 +153,7 @@ function CourseCard({
 
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`${course.title} 템플릿 복사해서 시작`}
+          accessibilityLabel={`${course.title} 여행 일정 보기`}
           accessibilityState={{ disabled }}
           disabled={disabled}
           onPress={onSelect}
@@ -161,8 +163,8 @@ function CourseCard({
             pressed && styles.pressed,
           ]}
         >
-          <Ionicons name="copy-outline" size={15} color="#203247" />
-          <Text style={styles.copyButtonText}>템플릿 복사해서 시작</Text>
+          <Ionicons name="calendar-outline" size={15} color={colors.text} />
+          <Text style={styles.copyButtonText}>여행 일정 보기</Text>
         </Pressable>
       </View>
     </View>
@@ -182,16 +184,16 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   sectionSub: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '800',
-    color: '#FF5C39',
+    color: colors.primary,
     letterSpacing: 0.5,
   },
   sectionTitle: {
     fontSize: 19,
     lineHeight: 26,
     fontWeight: '800',
-    color: '#203247',
+    color: colors.text,
     letterSpacing: -0.4,
   },
   viewAllButton: {
@@ -203,7 +205,7 @@ const styles = StyleSheet.create({
   },
   viewAllText: {
     fontSize: 13,
-    color: '#697581',
+    color: colors.muted,
     fontWeight: '600',
   },
   scrollContent: {
@@ -212,10 +214,10 @@ const styles = StyleSheet.create({
   },
   card: {
     width: 250,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#EDF0F2',
+    borderColor: colors.border,
     overflow: 'hidden',
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 2 },
@@ -241,8 +243,8 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   tagText: {
-    color: '#FFFFFF',
-    fontSize: 11,
+    color: colors.textLight,
+    fontSize: 13,
     fontWeight: '700',
   },
   subBadgeBottom: {
@@ -255,8 +257,8 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   subBadgeText: {
-    color: '#344054',
-    fontSize: 10,
+    color: colors.text,
+    fontSize: 13,
     fontWeight: '700',
   },
   cardBody: {
@@ -264,25 +266,25 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   locationDuration: {
-    fontSize: 12,
-    color: '#8A9BA8',
+    fontSize: 13,
+    color: colors.muted,
     fontWeight: '600',
   },
   cardTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#203247',
+    color: colors.text,
     letterSpacing: -0.3,
   },
   cardDescription: {
-    fontSize: 12,
-    lineHeight: 18,
-    color: '#697581',
+    fontSize: 13,
+    lineHeight: 20,
+    color: colors.muted,
     minHeight: 36,
   },
   copyButton: {
     marginTop: 8,
-    backgroundColor: '#F5F7FA',
+    backgroundColor: colors.background,
     borderRadius: 12,
     height: 40,
     flexDirection: 'row',
@@ -290,12 +292,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     borderWidth: 1,
-    borderColor: '#E4E7EC',
+    borderColor: colors.border,
   },
   copyButtonText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#203247',
+    color: colors.text,
   },
   disabled: {
     opacity: 0.5,

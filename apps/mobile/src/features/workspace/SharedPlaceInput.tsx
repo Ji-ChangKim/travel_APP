@@ -1,15 +1,19 @@
+import Text from '@/components/AppText';
 import {
   useState,
+  useEffect,
   useRef,
   type Dispatch,
   type SetStateAction,
   type RefObject,
 } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { mapsSharePreviewSchema, sharedMapsUrl } from '@wherego/validation';
 import { requestFoundation } from '@wherego/api-client';
 import { serverOptions } from './service';
 import { Action, Field, styles } from './ui';
+import { ScheduleButton, ScheduleField } from './ScheduleControls';
+import { scheduleStyles as schedule } from './scheduleTheme';
 
 type State = {
   text: string;
@@ -22,6 +26,7 @@ type Props = {
   userId: string;
   disabled: boolean;
   initialText?: string;
+  compact?: boolean;
   onQuery: (query: string) => void;
   onSelect: (id: string, title: string) => void;
 };
@@ -109,15 +114,19 @@ function SharedPlaceView({
   set: Set;
   request: RefObject<number>;
 }) {
+  const Button = props.compact ? ScheduleButton : Action;
+  const Input = props.compact ? ScheduleField : Field;
   // 외부 페이지의 원문을 표시하지 않고 검증한 후보만 보여준다.
   return (
-    <View style={styles.card}>
-      <Text style={styles.title}>Google Maps 공유 장소 가져오기</Text>
-      <Text style={styles.subtitle}>
+    <View style={props.compact ? { gap: 10 } : styles.card}>
+      {!props.compact && (
+        <Text style={styles.title}>Google Maps 공유 장소 가져오기</Text>
+      )}
+      <Text style={props.compact ? schedule.meta : styles.subtitle}>
         저장한 장소에서 공유 → 링크 복사 후 붙여 넣어 주세요. 장소 하나씩 여행에
         추가할 수 있어요.
       </Text>
-      <Field
+      <Input
         label="Google Maps 공유 링크"
         value={state.text}
         onChange={(text) => {
@@ -128,7 +137,7 @@ function SharedPlaceView({
           });
         }}
       />
-      <Action
+      <Button
         label={state.busy ? '링크 확인 중…' : '공유 링크 확인'}
         disabled={props.disabled || state.busy || !state.text.trim()}
         onPress={() => {
@@ -139,7 +148,7 @@ function SharedPlaceView({
       {state.preview && (
         <>
           <Text>{state.preview.query || '공유한 장소를 찾았어요.'}</Text>
-          <Action
+          <Button
             label={
               state.preview.googlePlaceId
                 ? '이 장소 선택'
@@ -196,6 +205,20 @@ function SharedPlaceState({
 }) {
   // 가져오기 후보는 서버 DB에 자동 저장하지 않는다.
   return (
-    <SharedPlaceView props={props} state={state} set={set} request={request} />
+    useEffect(() => {
+      // 화면 해제 후 완료되는 이전 링크 요청은 상태를 변경할 수 없게 한다.
+      return () => {
+        // 기존 네트워크 요청의 시간 제한은 유지하고 응답 적용 권한만 끝낸다.
+        return void nextRequest(request);
+      };
+    }, [request]),
+    (
+      <SharedPlaceView
+        props={props}
+        state={state}
+        set={set}
+        request={request}
+      />
+    )
   );
 }

@@ -1,3 +1,5 @@
+import { matchesDestination } from './countryRegions';
+
 // 외교부 여행금지 현황을 2026-10-05에 확인한 국가 선택 정책이다.
 // 출처: https://0404.go.kr/bbs/contsPst/MST0000000000101/1/detail
 export const travelPolicy = {
@@ -53,6 +55,16 @@ WS:사모아 XK:코소보 YE:예멘 ZA:남아프리카공화국 ZM:잠비아 ZW:
 
 // 익숙한 국가 별칭과 영어 검색어를 한국어 국가명에 연결한다.
 const aliases: Record<string, string> = {
+  AF: 'afghanistan',
+  HT: 'haiti',
+  IQ: 'iraq',
+  IR: 'iran',
+  LY: 'libya',
+  ML: 'mali',
+  SO: 'somalia',
+  SD: 'sudan',
+  UA: 'ukraine',
+  YE: 'yemen',
   KR: '한국 남한 korea south korea',
   JP: 'japan',
   US: '미합중국 america usa united states',
@@ -127,14 +139,17 @@ export function countryDefaults(country: string) {
   };
 }
 
-// 전 지역 여행금지 국가만 제거하고 일부 지역 금지는 안내 대상으로 남긴다.
-export const travelCountries = countryNames
+// 직접 입력과 목록이 같은 국가 코드·이름을 사용하게 한다.
+const allCountries = countryNames
   .trim()
   .split(/\s+/)
   .map((entry) => {
     // 국가 코드를 검색·정책의 안정적인 식별자로 사용한다.
     return { code: entry.slice(0, 2), country: entry.slice(3) };
-  })
+  });
+
+// 전 지역 여행금지 국가만 제거하고 일부 지역 금지는 안내 대상으로 남긴다.
+export const travelCountries = allCountries
   .filter((item) => {
     // 전 지역 여행금지 국가가 자동완성에 포함되지 않게 한다.
     return !travelPolicy.prohibitedCodes.includes(item.code);
@@ -144,14 +159,38 @@ export const travelCountries = countryNames
     return left.country.localeCompare(right.country, 'ko');
   });
 
+// 직접 입력한 국가에도 번들에 포함된 기존 선택 정책을 적용한다.
+export function countryInputError(value: string): string {
+  // 국가명·코드·영문 별칭의 정확한 일치만 판정하며 새 정책을 추측하지 않는다.
+  return allCountries.some((item) => {
+    // 허용 목록에서 빠진 국가를 직접 입력으로 우회하지 못하게 한다.
+    return (
+      travelPolicy.prohibitedCodes.includes(item.code) &&
+      [item.country, item.code, ...(aliases[item.code] || '').split(' ')].some(
+        (name) => {
+          // 공백·대소문자 차이로 같은 국가를 다른 입력으로 취급하지 않는다.
+          return (
+            name.toLowerCase().replace(/\s/g, '') ===
+            value.toLowerCase().replace(/\s/g, '')
+          );
+        },
+      )
+    );
+  })
+    ? '이 나라는 현재 여행지로 선택할 수 없어요. 다른 나라를 선택해 주세요.'
+    : value.trim().length > 50
+      ? '나라 이름은 50자 이하로 입력해 주세요.'
+      : '';
+}
+
 // 공백·대소문자와 한국어 별칭을 정규화해 국가를 검색한다.
 export function searchCountries(query: string) {
   // 결과 개수 제한은 화면에서 스크롤로 처리해 검색 누락을 피한다.
   return travelCountries.filter((item) => {
     // 국가명·코드·별칭 중 하나에 검색어가 있으면 표시한다.
-    return `${item.country} ${item.code} ${aliases[item.code] || ''}`
-      .toLowerCase()
-      .replace(/\s/g, '')
-      .includes(query.toLowerCase().replace(/\s/g, ''));
+    return matchesDestination(
+      `${item.country} ${item.code} ${aliases[item.code] || ''}`,
+      query,
+    );
   });
 }

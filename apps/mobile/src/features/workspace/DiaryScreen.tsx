@@ -1,6 +1,9 @@
+import Text from '@/components/AppText';
+import { travelDateRange } from './travelDateRange';
+import { colors } from '@/constants/theme';
 import ReceiptDetails from './ReceiptDetails';
 import HaruState from '@/components/HaruState';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
@@ -10,7 +13,8 @@ import { useTripStore } from '@/stores/useTripStore';
 import { Action, ServerPhoto, styles } from './ui';
 import { serverOptions } from './service';
 import { diaryCosts, diarySchedules, scheduleLabels } from './diary';
-import { workspaceError } from './WorkspaceScreen';
+import TripAccessFeedback from './TripAccessFeedback';
+import { authReturn } from '../auth/authReturn';
 
 // 선택한 여행의 멤버 권한으로 다이어리 원본을 조회한다.
 function useDiary(id: string, userId: string) {
@@ -54,7 +58,7 @@ function DiaryEntry({
       style={{
         gap: 10,
         borderLeftWidth: 3,
-        borderLeftColor: '#D5B985',
+        borderLeftColor: colors.border,
         paddingLeft: 16,
       }}
     >
@@ -118,7 +122,7 @@ function DiaryBook({
       <View
         style={[
           styles.card,
-          { backgroundColor: '#FFF9ED', borderColor: '#EADABB' },
+          { backgroundColor: colors.background, borderColor: colors.border },
         ]}
       >
         <Text style={styles.badge}>TripPrint / 나의 발자국</Text>
@@ -136,13 +140,13 @@ function DiaryBook({
               mediaId={media.id}
             />
           ))}
-        <Text style={[styles.header, { fontSize: 32 }]}>
-          {snapshot.trip.title}
-        </Text>
+        <Text style={styles.header}>{snapshot.trip.title}</Text>
         <Text style={styles.subtitle}>
-          {snapshot.trip.country} · {snapshot.trip.city}
+          {[snapshot.trip.country, snapshot.trip.city]
+            .filter(Boolean)
+            .join(' · ')}
           {'\n'}
-          {snapshot.trip.startDate} ~ {snapshot.trip.endDate}
+          {travelDateRange(snapshot.trip.startDate, snapshot.trip.endDate)}
         </Text>
         <Text>
           {snapshot.days.length}일의 여행 · {snapshot.itinerary.length}개의 일정
@@ -240,7 +244,9 @@ function DiaryView({
 }) {
   // 로그인·권한·여행 종료 여부가 확인된 결과만 다이어리로 렌더링한다.
   return (
-    <SafeAreaView style={[styles.screen, { backgroundColor: '#FBF9F4' }]}>
+    <SafeAreaView
+      style={[styles.screen, { backgroundColor: colors.background }]}
+    >
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.header}>발자국 다이어리</Text>
         {!userId && (
@@ -248,7 +254,10 @@ function DiaryView({
             label="로그인하고 발자국 보기"
             onPress={() => {
               // 비공개 기록 열기 전에 인증 화면으로 이동한다.
-              return router.push('/login');
+              return router.push({
+                pathname: '/login',
+                params: authReturn('diary', undefined, id),
+              });
             }}
           />
         )}
@@ -260,21 +269,18 @@ function DiaryView({
           />
         )}
         {query.isError && (
-          <HaruState
-            kind="error"
-            title="발자국을 불러오지 못했어요"
-            description={workspaceError(query.error)}
-          >
-            <Action
-              label="다시 불러오기"
-              onPress={() => {
-                // 같은 계정의 다이어리 조회만 재시도한다.
-                return void query.refetch();
-              }}
-            />
-          </HaruState>
+          <TripAccessFeedback
+            error={query.error}
+            target={authReturn('diary', undefined, id)}
+            busy={query.isFetching}
+            onRetry={() => {
+              // 같은 계정의 다이어리 원본만 다시 읽는다.
+              return void query.refetch();
+            }}
+          />
         )}
         {query.data &&
+          !query.isError &&
           (query.data.trip.status === 'COMPLETED' ? (
             <DiaryBook snapshot={query.data} userId={userId} />
           ) : (
@@ -282,7 +288,7 @@ function DiaryView({
               여행을 종료하면 일정·사진·비용을 모아 발자국을 만들 수 있어요.
             </Text>
           ))}
-        {query.data && (
+        {query.data && !query.isError && (
           <Action
             label={
               query.data.myRole === 'owner' &&

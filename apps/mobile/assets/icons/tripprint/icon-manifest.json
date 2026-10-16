@@ -1,0 +1,919 @@
+{
+  "schemaVersion": 1,
+  "revision": "1.0.0",
+  "createdAt": "2026-10-14",
+  "sourceScreen": "projects/13238536021221568181/screens/3c4e7db80d9f4dcba7fb58c5f7186c32",
+  "sourceSha256": "21e1b9e01d4bd44d82e06dc0d348cdaa919a55aa51df2d479ff3846ea73a3df9",
+  "baseSize": 24,
+  "strokeWidth": 2,
+  "sourceStrokeExceptions": 2.5,
+  "sizes": [16, 20, 24, 32, 48],
+  "defaultColor": "#203247",
+  "accentColor": "#FF6B57",
+  "licenseFile": "LICENSE.txt",
+  "icons": [
+    {
+      "id": "home-outline",
+      "name": "home",
+      "label": "홈",
+      "variant": "outline",
+      "group": "navigation",
+      "file": "icon-home-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(0) svg:index(0)",
+        "label": "Copy SVG Outline Filled 홈 (Home) 앱 첫 화면 및 맞춤형 여행 피드 tp-icon-home 24px"
+      },
+      "sourceBounds": { "x": 3, "y": 2, "width": 18, "height": 20 },
+      "sha256": "7899df46e4185089a491413dde2c65fc17ad755de85d8103c9cd8d61fce66d36",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "home-filled",
+      "name": "home",
+      "label": "홈",
+      "variant": "filled",
+      "group": "navigation",
+      "file": "icon-home-filled.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(0) svg:index(1)",
+        "label": "Copy SVG Outline Filled 홈 (Home) 앱 첫 화면 및 맞춤형 여행 피드 tp-icon-home 24px"
+      },
+      "sourceBounds": { "x": 2, "y": 3, "width": 20, "height": 17 },
+      "sha256": "79025c3065a6313b881df36da9389062067717826590c081313f1f989685d11f",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "compass-outline",
+      "name": "compass",
+      "label": "탐색",
+      "variant": "outline",
+      "group": "navigation",
+      "file": "icon-compass-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(1) svg:index(0)",
+        "label": "Copy SVG Outline Duotone 지도 & 탐색 (Explore) 둘러보기, 나침반 및 실시간 지도 tp-icon-compass 24px"
+      },
+      "sourceBounds": { "x": 2, "y": 2, "width": 20, "height": 20 },
+      "sha256": "1f0e930461260acdcb0dbce1abe1d3ee92abdcc75fd07942b4f06bb38ef59021",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "compass-duotone",
+      "name": "compass",
+      "label": "탐색",
+      "variant": "duotone",
+      "group": "navigation",
+      "file": "icon-compass-duotone.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(1) svg:index(1)",
+        "label": "Copy SVG Outline Duotone 지도 & 탐색 (Explore) 둘러보기, 나침반 및 실시간 지도 tp-icon-compass 24px"
+      },
+      "sourceBounds": { "x": 2, "y": 2, "width": 20, "height": 20 },
+      "sha256": "979425cdcfacfe07abe4d1fbdb29b3d18474a1a58168141c3959d44b7a410170",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "plus-outline",
+      "name": "plus",
+      "label": "추가",
+      "variant": "outline",
+      "group": "navigation",
+      "file": "icon-plus-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(2) svg:index(0)",
+        "label": "Copy SVG Center FAB 여행 기록 FAB (Create) 새 일정 추가 및 모바일 플로팅 버튼 tp-icon-fab-plus 24/48px"
+      },
+      "sourceBounds": { "x": 5, "y": 5, "width": 14, "height": 14 },
+      "sha256": "a7608b73eb127d6b8436a9bafd228d8331faeea699686ce97013015166c07650",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "journal-outline",
+      "name": "journal",
+      "label": "여행 기록",
+      "variant": "outline",
+      "group": "navigation",
+      "file": "icon-journal-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(3) svg:index(0)",
+        "label": "Copy SVG Outline Filled 여행 기록장 (Journal) 나의 타임라인 및 저널 북 tp-icon-journal 24px"
+      },
+      "sourceBounds": { "x": 4, "y": 2, "width": 16, "height": 20 },
+      "sha256": "879e89ae8c633b4d6d4bce48d38ede021413d0c188c17fd37b8343526c1b4da2",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "journal-filled",
+      "name": "journal",
+      "label": "여행 기록",
+      "variant": "filled",
+      "group": "navigation",
+      "file": "icon-journal-filled.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(3) svg:index(1)",
+        "label": "Copy SVG Outline Filled 여행 기록장 (Journal) 나의 타임라인 및 저널 북 tp-icon-journal 24px"
+      },
+      "sourceBounds": { "x": 4, "y": 2, "width": 16, "height": 20 },
+      "sha256": "34f555e57d6019b7566933832bf1976f5b56d4c8548fc0a0a4351f4508d139e2",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "user-outline",
+      "name": "user",
+      "label": "내 정보",
+      "variant": "outline",
+      "group": "navigation",
+      "file": "icon-user-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(4) svg:index(0)",
+        "label": "Copy SVG Outline Filled 마이페이지 (Profile) 회원 정보, 배지 및 환경설정 tp-icon-user 24px"
+      },
+      "sourceBounds": { "x": 4, "y": 3, "width": 16, "height": 18 },
+      "sha256": "f381c25d32105f6e84c82c643549ac587b4fba8567990498dbef5c3a4f76b8b5",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "user-filled",
+      "name": "user",
+      "label": "내 정보",
+      "variant": "filled",
+      "group": "navigation",
+      "file": "icon-user-filled.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(4) svg:index(1)",
+        "label": "Copy SVG Outline Filled 마이페이지 (Profile) 회원 정보, 배지 및 환경설정 tp-icon-user 24px"
+      },
+      "sourceBounds": { "x": 4, "y": 4, "width": 16, "height": 16 },
+      "sha256": "1a5ff1498dbad32abaa493a8f7ea3e6eee9f56d49c8d464f738e9f5b450f9105",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "restaurant-outline",
+      "name": "restaurant",
+      "label": "식당",
+      "variant": "outline",
+      "group": "category",
+      "file": "icon-restaurant-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(5) svg:index(0)",
+        "label": "식당 / 맛집 Dining / Restaurant #dining #restaurant"
+      },
+      "sourceBounds": { "x": 6, "y": 2, "width": 15, "height": 20 },
+      "sha256": "bd4fb8f808a1e8222049623dcef5f50e8d46b2442d6121bffddff7da9da3b911",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "cafe-outline",
+      "name": "cafe",
+      "label": "카페",
+      "variant": "outline",
+      "group": "category",
+      "file": "icon-cafe-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(6) svg:index(0)",
+        "label": "카페 / 베이커리 Cafe & Bakery #cafe #dessert"
+      },
+      "sourceBounds": { "x": 2, "y": 2, "width": 21, "height": 19 },
+      "sha256": "11ab7f1e98b0ca3da3b72ecd5800f55c59fe9fe2fb82552a8b3378161918171a",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "bar-duotone",
+      "name": "bar",
+      "label": "바",
+      "variant": "duotone",
+      "group": "category",
+      "file": "icon-bar-duotone.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(7) svg:index(0)",
+        "label": "펍 / 바 / 이자카야 Pub, Bar & Izakaya #pub #bar #izakaya"
+      },
+      "sourceBounds": { "x": 5, "y": 2, "width": 14, "height": 20 },
+      "sha256": "5289066ca75371a9d93987758b4788bd9fea1f8e553c7bbc57886378389591ef",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "grocery-duotone",
+      "name": "grocery",
+      "label": "마트",
+      "variant": "duotone",
+      "group": "category",
+      "file": "icon-grocery-duotone.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(8) svg:index(0)",
+        "label": "마트 / 편의점 Mart & Convenience #mart #grocery #cvs"
+      },
+      "sourceBounds": { "x": 1, "y": 1, "width": 22, "height": 21 },
+      "sha256": "c08080347c6811a704af39724e673888506eb839b3947065fcbaba998e696aac",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "flight-outline",
+      "name": "flight",
+      "label": "항공편",
+      "variant": "outline",
+      "group": "category",
+      "file": "icon-flight-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(9) svg:index(0)",
+        "label": "항공편 / 공항 Flight & Airport #flight #airport"
+      },
+      "sourceBounds": {
+        "x": 2.5,
+        "y": 4,
+        "width": 18.0692195892334,
+        "height": 19.5
+      },
+      "sha256": "57424789241a1db91855a3282818b1e512a5656dcdcab433e877807db5e5b855",
+      "geometryAdjusted": true
+    },
+    {
+      "id": "metro-duotone",
+      "name": "metro",
+      "label": "지하철",
+      "variant": "duotone",
+      "group": "category",
+      "file": "icon-metro-duotone.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(10) svg:index(0)",
+        "label": "지하철 / 전철역 Metro & Train #metro #station"
+      },
+      "sourceBounds": { "x": 4, "y": 3, "width": 16, "height": 18 },
+      "sha256": "9f0595b58950d3c09004feae98a7d7a92bc7f7dd3863af0c65243426a422e63a",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "bus-duotone",
+      "name": "bus",
+      "label": "버스",
+      "variant": "duotone",
+      "group": "category",
+      "file": "icon-bus-duotone.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(11) svg:index(0)",
+        "label": "버스 / 정류장 Bus & Bus Stop #bus #transit"
+      },
+      "sourceBounds": { "x": 2, "y": 4, "width": 20, "height": 15 },
+      "sha256": "f82fc02cbfe283b74f64b4cb7d3a77ff8384e5e55bacf3c727e51067ae64054d",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "taxi-outline",
+      "name": "taxi",
+      "label": "택시",
+      "variant": "outline",
+      "group": "category",
+      "file": "icon-taxi-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(12) svg:index(0)",
+        "label": "택시 / 렌터카 / 페리 Taxi & Car Rental #taxi #rental"
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 4,
+        "width": 21.000003814697266,
+        "height": 15
+      },
+      "sha256": "d361981d186d3d70c9b63cc10066076c933c1479120e6d673296bd21e84c46b9",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "hotel-duotone",
+      "name": "hotel",
+      "label": "호텔",
+      "variant": "duotone",
+      "group": "category",
+      "file": "icon-hotel-duotone.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(13) svg:index(0)",
+        "label": "호텔 / 리조트 Hotel & Resort #hotel"
+      },
+      "sourceBounds": { "x": 2, "y": 4, "width": 20, "height": 16 },
+      "sha256": "81236f582c8c674d06e00ae489d815d4987df67f078c099aaec1cc5d478b6d3e",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "guesthouse-outline",
+      "name": "guesthouse",
+      "label": "게스트하우스",
+      "variant": "outline",
+      "group": "category",
+      "file": "icon-guesthouse-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(14) svg:index(0)",
+        "label": "호스텔 / 료칸 / 게하 Guesthouse & Ryokan #guesthouse #ryokan"
+      },
+      "sourceBounds": { "x": 3, "y": 3, "width": 18, "height": 19 },
+      "sha256": "5897af0745645d3be98f89249fea4bfb91e921be9ac86078888d801df70c88f7",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "landmark-duotone",
+      "name": "landmark",
+      "label": "관광명소",
+      "variant": "duotone",
+      "group": "category",
+      "file": "icon-landmark-duotone.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(15) svg:index(0)",
+        "label": "관광명소 / 랜드마크 Sightseeing & Landmark #landmark #sight"
+      },
+      "sourceBounds": { "x": 5, "y": 2, "width": 14, "height": 19 },
+      "sha256": "2fe88c399fdb823f0eb9c209a472c5c0c768cc9b1df7865413eed8c4b1af0b6b",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "museum-outline",
+      "name": "museum",
+      "label": "박물관",
+      "variant": "outline",
+      "group": "category",
+      "file": "icon-museum-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(16) svg:index(0)",
+        "label": "박물관 / 미술관 / 문화재 Culture & Museum #museum #culture"
+      },
+      "sourceBounds": { "x": 2, "y": 3, "width": 20, "height": 17 },
+      "sha256": "189532cc7f2de1dca2fbbbe9083ff0e6d5021dce04aad53e86d0b90e3dc155a5",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "shopping-outline",
+      "name": "shopping",
+      "label": "쇼핑",
+      "variant": "outline",
+      "group": "category",
+      "file": "icon-shopping-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(17) svg:index(0)",
+        "label": "쇼핑 / 백화점 / 플리마켓 Shopping & Mall #shopping #market"
+      },
+      "sourceBounds": { "x": 3, "y": 2, "width": 18, "height": 20 },
+      "sha256": "751b6c8507b1cb0b164df517e6bb88113f11af7b0a9a26ddbd433016f13cdbba",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "activity-duotone",
+      "name": "activity",
+      "label": "액티비티",
+      "variant": "duotone",
+      "group": "category",
+      "file": "icon-activity-duotone.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(18) svg:index(0)",
+        "label": "액티비티 / 테마파크 Activity & Theme Park #activity #park"
+      },
+      "sourceBounds": { "x": 2, "y": 2, "width": 20, "height": 20 },
+      "sha256": "0b46f32f68ee9689e8c607c76d1e7b136d36e663156c0c6fb45c5c9234d03ea5",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "receipt-scan-outline",
+      "name": "receipt-scan",
+      "label": "영수증 스캔",
+      "variant": "outline",
+      "group": "action",
+      "file": "icon-receipt-scan-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(19) svg:index(0)",
+        "label": "영수증 스캔 (OCR) tp-scan-receipt"
+      },
+      "sourceBounds": { "x": 3, "y": 3, "width": 18, "height": 18 },
+      "sha256": "a7e4e791ee4e10f74194cd6f02790df3f706ed566cba25d1574fff474c09c117",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "share-outline",
+      "name": "share",
+      "label": "공유",
+      "variant": "outline",
+      "group": "action",
+      "file": "icon-share-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(20) svg:index(0)",
+        "label": "동행자 공유 tp-action-share"
+      },
+      "sourceBounds": { "x": 3, "y": 2, "width": 18, "height": 20 },
+      "sha256": "7a41c119b510e10b6073d71525f39f3a1eefaae9825dcbd94ce07efcd32dda23",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "filter-outline",
+      "name": "filter",
+      "label": "필터",
+      "variant": "outline",
+      "group": "action",
+      "file": "icon-filter-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(21) svg:index(0)",
+        "label": "조건 필터 tp-action-filter"
+      },
+      "sourceBounds": { "x": 1, "y": 3, "width": 22, "height": 18 },
+      "sha256": "73614dff1188a65a347b977ba60b913a053b8d3026a5c619a27ef29b37288363",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "checklist-outline",
+      "name": "checklist",
+      "label": "준비물",
+      "variant": "outline",
+      "group": "action",
+      "file": "icon-checklist-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(22) svg:index(0)",
+        "label": "체크리스트 tp-action-checklist"
+      },
+      "sourceBounds": { "x": 3, "y": 3, "width": 19, "height": 18 },
+      "sha256": "927b7e90fa6d2f409e96793acae58f659f33fe0f033aa8dc848990a087c2f46a",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "search-outline",
+      "name": "search",
+      "label": "검색",
+      "variant": "outline",
+      "group": "action",
+      "file": "icon-search-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(23) svg:index(0)",
+        "label": "장소/경로 검색 tp-action-search"
+      },
+      "sourceBounds": { "x": 3, "y": 3, "width": 18, "height": 18 },
+      "sha256": "5d16f02d57319cd0f891facba5ce4430cf45e219899f9b928db6cb52ab0b50b3",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "lock-outline",
+      "name": "lock",
+      "label": "비공개",
+      "variant": "outline",
+      "group": "action",
+      "file": "icon-lock-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(24) svg:index(0)",
+        "label": "비공개 잠금 tp-action-lock"
+      },
+      "sourceBounds": { "x": 3, "y": 2, "width": 18, "height": 20 },
+      "sha256": "f55a900478eba3af27654d8ba053bfe487382b0adf5c107679e6ed1e648d4758",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "bookmark-outline",
+      "name": "bookmark",
+      "label": "북마크",
+      "variant": "outline",
+      "group": "utility",
+      "file": "icon-bookmark-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(25) svg:index(0)",
+        "label": "bookmark"
+      },
+      "sourceBounds": { "x": 5, "y": 3, "width": 14, "height": 18 },
+      "sha256": "6912c46485d937e4a4913e3712c3adcdfdf0720cf8206b4eb00cbc45de1858da",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "calendar-outline",
+      "name": "calendar",
+      "label": "달력",
+      "variant": "outline",
+      "group": "utility",
+      "file": "icon-calendar-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(26) svg:index(0)",
+        "label": "calendar"
+      },
+      "sourceBounds": { "x": 3, "y": 2, "width": 18, "height": 20 },
+      "sha256": "344b2aa31d847e818f17cd4c5dbee9a5be49392c18db4644331b7afe04e05800",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "clock-outline",
+      "name": "clock",
+      "label": "시각",
+      "variant": "outline",
+      "group": "utility",
+      "file": "icon-clock-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(27) svg:index(0)",
+        "label": "clock"
+      },
+      "sourceBounds": { "x": 2, "y": 2, "width": 20, "height": 20 },
+      "sha256": "49cb1f8ffbed0ea4b97b0ab719230921923b26ec6e6591493ad8a23a7280a239",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "sun-outline",
+      "name": "sun",
+      "label": "맑음",
+      "variant": "outline",
+      "group": "utility",
+      "file": "icon-sun-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(28) svg:index(0)",
+        "label": "sun-weather"
+      },
+      "sourceBounds": { "x": 1, "y": 1, "width": 22, "height": 22 },
+      "sha256": "781a2237a94d2c6956f1505c21e479ec6a3d11b8bfa76259911e64589c61e651",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "rain-outline",
+      "name": "rain",
+      "label": "비",
+      "variant": "outline",
+      "group": "utility",
+      "file": "icon-rain-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(29) svg:index(0)",
+        "label": "cloud-rain"
+      },
+      "sourceBounds": {
+        "x": 0.9941070079803467,
+        "y": 1.000287652015686,
+        "width": 22.000011444091797,
+        "height": 21.999711990356445
+      },
+      "sha256": "41f28e017e4b957af2ab49334067e30475e8beb5ca911474a12bf2c532a0bc65",
+      "geometryAdjusted": true
+    },
+    {
+      "id": "navigation-outline",
+      "name": "navigation",
+      "label": "길 안내",
+      "variant": "outline",
+      "group": "utility",
+      "file": "icon-navigation-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(30) svg:index(0)",
+        "label": "navigation"
+      },
+      "sourceBounds": { "x": 3, "y": 2, "width": 19, "height": 19 },
+      "sha256": "12049b75d74f94d6b213b95dd01b9bc598d980d66da2b1026564761ddb301025",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "tag-outline",
+      "name": "tag",
+      "label": "분류",
+      "variant": "outline",
+      "group": "utility",
+      "file": "icon-tag-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(31) svg:index(0)",
+        "label": "tag-label"
+      },
+      "sourceBounds": {
+        "x": 2,
+        "y": 2,
+        "width": 19.17158317565918,
+        "height": 19.16657257080078
+      },
+      "sha256": "8d181045d38e513447672ca3669715354d1a0507230eef5e4fbf403c476740d9",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "heart-filled",
+      "name": "heart",
+      "label": "좋아요",
+      "variant": "filled",
+      "group": "utility",
+      "file": "icon-heart-filled.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(32) svg:index(0)",
+        "label": "heart-active"
+      },
+      "sourceBounds": {
+        "x": 2,
+        "y": 3,
+        "width": 20,
+        "height": 18.350000381469727
+      },
+      "sha256": "34bd33eee0135afa8585635904e4256b7467b2880f1ecfc571be03579fac2cff",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "ticket-outline",
+      "name": "ticket",
+      "label": "티켓",
+      "variant": "outline",
+      "group": "utility",
+      "file": "icon-ticket-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(33) svg:index(0)",
+        "label": "ticket-pass"
+      },
+      "sourceBounds": { "x": 2, "y": 5, "width": 20, "height": 14 },
+      "sha256": "0f17bdb11c66fc17d6faf3db6dd6c88a777e18f0c8d3b1f653e2fc1746f7c4cc",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "luggage-outline",
+      "name": "luggage",
+      "label": "짐",
+      "variant": "outline",
+      "group": "utility",
+      "file": "icon-luggage-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(34) svg:index(0)",
+        "label": "luggage"
+      },
+      "sourceBounds": { "x": 6, "y": 2, "width": 12, "height": 19 },
+      "sha256": "378b3ef24739881381731c67c8355e9e7e927f00de73b75306c1e887aa478bf5",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "route-outline",
+      "name": "route",
+      "label": "동선",
+      "variant": "outline",
+      "group": "utility",
+      "file": "icon-route-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(35) svg:index(0)",
+        "label": "route-path"
+      },
+      "sourceBounds": { "x": 3, "y": 2, "width": 18, "height": 20 },
+      "sha256": "e990c589a4c5b517ae11799048fd29925ccffb801da61ec549c8306d6e5f2223",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "bell-outline",
+      "name": "bell",
+      "label": "알림",
+      "variant": "outline",
+      "group": "utility",
+      "file": "icon-bell-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(36) svg:index(0)",
+        "label": "bell-notice"
+      },
+      "sourceBounds": {
+        "x": 3,
+        "y": 2,
+        "width": 18,
+        "height": 19.996456146240234
+      },
+      "sha256": "a1a6b65d99d5a004aceb08e8749bc00d3aadc1dad685c018e4bf31c03379cd49",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "sliders-outline",
+      "name": "sliders",
+      "label": "세부 설정",
+      "variant": "outline",
+      "group": "utility",
+      "file": "icon-sliders-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(37) svg:index(0)",
+        "label": "sliders"
+      },
+      "sourceBounds": { "x": 1, "y": 3, "width": 22, "height": 18 },
+      "sha256": "82b9c7c7139cd26f1cac0ef6fe2bd22abd0a9ef6a82b2fbc47384c0d57f58fec",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "refresh-outline",
+      "name": "refresh",
+      "label": "새로고침",
+      "variant": "outline",
+      "group": "utility",
+      "file": "icon-refresh-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(38) svg:index(0)",
+        "label": "refresh-sync"
+      },
+      "sourceBounds": {
+        "x": 1,
+        "y": 3.002363920211792,
+        "width": 22,
+        "height": 17.995271682739258
+      },
+      "sha256": "c7d350516c41ccd6e89cbce9972c441f5de4e68d89aa8311b021326dc2f01d8d",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "map-pin-outline",
+      "name": "map-pin",
+      "label": "장소",
+      "variant": "outline",
+      "group": "utility",
+      "file": "icon-map-pin-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(39) svg:index(0)",
+        "label": "map-pin"
+      },
+      "sourceBounds": {
+        "x": 3,
+        "y": 1.0031075477600098,
+        "width": 18,
+        "height": 21.99689292907715
+      },
+      "sha256": "97758a33b96eea9ece93a33f86ce5eef0e715b5e6a14a571baaaa7a7d9151c10",
+      "geometryAdjusted": true
+    },
+    {
+      "id": "star-filled",
+      "name": "star",
+      "label": "별점",
+      "variant": "filled",
+      "group": "utility",
+      "file": "icon-star-filled.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": ".icon-card,.icon-item:index(40) svg:index(0)",
+        "label": "star-rating"
+      },
+      "sourceBounds": {
+        "x": 2,
+        "y": 2,
+        "width": 20,
+        "height": 19.020000457763672
+      },
+      "sha256": "bf7f2a321b8ec8350205f4678a40b3cf999111c5fdf76e783f473663ffd0bf4f",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "success-outline",
+      "name": "success",
+      "label": "완료",
+      "variant": "outline",
+      "group": "status",
+      "file": "icon-success-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": "#status-icons svg:index(0)",
+        "label": "성공 / 완료 (Success) #186779 일정 체크 완료, 결제 및 저장 성공 안내 피드백"
+      },
+      "sourceBounds": {
+        "x": 2.000001907348633,
+        "y": 1.9942831993103027,
+        "width": 19.999998092651367,
+        "height": 19.999998092651367
+      },
+      "sha256": "117ab72eeaeb77fc1173ddba53baf571a0bd7f1df42063b1105d42134166dbe6",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "warning-outline",
+      "name": "warning",
+      "label": "주의",
+      "variant": "outline",
+      "group": "status",
+      "file": "icon-warning-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": "#status-icons svg:index(1)",
+        "label": "주의 / 확인요망 (Warning) #ffc857 환승 시간 부족, 기상 악화 및 경로 중복 경고"
+      },
+      "sourceBounds": {
+        "x": 1.5519810914993286,
+        "y": 2.8972558975219727,
+        "width": 20.896038055419922,
+        "height": 18.102745056152344
+      },
+      "sha256": "e0912f9e786d7e9f7e84185a04ccbced2efc3f9c0ec28a95c1e1ecde7e4792dc",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "error-outline",
+      "name": "error",
+      "label": "오류",
+      "variant": "outline",
+      "group": "status",
+      "file": "icon-error-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": "#status-icons svg:index(2)",
+        "label": "오류 / 취소 (Destructive) #ff6b57 연결 실패, 일정 삭제 및 필수 항목 누락 경보"
+      },
+      "sourceBounds": { "x": 2, "y": 2, "width": 20, "height": 20 },
+      "sha256": "61be3fc9d8177e955279e5dc2e10c88bcc5124a227860656b47754e001e2176f",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "info-outline",
+      "name": "info",
+      "label": "안내",
+      "variant": "outline",
+      "group": "status",
+      "file": "icon-info-outline.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": "#status-icons svg:index(3)",
+        "label": "안내 / 팁 (Info) #8fd3e8 로컬 여행 팁, 시차 알림 및 실시간 가이드 힌트"
+      },
+      "sourceBounds": { "x": 2, "y": 2, "width": 20, "height": 20 },
+      "sha256": "4db0c67b45a32df30574b5bcf1754fca5498301a7088e1eab70a4f72841d4811",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "map-pin-duotone",
+      "name": "map-pin",
+      "label": "장소",
+      "variant": "duotone",
+      "group": "utility",
+      "file": "icon-map-pin-duotone.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": "#principles duotone:index(0)",
+        "label": ""
+      },
+      "sourceBounds": { "x": 4, "y": 2, "width": 16, "height": 20 },
+      "sha256": "484b09306473456b605f0accd50501d9f729146539495a1d5c4ddfc473e2707a",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "camera-duotone",
+      "name": "camera",
+      "label": "카메라",
+      "variant": "duotone",
+      "group": "utility",
+      "file": "icon-camera-duotone.svg",
+      "source": {
+        "file": "docs/design/sources/stitch-icon-library.html",
+        "locator": "#principles duotone:index(1)",
+        "label": ""
+      },
+      "sourceBounds": { "x": 1, "y": 3, "width": 22, "height": 18 },
+      "sha256": "7f05d5625a4b2371956ed7147200d724650d50f477353efc9c7cf60afcace8d7",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "map-outline",
+      "name": "map",
+      "label": "지도",
+      "variant": "outline",
+      "group": "utility",
+      "file": "icon-map-outline.svg",
+      "source": {
+        "file": "apps/mobile/assets/brand/tripprint-v1/TripPrint_ui-map_256x256.svg",
+        "locator": "svg > g",
+        "label": "기존 TripPrint 브랜드 SVG"
+      },
+      "sourceBounds": null,
+      "sha256": "30761d2fefab5c45f207fda7ec02d392e1465251164b7bd67a619a8a9fce37c4",
+      "geometryAdjusted": false
+    },
+    {
+      "id": "camera-outline",
+      "name": "camera",
+      "label": "카메라",
+      "variant": "outline",
+      "group": "utility",
+      "file": "icon-camera-outline.svg",
+      "source": {
+        "file": "apps/mobile/assets/brand/tripprint-v1/TripPrint_ui-camera_256x256.svg",
+        "locator": "svg > g",
+        "label": "기존 TripPrint 브랜드 SVG"
+      },
+      "sourceBounds": null,
+      "sha256": "abcf8ffe6fd4e8fbbd593cb592f29e8a7d1bcbdff54770ba97c50c9744b63b9f",
+      "geometryAdjusted": false
+    }
+  ]
+}

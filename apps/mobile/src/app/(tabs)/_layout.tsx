@@ -1,3 +1,4 @@
+import { tabPageLayout } from '@/features/accessibility/PageTransition';
 import { Tabs } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -26,11 +27,13 @@ export default function TabLayout() {
   // 홈·공개 피드는 로그인 전에도 제공하고 비공개 조회·쓰기는 각 화면에서 인증한다.
   return (
     <Tabs
+      screenLayout={tabPageLayout}
       tabBar={() => {
         // 모든 페이지의 하단 메뉴는 루트 레이아웃이 한 번만 렌더링한다.
         return null;
       }}
       screenOptions={{
+        animation: 'none',
         headerShown: false,
         tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.mutedLight,
@@ -43,7 +46,7 @@ export default function TabLayout() {
           paddingTop: 8,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 13,
           fontWeight: '600',
         },
       }}

@@ -1,5 +1,7 @@
+import Text from '@/components/AppText';
+import { colors } from '@/constants/theme';
 import type { ReactNode } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { DiscoveryCity } from '@wherego/validation';
 import { useDiscoveryCarousel } from './useDiscoveryCarousel';
@@ -135,7 +137,12 @@ function CarouselContent({
               />
             );
           })}
-          <Text style={s.caption} testID="destination-carousel-position">
+          <Text
+            style={s.caption}
+            testID="destination-carousel-position"
+            accessibilityLiveRegion={restricted || paused ? 'polite' : 'none'}
+            accessibilityLabel={`${cities[activeIndex] ? name(cities[activeIndex]) : '여행지'} · ${cities.length}개 중 ${activeIndex + 1}번째 여행지`}
+          >
             {activeIndex + 1} / {cities.length}
           </Text>
         </View>
@@ -183,7 +190,7 @@ function CarouselButton({
   label: string;
   icon: keyof typeof Ionicons.glyphMap;
   onPress: () => void;
-  onFocus?: () => void;
+  onFocus?: Controller['pause'];
 }) {
   // 기호만 보이더라도 보조 기술에서는 정확한 행동을 읽는다.
   return (
@@ -194,7 +201,7 @@ function CarouselButton({
       onPress={onPress}
       onFocus={onFocus}
     >
-      <Ionicons name={icon} size={18} color="#203247" />
+      <Ionicons name={icon} size={18} color={colors.text} />
     </Pressable>
   );
 }

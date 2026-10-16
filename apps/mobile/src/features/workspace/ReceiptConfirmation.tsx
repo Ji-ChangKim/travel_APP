@@ -1,6 +1,8 @@
-import { Text, View } from 'react-native';
+import Text from '@/components/AppText';
+import { View } from 'react-native';
 import { Action, styles } from './ui';
 import type { PlanForm } from './forms';
+import { receiptDifference, receiptCurrencyIssue } from './receiptFlow';
 
 // 정보 확인과 사진 보관을 서로 다른 사용자 선택으로 받는다.
 export default function ReceiptConfirmation({
@@ -12,9 +14,46 @@ export default function ReceiptConfirmation({
   busy: boolean;
   onChange: (key: string, value: string) => void;
 }) {
+  // 수정한 합계와 품목을 기준으로 차이 확인 여부를 판단한다.
+  const difference = receiptDifference(form);
+  // 통화를 읽은 성공과 확정할 수 없는 상태를 구분한다.
+  const currencyIssue = receiptCurrencyIssue(form.values.currency || '');
   // 두 질문은 미선택 상태로 시작하고 동의를 유도하는 기본값을 두지 않는다.
   return (
     <View style={{ gap: 16 }}>
+      {currencyIssue && (
+        <Text accessibilityRole="alert" style={styles.error}>
+          {currencyIssue}
+        </Text>
+      )}
+      {difference && (
+        <View style={styles.card}>
+          <Text style={styles.title}>품목 합계와 결제 총액이 달라요</Text>
+          <Text>
+            품목 합계 · {difference.itemTotal} {form.values.currency}
+          </Text>
+          <Text>
+            결제 총액 · {form.values.amount} {form.values.currency}
+          </Text>
+          <Text>
+            차이 (총액 − 품목 합계) · {difference.difference}{' '}
+            {form.values.currency}
+          </Text>
+          <Text>
+            세금이나 할인 때문일 수 있어요. 원본을 확인해 주세요. 지출에는 결제
+            총액만 기록돼요.
+          </Text>
+          <Action
+            label="차이를 확인했어요. 결제 총액으로 기록할게요"
+            selected={form.values.totalDifferenceAccepted === 'true'}
+            disabled={busy || Boolean(currencyIssue)}
+            onPress={() => {
+              // 현재 합계의 차이에만 동의하며 정보 확인은 별도로 받는다.
+              return onChange('totalDifferenceAccepted', 'true');
+            }}
+          />
+        </View>
+      )}
       <View style={styles.card}>
         <Text style={styles.label}>1 · 정보 확인</Text>
         <Text style={styles.title}>영수증 정보가 맞나요?</Text>
@@ -25,7 +64,13 @@ export default function ReceiptConfirmation({
         <Action
           label="맞아요, 일정에 추가할게요"
           selected={form.values.receiptConfirmed === 'true'}
-          disabled={busy}
+          disabled={
+            busy ||
+            Boolean(currencyIssue) ||
+            Boolean(
+              difference && form.values.totalDifferenceAccepted !== 'true',
+            )
+          }
           onPress={() => {
             // 확인된 후보만 다음 사진 보관 선택으로 진행한다.
             return onChange('receiptConfirmed', 'true');

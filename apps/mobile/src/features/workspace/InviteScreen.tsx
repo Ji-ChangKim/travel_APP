@@ -1,5 +1,6 @@
+import Text from '@/components/AppText';
 import { useEffect, useRef, useState } from 'react';
-import { Text } from 'react-native';
+import {} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as Crypto from 'expo-crypto';
@@ -31,16 +32,34 @@ export default function InviteScreen() {
   // 수신 링크 또는 로그인 전 보관한 토큰을 복원한다.
   useEffect(() => {
     // 원문은 화면 입력 상태에만 유지한다.
-    pendingInvite()
-      .then((stored) => {
-        // 들어온 링크는 유효할 때만 기본 입력으로 선택한다.
-        if (url?.includes('#token=')) setValue(readInvite(url));
-        else if (stored) setValue(stored);
-      })
-      .catch(() => {
-        // 잘못된 링크에서도 직접 붙여넣기로 다시 진행할 수 있다.
-        setError('초대 링크를 확인하고 다시 붙여넣어 주세요.');
-      });
+    let active = true;
+    // 이전 초대 복원 결과는 종료되거나 다른 링크로 이동한 화면에 적용하지 않는다.
+    return (
+      void pendingInvite()
+        .then((stored) => {
+          // 들어온 링크는 유효할 때만 기본 입력으로 선택한다.
+          return active
+            ? url?.includes('#token=')
+              ? setValue(readInvite(url))
+              : stored
+                ? setValue((current) => {
+                    // 조회 중 직접 입력한 새 초대는 저장소의 이전 링크로 덮지 않는다.
+                    return current || stored;
+                  })
+                : undefined
+            : undefined;
+        })
+        .catch(() => {
+          // 잘못된 링크에서도 직접 붙여넣기로 다시 진행할 수 있다.
+          return active
+            ? setError('초대 링크를 확인하고 다시 붙여넣어 주세요.')
+            : undefined;
+        }),
+      () => {
+        // 화면 해제 및 링크 변경 시 진행 중 복원의 상태 반영을 차단한다.
+        return void (active = false);
+      }
+    );
   }, [url]);
   // 초대 토큰을 저장한 뒤 인증 또는 참여를 이어간다.
   function accept(): void {

@@ -5,6 +5,7 @@ import {
 } from '@wherego/api-client';
 import { WorkspaceModelError } from '@wherego/validation';
 import { useTripStore } from '@/stores/useTripStore';
+import { guestRemoteHeaders } from './guestRemoteHeaders';
 import {
   guestWorkspaceRequest,
   GuestWorkspaceError,
@@ -44,17 +45,14 @@ function guestFetch(
   remote: () => Promise<FoundationClientOptions>,
 ): Promise<Response> {
   // 허용한 외부 기능만 원격 인증을 사용하며 다른 경로는 기기에서 거부한다.
-  return /^\/(places(?:\/|\?)|profile(?:$|\?)|community(?:$|\?)|reports$|blocks$)/.test(
+  return /^\/(flights\/lookup(?:$|\?)|places(?:\/|\?)|profile(?:$|\?)|community(?:$|\?)|reports$|blocks$)/.test(
     new URL(url).pathname.replace('/api/v1', ''),
   )
     ? remote().then((options) => {
         // 기기 인증 상태를 원격 서버가 검증한 세션으로 대체하지 않는다.
         return fetch(url, {
           ...init,
-          headers: {
-            ...Object.fromEntries(new Headers(init?.headers)),
-            Authorization: `Bearer ${options.accessToken}`,
-          },
+          headers: guestRemoteHeaders(init?.headers, options.accessToken),
         });
       })
     : serializeGuest(userId, () => {

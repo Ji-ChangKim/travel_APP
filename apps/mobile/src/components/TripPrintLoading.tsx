@@ -1,3 +1,4 @@
+import { colors } from '@/constants/theme';
 import { Image, StyleSheet, View } from 'react-native';
 import HaruState from './HaruState';
 
@@ -31,7 +32,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFF9F3',
+    backgroundColor: colors.background,
     padding: 24,
     gap: 24,
     width: '100%',

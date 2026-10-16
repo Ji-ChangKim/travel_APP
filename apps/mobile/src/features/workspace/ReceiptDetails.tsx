@@ -1,4 +1,5 @@
-import { Text, View } from 'react-native';
+import Text from '@/components/AppText';
+import { View } from 'react-native';
 import type { WorkspaceReceipt } from '@wherego/domain';
 import { styles } from './ui';
 

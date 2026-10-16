@@ -1,0 +1,102 @@
+import { StyleSheet } from 'react-native';
+import { colors } from '@/constants/theme';
+
+// 사진과 글의 정보 영역을 구분하고 모든 설명을 단색 배경에서 읽게 한다.
+export const communityStyles = StyleSheet.create({
+  content: {
+    width: '100%',
+    maxWidth: 640,
+    alignSelf: 'center',
+    padding: 20,
+    paddingBottom: 32,
+    gap: 16,
+  },
+  post: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 16,
+    padding: 16,
+    gap: 16,
+  },
+  author: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  avatar: {
+    minWidth: 44,
+    minHeight: 44,
+    borderRadius: 22,
+    padding: 8,
+    backgroundColor: colors.selectedSurface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  initial: {
+    fontSize: 18,
+    lineHeight: 26,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  authorInfo: { flex: 1, minWidth: 0, gap: 2 },
+  authorName: {
+    fontSize: 14,
+    lineHeight: 22,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  meta: { fontSize: 14, lineHeight: 22, color: colors.muted },
+  title: {
+    fontSize: 18,
+    lineHeight: 26,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  body: { fontSize: 16, lineHeight: 26, color: colors.text },
+  details: { gap: 6 },
+  itinerary: {
+    backgroundColor: colors.background,
+    borderRadius: 12,
+    padding: 12,
+    gap: 6,
+  },
+  time: {
+    fontSize: 14,
+    lineHeight: 22,
+    fontWeight: '600',
+    color: colors.text,
+    fontVariant: ['tabular-nums'],
+  },
+  cost: {
+    fontSize: 16,
+    lineHeight: 24,
+    fontWeight: '600',
+    color: colors.text,
+    fontVariant: ['tabular-nums'],
+  },
+  photo: {
+    width: '100%',
+    aspectRatio: 1.5,
+    borderRadius: 12,
+    backgroundColor: colors.surfaceMuted,
+  },
+  photoStatus: {
+    minHeight: 120,
+    backgroundColor: colors.surfaceMuted,
+    padding: 16,
+    borderRadius: 12,
+    justifyContent: 'center',
+    gap: 8,
+  },
+  actions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  notice: { color: colors.success, fontSize: 14, lineHeight: 22 },
+});

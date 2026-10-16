@@ -1,3 +1,4 @@
+import { publicationIssue } from './publication';
 import { receiptItems, receiptCanSave } from './receiptFlow';
 import * as Crypto from 'expo-crypto';
 import {
@@ -6,6 +7,11 @@ import {
 } from '@wherego/validation';
 import type { WorkspaceSnapshot, WorkspaceSchedule } from '@wherego/domain';
 import { homeDestination } from './homeDestinations';
+import {
+  flightFormValues,
+  flightFromValues,
+  scheduleFlight,
+} from './flightModel';
 
 export type FormKind =
   | 'trip'
@@ -35,7 +41,7 @@ export function newTripForm(destination?: string): PlanForm {
       timezone: homeDestination(destination)?.timezone || 'Asia/Seoul',
       defaultCurrency: homeDestination(destination)?.currency || 'KRW',
       flightNumber: '',
-      flightDeparture: 'ICN',
+      flightDeparture: '',
       flightArrival: '',
       flightTime: '',
       flightSkipped: 'true',
@@ -68,6 +74,28 @@ export function scheduleForm(
       memo: item?.memo || '',
       address: item?.address || '',
       googlePlaceId: item?.googlePlaceId || '',
+      mapLocation: item?.location ? JSON.stringify(item.location) : '',
+      durationMinutes: item?.durationMinutes
+        ? String(item.durationMinutes)
+        : '',
+      estimatedAmount:
+        snapshot.expenses.find((expense) => {
+          // 이 화면에서 등록한 예상 비용만 수정 입력으로 가져온다.
+          return (
+            expense.scheduleId === item?.id &&
+            expense.source === 'schedule-plan'
+          );
+        })?.amount || '',
+      estimatedCurrency:
+        snapshot.expenses.find((expense) => {
+          // 예상 비용의 실제 통화를 보존한다.
+          return (
+            expense.scheduleId === item?.id &&
+            expense.source === 'schedule-plan'
+          );
+        })?.currency || snapshot.trip.defaultCurrency,
+      ...(item ? {} : { afterScheduleId: 'last' }),
+      ...flightFormValues(scheduleFlight(item)),
     },
   };
 }
@@ -92,9 +120,11 @@ export function formCommand(
   snapshot: WorkspaceSnapshot,
 ): WorkspaceCommand {
   // 저장 전 공통 Zod 검증을 적용한다.
-  return form.kind === 'receipt' && !receiptCanSave(form)
-    ? requireReceiptChoices()
-    : workspaceCommandSchema.parse(commandValue(form, snapshot));
+  return form.kind === 'publish' && publicationIssue(snapshot, form.values)
+    ? requirePublicationSelection(publicationIssue(snapshot, form.values))
+    : form.kind === 'receipt' && !receiptCanSave(form)
+      ? requireReceiptChoices()
+      : workspaceCommandSchema.parse(commandValue(form, snapshot));
 }
 
 // 확인 선택이 없는 직접 저장 호출도 사용자 안내로 차단한다.
@@ -110,8 +140,55 @@ function commandValue(form: PlanForm, snapshot: WorkspaceSnapshot) {
         operation: 'schedule.save',
         input: {
           ...scheduleValues(form.values),
+          title:
+            form.values.title?.trim() ||
+            (form.values.type === 'TRANSPORT' &&
+            form.values.flightEnabled === 'true'
+              ? `${form.values.flightNumber} ${form.values.flightDeparture} → ${form.values.flightArrival}`
+              : ''),
+          ...(form.values.flightEnabled === undefined
+            ? {}
+            : {
+                flight:
+                  form.values.type === 'TRANSPORT' &&
+                  form.values.flightEnabled === 'true'
+                    ? flightFromValues(form.values)
+                    : null,
+              }),
+          location: form.values.mapLocation
+            ? JSON.parse(form.values.mapLocation)
+            : null,
           id: form.id,
           sortOrder: Number(form.values.sortOrder),
+          durationMinutes: form.values.durationMinutes
+            ? Number(form.values.durationMinutes)
+            : null,
+          ...(form.values.afterScheduleId === undefined
+            ? {}
+            : {
+                afterScheduleId:
+                  form.values.afterScheduleId === 'last'
+                    ? snapshot.itinerary
+                        .filter((item) => {
+                          // 새 일정은 선택한 날짜의 마지막 뒤에 둔다.
+                          return (
+                            item.dayId === form.values.dayId &&
+                            item.id !== form.id
+                          );
+                        })
+                        .sort((a, b) => {
+                          // 시간 입력과 관계없이 저장된 방문 순서를 따른다.
+                          return a.sortOrder - b.sortOrder;
+                        })
+                        .at(-1)?.id || null
+                    : form.values.afterScheduleId || null,
+              }),
+          estimatedCost: form.values.estimatedAmount
+            ? {
+                amount: form.values.estimatedAmount,
+                currency: form.values.estimatedCurrency,
+              }
+            : null,
         },
       }
     : form.kind === 'expense'
@@ -185,7 +262,21 @@ function scheduleValues(
   return Object.fromEntries(
     Object.entries(values).filter(([key]) => {
       // 가져오기 UI에서만 사용한 값은 영구 저장하지 않는다.
-      return key !== 'sharedMapsText';
+      return (
+        key !== 'sharedMapsText' &&
+        key !== 'placeSearchExpanded' &&
+        key !== 'mapLocation' &&
+        key !== 'durationMinutes' &&
+        key !== 'afterScheduleId' &&
+        !key.startsWith('estimated') &&
+        !key.startsWith('flight')
+      );
     }),
   );
+}
+
+// 삭제된 선택이나 변경된 공개 권한을 최신 자료로 다시 확인하도록 막는다.
+function requirePublicationSelection(message: string): never {
+  // 저장 시에도 미리보기와 동일한 여행 원본을 대조한다.
+  throw new Error(message);
 }

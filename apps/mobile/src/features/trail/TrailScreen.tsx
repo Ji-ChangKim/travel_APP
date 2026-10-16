@@ -1,3 +1,4 @@
+import Text from '@/components/AppText';
 import Modal from '@/components/AppModal';
 import { useEffect, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
@@ -6,7 +7,6 @@ import {
   Linking,
   ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -1104,7 +1104,7 @@ const styles = StyleSheet.create({
   container: { padding: 20, gap: 20, paddingBottom: 80 },
   hero: { fontSize: 32, fontWeight: '800', color: colors.text, marginTop: 8 },
   eyebrow: {
-    fontSize: 11,
+    fontSize: 13,
     letterSpacing: 2,
     fontWeight: '700',
     color: colors.accent,
@@ -1140,8 +1140,8 @@ const styles = StyleSheet.create({
   },
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   title: { fontSize: 17, fontWeight: '700', color: colors.text },
-  tag: { fontSize: 12, fontWeight: '700', color: colors.accent },
-  small: { fontSize: 12, color: colors.muted, lineHeight: 20 },
+  tag: { fontSize: 13, fontWeight: '700', color: colors.accent },
+  small: { fontSize: 13, color: colors.muted, lineHeight: 20 },
   body: { fontSize: 14, color: colors.text, lineHeight: 22 },
   button: {
     paddingHorizontal: 14,
@@ -1150,12 +1150,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent,
   },
   secondary: { backgroundColor: colors.accentSoft },
-  buttonText: { color: colors.textLight, fontSize: 12, fontWeight: '700' },
+  buttonText: { color: colors.textLight, fontSize: 13, fontWeight: '700' },
   secondaryText: { color: colors.accent },
   disabled: { opacity: 0.4 },
   message: { color: colors.danger, fontSize: 13, lineHeight: 20 },
   field: { gap: 6 },
-  label: { color: colors.text, fontSize: 12, fontWeight: '700' },
+  label: { color: colors.text, fontSize: 13, fontWeight: '700' },
   input: {
     borderWidth: 1,
     borderColor: colors.border,

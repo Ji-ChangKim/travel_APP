@@ -1,22 +1,23 @@
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import Text from '@/components/AppText';
+import { colors } from '@/constants/theme';
+import { Image, StyleSheet, View } from 'react-native';
+import DesignButton from '@/components/DesignButton';
 
 interface Props {
+  returning?: boolean;
   disabled: boolean;
   onCreateTrip: () => void;
 }
 
 // 등록된 일정이 없는 신규 유저에게 하루 마스코트와 여행 생성 행동을 유도하는 히어로 카드를 렌더링한다.
-export default function HomeEmptyHero({ disabled, onCreateTrip }: Props) {
+export default function HomeEmptyHero({
+  disabled,
+  onCreateTrip,
+  returning = false,
+}: Props) {
   // 사용자가 여행 계획을 즉시 시작할 수 있도록 시각적 유도 카드를 반환한다.
   return (
     <View style={styles.card}>
-      <View style={styles.topBadgeRow}>
-        <View style={styles.passportBadge}>
-          <Text style={styles.passportBadgeText}>✈️ Passport Ready</Text>
-        </View>
-      </View>
-
       <View style={styles.mascotCircle}>
         <Image
           source={require('../../../assets/brand/haru-v1/TripPrint_Haru_empty_1024x1536.png')}
@@ -27,36 +28,34 @@ export default function HomeEmptyHero({ disabled, onCreateTrip }: Props) {
       </View>
 
       <View style={styles.journeyTag}>
-        <Text style={styles.journeyTagText}>🔖 첫 번째 여정</Text>
+        <Text style={styles.journeyTagText}>
+          {returning ? '다음 여정' : '첫 번째 여정'}
+        </Text>
       </View>
 
-      <Text style={styles.title}>아직 등록된 여행이 없어요</Text>
-
-      <Text style={styles.description}>
-        가고 싶은 여행지를 등록하면 일정 계획, 동선 추천, 명소 팁, 영수증 서랍
-        정리까지 한 번에 채워드릴게요!
+      <Text accessibilityRole="header" style={styles.title}>
+        {returning
+          ? '새로운 여행을 준비해 볼까요?'
+          : '아직 등록된 여행이 없어요'}
       </Text>
 
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="첫 여행 계획 만들기"
-        accessibilityState={{ disabled }}
-        disabled={disabled}
-        onPress={onCreateTrip}
-        style={({ pressed }) => [
-          styles.createButton,
-          disabled && styles.disabled,
-          pressed && styles.pressed,
-        ]}
-      >
-        <Ionicons name="add-circle" size={20} color="#FFFFFF" />
-        <Text style={styles.createButtonText}>첫 여행 계획 만들기</Text>
-        <Ionicons name="chevron-forward" size={18} color="#FFFFFF" />
-      </Pressable>
+      <Text style={styles.description}>
+        가고 싶은 도시와 날짜를 정해 보세요. 일정과 사진, 여행 중 쓴 비용을 한
+        여행에 모아 기록할 수 있어요.
+      </Text>
+
+      <View style={{ alignSelf: 'stretch' }}>
+        <DesignButton
+          label={returning ? '다음 여행 계획 만들기' : '첫 여행 계획 만들기'}
+          variant="primary"
+          disabled={disabled}
+          onPress={onCreateTrip}
+        />
+      </View>
 
       <View style={styles.hintRow}>
         <Text style={styles.hintText}>
-          ⏱️ 3분이면 나만의 템플릿 일정이 완성돼요
+          항공편 없이도 여행을 만들고 날짜별로 일정을 추가할 수 있어요.
         </Text>
       </View>
     </View>
@@ -65,37 +64,21 @@ export default function HomeEmptyHero({ disabled, onCreateTrip }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFF8F5',
-    borderRadius: 24,
+    backgroundColor: colors.surface,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#FFE8DF',
+    borderColor: colors.border,
     padding: 20,
     alignItems: 'center',
     gap: 12,
-  },
-  topBadgeRow: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
-  passportBadge: {
-    backgroundColor: '#FFEFE8',
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-  },
-  passportBadgeText: {
-    color: '#FF5C39',
-    fontSize: 12,
-    fontWeight: '700',
   },
   mascotCircle: {
     width: 140,
     height: 140,
     borderRadius: 70,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.selectedSurface,
     borderWidth: 4,
-    borderColor: '#FFEFE8',
+    borderColor: colors.selectedSurface,
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
@@ -106,53 +89,54 @@ const styles = StyleSheet.create({
     height: 120,
   },
   journeyTag: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#F0E2D8',
+    borderColor: colors.border,
     paddingHorizontal: 10,
     paddingVertical: 4,
     marginTop: -2,
   },
   journeyTagText: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '700',
-    color: '#4A5B6D',
+    color: colors.muted,
   },
   title: {
-    fontSize: 21,
-    lineHeight: 28,
-    fontWeight: '800',
-    color: '#203247',
+    width: '100%',
+    fontSize: 22,
+    lineHeight: 30,
+    fontWeight: '700',
+    color: colors.text,
     textAlign: 'center',
     letterSpacing: -0.4,
   },
   description: {
-    fontSize: 14,
-    lineHeight: 22,
-    color: '#697581',
+    fontSize: 16,
+    lineHeight: 26,
+    color: colors.muted,
     textAlign: 'center',
     paddingHorizontal: 8,
   },
   createButton: {
     width: '100%',
     minHeight: 54,
-    backgroundColor: '#FF5C39',
-    borderRadius: 16,
+    backgroundColor: colors.primary,
+    borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,
     gap: 8,
     marginTop: 6,
-    shadowColor: '#FF5C39',
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 0,
   },
   createButtonText: {
-    color: '#FFFFFF',
+    color: colors.textLight,
     fontSize: 16,
     fontWeight: '700',
     letterSpacing: -0.3,
@@ -171,9 +155,9 @@ const styles = StyleSheet.create({
     paddingTop: 2,
   },
   hintText: {
-    fontSize: 12,
-    lineHeight: 18,
-    color: '#8A9BA8',
+    fontSize: 14,
+    lineHeight: 22,
+    color: colors.muted,
     fontWeight: '500',
   },
 });

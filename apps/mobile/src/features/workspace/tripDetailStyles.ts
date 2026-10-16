@@ -1,0 +1,96 @@
+import { StyleSheet } from 'react-native';
+import { colors } from '@/constants/theme';
+
+// 상세 정보의 역할별 글자와 정보 묶음을 하루 UI Kit에 맞춘다.
+export const tripDetailStyles = StyleSheet.create({
+  section: { gap: 16 },
+  title: {
+    fontSize: 22,
+    lineHeight: 30,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  cardTitle: {
+    fontSize: 18,
+    lineHeight: 26,
+    fontWeight: '600',
+    color: colors.text,
+    flexShrink: 1,
+  },
+  body: { fontSize: 16, lineHeight: 26, color: colors.text },
+  meta: { fontSize: 14, lineHeight: 22, color: colors.muted },
+  card: {
+    padding: 16,
+    gap: 12,
+    borderRadius: 16,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  heading: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: 8,
+  },
+  badge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    backgroundColor: colors.selectedSurface,
+    borderRadius: 999,
+  },
+  badgeText: {
+    fontSize: 14,
+    lineHeight: 22,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  amount: {
+    fontSize: 16,
+    lineHeight: 24,
+    fontWeight: '600',
+    fontVariant: ['tabular-nums'],
+    color: colors.text,
+  },
+  total: {
+    fontSize: 22,
+    lineHeight: 30,
+    fontWeight: '700',
+    fontVariant: ['tabular-nums'],
+    color: colors.text,
+    flexShrink: 1,
+  },
+  currencyRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 8,
+    paddingVertical: 4,
+  },
+  summary: { gap: 12 },
+  actual: { borderTopWidth: 4, borderTopColor: colors.brandCoral },
+  progressTrack: {
+    height: 8,
+    backgroundColor: colors.surfaceMuted,
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressFill: { height: 8, backgroundColor: colors.text, borderRadius: 4 },
+  avatar: {
+    minWidth: 44,
+    minHeight: 44,
+    padding: 8,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.selectedSurface,
+  },
+  initial: {
+    fontSize: 18,
+    lineHeight: 26,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  memberInfo: { flex: 1, minWidth: 120, gap: 4 },
+  completed: { backgroundColor: colors.successSoft },
+});

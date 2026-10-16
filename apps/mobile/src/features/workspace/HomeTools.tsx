@@ -1,9 +1,12 @@
+import Text from '@/components/AppText';
+import { colors } from '@/constants/theme';
 import { useState, type Dispatch, type SetStateAction } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, type Href } from 'expo-router';
 import type { listServerTrips } from '@wherego/api-client';
 import { homeStyles as s } from './homeStyles';
+import PermissionTools from '../permissions/PermissionTools';
 
 type Trips = Awaited<ReturnType<typeof listServerTrips>> | undefined;
 
@@ -38,11 +41,12 @@ function ToolsContent({
         <Ionicons
           name={open ? 'chevron-up' : 'chevron-down'}
           size={18}
-          color="#697581"
+          color={colors.muted}
         />
       </Pressable>
       {open && (
         <View>
+          <PermissionTools />
           <ToolLink
             label="초대 링크로 참여"
             icon="people-outline"
@@ -121,9 +125,9 @@ function ToolButton({
         return router.push(path);
       }}
     >
-      <Ionicons name={icon} size={20} color="#536373" />
+      <Ionicons name={icon} size={20} color={colors.muted} />
       <Text style={[s.linkText, s.linkCopy]}>{label}</Text>
-      <Ionicons name="chevron-forward" size={16} color="#697581" />
+      <Ionicons name="chevron-forward" size={16} color={colors.muted} />
     </Pressable>
   );
 }

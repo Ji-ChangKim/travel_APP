@@ -1,17 +1,22 @@
-import {
-  useEffect,
-  useLayoutEffect,
-  useState,
-  useSyncExternalStore,
-} from 'react';
+import { useLayoutEffect, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import {
-  AccessibilityInfo,
-  AppState,
   Platform,
   ScrollView,
+  type NativeSyntheticEvent,
+  type TargetedEvent,
 } from 'react-native';
 import { usePathname } from 'expo-router';
+import {
+  accessibilitySnapshot,
+  useAppAccessibility,
+} from '../accessibility/appAccessibility';
+import { topModal, useTopModal } from '../accessibility/modalLayers';
+import {
+  allowsAutoplay,
+  carouselDelay,
+  instantMotion,
+} from '../accessibility/motionPolicy';
 
 type State<T> = [T, Dispatch<SetStateAction<T>>];
 interface CarouselState {
@@ -35,6 +40,8 @@ interface Options {
 
 // 화면 수명과 사용자의 동작 설정에 맞는 추천 슬라이드 제어기를 만든다.
 export function useDiscoveryCarousel(count: number, blocked: boolean) {
+  const settings = useAppAccessibility();
+  const modal = useTopModal();
   // 매 프레임 상태를 갱신하지 않고 카드 단위 상태만 보관한다.
   return useCarouselController(
     {
@@ -50,174 +57,53 @@ export function useDiscoveryCarousel(count: number, blocked: boolean) {
     },
     {
       count,
-      blocked,
-      foreground: useSyncExternalStore(
-        subscribeForeground,
-        foreground,
-        inactive,
-      ),
+      blocked: blocked || Boolean(modal),
+      foreground: settings.foreground,
       focused: usePathname() === '/',
-      restricted: useRestrictedMotion(),
+      restricted: instantMotion(settings) || settings.largeText,
     },
   );
-}
-
-// 앱이 실제로 보이는 동안에만 자동 이동을 허용한다.
-function foreground(): boolean {
-  // 웹의 탭 숨김도 React Native AppState가 전달한다.
-  return AppState.currentState === 'active';
-}
-
-// 정적 웹 렌더링 중에는 타이머를 시작하지 않는다.
-function inactive(): boolean {
-  // 브라우저 초기화가 끝난 뒤 실제 상태로 전환한다.
-  return false;
-}
-
-// 앱 상태 구독은 화면이 사라지면 해제한다.
-function subscribeForeground(changed: () => void): () => void {
-  // 백그라운드 복귀 시 밀린 슬라이드를 한꺼번에 실행하지 않는다.
-  return removeSubscription(AppState.addEventListener('change', changed));
-}
-
-// 같은 형태의 네이티브 이벤트 구독을 해제한다.
-function removeSubscription(subscription: { remove: () => void }): () => void {
-  // 정리 함수는 생성한 구독 하나만 해제한다.
-  return () => {
-    // 화면 이동 후 남는 이벤트 수신을 방지한다.
-    return subscription.remove();
-  };
-}
-
-// 동작 줄이기와 네이티브 화면 읽기 설정을 함께 확인한다.
-function useRestrictedMotion(): boolean {
-  // 웹은 화면 읽기 활성 여부를 감지할 수 없어 키보드 초점 시 별도로 멈춘다.
-  return [
-    usePreference(
-      'reduceMotionChanged',
-      AccessibilityInfo.isReduceMotionEnabled,
-    ),
-    usePreference('screenReaderChanged', screenReaderEnabled),
-  ].some(Boolean);
-}
-
-// 웹의 화면 읽기 조회 상수값을 실제 감지 결과로 사용하지 않는다.
-function screenReaderEnabled(): Promise<boolean> {
-  // Android와 iOS에서는 실제 접근성 API를 사용한다.
-  return Platform.OS === 'web'
-    ? Promise.resolve(false)
-    : AccessibilityInfo.isScreenReaderEnabled();
-}
-
-// 비동기 접근성 설정 확인 전에는 자동 이동을 보류한다.
-function usePreference(
-  event: 'reduceMotionChanged' | 'screenReaderChanged',
-  read: () => Promise<boolean>,
-): boolean {
-  // 초기 조회와 설정 변경 이벤트의 수명을 같은 상태에 연결한다.
-  return usePreferenceValue(useState(true), event, read);
-}
-
-// 설정 구독과 값 반환을 하나의 훅 수명으로 묶는다.
-function usePreferenceValue(
-  [value, set]: State<boolean>,
-  event: 'reduceMotionChanged' | 'screenReaderChanged',
-  read: () => Promise<boolean>,
-): boolean {
-  // 조회 실패 시 자동 이동을 켜지 않는다.
-  return (
-    useEffect(() => {
-      // 화면이 닫힌 뒤 비동기 설정 결과를 반영하지 않는다.
-      return observePreference(set, event, read);
-    }, [set, event, read]),
-    value
-  );
-}
-
-// 접근성 설정 변경이 초기 조회보다 늦게 덮어써지지 않게 한다.
-function observePreference(
-  set: Dispatch<SetStateAction<boolean>>,
-  event: 'reduceMotionChanged' | 'screenReaderChanged',
-  read: () => Promise<boolean>,
-): () => void {
-  // 살아 있는 구독의 가장 최근 상태만 유지한다.
-  return preferenceLifecycle({ alive: true, changed: false }, set, event, read);
-}
-
-// 구독과 최초 조회를 정리 가능한 하나의 자원으로 관리한다.
-function preferenceLifecycle(
-  lifetime: { alive: boolean; changed: boolean },
-  set: Dispatch<SetStateAction<boolean>>,
-  event: 'reduceMotionChanged' | 'screenReaderChanged',
-  read: () => Promise<boolean>,
-): () => void {
-  // 조회 중 새 이벤트가 오면 이벤트 값을 우선한다.
-  return finishPreference(
-    lifetime,
-    AccessibilityInfo.addEventListener(event, (enabled) => {
-      // 현재 동작 설정 변경을 즉시 적용한다.
-      return ((lifetime.changed = true), set(enabled));
-    }),
-    read()
-      .then((enabled) => {
-        // 초기 조회 결과는 변경 이벤트가 없을 때만 반영한다.
-        return lifetime.alive && !lifetime.changed ? set(enabled) : undefined;
-      })
-      .catch(() => {
-        // 설정 확인에 실패하면 안전하게 정지 상태를 유지한다.
-        return undefined;
-      }),
-  );
-}
-
-// 접근성 조회 완료 여부와 무관하게 화면 종료를 처리한다.
-function finishPreference(
-  lifetime: { alive: boolean },
-  subscription: { remove: () => void },
-  _query: Promise<void>,
-): () => void {
-  // 비동기 조회를 취소할 수 없어 결과 반영을 차단한다.
-  return () => {
-    // 이벤트 수신과 지연된 상태 갱신을 함께 끝낸다.
-    return ((lifetime.alive = false), subscription.remove());
-  };
 }
 
 // 자동 이동 허용 여부를 실제 수명과 사용자 조작에서 계산한다.
 function autoplay(state: CarouselState, options: Options): boolean {
   // 도시가 하나이거나 화면을 읽고 있을 때는 정지한다.
-  return (
-    options.count > 1 &&
-    state.width[0] > 0 &&
-    options.foreground &&
-    options.focused &&
-    !options.blocked &&
-    !options.restricted &&
-    !state.paused[0] &&
-    !state.dragging[0] &&
-    !state.hovering[0]
-  );
+  return allowsAutoplay({
+    ...options,
+    width: state.width[0],
+    paused: state.paused[0],
+    dragging: state.dragging[0],
+    hovering: state.hovering[0],
+  });
 }
 
 // 자동 이동 한 번만 예약하고 조건이 바뀌면 즉시 취소한다.
 function useAutoplay(state: CarouselState, options: Options): void {
   // 상태가 같은 동안 네트워크 재조회나 고주파 타이머를 만들지 않는다.
-  return useEffect(() => {
-    // 터치 이후에는 최소 8초 동안 읽을 시간을 제공한다.
+  return useLayoutEffect(() => {
+    // 터치 이후에는 최소 5초 동안 읽을 시간을 제공한다.
     return autoplay(state, options) ? scheduleMove(state, options) : undefined;
   }, [state, options]);
 }
 
-// 사용자 조작 유예와 기본 4.5초 간격 중 더 긴 시간으로 이동한다.
+// 사용자 조작 유예와 기본 5초 간격 중 더 긴 시간으로 이동한다.
 function scheduleMove(state: CarouselState, options: Options): () => void {
   // 백그라운드에서 지난 횟수를 누적하지 않는다.
   return cancelTimer(
     setTimeout(
       () => {
         // 마지막 카드는 역방향으로 길게 움직이지 않고 처음으로 돌아간다.
+        const settings = accessibilitySnapshot();
+        if (
+          !settings.foreground ||
+          instantMotion(settings) ||
+          settings.largeText ||
+          topModal()
+        )
+          return;
         return moveTo(state, options, (state.index[0] + 1) % options.count);
       },
-      Math.max(4500, state.interaction[0] + 8000 - Date.now()),
+      carouselDelay(state.interaction[0], Date.now()),
     ),
   );
 }
@@ -302,9 +188,13 @@ function useCarouselController(state: CarouselState, options: Options) {
         // 마우스로 도시를 살펴볼 때 자동 전환을 멈춘다.
         return (state.hovering[1](hovering), state.manual[1](hovering));
       },
-      pause: () => {
+      pause: (event: NativeSyntheticEvent<TargetedEvent>) => {
         // 키보드 초점이 이동한 뒤 사용자가 재생하기 전까지 정지한다.
-        return state.paused[1](true);
+        return Platform.OS !== 'web' ||
+          (event.currentTarget instanceof HTMLElement &&
+            event.currentTarget.matches(':focus-visible'))
+          ? state.paused[1](true)
+          : undefined;
       },
       toggle: () => {
         // 동작 줄이기 설정은 재생 버튼보다 우선한다.

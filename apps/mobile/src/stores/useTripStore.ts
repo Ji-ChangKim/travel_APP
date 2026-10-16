@@ -18,7 +18,7 @@ import {
   saveGuestSession,
 } from '@/services/guestAuthService';
 import { signOutUser } from '@/services/authService';
-import { accountChangeState } from '@/features/auth/model';
+import { accountChangeState, profileUpdateState } from '@/features/auth/model';
 import { guestSession } from '@/services/guestSession';
 import { cloudProfile } from '@/services/cloudAuth';
 
@@ -202,16 +202,10 @@ export const useTripStore = create<TripState>((set, get) => ({
 
   // 현재 로그인된 사용자의 프로필 속성을 부분 갱신한다.
   updateProfile: (updates: Partial<Profile>) => {
-    // 현재 사용자가 존재할 경우 업데이트 속성을 병합하여 상태를 갱신한다.
-    set((state) => {
-      if (!state.currentUser) return state;
-      return {
-        currentUser: {
-          ...state.currentUser,
-          ...updates,
-          updatedAt: new Date().toISOString(),
-        },
-      };
+    // 저장 요청 계정과 다른 프로필은 현재 사용자에 병합하지 않는다.
+    return set((state) => {
+      // 계정 검사와 병합을 하나의 상태 변경으로 처리한다.
+      return profileUpdateState(state.currentUser, updates);
     });
   },
 

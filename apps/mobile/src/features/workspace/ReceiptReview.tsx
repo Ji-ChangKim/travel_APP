@@ -1,4 +1,5 @@
-import { Text, View } from 'react-native';
+import Text from '@/components/AppText';
+import { View } from 'react-native';
 import type { WorkspaceSnapshot } from '@wherego/domain';
 import HaruState from '@/components/HaruState';
 import { Action, Field, styles } from './ui';
@@ -93,13 +94,18 @@ export default function ReceiptReview({
               }에 기록돼요`
             : '결제 날짜가 여행 기간과 맞는지 확인해 주세요.'}
         </Text>
-        {JSON.parse(form.values.warnings || '[]').map(
-          (warning: string, index: number) => (
+        {(JSON.parse(form.values.warnings || '[]') as string[])
+          .filter((warning) => {
+            // 합계·통화 안내는 수정된 값으로 다시 계산하므로 오래된 인식 경고를 반복하지 않는다.
+            return !/메뉴 금액과 결제 합계|통화를 읽지 못|영수증은 읽었지만/.test(
+              warning,
+            );
+          })
+          .map((warning: string, index: number) => (
             <Text key={index} style={styles.subtitle}>
               {warning}
             </Text>
-          ),
-        )}
+          ))}
         <Action
           label={
             form.values.receiptEditing === 'true'

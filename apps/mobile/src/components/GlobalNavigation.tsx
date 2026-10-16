@@ -1,55 +1,64 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useTopModal } from '@/features/accessibility/modalLayers';
+import Text from '@/components/AppText';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { usePathname, useRouter } from 'expo-router';
+import { usePathname, useRouter, useSegments } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTripStore } from '@/stores/useTripStore';
 import { colors } from '@/constants/theme';
+import { requestScheduleExit } from '@/features/workspace/scheduleExitGuard';
+import { hasGlobalNavigation } from './navigationPolicy';
 
-// 좌우 4개 일반 탭 메뉴 항목을 정의한다.
-const leftItems = [
+// 하루 UI Kit의 다섯 메뉴를 실제 기존 경로에 연결한다.
+const items = [
   {
     label: '홈',
-    path: '/(tabs)' as const,
+    path: '/(tabs)',
     match: '/',
-    icon: 'home-outline' as const,
-    activeIcon: 'home' as const,
+    icon: 'home-outline',
+    activeIcon: 'home',
   },
   {
-    label: '일정',
-    path: '/(tabs)' as const,
-    match: '/schedule',
-    icon: 'calendar-outline' as const,
-    activeIcon: 'calendar' as const,
+    label: '내 여행',
+    path: '/plans',
+    match: '/plans',
+    icon: 'calendar-outline',
+    activeIcon: 'calendar',
   },
-];
-
-const rightItems = [
   {
     label: '발자국',
-    path: '/(tabs)/footprints' as const,
+    path: '/(tabs)/footprints',
     match: '/footprints',
-    icon: 'map-outline' as const,
-    activeIcon: 'map' as const,
+    icon: 'footsteps-outline',
+    activeIcon: 'footsteps',
+  },
+  {
+    label: '커뮤니티',
+    path: '/(tabs)/community',
+    match: '/community',
+    icon: 'people-outline',
+    activeIcon: 'people',
   },
   {
     label: 'MY',
-    path: '/(tabs)/my' as const,
+    path: '/(tabs)/my',
     match: '/my',
-    icon: 'person-outline' as const,
-    activeIcon: 'person' as const,
+    icon: 'person-outline',
+    activeIcon: 'person',
   },
-];
+] as const;
 
-// 회원 또는 게스트로 시작한 뒤 하단 5단 내비게이션(중앙 FAB 포함)을 표시한다.
+// 인증·안전 영역·작성 이탈 보호를 그대로 유지한다.
 export default function GlobalNavigation() {
-  // 안전 영역과 라우터 정보를 하단 메뉴에 연결한다.
+  // 현재 라우트와 계정의 접근 상태만 메뉴에 전달한다.
   return (
     <NavigationContent
       bottom={useSafeAreaInsets().bottom}
       path={usePathname()}
+      starting={useSegments().join('/') === ''}
       router={useRouter()}
       allowed={useTripStore((state) => {
-        // 로그인 또는 프로필 설정을 마친 회원과 게스트만 메뉴를 이동한다.
+        // 게스트와 가입을 마친 사용자에게 기존 여행 메뉴를 제공한다.
         return Boolean(
           state.currentUser &&
           (state.currentUser.authProvider === 'guest' ||
@@ -60,96 +69,102 @@ export default function GlobalNavigation() {
   );
 }
 
-// 스크롤·키보드·상세 페이지와 독립된 메뉴 영역을 렌더링한다.
+// 최상위 탐색 화면에서만 같은 위치의 메뉴를 제공한다.
 function NavigationContent({
   bottom,
   path,
   router,
   allowed,
+  starting,
 }: {
   bottom: number;
   path: string;
   router: ReturnType<typeof useRouter>;
   allowed: boolean;
+  starting: boolean;
 }) {
-  // 로그인·인증 복귀·프로필 설정 중에는 하단 메뉴를 렌더링하지 않는다.
-  return allowed &&
-    path !== '/login' &&
-    path !== '/auth/callback' &&
-    path !== '/profile-setup' ? (
+  const modal = useTopModal();
+  const blocked = Boolean(modal && (modal.strict || modal.native));
+  // 상세·작성 화면은 메뉴를 숨기고 선택 시트 뒤의 메뉴 조작도 막는다.
+  return !starting && hasGlobalNavigation(path) && !(modal && !modal.strict) ? (
     <View
       accessibilityLabel="하단 내비게이션"
+      accessibilityElementsHidden={blocked}
+      importantForAccessibility={blocked ? 'no-hide-descendants' : 'auto'}
+      aria-hidden={blocked}
+      pointerEvents={blocked ? 'none' : 'auto'}
       style={[styles.container, { paddingBottom: bottom }]}
     >
-      {leftItems.map((item) => (
-        <TabItem
-          key={item.label}
-          item={item}
-          isSelected={path === item.match}
-          onPress={() => {
-            // 선택한 탭 경로로 화면을 전환한다.
-            return router.replace(item.path);
-          }}
-        />
-      ))}
-
-      <CenterCreateButton
-        onPress={() => {
-          // 중앙 플로팅 버튼 터치 시 새 여행 계획 생성 화면으로 이동한다.
-          return router.push('/new-trip');
-        }}
-      />
-
-      {rightItems.map((item) => (
-        <TabItem
-          key={item.label}
-          item={item}
-          isSelected={path === item.match}
-          onPress={() => {
-            // 선택한 탭 경로로 화면을 전환한다.
-            return router.replace(item.path);
-          }}
-        />
-      ))}
+      {items
+        .filter((item) => {
+          // 로그인 전 공개 탐색 범위를 확장하지 않는다.
+          return allowed || item.match === '/' || item.match === '/community';
+        })
+        .map((item) => (
+          <TabItem
+            key={item.label}
+            item={item}
+            isSelected={selectedPath(path, item.match)}
+            onPress={() => {
+              // 저장하지 않은 일정은 기존 이탈 확인을 통과한 뒤 이동한다.
+              return requestScheduleExit(() => {
+                // 새 데이터를 만들지 않고 선택한 기존 화면으로 이동한다.
+                return router.replace(item.path);
+              });
+            }}
+          />
+        ))}
     </View>
   ) : null;
 }
 
-// 단일 탭 버튼을 렌더링한다.
+// 여행 상세와 다이어리도 각각의 상위 메뉴에 선택 표시를 유지한다.
+function selectedPath(path: string, match: string): boolean {
+  // 정확한 경로와 해당 메뉴에 속하는 상세 경로만 비교한다.
+  return (
+    path === match ||
+    (match === '/plans' &&
+      (path.startsWith('/trips/') || path === '/new-trip')) ||
+    (match === '/footprints' && path.startsWith('/diary/'))
+  );
+}
+
+// 선택한 메뉴는 옅은 코랄 바탕과 네이비 글자·아이콘으로 표시한다.
 function TabItem({
   item,
   isSelected,
   onPress,
 }: {
-  item: {
-    label: string;
-    icon: keyof typeof Ionicons.glyphMap;
-    activeIcon: keyof typeof Ionicons.glyphMap;
-  };
+  item: (typeof items)[number];
   isSelected: boolean;
   onPress: () => void;
 }) {
-  // 활성/비활성에 맞는 색상과 아이콘을 반환한다.
-  const activeColor = '#FF5C39';
-  const inactiveColor = colors.muted;
-
+  // 색상과 선택 속성을 함께 제공하고 최소 44px의 조작 영역을 보장한다.
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`${item.label} 탭`}
       accessibilityState={{ selected: isSelected }}
+      aria-selected={isSelected}
       onPress={onPress}
-      style={styles.tabButton}
+      style={({ pressed }) => {
+        // 누름은 글자 투명도 대신 옅은 선택 배경으로 표시한다.
+        return [
+          styles.tabButton,
+          (isSelected || pressed) && styles.selectedTab,
+        ];
+      }}
     >
       <Ionicons
         name={isSelected ? item.activeIcon : item.icon}
         size={23}
-        color={isSelected ? activeColor : inactiveColor}
+        color={isSelected ? colors.text : colors.muted}
       />
       <Text
+        variant="navigation"
         style={[
           styles.tabLabel,
-          { color: isSelected ? activeColor : inactiveColor },
+          { color: isSelected ? colors.text : colors.muted },
         ]}
       >
         {item.label}
@@ -158,72 +173,34 @@ function TabItem({
   );
 }
 
-// 중앙 돌출형 원형 새 여행 생성 버튼(FAB)을 렌더링한다.
-function CenterCreateButton({ onPress }: { onPress: () => void }) {
-  // 강조된 코랄 색상과 입체감 있는 그림자가 적용된 중앙 액션 버튼을 반환한다.
-  return (
-    <View style={styles.fabWrapper}>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="새 여행 계획 만들기"
-        onPress={onPress}
-        style={({ pressed }) => [
-          styles.fabButton,
-          pressed && styles.fabPressed,
-        ]}
-      >
-        <Ionicons name="add" size={30} color="#FFFFFF" />
-      </Pressable>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.surface,
     borderTopWidth: 1,
-    borderTopColor: '#F0F2F5',
+    borderTopColor: colors.border,
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'stretch',
+    paddingHorizontal: 4,
+    paddingTop: 4,
     zIndex: 100,
-    elevation: 20,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
+    elevation: 12,
   },
   tabButton: {
     flex: 1,
-    height: 60,
+    minHeight: 60,
+    paddingVertical: 8,
+    paddingHorizontal: 2,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 3,
+    borderRadius: 12,
   },
+  selectedTab: { backgroundColor: colors.selectedSurface },
   tabLabel: {
-    fontSize: 11,
+    width: '100%',
+    textAlign: 'center',
+    fontSize: 13,
+    lineHeight: 20,
     fontWeight: '600',
-  },
-  fabWrapper: {
-    width: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  fabButton: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: '#FF5C39',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: -22,
-    shadowColor: '#FF5C39',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
-    shadowRadius: 10,
-    elevation: 8,
-  },
-  fabPressed: {
-    opacity: 0.85,
-    transform: [{ scale: 0.94 }],
   },
 });

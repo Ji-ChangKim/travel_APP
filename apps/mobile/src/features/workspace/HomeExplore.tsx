@@ -1,4 +1,6 @@
-import { Pressable, Text, View } from 'react-native';
+import Text from '@/components/AppText';
+import { travelDateRange } from './travelDateRange';
+import { Pressable, View } from 'react-native';
 import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { getCommunity, foundationQueryKey } from '@wherego/api-client';
@@ -36,7 +38,13 @@ function ExploreContent({
   return query.isSuccess && !query.data?.length ? null : (
     <View style={s.section}>
       <View style={s.sectionHeader}>
-        <Text style={s.sectionTitle}>여행자들의 발자국</Text>
+        <Text
+          accessibilityRole="header"
+          numberOfLines={1}
+          style={s.sectionTitle}
+        >
+          여행자들의 발자국
+        </Text>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="공개 일정 더 둘러보기"
@@ -79,10 +87,15 @@ function ExploreContent({
             }}
           >
             <View style={s.linkCopy}>
-              <Text style={s.linkText}>{post.title}</Text>
+              <Text numberOfLines={1} ellipsizeMode="tail" style={s.linkText}>
+                {post.title}
+              </Text>
               <Text style={s.supporting}>
-                {post.snapshot.city} · {post.snapshot.startDate} —{' '}
-                {post.snapshot.endDate}
+                {post.snapshot.city} ·{' '}
+                {travelDateRange(
+                  post.snapshot.startDate,
+                  post.snapshot.endDate,
+                )}
               </Text>
             </View>
           </Pressable>

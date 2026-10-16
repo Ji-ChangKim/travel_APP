@@ -1,17 +1,27 @@
+import Text from '@/components/AppText';
 import Modal from '@/components/AppModal';
 import ReceiptReview from './ReceiptReview';
 import ReceiptConfirmation from './ReceiptConfirmation';
+import PublishSelection from './PublishSelection';
+import { publicationIssue } from './publication';
 import { receiptCanSave } from './receiptFlow';
-import { ScrollView, Text, View } from 'react-native';
-import { useRef, type ReactNode } from 'react';
+import { ScrollView, View } from 'react-native';
+import { useRef, type RefObject } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { WorkspaceSnapshot } from '@wherego/domain';
 import { Action, Field, ServerPhoto, styles } from './ui';
 import type { PlanForm } from './forms';
-import { DateField } from './TravelInputs';
-import TripFields from './TripFields';
+import TripPeriodSummary from './TripPeriodSummary';
+import { tripPeriodImpact } from './tripPeriod';
+import { DateField, DestinationFields } from './TravelInputs';
+import TripPlanningFlow from './TripPlanningFlow';
 import PlaceSearch from './PlaceSearch';
 import GooglePlace from './GooglePlace';
+import ScheduleLocation from './ScheduleLocation';
+import ScheduleFlightFields from './FlightEntryFields';
+import ScheduleEditor from './ScheduleEditor';
+import { FormFeedback } from './InputFeedback';
+import { type FieldErrors, type FormFeedbackState } from './formFeedback';
 
 const labels: Record<string, string> = {
   title: '제목',
@@ -31,31 +41,84 @@ const labels: Record<string, string> = {
   details: '구매 내역',
   body: '커뮤니티 본문',
 };
-// 여행 생성만 일반 페이지로 표시하고 기존 편집 화면의 모달을 유지한다.
-function EditorSurface({
-  form,
-  onClose,
-  children,
-}: {
-  form: PlanForm | null;
-  onClose: () => void;
-  children: ReactNode;
-}) {
-  // 생성 페이지는 모달 계층 없이 내비게이션 스택에 표시한다.
-  return form?.kind === 'trip' ? (
-    children
+// 폼이 닫혀도 전환이 끝날 때까지 마지막 작성 내용을 보존한다.
+export default function PlanEditor(props: EditorProps) {
+  // 입력 참조는 폼이 바뀌어도 현재 스크롤에 연결한다.
+  const scroll = useRef<ScrollView>(null);
+  const content = (
+    <EditorScope key={props.form?.id || 'closed'} {...props} scroll={scroll} />
+  );
+  // 여행 생성은 페이지 전환을 사용하고 편집은 공통 모달 수명을 사용한다.
+  return props.form?.kind === 'trip' ? (
+    content
   ) : (
     <Modal
-      visible={Boolean(form)}
+      visible={Boolean(props.form)}
+      accessibilityLabel={editorLabel(props.form)}
       animationType="slide"
-      onRequestClose={onClose}
+      onRequestClose={props.onClose}
     >
-      {children}
+      {content}
     </Modal>
   );
 }
-// 명령 종류에 맞춘 입력·선택·공개 미리보기를 제공한다.
-export default function PlanEditor({
+
+// 폼 종류가 바뀌면 화면 읽기 이름도 현재 작성 내용으로 갱신한다.
+function editorLabel(form: PlanForm | null): string {
+  // 로그인·출처 창과 편집 내용을 읽기 이름으로 구분한다.
+  return (
+    (
+      {
+        schedule: '일정 작성',
+        receipt: '영수증 확인',
+        publish: '커뮤니티 공개',
+        metadata: '여행 정보 수정',
+        period: '여행 기간 변경',
+        expense: '비용 작성',
+      } as Record<string, string>
+    )[form?.kind || ''] || '여행 내용 작성'
+  );
+}
+
+// 폼 전체에 오류 이동과 저장 중 입력 잠금을 적용한다.
+function EditorScope(
+  props: EditorProps & { scroll: RefObject<ScrollView | null> },
+) {
+  // 일정 전용 모달도 같은 저장 상태와 검증 결과를 사용한다.
+  return (
+    <FormFeedback
+      locked={props.locked}
+      feedback={props.feedback}
+      scroll={props.scroll}
+    >
+      {props.form?.kind === 'trip' ? (
+        <TripPlanningFlow {...props} form={props.form} />
+      ) : (
+        <PlanEditorContent {...props} />
+      )}
+    </FormFeedback>
+  );
+}
+
+type EditorProps = {
+  userId: string;
+  form: PlanForm | null;
+  snapshot?: WorkspaceSnapshot;
+  busy: boolean;
+  locked: boolean;
+  feedback: FormFeedbackState;
+  onInvalid: (fields: FieldErrors) => void;
+  error: string;
+  onChange: (key: string, value: string) => void;
+  onSave: () => void;
+  onReload: () => void;
+  onClose: () => void;
+  onReceipt: (camera: boolean) => void;
+  onRescan: () => void;
+};
+
+// 명령 종류별 작성 화면을 같은 입력 계약으로 연결한다.
+function PlanEditorContent({
   userId,
   form,
   snapshot,
@@ -67,21 +130,15 @@ export default function PlanEditor({
   onClose,
   onReceipt,
   onRescan,
-}: {
-  userId: string;
-  form: PlanForm | null;
-  snapshot?: WorkspaceSnapshot;
-  busy: boolean;
-  error: string;
-  onChange: (key: string, value: string) => void;
-  onSave: () => void;
-  onReload: () => void;
-  onClose: () => void;
-  onReceipt: (camera: boolean) => void;
-  onRescan: () => void;
-}) {
+  locked,
+  scroll,
+}: EditorProps & { scroll: RefObject<ScrollView | null> }) {
   // 아니요 선택 시 수정할 정보를 화면 위에서 바로 확인할 수 있게 한다.
-  const receiptScroll = useRef<ScrollView>(null);
+  const receiptScroll = scroll;
+  const periodImpact =
+    form?.kind === 'period' && snapshot
+      ? tripPeriodImpact(snapshot, form.values)
+      : null;
   // 선택값을 반영한 다음 수정 화면의 시작으로 이동한다.
   function chooseReceiptValue(key: string, value: string) {
     // 사진 선택은 위치를 유지하고 정보 수정 선택만 위로 이동한다.
@@ -96,8 +153,25 @@ export default function PlanEditor({
     });
   }
   // 실패해도 같은 폼 입력값과 원본을 유지한다.
+  if (form?.kind === 'schedule' && snapshot)
+    return (
+      <ScheduleEditor
+        userId={userId}
+        form={form}
+        snapshot={snapshot}
+        busy={busy}
+        locked={locked}
+        scroll={scroll}
+        error={error}
+        onChange={onChange}
+        onSave={onSave}
+        onReload={onReload}
+        onClose={onClose}
+        onReceipt={onReceipt}
+      />
+    );
   return (
-    <EditorSurface form={form} onClose={onClose}>
+    <>
       <SafeAreaView style={styles.modal}>
         <ScrollView
           ref={receiptScroll}
@@ -105,21 +179,14 @@ export default function PlanEditor({
           keyboardShouldPersistTaps="handled"
         >
           <Text style={styles.header}>
-            {form?.kind === 'trip'
-              ? '새 여행 시작하기'
-              : form?.kind === 'publish'
-                ? '커뮤니티 공개'
-                : form?.kind === 'receipt'
-                  ? '영수증 확인'
+            {form?.kind === 'publish'
+              ? '커뮤니티 공개'
+              : form?.kind === 'receipt'
+                ? '영수증 확인'
+                : form?.kind === 'expense'
+                  ? '비용 기록'
                   : '여행 내용 작성'}
           </Text>
-          {form?.kind === 'trip' && (
-            <Action
-              label="내 여행으로 돌아가기"
-              disabled={busy}
-              onPress={onClose}
-            />
-          )}
           {form && (
             <>
               {form.kind === 'receipt' && snapshot && (
@@ -142,11 +209,20 @@ export default function PlanEditor({
                   }}
                 />
               )}
-              {form.kind === 'trip' && (
-                <TripFields values={form.values} onChange={onChange} />
-              )}
               {form.kind === 'schedule' && (
                 <>
+                  <ScheduleFlightFields
+                    userId={userId}
+                    date={
+                      snapshot?.days.find((day) => {
+                        // 선택 DAY의 출발 날짜만 조회에 사용한다.
+                        return day.id === form.values.dayId;
+                      })?.tripDate || ''
+                    }
+                    disabled={busy}
+                    values={form.values}
+                    onChange={onChange}
+                  />
                   <View style={styles.card}>
                     <Text style={styles.title}>장소를 어떻게 추가할까요?</Text>
                     <View style={styles.row}>
@@ -178,6 +254,8 @@ export default function PlanEditor({
                       // 사용자 제목과 구글 장소 ID만 영구 기록에 포함한다.
                       onChange('googlePlaceId', placeId);
                       onChange('title', authoredTitle);
+                      // 다른 공유 장소를 고르면 이전 위치 핀을 재사용하지 않는다.
+                      onChange('mapLocation', '');
                     }}
                   />
                   {form.values.googlePlaceId && (
@@ -197,6 +275,12 @@ export default function PlanEditor({
                       />
                     </>
                   )}
+                  <ScheduleLocation
+                    form={form}
+                    snapshot={snapshot}
+                    disabled={busy}
+                    onChange={onChange}
+                  />
                 </>
               )}
               {Object.entries(form.values)
@@ -216,6 +300,10 @@ export default function PlanEditor({
                         'timezone',
                         'defaultCurrency',
                       ].includes(key)
+                    ) &&
+                    !(
+                      form.kind === 'metadata' &&
+                      ['country', 'city'].includes(key)
                     ) &&
                     key !== 'sortOrder'
                   );
@@ -305,8 +393,20 @@ export default function PlanEditor({
                   {['KRW', 'JPY', 'USD'].map((currency) => (
                     <Action
                       key={currency}
-                      label={`${(form.values.currency || form.values.defaultCurrency) === currency ? '✓ ' : ''}${currency}`}
-                      disabled={busy}
+                      label={currency}
+                      selected={
+                        (form.values.currency ||
+                          form.values.defaultCurrency) === currency
+                      }
+                      size="chip"
+                      disabled={
+                        busy ||
+                        (form.kind === 'receipt' &&
+                          Boolean(form.values.currency) &&
+                          !['KRW', 'JPY', 'USD'].includes(
+                            form.values.currency!,
+                          ))
+                      }
                       onPress={() => {
                         // 금액은 선택 통화의 정밀도로 검사한다.
                         onChange(
@@ -331,6 +431,11 @@ export default function PlanEditor({
                         ? '새 장소 기록 만들기'
                         : '새 기록 / 일정 연결 없이'
                     }
+                    selected={
+                      form.kind === 'expense'
+                        ? !form.values.scheduleId
+                        : undefined
+                    }
                     disabled={busy}
                     onPress={() => {
                       // 영수증은 새 일정을 생성하고 수동 비용은 여행 전체에 연결한다.
@@ -348,7 +453,8 @@ export default function PlanEditor({
                     .map((item) => (
                       <Action
                         key={item.id}
-                        label={`${form.values.scheduleId === item.id ? '✓ ' : ''}${item.title}`}
+                        label={item.title}
+                        selected={form.values.scheduleId === item.id}
                         disabled={busy}
                         onPress={() => {
                           // 일정의 실제 DAY도 함께 연결한다.
@@ -361,20 +467,25 @@ export default function PlanEditor({
               {form.kind === 'expense' && (
                 <View style={styles.row}>
                   <Action
-                    label={`${form.values.isActual === 'true' ? '✓ ' : ''}실제 지출`}
+                    label="실제 지출"
+                    selected={form.values.isActual === 'true'}
                     onPress={() => {
                       // 실제 지출로 명시한다.
                       onChange('isActual', 'true');
                     }}
                   />
                   <Action
-                    label={`${form.values.isActual === 'false' ? '✓ ' : ''}예상 비용`}
+                    label="예상 비용"
+                    selected={form.values.isActual === 'false'}
                     onPress={() => {
                       // 예상 비용과 실제 지출은 합계를 분리한다.
                       onChange('isActual', 'false');
                     }}
                   />
                 </View>
+              )}
+              {form.kind === 'metadata' && (
+                <DestinationFields values={form.values} onChange={onChange} />
               )}
               {form.kind === 'metadata' && (
                 <View style={styles.row}>
@@ -390,69 +501,14 @@ export default function PlanEditor({
                   ))}
                 </View>
               )}
-              {form.kind === 'publish' && (
-                <View style={styles.card}>
-                  <Text style={styles.title}>공개 내용 미리보기</Text>
-                  <Text>
-                    {snapshot?.trip.country} · {snapshot?.trip.city}
-                  </Text>
-                  <Text>{form.values.title}</Text>
-                  <Text>{form.values.body}</Text>
-                  <Text>
-                    공개할 일정과 사진을 직접 선택해 주세요. 영수증 원본과 동행
-                    정보는 공개되지 않습니다.
-                  </Text>
-                  {snapshot?.itinerary.map((item) => (
-                    <Action
-                      key={item.id}
-                      label={`${selected(form.values.scheduleIds || '', item.id) ? '✓ ' : ''}일정: ${item.title}`}
-                      onPress={() => {
-                        // 선택한 일정만 게시 스냅샷에 포함한다.
-                        onChange(
-                          'scheduleIds',
-                          toggle(form.values.scheduleIds || '', item.id),
-                        );
-                      }}
-                    />
-                  ))}
-                  {snapshot?.media
-                    .filter((media) => {
-                      // 영수증 원본은 공개 선택지에서 제외한다.
-                      return media.purpose === 'photo';
-                    })
-                    .map((media, index) => (
-                      <Action
-                        key={media.id}
-                        label={`${selected(form.values.photoIds || '', media.id) ? '✓ ' : ''}사진 ${index + 1}`}
-                        onPress={() => {
-                          // 사용자가 선택한 사진만 공개한다.
-                          onChange(
-                            'photoIds',
-                            toggle(form.values.photoIds || '', media.id),
-                          );
-                        }}
-                      />
-                    ))}
-                  <Action
-                    label={`${form.values.includeCosts === 'true' ? '✓ ' : ''}실제 비용 합계 공개`}
-                    onPress={() => {
-                      // 금액 공개는 명시적 선택이다.
-                      onChange(
-                        'includeCosts',
-                        form.values.includeCosts === 'true' ? 'false' : 'true',
-                      );
-                    }}
-                  />
-                  <Text>
-                    선택 일정{' '}
-                    {form.values.scheduleIds?.split(',').filter(Boolean)
-                      .length || 0}
-                    개 · 사진{' '}
-                    {form.values.photoIds?.split(',').filter(Boolean).length ||
-                      0}
-                    장
-                  </Text>
-                </View>
+              {form.kind === 'publish' && snapshot && (
+                <PublishSelection
+                  userId={userId}
+                  form={form}
+                  snapshot={snapshot}
+                  busy={busy}
+                  onChange={onChange}
+                />
               )}
               {form.kind === 'receipt' &&
                 ['ready', 'manual'].includes(
@@ -465,11 +521,7 @@ export default function PlanEditor({
                   />
                 )}
               {form.kind === 'period' && (
-                <Text style={styles.subtitle}>
-                  DAY 순서와 일정은 유지되며 날짜가 이동합니다. 기록이 있는
-                  DAY를 없애는 기간 축소, 확정 영수증 날짜가 범위를 벗어나는
-                  변경은 저장되지 않습니다.
-                </Text>
+                <TripPeriodSummary impact={periodImpact} />
               )}
             </>
           )}
@@ -480,6 +532,7 @@ export default function PlanEditor({
           )}
           <View style={styles.row}>
             <Action
+              allowWhileLocked
               variant="primary"
               label={
                 busy
@@ -491,17 +544,21 @@ export default function PlanEditor({
                       : '확인하고 저장'
               }
               disabled={
-                busy || (form?.kind === 'receipt' && !receiptCanSave(form))
+                (form?.kind === 'period' &&
+                  !locked &&
+                  Boolean(periodImpact?.blocked)) ||
+                (form?.kind === 'receipt' && !receiptCanSave(form)) ||
+                (form?.kind === 'publish' &&
+                  !locked &&
+                  Boolean(snapshot && publicationIssue(snapshot, form.values)))
               }
+              loading={busy}
               onPress={onSave}
             />
-            <Action
-              label={form?.kind === 'trip' ? '취소' : '닫기'}
-              disabled={busy}
-              onPress={onClose}
-            />
+            <Action label="닫기" disabled={busy} onPress={onClose} />
             {error.includes('동행') && (
               <Action
+                allowWhileLocked
                 label="최신 내용 불러오기"
                 disabled={busy}
                 onPress={onReload}
@@ -510,23 +567,6 @@ export default function PlanEditor({
           </View>
         </ScrollView>
       </SafeAreaView>
-    </EditorSurface>
+    </>
   );
-}
-// 공개 선택 목록에서 특정 항목을 확인한다.
-function selected(value: string, id: string): boolean {
-  // ID 경계를 유지해 부분 문자열 오판정을 피한다.
-  return value.split(',').includes(id);
-}
-// 공개 선택 목록의 항목 하나만 변경한다.
-function toggle(value: string, id: string): string {
-  // 선택 상태를 UUID 목록으로 유지한다.
-  return (
-    selected(value, id)
-      ? value.split(',').filter((item) => {
-          // 지정한 항목만 제외한다.
-          return item !== id;
-        })
-      : [...value.split(',').filter(Boolean), id]
-  ).join(',');
 }

@@ -1,10 +1,10 @@
+import Text from '@/components/AppText';
 import Modal from '@/components/AppModal';
 import { useState } from 'react';
 import {
   Alert,
   ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -149,6 +149,8 @@ export function QuickAddModal({
   return (
     <Modal
       visible={visible}
+      blockNavigation={false}
+      accessibilityLabel="여행 기록 추가"
       animationType="slide"
       transparent
       onRequestClose={handleClose}
@@ -374,7 +376,6 @@ export function QuickAddModal({
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.55)',
     justifyContent: 'flex-end',
   },
   sheetContainer: {
@@ -406,7 +407,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   tagBadgeText: {
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: '700',
     color: colors.primary,
   },
@@ -416,7 +417,7 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   headerSub: {
-    fontSize: 12,
+    fontSize: 13,
     color: colors.muted,
     marginTop: 2,
   },
@@ -478,7 +479,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   typeSubLabel: {
-    fontSize: 10,
+    fontSize: 13,
     color: colors.muted,
     marginTop: 2,
   },
@@ -590,7 +591,7 @@ const styles = StyleSheet.create({
     color: colors.textLight,
   },
   footerNotice: {
-    fontSize: 11,
+    fontSize: 13,
     color: colors.muted,
     textAlign: 'center',
   },

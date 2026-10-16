@@ -1,3 +1,4 @@
+import { tripPresentation } from './tripPresentation';
 // 기기의 현재 달력 날짜를 시간대 변환 없이 구한다.
 export function localToday(now = new Date()): string {
   // UTC 날짜로 바뀌어 출발일 안내가 하루 어긋나지 않도록 한다.
@@ -10,12 +11,9 @@ export function departureReminder(
   end: string,
   today = localToday(),
 ): string {
-  // 여행 중·출발 당일·다가오는 여행을 서로 구분한다.
-  return start < today
-    ? end >= today
-      ? '지금 여행 중이에요'
-      : '지난 여행 계획을 확인해 보세요'
-    : start === today
-      ? '오늘 출발해요'
-      : `출발까지 ${Math.round((Date.parse(start) - Date.parse(today)) / 86400000)}일 남았어요`;
+  // 이전 호출도 여행 표시 모델의 같은 문구를 사용한다.
+  return tripPresentation(
+    { status: 'PLANNED', startDate: start, endDate: end, timezone: 'UTC' },
+    today,
+  ).reminder;
 }

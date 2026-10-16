@@ -10,12 +10,12 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 import { colors } from '@/constants/theme';
 import { useTripStore } from '@/stores/useTripStore';
 import type { ItineraryItem, PlaceCategory, TripStatus } from '@wherego/domain';
-import { tripCreateSchema } from '@wherego/validation';
 
 // 상태별 배지 색상 및 라벨 정보를 반환한다.
 function getStatusBadge(status: TripStatus) {
@@ -67,26 +67,18 @@ function getCategoryBadge(category: PlaceCategory) {
 
 // [내 여행] 화면을 렌더링한다.
 export default function MyTripsScreen() {
+  const router = useRouter();
   const {
     trips,
     selectedTripId,
     itineraries,
     setSelectedTripId,
-    createTrip,
     updateTripStatus,
     addItineraryItem,
     checkInPlace,
   } = useTripStore();
 
   const [filterStatus, setFilterStatus] = useState<TripStatus | 'ALL'>('ALL');
-
-  // 여행 생성 모달
-  const [isTripModalOpen, setIsTripModalOpen] = useState(false);
-  const [formTitle, setFormTitle] = useState('');
-  const [formCountry, setFormCountry] = useState('대한민국');
-  const [formCity, setFormCity] = useState('');
-  const [formStartDate, setFormStartDate] = useState('');
-  const [formEndDate, setFormEndDate] = useState('');
 
   // 일정 추가 모달
   const [isPlaceModalOpen, setIsPlaceModalOpen] = useState(false);
@@ -105,38 +97,6 @@ export default function MyTripsScreen() {
   const currentItinerary = selectedTrip
     ? itineraries[selectedTrip.id] || []
     : [];
-
-  // Zod 검증을 거쳐 새로운 여행을 생성한다.
-  const handleCreateTrip = () => {
-    const input = {
-      title: formTitle.trim(),
-      country: formCountry.trim(),
-      city: formCity.trim(),
-      startDate: formStartDate.trim(),
-      endDate: formEndDate.trim(),
-      coverColor: '#246A54',
-    };
-
-    const validationResult = tripCreateSchema.safeParse(input);
-    if (!validationResult.success) {
-      const errorMsg =
-        validationResult.error.errors[0]?.message || '입력값을 확인해 주세요.';
-      Alert.alert('입력 오류', errorMsg);
-      return;
-    }
-
-    createTrip({
-      ...input,
-      status: 'PLANNED',
-    });
-
-    Alert.alert('생성 완료', `'${input.title}' 여행이 등록되었습니다.`);
-    setIsTripModalOpen(false);
-    setFormTitle('');
-    setFormCity('');
-    setFormStartDate('');
-    setFormEndDate('');
-  };
 
   // 새로운 장소 일정을 추가한다.
   const handleAddPlace = () => {
@@ -185,7 +145,7 @@ export default function MyTripsScreen() {
           </View>
           <TouchableOpacity
             style={styles.createButton}
-            onPress={() => setIsTripModalOpen(true)}
+            onPress={() => router.push('/plan-create')}
           >
             <Ionicons name="add" size={20} color={colors.textLight} />
             <Text style={styles.createButtonText}>새 여행 생성</Text>
@@ -390,56 +350,6 @@ export default function MyTripsScreen() {
           </View>
         )}
       </ScrollView>
-
-      {/* 여행 생성 모달 */}
-      <Modal visible={isTripModalOpen} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>새 여행 생성</Text>
-              <TouchableOpacity onPress={() => setIsTripModalOpen(false)}>
-                <Ionicons name="close" size={24} color={colors.text} />
-              </TouchableOpacity>
-            </View>
-            <TextInput
-              style={styles.input}
-              placeholder="여행 제목 (예: 도쿄 미식 탐방)"
-              value={formTitle}
-              onChangeText={setFormTitle}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="국가 (예: 대한민국, 일본)"
-              value={formCountry}
-              onChangeText={setFormCountry}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="도시 (예: 서울, 도쿄, 제주)"
-              value={formCity}
-              onChangeText={setFormCity}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="시작일 (YYYY-MM-DD)"
-              value={formStartDate}
-              onChangeText={setFormStartDate}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="종료일 (YYYY-MM-DD)"
-              value={formEndDate}
-              onChangeText={setFormEndDate}
-            />
-            <TouchableOpacity
-              style={styles.submitBtn}
-              onPress={handleCreateTrip}
-            >
-              <Text style={styles.submitBtnText}>여행 생성하기</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
 
       {/* 장소 등록 모달 */}
       <Modal visible={isPlaceModalOpen} animationType="slide" transparent>
