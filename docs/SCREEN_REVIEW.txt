@@ -63,12 +63,23 @@ P1 빈 일정 첫 행동 — 캡처3
 - 추천이 없는 도시의 검색 연결, 보기 전용의 작성 행동 숨김, 여러 카드에서 하나의 주요 행동을 확인한다.
 - 보기 전용·저장 잠금·큰 글꼴·화면 읽기·배경 복귀에서도 기존 보호 유지.
 
-5. 검증 결과
+5. 검증 결과 — 4단계·홈 IA 최종본
 
-4단계·홈 IA 변경의 최종 npm run check·모델/인증·실제 브라우저 회귀 검증 중.
-기존 38개 성공을 새 규칙의 성공으로 올리지 않는다. 최종 결과와 로그는 이번 변경 검증 종료 후 갱신한다.
+- npm run check 통과. TypeScript·ESLint·Prettier·기존 WCAG AA 토큰46/46 검사 포함. outputs/state-machine-check-final.log
+- 모델·인증198/198 통과. D8/D7/D1/출발일/마지막 날/종료 다음 날, 날짜 미정/부분/잘못된 기간, 동일일 여행, 윤일/연도/시간대, 보관 분리, 다음 일정 정렬/원본 보존을 포함한다. outputs/state-machine-auth.log
+- 관련 브라우저53/53 통과. outputs/state-machine-browser-final.log
+  R06 인증 복귀14, R07 여행 정보·기간6, R10 공개2, R12 접근성·전환11, 내 여행2, 기존 상태/위계/코스16, 새 상태 머신 IA2건이다.
+  홈의 실제 다음 일정·지난 시각 제외·한 건 집중·실패/재시도/빈 기록, 네 단계 필터 건수, 홈 메뉴·중복 홈 이동 제거, 날짜 완료→실제 비공개 기록 연결을 확인했다.
+  날짜 경과는 명령을 보내지 않고 원본 PLANNED를 보존한다. 공개 준비가 없는 원본에는 공개 버튼이 생기지 않는다.
+  폭360/390/430, 큰 글꼴·키보드·Escape·시트 초점/배경 보호·캐러셀5초·동작 줄이기·백그라운드·기존 DAY2 취소/단일 저장/재조회도 통과했다.
+- 검증 전후 소스/설정/테스트365개 파일 SHA-256 일치(변경0개). outputs/state-machine-source-final.json, outputs/state-machine-source-changes.json.
+- 로컬 웹 출력 생성 통과. outputs/screen-review-web-export-final.log. 최신 앱 소스의 별도 검수 출력이며 AAB/APK가 아니다.
+- 문서 상대 링크0개 누락, 원본 기능정의서·디자인 소스 바이트 보존, 캡처172개 항목 파일/해시 일치. outputs/docs-cleanup-20261016/verification.log
+
+첫 관련50개 실행에서44개가 통과했고6개는 이전 메뉴·숨겨진 하단 탭·기록 제목 중복·캐러셀 포인터 상태를 가정한 검사였다. 실제 일시정지/재생·닫기 이탈 보호·다이어리 표지로 동선을 맞춘 뒤6개를 재통과하고 공개·DAY2까지 포함한53개 전체를 통과했다. 이전 실패 로그는 outputs/state-machine-browser.log에 보존한다.
+현재53개 관련 묶음의 결과이며 전체 브라우저·실제 기기 인수까지 실행했다는 뜻은 아니다.
 Play 설치본의 OS 권한·지도·인증·TalkBack은 qa/DEVICE_ACCEPTANCE.txt에서 이후 인수한다.
-AAB/APK 생성·업로드·원격 배포는 이번 범위에서 실행하지 않는다.
+이번 채팅에서 AAB/APK 생성·업로드·원격 배포·커밋·푸시는 실행하지 않았다.
 
 6. 현재 코드 연결
 
@@ -87,3 +98,6 @@ HomeNextSchedule.tsx / homeBriefing.ts: 권한이 있는 대표 여행 한 건�
 ScreenHeader.tsx / HomeHeader.tsx / HomeTools.tsx: 홈 팝업·중복 경로·내 여행 홈 이동 제거.
 DiaryScreen.tsx / FootprintsScreen.tsx / (tabs)/my.tsx: 날짜 완료 기록 열람·같은 단계 통계.
 PlanEditor.tsx / publication.ts: 날짜 단계와 명시적 기록 정리/공개 확인 구분.
+
+검수 설정: playwright.screen-review.config.ts(기존8804 로컬 검수 환경). 모델 검수: tripLifecycle.test.ts, tripPresentation.test.ts, travelPlans.test.ts, home-dates.test.ts, home-briefing.test.ts, receiptPublication.test.ts. 실제 화면 검수: tests/web/workspace.spec.ts.
+공통 도메인 index.ts: TripLifecycle/TripTiming/validTripDates 공개 진입점 유지.
