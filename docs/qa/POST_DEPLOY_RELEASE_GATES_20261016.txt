@@ -1,0 +1,46 @@
+TripPrint staging 반영 이후 출시 조건 점검
+기준일: 2026-10-16 / Asia/Seoul / 판정: Android AAB HOLD 유지
+
+[기획 종료 후 최신 판정]
+Google 사진19/19·실제 Places 검색200은 해결됐다. 현재 API256597e9-fb73-4ded-8361-fb5abd66afd5·Pages eff24df8-7e02-4950-95e0-14fd0364b468과 D1 migration0007 반영 인계를 대조했다. 남은 OCR·항공 조회·Play 지도 키·기기 인수 조건으로 AAB HOLD다. 최종 소스506파일/R8 보완/서명 준비와 검사는 FINAL_RELEASE_REVIEW_20261016.md를 따른다. 아래16/19와 Places 미등록은 사진 연결 전 진단 이력으로 보존한다.
+
+확인 범위
+기획 담당의 실제 게시·D1·브라우저 검증 인계, 저장된 사후 고객 회귀 증거, 배포 전후 바인딩 목록, 현재 OCR/항공/Places 처리 코드를 읽었다. 이 점검에서는 원격 배포·키 변경·계정 생성·AI 재호출·데이터 수정·게시 철회·Android 빌드·커밋·푸시를 실행하지 않았다.
+
+실제 공개 계획의 독립 확인
+GET https://tripprint-api-staging.gametps.workers.dev/public/community/72c64cdd-04d2-479a-b0a9-a700f009daa5 정상 응답.
+kind=plan, DAY4, 장소19, planContent.description19건 확인. requestId=5ccd4e1b-6d7c-494d-9643-b48d9b6cc53d.
+공개 주소: https://tripprint-staging.pages.dev/community/72c64cdd-04d2-479a-b0a9-a700f009daa5
+원문/선택 관계·D1/브라우저의19설명 일치는 기획 담당의 검수 인계 결과다. 이 채팅이 해당 브라우저 조작·D1 조회를 다시 실행한 것으로 표현하지 않는다. 공개 글을 그대로 유지했다.
+
+배포 및 실제 고객 회귀
+저장된 staging-version-after.json의 Worker 버전: a4d5dc1c-fbf7-48bf-94cc-b84b51508282. AI/DB/MEDIA 및 기존 공개 인증 변수·두 secret binding 이름이 배포 전후 유지됐다. 비밀 값은 읽지 않았다. 웹 main 배포54c87fb9는 기획 담당의 인계 기준이다.
+사후 회귀: outputs/customer-journey/live/qa-20261016064033-3e7786/result.json
+실행 시각: 2026-10-16 15:40:33~15:42:15 KST. 결과19개 중16통과·3실패.
+이전 온보딩422·수동 항공권 저장422·영수증 수정422는 해결됐다. 항공 조회의 이전404도 경로 미제공 상태에서503으로 바뀌었다. 공급자 조회 성공으로 처리하지 않는다.
+낡은 버전409·로그아웃/무인증401은 거부를 확인하는 정상 보안 검사이며 실패3개에 더하지 않는다.
+
+남은 실패와 원인 판단
+1. OCR503 OCR_UNAVAILABLE / requestId3ec35c0b-4487-4016-882e-fce28b72500a.
+   이전 실행(14:04:32~14:05:34 KST)은 실제 AI 인식에 성공했고 사후 실행은 실패했다. 현재 recognize는 AI 호출 실패·45초 시간 초과·빈/잘린 출력·JSON 파싱·초안 스키마 검사 실패를 모두 OCR_UNAVAILABLE로 합친다. 이번 응답과 증거에는 세부 단계·공급자 코드가 없어 원인을 확정할 수 없다.
+   AI 바인딩이 배포 전후 유지됐으므로 바인딩 삭제로 설명하지 않는다. 애플리케이션 스캔 한도 초과는 별도429 OCR_RATE_LIMITED 경로이므로 이503을 해당 한도 초과로 단정하지 않는다. Vision 키가 없어도 AI 우선 경로를 사용한다.
+   receiptAnalysis.ts에는2026-10-16 변경 이력이 있으며 프롬프트·통화 검증·품목 합계 경고 처리가 이전 코드와 다르다. 따라서 코드 회귀를 배제하고 외부 공급자 장애라고 단정할 근거도 없다. 이력 차이만으로 회귀 원인이 증명된 것은 아니다.
+   다음 진단은 실패 시각의 Workers AI/Worker 기록에서 호출 결과·지연·종료 원인·출력 검증 단계를 대조하는 것이다. 추가 진단이 필요하면 허용된 단계 코드·오류 분류·소요시간·requestId만 남긴다. 원본 이미지·영수증 본문·키·토큰·공급자 오류 원문을 로그에 넣지 않는다. 진단 결과 후 같은 원본의 실제 인식·확정·수정·재조회까지 확인한다.
+2. Places503 CONFIGURATION_REQUIRED / requestIdf3bd395f-d0ea-45d6-8e26-fd038eff90e4.
+   사후 배포 메타데이터에도 GOOGLE_PLACES_API_KEY가 없다. 등록 대상은 앱 번들에 넣는 지도 키와 별도인 서버 바인딩이다. 등록·Places API 활성화/결제/제한 확인 후 인증 검색·선택을 실제 검사한다.
+3. 항공503 FLIGHT_UNAVAILABLE / requestId0030d03e-441a-4aad-bc86-eb2c32062a81.
+   사후 배포 메타데이터에도 KAC_FLIGHT_SERVICE_KEY와 FLIGHT_LOOKUP_LIMITER가 없다. 현재 KAC 경로가 이 둘을 요구하므로 우선 설정 조건을 해소한다. 라우트200/조회0건/공급자 실패를 구분하며, 등록 후 실제 지원 구간·날짜 범위를 검사한다. 해외·미래 항공편을 지원한다고 미리 승인하지 않는다.
+
+별도 Android 조건
+Play 지도 키의 com.tripprint.app·Play 앱 서명 SHA-1 제한, versionCode8 사용 가능 여부와 기존 업로드 키 확인이 남아 있다. 카메라·실제 촬영 OCR·지도 타일·OS 권한/복귀·음성/큰 글자는 새 Play 내부 테스트 설치본에서 인수한다.
+이번 실제 게시 성공만으로 전체 서비스 승인·서명 AAB 준비 완료를 선언하지 않는다. 자동화는 중지 상태로 두고, 원격 배포를 중복 실행하지 않는다.
+
+공식 자료 대조
+Qwen3.8 모델의 현재 입력/출력 계약: https://developers.cloudflare.com/workers-ai/models/qwen3.8-27b/
+Workers AI 오류 분류: https://developers.cloudflare.com/workers-ai/platform/errors/
+Worker 관측 조회: https://developers.cloudflare.com/workers/observability/query-builder/
+공식 계약 대조는 공급자 상태를 실제 확인한 증거가 아니며, 이번 실패의 원인을 확정하지 않는다.
+
+
+[OCR·항공 복구 이후 최신 판정]
+실제 staging 핵심5/5·서버114/114·Worker22/22·관련 화면7/7 통과. 기존 KAC 키·항공 제한 바인딩 등록, Worker redirect:error 예외를 manual 거부 처리로 수정. OCR 단계 진단·서버60초/새 앱75초 보완. 최신 API53598090-46af-437d-a10a-fea602c686f4. OCR·항공 설정 누락 게이트는 해결. Play 버전8·지도 키 제한 확인 및 새 설치본 인수는 별도. 실제 AAB 생성·Play 업로드 없음. 자세한 증거와 사용자 작업은 docs/qa/OCR_FLIGHT_REPAIR_20261016.md 참조. 이전 HOLD·503 기록은 수정 전 이력.

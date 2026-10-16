@@ -1,0 +1,97 @@
+# TripPrint 최종 검수·빌드 전 준비
+
+최신 Git 정리: 사용자 후속 요청으로 codex/release-integration-20261016에 코드 커밋 a376450와 문서 정리를 진행했습니다. 이 문서의 커밋 미실행 기록은 복구·검수 당시 범위입니다. 푸시는 하지 않았으며 [Git 통합 기록](GIT_INTEGRATION_20261016.md)을 따릅니다.
+
+기준일: 2026-10-16 / Asia/Seoul
+
+**최신 판정: OCR·항공 조회를 staging에서 복구했고 실제 핵심 검수5/5가 통과했습니다.** 코드·서명·R8 등 AAB 빌드 설정은 준비했습니다. 실제 생성 전 남은 사용자 확인은 Play versionCode8 사용 가능 여부와 Android 지도 키의 Play 서명 제한입니다. 전체 출시·실기기 인수는 새 내부 테스트 설치본에서 별도로 진행합니다. 실제 AAB/APK·서명 빌드·Play 업로드·커밋·푸시는 하지 않았습니다.
+
+## OCR·항공 복구 후 최종 검토
+
+- 항공은 서버 키·제한 바인딩 누락과 현재 Worker의 redirect:error 거부가 원인이었습니다. 기존 키를 staging Secret으로 등록하고 분당6회 제한·manual 리다이렉트 처리로 복구했습니다. 실제 RS901 김포→제주 조회가 반복 성공했습니다.
+- OCR의 과거503은 당시 로그로 원인을 확정할 수 없습니다. 실패 단계 로그·추론 설정·서버60초/새 앱75초 제한을 보완했습니다. 현재 실제 인식·확인 저장·수정·재조회와 캐시는 통과했습니다.
+- 최신 Worker는53598090-46af-437d-a10a-fea602c686f4입니다. 기존 인증·Places·DB/R2 설정을 보존했고 공개 계획4DAY·19장소·19설명이 유지됩니다. Pages와 production은 변경하지 않았습니다.
+- 서버114/114, Worker·D1/R2 22/22, 최신 관련 화면7/7, 모델·인증207/207, 릴리스49/49 통과. 최종 npm run check도 TypeScript·ESLint·Prettier·WCAG AA46/46 전체 통과했습니다.
+- 앱506파일 해시: 7d7ef2d049b6f454c538b89224b3ab4adc24434f436c35158e89b70401a360bb. API60파일 해시: 011fbf0a6a28dec33b2f49bffccf2d3b8361673a85a0dd08aa43947276d3a2d7.
+- OCR·항공 연결용 새 계정이나 키를 사용자가 준비할 필요는 없습니다. Play 확인·내부 테스트 인수는 아직 미확인입니다.
+
+원인·수정 파일·실제 증거·직접 설정 절차: [OCR_FLIGHT_REPAIR_20261016.md](OCR_FLIGHT_REPAIR_20261016.md).
+
+## 이전 최종 검토 기록
+
+아래는 OCR·항공 복구 전의 점검 이력입니다. 이전503·키 누락·소스506 해시는 위 최신 결과로 갱신됐습니다. 과거 전체 고객 회귀16/19는 이력으로 보존하며 이번5/5와 합산하지 않습니다.
+
+## 완료 확인과 실제 서비스 결과
+
+기획 채팅의 Google 사진 작업과 UI/UX 헤더 작업이 모두 종료된 것을 확인했습니다. 예약한 한 번의 최종 점검을 시작하기 전에 자동화 tripprint를 PAUSED로 중지했습니다. 상태 파일의 pendingReview.id는 final-prebuild-20261016T065339Z이며 이번 요청의 결과를 이전 HOLD 기록과 구분합니다.
+
+- 오사카 여행계획: 실제 공개된 4DAY·19장소·19개 설명을 이 채팅의 새 공개 GET으로 다시 확인했습니다. 글을 철회하거나 중복 게시하지 않았습니다.
+- 기획 인수: 실제 Google 사진 API 19/19, 화면 이미지 19/19, 인증 Places 검색200·4개 결과, 원문·D1·선택 관계 보존 확인. 해당 실제 검수는 기획 담당의 증거를 대조했으며 이 채팅에서 Google 유료 가능 호출을 반복하지 않았습니다.
+- 최신 API는 256597e9-fb73-4ded-8361-fb5abd66afd5, Pages는 eff24df8-7e02-4950-95e0-14fd0364b468입니다. 저장된 배포·키 이름·검수 증거 기준이며 별도 재배포하지 않았습니다.
+- D1 0007_google_usage.sql 적용 완료를 확인한 기획 인계를 대조했습니다. Google 사진 제한·월 집계와 키 등록이 반영됐습니다. 이전 Places 키 미등록 판정은 해결됐습니다.
+
+공개 계획: https://tripprint-staging.pages.dev/community/72c64cdd-04d2-479a-b0a9-a700f009daa5
+
+실제 인수와 제한: [Google 사진 검증](GOOGLE_PLACE_PHOTOS.txt), [여행계획 게시](COMMUNITY_PLAN_PUBLISH.txt). 최초 전체 고객 회귀는 16/19였고, 이후 Places 검색·사진은 별도로 실제 통과했습니다. 이를 임의로 새 전체 회귀 17/19나 19/19로 합산하지 않습니다.
+
+## 최종 소스
+
+| 범위                   | 파일 수 | SHA-256                                                          | 판정                              |
+| ---------------------- | ------- | ---------------------------------------------------------------- | --------------------------------- |
+| 기획 검수·배포 앱 입력 | 505     | ea6a3f78d269ed531027afc0fe47e16271831c4f08a53d65cde205d393388c34 | 현재 화면·공유 코드와 일치        |
+| API·공유 모델 후보     | 59      | 0d93cd40dfcc720fd1fade83a2f265e0ef96084780f571e0d3b690191d278507 | 59개 파일 모두 현재 바이트와 일치 |
+| Android 빌드 준비 후보 | 506     | 63c0dc5fbf01d04c8b4a9c5834c5dc7e0a856fe286e8fe43769c0ffa93632167 | 아래 R8 보완만 추가               |
+
+최종 점검에서 R8·리소스 축소 설정이 Git 제외된 로컬 Android 폴더에만 있음을 발견했습니다. 새 CI·EAS prebuild에서도 유지하도록 withAndroidReleaseOptimization.cjs를 추가하고 루트·모바일 app.config.ts에 등록했습니다. 두 최적화 속성을 true로 만들고 proguard-android-optimize.txt를 사용합니다. 지원하지 않는 템플릿은 조용히 최적화를 누락하지 않고 중단합니다.
+
+505파일 후보와 비교한 변경은 app.config.ts, apps/mobile/app.config.ts, apps/mobile/plugins/withAndroidReleaseOptimization.cjs 세 경로뿐입니다. 화면·API 코드는 바꾸지 않았습니다. tests/release/android-optimization.test.mjs에서 실제 Expo mod 체인의 재실행·기존 false 교체·다른 속성 보존·기본 규칙·두 진입점·지원하지 않는 템플릿 거부를 확인했습니다. 네이티브 프로젝트 재생성이나 Android 앱 빌드는 하지 않았습니다.
+
+후보 기록: .release/final-review-followup/TripPrint_261016_Ver08_MobileSource.json, MobileDeployedSource.json, ApiSource.json. 파일명에는 공통 TripPrint_261016_Ver08_ 접두사를 사용했습니다. API manifest와 앱 manifest는 범위가 다르며 Git 전체 변경 목록을 대신하지 않습니다.
+
+## 검증
+
+| 검사                           | 결과·범위                                                  | 근거                                                 |
+| ------------------------------ | ---------------------------------------------------------- | ---------------------------------------------------- |
+| 전체 코드 품질                 | R8 보완 후 TypeScript·ESLint·Prettier·WCAG AA46/46 통과    | scratch/final-prebuild-20261016-check-after-r8.log   |
+| 모델·인증                      | 이번 실행 207/207 통과                                     | scratch/final-prebuild-20261016-auth.log             |
+| 로컬 D1/R2                     | 최신 Worker로 저장·권한·공개·사진 월 한도 포함20/20 통과   | scratch/final-prebuild-20261016-cloud.log            |
+| 릴리스                         | R8 mod 검사 포함49/49 통과                                 | scratch/final-prebuild-20261016-release.log          |
+| 관련 API                       | 기획의 동일 API 후보25/25 통과 대조                        | outputs/community-osaka/thumbnail-api-regression.log |
+| 최신 화면                      | 동일 화면 코드의11/11 통과 대조                            | outputs/community-osaka/thumbnail-ui-tests.log       |
+| Worker                         | 최신 소스 dry-run 성공. 원격 배포 없음                     | scratch/final-prebuild-20261016-api-dryrun.log       |
+| 공개 설정·Android 지도 키 형식 | release:check·check-android-maps 통과. 실제 키 제한은 별도 | 이번 실행 출력                                       |
+
+로컬 D1/R2 검사는 외부 Google 응답을 대체하며 실제 공급자 성공을 뜻하지 않습니다. 실제 공급자·브라우저 사진 성공은 위 기획 증거로 따로 판단했습니다. 이번 수정은 Android 생성 설정에 한정돼 동일한 화면 회귀를 반복 실행하지 않았습니다.
+
+## 서명·버전·산출 준비
+
+- ver.text는 사용자 확정 versionCode8 / versionName0.1.0을 유지합니다. Play Console에서8 사용 가능 여부는 미확인입니다.
+- JDK21과 Android SDK 경로가 존재합니다. 기존 업로드 keystore를 실제 저장 암호·개인 키 암호로 읽고 보관된 upload-cert.pem과 일치함을 확인했습니다. 비밀은 프로세스 환경에서만 전달했으며 인수·채팅·로그에 넣지 않았습니다. 개인 키를 내보내거나 서명하지 않았습니다.
+- 로컬 생성 Gradle의 debug 기본 서명만으로 Play AAB를 만들면 안 됩니다. 기존 scripts/android-ci.gradle은 선택한 업로드 서명을 finalizeDsl에서 적용하며 CI workflow가 --init-script로 연결합니다. 실제 빌드 시 이 경로와 기존 키를 사용합니다. Play Console 등록 인증서와의 대조는 별도입니다.
+- 기존 산출물 이름 TripPrint_YYMMDD_VerNN과 TRIPPRINT_BUILD_OUTPUT_DIR 지원을 유지합니다. 이전 AAB를 새 결과물로 제시하지 않습니다.
+- 새 AAB가 없으므로 실제 번들 버전·서명·유효성·mapping.txt 및 번들 내 R8 매핑·해시·설치 실행은 아직 미검증입니다. R8 적용 후 실제 앱 실행은 내부 테스트 설치본에서 검사합니다.
+- .env·.dev.vars·서명 파일·docs/98. keys·outputs·scratch·.release는 Git 및 빌드 업로드 제외 규칙을 확인했습니다. 서버 비밀이나 QA 자료를 앱에 넣지 않습니다.
+
+서명 점검 기록은 .release/final-review-followup/TripPrint_261016_Ver08_SigningReadiness.json입니다. 실제 비밀 원문은 포함하지 않습니다.
+
+## 남은 출시 조건
+
+1. OCR: 마지막 실제 고객 회귀에서503 OCR_UNAVAILABLE. 호출·시간 초과·출력/스키마 실패가 같은 코드로 반환돼 원인 미확정입니다. 사진·Places 성공으로 OCR도 해결됐다고 처리하지 않습니다. 안전한 단계 진단 후 실제 인식·확정·수정·재조회가 필요합니다.
+2. 항공 조회: 마지막 실제 회귀에서503 FLIGHT_UNAVAILABLE. 최신 사진 배포의 키·바인딩 추가는 Google Places와 사진 제한뿐입니다. KAC_FLIGHT_SERVICE_KEY·FLIGHT_LOOKUP_LIMITER의 원격 등록 및 실제 지원 구간 조회가 필요합니다. 직접 입력 저장 성공과 자동 조회 성공을 구분합니다.
+3. Play 지도 키: 로컬 형식은 통과했으나 com.tripprint.app과 Play 앱 서명 SHA-1 제한, 실제 Android 지도 타일은 미확인입니다.
+4. 실제 기기: 새 Play 내부 테스트 설치본에서 카메라·촬영 OCR·지도·권한/복귀·음성·큰 글자·계정 복원을 인수합니다. USB는 요구하지 않습니다.
+5. Google 계정: 서비스의 월별 원자 한도와 별개인 결제 계정 전체 사용량·할당량·키 제한은 사용자 계정에서 확인해야 합니다. 서비스 사진 성공만으로 계정 전체 무료를 보증하지 않습니다.
+
+따라서 로컬 기획 기능 인수와 빌드 설정 보완은 완료했지만 전체 서비스 출시 승인과 실제 AAB 실행은 보류합니다. 자동 확인을 재활성화하지 않습니다. 운영 조건 해소 후 사용자 후속 지시로 실제 빌드 범위를 확인합니다.
+
+## Git 반영 준비
+
+현재 main의 HEAD는 b74926f, 헤더 브랜치는 codex/haru-header-standard-20261016 / c221824입니다. 현재 변경을 보존했고 Git 인덱스는 비어 있습니다. 원격 fetch·병합·커밋·푸시는 하지 않았습니다. 현재 source/신규 파일을 포함한 변경 목록·파일별 해시·제한된 비밀 패턴 검사는 .release/git-update-preparation/TripPrint_261016_Ver08_GitReadiness.json을 따릅니다. 네 가지 패턴과 민감 경로 검사는 전체 보안 감사를 뜻하지 않습니다.
+
+통합 브랜치에서 헤더·고객 흐름·계획 공유·사진/월 한도·R8 보완·문서/테스트를 검토한 뒤 반영합니다. 공유 파일을 헤더 커밋으로 덮어쓰지 않습니다. 커밋 메시지 초안:
+
+`feat: 여행계획 공유 및 빌드 준비 통합 : DAY·장소 원문과 선택 관계 보존, Google 대표 사진·월 한도·공개 조회 복구, 항공권·영수증 흐름 및 R8 재생성 설정 보완`
+
+이번 점검이 수정한 제품·검사 파일은 app.config.ts, apps/mobile/app.config.ts, apps/mobile/plugins/withAndroidReleaseOptimization.cjs, tests/release/android-optimization.test.mjs입니다. DB·도메인 객체 변경은 없습니다. 최종 보고·출시 게이트·Git 준비 문서와 로컬 상태/증거만 추가 갱신합니다. 이전 검토 원본은 .release/final-review-followup/TripPrint_261016_Ver08_PreviousReview.md에 보관했습니다.
+
+공식 근거: [Expo native mods](https://docs.expo.dev/config-plugins/mods/), [Android R8 설정](https://developer.android.com/topic/performance/app-optimization/enable-app-optimization).

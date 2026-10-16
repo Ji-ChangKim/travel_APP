@@ -1,0 +1,83 @@
+TripPrint 전체 화면 헤더 수정 및 이미지 정리
+작성일: 2026-10-16
+
+수정 결과
+화면 제목을 Pretendard Bold 26/36·굵기 700·왼쪽 정렬로 통일했다.
+이동 바는 기본 56, 좌우 여백 20, 아이콘 24, 터치 영역 최소 44를 사용한다.
+최상위 화면에는 뒤로가기를 추가하지 않았다. 여행 상세는 실제 여행명을 큰 제목으로 표시한다.
+글자 확대만으로 제목을 아래 행으로 옮기던 분기를 제거했다. 긴 제목은 실제 너비에 따라 줄바꿈한다.
+제목의 말줄임·자동 축소·배율 제한 속성은 ScreenTitle의 타입에서 제외했다.
+웹은 한글 단어를 가능한 한 붙여 줄바꿈하고, iOS와 Android에는 각 플랫폼의 줄바꿈 옵션을 적용했다.
+프로필 편집의 닫기와 제목을 분리해 큰 글자의 가용 너비를 확보했다.
+일정 작성 제목 아래의 안내 문구도 남은 너비에서 줄바꿈하도록 고쳤다.
+브랜드 팔레트·하루 원본 이미지·기존 저장 및 권한 로직은 유지했다.
+
+적용 범위
+홈 브랜드 바, 내 여행, 발자국, 커뮤니티, MY.
+여행 만들기, 항공편 선택, 항공권 입력, 나라/도시 선택, 일정 작성.
+여행 상세의 일정·지도·비용·사진/영수증·준비물·동행.
+비용/영수증/공개/여행 정보/기간 편집이 공유하는 PlanEditor.
+여행지 가이드와 출처 시트, 다이어리, 초대, 장소 가져오기, 이전 기기 기록과 편집.
+이메일 인증과 프로필 설정이 공유하는 인증 헤더, 프로필 편집, 공통 ActionSheet 제목.
+로그인 소개 문구와 본문 카드/섹션 제목은 화면 헤더와 구분했다.
+
+재발 방지
+docs/design/SCREEN_HEADER_SPEC.md를 현재 헤더의 우선 규격으로 지정했다.
+DESIGN.md, 기존 UI 디자인 문서와 홈·일정 명세에 같은 우선순위를 연결했다.
+공통 디자인 토큰을 3.0.1로 갱신했다. 색상 토큰은 바꾸지 않았다.
+npm run test:headers:web는 검수 번들을 새로 만들고 헤더·접근성 9개 시나리오를 실행한다.
+320·390·430 너비와 글자 100%·200%에서 실제 글자 영역, 정렬, 행간, 굵기, 버튼 영역, 빈 행과 가로 넘침을 검사한다.
+줄 끝 공백의 브라우저 선택 영역은 잘림으로 오판하지 않도록 실제 글자별 영역을 측정한다.
+
+검증
+npm run check: 대비 토큰 46/46, TypeScript, ESLint, Prettier.
+공유 폴더의 별도 항공권 입력 작업에서 타입 오류가 생겨, 커밋 대상 소스만 별도 검수 폴더로 내보내 최종 npm run check를 실행했고 통과했다. 해당 기능 변경은 이번 커밋과 검증 범위에 포함하지 않는다.
+npm run test:headers:web: 헤더 6개 조건 + 기존 WCAG AA 3개 시나리오.
+26개 화면/상태를 6개 조건에서 확인하고 156회 촬영했다.
+실제 캡처를 열어 일반 화면과 320 너비·200% 글자에서 제목 및 안내 문구의 줄바꿈을 육안으로 확인했다.
+웹 검수 결과이며 Android/iOS 기기의 OS 배율·노치·스크린리더를 직접 검증한 결과는 아니다.
+Android/iOS 전용 줄바꿈 속성은 타입 검사로 확인했다. APK 업로드나 원격 서비스 배포는 이 작업에 포함하지 않는다.
+
+이미지 정리
+docs/1.uiux의 2026-10-14 이전 웹 캡처와 오래된 Android 로그인 캡처 154장을 삭제했다.
+실행 코드에서 참조하지 않는 문서용 캡처이며 현재 헤더·CTA·탭 구조와 달라 교체했다.
+390/100% 및 320/200% 대표 원본 52장을 current/에 보관한다.
+운영체제 권한·지도 SDK 지연·시간 선택의 Android 참고 자료 6장은 촬영 시점과 한계를 명시해 유지했다.
+사용자 피드백 원본 3장은 유지했다. 브랜드·하루·앱 실행 이미지와 지정 폴더 밖의 이미지는 삭제하지 않았다.
+SCREENSHOT_INDEX.txt와 SCREENSHOT_MANIFEST.json을 현재 파일에 맞춰 다시 작성했다.
+삭제 파일명·용량·판단 기준은 docs/1.uiux/IMAGE_CLEANUP_LOG.txt에 기록했다.
+
+소스 변경 목록
+apps/mobile/src/components/ScreenTitle.tsx: 제목 규격과 축소 방지.
+apps/mobile/src/components/ScreenHeader.tsx: 이동 바·화면 제목 분리, 빈 행 제거.
+apps/mobile/src/components/DesignButton.tsx: 헤더 텍스트 행동 규격과 아이콘 색상.
+apps/mobile/src/components/ActionSheet.tsx: 시트 제목 및 좌우 여백.
+apps/mobile/src/features/auth/AuthFormChrome.tsx, loginStyles.ts: 인증 헤더와 본문 기준선.
+apps/mobile/src/features/trail/TrailScreen.tsx: 이전 기록 및 편집 헤더.
+apps/mobile/src/app/(tabs)/my.tsx: MY와 프로필 편집 헤더.
+apps/mobile/src/features/workspace/CityGuideScreen.tsx, CitySourcesModal.tsx: 가이드·출처 헤더.
+apps/mobile/src/features/workspace/CommunityScreen.tsx, FootprintsScreen.tsx: 최상위 제목.
+apps/mobile/src/features/workspace/DestinationPicker.tsx: 나라·도시 선택 헤더.
+apps/mobile/src/features/workspace/DiaryScreen.tsx: 다이어리 제목 및 복귀.
+apps/mobile/src/features/workspace/FlightTicketEditor.tsx, TripPlanningFlow.tsx: 제목과 헤더 행동.
+apps/mobile/src/features/workspace/HomeHeader.tsx, HomeScreen.tsx, homeStyles.ts: 브랜드 바 기준선.
+apps/mobile/src/features/workspace/ImportPlaceScreen.tsx, InviteScreen.tsx: 가져오기·초대 헤더.
+apps/mobile/src/features/workspace/PlanEditor.tsx: 공통 편집 제목 및 닫기.
+apps/mobile/src/features/workspace/ScheduleEditor.tsx: 일정 작성 헤더 및 안내 줄바꿈.
+apps/mobile/src/features/workspace/WorkspaceScreen.tsx: 상세 이동 바와 실제 여행명 분리.
+apps/mobile/src/features/workspace/ui.tsx: 헤더 버튼 크기 전달과 공통 본문 너비.
+tests/web/workspace.spec.ts, playwright.header.config.ts: 화면 회귀 검사.
+scripts/verify-header-web.mjs, package.json: 검수 재현 명령.
+
+문서 변경 목록
+docs/design/SCREEN_HEADER_SPEC.md: 새 헤더 규격과 검수 절차.
+docs/design/DESIGN.md, design-tokens.json: 현재 디자인 기준과 토큰.
+docs/README.md: 규격·검수 캡처·삭제 내역 링크.
+docs/1.uiux/HOME_ONBOARDING_SCREEN_SPEC.md, ITINERARY_SCHEDULE_SCREEN_SPEC.md, ui_design_system.md: 최신 헤더 규격 우선 안내.
+docs/1.uiux/SCREENSHOT_INDEX.txt, SCREENSHOT_MANIFEST.json, IMAGE_CLEANUP_LOG.txt, current/: 현재 캡처와 삭제 기록.
+이 보고서는 수정 내역과 검증 범위를 함께 남긴다.
+
+Git 범위
+이번 헤더·규격 문서·이미지 정리만 커밋한다. 함께 진행 중인 지도·장소 검색·릴리즈 문서 변경은 포함하지 않는다.
+공유 파일인 ScheduleEditor.tsx·PlanEditor.tsx·FlightTicketEditor.tsx·TripPlanningFlow.tsx·workspace.spec.ts도 이번 변경 구간만 별도 인덱스에 반영한다.
+DB·도메인 객체 변경은 없다.

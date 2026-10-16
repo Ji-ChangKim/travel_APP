@@ -1,0 +1,34 @@
+Google 장소 썸네일·무료 호출 한도 검증 / 2026-10-16
+요구: 공개 여행계획의 장소에 Google 등록 대표 사진을 표시한다. 사진은 필수 인수 항목이며 실제 공급자 사진이 나오기 전 완료로 처리하지 않는다.
+최신 상태: 사용자가 GOOGLE_PLACES_API_KEY를 Secret으로 등록했다. staging API·웹 반영 후19개 장소의 실제 Google 사진 조회와 실제 화면 다운로드19/19 통과. 기존 오사카 공개 계획·원문은 그대로이며 Android 빌드는 하지 않았다.
+구현: 최신 Places 사진 API, 저장 Google ID 우선/이전 공개 계획은 도시+이름 조회, 공식 사진 URL·저작자·프로필·Google Maps·원본 출처, 사진 없음/이미지 실패/재시도, 현재DAY·백그라운드·취소 처리. 개인 여행 원본은 공개 조회에 사용하지 않는다.
+비용 보호: 기존 검색·상세와 공개 사진 모두 D1 원자 월 집계. 검색4000·상세4000·사진900 이후 공급자 호출 차단, 실패 호출도 보수적으로 집계. 공개 사진 IP별40/분. 앱 단위/인스턴스 메모리 제한으로 대신하지 않는다. D1 마이그레이션0007 필요.
+Google 공식 무료 한도(2026-10-16 조회):Text Search Pro5000/월, Place Details Pro5000/월, Place Details Photos1000/월. 미국 태평양 시간 월 경계. 결제 계정 내 여러 프로젝트의 사용량을 합산하므로 서버 한도만으로 계정 전체0원 보장 불가. 예산 알림은 중단 장치가 아니다.
+설정 순서:Google Cloud에서 사용 프로젝트의 Places API (New) 활성화·결제 계정 연결 상태 확인→서버 전용 키 생성·API 제한을 Places API (New)만 허용→Google Maps Platform/Quotas에서 사용 가능한 메서드 할당량 낮추기→동일 결제 계정 기존 SKU 사용량 확인→Cloudflare tripprint-api-staging Variables and Secrets에 GOOGLE_PLACES_API_KEY 등록. 결제 연결·약관 동의는 사용자가 직접 결정한다. 키 값은 채팅/문서에 쓰지 않는다. Android Maps SDK 키와 구분한다.
+공식 근거:
+https://developers.google.com/maps/documentation/places/web-service/place-photos
+https://developers.google.com/maps/documentation/places/web-service/policies
+https://developers.google.com/maps/billing-and-pricing/pricing
+https://developers.google.com/maps/billing-and-pricing/manage-costs
+검증 상태·원격 반영은 아래 최종 결과를 따른다.
+
+최종 실제 결과
+공개 주소:https://tripprint-staging.pages.dev/community/72c64cdd-04d2-479a-b0a9-a700f009daa5 . 새로고침하면 DAY별 장소 사진을 볼 수 있다. 19개 장소명 모두 실제 Google 응답과 일치했다. 사진 제공자 이름·프로필·Google Maps·원본/장소 출처를 같은 카드에 표시했다.
+실제 API19/19:outputs/community-osaka/thumbnail-live-19.json / thumbnail-live-19.log. URL·사진 파일은 서비스 저장소에 보관하지 않으며 검증 JSON에도 표시 URL·사진 이름을 남기지 않았다. Google place ID는 허용된 식별자로 기록했다.
+실제 CUA 화면19/19:thumbnail-live-ui.json. 4DAY의 DOM 이미지 complete·naturalWidth>0 확인. 캡처:live-google-thumbnails.jpg. 기존 게시물 공개 API 객체 전체 보존:thumbnail-original-preserved.json.
+실제 인증 장소 검색:thumbnail-authenticated-search.json. 오사카 성 요청200·결과4개·해당 장소 포함. 검수 계정388c9f3f-4a0b-4475-aac7-a72ccf31fe58는 세션 종료, 비밀번호/토큰 미저장. 개인 여행은 만들지 않았으며 검수 계정은 남아 있다. 전체 고객19개 흐름을 다시 돌린 결과로 간주하지 않는다.
+원격 API:256597e9-fb73-4ded-8361-fb5abd66afd5. 기존 모든 바인딩·공개 변수 동일, 사용자 등록 GOOGLE_PLACES_API_KEY(Secret)와 PLACES_PHOTO_LIMITER만 추가. 비밀 값을 읽거나 출력하지 않았다. thumbnail-version-before/after.json 및 thumbnail-secret-names-after.json.
+원격 웹:eff24df8-7e02-4950-95e0-14fd0364b468 / main. thumbnail-web-deploy.log / thumbnail-pages-after.json.
+D1:0007_google_usage.sql 적용 완료. thumbnail-migration-apply.log. 실제 월 집계 place-photo/text-search 증가와 기존 여행version25·공개 게시물1건 보존을SELECT 확인. thumbnail-live-d1-usage.json. 고객 여행·회원·영수증 원본을 관리자 SQL로 수정하지 않았다.
+검증:npm run check 전체 종료코드0(thumbnail-check-verified.log), UI11/11(thumbnail-ui-tests.log), API25/25(thumbnail-api-regression.log), 실제 로컬D1 병렬 월 한도/철회2/2(thumbnail-d1-tests.log), 기존 모델206/206(thumbnail-auth-tests.log) 및 새Google ID 공개 선택 포함 계획4/4(thumbnail-model-tests.log). 공급자 단위·UI 회귀의 외부 응답 목업과 실제 원격 Google 조회를 구분한다. 생성된 Worker 타입의 Prettier 오류를 고친 뒤 최종 전체check를 통과했다.
+최신 후보:앱505파일 SHA ea6a3f78d269ed531027afc0fe47e16271831c4f08a53d65cde205d393388c34 / thumbnail-source.json. API59파일 SHA0d93cd40dfcc720fd1fade83a2f265e0ef96084780f571e0d3b690191d278507 / thumbnail-api-source.json. Worker bundle SHA20455dd6dad856c85ae398f9c6a00a1f1fffe8717c6d44f42017a0ff1bcf41a0. 이전504/56파일 해시는 이번 사진 보완 후보로 재사용하지 않는다.
+수정 파일:apps/api/src/placePhotos.ts·googleUsage.ts·places.ts·app.ts·types.ts·errors.ts, apps/api/wrangler.jsonc·worker-configuration.d.ts·migrations/0007_google_usage.sql, packages/domain/src/workspace.ts, packages/validation/src/workspace.ts·workspaceModel.ts, apps/mobile/src/features/workspace/PlacePhoto.tsx·CommunityPlanView.tsx, API/모델/웹/D1 회귀 테스트. DB_DICTIONARY·CURRENT_STATUS·PLAY_INTERNAL_PREBUILD·GOOGLE_MAPS_SETUP·README와 이 문서에 최신 근거를 반영한다.
+남은 인수:Google Cloud API키 제한·동일 결제 계정의 다른 사용량/할당량은 이 키 조회 성공만으로 확정하지 않는다. 기존 OCR/항공 공급자 실패, Play 지도 키·새 설치본 실제 기기 인수는 별도다. Android 빌드 HOLD, AAB/APK·Play 업로드·커밋·푸시 없음.
+
+최종 검사·배포 후505파일 동일 확인:thumbnail-source.json / thumbnail-source-after.json. D1 SELECT rows_written0, 여행version25·공개 게시물1건 보존. 실제 이미지19/19 모두 다운로드 완료.
+
+추가 릴리스 회귀48/48 통과:outputs/community-osaka/thumbnail-release-verified.log. 최초 제한 환경 실행은 임시 파일/네이티브 탐색 제약7건과 새 사진 바인딩을 기대값에 넣지 않은1건으로40/48이었다. 새 사진 제한을 명시한 검수 계약으로 갱신하고 같은 검사48개를 제한 없는 환경에서 재실행해 모두 통과했다. 실제 Android 앱 빌드나 설치본 생성은 아니다.
+
+최종 운영 집계 조회:2026-10 place-photo47회/월900, text-search48회/월4000. 실패·취소 예약도 포함하는 서버 상한 집계이며 Google 결제 계정 청구 사용량을 조회한 값은 아니다. thumbnail-usage-final.json, SELECT rows_written0.
+
+최종 전체 검사 완료:npm run check 종료코드0, outputs/community-osaka/thumbnail-check-final-pass.log. 릴리스 검수 계약과 문서 링크 서식까지 포함한 현재 소스의 TypeScript·ESLint·Prettier·WCAG AA46/46 통과. 이 로그가 앞선 check 로그보다 우선한다.
