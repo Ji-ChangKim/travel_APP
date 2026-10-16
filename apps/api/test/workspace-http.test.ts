@@ -6,6 +6,14 @@ import { accounts } from './database';
 const trip = '00000000-0000-4000-8000-000000000010';
 const media = '00000000-0000-4000-8000-000000000011';
 const env: Env = {
+  APP_UPDATE_POLICY_JSON: '',
+  FLIGHT_LOOKUP_PROVIDER: 'kac',
+  FLIGHT_LOOKUP_LIMITER: {
+    limit: async () => {
+      // 기존 워크스페이스 HTTP 검증은 조회 제한 경계만 고정한다.
+      return { success: true };
+    },
+  },
   GOOGLE_CLIENT_ID: '',
   KAKAO_CLIENT_ID: '',
   NAVER_CLIENT_ID: '',

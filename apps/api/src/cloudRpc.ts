@@ -49,16 +49,15 @@ function dispatch(actor: Actor, name: string, args: Args): Promise<unknown> {
     case 'wherego_list_trips':
       return database(actor.env)
         .prepare(
-          "SELECT t.snapshot FROM trips t JOIN trip_members m ON m.trip_id=t.id WHERE m.user_id=? ORDER BY json_extract(t.snapshot,'$.trip.startDate') LIMIT 1000",
+          "SELECT json_extract(t.snapshot,'$.trip') AS summary FROM trips t JOIN trip_members m ON m.trip_id=t.id WHERE m.user_id=? ORDER BY json_extract(t.snapshot,'$.trip.startDate') LIMIT 1000",
         )
         .bind(actor.session.userId)
-        .all<{ snapshot: string }>()
+        .all<{ summary: string }>()
         .then((rows) => {
           /* 여행 제목과 요약만 목록으로 반환한다. */ return rows.results.map(
             (row) => {
-              /* DB의 여행 요약을 읽는다. */ return (
-                JSON.parse(row.snapshot) as Snapshot
-              ).trip;
+              // 사진·일정 전체를 메모리에 올리지 않고 DB에서 추출한 요약만 읽는다.
+              return JSON.parse(row.summary) as Snapshot['trip'];
             },
           );
         });

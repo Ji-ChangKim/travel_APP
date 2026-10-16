@@ -4,18 +4,25 @@ import { database } from './cloudStore';
 import { rejectRequest } from './errors';
 import type { ApiEnvironment } from './types';
 import { nicknameExists } from './nicknames';
+import {
+  nicknameError,
+  validProfileNickname,
+  validProfileBirthDate,
+} from '@wherego/validation';
 type Ctx = Context<ApiEnvironment>;
 const inputSchema = z
   .object({
-    nickname: z.string().trim().min(1).max(50),
+    nickname: z.string().optional(),
     bio: z.string().max(300).nullable().optional(),
     travelStyles: z.array(z.string().max(50)).max(20).optional(),
     gender: z.enum(['female', 'male', 'unspecified']).optional(),
     birthDate: z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/)
-      .refine(validBirthDate)
+      .refine(validProfileBirthDate)
+      .nullable()
       .optional(),
+    onboardingCompleted: z.literal(true).optional(),
   })
   .strict();
 type ProfileRow = {
@@ -93,14 +100,37 @@ function update(c: Ctx): Promise<Response> {
 // 검증한 본인 프로필 값을 확정한다.
 function save(c: Ctx, input: z.infer<typeof inputSchema>): Promise<unknown> {
   // 닉네임 저장 성공 전 화면 상태를 변경하지 않는다.
-  return nicknameExists(c.env, input.nickname, c.get('session').userId).then(
-    (exists) => {
-      // 닉네임 변경도 가입과 같은 고유 제약을 적용한다.
-      return exists
-        ? rejectRequest('NICKNAME_TAKEN')
-        : persistProfile(c, input);
-    },
-  );
+  return database(c.env)
+    .prepare('SELECT name FROM user WHERE id=?')
+    .bind(c.get('session').userId)
+    .first<{ name: string }>()
+    .then((row) => {
+      // 기존 이름을 그대로 보내거나 생략하면 이름 변경 명령에서 제외한다.
+      return !row
+        ? rejectRequest('RESOURCE_NOT_FOUND')
+        : input.nickname === undefined || input.nickname === row.name
+          ? persistProfile(c, { ...input, nickname: undefined })
+          : saveChangedNickname(c, input);
+    });
+}
+
+// 이름을 실제로 바꾸는 요청에만 길이와 중복 검사를 적용한다.
+function saveChangedNickname(
+  c: Ctx,
+  input: z.infer<typeof inputSchema>,
+): Promise<unknown> {
+  // 요청 계정의 기존 이름은 클라이언트가 지정할 수 없다.
+  return nicknameExists(
+    c.env,
+    z
+      .string()
+      .refine(validProfileNickname, nicknameError)
+      .parse(input.nickname),
+    c.get('session').userId,
+  ).then((exists) => {
+    // DB 고유 인덱스와 같은 기준으로 중복 이름을 차단한다.
+    return exists ? rejectRequest('NICKNAME_TAKEN') : persistProfile(c, input);
+  });
 }
 
 // 검증한 이름과 개인정보를 같은 원자 저장으로 확정한다.
@@ -112,12 +142,12 @@ function persistProfile(
   return database(c.env)
     .batch([
       database(c.env)
-        .prepare('UPDATE user SET name=?,updatedAt=? WHERE id=?')
-        .bind(input.nickname, Date.now(), c.get('session').userId),
+        .prepare('UPDATE user SET name=coalesce(?,name),updatedAt=? WHERE id=?')
+        .bind(input.nickname ?? null, Date.now(), c.get('session').userId),
       database(c.env)
         .prepare(
           `INSERT INTO profiles(user_id,details,gender,birth_date,onboarding_completed_at) VALUES(?,?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET
-        details=json_patch(details,excluded.details),gender=coalesce(excluded.gender,gender),birth_date=coalesce(excluded.birth_date,birth_date),
+        details=json_patch(details,excluded.details),gender=coalesce(excluded.gender,gender),birth_date=CASE WHEN ? THEN excluded.birth_date ELSE birth_date END,
         onboarding_completed_at=coalesce(onboarding_completed_at,excluded.onboarding_completed_at)`,
         )
         .bind(
@@ -130,31 +160,24 @@ function persistProfile(
           }),
           input.gender || null,
           input.birthDate || null,
-          input.gender && input.birthDate ? Date.now() : null,
+          // 구버전 앱의 성별·생일 동시 제출도 기존 완료 동작을 유지한다.
+          input.onboardingCompleted || (input.gender && input.birthDate)
+            ? Date.now()
+            : null,
+          input.birthDate !== undefined ? 1 : 0,
         ),
     ])
     .catch((error: unknown) => {
       // SQL 원문을 숨기고 실제 중복인 경우에만 중복 안내로 변환한다.
-      return nicknameExists(
-        c.env,
-        input.nickname,
-        c.get('session').userId,
+      return (
+        input.nickname === undefined
+          ? Promise.resolve(false)
+          : nicknameExists(c.env, input.nickname, c.get('session').userId)
       ).then((exists) => {
         // 다른 저장 실패는 중복 오류로 오인하지 않는다.
         return exists ? rejectRequest('NICKNAME_TAKEN') : Promise.reject(error);
       });
     });
-}
-
-// 존재하는 달력 날짜와 오늘 이전의 생년월일만 허용한다.
-function validBirthDate(value: string): boolean {
-  // 윤년·월말을 자동 보정한 날짜와 미래 날짜를 저장하지 않는다.
-  return (
-    Number.isFinite(Date.parse(value)) &&
-    new Date(value).toISOString().slice(0, 10) === value &&
-    value <= new Date().toISOString().slice(0, 10) &&
-    value >= '1900-01-01'
-  );
 }
 
 // 현재 로그인 계정의 조회와 수정 경로를 등록한다.

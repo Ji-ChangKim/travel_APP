@@ -109,7 +109,7 @@ function detectText(
 // OCR 텍스트에서 확인이 필요한 영수증 초안을 만든다.
 export function receiptDraft(
   text: string,
-  currency: SupportedCurrency,
+  _currency: SupportedCurrency,
 ): ReceiptDraft {
   // 합계 표식이 없는 숫자를 결제 금액으로 임의 확정하지 않는다.
   return {
@@ -129,13 +129,7 @@ export function receiptDraft(
         /(?:grand\s*total|total|합계|총액|결제금액|合計)[^\d\n]*([\d,]+(?:\.\d{1,2})?)/i,
       )?.[1] || ''
     ).replace(/,/g, ''),
-    currency: /\bUSD\b|\$/.test(text)
-      ? 'USD'
-      : /\bJPY\b|円|¥/.test(text)
-        ? 'JPY'
-        : /\bKRW\b|원|₩/.test(text)
-          ? 'KRW'
-          : currency,
+    currency: printedCurrency(text),
     needsConfirmation: true,
     address:
       text
@@ -348,4 +342,35 @@ function recognize(
     // 인식 실패는 성공한 빈 초안과 구분한다.
     return rejectRequest('OCR_UNAVAILABLE');
   });
+}
+
+// 미지원 통화의 표식을 달러·엔 표식보다 먼저 검사한다.
+export function printedCurrency(text: string): string {
+  // 모호한 달러 기호와 표식 누락을 여행 기본 통화로 확정하지 않는다.
+  return (
+    text
+      .match(
+        /\b(KRW|JPY|USD|TWD|VND|THB|CNY|SGD|HKD|EUR|GBP|AUD|CAD|NZD|MYR|IDR|PHP|INR|CHF)\b/i,
+      )?.[0]
+      .toUpperCase() ||
+    (/NT\$|新[臺台]幣/.test(text)
+      ? 'TWD'
+      : /\bS\$/.test(text)
+        ? 'SGD'
+        : /HK\$/.test(text)
+          ? 'HKD'
+          : /RMB|人民币|人民幣/.test(text)
+            ? 'CNY'
+            : /฿/.test(text)
+              ? 'THB'
+              : /₫|đồng/.test(text)
+                ? 'VND'
+                : /US\$/.test(text)
+                  ? 'USD'
+                  : /円|¥/.test(text)
+                    ? 'JPY'
+                    : /원|₩/.test(text)
+                      ? 'KRW'
+                      : '')
+  );
 }

@@ -5,3 +5,8 @@ ALLOWED_ORIGINS="http://localhost:8081,http://localhost:19006"
 # 미설정 시 실제 지도 검색·자동 OCR은 사용할 수 없고 수동 입력은 가능하다.
 GOOGLE_VISION_API_KEY=""
 GOOGLE_PLACES_API_KEY=""
+# 항공편 조회를 활성화할 때만 AeroDataBox RapidAPI 키를 서버에 등록한다.
+AERODATABOX_RAPIDAPI_KEY=""
+# 공공데이터포털의 해당 API 활용신청을 완료한 일반 인증키를 입력한다.
+KAC_FLIGHT_SERVICE_KEY=""
+FLIGHT_LOOKUP_PROVIDER="kac"

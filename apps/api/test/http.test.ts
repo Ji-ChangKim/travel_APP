@@ -4,6 +4,14 @@ import { createApp } from '../src/app';
 import { accounts, tripInput } from './database';
 
 const env: Env = {
+  APP_UPDATE_POLICY_JSON: '',
+  FLIGHT_LOOKUP_PROVIDER: 'kac',
+  FLIGHT_LOOKUP_LIMITER: {
+    limit: async () => {
+      // 기본 HTTP 검증에서도 실제 바인딩 계약을 유지한다.
+      return { success: true };
+    },
+  },
   GOOGLE_CLIENT_ID: '',
   KAKAO_CLIENT_ID: '',
   NAVER_CLIENT_ID: '',

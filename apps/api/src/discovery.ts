@@ -121,26 +121,29 @@ function discoveryData(
 ): Promise<DestinationDiscovery> {
   // 외부 API 실패를 예제 여행지 데이터로 바꾸지 않는다.
   return Promise.all([
-    discoveryPages(fetcher),
+    discoveryPages(fetcher).then((pages) => {
+      // 사진은 월간 조회 통계가 끝나기를 기다리지 않고 소개 직후부터 읽는다.
+      return discoveryImages(fetcher, pages).then((images) => {
+        // 동일한 소개 문서와 대응하는 사진 결과를 묶는다.
+        return { pages, images };
+      });
+    }),
     cityViews(fetcher, periods),
-  ]).then(([pages, views]) => {
-    // 사진 오류는 원문 소개와 통계까지 버리지 않는다.
-    return discoveryImages(fetcher, pages).then((images) => {
-      // 선정한 도시와 일치하는 실제 문서만 포함한다.
-      return validatedDiscovery(
-        discoveryDestinations
-          .map((city, index) => {
-            // API의 후보 순서는 고정 카탈로그 순서와 대응한다.
-            return discoveryCity(city, pages, images, views[index] ?? null);
-          })
-          .filter((city): city is DiscoveryCity => {
-            // 문서가 없으면 가짜 소개를 만들지 않는다.
-            return city !== null;
-          }),
-        now,
-        periods,
-      );
-    });
+  ]).then(([{ pages, images }, views]) => {
+    // 사진 조회와 월간 통계를 독립적으로 마친 뒤 실제 문서만 포함한다.
+    return validatedDiscovery(
+      discoveryDestinations
+        .map((city, index) => {
+          // API의 후보 순서는 고정 카탈로그 순서와 대응한다.
+          return discoveryCity(city, pages, images, views[index] ?? null);
+        })
+        .filter((city): city is DiscoveryCity => {
+          // 문서가 없으면 가짜 소개를 만들지 않는다.
+          return city !== null;
+        }),
+      now,
+      periods,
+    );
   });
 }
 
@@ -167,7 +170,7 @@ function discoveryCache(): Promise<Cache | undefined> {
   // 로컬 단위 검사에서는 전역 캐시가 없어도 같은 공급자 경로를 실행한다.
   return typeof caches === 'undefined'
     ? Promise.resolve(undefined)
-    : caches.open('tripprint-discovery-v1').catch(() => {
+    : caches.open('tripprint-discovery-v2').catch(() => {
         // 캐시를 열지 못해도 공식 공급자에서 다시 읽는다.
         return undefined;
       });
@@ -177,7 +180,7 @@ function discoveryCache(): Promise<Cache | undefined> {
 function cacheKey(c: Context<ApiEnvironment>): Request {
   // 데이터 형식과 월간 집계 범위별로 같은 키를 사용한다.
   return new Request(
-    new URL(`/_discovery-cache/v1/${discoveryPeriods().join('_')}`, c.req.url),
+    new URL(`/_discovery-cache/v2/${discoveryPeriods().join('_')}`, c.req.url),
   );
 }
 

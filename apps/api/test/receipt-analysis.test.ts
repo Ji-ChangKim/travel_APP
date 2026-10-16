@@ -5,6 +5,7 @@ import {
   persistedTripCreateSchema,
   workspaceCommandSchema,
 } from '@wherego/validation';
+import { printedCurrency } from '../src/ocr';
 import { parseReceiptAnalysis } from '../src/receiptAnalysis';
 import { newTrip, transform } from '../src/cloudModel';
 const draft = JSON.parse(
@@ -29,14 +30,14 @@ test('일본 영수증은 입점 시간 대신 결제 시간과 최종 합계를
 });
 
 // 통화 표식 누락을 확실한 인식으로 오인하지 않는다.
-test('통화 미인식은 기본 통화를 제시하되 확인 경고를 남긴다', () => {
+test('통화 미인식은 빈 값을 보존하고 확인 경고를 남긴다', () => {
   // 모델의 추측을 경고 없는 확정 데이터로 전달하지 않는다.
   return assert.match(
     parseReceiptAnalysis(
       JSON.stringify({ ...draft, currency: '' }),
       'KRW',
     ).warnings.join(' '),
-    /통화를 읽지 못해/,
+    /통화를 읽지 못했어요/,
   );
 });
 
@@ -163,3 +164,64 @@ function assertReceiptChange(change: ReturnType<typeof transform>) {
     })
   );
 }
+
+// 저장 통화 제한과 인식 결과 보존은 서로 다른 계약이다.
+test('R10 미지원 통화 초안은 원 통화·금액·품목을 보존하고 확정 저장을 거부한다', () => {
+  // 여행 기본 통화가 USD여도 원본을 달러로 변환하지 않는다.
+  return ['TWD', 'VND', 'THB', 'CNY', 'SGD', 'EUR'].forEach((currency) => {
+    // 인식 결과는 성공한 초안으로 반환하되 확정만 막는다.
+    const result = parseReceiptAnalysis(
+      JSON.stringify({ ...draft, currency }),
+      'USD',
+    );
+    assert.equal(result.currency, currency);
+    assert.equal(result.amount, draft.amount);
+    assert.deepEqual(result.items, draft.items);
+    assert.match(result.warnings.join(' '), /읽었지만/);
+    assert.equal(
+      workspaceCommandSchema.safeParse({
+        operation: 'receipt.confirm',
+        input: {
+          id: receiptId,
+          mediaId: media,
+          dayId: receiptId,
+          merchant: result.merchant,
+          transactionDate: result.transactionDate,
+          amount: result.amount,
+          currency: result.currency,
+          items: result.items,
+        },
+      }).success,
+      false,
+    );
+  });
+});
+
+test('R10 통화 미인식과 모호한 기호는 기본 통화로 대체하지 않는다', () => {
+  // 미인식은 미지원 코드와 다른 안내로 남는다.
+  return void (assert.equal(
+    parseReceiptAnalysis(JSON.stringify({ ...draft, currency: '' }), 'USD')
+      .currency,
+    '',
+  ),
+  assert.deepEqual(
+    ['total $300', 'total 300'].map((text) => {
+      // 명시된 ISO 코드 없이 달러를 추측하지 않는다.
+      return printedCurrency(text);
+    }),
+    ['', ''],
+  ));
+});
+
+test('R10 OCR 텍스트는 NT$·S$·CNY 표식을 USD·JPY보다 먼저 보존한다', () => {
+  // 미지원 통화의 원문 표식을 잘못 축약하지 않는다.
+  return assert.deepEqual(
+    ['NT$300', 'S$25', 'CNY ¥500', 'VND 100000', 'THB ฿300', 'US$5'].map(
+      (text) => {
+        // 인쇄된 통화만 반환한다.
+        return printedCurrency(text);
+      },
+    ),
+    ['TWD', 'SGD', 'CNY', 'VND', 'THB', 'USD'],
+  );
+});

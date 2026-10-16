@@ -21,6 +21,8 @@ import { registerMediaRoutes } from './cloudMedia';
 import { registerProfileRoutes } from './cloudProfiles';
 import { registerDiscoveryRoutes } from './discovery';
 import { startupManifest } from './startup';
+import { appConfig } from './appConfig';
+import { lookupFlights } from './flights';
 
 type ApiContext = Context<ApiEnvironment>;
 
@@ -315,7 +317,9 @@ export function createApp(fetcher: typeof fetch = fetch): Hono<ApiEnvironment> {
               })
               .get('/health', health)
               .get('/public/startup', startupManifest)
+              .get('/public/app-config', appConfig)
               .get('/api/v1/me', getMe.bind(null, fetcher))
+              .get('/api/v1/flights/lookup', lookupFlights.bind(null, fetcher))
               .get('/api/v1/places/search', searchPlaces.bind(null, fetcher))
               .get('/api/v1/places/import', importMapsShare.bind(null, fetcher))
               .get(

@@ -1,5 +1,6 @@
 import { APIError } from 'better-auth/api';
 import { database } from './cloudStore';
+import { nicknameError, validProfileNickname } from '@wherego/validation';
 
 const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
@@ -70,18 +71,47 @@ function checkedGuestNickname(
 
 // 이메일 가입은 사용자가 선택한 닉네임을 중복 없이 검증한다.
 export function checkedSignupNickname(env: Env, name: string): Promise<string> {
-  // 서버에서도 앞뒤 공백과 길이를 검증한다.
-  return name.trim().length > 0 && name.trim().length <= 50
+  // 공백을 포함한 UTF-8 길이를 앱과 같은 규칙으로 검증한다.
+  return validProfileNickname(name)
     ? nicknameExists(env, name).then((exists) => {
         // 이미 등록한 이름은 다른 사람의 가입으로 재사용하지 않는다.
-        return exists ? rejectNickname() : name.trim();
+        return exists ? rejectNickname() : name;
       })
     : Promise.reject(
         new APIError('BAD_REQUEST', {
           code: 'INVALID_NICKNAME',
-          message: '닉네임을 1~50자로 입력해 주세요.',
+          message: nicknameError,
         }),
       );
+}
+
+// 인증 라이브러리의 이름 수정 경로에도 같은 입력 계약을 적용한다.
+export function checkedUpdatedNickname(
+  env: Env,
+  name: string,
+  userId: string,
+): Promise<string> {
+  // 기존 이름 예외는 실제 로그인 계정의 DB 값과 비교해서만 허용한다.
+  return database(env)
+    .prepare('SELECT name FROM user WHERE id=?')
+    .bind(userId)
+    .first<{ name: string }>()
+    .then((row) => {
+      // 이름을 바꾸는 요청만 새 길이와 고유성 검사를 거친다.
+      return row?.name === name
+        ? name
+        : typeof name === 'string' && validProfileNickname(name)
+          ? nicknameExists(env, name, userId).then((exists) => {
+              // 인증 경로로 프로필 API의 중복 검사를 우회하지 못하게 한다.
+              return exists ? rejectNickname() : name;
+            })
+          : Promise.reject(
+              new APIError('BAD_REQUEST', {
+                code: 'INVALID_NICKNAME',
+                message: nicknameError,
+              }),
+            );
+    });
 }
 
 // 소셜 초기 표시 이름 충돌은 프로필 설정 전에 임시 고유 이름으로 바꾼다.
@@ -89,9 +119,9 @@ export function checkedSocialNickname(env: Env, name: string): Promise<string> {
   // 소셜 제공자의 이름은 우리 서비스의 고유 닉네임을 보장하지 않는다.
   return nicknameExists(env, name).then((exists) => {
     // 빈 이름이나 긴 이름에도 서버에서 발급한 고유 후보를 사용한다.
-    return exists || !name.trim() || name.trim().length > 50
+    return exists || !validProfileNickname(name)
       ? availableGuestNickname(env)
-      : name.trim();
+      : name;
   });
 }
 

@@ -8,6 +8,7 @@ import {
   availableGuestNickname,
   checkedSignupNickname,
   checkedSocialNickname,
+  checkedUpdatedNickname,
 } from './nicknames';
 
 // 요청의 D1 연결로 표준 이메일 인증과 서명된 세션을 구성한다.
@@ -40,6 +41,22 @@ export function cloudAuth(env: Env, callbackState?: string) {
               // 최종 중복 생성은 DB 고유 제약에서 차단한다.
               return { data: { ...user, name } };
             });
+          },
+        },
+        update: {
+          before: (user, context) => {
+            // 인증 라이브러리의 직접 이름 수정도 새 닉네임 규칙을 지킨다.
+            return context?.path === '/update-user' && user.name !== undefined
+              ? checkedUpdatedNickname(
+                  env,
+                  user.name,
+                  context.context.session?.user.id ||
+                    rejectRequest('AUTH_REQUIRED'),
+                ).then((name) => {
+                  // 이름 검증 외의 인증 프로필 필드는 기존 값으로 전달한다.
+                  return { data: { ...user, name } };
+                })
+              : Promise.resolve({ data: user });
           },
         },
       },

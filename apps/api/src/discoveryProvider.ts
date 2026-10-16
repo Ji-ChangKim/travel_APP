@@ -5,6 +5,7 @@ import {
 } from '@wherego/domain';
 import { discoveryImageSchema, type DiscoveryCity } from '@wherego/validation';
 import { readBounded } from './ocr';
+import { officialDiscoveryImage } from './discoveryAssets';
 
 const agent =
   'TripPrint/0.1 (https://github.com/Ji-ChangKim/travel_APP; destination discovery)';
@@ -304,7 +305,9 @@ function cityFromPage(
         key: destination.key,
         excerpt: page.extract.trim().slice(0, 1000),
         sourceUrl: page.fullurl,
-        image: licensedImage(page, images),
+        image:
+          officialDiscoveryImage(destination.key) ||
+          licensedImage(page, images),
         currentViews: views?.currentViews ?? null,
         previousViews: views?.previousViews ?? null,
       }

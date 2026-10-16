@@ -25,6 +25,8 @@ export const errorStatuses = {
   INVITE_INVALID: 410,
   OCR_UNAVAILABLE: 503,
   OCR_RATE_LIMITED: 429,
+  FLIGHT_UNAVAILABLE: 503,
+  FLIGHT_RATE_LIMITED: 429,
 } as const;
 
 // 공개 오류 코드만 저장하고 내부 응답과 비밀 값은 담지 않는다.

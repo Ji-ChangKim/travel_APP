@@ -241,8 +241,83 @@ test('상업 이용 불가 사진과 다른 호스트 사진은 표시 데이터
   const foreign = await fetchDiscovery(
     fixture([], { imageHost: 'evil.example' }),
   );
-  assert.ok(noncommercial.cities.every((city) => city.image === null));
-  assert.ok(foreign.cities.every((city) => city.image === null));
+  assert.ok(
+    noncommercial.cities
+      .filter((city) => {
+        // 공식 사진이 별도 등록된 도시는 Commons 검사와 분리한다.
+        return city.key !== 'taipei';
+      })
+      .every((city) => {
+        // 상업 이용 불가 사진은 공개 응답에서 제외한다.
+        return city.image === null;
+      }),
+  );
+  assert.ok(
+    foreign.cities
+      .filter((city) => {
+        // 등록된 공식 사진은 임의 공급자 이미지로 덮어쓰지 않는다.
+        return city.key !== 'taipei';
+      })
+      .every((city) => {
+        // 다른 호스트의 사진을 공개 자료로 허용하지 않는다.
+        return city.image === null;
+      }),
+  );
+  assert.equal(
+    noncommercial.cities.find((city) => {
+      // 공식 관광청 사진의 실제 출처를 확인한다.
+      return city.key === 'taipei';
+    })?.image?.sourceUrl,
+    'https://media.taiwan.net.tw/zh-tw/portal/media?Keyword=%E5%8F%B0%E5%8C%97101',
+  );
+});
+
+test('월간 통계가 대기 중이어도 사진 조회가 먼저 시작된다', async () => {
+  // 통계와 무관한 사진 요청을 뒤로 미뤄 사용자 대기를 늘리지 않는다.
+  let releaseViews!: () => void;
+  let photoStarted!: () => void;
+  let watchdog: ReturnType<typeof setTimeout> | undefined;
+  const viewGate = new Promise<void>((resolve) => {
+    // 통계 공급자의 완료 시점만 제어한다.
+    releaseViews = resolve;
+  });
+  const photoGate = new Promise<void>((resolve) => {
+    // 실제 사진 공급자 호출이 시작됐는지 관찰한다.
+    photoStarted = resolve;
+  });
+  const fetcher: typeof fetch = (input, init) => {
+    // 공개 공급자별 요청 순서를 실제 조회 함수에 연결한다.
+    const request = new Request(input, init);
+    return new URL(request.url).hostname === 'wikimedia.org'
+      ? viewGate.then(() => {
+          // 통계 지연을 해제한 뒤 유효한 실제 형식의 응답을 반환한다.
+          return fixtureResponse(request, [], {});
+        })
+      : Promise.resolve(
+          new URL(request.url).hostname === 'commons.wikimedia.org'
+            ? (photoStarted(), fixtureResponse(request, [], {}))
+            : fixtureResponse(request, [], {}),
+        );
+  };
+  const loading = fetchDiscovery(fetcher);
+  try {
+    // 통계가 끝나기 전에 사진 조회가 시작돼야 한다.
+    await Promise.race([
+      photoGate,
+      new Promise<never>((_, reject) => {
+        // 회귀로 교착되어도 검사 자체는 끝나야 한다.
+        return void (watchdog = setTimeout(() => {
+          // 사진 요청을 통계 이후로 미루는 회귀를 실패로 처리한다.
+          return reject(new Error('사진 조회 지연'));
+        }, 1000));
+      }),
+    ]);
+  } finally {
+    // 실패한 검사에서도 남은 공급자 요청을 모두 완료한다.
+    clearTimeout(watchdog);
+    releaseViews();
+    await loading;
+  }
 });
 
 test('공급자 실패와 초과 본문은 공개 503이며 원문 오류를 노출하지 않는다', async () => {

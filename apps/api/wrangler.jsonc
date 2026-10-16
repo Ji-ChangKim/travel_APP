@@ -4,12 +4,23 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-10-02",
   "compatibility_flags": ["nodejs_compat"],
+  // 항공 조회는 사용자별 분당 6회로 제한하며 환경별 카운터를 분리한다.
+  "ratelimits": [
+    {
+      "name": "FLIGHT_LOOKUP_LIMITER",
+      "namespace_id": "100541",
+      "simple": { "limit": 6, "period": 60 },
+    },
+  ],
   // 서버 AI 바인딩으로 영수증을 인식하며 사용자 확인 후 기록한다.
   "secrets": {
     "required": ["AUTH_SECRET"],
   },
   // 실제 프로젝트 주소와 공개 API 키는 로컬 설정 또는 환경별 vars에서 주입한다.
   "vars": {
+    "FLIGHT_LOOKUP_PROVIDER": "kac",
+    // 최소 지원 운영값을 확정한 뒤 검증된 정책 JSON을 설정한다.
+    "APP_UPDATE_POLICY_JSON": "",
     "GOOGLE_CLIENT_ID": "",
     "KAKAO_CLIENT_ID": "",
     "NAVER_CLIENT_ID": "",
@@ -33,6 +44,13 @@
   "observability": { "enabled": true, "head_sampling_rate": 1 },
   "env": {
     "staging": {
+      "ratelimits": [
+        {
+          "name": "FLIGHT_LOOKUP_LIMITER",
+          "namespace_id": "100542",
+          "simple": { "limit": 6, "period": 60 },
+        },
+      ],
       "secrets": {
         "required": ["AUTH_SECRET"],
       },
@@ -50,6 +68,9 @@
         { "binding": "MEDIA", "bucket_name": "tripprint-staging-private" },
       ],
       "vars": {
+        "FLIGHT_LOOKUP_PROVIDER": "kac",
+        // 최소 지원 운영값을 확정한 뒤 검증된 정책 JSON을 설정한다.
+        "APP_UPDATE_POLICY_JSON": "",
         "GOOGLE_CLIENT_ID": "",
         "KAKAO_CLIENT_ID": "",
         "NAVER_CLIENT_ID": "",
@@ -60,9 +81,19 @@
       },
     },
     "production": {
+      "ratelimits": [
+        {
+          "name": "FLIGHT_LOOKUP_LIMITER",
+          "namespace_id": "100543",
+          "simple": { "limit": 6, "period": 60 },
+        },
+      ],
       "secrets": { "required": ["GOOGLE_VISION_API_KEY"] },
       "name": "tripprint-api-production",
       "vars": {
+        "FLIGHT_LOOKUP_PROVIDER": "kac",
+        // 최소 지원 운영값을 확정한 뒤 검증된 정책 JSON을 설정한다.
+        "APP_UPDATE_POLICY_JSON": "",
         "GOOGLE_CLIENT_ID": "",
         "KAKAO_CLIENT_ID": "",
         "NAVER_CLIENT_ID": "",
