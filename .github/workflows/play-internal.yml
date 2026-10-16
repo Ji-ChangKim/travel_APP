@@ -20,10 +20,6 @@ on:
         type: choice
         default: draft
         options: [draft, completed]
-      version_code:
-        description: '선택: Play의 기존 버전 코드보다 큰 정수 (빈 값은 실행 번호로 증가)'
-        type: string
-        default: ''
 
 permissions:
   contents: read
@@ -79,9 +75,7 @@ jobs:
 
       - name: 공개 서버 주소와 버전 코드 준비
         id: config
-        env:
-          REQUESTED_VERSION_CODE: ${{ inputs.version_code }}
-          ANDROID_VERSION_CODE_BASE: ${{ vars.ANDROID_VERSION_CODE_BASE || '1000' }}
+        # 루트 ver.text에 저장한 번호를 빌드와 산출물 이름에 함께 사용한다.
         run: node scripts/prepare-android-ci.mjs
 
       - name: 선택한 산출물의 서명 및 제출 자격 확인

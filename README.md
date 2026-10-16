@@ -2,25 +2,29 @@
 
 여행을 계획하고, 동행자와 일정을 공유하고, 다녀온 이야기를 기록하는 APP/WEB 프로젝트입니다.
 
-1차 MVP 후보 `0.1.0 / mvp-0.1.0-internal-candidate-20261012`에 메인 추천 자동 슬라이드를 추가했습니다. 검증·성능 측정·산출물 및 Play 내부 테스트 배포 전 인수 항목은 [MVP 마무리 보고](docs/MVP_1_RELEASE_PERFORMANCE_20261012.txt)를 확인하세요. 실제 원격 출시 완료 여부는 보고서에 별도로 기록합니다.
+페이지별 오류 발생 상황·서버/네트워크/버전 분류·코드 표시·재시도 기준은 [에러 코드 정의서](docs/ERROR_CODE_SPEC.md)를 확인하세요. 현행 서버 오류와 앞으로 적용할 앱 표시 규약을 구분했습니다.
 
-메인에서 회원 게시물 없이도 도시 사진·소개와 월간 문서 조회 통계를 탐색하도록 공개 Wikimedia API를 연결했습니다. 실제 방문객 순위와 편집 추천을 구분하며, 연결·검증·배포 상태는 [여행지 탐색 API 보고](docs/DESTINATION_DISCOVERY_API_20261012.txt)를 확인하세요.
+2026-10-12 내부 테스트 핵심 흐름 안정화: 로그인 상태 유지, 일정·비용 입력 오류 복구, 저장 응답 유실·동행 충돌 처리, 사진 계정 확인·재조회·게스트 삭제를 보완했습니다. 변경 파일·자동 검사·실기기 인수 12개 항목은 [핵심 안정화 보고](docs/CURRENT_STATUS.txt)를 확인하세요.
 
-2026-10-12 Play 내부 테스트 목표에 맞춰 비회원 공개 발자국 탐색과 빌드 전 저장·보안·화면 검증을 보완했습니다. Google 저장 목록 직접 동기화의 지원 국가 제약, 미완료 계정 기능, 실제 배포·인수 항목은 [내부 테스트 준비 보고](docs/PLAY_INTERNAL_READINESS_20261012.txt)를 확인하세요.
+1차 MVP 후보 `0.1.0 / mvp-0.1.0-internal-candidate-20261012`에 메인 추천 자동 슬라이드를 추가했습니다. 검증·성능 측정·산출물 및 Play 내부 테스트 배포 전 인수 항목은 [MVP 마무리 보고](docs/CURRENT_STATUS.txt)를 확인하세요. 실제 원격 출시 완료 여부는 보고서에 별도로 기록합니다.
 
-게스트는 Google 인증 없는 기기별 계정이며 여행과 사진을 로컬에 저장합니다. `Quest-` 뒤 대문자·숫자 6자리 닉네임과 모든 회원의 닉네임 중복 방지를 구현했습니다. 최신 정책·검증·배포 전 필요한 `0006_unique_nicknames.sql` 적용은 [기기 게스트 구현 보고](docs/GUEST_LOCAL_ACCOUNTS_20261012.txt)를 확인하세요. 이번 스키마와 앱 변경은 아직 원격 배포하지 않았습니다.
+메인에서 회원 게시물 없이도 도시 사진·소개와 월간 문서 조회 통계를 탐색하도록 공개 Wikimedia API를 연결했습니다. 실제 방문객 순위와 편집 추천을 구분하며, 연결·검증·배포 상태는 [여행지 탐색 API 보고](docs/CURRENT_STATUS.txt)를 확인하세요.
 
-2026-10-06 MVP 보완: 이메일 로그인/가입, Google Maps 공유 장소 가져오기, 완료 여행 발자국 다이어리. 범위·변경 파일·실서비스 연결·검증 결과는 [MVP 구현 보고](docs/MVP_IMPLEMENTATION_20261006.md)를 확인하세요. `npm start`와 `npm run web`는 현재 MVP가 있는 `apps/mobile`을 실행합니다.
+2026-10-12 Play 내부 테스트 목표에 맞춰 비회원 공개 발자국 탐색과 빌드 전 저장·보안·화면 검증을 보완했습니다. Google 저장 목록 직접 동기화의 지원 국가 제약, 미완료 계정 기능, 실제 배포·인수 항목은 [내부 테스트 준비 보고](docs/CURRENT_STATUS.txt)를 확인하세요.
 
-현재 MVP는 Cloudflare Workers + D1 + 비공개 R2 + Better Auth 이메일 로그인으로 동작합니다. [배포된 웹](https://wherego-staging.pages.dev)에서 확인할 수 있습니다. 실제 배포·검증·변경 파일·APK 및 공급자 연결 상태는 [Cloudflare 전환·배포 보고](docs/CLOUDFLARE_MVP_DEPLOYMENT_20261006.md)를 확인하세요. 소셜 로그인과 자동 Google OCR/장소 검색은 공급자 설정을 기다리고 있습니다.
+게스트는 Google 인증 없는 기기별 계정이며 여행과 사진을 로컬에 저장합니다. `Quest-` 뒤 대문자·숫자 6자리 닉네임과 모든 회원의 닉네임 중복 방지를 구현했습니다. 최신 정책·검증·배포 전 필요한 `0006_unique_nicknames.sql` 적용은 [기기 게스트 구현 보고](docs/CURRENT_STATUS.txt)를 확인하세요. 이번 스키마와 앱 변경은 아직 원격 배포하지 않았습니다.
 
-1차 테스트 준비본은 `0.1.0 / test-1`입니다. [테스트 안내](docs/TEST_1_RELEASE.md)에 접속 방법·시나리오·배포 기록·미연결 범위를 정리했습니다. [배포 버전 확인](https://wherego-staging.pages.dev/release.json)에서 현재 공개된 버전을 확인할 수 있습니다.
+2026-10-06 MVP 보완: 이메일 로그인/가입, Google Maps 공유 장소 가져오기, 완료 여행 발자국 다이어리. 범위·변경 파일·실서비스 연결·검증 결과는 [MVP 구현 보고](docs/CURRENT_STATUS.txt)를 확인하세요. `npm start`와 `npm run web`는 현재 MVP가 있는 `apps/mobile`을 실행합니다.
+
+현재 MVP는 Cloudflare Workers + D1 + 비공개 R2 + Better Auth 이메일 로그인으로 동작합니다. [배포된 웹](https://wherego-staging.pages.dev)에서 확인할 수 있습니다. 실제 배포·검증·변경 파일·APK 및 공급자 연결 상태는 [Cloudflare 전환·배포 보고](docs/CURRENT_STATUS.txt)를 확인하세요. 소셜 로그인과 자동 Google OCR/장소 검색은 공급자 설정을 기다리고 있습니다.
+
+1차 테스트 준비본은 `0.1.0 / test-1`입니다. [테스트 안내](docs/CURRENT_STATUS.txt)에 접속 방법·시나리오·배포 기록·미연결 범위를 정리했습니다. [배포 버전 확인](https://wherego-staging.pages.dev/release.json)에서 현재 공개된 버전을 확인할 수 있습니다.
 
 지도는 Google Places 검색과 Google Maps 앱·웹 열기를 사용합니다. [설정 및 변경 보고](docs/GOOGLE_MAPS_SETUP.md)를 확인하세요.
 
 ## 개발 환경
 
-Android 설치 테스트의 하단 시스템 바·로그인 진입·항공편 기반 여행 생성·지도/영수증 우선 입력 변경은 [피드백 반영 및 재빌드 절차](docs/TEST_FEEDBACK_20261003.md)를 확인하세요.
+Android 설치 테스트의 하단 시스템 바·로그인 진입·항공편 기반 여행 생성·지도/영수증 우선 입력 변경은 [피드백 반영 및 재빌드 절차](docs/CURRENT_STATUS.txt)를 확인하세요.
 
 - Node.js 22.13 이상인 22 LTS 또는 24.3 이상인 24 LTS (`.nvmrc`: 22.17.0)
 - npm 11.5.2 기준
@@ -54,7 +58,9 @@ npm start
 
 ### 배포 프로세스 상세 가이드
 
-현재 목표는 Expo에서 내려받아 Android 실기기에 설치하는 MVP APK입니다. [Android MVP 빌드 절차](docs/MVP_ANDROID_BUILD.md)와 [체크리스트](docs/BUILD_CHECKLIST.md)를 먼저 확인하세요. Cloudflare 공개 API와 웹 주소를 준비해 `npm run mvp:check`, `npm run mvp:prepare`로 검사하고, Expo 로그인·preview 환경 등록 후 `npm run mobile:build:apk`를 실행합니다. 스토어 심사·제출은 이번 범위에 포함하지 않습니다.
+앱 버전은 루트의 [ver.text](ver.text) 파일에서 관리합니다. `versionCode=2`는 Android 업로드 번호, `versionName=0.1.0`은 사용자 표시 버전입니다. 이 파일을 수정하고 저장하면 Expo와 Android Studio 빌드가 같은 값을 직접 읽습니다. Android Studio에서 Sync 후 서명된 AAB/APK를 새로 생성하세요. Play에 이미 사용한 번호보다 큰 versionCode를 지정해야 합니다. EAS도 local 설정과 자동 증가 해제로 같은 파일을 사용합니다. 상세 내용은 [버전 관리 안내](docs/CURRENT_STATUS.txt)를 참고하세요.
+
+현재 목표는 Expo에서 내려받아 Android 실기기에 설치하는 MVP APK입니다. [Android MVP 빌드 절차](docs/CURRENT_STATUS.txt)와 [체크리스트](docs/CURRENT_STATUS.txt)를 먼저 확인하세요. Cloudflare 공개 API와 웹 주소를 준비해 `npm run mvp:check`, `npm run mvp:prepare`로 검사하고, Expo 로그인·preview 환경 등록 후 `npm run mobile:build:apk`를 실행합니다. 스토어 심사·제출은 이번 범위에 포함하지 않습니다.
 
 자세한 빌드 및 배포 절차는 [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) 문서를 참고하세요.
 

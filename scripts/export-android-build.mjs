@@ -108,5 +108,13 @@ if (
   process.argv[1] &&
   resolve(process.argv[1]) === fileURLToPath(import.meta.url)
 ) {
-  console.log(exportBuild(resolve(process.argv[2]), process.argv[3]));
+  console.log(
+    exportBuild(
+      resolve(process.argv[2]),
+      process.argv[3],
+      process.env.TRIPPRINT_BUILD_OUTPUT_DIR
+        ? resolve(process.env.TRIPPRINT_BUILD_OUTPUT_DIR)
+        : undefined,
+    ),
+  );
 }

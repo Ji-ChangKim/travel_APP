@@ -47,6 +47,11 @@ function isCallback(env) {
 export function getReleaseIssues(env) {
   // 앱과 Worker 설정은 검증한 동일 공개 값을 공유한다.
   return [
+    ...issue(
+      !env.FLIGHT_LOOKUP_PROVIDER ||
+        ['kac', 'aerodatabox'].includes(env.FLIGHT_LOOKUP_PROVIDER),
+      'FLIGHT_LOOKUP_PROVIDER: kac 또는 aerodatabox 필요',
+    ),
     ...(env.EXPO_PUBLIC_BACKEND === 'cloudflare' &&
     env.RELEASE_ENV === 'production'
       ? ['RELEASE_ENV: 운영 D1·R2 바인딩을 별도로 구성한 후 배포 필요']
@@ -107,6 +112,8 @@ function configureWorker(template, env) {
     main: '../src/index.ts',
     name: template.env[env.RELEASE_ENV].name,
     env: undefined,
+    // 로컬에 없는 기존 서버의 공개 OAuth 설정은 재배포에서 보존한다.
+    keep_vars: true,
     secrets: template.env[env.RELEASE_ENV].secrets,
     d1_databases: template.env[env.RELEASE_ENV].d1_databases?.map((binding) => {
       // 생성 설정 파일의 위치에 맞게 마이그레이션 디렉터리를 지정한다.
@@ -114,26 +121,42 @@ function configureWorker(template, env) {
     }),
     r2_buckets: template.env[env.RELEASE_ENV].r2_buckets,
     ai: template.env[env.RELEASE_ENV].ai,
+    // 조회 제한 카운터도 실제 배포 환경의 namespace를 사용한다.
+    ratelimits: template.env[env.RELEASE_ENV].ratelimits,
     vars: {
+      // 항공편 조회는 공공데이터를 기본으로 선택하고 유료 공급자는 명시적으로만 지정한다.
+      FLIGHT_LOOKUP_PROVIDER:
+        env.FLIGHT_LOOKUP_PROVIDER ||
+        template.env[env.RELEASE_ENV].vars.FLIGHT_LOOKUP_PROVIDER,
       // 등록을 마친 공급자의 공개 식별값만 배포 설정에 유지한다.
-      GOOGLE_CLIENT_ID:
-        env.GOOGLE_CLIENT_ID ||
-        template.env[env.RELEASE_ENV].vars.GOOGLE_CLIENT_ID ||
-        '',
-      KAKAO_CLIENT_ID:
-        env.KAKAO_CLIENT_ID ||
-        template.env[env.RELEASE_ENV].vars.KAKAO_CLIENT_ID ||
-        '',
-      NAVER_CLIENT_ID:
-        env.NAVER_CLIENT_ID ||
-        template.env[env.RELEASE_ENV].vars.NAVER_CLIENT_ID ||
-        '',
+      ...configuredSocialClients(template, env),
       AUTH_BASE_URL: env.EXPO_PUBLIC_API_URL,
       ALLOWED_ORIGINS: env.RELEASE_WEB_ORIGIN,
       SUPABASE_URL: '',
       SUPABASE_ANON_KEY: '',
     },
   };
+}
+
+// 명시된 공개 식별값만 전달하여 빈 값으로 기존 로그인을 끄지 않는다.
+function configuredSocialClients(template, env) {
+  // 미등록·공백 값은 배포 변수에서 제외하고 기존 원격 값 보존에 맡긴다.
+  return Object.fromEntries(
+    Object.entries({
+      GOOGLE_CLIENT_ID:
+        env.GOOGLE_CLIENT_ID ||
+        template.env[env.RELEASE_ENV].vars.GOOGLE_CLIENT_ID,
+      KAKAO_CLIENT_ID:
+        env.KAKAO_CLIENT_ID ||
+        template.env[env.RELEASE_ENV].vars.KAKAO_CLIENT_ID,
+      NAVER_CLIENT_ID:
+        env.NAVER_CLIENT_ID ||
+        template.env[env.RELEASE_ENV].vars.NAVER_CLIENT_ID,
+    }).filter(([, value]) => {
+      // 공백만 있는 공개 식별값도 기존 서버 설정을 덮어쓰지 못하게 한다.
+      return typeof value === 'string' && value.trim().length > 0;
+    }),
+  );
 }
 
 // 릴리스 파일은 고정된 무시 디렉터리에만 기록한다.

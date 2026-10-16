@@ -4,13 +4,16 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 // 브라우저 검증은 웹 빌드 폴더만 로컬에서 제공한다.
-const root = fileURLToPath(new URL('../apps/mobile/dist/', import.meta.url));
+const root = process.env.TRIPPRINT_PREVIEW_DIR
+  ? path.resolve(process.env.TRIPPRINT_PREVIEW_DIR)
+  : fileURLToPath(new URL('../apps/mobile/dist/', import.meta.url));
 const mime = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'application/javascript',
   '.css': 'text/css',
   '.json': 'application/json',
   '.png': 'image/png',
+  '.jpg': 'image/jpeg',
   '.svg': 'image/svg+xml',
   '.ttf': 'font/ttf',
 };
@@ -55,7 +58,14 @@ function respond(response, file) {
         }),
       )
     : fs
-        .createReadStream(path.join(root, '404.html'))
+        .createReadStream(
+          path.join(
+            root,
+            fs.existsSync(path.join(root, '404.html'))
+              ? '404.html'
+              : '+not-found.html',
+          ),
+        )
         .pipe(response.writeHead(404, { 'Content-Type': mime['.html'] }));
 }
 
@@ -70,4 +80,6 @@ function handle(request, response) {
 }
 
 // 개발 PC 내부에서만 테스트 페이지를 제공한다.
-http.createServer(handle).listen(8788, '127.0.0.1');
+http
+  .createServer(handle)
+  .listen(Number(process.env.TRIPPRINT_PREVIEW_PORT || 8788), '127.0.0.1');

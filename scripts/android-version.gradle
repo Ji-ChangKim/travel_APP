@@ -1,0 +1,65 @@
+// 루트 또는 모바일에서 생성한 Android 프로젝트가 같은 버전 파일을 찾는다.
+def tripprintVersionRoot = [new File(rootProject.projectDir, '..'), new File(rootProject.projectDir, '../../..')].find { candidate ->
+    // 다른 위치의 임의 파일 대신 이 저장소의 공통 버전 설정만 선택한다.
+    new File(candidate, 'ver.text').isFile() && new File(candidate, 'scripts/app-version.cjs').isFile()
+}
+if (tripprintVersionRoot == null) {
+    throw new GradleException('프로젝트 루트의 ver.text 파일을 찾을 수 없습니다.')
+}
+def tripprintVersionFile = new File(tripprintVersionRoot, 'ver.text').canonicalFile
+def tripprintVersionLines = providers.fileContents(layout.file(providers.provider {
+    // 버전 파일 경로를 Gradle의 추적 가능한 입력으로 전달한다.
+    tripprintVersionFile
+})).asText.get().replaceFirst('^\uFEFF', '').readLines().collect { line ->
+    // 메모장에서 저장한 줄바꿈과 주변 공백을 정리한다.
+    line.trim()
+}.findAll { line ->
+    // 한글 설명과 빈 줄은 버전 값으로 해석하지 않는다.
+    line && !line.startsWith('#')
+}
+if (tripprintVersionLines.size() != 2 || tripprintVersionLines.count { line ->
+    // 중복 번호나 숫자가 아닌 코드는 빌드 전에 거부한다.
+    line ==~ /versionCode\s*=\s*[1-9]\d*/
+} != 1 || tripprintVersionLines.count { line ->
+    // Expo와 동일한 표시 버전 형식을 허용한다.
+    line ==~ /versionName\s*=\s*\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?/
+} != 1) {
+    throw new GradleException('ver.text에 versionCode=양의 정수, versionName=0.1.0 형식으로 각각 한 줄씩 작성하세요.')
+}
+def tripprintVersion = new Properties()
+tripprintVersion.load(new StringReader(tripprintVersionLines.join('\n')))
+def tripprintVersionCode = new BigInteger(tripprintVersion.getProperty('versionCode'))
+if (tripprintVersionCode > 2100000000) {
+    throw new GradleException('ver.text의 versionCode는 2100000000 이하여야 합니다.')
+}
+// 생성된 기본값보다 파일에 저장한 버전을 우선하여 최종 APK/AAB에 반영한다.
+android.defaultConfig.versionCode = tripprintVersionCode.intValue()
+android.defaultConfig.versionName = tripprintVersion.getProperty('versionName')
+
+// 버전 파일을 수정하면 앱의 공개 설정과 JavaScript 번들도 갱신한다.
+gradle.projectsEvaluated {
+    // Expo 설정 생성과 JS 번들 생성 작업에 같은 버전 파일을 입력으로 등록한다.
+    rootProject.findProject(':expo-constants')?.tasks?.matching { task ->
+        // 앱 표시 버전이 이전 설정 생성 결과에 남지 않게 한다.
+        task.name == 'createExpoConfig'
+    }?.configureEach { task ->
+        // 파일 변경에 따라 공개 앱 설정을 다시 생성한다.
+        task.inputs.file(tripprintVersionFile)
+    }
+    tasks.matching { task ->
+        // 디버그 실행에는 불필요한 릴리스 번들 생성을 추가하지 않는다.
+        task.name.startsWith('createBundle') && task.name.endsWith('JsAndAssets')
+    }.configureEach { task ->
+        // 버전 파일의 변경을 릴리스 번들 생성 입력에 포함한다.
+        task.inputs.file(tripprintVersionFile)
+    }
+}
+
+// APK/AAB 전체 빌드 없이 실제 Gradle 적용 값을 확인한다.
+tasks.register('printTripPrintVersion') {
+    // 서명 키나 다른 환경 설정은 출력하지 않는다.
+    doLast {
+        // Android 빌드가 사용할 최종 버전 두 값만 표시한다.
+        logger.lifecycle("TripPrint versionCode=${android.defaultConfig.versionCode}, versionName=${android.defaultConfig.versionName}")
+    }
+}

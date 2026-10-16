@@ -1,0 +1,40 @@
+// Worklets 라이브러리를 준비한 뒤 소비 모듈의 CMake 연결 정보를 생성한다.
+gradle.projectsEvaluated {
+    def worklets = rootProject.findProject(":react-native-worklets")
+    if (worklets == null) return
+
+    // 오류가 발생한 두 모듈과 최종 앱의 네이티브 연결을 함께 보정한다.
+    [":expo-modules-core", ":react-native-reanimated", ":app"].each { path ->
+        def consumer = rootProject.findProject(path)
+        if (consumer == null) return
+        consumer.tasks.matching { task -> task.name ==~ /^configureCMake(Debug|RelWithDebInfo)(\[[^\]]+\])?$/ }.configureEach { task ->
+            def release = task.name.startsWith("configureCMakeRelWithDebInfo")
+            def buildType = release ? "Release" : "Debug"
+            task.dependsOn(worklets.tasks.named("prefab${buildType}Package"))
+
+            // 헤더 전용 캐시가 남았으면 AGP의 설정 검사도 다시 실행한다.
+            task.outputs.upToDateWhen { false }
+            task.doFirst {
+                def match = task.name =~ /^configureCMake([^\[]+)\[([^\]]+)\]$/
+                if (!match.matches()) return
+                def cmakeType = match[0][1]
+                def abi = match[0][2]
+                def cacheRoot = consumer.file(".cxx/${cmakeType}")
+                def models = cacheRoot.listFiles()?.findAll { it.isDirectory() } ?: []
+                models.each { model ->
+                    def prefab = new File(model, "prefab/${abi}")
+                    def configs = consumer.fileTree(prefab) { include("**/react-native-workletsConfig.cmake") }
+                    def headerOnly = configs.any { it.getText("UTF-8").contains("add_library(react-native-worklets::worklets INTERFACE IMPORTED)") }
+                    if (!headerOnly) return
+
+                    // 잘못된 설정의 지문만 무효화하고 소스와 컴파일된 객체는 보존한다.
+                    def fingerprint = new File(model, "${abi}/configure_fingerprint.bin")
+                    if (fingerprint.isFile() && !fingerprint.delete()) {
+                        throw new GradleException("Worklets 연결 설정 지문을 갱신할 수 없습니다: ${fingerprint}")
+                    }
+                    logger.lifecycle("Worklets 헤더 전용 연결 캐시 갱신: ${consumer.path} ${cmakeType} ${abi}")
+                }
+            }
+        }
+    }
+}

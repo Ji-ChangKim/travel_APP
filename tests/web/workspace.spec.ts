@@ -868,9 +868,8 @@ test('R06 여행 직접 링크 → 이메일 가입·생일 없는 온보딩 →
     () => {
       /* 실제 원본 제목까지 확인한다. */ return expect(
         page
-          .getByRole('button', { name: '여행 더보기', exact: true })
-          .locator('..')
-          .getByText('삭제 확인 여행', { exact: true }),
+          .getByText('삭제 확인 여행', { exact: true })
+          .filter({ visible: true }),
       ).toBeVisible();
     },
   ]);

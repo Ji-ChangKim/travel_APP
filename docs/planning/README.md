@@ -7,6 +7,7 @@
 - [정책 결정 자료](POLICY_DECISIONS.md): 미확정 정책은 승인·구현 완료로 해석하지 않습니다.
 - [여행 생성 흐름](TRIP_CREATION_FLOW_20261015.md)
 - [여행 표시·내비게이션·확인 창 정합성](TRIP_PRESENTATION_NAVIGATION_20261016.md)
+- [상세 세 허브·CTA·빈 일정 개편](../HARU_WORKSPACE_REFACTOR_20261016.txt)
 - [항공 조회 명세](FLIGHT_LOOKUP_SPEC.md), [KAC API 검토](KAC_FLIGHT_API_REVIEW.md), [실제 응답 분석](KAC_FLIGHT_LIVE_ANALYSIS.md)
 - [발자국 콘텐츠](TRAIL_CONTENT_SPEC.md)
 - [QA 기준](QA_ACCEPTANCE.md), [실제 기기 검수표](../qa/DEVICE_ACCEPTANCE.txt)

@@ -6,6 +6,7 @@
 
 - [현재 개발·검수 상태](CURRENT_STATUS.txt)
 - [화면 피드백과 날짜·상태·동선 계약](SCREEN_REVIEW.txt)
+- [현재 상세 화면·CTA·빈 일정 개편](HARU_WORKSPACE_REFACTOR_20261016.txt)
 - [최신 화면별 상세기능정의서 v3 원본](<2. planning/TripPrint_화면별_상세기능정의서_v3_20261014.docx>)
 - [빌드 직전 인계](PLAY_INTERNAL_PREBUILD.txt)
 - [Play 내부 테스트 기기 검수표](qa/DEVICE_ACCEPTANCE.txt)

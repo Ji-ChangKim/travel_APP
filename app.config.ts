@@ -1,10 +1,14 @@
 import type { ExpoConfig } from 'expo/config';
+import { readAppVersion } from './scripts/app-version.cjs';
+
+// 루트에서 실행하는 Expo 빌드도 공통 버전 파일을 사용한다.
+const appVersion = readAppVersion();
 
 // 모바일과 웹에서 공유하는 앱 이름, 경로, 표시 방식을 설정한다.
 const config: ExpoConfig = {
   name: 'TripPrint',
   slug: 'travel-app',
-  version: '0.1.0',
+  version: appVersion.versionName,
   scheme: 'travelapp',
   orientation: 'portrait',
   userInterfaceStyle: 'light',
@@ -18,7 +22,8 @@ const config: ExpoConfig = {
   android: {
     // Play Console에 등록된 TripPrint 앱과 동일한 Android 식별자로 빌드한다.
     package: 'com.tripprint.app',
-    versionCode: 1,
+    // 업로드 번호는 프로젝트 루트의 ver.text 한 곳에서 수정한다.
+    versionCode: appVersion.versionCode,
     adaptiveIcon: {
       backgroundColor: '#FF6B57',
       foregroundImage:
@@ -34,11 +39,17 @@ const config: ExpoConfig = {
   },
   // 파일 기반 화면 전환과 앱 시작 시 표시할 기본 이미지를 등록한다.
   plugins: [
+    './apps/mobile/plugins/withAppVersion.cjs',
     ['expo-navigation-bar', { hidden: true }],
     '@react-native-community/datetimepicker',
     // 루트에서 EAS를 실행해도 예전 src/app 대신 현재 모바일 앱을 빌드한다.
     ['expo-router', { root: './apps/mobile/src/app' }],
     'expo-web-browser',
+    // 시작 영상은 전경에서만 무음으로 재생하며 PIP·백그라운드 서비스를 사용하지 않는다.
+    [
+      'expo-video',
+      { supportsBackgroundPlayback: false, supportsPictureInPicture: false },
+    ],
     // 출발일 알림과 Android 알림 권한을 네이티브 빌드에 등록한다.
     'expo-notifications',
     // 루트에서 생성하는 네이티브 설정도 동일한 지도 링크 공유를 지원한다.
@@ -59,9 +70,9 @@ const config: ExpoConfig = {
     [
       'expo-splash-screen',
       {
-        backgroundColor: '#FFF9F3',
+        backgroundColor: '#FFFFFF',
         image:
-          './apps/mobile/assets/brand/tripprint-v1/TripPrint_splash-symbol_1024x1024.png',
+          './apps/mobile/assets/brand/tripprint-v1/TripPrint_symbol-coral-clean_1024x1024.png',
         imageWidth: 240,
       },
     ],

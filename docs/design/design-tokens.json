@@ -425,9 +425,13 @@
   ],
   "interactionHierarchy": {
     "maxPrimaryActionsPerScreen": 1,
-    "tripVisibleNavigationItems": 4,
-    "inlineItineraryAction": "일정 추가",
-    "auxiliaryActions": "more-menu"
+    "tripVisibleNavigationItems": 3,
+    "auxiliaryActions": "header-more-menu",
+    "itineraryAction": "일정 추가",
+    "itineraryActionPlacement": "bottom-single",
+    "listCreationAction": "header-icon",
+    "listPrimaryAction": "first-visible-trip",
+    "emptyScheduleActions": ["course-preview", "place-search"]
   },
   "navigation": {
     "headerMinHeight": 56,
@@ -435,5 +439,18 @@
   },
   "format": {
     "dateRangeSeparator": " – "
+  },
+  "accessibility": {
+    "standard": "WCAG 2.2",
+    "level": "AA",
+    "textContrastMinimum": 4.5,
+    "nonTextContrastMinimum": 3,
+    "placeholderContrastMinimum": 4.5,
+    "disabledTextContrastMinimum": 4.5,
+    "focusOutlineWidth": 2,
+    "minimumTouchTarget": 44,
+    "textResizePercent": 200,
+    "reflowCssWidth": 320,
+    "projectRule": "큰 글자·비활성 글자도 4.5:1로 제작한다. 로고·장식은 정보 전달용 글자로 사용하지 않는다."
   }
 }

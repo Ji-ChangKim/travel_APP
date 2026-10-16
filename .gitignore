@@ -36,11 +36,14 @@ playwright-report/
 *.pem
 *.mobileprovision
 
-# 운영체제 임시 파일과 개발 로그를 제외한다.
+# 운영체제 및 IDE 임시 파일과 개발 로그를 제외한다.
 .DS_Store
 Thumbs.db
 *.log
 .vs/
+.idea/
+outputs/
+scratch/
 
 # 보안 키 및 접근 토큰 문서
 docs/98. keys/
