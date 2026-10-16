@@ -1,4 +1,5 @@
 import Text from '@/components/AppText';
+import ScreenHeader from '@/components/ScreenHeader';
 import { travelDateRange } from './travelDateRange';
 import { colors } from '@/constants/theme';
 import ReceiptDetails from './ReceiptDetails';
@@ -250,8 +251,15 @@ function DiaryView({
     <SafeAreaView
       style={[styles.screen, { backgroundColor: colors.background }]}
     >
+      <ScreenHeader
+        title="발자국 다이어리"
+        backLabel="나의 발자국으로 돌아가기"
+        onBack={() => {
+          // 기록 목록으로 돌아가는 기존 경로를 유지한다.
+          return router.replace('/(tabs)/footprints');
+        }}
+      />
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.header}>발자국 다이어리</Text>
         {!userId && (
           <Action
             label="로그인하고 발자국 보기"
@@ -293,6 +301,27 @@ function DiaryView({
             </Text>
           ))}
         {query.data && !query.isError && (
+          <View style={styles.card}>
+            {query.data.myRole !== 'viewer' &&
+              query.data.trip.status !== 'ARCHIVED' && (
+                <Action
+                  label="기록 더 추가"
+                  onPress={() => {
+                    // 개인 기록은 공개 여부와 관계없이 같은 여행에서 이어 쓴다.
+                    return router.push(`/trips/${id}`);
+                  }}
+                />
+              )}
+            <Action
+              label="여행 경비 요약"
+              onPress={() => {
+                // 날짜나 여행 ID를 바꾸지 않고 전체 실제 비용 허브를 연다.
+                return router.push(`/trips/${id}?section=expenses`);
+              }}
+            />
+          </View>
+        )}
+        {query.data && !query.isError && (
           <Action
             label={
               query.data.myRole === 'owner' &&
@@ -311,13 +340,6 @@ function DiaryView({
             }}
           />
         )}
-        <Action
-          label="나의 발자국으로 돌아가기"
-          onPress={() => {
-            // 완료 여행 목록으로 돌아간다.
-            return router.replace('/(tabs)/footprints');
-          }}
-        />
       </ScrollView>
     </SafeAreaView>
   );

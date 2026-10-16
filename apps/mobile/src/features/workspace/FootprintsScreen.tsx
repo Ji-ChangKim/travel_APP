@@ -1,4 +1,5 @@
 import Text from '@/components/AppText';
+import ScreenHeader from '@/components/ScreenHeader';
 import { travelDateRange } from './travelDateRange';
 import TripAccessFeedback from './TripAccessFeedback';
 import HaruState from '@/components/HaruState';
@@ -38,8 +39,8 @@ export default function FootprintsScreen() {
   // 항공편부터 일정·영수증·사진으로 이어지는 여행 기록을 표시한다.
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={styles.screen}>
+      <ScreenHeader title="나의 발자국" />
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.header}>나의 발자국</Text>
         <Text style={styles.subtitle}>
           함께 걸은 길과 사진, 여행의 순간을 다시 펼쳐보세요.
         </Text>
@@ -56,6 +57,20 @@ export default function FootprintsScreen() {
           />
         ) : (
           <>
+            <Action
+              label="다녀온 여행 기록하기"
+              variant="primary"
+              onPress={() => {
+                // 별도 복제 없이 기존 생성 계약으로 지난 여행 기록을 시작한다.
+                return router.push('/new-trip?mode=record');
+              }}
+            />
+            {user?.authProvider === 'guest' && (
+              <Text style={styles.subtitle}>
+                이 여행 기록은 이 기기에 보관돼요. 앱을 삭제하거나 기기 데이터를
+                지우면 기록이 사라질 수 있어요.
+              </Text>
+            )}
             <Action
               label="내 여행 계획 보기"
               onPress={() => {

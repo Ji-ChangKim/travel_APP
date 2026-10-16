@@ -184,7 +184,8 @@ function resultCode(code: string): void {
   // 일일·초당 한도 초과를 인증 실패나 정상 빈 목록과 구분한다.
   return ['00', '0'].includes(code)
     ? undefined
-    : rejectRequest(
+    : (logKacFailure('gateway', /^\d{1,2}$/.test(code) ? code : 'unknown'),
+      rejectRequest(
         [
           '22',
           '23',
@@ -193,18 +194,58 @@ function resultCode(code: string): void {
         ].includes(code)
           ? 'FLIGHT_RATE_LIMITED'
           : 'FLIGHT_UNAVAILABLE',
-      );
+      ));
+}
+
+// 공급자 키·요청 주소·응답 원문 없이 실패 단계만 기록한다.
+function logKacFailure(stage: string, code: string): void {
+  // 고정 단계와 제한된 상태 코드만 운영 로그에 남긴다.
+  return console.warn(
+    JSON.stringify({ event: 'flight.kac.failed', stage, code }),
+  );
+}
+
+// 자유 텍스트를 복사하지 않고 전송 실패의 알려진 유형만 분류한다.
+function kacTransportFailure(error: unknown): string {
+  // 인증키가 포함될 수 있는 URL·message·stack은 로그에 남기지 않는다.
+  return error instanceof Error
+    ? error.name === 'URIError'
+      ? 'key-encoding'
+      : ['TimeoutError', 'AbortError'].includes(error.name)
+        ? 'timeout'
+        : /redirect/i.test(error.message)
+          ? 'redirect'
+          : /SSL|TLS|certificate/i.test(error.message)
+            ? 'tls'
+            : /DNS|resolve|address/i.test(error.message)
+              ? 'dns'
+              : /Illegal invocation/i.test(error.message)
+                ? 'invocation'
+                : /fetch|network|connection/i.test(error.message)
+                  ? 'network'
+                  : error instanceof SyntaxError
+                    ? 'invalid-json'
+                    : error instanceof z.ZodError
+                      ? 'invalid-response'
+                      : 'request'
+    : 'non-error';
 }
 
 // JSON 요청이어도 XML로 반환되는 게이트웨이 인증 오류를 처리한다.
 function decodePage(text: string, page: number): Page {
   // XML 본문을 사용자에게 전달하지 않고 한도 오류만 별도로 구분한다.
   return text.trimStart().startsWith('<')
-    ? rejectRequest(
+    ? (logKacFailure(
+        'xml-response',
+        text.match(
+          /<(?:returnReasonCode|resultCode)>\s*(\d{1,2})\s*<\//,
+        )?.[1] || 'unexpected-format',
+      ),
+      rejectRequest(
         /<(?:returnReasonCode|resultCode)>\s*(?:22|23)\s*<\//.test(text)
           ? 'FLIGHT_RATE_LIMITED'
           : 'FLIGHT_UNAVAILABLE',
-      )
+      ))
     : jsonPage(JSON.parse(text), page);
 }
 
@@ -243,15 +284,18 @@ function readPage(
   return fetcher(requestUrl(key, query, page), {
     headers: { Accept: 'application/json' },
     signal,
-    redirect: 'error',
+    redirect: 'manual',
   }).then((response) => {
     // HTTP 한도 초과도 공공데이터 한도 오류와 동일하게 처리한다.
-    return response.status === 429
-      ? rejectRequest('FLIGHT_RATE_LIMITED')
-      : readBounded(response, 262144).then((bytes) => {
-          // 256KiB 이내의 JSON 또는 인증 오류만 해석한다.
-          return decodePage(new TextDecoder().decode(bytes), page);
-        });
+    return (
+      !response.ok && logKacFailure('http', String(response.status)),
+      response.status === 429
+        ? rejectRequest('FLIGHT_RATE_LIMITED')
+        : readBounded(response, 262144).then((bytes) => {
+            // 256KiB 이내의 JSON 또는 인증 오류만 해석한다.
+            return decodePage(new TextDecoder().decode(bytes), page);
+          })
+    );
   });
 }
 
@@ -392,10 +436,16 @@ export function lookupKacFlights(
     })
     .catch((error: unknown) => {
       // 과도한 본문·잘못된 키·형식 오류도 가짜 성공으로 변환하지 않는다.
-      return rejectRequest(
-        error instanceof ApiError && error.code === 'FLIGHT_RATE_LIMITED'
-          ? error.code
-          : 'FLIGHT_UNAVAILABLE',
+      return (
+        logKacFailure(
+          kacTransportFailure(error),
+          error instanceof ApiError ? error.code : 'unavailable',
+        ),
+        rejectRequest(
+          error instanceof ApiError && error.code === 'FLIGHT_RATE_LIMITED'
+            ? error.code
+            : 'FLIGHT_UNAVAILABLE',
+        )
       );
     });
 }

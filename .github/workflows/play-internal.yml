@@ -37,6 +37,7 @@ jobs:
       CI: 'true'
       EXPO_NO_TELEMETRY: '1'
       EXPO_NO_DOTENV: '1'
+      GOOGLE_MAPS_ANDROID_API_KEY: ${{ secrets.GOOGLE_MAPS_ANDROID_API_KEY }}
     steps:
       - name: 저장소 체크아웃
         uses: actions/checkout@v5
@@ -49,6 +50,9 @@ jobs:
 
       - name: 의존성 설치
         run: npm ci
+
+      - name: Android 지도 키 확인
+        run: node scripts/check-android-maps.mjs
 
       - name: 코드 품질 및 릴리스 검사
         run: npm run check && npm run test:auth && npm run test:release

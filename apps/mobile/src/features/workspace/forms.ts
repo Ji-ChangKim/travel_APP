@@ -20,6 +20,7 @@ export type FormKind =
   | 'receipt'
   | 'publish'
   | 'metadata'
+  | 'dayPlan'
   | 'period';
 export interface PlanForm {
   kind: FormKind;
@@ -27,13 +28,14 @@ export interface PlanForm {
   values: Record<string, string>;
 }
 // 생성 페이지마다 별도의 멱등 키와 빈 여행 초안을 준비한다.
-export function newTripForm(destination?: string): PlanForm {
+export function newTripForm(destination?: string, recording = false): PlanForm {
   // 날짜와 목적지는 사용자가 선택하며 기존 항공편 등록 기본값을 유지한다.
   return {
     kind: 'trip',
     id: Crypto.randomUUID(),
     values: {
       title: '',
+      recording: String(recording),
       country: homeDestination(destination)?.country || '',
       city: homeDestination(destination)?.city || '',
       startDate: '',
@@ -73,6 +75,14 @@ export function scheduleForm(
       sortOrder: String(item?.sortOrder || snapshot.itinerary.length + 1),
       memo: item?.memo || '',
       address: item?.address || '',
+      ...(item?.planContent
+        ? {
+            planDescription: item.planContent.description,
+            planChoiceGroup: item.planContent.choiceGroup || '',
+            planChoiceLabel: item.planContent.choiceLabel || '',
+            planChoiceKind: item.planContent.choiceKind || 'choice',
+          }
+        : {}),
       googlePlaceId: item?.googlePlaceId || '',
       mapLocation: item?.location ? JSON.stringify(item.location) : '',
       durationMinutes: item?.durationMinutes
@@ -135,123 +145,162 @@ function requireReceiptChoices(): never {
 // 각 화면 폼을 정확한 서버 명령으로 매핑한다.
 function commandValue(form: PlanForm, snapshot: WorkspaceSnapshot) {
   // 영수증·공개 게시를 일정 변경과 별도 명령으로 처리한다.
-  return form.kind === 'schedule'
+  return form.kind === 'dayPlan'
     ? {
-        operation: 'schedule.save',
+        operation: 'day.plan',
         input: {
-          ...scheduleValues(form.values),
-          title:
-            form.values.title?.trim() ||
-            (form.values.type === 'TRANSPORT' &&
-            form.values.flightEnabled === 'true'
-              ? `${form.values.flightNumber} ${form.values.flightDeparture} → ${form.values.flightArrival}`
-              : ''),
-          ...(form.values.flightEnabled === undefined
-            ? {}
-            : {
-                flight:
-                  form.values.type === 'TRANSPORT' &&
-                  form.values.flightEnabled === 'true'
-                    ? flightFromValues(form.values)
-                    : null,
-              }),
-          location: form.values.mapLocation
-            ? JSON.parse(form.values.mapLocation)
-            : null,
-          id: form.id,
-          sortOrder: Number(form.values.sortOrder),
-          durationMinutes: form.values.durationMinutes
-            ? Number(form.values.durationMinutes)
-            : null,
-          ...(form.values.afterScheduleId === undefined
-            ? {}
-            : {
-                afterScheduleId:
-                  form.values.afterScheduleId === 'last'
-                    ? snapshot.itinerary
-                        .filter((item) => {
-                          // 새 일정은 선택한 날짜의 마지막 뒤에 둔다.
-                          return (
-                            item.dayId === form.values.dayId &&
-                            item.id !== form.id
-                          );
-                        })
-                        .sort((a, b) => {
-                          // 시간 입력과 관계없이 저장된 방문 순서를 따른다.
-                          return a.sortOrder - b.sortOrder;
-                        })
-                        .at(-1)?.id || null
-                    : form.values.afterScheduleId || null,
-              }),
-          estimatedCost: form.values.estimatedAmount
-            ? {
-                amount: form.values.estimatedAmount,
-                currency: form.values.estimatedCurrency,
-              }
-            : null,
+          dayId: form.id,
+          planTitle: form.values.planTitle || '',
+          planConcept: form.values.planConcept || '',
         },
       }
-    : form.kind === 'expense'
+    : form.kind === 'schedule'
       ? {
-          operation: 'expense.save',
+          operation: 'schedule.save',
           input: {
-            id: form.id,
-            title: form.values.title,
-            amount: form.values.amount,
-            currency: form.values.currency,
-            category: form.values.category,
-            isActual: form.values.isActual === 'true',
-            ...(form.values.scheduleId
+            ...scheduleValues(form.values),
+            ...(form.values.planDescription !== undefined
               ? {
-                  scheduleId: form.values.scheduleId,
-                  dayId: snapshot.itinerary.find((item) => {
-                    // 선택 일정의 실제 DAY로 비용 부모를 연결한다.
-                    return item.id === form.values.scheduleId;
-                  })?.dayId,
+                  planContent:
+                    form.values.planDescription || form.values.planChoiceGroup
+                      ? {
+                          description: form.values.planDescription || '',
+                          ...(form.values.planChoiceGroup
+                            ? { choiceGroup: form.values.planChoiceGroup }
+                            : {}),
+                          ...(form.values.planChoiceLabel
+                            ? { choiceLabel: form.values.planChoiceLabel }
+                            : {}),
+                          ...(form.values.planChoiceGroup
+                            ? {
+                                choiceKind:
+                                  form.values.planChoiceKind === 'backup'
+                                    ? 'backup'
+                                    : 'choice',
+                              }
+                            : {}),
+                        }
+                      : null,
                 }
               : {}),
+            title:
+              form.values.title?.trim() ||
+              (form.values.type === 'TRANSPORT' &&
+              form.values.flightEnabled === 'true'
+                ? `${form.values.flightNumber} ${form.values.flightDeparture} → ${form.values.flightArrival}`
+                : ''),
+            ...(form.values.flightEnabled === undefined
+              ? {}
+              : {
+                  flight:
+                    form.values.type === 'TRANSPORT' &&
+                    form.values.flightEnabled === 'true'
+                      ? flightFromValues(form.values)
+                      : null,
+                }),
+            location: form.values.mapLocation
+              ? JSON.parse(form.values.mapLocation)
+              : null,
+            id: form.id,
+            sortOrder: Number(form.values.sortOrder),
+            durationMinutes: form.values.durationMinutes
+              ? Number(form.values.durationMinutes)
+              : null,
+            ...(form.values.afterScheduleId === undefined
+              ? {}
+              : {
+                  afterScheduleId:
+                    form.values.afterScheduleId === 'last'
+                      ? snapshot.itinerary
+                          .filter((item) => {
+                            // 새 일정은 선택한 날짜의 마지막 뒤에 둔다.
+                            return (
+                              item.dayId === form.values.dayId &&
+                              item.id !== form.id
+                            );
+                          })
+                          .sort((a, b) => {
+                            // 시간 입력과 관계없이 저장된 방문 순서를 따른다.
+                            return a.sortOrder - b.sortOrder;
+                          })
+                          .at(-1)?.id || null
+                      : form.values.afterScheduleId || null,
+                }),
+            estimatedCost: form.values.estimatedAmount
+              ? {
+                  amount: form.values.estimatedAmount,
+                  currency: form.values.estimatedCurrency,
+                }
+              : null,
           },
         }
-      : form.kind === 'receipt'
+      : form.kind === 'expense'
         ? {
-            operation: 'receipt.confirm',
+            operation: 'expense.save',
             input: {
               id: form.id,
-              dayId: form.values.dayId,
-              mediaId: form.values.mediaId,
-              keepPhoto: form.values.keepPhoto === 'true',
-              ...(form.values.scheduleId
-                ? { scheduleId: form.values.scheduleId }
-                : {}),
-              merchant: form.values.merchant,
-              transactionDate: form.values.transactionDate,
+              title: form.values.title,
               amount: form.values.amount,
               currency: form.values.currency,
-              details: form.values.details,
-              address: form.values.address || '',
-              transactionTime: form.values.transactionTime || '',
-              category: form.values.category || 'etc',
-              items: receiptItems(form.values.items),
+              category: form.values.category,
+              isActual: form.values.isActual === 'true',
+              ...(form.values.scheduleId
+                ? {
+                    scheduleId: form.values.scheduleId,
+                    dayId: snapshot.itinerary.find((item) => {
+                      // 선택 일정의 실제 DAY로 비용 부모를 연결한다.
+                      return item.id === form.values.scheduleId;
+                    })?.dayId,
+                  }
+                : {}),
             },
           }
-        : form.kind === 'metadata'
-          ? { operation: 'trip.update', input: form.values }
-          : form.kind === 'period'
-            ? { operation: 'trip.period', input: form.values }
-            : {
-                operation: 'community.publish',
-                input: {
-                  title: form.values.title,
-                  body: form.values.body,
-                  scheduleIds: (form.values.scheduleIds || '')
-                    .split(',')
-                    .filter(Boolean),
-                  photoIds: (form.values.photoIds || '')
-                    .split(',')
-                    .filter(Boolean),
-                  includeCosts: form.values.includeCosts === 'true',
-                },
-              };
+        : form.kind === 'receipt'
+          ? {
+              operation:
+                form.values.receiptOperation === 'update'
+                  ? 'receipt.update'
+                  : 'receipt.confirm',
+              input: {
+                id: form.id,
+                dayId: form.values.dayId,
+                mediaId: form.values.mediaId,
+                keepPhoto: form.values.keepPhoto === 'true',
+                ...(form.values.scheduleId
+                  ? { scheduleId: form.values.scheduleId }
+                  : {}),
+                merchant: form.values.merchant,
+                transactionDate: form.values.transactionDate,
+                amount: form.values.amount,
+                currency: form.values.currency,
+                details: form.values.details,
+                address: form.values.address || '',
+                transactionTime: form.values.transactionTime || '',
+                category: form.values.category || 'etc',
+                items: receiptItems(form.values.items),
+              },
+            }
+          : form.kind === 'metadata'
+            ? { operation: 'trip.update', input: form.values }
+            : form.kind === 'period'
+              ? { operation: 'trip.period', input: form.values }
+              : {
+                  operation: 'community.publish',
+                  input: {
+                    ...(form.values.kind === 'plan'
+                      ? { kind: 'plan' as const }
+                      : {}),
+                    title: form.values.title,
+                    body: form.values.body,
+                    scheduleIds: (form.values.scheduleIds || '')
+                      .split(',')
+                      .filter(Boolean),
+                    photoIds: (form.values.photoIds || '')
+                      .split(',')
+                      .filter(Boolean),
+                    includeCosts: form.values.includeCosts === 'true',
+                  },
+                };
 }
 
 // 화면 전용 공유 입력은 서버 일정 저장 계약에서 제외한다.
@@ -269,6 +318,7 @@ function scheduleValues(
         key !== 'durationMinutes' &&
         key !== 'afterScheduleId' &&
         !key.startsWith('estimated') &&
+        !key.startsWith('plan') &&
         !key.startsWith('flight')
       );
     }),

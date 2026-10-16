@@ -8,9 +8,10 @@ export interface VerifiedSession {
 
 // Bindings는 Wrangler가 생성한 Env를 사용하고 요청 상태만 별도로 선언한다.
 export interface ApiEnvironment {
-  Bindings: Omit<Env, 'FLIGHT_LOOKUP_LIMITER'> & {
+  Bindings: Omit<Env, 'FLIGHT_LOOKUP_LIMITER' | 'PLACES_PHOTO_LIMITER'> & {
     FLIGHT_LOOKUP_LIMITER: RateLimit;
     GOOGLE_PLACES_API_KEY?: string;
+    PLACES_PHOTO_LIMITER: RateLimit;
     AERODATABOX_RAPIDAPI_KEY?: string;
     KAC_FLIGHT_SERVICE_KEY?: string;
   };

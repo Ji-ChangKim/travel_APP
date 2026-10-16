@@ -40,6 +40,7 @@ const config: ExpoConfig = {
   // 파일 기반 화면 전환과 앱 시작 시 표시할 기본 이미지를 등록한다.
   plugins: [
     './apps/mobile/plugins/withAppVersion.cjs',
+    './apps/mobile/plugins/withAndroidReleaseOptimization.cjs',
     ['expo-navigation-bar', { hidden: true }],
     '@react-native-community/datetimepicker',
     // 루트에서 EAS를 실행해도 예전 src/app 대신 현재 모바일 앱을 빌드한다.

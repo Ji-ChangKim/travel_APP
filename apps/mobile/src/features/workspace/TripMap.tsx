@@ -38,13 +38,11 @@ export default function TripMap({
         번호는 방문 순서예요. 연결선은 장소 사이를 잇는 선으로, 실제 이동 경로와
         다를 수 있어요.
       </Text>
-      {stops.length > 0 && (
-        <TripMapCanvas
-          stops={stops}
-          selectedId={selectedId}
-          onSelect={setSelectedId}
-        />
-      )}
+      <TripMapCanvas
+        stops={stops}
+        selectedId={selectedId}
+        onSelect={setSelectedId}
+      />
       {!stops.length ? (
         <TripDetailEmpty
           title="아직 이날의 일정이 없어요"

@@ -44,7 +44,9 @@ function existingFile(candidate) {
       ? `${candidate}.html`
       : /[\\/](?:trips|diary)[\\/][0-9a-f-]{36}$/.test(candidate)
         ? path.join(path.dirname(candidate), '[id].html')
-        : null;
+        : /[\\/]community[\\/][0-9a-f-]{36}$/.test(candidate)
+          ? path.join(path.dirname(candidate), '[postId].html')
+          : null;
 }
 
 // 정적 응답 또는 찾을 수 없음 상태를 반환한다.

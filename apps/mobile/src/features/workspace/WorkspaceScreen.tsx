@@ -14,6 +14,7 @@ import { colors } from '@/constants/theme';
 import TripAccessFeedback from './TripAccessFeedback';
 import { authReturn } from '../auth/authReturn';
 import ReceiptDetails from './ReceiptDetails';
+import PublishReadiness from './PublishReadiness';
 import WorkspaceConfirmDialog from './WorkspaceConfirmDialog';
 import {
   workspaceConfirmation,
@@ -29,6 +30,7 @@ import {
   receiptForm,
   receiptDateValues,
   receiptConfirmationValues,
+  savedReceiptForm,
 } from './receiptFlow';
 import ReceiptCapture from './ReceiptCapture';
 import HaruState from '@/components/HaruState';
@@ -74,6 +76,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 import TripIcon from '@/components/icons/TripIcon';
 import ScreenHeader from '@/components/ScreenHeader';
+import ScreenTitle from '@/components/ScreenTitle';
 import { TripSectionNavigation, TripMoreMenu } from './TripSectionNavigation';
 import TripTimeline, { TripDayStrip } from './TripTimeline';
 import { tripHubStyles as hub } from './tripHubStyles';
@@ -161,10 +164,11 @@ export default function WorkspaceScreen({
     // 게스트와 로그인 계정의 작성 상태를 분리한다.
     return state.currentUser?.id || 'public';
   });
-  const { id, importPlace, destination } = useLocalSearchParams<{
+  const { id, importPlace, destination, mode } = useLocalSearchParams<{
     id?: string;
     importPlace?: string;
     destination?: string;
+    mode?: string;
   }>();
   const [fontsLoaded, fontError] = useFonts({
     TripPrintRegular: require('../../../assets/fonts/pretendard-regular.otf'),
@@ -175,7 +179,7 @@ export default function WorkspaceScreen({
     <HaruState kind="loading" title="여행을 불러오는 중입니다." compact />
   ) : (
     <WorkspaceContent
-      key={`${userId}:${creating ? `new:${destination || ''}` : id || 'list'}:${importPlace || ''}`}
+      key={`${userId}:${creating ? `new:${destination || ''}:${mode || ''}` : id || 'list'}:${importPlace || ''}`}
       creating={creating}
       importing={importPlace === '1'}
     />
@@ -195,16 +199,17 @@ function WorkspaceContent({
     // 게스트는 서버 작성 권한을 갖지 않는다.
     return state.currentUser;
   });
-  const { id, section, destination } = useLocalSearchParams<{
+  const { id, section, destination, mode } = useLocalSearchParams<{
     id?: string;
     section?: string;
     destination?: string;
+    mode?: string;
   }>();
   const router = useRouter();
   const cache = useQueryClient();
   const userId = user?.id || '';
   const [form, setForm] = useState<PlanForm | null>(
-    creating ? () => newTripForm(destination) : null,
+    creating ? () => newTripForm(destination, mode === 'record') : null,
   );
   const [busy, setBusy] = useState(false);
   const [scanning, setScanning] = useState(false);
@@ -232,7 +237,13 @@ function WorkspaceContent({
   const [checklist, setChecklist] = useState('');
   // 여행 계획과 현장 기록을 작업별 영역으로 나눈다.
   const [activeSection, setActiveSection] = useState(
-    section === 'share' ? 'share' : section === 'map' ? 'map' : 'itinerary',
+    section === 'share'
+      ? 'share'
+      : section === 'map'
+        ? 'map'
+        : section === 'expenses'
+          ? 'expenses'
+          : 'itinerary',
   );
   const [selectedDay, setSelectedDay] = useState('');
   const [courseDay, setCourseDay] = useState('');
@@ -885,7 +896,6 @@ function WorkspaceContent({
       <ModalBackground>
         {id && (
           <ScreenHeader
-            title="여행 상세"
             backLabel="내 여행 목록"
             onBack={() => {
               /* 작성 중인 내용과 대기 요청을 확인한 뒤 목록으로 돌아간다. */ return requestScheduleExit(
@@ -996,7 +1006,9 @@ function WorkspaceContent({
                   )}
                   <View style={hub.tripHeader}>
                     <View style={hub.titleRow}>
-                      <Text style={hub.tripTitle}>{snapshot.trip.title}</Text>
+                      <ScreenTitle style={{ flex: 1 }}>
+                        {snapshot.trip.title}
+                      </ScreenTitle>
                     </View>
                     <Text style={hub.status}>
                       {tripPresentation(snapshot.trip).label} ·{' '}
@@ -1119,6 +1131,17 @@ function WorkspaceContent({
                             userId={userId}
                             day={day}
                             canCreate={writable}
+                            onPlan={() => {
+                              // 같은 DAY ID의 제목과 컨셉만 수정한다.
+                              return edit({
+                                kind: 'dayPlan',
+                                id: day.id,
+                                values: {
+                                  planTitle: day.planTitle || '',
+                                  planConcept: day.planConcept || '',
+                                },
+                              });
+                            }}
                             onAdd={() => {
                               // 현재 날짜의 작성 화면에서 지도 검색과 링크 입력을 바로 펼친다.
                               return edit({
@@ -1336,6 +1359,16 @@ function WorkspaceContent({
                             </Text>
                             <ReceiptDetails receipt={item} />
                             <Action
+                              label="영수증 기록 수정"
+                              disabled={
+                                !writable || busy || scanning || hasPending
+                              }
+                              onPress={() => {
+                                // 원본이 없어도 저장된 결제 정보와 동일 지출을 수정한다.
+                                return edit(savedReceiptForm(snapshot, item));
+                              }}
+                            />
+                            <Action
                               label="영수증 기록·지출 삭제"
                               disabled={
                                 !writable || busy || scanning || hasPending
@@ -1395,6 +1428,18 @@ function WorkspaceContent({
                                   {item.currency}
                                 </Text>
                                 <ReceiptDetails receipt={item} />
+                                <Action
+                                  label="영수증 기록 수정"
+                                  disabled={
+                                    !writable || busy || scanning || hasPending
+                                  }
+                                  onPress={() => {
+                                    // 같은 원본의 수정은 새 영수증이나 지출을 생성하지 않는다.
+                                    return edit(
+                                      savedReceiptForm(snapshot, item),
+                                    );
+                                  }}
+                                />
                                 <Action
                                   variant="danger"
                                   label="영수증 기록·지출 삭제"
@@ -1623,8 +1668,51 @@ function WorkspaceContent({
                         }}
                       />
                       <Text>
-                        여행을 종료한 뒤 공개할 일정·사진·금액을 확인해 주세요.
+                        공개할 일정·사진·금액을 직접 골라 주세요. 게시하지
+                        않아도 개인 기록은 남아요.
                       </Text>
+                      <Action
+                        label="여행계획 공유하기"
+                        disabled={
+                          snapshot.trip.status === 'ARCHIVED' ||
+                          busy ||
+                          scanning ||
+                          hasPending
+                        }
+                        onPress={() => {
+                          // 다녀온 기록으로 바꾸지 않고 계획 자체의 공개 내용을 선택한다.
+                          return edit({
+                            kind: 'publish',
+                            id: Crypto.randomUUID(),
+                            values: {
+                              kind: 'plan',
+                              title: snapshot.trip.title,
+                              body: '',
+                              scheduleIds: '',
+                              photoIds: '',
+                              includeCosts: 'false',
+                            },
+                          });
+                        }}
+                      />
+                      {snapshot.trip.status !== 'COMPLETED' &&
+                        snapshot.trip.status !== 'ARCHIVED' && (
+                          <PublishReadiness
+                            disabled={busy || scanning || hasPending}
+                            onComplete={() => {
+                              // 소유자의 확인 뒤 원본 정보는 유지하고 정리 완료만 저장한다.
+                              return command({
+                                operation: 'trip.update',
+                                input: {
+                                  title: snapshot.trip.title,
+                                  country: snapshot.trip.country,
+                                  city: snapshot.trip.city,
+                                  status: 'COMPLETED',
+                                },
+                              });
+                            }}
+                          />
+                        )}
                       <Action
                         label={
                           snapshot.postId

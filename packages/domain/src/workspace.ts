@@ -7,6 +7,19 @@ import type {
 } from './index';
 
 // 앱과 향후 웹이 같은 서버 스냅샷 계약을 사용한다.
+export interface SchedulePlanContent {
+  description: string;
+  choiceGroup?: string;
+  choiceLabel?: string;
+  choiceKind?: 'choice' | 'backup';
+}
+export interface WorkspaceDay {
+  id: string;
+  dayNumber: number;
+  tripDate: string;
+  planTitle?: string;
+  planConcept?: string;
+}
 export interface WorkspaceSchedule {
   id: string;
   dayId: string;
@@ -23,6 +36,8 @@ export interface WorkspaceSchedule {
   flight?: FlightDetails | null;
   // 사용자가 정한 방문 체류시간이며 생략은 이전 기록, null은 미정이다.
   durationMinutes?: number | null;
+  // 사용자가 공유용으로 따로 입력한 계획이며 개인 메모와 분리한다.
+  planContent?: SchedulePlanContent | null;
 }
 export interface WorkspaceMedia {
   id: string;
@@ -60,7 +75,7 @@ export interface WorkspaceReceipt {
 export interface WorkspaceSnapshot {
   trip: PersistedTrip;
   myRole: MemberRole;
-  days: { id: string; dayNumber: number; tripDate: string }[];
+  days: WorkspaceDay[];
   itinerary: WorkspaceSchedule[];
   expenses: WorkspaceExpense[];
   checklists: { id: string; title: string; isCompleted: boolean }[];
@@ -83,6 +98,7 @@ export interface WorkspaceSnapshot {
   postId: string | null;
 }
 export interface CommunityPost {
+  kind?: 'plan' | 'record';
   id: string;
   authorId: string;
   author: string;
@@ -91,11 +107,23 @@ export interface CommunityPost {
   publishedAt: string;
   photoPaths: string[];
   snapshot: {
+    days?: {
+      dayNumber: number;
+      date: string;
+      planTitle?: string;
+      planConcept?: string;
+    }[];
     country: string;
     city: string;
     startDate: string;
     endDate: string;
     itinerary: {
+      id?: string;
+      dayNumber?: number;
+      sortOrder?: number;
+      type?: ScheduleType;
+      googlePlaceId?: string;
+      planContent?: SchedulePlanContent | null;
       title: string;
       date: string;
       timeSlot: string | null;

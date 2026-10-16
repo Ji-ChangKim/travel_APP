@@ -220,6 +220,8 @@ export type {
 } from './foundation';
 export type {
   WorkspaceSchedule,
+  WorkspaceDay,
+  SchedulePlanContent,
   WorkspaceMedia,
   WorkspaceExpense,
   WorkspaceReceipt,

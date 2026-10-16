@@ -12,6 +12,7 @@ export const scheduleLabels: Record<WorkspaceSchedule['type'], string> = {
 // 실제 지출을 통화별 정확한 소수 문자열로 합산한다.
 export function diaryCosts(
   expenses: WorkspaceExpense[],
+  actual = true,
 ): { currency: string; amount: string }[] {
   // 환율 정보가 없으므로 서로 다른 통화를 합치지 않는다.
   return (['KRW', 'JPY', 'USD'] as const)
@@ -19,7 +20,7 @@ export function diaryCosts(
       // 실제 결제한 통화만 요약에 표시한다.
       return expenses.some((item) => {
         // 예상 비용을 실제 여행 비용에 포함하지 않는다.
-        return item.isActual && item.currency === currency;
+        return item.isActual === actual && item.currency === currency;
       });
     })
     .map((currency) => {
@@ -30,7 +31,7 @@ export function diaryCosts(
           expenses
             .filter((item) => {
               // 현재 통화의 실제 금액만 합산한다.
-              return item.isActual && item.currency === currency;
+              return item.isActual === actual && item.currency === currency;
             })
             .reduce((sum, item) => {
               // 지원 통화의 최대 두 자리 소수를 정수로 변환한다.

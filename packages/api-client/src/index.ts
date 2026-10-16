@@ -1,4 +1,4 @@
-import type { Place } from '@wherego/domain';
+import { requestFoundation, type FoundationClientOptions } from './foundation';
 export * from './foundation';
 export * from './workspace';
 
@@ -7,15 +7,17 @@ const API_BASE_URL =
   process.env.EXPO_PUBLIC_API_URL || 'https://api.wherego.app';
 
 // 외부 장소 검색 Hono API를 호출한다.
-export async function searchPlaces(query: string): Promise<Place[]> {
-  const response = await fetch(
-    `${API_BASE_URL}/api/places/search?q=${encodeURIComponent(query)}`,
+export function searchPlaces(
+  options: FoundationClientOptions,
+  query: string,
+  signal?: AbortSignal,
+) {
+  // 실제 세션으로 현재 검색 경로를 호출하고 취소 신호를 전달한다.
+  return requestFoundation(
+    options,
+    `/places/search?q=${encodeURIComponent(query)}`,
+    { signal },
   );
-  if (!response.ok) {
-    throw new Error('장소 검색 중 오류가 발생했습니다.');
-  }
-  const data = (await response.json()) as { results: Place[] };
-  return data.results;
 }
 
 // 여행 공유 링크 발급 Hono API를 호출한다.

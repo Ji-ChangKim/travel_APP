@@ -13,6 +13,13 @@ import { DateField } from './TravelInputs';
 import { airlineByCode } from './airlineDirectory';
 import { serverOptions } from './service';
 import FlightRoutePreview from './FlightRoutePreview';
+import FlightTicketManualInput from './FlightTicketManualInput';
+import {
+  manualTicketIssue,
+  manualTripFlight,
+  ticketManualValues,
+  type FlightTicketDraft,
+} from './flightTicketDraft';
 import type { FlightLookupCandidate } from './flightLookupModel';
 import {
   selectedTripFlight,
@@ -24,46 +31,75 @@ type Props = {
   userId: string;
   slot: FlightSlot;
   initial?: TripFlight;
+  draft?: FlightTicketDraft;
   startDate: string;
   endDate: string;
   locked: boolean;
-  onBack: () => void;
+  onBack: (draft: FlightTicketDraft) => void;
   onDone: (flight: TripFlight) => void;
 };
 
 // 항공사 선택과 번호 입력을 거쳐 조회한 구간만 목록에 확정한다.
 export default function FlightTicketEditor(props: Props) {
   // 완료 전 수정값은 부모의 항공편 목록을 바꾸지 않는다.
-  const [code, setCode] = useState(props.initial?.number.slice(0, 2) || '');
-  const [digits, setDigits] = useState(props.initial?.number.slice(2) || '');
+  const [code, setCode] = useState(
+    props.draft?.code ?? props.initial?.number.slice(0, 2) ?? '',
+  );
+  const [digits, setDigits] = useState(
+    props.draft?.digits ?? props.initial?.number.slice(2) ?? '',
+  );
   const [airline, setAirline] = useState(
-    props.initial?.number.slice(0, 2) || '',
+    props.draft?.airline ?? props.initial?.number.slice(0, 2) ?? '',
   );
   const [date, setDate] = useState(
-    props.initial?.date ||
+    props.draft?.date ||
+      props.initial?.date ||
       (props.slot.role === 'inbound' ? props.endDate : props.startDate),
   );
   const [selected, setSelected] = useState<TripFlight | null>(
-    props.initial || null,
+    props.draft ? props.draft.selected : props.initial || null,
+  );
+  const [manual, setManual] = useState(props.draft?.manual || false);
+  const [values, setValues] = useState(
+    props.draft?.values || ticketManualValues(props.initial),
   );
   const match = airlineByCode(code);
+  const issue = manualTicketIssue(values, date, props.startDate, props.endDate);
+  function finish(): void {
+    // 직접 입력도 공통 계약을 통과해야 목록에 반영한다.
+    return manual
+      ? issue
+        ? undefined
+        : props.onDone(manualTripFlight(values, date, props.slot.role))
+      : selected
+        ? props.onDone(selected)
+        : undefined;
+  }
   return (
     <SafeAreaView style={styles.modal}>
       <ScreenHeader
         title="항공권 입력"
         backLabel="항공편 목록으로 돌아가기"
-        onBack={props.onBack}
+        onBack={() => {
+          // 확정하지 않은 입력은 해당 슬롯의 초안으로만 보존한다.
+          return props.onBack({
+            code,
+            digits,
+            airline,
+            date,
+            selected,
+            manual,
+            values,
+          });
+        }}
         disabled={props.locked}
         right={
           <Action
             label="완료"
+            size="header"
             variant="quiet"
-            disabled={!selected || props.locked}
-            onPress={() => {
-              /* 선택한 구간만 기존 슬롯에 확정한다. */ return selected
-                ? props.onDone(selected)
-                : undefined;
-            }}
+            disabled={props.locked || (manual ? Boolean(issue) : !selected)}
+            onPress={finish}
           />
         }
       />
@@ -84,76 +120,126 @@ export default function FlightTicketEditor(props: Props) {
             return void (setDate(value), setSelected(null));
           }}
         />
-        <View style={styles.card}>
-          <Field
-            label="항공사 코드"
-            placeholder="예: KE"
-            value={code}
-            disabled={props.locked}
-            onChange={(value) => {
-              // 항공사 코드 변경 후에는 항공사와 구간을 다시 선택한다.
-              return void (setCode(
-                value
+        {!manual && (
+          <View style={styles.card}>
+            <Field
+              label="항공사 코드"
+              placeholder="예: KE"
+              value={code}
+              disabled={props.locked}
+              onChange={(value) => {
+                // 항공사 코드 변경 후에는 항공사와 구간을 다시 선택한다.
+                const next = value
                   .replace(/[^A-Z0-9]/gi, '')
                   .toUpperCase()
-                  .slice(0, 2),
-              ),
-              setAirline(''),
-              setSelected(null));
-            }}
-          />
-          {match ? (
-            <Action
-              label={`${match.code} · ${match.name}`}
-              selected={airline === match.code}
-              onPress={() => {
-                // 확인한 항공사를 선택한 뒤 운항 번호를 입력한다.
-                return setAirline(match.code);
+                  .slice(0, 2);
+                return void (setCode(next),
+                setValues((previous) => ({
+                  ...previous,
+                  flightNumber: `${next}${digits}`,
+                })),
+                setAirline(''),
+                setSelected(null));
               }}
             />
-          ) : code.length === 2 ? (
-            <Text style={styles.subtitle}>
-              항공사를 찾지 못했어요. 항공권의 두 자리 코드를 확인해 주세요.
-            </Text>
-          ) : null}
-          <Field
-            label="항공편 번호"
-            inputMode="numeric"
-            placeholder="예: 901"
-            value={digits}
-            disabled={!airline || props.locked}
-            onChange={(value) => {
-              // 앞의 0과 실제 운항 접미사를 보존하고 이전 구간 선택은 해제한다.
-              return void (setDigits(
-                value
+            {match ? (
+              <Action
+                label={`${match.code} · ${match.name}`}
+                selected={airline === match.code}
+                onPress={() => {
+                  // 확인한 항공사를 선택한 뒤 운항 번호를 입력한다.
+                  return setAirline(match.code);
+                }}
+              />
+            ) : code.length === 2 ? (
+              <Text style={styles.subtitle}>
+                항공사를 찾지 못했어요. 항공권의 두 자리 코드를 확인해 주세요.
+              </Text>
+            ) : null}
+            <Field
+              label="항공편 번호"
+              inputMode="numeric"
+              placeholder="예: 901"
+              value={digits}
+              disabled={!airline || props.locked}
+              onChange={(value) => {
+                // 앞의 0과 실제 운항 접미사를 보존하고 이전 구간 선택은 해제한다.
+                const next = value
                   .toUpperCase()
                   .replace(/[^0-9A-Z]/g, '')
-                  .slice(0, 5),
-              ),
+                  .slice(0, 5);
+                return void (setDigits(next),
+                setValues((previous) => ({
+                  ...previous,
+                  flightNumber: `${code}${next}`,
+                })),
+                setSelected(null));
+              }}
+            />
+            <Text style={styles.subtitle}>
+              항공사를 선택하고 항공권의 번호 3~4자리를 입력해 주세요.
+            </Text>
+          </View>
+        )}
+        {!manual && (
+          <TicketSearch
+            key={`${props.userId}:${airline}:${digits}:${date}`}
+            userId={props.userId}
+            number={`${airline}${digits}`}
+            enabled={Boolean(airline && /^\d{3,4}[A-Z]?$/.test(digits))}
+            date={date}
+            startDate={props.startDate}
+            endDate={props.endDate}
+            locked={props.locked}
+            onSelect={(candidate) => {
+              // 공급자가 반환한 실제 출발일·구간만 선택 상태로 보관한다.
+              return candidate
+                ? void (setSelected(
+                    selectedTripFlight(candidate, props.slot.role),
+                  ),
+                  setValues(
+                    ticketManualValues(
+                      selectedTripFlight(candidate, props.slot.role),
+                    ),
+                  ))
+                : setSelected(null);
+            }}
+          />
+        )}
+        <Action
+          label={manual ? '항공편 조회로 돌아가기' : '항공권 직접 입력'}
+          disabled={props.locked}
+          onPress={() => {
+            // 조회 실패 후에도 이전 수동 입력을 보존하며 방식만 바꾼다.
+            return manual
+              ? setManual(false)
+              : void (setValues((previous) => ({
+                  ...previous,
+                  flightNumber: previous.flightNumber || `${code}${digits}`,
+                })),
+                setManual(true));
+          }}
+        />
+        {manual && (
+          <FlightTicketManualInput
+            values={values}
+            disabled={props.locked}
+            onChange={(key, value) => {
+              // 직접 입력 필드 한 개만 수정한다.
+              return void (setValues((previous) => ({
+                ...previous,
+                [key]: value,
+              })),
               setSelected(null));
             }}
           />
-          <Text style={styles.subtitle}>
-            항공사를 선택하고 항공권의 번호 3~4자리를 입력해 주세요.
+        )}
+        {manual && issue ? (
+          <Text accessibilityRole="alert" style={styles.error}>
+            {issue}
           </Text>
-        </View>
-        <TicketSearch
-          key={`${props.userId}:${airline}:${digits}:${date}`}
-          userId={props.userId}
-          number={`${airline}${digits}`}
-          enabled={Boolean(airline && /^\d{3,4}[A-Z]?$/.test(digits))}
-          date={date}
-          startDate={props.startDate}
-          endDate={props.endDate}
-          locked={props.locked}
-          onSelect={(candidate) => {
-            // 공급자가 반환한 실제 출발일·구간만 선택 상태로 보관한다.
-            return setSelected(
-              candidate ? selectedTripFlight(candidate, props.slot.role) : null,
-            );
-          }}
-        />
-        {selected ? (
+        ) : null}
+        {!manual && selected ? (
           <Text style={styles.label}>
             선택한 항공편 · {selected.number} {selected.departure} →{' '}
             {selected.arrival}

@@ -345,7 +345,7 @@ export function scanServerReceipt(
   // 추출 결과는 사용자 확인 전까지 기록되지 않는다.
   return requestFoundation(options, `/trips/${trip}/receipts/ocr`, {
     method: 'POST',
-    signal: AbortSignal.timeout(55000),
+    signal: AbortSignal.timeout(75000),
     body: JSON.stringify({ mediaId: media }),
   }).then((response) => {
     // 후보 데이터만 해석하며 금액을 자동 확정하지 않는다.

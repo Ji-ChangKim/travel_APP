@@ -7,6 +7,7 @@ import { rejectRequest } from './errors';
 import type { VerifiedSession } from './types';
 import { mediaBucket } from './cloudMedia';
 import { analyzeReceiptImage } from './receiptAnalysis';
+import { logReceiptFailure, ReceiptAnalysisError } from './receiptDiagnostics';
 import {
   cachedReceipt,
   cacheReceipt,
@@ -337,10 +338,10 @@ function recognize(
             // 기존 텍스트 OCR도 확인 전 초안으로만 취급한다.
             return receiptDraftSchema.parse(receiptDraft(text, currency));
           })
-        : Promise.reject(new Error('OCR_UNAVAILABLE'))
-  ).catch(() => {
+        : Promise.reject(new ReceiptAnalysisError('configuration'))
+  ).catch((error: unknown) => {
     // 인식 실패는 성공한 빈 초안과 구분한다.
-    return rejectRequest('OCR_UNAVAILABLE');
+    return (logReceiptFailure(error), rejectRequest('OCR_UNAVAILABLE'));
   });
 }
 

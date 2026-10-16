@@ -1,4 +1,5 @@
 import Text from '@/components/AppText';
+import ScreenHeader from '@/components/ScreenHeader';
 import { useContext, useLayoutEffect, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -83,12 +84,11 @@ export default function CitySourcesModal({
     <>
       <SafeAreaView style={[s.backdrop, { backgroundColor: 'transparent' }]}>
         <View accessibilityViewIsModal style={s.sheet}>
-          <View style={{ padding: 20, gap: 10 }}>
-            <Text accessibilityRole="header" style={s.title}>
-              {city.city} 정보·사진 출처
-            </Text>
-            <Action label="출처 닫기" onPress={onClose} />
-          </View>
+          <ScreenHeader
+            title={`${city.city} 정보·사진 출처`}
+            onBack={onClose}
+            backLabel="출처 닫기"
+          />
           <ScrollView contentContainerStyle={s.detail}>
             <Text style={s.caption}>
               원문 열기나 이용 조건 열기를 누르면 선택한 사이트가 열려요.

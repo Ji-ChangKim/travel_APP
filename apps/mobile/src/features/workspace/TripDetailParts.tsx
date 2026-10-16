@@ -2,36 +2,12 @@ import Text from '@/components/AppText';
 import HaruState from '@/components/HaruState';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 import { View } from 'react-native';
+import { useState } from 'react';
+import { Action } from './ui';
+import { diaryCosts } from './diary';
 import type { WorkspaceExpense, WorkspaceSnapshot } from '@wherego/domain';
 import { memberRoleLabel } from './presentation';
 import { tripDetailStyles as s } from './tripDetailStyles';
-
-// 통화별 소수 문자열을 센트 정수로 합산하여 기존 정밀도를 유지한다.
-function expenseTotal(
-  expenses: WorkspaceExpense[],
-  actual: boolean,
-  currency: string,
-): string {
-  // 환산 없이 같은 통화와 비용 구분만 합한다.
-  return expenses
-    .filter((item) => {
-      // 실제와 예상 비용을 분리한다.
-      return item.currency === currency && item.isActual === actual;
-    })
-    .reduce((sum, item) => {
-      // 금액 문자열의 소수 두 자리를 정수로 옮긴다.
-      return (
-        sum +
-        BigInt(
-          (item.amount.split('.')[0] || '0') +
-            (item.amount.split('.')[1] || '').padEnd(2, '0'),
-        )
-      );
-    }, 0n)
-    .toString()
-    .padStart(3, '0')
-    .replace(/(\d{2})$/, '.$1');
-}
 
 // 실제 지출과 예상 비용을 통화별로 나란히 읽을 수 있게 표시한다.
 export function TripCostSummary({
@@ -40,21 +16,43 @@ export function TripCostSummary({
   expenses: WorkspaceExpense[];
 }) {
   // 조회에 있는 금액만 계산하며 환율이나 가짜 예산을 추가하지 않는다.
+  const [showEstimates, setShowEstimates] = useState(false);
+  const actualCosts = diaryCosts(expenses);
+  const estimatedCosts = diaryCosts(expenses, false);
   return (
     <View style={s.summary}>
-      {[true, false].map((actual) => (
-        <View key={String(actual)} style={[s.card, actual && s.actual]}>
-          <Text style={s.cardTitle}>{actual ? '실제 지출' : '예상 비용'}</Text>
-          {['KRW', 'JPY', 'USD'].map((currency) => (
-            <View key={currency} style={s.currencyRow}>
-              <Text style={s.meta}>{currency}</Text>
-              <Text style={s.total}>
-                {expenseTotal(expenses, actual, currency)}
-              </Text>
+      <View style={[s.card, s.actual]}>
+        <Text style={s.cardTitle}>실제 지출</Text>
+        {!actualCosts.length && (
+          <Text style={s.meta}>아직 기록한 지출이 없어요.</Text>
+        )}
+        {actualCosts.map((cost) => (
+          <View key={cost.currency} style={s.currencyRow}>
+            <Text style={s.meta}>{cost.currency}</Text>
+            <Text style={s.total}>{cost.amount}</Text>
+          </View>
+        ))}
+      </View>
+      {estimatedCosts.length > 0 && (
+        <Action
+          label={showEstimates ? '예상 비용 접기' : '예상 비용 보기'}
+          onPress={() => {
+            // 실제 지출을 먼저 읽고 필요한 경우에만 예상 비용을 펼친다.
+            return setShowEstimates(!showEstimates);
+          }}
+        />
+      )}
+      {showEstimates && estimatedCosts.length > 0 && (
+        <View style={s.card}>
+          <Text style={s.cardTitle}>예상 비용</Text>
+          {estimatedCosts.map((cost) => (
+            <View key={cost.currency} style={s.currencyRow}>
+              <Text style={s.meta}>{cost.currency}</Text>
+              <Text style={s.total}>{cost.amount}</Text>
             </View>
           ))}
         </View>
-      ))}
+      )}
       <Text style={s.meta}>
         통화별로 모았어요. 서로 다른 통화는 합산하지 않아요.
       </Text>

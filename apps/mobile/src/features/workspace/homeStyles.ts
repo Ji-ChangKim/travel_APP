@@ -14,6 +14,13 @@ export const homeStyles = StyleSheet.create({
     alignSelf: 'center',
   },
   topBar: {
+    width: '100%',
+    maxWidth: 640,
+    alignSelf: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 6,
+    gap: 8,
+    flexWrap: 'wrap',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

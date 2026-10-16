@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import type { WorkspaceSnapshot } from '@wherego/domain';
 import { Action, ServerPhoto, styles } from './ui';
 import type { PlanForm } from './forms';
+import CommunityPlanView from './CommunityPlanView';
 import {
   publicationIds,
   publicationIssue,
@@ -33,6 +34,32 @@ export default function PublishSelection({
   return (
     <View style={styles.card}>
       <Text style={styles.title}>공개할 내용 선택</Text>
+      <View style={styles.row}>
+        <Action
+          label="여행계획 공유"
+          selected={form.values.kind === 'plan'}
+          disabled={busy}
+          onPress={() => {
+            // 완료 처리 없이 일차별 계획의 공개 내용을 선택한다.
+            return onChange('kind', 'plan');
+          }}
+        />
+        <Action
+          label="여행기록 공유"
+          selected={form.values.kind !== 'plan'}
+          disabled={busy || snapshot.trip.status !== 'COMPLETED'}
+          onPress={() => {
+            // 실제 여행기록은 기존 정리 완료 조건을 유지한다.
+            return onChange('kind', 'record');
+          }}
+        />
+      </View>
+      {form.values.kind === 'plan' && (
+        <Text>
+          선택한 장소의 계획 설명·추천 메뉴·팁도 함께 공개돼요. 개인적인 내용은
+          일정 메모에 남겨 주세요.
+        </Text>
+      )}
       <Text>
         영수증 원본, 구매 품목, 비공개 메모와 동행 정보는 공개되지 않아요.
         비용을 선택하면 여행 전체의 실제 지출 합계가 통화별로 공개돼요.
@@ -103,14 +130,26 @@ export default function PublishSelection({
           <Text>
             {preview.snapshot.country} · {preview.snapshot.city}
           </Text>
-          <Text>
-            {travelDateRange(
-              preview.snapshot.startDate,
-              preview.snapshot.endDate,
-            )}
-          </Text>
-          <Text>{form.values.title}</Text>
-          <Text>{form.values.body}</Text>
+          {form.values.kind !== 'plan' && (
+            <Text>
+              {travelDateRange(
+                preview.snapshot.startDate,
+                preview.snapshot.endDate,
+              )}
+            </Text>
+          )}
+          {form.values.kind !== 'plan' && <Text>{form.values.title}</Text>}
+          {form.values.kind !== 'plan' && <Text>{form.values.body}</Text>}
+          {form.values.kind === 'plan' && (
+            <CommunityPlanView
+              key={form.values.scheduleIds}
+              post={{
+                title: form.values.title || '',
+                body: form.values.body || '',
+                snapshot: preview.snapshot,
+              }}
+            />
+          )}
           <Text>
             선택 일정 {preview.snapshot.itinerary.length}개 · 사진{' '}
             {preview.photoPaths.length}장
@@ -118,14 +157,15 @@ export default function PublishSelection({
           {!preview.snapshot.itinerary.length && (
             <Text>공개할 일정이 없어요.</Text>
           )}
-          {preview.snapshot.itinerary.map((item, index) => (
-            <View key={index}>
-              <Text>
-                {item.date} · {item.timeSlot || '시간 미정'} · {item.title}
-              </Text>
-              <Text>{item.address || '주소 없음'}</Text>
-            </View>
-          ))}
+          {form.values.kind !== 'plan' &&
+            preview.snapshot.itinerary.map((item, index) => (
+              <View key={index}>
+                <Text>
+                  {item.date} · {item.timeSlot || '시간 미정'} · {item.title}
+                </Text>
+                <Text>{item.address || '주소 없음'}</Text>
+              </View>
+            ))}
           {publicationIds(form.values.photoIds).map((id) => (
             <ServerPhoto
               key={id}

@@ -1,7 +1,9 @@
 import Text from '@/components/AppText';
+import ScreenHeader from '@/components/ScreenHeader';
 import { colors } from '@/constants/theme';
-import { Image, Pressable, View } from 'react-native';
+import { Image, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import DesignButton from '@/components/DesignButton';
 import { loginStyles as styles, loginTheme } from './loginStyles';
 
 // 인증 입력 화면의 제목과 뒤로가기·닫기 버튼을 표시한다.
@@ -18,33 +20,28 @@ export function AuthNavigation({
 }) {
   // 처리 중에는 화면을 닫아 인증 요청을 중복으로 시작하지 못하게 한다.
   return (
-    <View style={styles.formNavigation}>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="로그인 화면으로 돌아가기"
-        accessibilityState={{ disabled }}
-        disabled={disabled}
-        onPress={onBack}
-        style={[styles.navigationButton, disabled && styles.disabled]}
-      >
-        <Ionicons name="arrow-back" size={21} color={loginTheme.secondary} />
-      </Pressable>
-      <Text style={styles.navigationTitle}>{title}</Text>
-      {onClose ? (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="이메일 인증 닫기"
-          accessibilityState={{ disabled }}
-          disabled={disabled}
-          onPress={onClose}
-          style={[styles.navigationButton, disabled && styles.disabled]}
-        >
-          <Ionicons name="close" size={22} color={loginTheme.secondary} />
-        </Pressable>
-      ) : (
-        <View style={styles.navigationButton} />
-      )}
-    </View>
+    <ScreenHeader
+      title={title}
+      backLabel="로그인 화면으로 돌아가기"
+      onBack={onBack}
+      disabled={disabled}
+      right={
+        onClose ? (
+          <DesignButton
+            label=""
+            accessibilityLabel="이메일 인증 닫기"
+            variant="quiet"
+            size="icon"
+            disabled={disabled}
+            onPress={onClose}
+            icon={(color) => {
+              // 인증 닫기도 같은 아이콘과 터치 규격을 사용한다.
+              return <Ionicons name="close" size={24} color={color} />;
+            }}
+          />
+        ) : undefined
+      }
+    />
   );
 }
 

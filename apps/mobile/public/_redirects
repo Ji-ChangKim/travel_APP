@@ -2,3 +2,5 @@
 /trips/* /trips/[id] 200
 # 비공개 발자국도 UUID 직접 접근과 새로고침을 지원한다.
 /diary/* /diary/[id] 200
+# 공유 여행계획도 목록을 거치지 않고 직접 열고 새로고침할 수 있다.
+/community/* /community/[postId] 200

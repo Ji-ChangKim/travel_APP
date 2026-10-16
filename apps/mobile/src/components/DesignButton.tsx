@@ -14,7 +14,7 @@ interface Props {
   expanded?: boolean;
   disabled?: boolean;
   loading?: boolean;
-  size?: 'default' | 'chip' | 'icon' | 'day';
+  size?: 'default' | 'chip' | 'icon' | 'day' | 'header';
   icon?: (color: string) => ReactNode;
 }
 
@@ -38,7 +38,9 @@ function foreground(props: Props, pressed = false): string {
             ? colors.actionPressedForeground
             : colors.actionForeground
           : props.variant === 'quiet'
-            ? colors.secondary
+            ? props.size === 'icon' || props.size === 'header'
+              ? colors.text
+              : colors.secondary
             : colors.text;
 }
 
@@ -84,6 +86,7 @@ function ButtonView({
           props.size === 'chip' && s.chip,
           props.size === 'icon' && s.icon,
           props.size === 'day' && s.day,
+          props.size === 'header' && s.header,
           pressed && s.pressed,
           pressed && props.variant === 'primary' && s.primaryPressed,
           props.selected && s.selected,
@@ -165,8 +168,16 @@ const s = StyleSheet.create({
     borderRadius: radii.pill,
   },
   icon: {
+    flexShrink: 0,
     minHeight: 44,
     minWidth: 44,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+  },
+  header: {
+    flexShrink: 0,
+    minWidth: 44,
+    minHeight: 44,
     paddingHorizontal: 8,
     paddingVertical: 8,
   },

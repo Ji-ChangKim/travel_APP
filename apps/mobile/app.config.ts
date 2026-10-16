@@ -47,6 +47,7 @@ const config: ExpoConfig = {
     './plugins/withAndroidBuildExport.cjs',
     './plugins/withAndroidStudioSync.cjs',
     './plugins/withAndroidWorkletsLinking.cjs',
+    './plugins/withAndroidReleaseOptimization.cjs',
     './plugins/withNativeMaps.cjs',
     ['expo-navigation-bar', { hidden: true }],
     '@react-native-community/datetimepicker',

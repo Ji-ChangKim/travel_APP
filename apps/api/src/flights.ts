@@ -202,7 +202,24 @@ function executeLookup(
             })
           : rejectRequest('FLIGHT_RATE_LIMITED');
       })
-    : Promise.reject(new ApiError('FLIGHT_UNAVAILABLE'));
+    : unavailableFlightConfiguration(c);
+}
+
+// 공급자 호출 전 누락된 설정 이름만 운영 로그에 남긴다.
+function unavailableFlightConfiguration(
+  c: Context<ApiEnvironment>,
+): Promise<never> {
+  // 키 원문·사용자·편명·날짜는 기록하지 않고 공개 오류 계약을 유지한다.
+  return (
+    console.warn(
+      JSON.stringify({
+        event: 'flight.lookup.configuration-missing',
+        providerKeyPresent: Boolean(providerKey(c)),
+        limiterPresent: Boolean(c.env.FLIGHT_LOOKUP_LIMITER),
+      }),
+    ),
+    Promise.reject(new ApiError('FLIGHT_UNAVAILABLE'))
+  );
 }
 
 // 공공데이터를 기본으로 사용하며 유료 조회는 명시적으로 선택한 경우만 허용한다.

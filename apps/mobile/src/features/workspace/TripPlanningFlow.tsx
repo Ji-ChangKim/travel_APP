@@ -14,6 +14,8 @@ import { Action, styles } from './ui';
 import TripFields from './TripFields';
 import TripFlightList from './TripFlightList';
 import FlightTicketEditor from './FlightTicketEditor';
+import type { FlightTicketDraft } from './flightTicketDraft';
+import { tripToday } from '@wherego/domain';
 import {
   saveTripFlight,
   tripFlights,
@@ -38,9 +40,19 @@ export default function TripPlanningFlow({ scroll, ...props }: Props) {
   // 페이지 이동은 작성한 여행과 항공편 목록을 초기화하지 않는다.
   const [step, setStep] = useState<'basics' | 'flights'>('basics');
   const [slot, setSlot] = useState<FlightSlot | null>(null);
+  const [ticketDrafts, setTicketDrafts] = useState<
+    Record<string, FlightTicketDraft>
+  >({});
   const [skip, setSkip] = useState(false);
   const [basicsError, setBasicsError] = useState('');
   const items = tripFlights(props.form.values);
+  const recording =
+    props.form.values.recording === 'true' ||
+    Boolean(
+      props.form.values.endDate &&
+      props.form.values.endDate <
+        tripToday(props.form.values.timezone || 'Asia/Seoul'),
+    );
   function next(): void {
     // 첫 단계에서는 등록한 항공편과 별개로 여행지·기간만 검사한다.
     try {
@@ -78,18 +90,31 @@ export default function TripPlanningFlow({ scroll, ...props }: Props) {
         userId={props.userId}
         slot={slot}
         initial={slot.index === null ? undefined : items[slot.index]}
+        draft={ticketDrafts[`${slot.role}:${slot.index ?? 'new'}`]}
         startDate={props.form.values.startDate || ''}
         endDate={props.form.values.endDate || ''}
         locked={props.locked}
-        onBack={() => {
-          // 완료하지 않은 항공권 수정만 취소하고 기존 목록을 보존한다.
-          return setSlot(null);
+        onBack={(draft) => {
+          // 목록은 바꾸지 않고 해당 슬롯의 미완성 입력을 이어 쓸 수 있게 한다.
+          return void (setTicketDrafts((previous) => ({
+            ...previous,
+            [`${slot.role}:${slot.index ?? 'new'}`]: draft,
+          })),
+          setSlot(null));
         }}
         onDone={(flight) => {
           // 완료한 항공권을 해당 슬롯에 적용하고 목록으로 돌아간다.
           return void (props.onChange(
             'flights',
             JSON.stringify(saveTripFlight(items, slot, flight)),
+          ),
+          setTicketDrafts((previous) =>
+            Object.fromEntries(
+              Object.entries(previous).filter(([key]) => {
+                // 완료한 슬롯의 초안만 제거하고 다른 항공권 작성은 보존한다.
+                return key !== `${slot.role}:${slot.index ?? 'new'}`;
+              }),
+            ),
           ),
           setSlot(null));
         }}
@@ -99,7 +124,13 @@ export default function TripPlanningFlow({ scroll, ...props }: Props) {
     <SafeAreaView style={styles.modal}>
       <ModalBackground>
         <ScreenHeader
-          title={step === 'basics' ? '여행 계획 만들기' : '항공편 선택'}
+          title={
+            step === 'basics'
+              ? recording
+                ? '다녀온 여행 기록하기'
+                : '여행 계획 만들기'
+              : '항공편 선택'
+          }
           backLabel={
             step === 'basics'
               ? '내 여행으로 돌아가기'
@@ -111,6 +142,7 @@ export default function TripPlanningFlow({ scroll, ...props }: Props) {
             step === 'basics' ? (
               <Action
                 label="다음"
+                size="header"
                 variant="quiet"
                 disabled={props.locked}
                 onPress={next}
@@ -144,7 +176,9 @@ export default function TripPlanningFlow({ scroll, ...props }: Props) {
                 }}
               >
                 {step === 'basics'
-                  ? '어디로, 언제 떠날까요?'
+                  ? recording
+                    ? '어디를, 언제 다녀오셨나요?'
+                    : '어디로, 언제 떠날까요?'
                   : '항공편을 더하거나 나중에 입력해도 괜찮아요.'}
               </Text>
               {step === 'basics' && (
@@ -189,7 +223,13 @@ export default function TripPlanningFlow({ scroll, ...props }: Props) {
                 />
               ) : items.length ? (
                 <Action
-                  label={props.busy ? '저장 중…' : '여행 만들기'}
+                  label={
+                    props.busy
+                      ? '저장 중…'
+                      : recording
+                        ? '여행 기록 만들기'
+                        : '여행 만들기'
+                  }
                   variant="primary"
                   loading={props.busy}
                   allowWhileLocked

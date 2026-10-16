@@ -227,6 +227,10 @@ export function tripDays(
     (_, index) => {
       // 생성한 날짜에 대응하는 기존 ID만 재사용한다.
       return {
+        ...previous.find((day) => {
+          // 같은 실제 날짜의 공개용 계획 제목과 컨셉을 기간 변경에서도 보존한다.
+          return day.tripDate === dateAt(start, index);
+        }),
         id:
           previous.find((day) => {
             // 날짜가 동일한 DAY를 찾는다.
@@ -407,6 +411,7 @@ function publicPost(
   return {
     id: snapshot.postId || crypto.randomUUID(),
     authorId: snapshot.trip.ownerId,
+    kind: input.kind || 'record',
     author:
       snapshot.members.find((member) => {
         // 여행 소유자의 공개 닉네임만 사용한다.
@@ -424,7 +429,7 @@ export function publicSelection(
   snapshot: Snapshot,
   input: Pick<
     Extract<WorkspaceCommand, { operation: 'community.publish' }>['input'],
-    'scheduleIds' | 'photoIds' | 'includeCosts'
+    'scheduleIds' | 'photoIds' | 'includeCosts' | 'kind'
   >,
 ): Pick<CommunityPost, 'photoPaths' | 'snapshot'> {
   // 공개 필드만 반환하며 비공개 원본을 화면 미리보기에도 섞지 않는다.
@@ -443,9 +448,12 @@ export function publicSelection(
       city: snapshot.trip.city,
       startDate: snapshot.trip.startDate,
       endDate: snapshot.trip.endDate,
+      ...(input.kind === 'plan'
+        ? { days: publicPlanDays(snapshot, input.scheduleIds) }
+        : {}),
       itinerary: input.scheduleIds.map((id) => {
         // 선택한 일정의 공개 필드만 변환한다.
-        return publicSchedule(snapshot, id);
+        return publicSchedule(snapshot, id, input.kind === 'plan');
       }),
       costs: input.includeCosts ? costTotals(snapshot) : {},
     },
@@ -456,6 +464,7 @@ export function publicSelection(
 function publicSchedule(
   snapshot: Snapshot,
   id: string,
+  includePlan = false,
 ): CommunityPost['snapshot']['itinerary'][number] {
   // 존재하지 않는 ID를 빈 공개 일정으로 만들지 않는다.
   return selectedSchedule(
@@ -464,6 +473,7 @@ function publicSchedule(
       // 같은 여행 내에서 공개 선택을 찾는다.
       return item.id === id;
     }) || rejectRequest('VALIDATION_FAILED'),
+    includePlan,
   );
 }
 
@@ -471,10 +481,12 @@ function publicSchedule(
 function selectedSchedule(
   snapshot: Snapshot,
   item: Snapshot['itinerary'][number],
+  includePlan: boolean,
 ): CommunityPost['snapshot']['itinerary'][number] {
   // 메모와 Google 원본 링크는 제외한다.
   return {
     title: item.title,
+    ...(includePlan ? publicPlanSchedule(snapshot, item) : {}),
     address: item.address,
     timeSlot: item.timeSlot,
     date:
@@ -482,6 +494,54 @@ function selectedSchedule(
         // 저장된 부모 날짜를 찾는다.
         return day.id === item.dayId;
       })?.tripDate || rejectRequest('VALIDATION_FAILED'),
+  };
+}
+
+// 선택된 일정이 있는 DAY의 공개용 테마만 내보낸다.
+function publicPlanDays(snapshot: Snapshot, selected: string[]) {
+  // 비공개 DAY의 임의 필드는 복사하지 않는다.
+  return snapshot.days
+    .filter((day) => {
+      // 같은 여행의 선택 일정에 연결된 날짜만 공개한다.
+      return snapshot.itinerary.some((item) => {
+        // 공개 선택 ID와 부모 DAY를 함께 대조한다.
+        return selected.includes(item.id) && item.dayId === day.id;
+      });
+    })
+    .map((day) => {
+      // 원본 식별자 대신 DAY 번호와 명시적 계획 제목·컨셉만 공개한다.
+      return {
+        dayNumber: day.dayNumber,
+        date: day.tripDate,
+        planTitle: day.planTitle,
+        planConcept: day.planConcept,
+      };
+    });
+}
+
+// 사용자가 별도로 저장한 공개용 계획 필드만 일정에 투영한다.
+function publicPlanSchedule(
+  snapshot: Snapshot,
+  item: Snapshot['itinerary'][number],
+) {
+  // 개인 메모·항공 상세·영수증 정보는 이 객체에 포함하지 않는다.
+  return {
+    id: item.id,
+    dayNumber: snapshot.days.find((day) => {
+      // 같은 여행의 부모 DAY에서 일차 번호를 찾는다.
+      return day.id === item.dayId;
+    })?.dayNumber,
+    sortOrder: item.sortOrder,
+    type: item.type,
+    googlePlaceId: item.googlePlaceId,
+    planContent: item.planContent
+      ? {
+          description: item.planContent.description,
+          choiceGroup: item.planContent.choiceGroup,
+          choiceLabel: item.planContent.choiceLabel,
+          choiceKind: item.planContent.choiceKind,
+        }
+      : item.planContent,
   };
 }
 
@@ -553,6 +613,21 @@ function applyCommand(
 ): Change {
   // 각 분기는 한 종류의 명령 결과만 반환한다.
   switch (command.operation) {
+    case 'day.plan':
+      return validDay(s, command.input.dayId)
+        ? changed(s, {
+            days: s.days.map((day) => {
+              // 선택 DAY만 변경하며 기존 DAY 식별자와 날짜를 보존한다.
+              return day.id === command.input.dayId
+                ? {
+                    ...day,
+                    planTitle: command.input.planTitle,
+                    planConcept: command.input.planConcept,
+                  }
+                : day;
+            }),
+          })
+        : rejectRequest('VALIDATION_FAILED');
     case 'schedule.save':
       return validSchedulePlacement(s, command.input)
         ? changed(
@@ -560,6 +635,13 @@ function applyCommand(
             {
               itinerary: placedSchedule(s, command.input, {
                 ...scheduleStoredInput(command.input),
+                planContent:
+                  command.input.planContent === undefined
+                    ? s.itinerary.find((item) => {
+                        // 이전 앱의 수정에서도 공유용 계획 원문을 보존한다.
+                        return item.id === command.input.id;
+                      })?.planContent
+                    : command.input.planContent,
                 durationMinutes:
                   command.input.durationMinutes === undefined
                     ? s.itinerary.find((item) => {
@@ -726,6 +808,8 @@ function applyCommand(
           );
     case 'receipt.confirm':
       return confirmReceipt(s, command.input, identify);
+    case 'receipt.update':
+      return updateReceipt(s, command.input);
     case 'receipt.delete':
       return changed(s, {
         receipts: without(s.receipts, command.input.id),
@@ -767,7 +851,11 @@ function applyCommand(
             }),
           });
     case 'community.publish':
-      return s.trip.status === 'COMPLETED'
+      return (
+        command.input.kind === 'plan'
+          ? command.input.scheduleIds.length > 0 && s.trip.status !== 'ARCHIVED'
+          : s.trip.status === 'COMPLETED'
+      )
         ? attachPost(s, publicPost(s, command.input))
         : rejectRequest('VALIDATION_FAILED');
     case 'community.withdraw':
@@ -847,6 +935,39 @@ function confirmReceipt(
 }
 
 // 영수증 연결 일정과 동일 ID 비용을 저장 후보에 반영한다.
+function updateReceipt(
+  s: Snapshot,
+  input: Extract<WorkspaceCommand, { operation: 'receipt.update' }>['input'],
+): Change {
+  // 확정한 원본·보관 선택은 바꾸지 않고 같은 영수증·지출만 교체한다.
+  return s.receipts.some((receipt) => {
+    // 다른 영수증의 원본을 가로채거나 삭제한 사진을 보관 상태로 되돌리지 않는다.
+    return (
+      receipt.id === input.id &&
+      receipt.mediaId === input.mediaId &&
+      receipt.keepPhoto === (input.keepPhoto !== false)
+    );
+  }) &&
+    validDay(s, input.dayId) &&
+    Boolean(input.scheduleId) &&
+    validSchedule(s, input.scheduleId, input.dayId) &&
+    s.days.some((day) => {
+      // 수정한 결제일도 같은 여행 날짜에 연결한다.
+      return day.id === input.dayId && day.tripDate === input.transactionDate;
+    })
+    ? receiptChange(
+        {
+          ...s,
+          receipts: without(s.receipts, input.id),
+          expenses: without(s.expenses, input.id),
+        },
+        input,
+        input.scheduleId!,
+      )
+    : rejectRequest('VALIDATION_FAILED');
+}
+
+// 영수증 연결 일정과 동일 ID 비용을 저장 후보에 반영한다.
 function receiptChange(
   s: Snapshot,
   input: Extract<WorkspaceCommand, { operation: 'receipt.confirm' }>['input'],
@@ -916,7 +1037,11 @@ function receiptChange(
     {
       id: input.id,
       scheduleId,
-      ...(input.keepPhoto !== false
+      ...(input.keepPhoto !== false ||
+      !s.media.some((media) => {
+        // 정보만 남긴 영수증 수정에서는 이미 삭제한 원본을 다시 찾지 않는다.
+        return media.id === input.mediaId;
+      })
         ? {}
         : {
             discardedReceiptPath: s.media.find((media) => {

@@ -142,6 +142,17 @@ function feed(fetcher: typeof fetch, c: Ctx): Promise<Response> {
     fetcher,
   ).then(respond.bind(null, c));
 }
+// 목록 페이지 수와 무관하게 현재 공개된 계획 한 건을 조회한다.
+function publicPost(fetcher: typeof fetch, c: Ctx): Promise<Response> {
+  // 공개 RPC만 사용하며 회원 여행 원본 조회로 우회하지 않는다.
+  return runRpc(
+    c.env,
+    { userId: '', token: c.env.SUPABASE_ANON_KEY },
+    'wherego_community_post',
+    { p_post: foundationUuidSchema.parse(c.req.param('postId')) },
+    fetcher,
+  ).then(respond.bind(null, c));
+}
 // 공개 게시물 신고를 저장한다.
 function report(fetcher: typeof fetch, c: Ctx): Promise<Response> {
   // 신고자는 JWT 계정으로만 기록한다.
@@ -254,6 +265,7 @@ export function registerWorkspaceRoutes(
     .post('/api/v1/invites/accept', accept.bind(null, fetcher))
     .get('/api/v1/community', feed.bind(null, fetcher))
     .get('/public/community', feed.bind(null, fetcher))
+    .get('/public/community/:postId', publicPost.bind(null, fetcher))
     .post('/api/v1/community/reports', report.bind(null, fetcher))
     .post('/api/v1/community/blocks', block.bind(null, fetcher))
     .post('/api/v1/trips/:tripId/receipts/ocr', ocr.bind(null, fetcher))

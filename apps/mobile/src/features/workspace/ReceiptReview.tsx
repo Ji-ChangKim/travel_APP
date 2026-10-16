@@ -121,12 +121,14 @@ export default function ReceiptReview({
             );
           }}
         />
-        <Action
-          label="다시 스캔하기"
-          disabled={busy}
-          variant="quiet"
-          onPress={onRetry}
-        />
+        {form.values.receiptOperation !== 'update' && (
+          <Action
+            label="다시 스캔하기"
+            disabled={busy}
+            variant="quiet"
+            onPress={onRetry}
+          />
+        )}
       </View>
       {(form.values.receiptEditing === 'true' ||
         form.values.receiptStatus === 'manual') && (

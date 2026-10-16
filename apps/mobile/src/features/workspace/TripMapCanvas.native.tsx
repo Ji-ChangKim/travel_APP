@@ -19,7 +19,9 @@ export default function TripMapCanvas(props: MapCanvasProps) {
       description={
         props.picking
           ? 'Google Maps에서 위치를 확인한 뒤 좌표를 붙여 넣어 주세요.'
-          : '아래 장소에서 Google Maps로 확인해 주세요.'
+          : props.stops.length
+            ? '아래 장소에서 Google Maps로 확인해 주세요.'
+            : '일정 탭에서 장소를 추가한 뒤 Google Maps로 확인해 주세요.'
       }
       compact
     />

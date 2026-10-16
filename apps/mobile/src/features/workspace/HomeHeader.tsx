@@ -27,7 +27,7 @@ export default function HomeHeader({
             style={s.brandSymbol}
           />
         </View>
-        <Text numberOfLines={1} ellipsizeMode="tail" style={s.brandTitle}>
+        <Text style={s.brandTitle}>
           Trip<Text style={s.brandAccent}>Print</Text>
         </Text>
       </View>

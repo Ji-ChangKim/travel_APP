@@ -161,9 +161,18 @@ function PlansView({
       >
         <View style={s.heading}>
           <Text style={s.supporting}>
-            준비하는 설렘부터 여행의 마지막 날까지.
+            앞으로의 여행과 다녀온 여행 기록을 한곳에 모아요.
           </Text>
         </View>
+        {userId && (
+          <Action
+            label="다녀온 여행 기록하기"
+            onPress={() => {
+              // 같은 계정의 여행 생성 화면을 기록 문구로 연다.
+              return router.push('/new-trip?mode=record');
+            }}
+          />
+        )}
         {local && (
           <Text style={s.supporting}>이 기기에서만 볼 수 있는 여행이에요.</Text>
         )}

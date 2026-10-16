@@ -1,4 +1,5 @@
 import Text from '@/components/AppText';
+import ScreenHeader from '@/components/ScreenHeader';
 import Modal from '@/components/AppModal';
 import ReceiptReview from './ReceiptReview';
 import ReceiptConfirmation from './ReceiptConfirmation';
@@ -40,6 +41,8 @@ const labels: Record<string, string> = {
   transactionDate: '실제 결제 날짜',
   details: '구매 내역',
   body: '커뮤니티 본문',
+  planTitle: '이날 계획 제목',
+  planConcept: '이날 여행 컨셉',
 };
 // 폼이 닫혀도 전환이 끝날 때까지 마지막 작성 내용을 보존한다.
 export default function PlanEditor(props: EditorProps) {
@@ -74,6 +77,7 @@ function editorLabel(form: PlanForm | null): string {
         publish: '커뮤니티 공개',
         metadata: '여행 정보 수정',
         period: '여행 기간 변경',
+        dayPlan: '이날 여행계획',
         expense: '비용 작성',
       } as Record<string, string>
     )[form?.kind || ''] || '여행 내용 작성'
@@ -173,20 +177,29 @@ function PlanEditorContent({
   return (
     <>
       <SafeAreaView style={styles.modal}>
-        <ScrollView
-          ref={receiptScroll}
-          contentContainerStyle={styles.content}
-          keyboardShouldPersistTaps="handled"
-        >
-          <Text style={styles.header}>
-            {form?.kind === 'publish'
+        <ScreenHeader
+          title={
+            form?.kind === 'publish'
               ? '커뮤니티 공개'
               : form?.kind === 'receipt'
                 ? '영수증 확인'
                 : form?.kind === 'expense'
                   ? '비용 기록'
-                  : '여행 내용 작성'}
-          </Text>
+                  : form?.kind === 'metadata'
+                    ? '여행 정보 수정'
+                    : form?.kind === 'period'
+                      ? '여행 기간 변경'
+                      : '여행 내용 작성'
+          }
+          backLabel="닫기"
+          onBack={onClose}
+          disabled={busy || locked}
+        />
+        <ScrollView
+          ref={receiptScroll}
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+        >
           {form && (
             <>
               {form.kind === 'receipt' && snapshot && (
@@ -245,7 +258,7 @@ function PlanEditorContent({
                     </View>
                   </View>
                   <PlaceSearch
-                    key={form.id}
+                    key={`${form.id}:${form.values.dayId}:${form.values.type}`}
                     userId={userId}
                     city={snapshot?.trip.city || ''}
                     disabled={busy}
@@ -334,9 +347,18 @@ function PlanEditorContent({
                   ) : (
                     <Field
                       key={key}
-                      label={labels[key]!}
+                      label={
+                        key === 'body' && form.values.kind === 'plan'
+                          ? '계획 소개'
+                          : labels[key]!
+                      }
                       value={value}
-                      multiline={['memo', 'body', 'details'].includes(key)}
+                      multiline={[
+                        'memo',
+                        'body',
+                        'details',
+                        'planConcept',
+                      ].includes(key)}
                       onChange={(next) => {
                         // 해당 필드 하나만 변경한다.
                         onChange(key, next);
@@ -425,23 +447,31 @@ function PlanEditorContent({
                   ))) && (
                 <View style={styles.card}>
                   <Text style={styles.title}>연결할 일정</Text>
-                  <Action
-                    label={
-                      form.kind === 'receipt'
-                        ? '새 장소 기록 만들기'
-                        : '새 기록 / 일정 연결 없이'
-                    }
-                    selected={
-                      form.kind === 'expense'
-                        ? !form.values.scheduleId
-                        : undefined
-                    }
-                    disabled={busy}
-                    onPress={() => {
-                      // 영수증은 새 일정을 생성하고 수동 비용은 여행 전체에 연결한다.
-                      onChange('scheduleId', '');
-                    }}
-                  />
+                  {form.values.receiptOperation !== 'update' && (
+                    <Action
+                      label={
+                        form.kind === 'receipt'
+                          ? '새 장소 기록 만들기'
+                          : '새 기록 / 일정 연결 없이'
+                      }
+                      selected={
+                        form.kind === 'expense'
+                          ? !form.values.scheduleId
+                          : undefined
+                      }
+                      disabled={busy}
+                      onPress={() => {
+                        // 영수증은 새 일정을 생성하고 수동 비용은 여행 전체에 연결한다.
+                        onChange('scheduleId', '');
+                      }}
+                    />
+                  )}
+                  {form.values.receiptOperation === 'update' && (
+                    <Text style={styles.subtitle}>
+                      수정할 영수증을 연결할 기존 일정을 선택해 주세요. 새
+                      장소를 추가하려면 일정 추가를 이용해 주세요.
+                    </Text>
+                  )}
                   {snapshot?.itinerary
                     .filter((item) => {
                       // 영수증은 실제 결제 날짜에 속한 일정만 연결한다.
@@ -546,7 +576,9 @@ function PlanEditorContent({
                   : form?.kind === 'publish'
                     ? '확인하고 게시'
                     : form?.kind === 'receipt'
-                      ? '일정에 추가하기'
+                      ? form.values.receiptOperation === 'update'
+                        ? '영수증 수정 저장'
+                        : '일정에 추가하기'
                       : '확인하고 저장'
               }
               disabled={
@@ -561,7 +593,6 @@ function PlanEditorContent({
               loading={busy}
               onPress={onSave}
             />
-            <Action label="닫기" disabled={busy} onPress={onClose} />
             {error.includes('동행') && (
               <Action
                 allowWhileLocked

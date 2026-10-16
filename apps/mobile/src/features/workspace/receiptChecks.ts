@@ -44,6 +44,7 @@ export function receiptCanSave(form: PlanForm): boolean {
     (!receiptDifference(form) ||
       form.values.totalDifferenceAccepted === 'true') &&
     form.values.dayId &&
+    (form.values.receiptOperation !== 'update' || form.values.scheduleId) &&
     form.values.merchant &&
     form.values.amount &&
     ['ready', 'manual'].includes(form.values.receiptStatus || '') &&

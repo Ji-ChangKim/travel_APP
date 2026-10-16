@@ -8,6 +8,12 @@ const media = '00000000-0000-4000-8000-000000000011';
 const env: Env = {
   APP_UPDATE_POLICY_JSON: '',
   FLIGHT_LOOKUP_PROVIDER: 'kac',
+  PLACES_PHOTO_LIMITER: {
+    limit: async () => {
+      // 워크스페이스 회귀에서는 사진 호출 제한의 외부 경계만 고정한다.
+      return { success: true };
+    },
+  },
   FLIGHT_LOOKUP_LIMITER: {
     limit: async () => {
       // 기존 워크스페이스 HTTP 검증은 조회 제한 경계만 고정한다.
@@ -81,7 +87,59 @@ function headers(): Record<string, string> {
     'If-Match': `"trip:${trip}:1"`,
   };
 }
+
 // 명령 입력에서 권한 우회·소수 정밀도·버전 위조를 차단한다.
+test('계획 원문은 16KiB 안에서 전달하고 과대 요청은 기존 413으로 거부한다', async () => {
+  // 게시 명령 여부와 무관하게 기존 바이트 상한을 유지한다.
+  const calls: Request[] = [];
+  const input = {
+    id: media,
+    dayId: trip,
+    title: '계획 장소',
+    type: 'PLACE',
+    sortOrder: 1,
+    planContent: { description: '가'.repeat(3998) + '🗾' },
+  };
+  const response = await createApp(fixture(calls)).request(
+    `/api/v1/trips/${trip}/commands`,
+    {
+      method: 'POST',
+      headers: headers(),
+      body: JSON.stringify({ operation: 'schedule.save', input }),
+    },
+    env,
+  );
+  assert.equal(response.status, 200);
+  const rpc = calls.find((request) => {
+    // 공개용 원문의 실제 전달값을 확인한다.
+    return request.url.includes('wherego_command');
+  });
+  assert.equal(
+    (await rpc!.json()).p_input.planContent.description,
+    input.planContent.description,
+  );
+  const oversized = await createApp(fixture([])).request(
+    `/api/v1/trips/${trip}/commands`,
+    {
+      method: 'POST',
+      headers: headers(),
+      body: JSON.stringify({
+        operation: 'community.publish',
+        input: {
+          kind: 'plan',
+          title: '계획',
+          body: '소개',
+          scheduleIds: [media],
+          photoIds: [],
+          includeCosts: false,
+        },
+      }).padEnd(16385),
+    },
+    env,
+  );
+  assert.equal(oversized.status, 413);
+});
+
 test('명령 API strict 필드·금액 정밀도·다른 여행 버전 거부', async () => {
   // 모든 실패 요청은 실제 Hono 미들웨어부터 실행한다.
   const calls: Request[] = [];

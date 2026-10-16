@@ -11,6 +11,11 @@
       "namespace_id": "100541",
       "simple": { "limit": 6, "period": 60 },
     },
+    {
+      "name": "PLACES_PHOTO_LIMITER",
+      "namespace_id": "100551",
+      "simple": { "limit": 40, "period": 60 },
+    },
   ],
   // 서버 AI 바인딩으로 영수증을 인식하며 사용자 확인 후 기록한다.
   "secrets": {
@@ -50,6 +55,11 @@
           "namespace_id": "100542",
           "simple": { "limit": 6, "period": 60 },
         },
+        {
+          "name": "PLACES_PHOTO_LIMITER",
+          "namespace_id": "100552",
+          "simple": { "limit": 40, "period": 60 },
+        },
       ],
       "secrets": {
         "required": ["AUTH_SECRET"],
@@ -86,6 +96,11 @@
           "name": "FLIGHT_LOOKUP_LIMITER",
           "namespace_id": "100543",
           "simple": { "limit": 6, "period": 60 },
+        },
+        {
+          "name": "PLACES_PHOTO_LIMITER",
+          "namespace_id": "100553",
+          "simple": { "limit": 40, "period": 60 },
         },
       ],
       "secrets": { "required": ["GOOGLE_VISION_API_KEY"] },

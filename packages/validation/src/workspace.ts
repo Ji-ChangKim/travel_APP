@@ -12,6 +12,21 @@ const idInput = z.object({ id: foundationUuidSchema }).strict();
 const optionalId = foundationUuidSchema.optional();
 const title = z.string().trim().min(1).max(100);
 const roles = z.enum(['editor', 'viewer']);
+// 공개용 계획 원문은 개인 메모와 별도 저장하며 원문 공백을 보존한다.
+export const schedulePlanContentSchema = z
+  .object({
+    description: z.string().max(4000),
+    choiceGroup: z.string().min(1).max(80).optional(),
+    choiceLabel: z.string().max(200).optional(),
+    choiceKind: z.enum(['choice', 'backup']).optional(),
+  })
+  .strict()
+  .refine((input) => {
+    // 선택·대체 표시는 같은 그룹을 지정했을 때만 허용한다.
+    return (
+      !(input.choiceLabel || input.choiceKind) || Boolean(input.choiceGroup)
+    );
+  }, '선택할 장소 그룹을 지정해 주세요.');
 // 지도 위치는 위도·경도 쌍과 유효 범위를 함께 검사한다.
 export const scheduleLocationSchema = z
   .object({
@@ -34,6 +49,7 @@ export const scheduleInputSchema = z
     address: z.string().max(200).default(''),
     location: scheduleLocationSchema.nullable().optional(),
     flight: flightDetailsSchema.nullable().optional(),
+    planContent: schedulePlanContentSchema.nullable().optional(),
     durationMinutes: z.number().int().min(1).max(1440).nullable().optional(),
     afterScheduleId: foundationUuidSchema.nullable().optional(),
     estimatedCost: decimalExpenseSchema.nullable().optional(),
@@ -149,6 +165,18 @@ export const receiptInputSchema = z
 export const workspaceCommandSchema = z.discriminatedUnion('operation', [
   z
     .object({
+      operation: z.literal('day.plan'),
+      input: z
+        .object({
+          dayId: foundationUuidSchema,
+          planTitle: z.string().max(200),
+          planConcept: z.string().max(2000),
+        })
+        .strict(),
+    })
+    .strict(),
+  z
+    .object({
       operation: z.literal('schedule.save'),
       input: scheduleInputSchema,
     })
@@ -223,6 +251,12 @@ export const workspaceCommandSchema = z.discriminatedUnion('operation', [
   z.object({ operation: z.literal('receipt.delete'), input: idInput }).strict(),
   z
     .object({
+      operation: z.literal('receipt.update'),
+      input: receiptInputSchema,
+    })
+    .strict(),
+  z
+    .object({
       operation: z.literal('invite.create'),
       input: z.object({ role: roles }).strict(),
     })
@@ -247,11 +281,16 @@ export const workspaceCommandSchema = z.discriminatedUnion('operation', [
         .object({
           title,
           body: z.string().max(2000),
+          kind: z.enum(['plan', 'record']).optional(),
           scheduleIds: z.array(foundationUuidSchema).max(300),
           photoIds: z.array(foundationUuidSchema).max(30),
           includeCosts: z.boolean(),
         })
-        .strict(),
+        .strict()
+        .refine((input) => {
+          // 계획 공유에는 사용자가 명시적으로 고른 일정이 필요하다.
+          return input.kind !== 'plan' || input.scheduleIds.length > 0;
+        }, '공유할 여행 일정을 선택해 주세요.'),
     })
     .strict(),
   z
@@ -298,6 +337,8 @@ export const workspaceSnapshotSchema = z.object({
       id: foundationUuidSchema,
       dayNumber: z.number(),
       tripDate: calendarDateSchema,
+      planTitle: z.string().max(200).optional(),
+      planConcept: z.string().max(2000).optional(),
     }),
   ),
   itinerary: z.array(
@@ -319,6 +360,7 @@ export const workspaceSnapshotSchema = z.object({
       address: z.string(),
       location: scheduleLocationSchema.nullable().optional(),
       flight: flightDetailsSchema.nullable().optional(),
+      planContent: schedulePlanContentSchema.nullable().optional(),
       durationMinutes: z.number().int().min(1).max(1440).nullable().optional(),
       googlePlaceId: z
         .string()
@@ -392,6 +434,7 @@ export const workspaceSnapshotSchema = z.object({
   postId: z.string().nullable(),
 });
 export const communityPostSchema = z.object({
+  kind: z.enum(['plan', 'record']).optional(),
   id: foundationUuidSchema,
   authorId: foundationUuidSchema,
   author: z.string(),
@@ -400,12 +443,33 @@ export const communityPostSchema = z.object({
   publishedAt: z.string(),
   photoPaths: z.array(z.string()),
   snapshot: z.object({
+    days: z
+      .array(
+        z.object({
+          dayNumber: z.number().int().positive(),
+          date: calendarDateSchema,
+          planTitle: z.string().max(200).optional(),
+          planConcept: z.string().max(2000).optional(),
+        }),
+      )
+      .optional(),
     country: z.string(),
     city: z.string(),
     startDate: calendarDateSchema,
     endDate: calendarDateSchema,
     itinerary: z.array(
       z.object({
+        id: foundationUuidSchema.optional(),
+        dayNumber: z.number().int().positive().optional(),
+        sortOrder: z.number().int().positive().optional(),
+        type: z
+          .enum(['PLACE', 'TRANSPORT', 'STAY', 'RESERVATION', 'TODO', 'MEMO'])
+          .optional(),
+        planContent: schedulePlanContentSchema.nullable().optional(),
+        googlePlaceId: z
+          .string()
+          .regex(/^[A-Za-z0-9_-]{1,200}$/)
+          .optional(),
         title: z.string(),
         date: calendarDateSchema,
         timeSlot: z.string().nullable(),

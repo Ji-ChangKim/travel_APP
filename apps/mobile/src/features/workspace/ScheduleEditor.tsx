@@ -1,13 +1,7 @@
 import Text from '@/components/AppText';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  View,
-} from 'react-native';
+import ScreenHeader from '@/components/ScreenHeader';
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import type { WorkspaceSnapshot } from '@wherego/domain';
 import type { PlanForm } from './forms';
 import {
@@ -22,6 +16,7 @@ import GooglePlace from './GooglePlace';
 import ScheduleLocation from './ScheduleLocation';
 import ScheduleRoutePreview from './ScheduleRoutePreview';
 import ScheduleFlightFields from './FlightEntryFields';
+import SchedulePlanFields from './SchedulePlanFields';
 import { DateField } from './TravelInputs';
 import type { RefObject } from 'react';
 
@@ -62,35 +57,12 @@ function EditorContent({ scroll, ...props }: Props) {
   // 미리보기에서 선택한 순서는 같은 저장 요청으로 반영한다.
   return (
     <>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          paddingHorizontal: 12,
-          minHeight: 52,
-          gap: 8,
-        }}
-      >
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="닫기"
-          onPress={props.onClose}
-          disabled={props.busy || props.locked}
-          style={{
-            minWidth: 44,
-            minHeight: 44,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Ionicons
-            name="arrow-back"
-            size={22}
-            color={theme.color.text.primary}
-          />
-        </Pressable>
-        <Text style={[s.label, { flex: 1 }]}>일정 추가 및 정리</Text>
-      </View>
+      <ScreenHeader
+        title="일정 추가 및 정리"
+        backLabel="닫기"
+        onBack={props.onClose}
+        disabled={props.busy || props.locked}
+      />
       <ScrollView
         ref={scroll}
         keyboardShouldPersistTaps="handled"
@@ -119,7 +91,7 @@ function EditorContent({ scroll, ...props }: Props) {
               }
             </Text>
           </View>
-          <View style={{ gap: 4 }}>
+          <View style={{ gap: 4, flex: 1, minWidth: 0 }}>
             <Text style={s.title}>
               {props.snapshot.itinerary.some((item) => {
                 // 기존 ID를 편집할 때 새 일정처럼 안내하지 않는다.
@@ -201,6 +173,7 @@ function EditorContent({ scroll, ...props }: Props) {
           icon="map-pin-duotone"
         >
           <PlaceSearch
+            key={`${props.form.id}:${props.form.values.dayId}:${props.form.values.type}`}
             compact
             startExpanded={props.form.values.placeSearchExpanded === 'true'}
             simple={['TODO', 'MEMO'].includes(props.form.values.type || '')}
@@ -214,7 +187,7 @@ function EditorContent({ scroll, ...props }: Props) {
             disabled={props.busy || props.locked}
             initialShare={props.form.values.sharedMapsText}
             onSelect={(id, title) => {
-              // 실제 공유 링크로 확인한 장소만 연결한다.
+              // 검색 결과나 공유 링크에서 선택한 실제 장소 ID만 연결한다.
               return (
                 props.onChange('googlePlaceId', id),
                 props.onChange('title', title),
@@ -267,6 +240,11 @@ function EditorContent({ scroll, ...props }: Props) {
             onChange={props.onChange}
           />
         )}
+        <SchedulePlanFields
+          form={props.form}
+          disabled={props.busy || props.locked}
+          onChange={props.onChange}
+        />
         <ScheduleSection title="일정 세부 설정" icon="sliders-outline">
           <DateField
             label="일정 시간 (HH:mm)"

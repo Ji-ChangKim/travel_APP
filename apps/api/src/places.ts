@@ -3,6 +3,7 @@ import type { Context } from 'hono';
 import type { ApiEnvironment } from './types';
 import { rejectRequest } from './errors';
 import { readBounded } from './ocr';
+import { reserveGoogleCall } from './googleUsage';
 
 const querySchema = z.string().trim().min(2).max(200);
 const responseSchema = z.object({
@@ -69,11 +70,14 @@ function displayPlace(place: z.infer<typeof responseSchema>['places'][number]) {
 }
 
 // 고정 공급자에만 인증된 장소 검색 요청을 전송한다.
-export function searchPlaces(
+export async function searchPlaces(
   fetcher: typeof fetch,
   c: Context<ApiEnvironment>,
 ): Promise<Response> {
   // 서버 비밀 키가 없으면 준비되지 않은 검색을 성공처럼 표시하지 않는다.
+  querySchema.parse(c.req.query('q'));
+  if (c.env.GOOGLE_PLACES_API_KEY)
+    await reserveGoogleCall(c.env, 'text-search');
   return c.env.GOOGLE_PLACES_API_KEY
     ? fetcher('https://places.googleapis.com/v1/places:searchText', {
         method: 'POST',
@@ -107,7 +111,7 @@ export function searchPlaces(
 }
 
 // 저장한 장소 ID의 최신 이름·주소를 요청 시점에 조회한다.
-export function getGooglePlace(
+export async function getGooglePlace(
   fetcher: typeof fetch,
   c: Context<ApiEnvironment>,
 ): Promise<Response> {
@@ -117,6 +121,8 @@ export function getGooglePlace(
     .regex(/^[A-Za-z0-9_-]{1,200}$/)
     .parse(c.req.param('placeId'));
   // 키 누락을 명시적 설정 오류로 안내한다.
+  if (c.env.GOOGLE_PLACES_API_KEY)
+    await reserveGoogleCall(c.env, 'place-details');
   return c.env.GOOGLE_PLACES_API_KEY
     ? fetcher(
         `https://places.googleapis.com/v1/places/${encodeURIComponent(id)}?languageCode=ko`,

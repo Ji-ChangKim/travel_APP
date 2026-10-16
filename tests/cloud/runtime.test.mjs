@@ -55,6 +55,251 @@ const png = Buffer.from(
   'base64',
 );
 
+test('여행계획은 DAY·장소 원문으로 D1 저장하며 단건 공개 조회와 철회가 일치한다', async () => {
+  // 별도 회원·여행에서 실제 Worker·D1 명령을 거치며 외부 서버는 호출하지 않는다.
+  const member = await accountResponse(
+    await request(
+      '/api/auth/sign-up/email',
+      'POST',
+      {
+        name: '계획 원문 검수',
+        email: `${randomUUID()}@example.test`,
+        password: 'plan-test-strong-password!',
+      },
+      undefined,
+      { 'CF-Connecting-IP': '203.0.113.219' },
+    ),
+  );
+  const created = await json(
+    await request(
+      '/api/v1/trips',
+      'POST',
+      {
+        country: '일본',
+        city: '오사카',
+        startDate: '2026-10-01',
+        endDate: '2026-10-04',
+        timezone: 'Asia/Tokyo',
+      },
+      member,
+      { 'Idempotency-Key': randomUUID() },
+    ),
+    201,
+  );
+  const tripId = created.data.tripId;
+  const original = (
+    await json(
+      await request(
+        `/api/v1/trips/${tripId}/workspace`,
+        'GET',
+        undefined,
+        member,
+      ),
+    )
+  ).data;
+  const dayId = original.days[0].id;
+  const selected = randomUUID();
+  const hidden = randomUUID();
+  const description =
+    '하나마루켄\n4.3 stars rating4.3\nOpen\n핵심 포인트: 원문 🗾\n추천 메뉴: 행복 라멘\n이용 팁: 원문 그대로';
+  let version = 1;
+  const save = async (operation, input) => {
+    // 매번 서버가 확정한 최신 여행 버전과 고유 멱등 키를 사용한다.
+    const result = await json(
+      await request(
+        `/api/v1/trips/${tripId}/commands`,
+        'POST',
+        { operation, input },
+        member,
+        {
+          'Idempotency-Key': randomUUID(),
+          'If-Match': `"trip:${tripId}:${version}"`,
+        },
+      ),
+    );
+    version = result.data.tripVersion;
+    return result.data;
+  };
+  await save('day.plan', {
+    dayId,
+    planTitle: 'DAY 1 원문 테마',
+    planConcept: '원문 컨셉',
+  });
+  await save('schedule.save', {
+    id: selected,
+    dayId,
+    title: '하나마루켄',
+    type: 'PLACE',
+    sortOrder: 1,
+    memo: '비공개 예약 번호',
+    planContent: {
+      description,
+      choiceGroup: 'dinner',
+      choiceLabel: '택1',
+      choiceKind: 'choice',
+    },
+  });
+  await save('schedule.save', {
+    id: hidden,
+    dayId,
+    title: '미선택 장소',
+    type: 'PLACE',
+    sortOrder: 2,
+    memo: '숨김',
+    planContent: { description: '미선택 원문' },
+  });
+  assert.equal((await request(`/public/community/${tripId}`)).status, 404);
+  const emptyPlan = await request(
+    `/api/v1/trips/${tripId}/commands`,
+    'POST',
+    {
+      operation: 'community.publish',
+      input: {
+        kind: 'plan',
+        title: '빈 계획',
+        body: '본문만 있는 글',
+        scheduleIds: [],
+        photoIds: [],
+        includeCosts: false,
+      },
+    },
+    member,
+    {
+      'Idempotency-Key': randomUUID(),
+      'If-Match': `"trip:${tripId}:${version}"`,
+    },
+  );
+  assert.equal(emptyPlan.status, 422);
+  assert.equal((await emptyPlan.json()).error.code, 'VALIDATION_FAILED');
+  const afterEmpty = (
+    await json(
+      await request(
+        `/api/v1/trips/${tripId}/workspace`,
+        'GET',
+        undefined,
+        member,
+      ),
+    )
+  ).data;
+  assert.equal(afterEmpty.trip.version, version);
+  assert.equal(afterEmpty.postId, null);
+  const published = await save('community.publish', {
+    kind: 'plan',
+    title: '오사카 여행계획',
+    body: '검수용 날짜',
+    scheduleIds: [selected],
+    photoIds: [],
+    includeCosts: false,
+  });
+  const postId = published.id;
+  const post = (await json(await request(`/public/community/${postId}`))).data;
+  assert.equal(post.kind, 'plan');
+  assert.equal(post.snapshot.days.length, 1);
+  assert.equal(post.snapshot.days[0].planTitle, 'DAY 1 원문 테마');
+  assert.equal(post.snapshot.itinerary.length, 1);
+  assert.equal(post.snapshot.itinerary[0].planContent.description, description);
+  assert.equal(post.snapshot.itinerary[0].dayNumber, 1);
+  assert.equal(JSON.stringify(post).includes('비공개 예약 번호'), false);
+  assert.equal(JSON.stringify(post).includes('미선택 원문'), false);
+  const db = await mf.getD1Database('DB');
+  const stored = await db
+    .prepare('SELECT snapshot FROM posts WHERE id=?')
+    .bind(postId)
+    .first();
+  assert.deepEqual(JSON.parse(stored.snapshot), post);
+  const newer = Array.from({ length: 20 }, () => {
+    // 목록 경계용 공개 행은 이 격리 D1 안에서만 사용한다.
+    return { tripId: randomUUID(), postId: randomUUID() };
+  });
+  try {
+    // 실제 20건 목록 밖에 있는 원문 계획도 ID로 직접 조회해야 한다.
+    await db.batch(
+      newer.flatMap((item, index) => {
+        // 각 fixture의 부모 여행과 공개 행을 같은 로컬 batch에 만든다.
+        return [
+          db
+            .prepare(
+              'INSERT INTO trips(id,owner_id,version,snapshot,last_key) VALUES(?,?,1,?,?)',
+            )
+            .bind(
+              item.tripId,
+              member.id,
+              JSON.stringify({
+                ...original,
+                trip: { ...original.trip, id: item.tripId },
+              }),
+              randomUUID(),
+            ),
+          db
+            .prepare(
+              'INSERT INTO posts(id,trip_id,author_id,published_at,snapshot) VALUES(?,?,?,?,?)',
+            )
+            .bind(
+              item.postId,
+              item.tripId,
+              member.id,
+              Date.now() + index,
+              JSON.stringify({ ...post, id: item.postId }),
+            ),
+        ];
+      }),
+    );
+    const page = (await json(await request('/public/community'))).data;
+    assert.equal(page.length, 20);
+    assert.ok(
+      !page.some((item) => {
+        // 검수 대상이 실제로 첫 목록에서 빠져 있어야 한다.
+        return item.id === postId;
+      }),
+    );
+    assert.deepEqual(
+      (await json(await request(`/public/community/${postId}`))).data,
+      post,
+    );
+  } finally {
+    // 이 검사에서 만든 정확한 fixture ID만 정리한다.
+    await db.batch(
+      newer.flatMap((item) => {
+        // 다른 테스트나 고객 자료를 이름 조건으로 지우지 않는다.
+        return [
+          db.prepare('DELETE FROM posts WHERE id=?').bind(item.postId),
+          db.prepare('DELETE FROM trips WHERE id=?').bind(item.tripId),
+        ];
+      }),
+    );
+  }
+  const loaded = (
+    await json(
+      await request(
+        `/api/v1/trips/${tripId}/workspace`,
+        'GET',
+        undefined,
+        member,
+      ),
+    )
+  ).data;
+  assert.equal(loaded.trip.status, original.trip.status);
+  assert.equal(loaded.days[0].planConcept, '원문 컨셉');
+  assert.equal(
+    loaded.itinerary.find((item) => {
+      // 개인 원본에는 선택하지 않은 장소 원문도 남아 있어야 한다.
+      return item.id === hidden;
+    }).planContent.description,
+    '미선택 원문',
+  );
+  assert.equal((await request('/public/community/not-a-uuid')).status, 422);
+  assert.equal(
+    (await request(`/public/community/${randomUUID()}`)).status,
+    404,
+  );
+  await save('community.withdraw', {});
+  assert.equal((await request(`/public/community/${postId}`)).status, 404);
+  assert.ok(
+    await db.prepare('SELECT id FROM trips WHERE id=?').bind(tripId).first(),
+  );
+  await json(await request('/api/auth/sign-out', 'POST', {}, member));
+});
+
 test('R08 Worker 공개 정책은 운영값 미설정에서 인증·DB 조회 없이 null을 반환한다', async () => {
   // 실제 빌드한 Worker의 공개 라우팅과 비활성 기본 정책을 확인한다.
   const response = await mf.dispatchFetch(
@@ -1508,6 +1753,63 @@ function concurrentSave(
     });
 }
 
+// D1 명령 경로에서도 수정은 같은 영수증·실제 비용 한 건을 교체한다.
+function receiptUpdateIntegrity(id) {
+  // 실제 원본·DAY·연결 일정은 유지하고 결제 금액만 수정한다.
+  return save('receipt.update', {
+    id,
+    dayId: state.day,
+    mediaId: state.media,
+    scheduleId: state.schedule,
+    keepPhoto: true,
+    merchant: '뉴욕 식당',
+    transactionDate: '2026-10-06',
+    amount: '21.50',
+    currency: 'USD',
+    details: '피자',
+    address: 'New York sample cafe',
+    transactionTime: '16:36',
+    category: 'food',
+    items: [
+      { name: 'Pizza', quantity: 1, unitPrice: '21.50', amount: '21.50' },
+    ],
+  })
+    .then(() => {
+      // HTTP 저장 뒤 D1의 원본을 다시 읽는다.
+      return request(
+        `/api/v1/trips/${state.trip}/workspace`,
+        'GET',
+        undefined,
+        state.users[0],
+      );
+    })
+    .then(json)
+    .then((body) => {
+      // 신규 결제나 일정이 생기지 않고 같은 식별자로 금액이 바뀌어야 한다.
+      return void (assert.equal(
+        body.data.receipts.filter((receipt) => receipt.id === id).length,
+        1,
+      ),
+      assert.equal(
+        body.data.receipts.find((receipt) => receipt.id === id).amount,
+        '21.50',
+      ),
+      assert.equal(
+        body.data.expenses.filter((expense) => expense.id === id).length,
+        1,
+      ),
+      assert.equal(
+        body.data.expenses.find((expense) => expense.id === id).amount,
+        '21.50',
+      ),
+      assert.equal(
+        body.data.itinerary.filter((schedule) => schedule.id === state.schedule)
+          .length,
+        1,
+      ));
+    });
+}
+
 // 영수증·자동 일정·실제 비용의 원자 연결과 중복 차단을 검사한다.
 function receiptIntegrity(id = randomUUID()) {
   // OCR 미설정에서도 사용자 확인 수동 입력은 실제 저장 가능하다.
@@ -1568,6 +1870,7 @@ function receiptIntegrity(id = randomUUID()) {
         )
       );
     })
+    .then(() => receiptUpdateIntegrity(id))
     .then(() =>
       command('receipt.confirm', {
         id: randomUUID(),

@@ -33,6 +33,7 @@ interface Props {
   canCreate: boolean;
   onAdd: () => void;
   onCourse: () => void;
+  onPlan?: () => void;
   onCapture: (item: WorkspaceSchedule) => void;
   onPhoto: (item: WorkspaceSchedule) => void;
   onEdit: (item: WorkspaceSchedule) => void;
@@ -147,6 +148,12 @@ function TimelineContent(
           <Text style={shared.meta}>
             DAY {props.day.dayNumber} · {props.day.tripDate}
           </Text>
+          {props.day.planTitle ? (
+            <Text style={s.headingText}>{props.day.planTitle}</Text>
+          ) : null}
+          {props.day.planConcept ? (
+            <Text style={shared.meta}>{props.day.planConcept}</Text>
+          ) : null}
         </View>
         {!props.disabled &&
           schedulesForDay(props.snapshot.itinerary, props.day.id).length >
@@ -173,6 +180,13 @@ function TimelineContent(
       <ScheduleConflictNotice
         items={schedulesForDay(props.snapshot.itinerary, props.day.id)}
       />
+      {props.onPlan && props.canCreate && (
+        <ScheduleButton
+          label="이날 여행계획 정리"
+          disabled={props.disabled}
+          onPress={props.onPlan}
+        />
+      )}
       {props.arranging[0] && (
         <Text style={shared.meta}>화살표를 눌러 방문 순서를 바꿔 보세요.</Text>
       )}

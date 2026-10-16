@@ -2,6 +2,7 @@ import cityCredits from '../../apps/mobile/assets/destinations/credits.json';
 import receiptScan from '../fixtures/kagerou-receipt-analysis.json';
 import kacDomestic from '../fixtures/kac-rs901-normalized.json';
 import kacInternational from '../fixtures/kac-ze781a-normalized.json';
+import osakaPlan from '../fixtures/osaka-community-plan.json';
 import { test, expect, type Page, type Route } from '@playwright/test';
 
 import {
@@ -2084,6 +2085,7 @@ async function flightLookupDraft(
   page: Page,
   guest = false,
   date = '2026-11-01',
+  endDate = date === '2026-10-14' ? '2026-10-16' : '2026-11-03',
 ): Promise<void> {
   // 인증 경계만 격리하고 여행과 항공편 페이지는 실제 앱을 사용한다.
   await network(page);
@@ -2096,7 +2098,7 @@ async function flightLookupDraft(
   await page.getByRole('button', { name: '도쿄 선택', exact: true }).click();
   await fields(page, {
     시작일: date,
-    종료일: date === '2026-10-14' ? '2026-10-16' : '2026-11-03',
+    종료일: endDate,
   });
   await page.getByRole('button', { name: '다음', exact: true }).click();
   await page
@@ -2157,8 +2159,8 @@ test('항공권 입력: 항공사 선택·번호 조회·구간 선택·완료 �
     page.getByRole('button', { name: '완료', exact: true }),
   ).toBeDisabled();
   await expect(
-    page.getByRole('button', { name: '직접 입력하기', exact: true }),
-  ).toHaveCount(0);
+    page.getByRole('button', { name: '항공권 직접 입력', exact: true }),
+  ).toBeVisible();
   await ticketNumber(page, 'RS0715');
   expect(queries).toHaveLength(0);
   await page.getByRole('button', { name: '조회하기', exact: true }).click();
@@ -4950,9 +4952,21 @@ for (const { largePhoto, keepPhoto } of [
       },
       () => {
         // 한 번 등록한 영수증은 실제 지출 하나만 만든다.
+        return expect(page.getByTestId('trip-expenses-panel')).toContainText(
+          'Kagerou Cafe',
+        );
+      },
+      () => {
+        // 카드의 금액과 실제 영수증 출처를 각각 검사한다.
+        return expect(page.getByTestId('trip-expenses-panel')).toContainText(
+          'JPY 2450',
+        );
+      },
+      () => {
+        // 같은 영수증 지출 카드가 한 번만 보여야 한다.
         return expect(
-          page.getByText('Kagerou Cafe · 2450 JPY · 실제', { exact: true }),
-        ).toBeVisible();
+          page.getByText('영수증에서 기록', { exact: true }),
+        ).toHaveCount(1);
       },
     ]);
   });
@@ -5484,7 +5498,7 @@ async function saveEditor(page: Page): Promise<void> {
   if (await page.getByRole('button', { name: '다음', exact: true }).count())
     await page.getByRole('button', { name: '다음', exact: true }).click();
   const save = page.getByRole('button', {
-    name: /^(확인하고 저장|건너뛰기|여행 만들기|DAY \d+ 일정에 추가|일정 수정 저장)$/,
+    name: /^(확인하고 저장|건너뛰기|여행 만들기|여행 기록 만들기|DAY \d+ 일정에 추가|일정 수정 저장)$/,
   });
   if (await save.count()) await save.click();
   else
@@ -7148,13 +7162,27 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
     '여행 타이틀 (비우면 자동 생성)': '검증 여행',
     '나라 검색': '일본',
     '도시 검색': '도쿄',
-    시작일: '2026-11-10',
-    종료일: '2026-11-10',
+    시작일: '2026-10-02',
+    종료일: '2026-10-02',
     '현지 시간대': 'Asia/Tokyo',
   });
+  await page.getByRole('button', { name: '다음', exact: true }).click();
+  await page
+    .getByRole('button', { name: '출발 항공편 추가하기', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: '항공권 직접 입력', exact: true })
+    .click();
+  await fields(page, {
+    '항공 편명': 'RS715',
+    '출발 공항 코드': 'ICN',
+    '도착 공항 코드': 'KIX',
+    '출발 시각 (현지, HH:mm)': '09:00',
+  });
+  await page.getByRole('button', { name: '완료', exact: true }).click();
   await saveEditor(page);
   await expect(
-    page.getByText('DAY 1 · 2026-11-10', { exact: true }),
+    page.getByText('DAY 1 · 2026-10-02', { exact: true }),
   ).toBeVisible();
   await page.getByRole('button', { name: '일정 추가', exact: true }).click();
   // 외부 지도에서 확인한 장소는 수동 제목·주소 입력으로 일정에 추가한다.
@@ -7194,7 +7222,7 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
   ).toBeVisible();
   await fields(page, {
     '영수증 상호': '라멘 식당',
-    '실제 결제 날짜': '2026-11-10',
+    '실제 결제 날짜': '2026-10-02',
     금액: '2500',
     '구매 내역': '라멘 2그릇',
   });
@@ -7207,21 +7235,25 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
   // 확인한 영수증 원본과 내역은 사진 영역에서 조회한다.
   await openTripSection(page, '사진·영수증');
   await expect(
-    page.getByText('라멘 식당 · 2026-11-10 · 2500 JPY', { exact: true }),
+    page.getByText('라멘 식당 · 2026-10-02 · 2500 JPY', { exact: true }),
   ).toBeVisible();
   await page.reload();
   await expect(
     page.getByLabel('12:30 · 도쿄 식당', { exact: true }),
   ).toBeVisible();
-  await page.getByRole('button', { name: '여행 더보기', exact: true }).click();
-  await openTripSettings(page, '여행 정보 / 기록 정리');
+  await openTripSection(page, '발자국 공유');
+  await page
+    .getByRole('button', { name: '기록 정리 마치기', exact: true })
+    .click();
   await page
     .getByRole('button', { name: '기록 정리 완료', exact: true })
     .click();
-  await saveEditor(page);
+  await expect(
+    page.getByRole('button', { name: '공개 내용 작성', exact: true }),
+  ).toBeEnabled();
   // 완료 여행은 원본 일정·음식·실제 비용을 다이어리로 읽고 직접 링크 재조회도 지원한다.
   await page
-    .getByRole('button', { name: '발자국 다이어리 보기', exact: true })
+    .getByRole('button', { name: '기록 보러가기', exact: true })
     .click();
   await expect(
     page.getByText('음식·구매 기록: 라멘 2그릇', { exact: true }),
@@ -7254,7 +7286,7 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
   await page
     .getByRole('button', { name: '확인하고 게시', exact: true })
     .click();
-  await page.getByRole('button', { name: '커뮤니티 탭', exact: true }).click();
+  await page.getByRole('button', { name: '커뮤니티', exact: true }).click();
   await expect(
     page.getByText('함께 다녀온 도쿄 여행', { exact: true }),
   ).toBeVisible();
@@ -7271,6 +7303,12 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
     path: 'test-results/workspace-community.png',
     fullPage: true,
   });
+  await page.goto(`/trips/${trip}`);
+  await expect(page.getByText('RS715', { exact: true }).first()).toBeVisible();
+  await openTripSection(page, '사진·영수증');
+  await expect(
+    page.getByText('라멘 식당 · 2026-10-02 · 2500 JPY', { exact: true }),
+  ).toBeVisible();
 });
 // 직접 비공개 화면을 열어도 최초 로그인 선택으로 안내한다.
 test('인증 전 발자국 직접 링크는 로그인 선택으로 돌아간다', ({ page }) => {
@@ -11073,4 +11111,1217 @@ test('상태 머신 IA: 홈 브리핑 조회 실패·재시도·빈 일정', asy
   ).toBeVisible();
   expect(calls).toBe(2);
   expect(state.writes).toHaveLength(0);
+});
+
+// 검색 HTTP만 대체하고 사용자 입력·선택·저장은 실제 화면을 통과한다.
+test('지도 검색 복구: 수동 검색·인증·장소 ID 선택·사용자 제목 보존', async ({
+  page,
+}) => {
+  // 검색이나 선택만으로 일정이 자동 저장되면 안 된다.
+  const snapshot = haruDetailFixture();
+  snapshot.itinerary = [];
+  const state = await r07Network(page, snapshot);
+  let calls = 0;
+  await page.route('**/api/v1/places/search?*', (route) => {
+    // 현재 API 경로와 실제 로그인 세션 전달을 확인한다.
+    calls++;
+    expect(new URL(route.request().url()).searchParams.get('q')).toBe(
+      `${snapshot.trip.city} 내 점심 장소`,
+    );
+    expect(route.request().headers()['authorization']).toBeTruthy();
+    return route.fulfill({
+      json: {
+        data: [
+          {
+            id: 'fixture-place',
+            title: '공급자 식당',
+            address: '공급자 주소',
+            attributions: [],
+          },
+        ],
+      },
+    });
+  });
+  await login(page);
+  await page.goto('/trips/' + trip);
+  await page.getByRole('button', { name: '일정 추가', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Google Maps로 찾거나 가져오기', exact: true })
+    .click();
+  await expect(
+    page.getByRole('button', { name: '장소 검색', exact: true }),
+  ).toBeDisabled();
+  await fields(page, { 제목: '내 점심 장소' });
+  expect(calls).toBe(0);
+  await page.getByRole('button', { name: '장소 검색', exact: true }).click();
+  await page
+    .getByRole('button', { name: '공급자 식당 선택', exact: true })
+    .click();
+  await expect(page.getByLabel('제목', { exact: true })).toHaveValue(
+    '내 점심 장소',
+  );
+  await expect(page.getByLabel('지역명·주소', { exact: true })).toHaveValue('');
+  expect(calls).toBe(1);
+  expect(state.writes).toHaveLength(0);
+  await saveEditor(page);
+  await expect.poll(() => state.snapshot.itinerary.length).toBe(1);
+  expect(state.snapshot.itinerary[0]).toMatchObject({
+    title: '내 점심 장소',
+    googlePlaceId: 'fixture-place',
+  });
+  expect(JSON.stringify(state.writes)).not.toContain('공급자 주소');
+  expect(JSON.stringify(state.writes)).not.toContain('공급자 식당');
+});
+
+test('지도 검색 복구: 잠금·늦은 결과 폐기·빈 결과·오류 후 재시도', async ({
+  page,
+}) => {
+  // 이전 검색이 새 입력이나 닫힌 폼을 덮어쓰지 않는지 확인한다.
+  await r07Network(page, haruDetailFixture());
+  let calls = 0;
+  let release = () => {
+    // 요청이 시작되기 전에는 해제할 응답이 없다.
+  };
+  let firstFinished = Promise.resolve();
+  await page.route('**/api/v1/places/search?*', async (route) => {
+    // 첫 검색만 지연하고 뒤의 요청은 결과 없음·설정 오류·성공 순으로 반환한다.
+    calls++;
+    if (calls === 1) {
+      const gate = new Promise<void>((resolve) => {
+        // 테스트에서 응답을 보낼 시점을 결정한다.
+        release = resolve;
+      });
+      firstFinished = gate.then(() =>
+        route
+          .fulfill({
+            json: {
+              data: [{ id: 'late-place', title: '늦은 장소', address: '' }],
+            },
+          })
+          .catch(() => undefined),
+      );
+      return firstFinished;
+    }
+    return calls === 2
+      ? route.fulfill({ json: { data: [] } })
+      : calls === 3
+        ? route.fulfill({
+            status: 503,
+            json: { error: { code: 'CONFIGURATION_REQUIRED' } },
+          })
+        : route.fulfill({
+            json: {
+              data: [{ id: 'new-place', title: '새 장소', address: '' }],
+            },
+          });
+  });
+  await login(page);
+  await page.goto('/trips/' + trip);
+  await page.getByRole('button', { name: '일정 추가', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Google Maps로 찾거나 가져오기', exact: true })
+    .click();
+  await fields(page, { 제목: '첫 장소' });
+  await page.getByRole('button', { name: '장소 검색', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: '장소 검색 중…', exact: true }),
+  ).toBeDisabled();
+  await expect.poll(() => calls).toBe(1);
+  await fields(page, { 제목: '새 장소' });
+  await page.getByRole('button', { name: '장소 검색', exact: true }).click();
+  await expect(
+    page.getByText(
+      '찾은 장소가 없어요. 이름을 바꿔 검색하거나 직접 입력해 주세요.',
+      { exact: true },
+    ),
+  ).toBeVisible();
+  release();
+  await firstFinished;
+  await page.getByRole('button', { name: '장소 검색', exact: true }).click();
+  await expect(page.getByRole('alert')).toContainText(
+    '다시 검색하거나 Google Maps에서 찾아 주세요.',
+  );
+  await page.getByRole('button', { name: '장소 검색', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: '새 장소 선택', exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: '늦은 장소 선택', exact: true }),
+  ).toHaveCount(0);
+  expect(calls).toBe(4);
+});
+
+test('지도 검색 복구: 빈 일정에도 지도 영역과 빈 상태를 함께 표시', async ({
+  page,
+}) => {
+  // Android에서는 같은 분기에서 기본 지도가 생성되며 웹은 위치 도식을 제공한다.
+  const snapshot = haruDetailFixture();
+  snapshot.itinerary = [];
+  await r07Network(page, snapshot);
+  await login(page);
+  await page.goto('/trips/' + trip);
+  await openTripSection(page, '지도');
+  await expect(page.getByTestId('trip-map-panel')).toContainText(
+    '장소의 위치를 선택하면 방문 순서를 확인할 수 있어요.',
+  );
+  await expect(
+    page.getByText('아직 이날의 일정이 없어요', { exact: true }),
+  ).toBeVisible();
+});
+
+test('지도 검색 복구: 검색 영역 종료 뒤 늦은 응답 폐기와 인증 오류 안내', async ({
+  page,
+}) => {
+  // 검색 영역 수명이 끝나면 결과·타이머를 다음 입력에 남기지 않는다.
+  const state = await r07Network(page, haruDetailFixture());
+  let calls = 0;
+  let release = () => {
+    // 첫 요청이 시작되기 전에는 대기 중인 응답이 없다.
+  };
+  let finished = Promise.resolve();
+  await page.route('**/api/v1/places/search?*', (route) => {
+    // 첫 요청은 영역 종료 뒤 반환하고 두 번째는 인증 만료를 재현한다.
+    calls++;
+    if (calls > 1)
+      return route.fulfill({
+        status: 401,
+        json: { error: { code: 'UNAUTHORIZED' } },
+      });
+    finished = new Promise<void>((resolve) => {
+      // 요청 완료 시점을 화면 종료 이후로 미룬다.
+      release = resolve;
+    }).then(() =>
+      route
+        .fulfill({
+          json: {
+            data: [
+              { id: 'closed-place', title: '닫힌 검색 장소', address: '' },
+            ],
+          },
+        })
+        .catch(() => undefined),
+    );
+    return finished;
+  });
+  await login(page);
+  await page.goto('/trips/' + trip);
+  await page.getByRole('button', { name: '일정 추가', exact: true }).click();
+  await fields(page, { 제목: '확인할 장소' });
+  await page
+    .getByRole('button', { name: 'Google Maps로 찾거나 가져오기', exact: true })
+    .click();
+  await page.getByRole('button', { name: '장소 검색', exact: true }).click();
+  await expect.poll(() => calls).toBe(1);
+  await page
+    .getByRole('button', { name: '지도 검색·링크 접기', exact: true })
+    .click();
+  release();
+  await finished;
+  await page
+    .getByRole('button', { name: 'Google Maps로 찾거나 가져오기', exact: true })
+    .click();
+  await expect(
+    page.getByRole('button', { name: '닫힌 검색 장소 선택', exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole('button', { name: '장소 검색', exact: true }).click();
+  await expect(page.getByRole('alert')).toContainText(
+    '로그인 후 다시 검색해 주세요.',
+  );
+  await expect(
+    page.getByRole('button', { name: 'Google Maps에서 찾기', exact: true }),
+  ).toBeEnabled();
+  expect(state.writes).toHaveLength(0);
+});
+
+// 화면과 글자 크기가 바뀌어도 제목·이동 버튼·여백의 계약을 검사한다.
+for (const width of [320, 390, 430]) {
+  for (const scale of [1, 2]) {
+    test(`헤더 규격 ${width} ${scale * 100}%: 전체 화면 제목·정렬·줄바꿈`, async ({
+      page,
+    }, testInfo) => {
+      // HTTP 응답만 격리하고 제품 화면과 사용자 입력으로 이동한다.
+      const snapshot = haruDetailFixture();
+      snapshot.trip.title = '도쿄 골목과 바다를 함께 걷는 긴 이름의 여행';
+      await r07Network(page, snapshot);
+      await page.route('**/api/v1/trips', (route) => {
+        // 여행 목록도 상세와 같은 제목을 반환한다.
+        return route.fulfill({ json: { data: [snapshot.trip] } });
+      });
+      await page.setViewportSize({ width, height: 844 });
+      await login(page);
+      await page.evaluate((size) => {
+        // 사용자의 글자 확대 설정만 적용한다.
+        document.documentElement.style.fontSize = `${16 * size}px`;
+      }, scale);
+      await inspectHeader(page, 'home', width, scale, testInfo);
+      await page.goto('/plans');
+      await expect(
+        page.getByText('내 여행 계획', { exact: true }),
+      ).toBeVisible();
+      await inspectHeader(page, 'plans', width, scale, testInfo);
+      await expect(
+        page.getByRole('button', { name: '홈으로', exact: true }),
+      ).toHaveCount(0);
+      await page
+        .getByRole('button', { name: '새 여행 만들기', exact: true })
+        .click();
+      await expect(page.getByTestId('trip-country')).toBeVisible();
+      await inspectHeader(page, 'create', width, scale, testInfo);
+      await page.getByTestId('trip-country').getByRole('button').click();
+      await inspectHeader(page, 'country', width, scale, testInfo);
+      await page
+        .getByRole('button', { name: '선택 닫기', exact: true })
+        .click();
+      await fields(page, {
+        '나라 검색': '일본',
+        '도시 검색': '도쿄',
+        시작일: '2026-11-10',
+        종료일: '2026-11-12',
+      });
+      await page.getByTestId('trip-city').getByRole('button').click();
+      await inspectHeader(page, 'city', width, scale, testInfo);
+      await page
+        .getByRole('button', { name: '선택 닫기', exact: true })
+        .click();
+      await page.getByRole('button', { name: '다음', exact: true }).click();
+      await expect(
+        page.getByRole('button', { name: '출발 항공편 추가하기', exact: true }),
+      ).toBeVisible();
+      await inspectHeader(page, 'flights', width, scale, testInfo);
+      await page
+        .getByRole('button', { name: '출발 항공편 추가하기', exact: true })
+        .click();
+      await inspectHeader(page, 'ticket', width, scale, testInfo);
+      await expect(
+        page.getByRole('button', { name: '완료', exact: true }),
+      ).toBeDisabled();
+      await page.goto(`/trips/${trip}`);
+      await expect(page.getByTestId('trip-section-navigation')).toBeVisible();
+      for (const section of [
+        '일정',
+        '지도',
+        '비용',
+        '사진·영수증',
+        '준비물',
+        '동행',
+      ]) {
+        // 같은 여행의 탭과 부가 기능에서 헤더 위치가 바뀌지 않는다.
+        await openTripSection(page, section);
+        await inspectHeader(page, `detail-${section}`, width, scale, testInfo);
+      }
+      await openTripSection(page, '일정');
+      await page
+        .getByRole('button', { name: '일정 추가', exact: true })
+        .click();
+      await expect(page.getByLabel('제목', { exact: true })).toBeVisible();
+      await inspectHeader(page, 'schedule-editor', width, scale, testInfo);
+      await page.goto(`/trips/${trip}`);
+      await openTripSettings(page, '여행 정보 / 기록 정리');
+      await inspectHeader(page, 'metadata', width, scale, testInfo);
+      await page.goto(`/trips/${trip}`);
+      await openTripSettings(page, '여행 기간 변경');
+      await inspectHeader(page, 'period', width, scale, testInfo);
+      for (const [route, file, title] of [
+        ['/footprints', 'footprints', '나의 발자국'],
+        ['/community', 'community', '여행 커뮤니티'],
+        ['/my', 'my', '마이페이지'],
+        ['/destinations/tokyo', 'guide', '도쿄 여행 가이드'],
+        ['/diary/' + trip, 'diary', '발자국 다이어리'],
+        ['/invite', 'invite', '여행 초대'],
+        ['/import-place', 'import', '저장한 장소를 여행으로'],
+        ['/local-records', 'legacy', '나의 발자취'],
+      ]) {
+        // 직접 진입한 화면도 같은 제목 토큰을 유지한다.
+        await page.goto(route!);
+        await expect(
+          page.getByText(title!, { exact: true }).first(),
+        ).toBeVisible();
+        await inspectHeader(page, file!, width, scale, testInfo);
+      }
+      await page.goto('/my');
+      await page
+        .getByRole('button', { name: '프로필 수정', exact: true })
+        .click();
+      await inspectHeader(page, 'profile', width, scale, testInfo);
+      await page
+        .getByRole('button', { name: '프로필 수정 닫기', exact: true })
+        .click();
+      await page.goto('/login?reauth=1');
+      await page
+        .getByRole('button', {
+          name: '이메일 계정으로 로그인 / 회원가입',
+          exact: true,
+        })
+        .click();
+      await inspectHeader(page, 'email', width, scale, testInfo);
+    });
+  }
+}
+
+// 계산된 실제 텍스트·버튼·행 높이와 화면 밖 넘침을 함께 확인한다.
+async function inspectHeader(
+  page: Page,
+  file: string,
+  width: number,
+  scale: number,
+  testInfo: import('@playwright/test').TestInfo,
+): Promise<void> {
+  // 페이지 이동 뒤 사용자 배율을 다시 적용하고 글꼴 로딩을 기다린다.
+  await page.evaluate(async (size) => {
+    // 새 문서에 유지되지 않는 웹 글자 설정을 복원한다.
+    document.documentElement.style.fontSize = `${16 * size}px`;
+    await document.fonts.ready;
+  }, scale);
+  if (file !== 'home')
+    await expect
+      .poll(() => page.locator('[data-testid="screen-title"]:visible').count())
+      .toBeGreaterThan(0);
+  if (file !== 'home')
+    await expect(
+      page.locator('[data-testid="screen-title"]:visible').first(),
+    ).toHaveCSS('font-size', `${26 * scale}px`);
+  const metrics = await page.evaluate(() => {
+    // 보이는 현재 레이어만 검사하고 가려진 배경 화면은 제외한다.
+    const visible = (node: Element) => {
+      // 닫힌 모달과 접근성이 차단된 배경은 현재 화면이 아니다.
+      return (
+        !node.closest('[aria-hidden="true"], [inert]') &&
+        node.getClientRects().length > 0
+      );
+    };
+    const titles = [
+      ...document.querySelectorAll('[data-testid="screen-title"]'),
+    ]
+      .filter(visible)
+      .map((node) => {
+        // 실제 글자 영역이 부모를 벗어나거나 잘리는지 측정한다.
+        const style = getComputedStyle(node);
+        const rect = node.getBoundingClientRect();
+        const range = document.createRange();
+        const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+        const glyphs: DOMRect[] = [];
+        let textNode: Node | null;
+        while ((textNode = walker.nextNode())) {
+          // 자동 줄바꿈 뒤 남는 공백은 제외하고 실제 글자만 측정한다.
+          for (
+            let index = 0;
+            index < (textNode.textContent || '').length;
+            index++
+          ) {
+            // 공백의 선택 범위가 행 밖으로 늘어나는 브라우저 동작을 제외한다.
+            if (/\s/.test(textNode.textContent![index]!)) continue;
+            range.setStart(textNode, index);
+            range.setEnd(textNode, index + 1);
+            glyphs.push(...range.getClientRects());
+          }
+        }
+        return {
+          text: node.textContent,
+          fontSize: parseFloat(style.fontSize),
+          lineHeight: parseFloat(style.lineHeight),
+          weight: style.fontWeight,
+          align: style.textAlign,
+          x: rect.x,
+          right: rect.right,
+          height: rect.height,
+          scrollWidth: node.scrollWidth,
+          clientWidth: node.clientWidth,
+          lines: glyphs.map((line) => ({
+            left: line.left,
+            right: line.right,
+            top: line.top,
+            bottom: line.bottom,
+          })),
+          top: rect.top,
+          bottom: rect.bottom,
+        };
+      });
+    const headers = [
+      ...document.querySelectorAll('[data-testid="screen-header-row"]'),
+    ]
+      .filter(visible)
+      .map((node) => {
+        // 보이는 컨트롤 없이 높이만 차지하는 빈 행을 검출한다.
+        const rect = node.getBoundingClientRect();
+        return {
+          height: rect.height,
+          children: node.childElementCount,
+          buttons: [...node.querySelectorAll('[role="button"]')].map(
+            (button) => {
+              // 작은 터치 영역과 화면 밖으로 밀린 버튼을 검출한다.
+              const box = button.getBoundingClientRect();
+              return {
+                name: button.getAttribute('aria-label'),
+                x: box.x,
+                right: box.right,
+                width: box.width,
+                height: box.height,
+              };
+            },
+          ),
+        };
+      });
+    return {
+      titles,
+      headers,
+      documentWidth: document.documentElement.scrollWidth,
+    };
+  });
+  expect(metrics.documentWidth).toBeLessThanOrEqual(width);
+  for (const title of metrics.titles) {
+    // 같은 제목은 어느 화면에서나 26/36·700·왼쪽 정렬을 유지한다.
+    expect(title.fontSize).toBe(26 * scale);
+    expect(title.lineHeight).toBe(36 * scale);
+    expect(title.weight).toBe('700');
+    expect(title.align).toBe('left');
+    expect(title.x).toBeGreaterThanOrEqual(19);
+    expect(title.right).toBeLessThanOrEqual(width - 19);
+    expect(title.scrollWidth).toBeLessThanOrEqual(title.clientWidth + 1);
+    for (const line of title.lines) {
+      // 글자 행이 제목 상자 밖에서 잘리지 않도록 한다.
+      expect(line.left).toBeGreaterThanOrEqual(title.x - 1);
+      expect(line.right).toBeLessThanOrEqual(title.right + 1);
+      expect(line.top).toBeGreaterThanOrEqual(title.top - 1);
+      expect(line.bottom).toBeLessThanOrEqual(title.bottom + 1);
+    }
+  }
+  for (const header of metrics.headers) {
+    // 제목 없는 이동 행은 56px이며 확대 텍스트가 있는 행만 늘어난다.
+    expect(header.children).toBeGreaterThan(0);
+    expect(header.height).toBeGreaterThanOrEqual(55.9);
+    if (scale === 1) expect(header.height).toBeCloseTo(56, 1);
+    for (const button of header.buttons) {
+      // 뒤로가기·더보기·텍스트 행동에 같은 최소 터치 영역을 보장한다.
+      expect(button.width).toBeGreaterThanOrEqual(43.9);
+      expect(button.height).toBeGreaterThanOrEqual(43.9);
+      expect(button.x).toBeGreaterThanOrEqual(19);
+      expect(button.right).toBeLessThanOrEqual(width - 19);
+    }
+  }
+  await expect.poll(() => haruReadingAudit(page)).toEqual([]);
+  await page.screenshot({
+    path: `outputs/header-standard/${file}-${width}-${scale * 100}.png`,
+  });
+  await testInfo.attach(`${file}-header-metrics`, {
+    body: JSON.stringify(metrics),
+    contentType: 'application/json',
+  });
+}
+
+for (const status of [200, 503])
+  test(`CJ-01 항공 조회 ${status}: 지난 왕복·추가편 직접 입력과 뒤로가기 초안·저장 재조회`, async ({
+    page,
+  }) => {
+    // 공급자 실패만 격리하고 실제 여행 생성·목록·입력·재조회를 검증한다.
+    await flightLookupDraft(page, false, '2026-10-01', '2026-10-03');
+    await page.route('**/api/v1/flights/lookup?*', (route) => {
+      // 조회0건과 연결 실패 모두 직접 입력으로 이어져야 한다.
+      return route.fulfill({
+        status,
+        json:
+          status === 200
+            ? {
+                data: {
+                  candidates: [],
+                  source: '한국공항공사',
+                  checkedAt: '2026-10-16T00:00:00Z',
+                },
+              }
+            : { error: { code: 'FLIGHT_UNAVAILABLE' } },
+      });
+    });
+    await ticketNumber(page, 'RS0715');
+    await page.getByRole('button', { name: '조회하기', exact: true }).click();
+    await expect(
+      page.getByText(
+        status === 200
+          ? /해당 날짜의 항공편을 찾지 못/
+          : /항공편을 불러오지 못/,
+      ),
+    ).toBeVisible();
+    await page
+      .getByRole('button', { name: '항공권 직접 입력', exact: true })
+      .click();
+    await fields(page, {
+      '출발 공항 코드': 'ICN',
+      '도착 공항 코드': 'KIX',
+      '출발 시각 (현지, HH:mm)': '23:20',
+      '도착 시각 (현지, HH:mm, 선택)': '01:00',
+      '도착일 (현지, 선택)': '2026-10-02',
+    });
+    await page
+      .getByRole('button', { name: '항공편 목록으로 돌아가기', exact: true })
+      .click();
+    await page
+      .getByRole('button', { name: '출발 항공편 추가하기', exact: true })
+      .click();
+    await expect(
+      page.getByLabel('출발 공항 코드', { exact: true }),
+    ).toHaveValue('ICN');
+    await expect(page.getByLabel('항공 편명', { exact: true })).toHaveValue(
+      'RS0715',
+    );
+    await page.getByRole('button', { name: '완료', exact: true }).click();
+    for (const flight of [
+      {
+        open: '도착 항공편 추가하기',
+        number: 'ZZ9999',
+        departure: 'KIX',
+        arrival: 'ICN',
+        date: '2026-10-03',
+      },
+      {
+        open: '추가 항공권 등록',
+        number: 'NH123',
+        departure: 'KIX',
+        arrival: 'HND',
+        date: '2026-10-02',
+      },
+    ]) {
+      // 조회 카탈로그에 없는 항공사도 수동 항공권은 기존 계약으로 저장한다.
+      await page
+        .getByRole('button', { name: flight.open, exact: true })
+        .click();
+      await page
+        .getByRole('button', { name: '항공권 직접 입력', exact: true })
+        .click();
+      await fields(page, {
+        '항공편 출발일': flight.date,
+        '항공 편명': flight.number,
+        '출발 공항 코드': flight.departure,
+        '도착 공항 코드': flight.arrival,
+        '출발 시각 (현지, HH:mm)': '20:00',
+      });
+      await page.getByRole('button', { name: '완료', exact: true }).click();
+    }
+    const request = page.waitForRequest((r) => {
+      // 목록의 세 구간을 저장하는 하나의 생성 요청만 잡는다.
+      return r.method() === 'POST' && r.url().endsWith('/api/v1/trips');
+    });
+    await page
+      .getByRole('button', { name: '여행 기록 만들기', exact: true })
+      .click();
+    expect((await request).postDataJSON().flights).toMatchObject([
+      {
+        number: 'RS0715',
+        date: '2026-10-01',
+        arrivalDate: '2026-10-02',
+        role: 'outbound',
+      },
+      { number: 'ZZ9999', date: '2026-10-03', role: 'inbound' },
+      { number: 'NH123', date: '2026-10-02', role: 'additional' },
+    ]);
+    await expect(page).toHaveURL(/\/trips\//);
+    await page.reload();
+    await expect(
+      page.getByText('RS0715', { exact: true }).first(),
+    ).toBeVisible();
+    await page.getByRole('button', { name: 'DAY 3', exact: true }).click();
+    await expect(
+      page.getByText('ZZ9999', { exact: true }).first(),
+    ).toBeVisible();
+  });
+
+test('CJ-06 날짜상 완료 여행: 공개 화면에서 확인→정리 완료→선택 공개, 취소는 무저장', async ({
+  page,
+}) => {
+  // 날짜 표시와 원본 공개 준비 상태를 분리하면서 다음 행동을 바로 찾게 한다.
+  const source = r07Snapshot();
+  source.trip = {
+    ...source.trip,
+    startDate: '2026-10-01',
+    endDate: '2026-10-03',
+    status: 'PLANNED',
+  };
+  source.days = source.days.map((day, index) => ({
+    ...day,
+    tripDate: `2026-10-0${index + 1}`,
+  }));
+  source.receipts = source.receipts.map((receipt) => ({
+    ...receipt,
+    date: '2026-10-01',
+  }));
+  source.postId = null;
+  const state = await r07Network(page, source);
+  await login(page);
+  await page.goto(`/trips/${trip}?section=share`);
+  await expect(
+    page.getByRole('button', { name: '공개 내용 작성', exact: true }),
+  ).toBeDisabled();
+  await page
+    .getByRole('button', { name: '기록 정리 마치기', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: '계속 정리하기', exact: true })
+    .click();
+  expect(state.writes).toHaveLength(0);
+  await page
+    .getByRole('button', { name: '기록 정리 마치기', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: '기록 정리 완료', exact: true })
+    .click();
+  await expect.poll(() => state.snapshot.trip.status).toBe('COMPLETED');
+  expect(state.snapshot.postId).toBeNull();
+  await page
+    .getByRole('button', { name: '공개 내용 작성', exact: true })
+    .click();
+  await expect(page.getByLabel('커뮤니티 본문', { exact: true })).toBeVisible();
+  expect(state.writes).toHaveLength(1);
+  await expect(
+    page.getByText('비용은 공개하지 않아요.', { exact: true }),
+  ).toBeVisible();
+});
+
+for (const keepPhoto of [true, false])
+  test(`CJ-04/05/07 영수증 수정 ${keepPhoto}: 같은 ID·원본 선택·경비·다이어리·삭제 반영`, async ({
+    page,
+  }) => {
+    // 저장된 영수증 수정은 실제 버튼과 같은 명령 모델로 확인한다.
+    const source = confirmationSnapshot();
+    source.trip = {
+      ...source.trip,
+      startDate: '2026-10-02',
+      endDate: '2026-10-02',
+    };
+    source.days[0]!.tripDate = '2026-10-02';
+    source.receipts[0] = {
+      ...source.receipts[0]!,
+      date: '2026-10-02',
+      keepPhoto,
+    };
+    if (!keepPhoto)
+      source.media = source.media.filter(
+        (media) => media.id !== source.receipts[0]!.mediaId,
+      );
+    const originalId = source.receipts[0]!.id;
+    const mediaId = source.receipts[0]!.mediaId;
+    const postId = source.postId;
+    const state = await r07Network(page, source);
+    await login(page);
+    await page.goto(`/trips/${trip}`);
+    await openTripSection(page, '사진·영수증');
+    await page
+      .getByRole('button', { name: '영수증 기록 수정', exact: true })
+      .click();
+    await expect(
+      page.getByRole('button', { name: '새 장소 기록 만들기', exact: true }),
+    ).toHaveCount(0);
+    await fields(page, { 금액: '2100' });
+    await page
+      .getByRole('button', {
+        name: '맞아요, 수정한 내용을 저장할게요',
+        exact: true,
+      })
+      .click();
+    await page
+      .getByRole('button', { name: '영수증 수정 저장', exact: true })
+      .click();
+    await expect.poll(() => state.snapshot.receipts[0]?.amount).toBe('2100');
+    expect(state.snapshot.receipts).toHaveLength(1);
+    expect(state.snapshot.receipts[0]).toMatchObject({
+      id: originalId,
+      mediaId,
+      keepPhoto,
+    });
+    expect(state.snapshot.itinerary).toHaveLength(2);
+    expect(state.snapshot.postId).toBe(postId);
+    expect(
+      state.snapshot.expenses.filter((expense) => expense.id === originalId),
+    ).toHaveLength(1);
+    await page.getByRole('button', { name: '비용', exact: true }).click();
+    await expect(page.getByText('3600.00', { exact: true })).toBeVisible();
+    await page.screenshot({
+      path: `outputs/customer-server-review/receipt-update-${keepPhoto}-costs.png`,
+    });
+    await page.reload();
+    await page
+      .getByRole('button', { name: '기록 보러가기', exact: true })
+      .click();
+    await expect(
+      page.getByText('총 실제 비용 3600.00 JPY', { exact: true }),
+    ).toBeVisible();
+    await page
+      .getByRole('button', { name: '기록 더 추가', exact: true })
+      .click();
+    await openTripSection(page, '사진·영수증');
+    await page
+      .getByRole('button', { name: '영수증 기록·지출 삭제', exact: true })
+      .click();
+    await page
+      .getByRole('button', { name: '기록·지출 삭제하기', exact: true })
+      .click();
+    await expect.poll(() => state.snapshot.receipts.length).toBe(0);
+    expect(state.snapshot.itinerary).toHaveLength(2);
+    expect(
+      state.snapshot.expenses.some((expense) => expense.id === originalId),
+    ).toBe(false);
+    expect(state.snapshot.media.some((media) => media.id === mediaId)).toBe(
+      keepPhoto,
+    );
+    await page.getByRole('button', { name: '비용', exact: true }).click();
+    await expect(page.getByText('1500.00', { exact: true })).toBeVisible();
+  });
+
+// 공개 계획에 필요한 일차·장소만 담고 비공개 메모는 넣지 않는다.
+function osakaPublicPlan(): CommunityPost {
+  // 실제 게시 검증과 별개로 UI 탐색을 재현할 원문 fixture를 사용한다.
+  let sequence = 0;
+  return {
+    kind: 'plan',
+    id: '00000000-0000-4000-8000-000000000070',
+    authorId: owner,
+    author: '계획 검수자',
+    title: '오사카 3박4일 여행계획',
+    body: '4일간의 장소와 선택지를 공유합니다.',
+    publishedAt: '2026-10-16T05:00:00Z',
+    photoPaths: [],
+    snapshot: {
+      country: '일본',
+      city: '오사카',
+      startDate: '2026-10-01',
+      endDate: '2026-10-04',
+      costs: {},
+      days: osakaPlan.days.map((day) => {
+        // 실제 날짜의 여행 실적으로 표현하지 않고 일차 주제를 유지한다.
+        return {
+          dayNumber: day.dayNumber,
+          date: `2026-10-0${day.dayNumber}`,
+          planTitle: day.planTitle,
+          planConcept: day.planConcept,
+        };
+      }),
+      itinerary: osakaPlan.days.flatMap((day) => {
+        // 원안의 장소 순서와 설명을 같은 DAY에 묶는다.
+        return day.places.map((place, index) => {
+          // 장소 설명을 게시 본문에 합치지 않는다.
+          return {
+            id: `00000000-0000-4000-8000-${String(++sequence).padStart(12, '0')}`,
+            dayNumber: day.dayNumber,
+            sortOrder: index + 1,
+            type: 'PLACE' as const,
+            title: place.title,
+            date: `2026-10-0${day.dayNumber}`,
+            timeSlot: null,
+            address: '',
+            planContent: {
+              description: place.description,
+              ...(['릴로 커피 로스터즈', '릴로커피 킷사'].includes(place.title)
+                ? {
+                    choiceGroup: 'day1-cafe',
+                    choiceLabel: '카페 · 둘 중 한 곳 선택',
+                    choiceKind: 'choice' as const,
+                  }
+                : {}),
+            },
+          };
+        });
+      }),
+    },
+  };
+}
+
+// 외부 공개 응답만 대체하고 실제 상세 경로·컴포넌트를 사용한다.
+async function osakaPlanNetwork(page: Page, missing = false) {
+  // 다른 인증/시작 규칙은 기존 통합 검수와 공유한다.
+  await network(page);
+  const post = osakaPublicPlan();
+  await page.route('**/public/community*', (route) => {
+    // 목록에서는 짧은 계획 카드만 만들도록 공개 스냅샷을 제공한다.
+    return route.fulfill({ json: { data: [post] } });
+  });
+  await page.route('**/public/community/*', (route) => {
+    // 단건 조회의 철회 오류를 별도로 재현한다.
+    return route.fulfill(
+      missing
+        ? { status: 404, json: { error: { code: 'RESOURCE_NOT_FOUND' } } }
+        : { json: { data: post } },
+    );
+  });
+  return post;
+}
+
+test('CP-01 커뮤니티는 요약 카드에서 DAY별 계획을 열고 19개 장소의 원문을 보존한다', async ({
+  page,
+}) => {
+  // 긴 글 전체를 피드에 붙이지 않고 원문의 모든 장소를 계획 안에서 읽는다.
+  test.setTimeout(180000);
+  const post = await osakaPlanNetwork(page);
+  await page.goto('/community');
+  await expect(page.getByText(post.title, { exact: true })).toBeVisible();
+  await expect(
+    page.getByText(osakaPlan.days[0]!.places[0]!.description, { exact: true }),
+  ).toHaveCount(0);
+  await page
+    .getByRole('button', {
+      name: `${post.title} 여행계획 열어보기`,
+      exact: true,
+    })
+    .click();
+  await expect(page).toHaveURL(new RegExp(`/community/${post.id}$`));
+  for (const day of osakaPlan.days) {
+    await page
+      .getByRole('button', {
+        name: `DAY ${day.dayNumber} 여행계획`,
+        exact: true,
+      })
+      .click();
+    await expect(
+      page.getByText(day.planConcept, { exact: true }),
+    ).toBeVisible();
+    for (const place of day.places) {
+      await page
+        .getByRole('button', {
+          name: `${place.title} 장소 설명·팁 보기`,
+          exact: true,
+        })
+        .click();
+      await expect(
+        page.getByText(place.description, { exact: true }),
+      ).toBeVisible();
+    }
+  }
+  expect(
+    await page.evaluate(() => {
+      // 작은 화면에서 긴 제목과 원문이 가로로 잘리지 않는지 확인한다.
+      return document.documentElement.scrollWidth <= window.innerWidth;
+    }),
+  ).toBe(true);
+  await page.screenshot({
+    path: 'outputs/community-osaka/ui-day4.png',
+    fullPage: true,
+  });
+});
+
+test('CP-02 철회된 계획의 직접 링크는 오류와 커뮤니티 복귀를 제공한다', async ({
+  page,
+}) => {
+  // 오래된 링크에 비공개 원본을 대신 보여 주지 않는다.
+  const post = await osakaPlanNetwork(page, true);
+  await page.goto(`/community/${post.id}`);
+  await expect(
+    page.getByText(
+      '공유가 끝났거나 찾을 수 없는 여행계획이에요. 커뮤니티에서 다른 계획을 살펴보세요.',
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await page
+    .getByRole('button', { name: '커뮤니티로 돌아가기', exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/community$/);
+});
+
+test('CP-06 로그인 복원과 느린 공개 조회 뒤에도 직접 링크·새로고침이 열린다', async ({
+  page,
+}) => {
+  // 이전 회원 캐시 정리가 공개 요청을 취소한 채 로딩을 남기지 않아야 한다.
+  const post = await osakaPlanNetwork(page);
+  await login(page);
+  await page.route('**/api/auth/get-session', async (route) => {
+    // 저장된 토큰으로 계정이 복원되는 시간을 재현한다.
+    await new Promise((resolve) => {
+      // 공개 응답과 세션 확인이 겹치는 순서를 고정한다.
+      return setTimeout(resolve, 200);
+    });
+    return route.fulfill({
+      json: {
+        user: {
+          id: owner,
+          name: '검증 여행자',
+          email: 'fixture@example.test',
+          createdAt: '2026-10-03T00:00:00Z',
+          updatedAt: '2026-10-03T00:00:00Z',
+        },
+        session: { id: owner },
+      },
+    });
+  });
+  await page.route('**/public/community/*', async (route) => {
+    // 계정 복원보다 늦은 공개 응답도 현재 화면에 표시돼야 한다.
+    await new Promise((resolve) => {
+      // 외부 통신 지연만 재현하고 제품 상태를 직접 바꾸지 않는다.
+      return setTimeout(resolve, 600);
+    });
+    return route.fulfill({ json: { data: post } });
+  });
+  await page.goto(`/community/${post.id}`);
+  await expect(page.getByText(post.title, { exact: true })).toBeVisible();
+  await page.reload();
+  await expect(page.getByText(post.title, { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'DAY 4 여행계획', exact: true }),
+  ).toBeVisible();
+});
+
+test('CP-03 준비 중인 여행은 완료 처리 없이 선택한 계획 설명을 미리 보고 공유한다', async ({
+  page,
+}) => {
+  // 실제 지출과 비공개 메모는 계획의 공개 설명으로 섞지 않는다.
+  const source = r07Snapshot();
+  source.postId = null;
+  source.trip.status = 'PLANNED';
+  source.days[0]!.planTitle = '미나미 여행';
+  source.days[0]!.planConcept = '맛집과 강변 산책';
+  source.itinerary[0]!.planContent = {
+    description: '공개할 메뉴와 이용 팁',
+    choiceGroup: 'cafe',
+    choiceLabel: '카페 중 택1',
+  };
+  source.itinerary[0]!.memo = '비공개 동행 메모';
+  const state = await r07Network(page, source);
+  await login(page);
+  await page.goto(`/trips/${trip}?section=share`);
+  await page
+    .getByRole('button', { name: '여행계획 공유하기', exact: true })
+    .click();
+  await page
+    .getByRole('button', {
+      name: `일정: ${source.itinerary[0]!.title}`,
+      exact: true,
+    })
+    .click();
+  await page.getByLabel('계획 소개', { exact: true }).fill('일차별 계획 공유');
+  await page
+    .getByRole('button', {
+      name: `${source.itinerary[0]!.title} 장소 설명·팁 보기`,
+      exact: true,
+    })
+    .click();
+  await expect(
+    page.getByText('공개할 메뉴와 이용 팁', { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText('비공개 동행 메모', { exact: true })).toHaveCount(
+    0,
+  );
+  await page
+    .getByRole('button', { name: '확인하고 게시', exact: true })
+    .click();
+  await expect.poll(() => state.writes.length).toBe(1);
+  await expect.poll(() => state.snapshot.postId).not.toBeNull();
+  expect(state.snapshot.trip.status).toBe('PLANNED');
+  expect(state.writes).toHaveLength(1);
+  expect(state.writes[0]!.body).toMatchObject({
+    operation: 'community.publish',
+    input: { kind: 'plan', includeCosts: false },
+  });
+});
+
+test('CP-04 DAY 제목·컨셉 수정은 같은 DAY와 연결 장소를 유지한다', async ({
+  page,
+}) => {
+  // 공통 폼이 새 명령과 실제 입력란을 연결하는지 확인한다.
+  const source = r07Snapshot();
+  const dayId = source.days[0]!.id;
+  const placeIds = source.itinerary.map((item) => {
+    // 날짜 제목 수정으로 방문 기록을 다시 만들지 않는다.
+    return item.id;
+  });
+  const state = await r07Network(page, source);
+  await login(page);
+  await page.goto(`/trips/${trip}`);
+  await page
+    .getByRole('button', { name: '이날 여행계획 정리', exact: true })
+    .click();
+  await page
+    .getByLabel('이날 계획 제목', { exact: true })
+    .fill('미나미 랜드마크');
+  await page
+    .getByLabel('이날 여행 컨셉', { exact: true })
+    .fill('라멘과 강변 산책');
+  await page
+    .getByRole('button', { name: '확인하고 저장', exact: true })
+    .click();
+  await expect
+    .poll(() => state.snapshot.days[0]!.planTitle)
+    .toBe('미나미 랜드마크');
+  expect(state.snapshot.days[0]!.id).toBe(dayId);
+  expect(state.snapshot.itinerary.map((item) => item.id)).toEqual(placeIds);
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(
+    page
+      .getByTestId('trip-content')
+      .getByText('라멘과 강변 산책', { exact: true }),
+  ).toBeVisible();
+});
+
+test('CP-05 장소 계획 설명을 수정해도 선택지 관계·비공개 메모·일정 ID를 보존한다', async ({
+  page,
+}) => {
+  // 편집 폼이 공개 설명과 개인 메모를 같은 값으로 합치지 않아야 한다.
+  const source = r07Snapshot();
+  source.itinerary[0]!.planContent = {
+    description: '원래 추천 메뉴',
+    choiceGroup: 'day1-cafe',
+    choiceLabel: '카페 중 택1',
+    choiceKind: 'backup',
+  };
+  source.itinerary[0]!.memo = '개인 예약 확인 메모';
+  const place = source.itinerary[0]!;
+  const state = await r07Network(page, source);
+  await login(page);
+  await page.goto(`/trips/${trip}`);
+  await page
+    .getByRole('button', { name: `${place.title} 일정 관리`, exact: true })
+    .click();
+  await page.getByRole('button', { name: '일정 수정', exact: true }).click();
+  await expect(
+    page.getByLabel('계획 설명·추천 메뉴·팁', { exact: true }),
+  ).toHaveValue('원래 추천 메뉴');
+  await page
+    .getByLabel('계획 설명·추천 메뉴·팁', { exact: true })
+    .fill('수정한 추천 메뉴\n이용 팁도 보존');
+  await saveEditor(page);
+  await expect
+    .poll(
+      () =>
+        state.snapshot.itinerary.find((item) => {
+          // 저장 후 배열 위치가 바뀌어도 같은 일정 ID를 검사한다.
+          return item.id === place.id;
+        })?.planContent?.description,
+    )
+    .toBe('수정한 추천 메뉴\n이용 팁도 보존');
+  const updated = state.snapshot.itinerary.find((item) => {
+    // 물리 배열 순서 대신 저장된 식별자로 메모와 선택지를 대조한다.
+    return item.id === place.id;
+  })!;
+  expect(updated.memo).toBe('개인 예약 확인 메모');
+  expect(updated.planContent).toMatchObject({
+    choiceGroup: 'day1-cafe',
+    choiceLabel: '카페 중 택1',
+    choiceKind: 'backup',
+  });
+});
+
+test('CP-07 장소 대표 사진·저작자·원본 출처를 표시하고 선택한 DAY만 조회한다', async ({
+  page,
+}) => {
+  // Google 외부 경계만 고정하고 실제 사진 컴포넌트와 DAY 전환을 검사한다.
+  const post = await osakaPlanNetwork(page);
+  const requested: string[] = [];
+  await page.route('**/public/community/*/places/*/photo', (route) => {
+    // 공개 일정 ID별로 사진이 정확한 카드에 연결되는지 대조한다.
+    const id = new URL(route.request().url()).pathname.split('/').at(-2)!;
+    requested.push(id);
+    return route.fulfill({
+      json: {
+        data: {
+          imageUrl: `https://lh3.googleusercontent.com/qa-photo-${id}`,
+          placeId: `google-${id}`,
+          matchedTitle: 'Google 장소명',
+          matchedAddress: '오사카',
+          sourceUrl: 'https://www.google.com/maps/photo/source',
+          authors: [
+            {
+              name: '검수 사진가',
+              url: 'https://maps.google.com/maps/contrib/123',
+            },
+          ],
+        },
+      },
+    });
+  });
+  await page.route('https://lh3.googleusercontent.com/**', (route) => {
+    // 화면 검수용 이미지임을 실제 Google 조회 성공과 구분한다.
+    return route.fulfill({ body: tinyPng, contentType: 'image/png' });
+  });
+  await page.goto(`/community/${post.id}`);
+  await expect(
+    page.getByRole('img', { name: '하나마루켄 Google 장소 사진', exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText('사진: 검수 사진가', { exact: true }),
+  ).toHaveCount(8);
+  await expect.poll(() => requested.length).toBe(8);
+  const firstIds = post.snapshot.itinerary
+    .filter((p) => p.dayNumber === 1)
+    .map((p) => p.id);
+  expect(requested.every((id) => firstIds.includes(id))).toBe(true);
+  await page
+    .getByRole('button', { name: 'DAY 4 여행계획', exact: true })
+    .click();
+  await expect(
+    page.getByRole('img', {
+      name: '구로몬 시장 Google 장소 사진',
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect.poll(() => requested.length).toBe(9);
+  await expect(
+    page.getByRole('button', {
+      name: '구로몬 시장 Google Maps 사진 원본 보기',
+      exact: true,
+    }),
+  ).toBeVisible();
+  expect(
+    await page.evaluate(() => {
+      // 사진과 긴 출처 이름도 좁은 화면에서 가로로 넘치지 않아야 한다.
+      return document.documentElement.scrollWidth <= window.innerWidth;
+    }),
+  ).toBe(true);
+});
+
+test('CP-08 이미지 다운로드 실패는 재조회로 회복하고 사진 없음·한도 오류는 구분한다', async ({
+  page,
+}) => {
+  // 실패한 이미지의 이전 URL이 새 성공 응답을 계속 가리지 않아야 한다.
+  const post = await osakaPlanNetwork(page);
+  let calls = 0;
+  const targetId = post.snapshot.itinerary[0]!.id;
+  await page.route('**/public/community/*/places/*/photo', (route) => {
+    // 첫 장소만 만료 이미지→새 이미지 순서로 제공한다.
+    const id = new URL(route.request().url()).pathname.split('/').at(-2);
+    if (id !== targetId) return route.fulfill({ json: { data: null } });
+    calls++;
+    return route.fulfill({
+      json: {
+        data: {
+          imageUrl: `https://lh3.googleusercontent.com/${calls === 1 ? 'expired' : 'fresh'}`,
+          placeId: 'photo-place',
+          matchedTitle: '하나마루켄',
+          matchedAddress: '오사카',
+          sourceUrl: 'https://www.google.com/maps/photo/source',
+          authors: [],
+        },
+      },
+    });
+  });
+  await page.route('https://lh3.googleusercontent.com/**', (route) => {
+    // 만료 URL은 실패시키고 새 URL만 실제 이미지 바이트를 반환한다.
+    return route.request().url().endsWith('/expired')
+      ? route.fulfill({ status: 404, body: '' })
+      : route.fulfill({ body: tinyPng, contentType: 'image/png' });
+  });
+  await page.goto(`/community/${post.id}`);
+  await expect(
+    page.getByRole('button', {
+      name: '하나마루켄 사진 다시 불러오기',
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByText('Google에 등록된 장소 사진이 없어요.', { exact: true }),
+  ).toHaveCount(7);
+  await page
+    .getByRole('button', { name: '하나마루켄 사진 다시 불러오기', exact: true })
+    .click();
+  await expect(
+    page.getByRole('img', { name: '하나마루켄 Google 장소 사진', exact: true }),
+  ).toBeVisible();
+  expect(calls).toBe(2);
+  await page.route('**/public/community/*/places/*/photo', (route) => {
+    // 무료 호출 한도 도달은 사진 없음으로 숨기지 않는다.
+    return route.fulfill({
+      status: 429,
+      json: { error: { code: 'PLACE_PHOTO_RATE_LIMITED' } },
+    });
+  });
+  await page
+    .getByRole('button', { name: 'DAY 4 여행계획', exact: true })
+    .click();
+  await expect(
+    page.getByText(
+      '지금은 사진을 더 불러올 수 없어요. 나중에 다시 시도해 주세요.',
+      { exact: true },
+    ),
+  ).toBeVisible();
 });

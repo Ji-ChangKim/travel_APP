@@ -1,4 +1,5 @@
 import Text from '@/components/AppText';
+import ScreenHeader from '@/components/ScreenHeader';
 import { travelDateRange } from './travelDateRange';
 import HaruState from '@/components/HaruState';
 import { useRef, useState } from 'react';
@@ -178,10 +179,10 @@ function CommunityContent() {
   // 공개 스냅샷에만 있는 날짜·지역·일정·선택 비용을 표시한다.
   return (
     <SafeAreaView style={styles.screen}>
+      <ScreenHeader title="여행 커뮤니티" />
       <ScrollView contentContainerStyle={s.content}>
-        <Text style={styles.header}>여행 커뮤니티</Text>
         <Text style={styles.subtitle}>
-          여행을 마친 사람들이 직접 선택해 공개한 일정과 사진입니다.
+          여행자들이 직접 선택해 공유한 여행계획과 기록입니다.
         </Text>
         <View style={styles.row}>
           <Action
@@ -270,24 +271,42 @@ function CommunityContent() {
                       .join(' · ')}
                   </Text>
                   <Text style={s.meta}>
-                    {travelDateRange(
-                      post.snapshot.startDate,
-                      post.snapshot.endDate,
-                    )}
+                    {post.kind === 'plan'
+                      ? `${post.snapshot.days?.length || 0}일 계획 · 장소 ${post.snapshot.itinerary.length}곳`
+                      : travelDateRange(
+                          post.snapshot.startDate,
+                          post.snapshot.endDate,
+                        )}
                   </Text>
                 </View>
-                <Text style={s.body}>{post.body}</Text>
-                {post.snapshot.itinerary.map((item, index) => (
-                  <View key={`${post.id}-${index}`} style={s.itinerary}>
-                    <Text style={s.time}>
-                      {item.date} · {item.timeSlot || '시간 미정'}
-                    </Text>
-                    <Text style={s.title}>{item.title}</Text>
-                    {item.address ? (
-                      <Text style={s.meta}>{item.address}</Text>
-                    ) : null}
-                  </View>
-                ))}
+                {post.kind === 'plan' ? (
+                  <Action
+                    label="여행계획 열어보기"
+                    accessibilityLabel={`${post.title} 여행계획 열어보기`}
+                    variant="primary"
+                    onPress={() => {
+                      // 피드 본문에 일정을 나열하지 않고 DAY별 계획 상세를 연다.
+                      return router.push({
+                        pathname: '/community/[postId]',
+                        params: { postId: post.id },
+                      });
+                    }}
+                  />
+                ) : (
+                  <Text style={s.body}>{post.body}</Text>
+                )}
+                {post.kind !== 'plan' &&
+                  post.snapshot.itinerary.map((item, index) => (
+                    <View key={`${post.id}-${index}`} style={s.itinerary}>
+                      <Text style={s.time}>
+                        {item.date} · {item.timeSlot || '시간 미정'}
+                      </Text>
+                      <Text style={s.title}>{item.title}</Text>
+                      {item.address ? (
+                        <Text style={s.meta}>{item.address}</Text>
+                      ) : null}
+                    </View>
+                  ))}
                 {Object.entries(post.snapshot.costs).map(
                   ([currency, amount]) => (
                     <Text key={currency} style={s.cost}>

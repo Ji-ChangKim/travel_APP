@@ -1,8 +1,8 @@
 import Modal from '@/components/AppModal';
 import Text from '@/components/AppText';
-import { colors } from '@/constants/theme';
+import ScreenHeader from '@/components/ScreenHeader';
 import { useCallback, useState } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   useLocalSearchParams,
@@ -11,7 +11,6 @@ import {
   useIsFocused,
 } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
-import { Ionicons } from '@expo/vector-icons';
 import { useTripStore } from '@/stores/useTripStore';
 import {
   cityGuides,
@@ -87,28 +86,14 @@ function GuideContent(
   // 알 수 없는 경로에서는 다른 도시의 가이드를 보여주지 않는다.
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={styles.screen}>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 8,
-          padding: 16,
+      <ScreenHeader
+        title={city ? `${city.city} 여행 가이드` : '여행지 안내'}
+        backLabel="여행지 목록으로 돌아가기"
+        onBack={() => {
+          // 기존 도시 가이드의 복귀 경로를 유지한다.
+          return closeGuide(router);
         }}
-      >
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="여행지 목록으로 돌아가기"
-          style={{ padding: 10, minWidth: 44, minHeight: 44 }}
-          onPress={() => {
-            /* 도시 페이지를 닫는다. */ return closeGuide(router);
-          }}
-        >
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </Pressable>
-        <Text style={s.title}>
-          {city ? `${city.city} 여행 가이드` : '여행지 안내'}
-        </Text>
-      </View>
+      />
       {city ? (
         <GuideBody
           key={city.key}

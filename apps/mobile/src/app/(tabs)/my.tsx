@@ -1,6 +1,7 @@
 import ModalBackground from '@/features/accessibility/ModalBackground';
 import TextInput from '@/components/DesignInput';
 import Text from '@/components/AppText';
+import ScreenHeader from '@/components/ScreenHeader';
 import DesignButton from '@/components/DesignButton';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 import Modal from '@/components/AppModal';
@@ -245,13 +246,8 @@ function MyContent() {
   return (
     <SafeAreaView style={styles.screen}>
       <ModalBackground>
+        <ScreenHeader title="마이페이지" />
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          {/* 상단 헤더 */}
-          <View style={styles.header}>
-            <Text style={styles.headerSubtitle}>계정 및 환경</Text>
-            <Text style={styles.headerTitle}>마이페이지</Text>
-          </View>
-
           {/* 사용자 프로필 카드 */}
           <View style={styles.profileCard}>
             <View
@@ -468,22 +464,13 @@ function MyContent() {
             contentContainerStyle={{ padding: 20, gap: 12 }}
             keyboardShouldPersistTaps="handled"
           >
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>개인 프로필 수정</Text>
-              <DesignButton
-                label=""
-                size="icon"
-                variant="quiet"
-                onPress={closeProfileEditModal}
-                disabled={isSavingProfile}
-                accessibilityLabel="프로필 수정 닫기"
-                icon={(color) => {
-                  /* 모달 닫기 초점과 상태색을 함께 표시한다. */ return (
-                    <Ionicons name="close" size={24} color={color} />
-                  );
-                }}
-              />
-            </View>
+            <ScreenHeader
+              inset={false}
+              title="개인 프로필 수정"
+              backLabel="프로필 수정 닫기"
+              onBack={closeProfileEditModal}
+              disabled={isSavingProfile}
+            />
             <Text style={styles.modalDesc}>
               닉네임과 소개, 좋아하는 여행 스타일을 적어보세요.
             </Text>

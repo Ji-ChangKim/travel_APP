@@ -1,5 +1,8 @@
 import type { PersistedTripInput } from '@wherego/domain';
-import { workspaceCommandSchema } from '@wherego/validation';
+import {
+  workspaceCommandSchema,
+  communityPostSchema,
+} from '@wherego/validation';
 import {
   changed,
   newTrip,
@@ -66,6 +69,17 @@ function dispatch(actor: Actor, name: string, args: Args): Promise<unknown> {
       return readTrip(actor, String(args.p_trip));
     case 'wherego_community':
       return feed(actor, Number(args.p_offset || 0));
+    case 'wherego_community_post':
+      return database(actor.env)
+        .prepare('SELECT snapshot FROM posts WHERE id=?')
+        .bind(String(args.p_post))
+        .first<{ snapshot: string }>()
+        .then((row) => {
+          // 철회된 공개 행은 개인 여행으로 대체하지 않는다.
+          return row
+            ? communityPostSchema.parse(JSON.parse(row.snapshot))
+            : rejectRequest('RESOURCE_NOT_FOUND');
+        });
     case 'wherego_report':
       return database(actor.env)
         .prepare(

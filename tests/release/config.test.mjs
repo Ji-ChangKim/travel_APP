@@ -39,7 +39,7 @@ test('공공데이터 키는 공개 배포 설정에 복사하지 않고 잘못�
   );
 });
 
-test('항공 조회 제한은 배포 환경별 namespace를 사용하고 서버 키를 공개하지 않는다', () => {
+test('항공·사진 조회 제한은 배포 환경별 namespace를 사용하고 서버 키를 공개하지 않는다', () => {
   // 생성 설정에서 로컬 제한 카운터를 잘못 재사용하지 않는다.
   const config = workerConfig({
     ...valid,
@@ -50,6 +50,11 @@ test('항공 조회 제한은 배포 환경별 namespace를 사용하고 서버 
       name: 'FLIGHT_LOOKUP_LIMITER',
       namespace_id: '100542',
       simple: { limit: 6, period: 60 },
+    },
+    {
+      name: 'PLACES_PHOTO_LIMITER',
+      namespace_id: '100552',
+      simple: { limit: 40, period: 60 },
     },
   ]);
   assert.equal(JSON.stringify(config).includes('private-flight-secret'), false);

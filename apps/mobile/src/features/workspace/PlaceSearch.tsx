@@ -5,8 +5,9 @@ import { Action, Field, styles } from './ui';
 import SharedPlaceInput from './SharedPlaceInput';
 import { ScheduleButton, ScheduleField } from './ScheduleControls';
 import { scheduleStyles as schedule } from './scheduleTheme';
+import PlaceSearchResults from './PlaceSearchResults';
 
-// 장소 확인은 외부 Google Maps와 사용자 공유 입력으로 연결한다.
+// 직접 검색·외부 지도·공유 링크를 사용자의 선택으로 연결한다.
 export default function PlaceSearch({
   userId,
   city,
@@ -30,7 +31,7 @@ export default function PlaceSearch({
   simple?: boolean;
   startExpanded?: boolean;
 }) {
-  // 입력 중 자동 검색이나 유료 Places 요청을 실행하지 않는다.
+  // 검색 요청은 명시적으로 검색 버튼을 눌렀을 때만 실행한다.
   const [localQuery, setLocalQuery] = useState('');
   const query = value ?? localQuery;
   const setQuery = onQueryChange || setLocalQuery;
@@ -71,6 +72,15 @@ export default function PlaceSearch({
       )}
       {!simple && (!compact || expanded) && (
         <>
+          <PlaceSearchResults
+            key={JSON.stringify([userId, city, query, disabled])}
+            userId={userId}
+            city={city}
+            query={query}
+            disabled={disabled}
+            compact={compact}
+            onSelect={onSelect}
+          />
           <Button
             label="Google Maps에서 찾기"
             disabled={disabled || !query.trim()}

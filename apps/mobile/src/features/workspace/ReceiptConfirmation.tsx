@@ -58,11 +58,16 @@ export default function ReceiptConfirmation({
         <Text style={styles.label}>1 · 정보 확인</Text>
         <Text style={styles.title}>영수증 정보가 맞나요?</Text>
         <Text style={styles.subtitle}>
-          장소, 결제 일시, 메뉴와 금액을 확인해 주세요. 맞다면 선택한 날짜의
-          일정에 추가할 수 있어요.
+          {form.values.receiptOperation === 'update'
+            ? '장소, 결제 일시, 메뉴와 금액을 확인해 주세요. 기존 영수증과 실제 지출에 수정한 내용을 반영해요.'
+            : '장소, 결제 일시, 메뉴와 금액을 확인해 주세요. 맞다면 선택한 날짜의 일정에 추가할 수 있어요.'}
         </Text>
         <Action
-          label="맞아요, 일정에 추가할게요"
+          label={
+            form.values.receiptOperation === 'update'
+              ? '맞아요, 수정한 내용을 저장할게요'
+              : '맞아요, 일정에 추가할게요'
+          }
           selected={form.values.receiptConfirmed === 'true'}
           disabled={
             busy ||
@@ -85,41 +90,48 @@ export default function ReceiptConfirmation({
           }}
         />
       </View>
-      {form.values.receiptConfirmed === 'true' && (
-        <View style={styles.card}>
-          <Text style={styles.label}>2 · 사진 보관</Text>
-          <Text style={styles.title}>영수증 사진도 함께 보관할까요?</Text>
-          <Text style={styles.subtitle}>
-            사진을 보관하면 나와 여행 친구가 원본을 다시 볼 수 있어요.
-            커뮤니티에는 공개되지 않아요.
-          </Text>
-          <Action
-            label="네, 사진도 보관할게요"
-            selected={form.values.keepPhoto === 'true'}
-            disabled={busy}
-            onPress={() => {
-              // 원본 보관을 명시적으로 선택한다.
-              return onChange('keepPhoto', 'true');
-            }}
-          />
-          <Action
-            label="아니요, 정보만 저장할게요"
-            selected={form.values.keepPhoto === 'false'}
-            disabled={busy}
-            onPress={() => {
-              // 장소·메뉴·금액만 남기고 인식용 사진을 삭제하도록 선택한다.
-              return onChange('keepPhoto', 'false');
-            }}
-          />
-          {form.values.keepPhoto && (
-            <Text style={styles.subtitle}>
-              {form.values.keepPhoto === 'true'
-                ? '장소·메뉴·실제 지출과 영수증 사진을 함께 저장해요.'
-                : '장소·메뉴·실제 지출만 저장해요. 등록이 끝나면 인식에 사용한 사진은 삭제해요.'}
-            </Text>
-          )}
-        </View>
+      {form.values.receiptOperation === 'update' && (
+        <Text style={styles.subtitle}>
+          처음 선택한 영수증 사진 보관 여부는 유지돼요. 수정한 내용은 기존
+          지출에 반영돼요.
+        </Text>
       )}
+      {form.values.receiptConfirmed === 'true' &&
+        form.values.receiptOperation !== 'update' && (
+          <View style={styles.card}>
+            <Text style={styles.label}>2 · 사진 보관</Text>
+            <Text style={styles.title}>영수증 사진도 함께 보관할까요?</Text>
+            <Text style={styles.subtitle}>
+              사진을 보관하면 나와 여행 친구가 원본을 다시 볼 수 있어요.
+              커뮤니티에는 공개되지 않아요.
+            </Text>
+            <Action
+              label="네, 사진도 보관할게요"
+              selected={form.values.keepPhoto === 'true'}
+              disabled={busy}
+              onPress={() => {
+                // 원본 보관을 명시적으로 선택한다.
+                return onChange('keepPhoto', 'true');
+              }}
+            />
+            <Action
+              label="아니요, 정보만 저장할게요"
+              selected={form.values.keepPhoto === 'false'}
+              disabled={busy}
+              onPress={() => {
+                // 장소·메뉴·금액만 남기고 인식용 사진을 삭제하도록 선택한다.
+                return onChange('keepPhoto', 'false');
+              }}
+            />
+            {form.values.keepPhoto && (
+              <Text style={styles.subtitle}>
+                {form.values.keepPhoto === 'true'
+                  ? '장소·메뉴·실제 지출과 영수증 사진을 함께 저장해요.'
+                  : '장소·메뉴·실제 지출만 저장해요. 등록이 끝나면 인식에 사용한 사진은 삭제해요.'}
+              </Text>
+            )}
+          </View>
+        )}
     </View>
   );
 }

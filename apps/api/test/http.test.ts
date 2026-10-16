@@ -6,6 +6,12 @@ import { accounts, tripInput } from './database';
 const env: Env = {
   APP_UPDATE_POLICY_JSON: '',
   FLIGHT_LOOKUP_PROVIDER: 'kac',
+  PLACES_PHOTO_LIMITER: {
+    limit: async () => {
+      // 사진 외 HTTP 검수에서도 새 바인딩의 타입 계약을 유지한다.
+      return { success: true };
+    },
+  },
   FLIGHT_LOOKUP_LIMITER: {
     limit: async () => {
       // 기본 HTTP 검증에서도 실제 바인딩 계약을 유지한다.
