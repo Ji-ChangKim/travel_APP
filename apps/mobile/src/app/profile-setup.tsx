@@ -1,10 +1,15 @@
-import { useState, type Dispatch, type SetStateAction } from 'react';
+import Text from '@/components/AppText';
+import { colors } from '@/constants/theme';
+import { useRef, useState, type Dispatch, type SetStateAction } from 'react';
+import {
+  submitOnce,
+  type SubmissionLock,
+} from '@/features/forms/submissionLock';
 import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
-  Text,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -27,6 +32,12 @@ import { loginStyles as styles } from '@/features/auth/loginStyles';
 import { workspaceError } from '@/features/workspace/WorkspaceScreen';
 import type { Profile } from '@wherego/domain';
 import { useQueryClient } from '@tanstack/react-query';
+import {
+  nicknameHint,
+  nicknameError,
+  validProfileNickname,
+  validProfileBirthDate,
+} from '@wherego/validation';
 
 type State<T> = [T, Dispatch<SetStateAction<T>>];
 type FormProps = {
@@ -37,11 +48,12 @@ type FormProps = {
   busy: State<boolean>;
   error: State<string>;
   router: ReturnType<typeof useRouter>;
-  params: { next?: string; destination?: string };
+  params: { next?: string; destination?: string; tripId?: string };
   queryClient: ReturnType<typeof useQueryClient>;
+  lock: SubmissionLock;
 };
 
-// 인증 후 닉네임·성별·생년월일 세 항목만 설정한다.
+// 인증 후 닉네임과 선택할 개인정보를 설정한다.
 export default function ProfileSetup() {
   // 공개하지 않는 개인정보는 본인 프로필에서만 읽는다.
   return (
@@ -49,6 +61,10 @@ export default function ProfileSetup() {
       initial={useTripStore((state) => {
         // 현재 회원이 확인한 기본 닉네임을 입력 기본값으로 제공한다.
         return state.currentUser;
+      })}
+      key={useTripStore((state) => {
+        // 계정이 바뀌면 이전 회원의 입력을 새 폼에 남기지 않는다.
+        return state.currentUser?.id || 'signed-out';
       })}
     />
   );
@@ -66,10 +82,15 @@ function ProfileForm({ initial }: { initial: Profile | null }) {
       )}
       birthDate={useState(initial?.birthDate || '')}
       busy={useState(false)}
+      lock={useRef(false)}
       error={useState('')}
       router={useRouter()}
       queryClient={useQueryClient()}
-      params={useLocalSearchParams<{ next?: string; destination?: string }>()}
+      params={useLocalSearchParams<{
+        next?: string;
+        destination?: string;
+        tripId?: string;
+      }>()}
     />
   );
 }
@@ -117,8 +138,7 @@ function ProfileFields({
           <AuthInput
             label="닉네임"
             placeholder="여행에서 사용할 이름"
-            hint="2~30자로 입력해 주세요."
-            maxLength={30}
+            hint={nicknameHint}
             value={nickname}
             disabled={busy}
             onChange={setNickname}
@@ -182,7 +202,11 @@ function ProfileFields({
               disabled={busy}
               busy={busy}
               trailing={
-                <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
+                <Ionicons
+                  name="arrow-forward"
+                  size={18}
+                  color={colors.textLight}
+                />
               }
               onPress={onSave}
             />
@@ -203,46 +227,59 @@ function submitProfile({
   error: [, setError],
   router,
   queryClient,
-  params: { next, destination },
+  params: { next, destination, tripId },
+  lock,
 }: FormProps): void {
   // 처리 중 중복 입력과 누락 항목을 차단한다.
-  return busy || !initial
+  return busy || lock.current || !initial
     ? undefined
-    : !nickname.trim() || !gender || !birthDate
-      ? setError('닉네임, 성별, 생년월일을 선택해 주세요.')
-      : void (setBusy(true),
-        setError(''),
-        updateUserProfile(initial.id, {
-          nickname: nickname.trim(),
-          gender,
-          birthDate,
-        })
-          .then((profile) => {
-            // 요청 중 계정이 바뀌면 이전 계정의 결과를 반영하지 않는다.
-            return useTripStore.getState().currentUser?.id === profile.id
-              ? (queryClient.setQueryData(
-                  ['member-profile', profile.id],
-                  profile,
-                ),
-                useTripStore.getState().updateProfile(profile))
-              : Promise.reject(
-                  new Error('계정이 변경됐어요. 다시 로그인해 주세요.'),
-                );
-          })
-          .then(() => {
-            // 프로필 저장 후에만 원래 여행 행동을 이어간다.
-            return completedDestination(next, destination);
-          })
-          .then((path) => {
-            // 확인한 내부 경로로 이동한다.
-            return router.replace(path);
-          })
-          .catch((failure: unknown) => {
-            // 날짜가 잘못됐을 때도 입력을 보존한다.
-            return setError(workspaceError(failure));
-          })
-          .finally(() => {
-            // 실패 후 다시 저장할 수 있다.
-            return setBusy(false);
-          }));
+    : !validProfileNickname(nickname, initial.nickname)
+      ? setError(nicknameError)
+      : !gender
+        ? setError(
+            '성별을 선택해 주세요. 밝히고 싶지 않다면 선택 안 함을 눌러 주세요.',
+          )
+        : birthDate && !validProfileBirthDate(birthDate)
+          ? setError(
+              '생년월일을 확인해 주세요. 입력하지 않고 시작할 수도 있어요.',
+            )
+          : void (setBusy(true),
+            setError(''),
+            submitOnce(lock, () => {
+              // 한 번의 제출에 입력값과 계정 UUID를 고정한다.
+              return updateUserProfile(initial.id, {
+                nickname,
+                gender,
+                birthDate: birthDate || null,
+                onboardingCompleted: true,
+              });
+            })
+              ?.then((profile) => {
+                // 요청 중 계정이 바뀌면 이전 계정의 결과를 반영하지 않는다.
+                return useTripStore.getState().currentUser?.id === profile.id
+                  ? (queryClient.setQueryData(
+                      ['member-profile', profile.id],
+                      profile,
+                    ),
+                    useTripStore.getState().updateProfile(profile))
+                  : Promise.reject(
+                      new Error('계정이 변경됐어요. 다시 로그인해 주세요.'),
+                    );
+              })
+              .then(() => {
+                // 프로필 저장 후에만 원래 여행 행동을 이어간다.
+                return completedDestination(next, destination, tripId);
+              })
+              .then((path) => {
+                // 확인한 내부 경로로 이동한다.
+                return router.replace(path);
+              })
+              .catch((failure: unknown) => {
+                // 날짜가 잘못됐을 때도 입력을 보존한다.
+                return setError(workspaceError(failure));
+              })
+              .finally(() => {
+                // 실패 후 다시 저장할 수 있다.
+                return setBusy(false);
+              }));
 }

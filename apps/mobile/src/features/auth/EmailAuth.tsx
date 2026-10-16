@@ -1,3 +1,5 @@
+import Text from '@/components/AppText';
+import { colors } from '@/constants/theme';
 import Modal from '@/components/AppModal';
 import {
   useRef,
@@ -6,7 +8,7 @@ import {
   type SetStateAction,
   type RefObject,
 } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, Text } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import LoginButton from './LoginButton';
@@ -20,6 +22,7 @@ import { loginStyles as styles } from './loginStyles';
 import { signInWithEmail, signUpWithEmail } from '@/services/authService';
 import { emailLoginSchema, emailSignupSchema } from './email';
 import { ZodError } from 'zod';
+import { nicknameHint } from '@wherego/validation';
 
 const initialState = {
   mode: 'login' as 'login' | 'signup',
@@ -169,6 +172,9 @@ function EmailForm({
   // 모달이 닫히면 민감한 입력 상태도 함께 해제한다.
   return (
     <Modal
+      accessibilityLabel={
+        state.mode === 'login' ? '이메일 로그인' : '이메일 회원가입'
+      }
       animationType="slide"
       onRequestClose={
         state.busy
@@ -217,8 +223,7 @@ function EmailForm({
               <AuthInput
                 label="닉네임"
                 placeholder="여행에서 사용할 이름"
-                hint="2~30자로 입력해 주세요."
-                maxLength={30}
+                hint={nicknameHint}
                 value={state.nickname}
                 disabled={state.busy}
                 onChange={(value) => {
@@ -282,7 +287,11 @@ function EmailForm({
               }
               disabled={state.busy}
               trailing={
-                <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
+                <Ionicons
+                  name="arrow-forward"
+                  size={18}
+                  color={colors.textLight}
+                />
               }
               onPress={() => {
                 // 현재 모드의 실제 인증을 실행한다.

@@ -1,4 +1,6 @@
-import { Image, Pressable, Text, View } from 'react-native';
+import Text from '@/components/AppText';
+import { colors } from '@/constants/theme';
+import { Image, Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { loginStyles as styles, loginTheme } from './loginStyles';
 
@@ -100,7 +102,7 @@ export function TravelerPortrait() {
         resizeMode="cover"
       />
       <View style={styles.profileBadge}>
-        <Ionicons name="airplane" size={13} color="#FFFFFF" />
+        <Ionicons name="airplane" size={13} color={colors.textLight} />
       </View>
     </View>
   );

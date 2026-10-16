@@ -1,5 +1,7 @@
+import Text from '@/components/AppText';
+import { colors } from '@/constants/theme';
 import { useState, type Dispatch, type SetStateAction } from 'react';
-import { Platform, Pressable, Text, View } from 'react-native';
+import { Platform, Pressable, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import LoginButton from './LoginButton';
@@ -35,11 +37,15 @@ function BirthDateField({
   // 선택 취소는 기존 날짜를 보존하며 미래 날짜 선택은 막는다.
   return (
     <View style={styles.field}>
-      <Text style={styles.label}>생년월일</Text>
+      <Text style={styles.label}>생년월일 (선택)</Text>
+      <Text style={styles.fieldHint}>
+        입력하지 않아도 여행을 시작할 수 있어요.
+      </Text>
       {Platform.OS === 'web' ? (
         <input
           aria-label="생년월일 (YYYY-MM-DD)"
           type="date"
+          min="1900-01-01"
           value={value}
           max={calendarDate(new Date())}
           disabled={disabled}
@@ -55,7 +61,7 @@ function BirthDateField({
             padding: 14,
             border: `1px solid ${loginTheme.border}`,
             borderRadius: 14,
-            backgroundColor: '#FFFFFF',
+            backgroundColor: colors.surface,
             color: loginTheme.text,
             fontFamily: 'inherit',
             fontSize: 15,
@@ -80,7 +86,7 @@ function BirthDateField({
             ]}
           >
             <Text style={{ color: value ? loginTheme.text : loginTheme.muted }}>
-              {value || '생일을 선택해 주세요'}
+              {value || '생일 선택 (선택 사항)'}
             </Text>
             <Ionicons
               name="calendar-outline"
@@ -94,6 +100,7 @@ function BirthDateField({
               mode="date"
               display={Platform.OS === 'ios' ? 'inline' : 'calendar'}
               maximumDate={new Date()}
+              minimumDate={new Date('1900-01-01T12:00:00')}
               onChange={(event, date) => {
                 // Android는 선택 즉시 닫고 iOS는 완료 버튼까지 달력을 유지한다.
                 return void (setOpen(
@@ -116,6 +123,16 @@ function BirthDateField({
           ) : null}
         </>
       )}
+      {value ? (
+        <LoginButton
+          label="생년월일 지우기"
+          disabled={disabled}
+          onPress={() => {
+            // 선택한 생일을 지워도 다른 프로필 입력은 유지한다.
+            return void (setOpen(false), onChange(''));
+          }}
+        />
+      ) : null}
     </View>
   );
 }

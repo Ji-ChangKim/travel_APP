@@ -102,9 +102,7 @@ export function emailSession(
         body: JSON.stringify({
           email: email.trim(),
           password,
-          ...(mode === 'sign-up'
-            ? { name: name?.trim() || email.split('@')[0] || '여행자' }
-            : {}),
+          ...(mode === 'sign-up' ? { name: name ?? '' } : {}),
         }),
         signal: AbortSignal.timeout(30000),
       }),

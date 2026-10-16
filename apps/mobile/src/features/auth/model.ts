@@ -141,6 +141,20 @@ export function accountChangeState(
       };
 }
 
+// 같은 계정의 프로필 변경만 스토어에 병합한다.
+export function profileUpdateState(
+  currentUser: Profile | null,
+  updates: Partial<Profile>,
+): { currentUser: Profile | null } {
+  // 로그아웃 뒤 응답과 다른 UUID 응답은 기존 계정 상태를 유지한다.
+  return {
+    currentUser:
+      currentUser && (!updates.id || updates.id === currentUser.id)
+        ? { ...currentUser, ...updates, updatedAt: new Date().toISOString() }
+        : currentUser,
+  };
+}
+
 // 비어 있거나 중복된 콜백 대신 유효 코드를 전달한다.
 function requireCode(code: string | null): string {
   // 임의 토큰이나 사용자 ID로 로그인하지 않는다.

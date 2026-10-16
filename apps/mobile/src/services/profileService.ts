@@ -1,4 +1,4 @@
-import type { Profile } from '@wherego/domain';
+import type { Profile, ProfileUpdate } from '@wherego/domain';
 import { z } from 'zod';
 import { requestFoundation, FoundationClientError } from '@wherego/api-client';
 import { serverOptions } from '@/features/workspace/service';
@@ -32,19 +32,13 @@ export function fetchUserProfile(userId: string): Promise<Profile | null> {
     })
     .then((response) => {
       // 현재 게스트의 복원 닉네임도 서버 확정 값과 맞춘다.
-      return savedProfile(profileSchema.parse(response.data));
+      return savedProfile(profileSchema.parse(response.data), userId);
     });
 }
 // 서버에서 확정한 프로필만 화면에 반영한다.
 export function updateUserProfile(
   userId: string,
-  updates: {
-    nickname?: string;
-    bio?: string | null;
-    travelStyles?: string[];
-    gender?: NonNullable<Profile['gender']>;
-    birthDate?: string;
-  },
+  updates: ProfileUpdate,
 ): Promise<Profile> {
   // 서버 오류에서는 로컬 프로필을 성공 상태로 만들지 않는다.
   return serverOptions(userId)
@@ -57,7 +51,7 @@ export function updateUserProfile(
     })
     .then((response) => {
       // 게스트 닉네임 변경도 DB 확정 뒤 기기 복원 프로필에 반영한다.
-      return savedProfile(profileSchema.parse(response.data));
+      return savedProfile(profileSchema.parse(response.data), userId);
     })
     .catch((error: unknown) => {
       // 다른 계정의 정보와 원본 서버 오류를 숨긴다.
@@ -72,15 +66,21 @@ export function updateUserProfile(
 }
 
 // 기기 복원에서도 서버가 확정한 게스트 닉네임을 유지한다.
-function savedProfile(profile: Profile): Promise<Profile> {
+function savedProfile(profile: Profile, userId: string): Promise<Profile> {
   // 일반 회원 프로필을 게스트 저장소에 넣지 않는다.
-  return (
-    profile.authProvider === 'guest' &&
-    useTripStore.getState().currentUser?.id === profile.id
-      ? saveGuestSession(profile)
-      : Promise.resolve()
-  ).then(() => {
-    // 보존 실패를 프로필 저장 완료로 표시하지 않는다.
-    return profile;
-  });
+  return profile.id !== userId ||
+    useTripStore.getState().currentUser?.id !== userId
+    ? Promise.reject(new Error('계정이 변경됐어요. 다시 로그인해 주세요.'))
+    : (profile.authProvider === 'guest' &&
+      useTripStore.getState().currentUser?.id === profile.id
+        ? saveGuestSession(profile)
+        : Promise.resolve()
+      ).then(() => {
+        // 기기 저장을 기다리는 동안 바뀐 계정에도 이전 응답을 반환하지 않는다.
+        return useTripStore.getState().currentUser?.id === userId
+          ? profile
+          : Promise.reject(
+              new Error('계정이 변경됐어요. 다시 로그인해 주세요.'),
+            );
+      });
 }

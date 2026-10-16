@@ -3,6 +3,8 @@ import * as Crypto from 'expo-crypto';
 import * as SecureStore from 'expo-secure-store';
 import * as WebBrowser from 'expo-web-browser';
 import { z } from 'zod';
+import { saveSocialReturn, clearSocialReturn } from './socialReturn';
+import type { AuthReturn } from './authReturn';
 import type { SocialProvider } from './model';
 import { failAuth, readOAuthCode } from './model';
 import {
@@ -98,13 +100,17 @@ function challenge(verifier: string): Promise<string> {
 // SNS 인증을 준비하고 시스템 인증 브라우저에서 연다.
 export function signInWithSocial(
   provider: SocialProvider,
+  target: AuthReturn = {},
 ): Promise<CloudSession | null> {
   // 보안 난수로 만든 검증자는 URL에 포함하지 않는다.
-  return prepareSocial(
-    provider,
-    Crypto.randomUUID().replace(/-/g, '') +
-      Crypto.randomUUID().replace(/-/g, ''),
-  );
+  return saveSocialReturn(target).then(() => {
+    // 복귀 정보를 보관한 뒤 새 PKCE 인증을 시작한다.
+    return prepareSocial(
+      provider,
+      Crypto.randomUUID().replace(/-/g, '') +
+        Crypto.randomUUID().replace(/-/g, ''),
+    );
+  });
 }
 
 // 기기 검증자와 기존 게스트를 하나의 인증에 연결한다.
@@ -165,7 +171,10 @@ function openSocial(url: string): Promise<CloudSession | null> {
             ? completeSocialAuth(result.url)
             : clearSocialExchange().then(() => {
                 // 취소 결과를 호출 화면으로 보낸다.
-                return null;
+                return clearSocialReturn().then(() => {
+                  // 취소한 인증의 목적은 다음 시도에 재사용하지 않는다.
+                  return null;
+                });
               });
         },
       );

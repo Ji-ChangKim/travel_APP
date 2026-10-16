@@ -1,4 +1,6 @@
-import { Image, ScrollView, Text, View } from 'react-native';
+import Text from '@/components/AppText';
+import { colors } from '@/constants/theme';
+import { Image, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -29,7 +31,7 @@ function LoginHero({
           accessibilityLabel="여행 노트 위에서 캐리어와 함께 떠나는 여행자"
         />
         <View style={styles.flightBadge} accessible={false}>
-          <Ionicons name="airplane" size={20} color="#FFFFFF" />
+          <Ionicons name="airplane" size={20} color={colors.textLight} />
         </View>
       </View>
       <Text style={styles.eyebrow}>트립프린트 · TRIPPRINT</Text>
@@ -60,7 +62,7 @@ function GuestStart({
     <View style={styles.guestCard}>
       <View style={styles.guestHeading}>
         <View style={styles.guestIcon} accessible={false}>
-          <Ionicons name="compass-outline" size={23} color="#527C9C" />
+          <Ionicons name="compass-outline" size={23} color={colors.secondary} />
         </View>
         <View style={styles.guestCopy}>
           <Text style={styles.guestTitle}>가볍게 여행을 시작해요</Text>
@@ -79,7 +81,9 @@ function GuestStart({
         busy={controller.operation === 'guest'}
         disabled={controller.busy || controller.emailOpen}
         onPress={controller.startGuest}
-        trailing={<Ionicons name="arrow-forward" size={18} color="#FFFFFF" />}
+        trailing={
+          <Ionicons name="arrow-forward" size={18} color={colors.textLight} />
+        }
       />
     </View>
   );
@@ -128,13 +132,17 @@ function ExistingSession({
 // Google·이메일 로그인과 게스트·공개 탐색 진입을 표시한다.
 export default function LoginScreen() {
   // 인증 전에 고른 여행의 고정 복귀 경로만 전달한다.
-  const { next, destination } = useLocalSearchParams<{
+  const { next, destination, tripId, reauth } = useLocalSearchParams<{
     next?: string;
     destination?: string;
+    tripId?: string;
+    reauth?: string;
   }>();
-  const controller = useLoginController(next, destination);
+  const controller = useLoginController(next, destination, tripId);
   const signedInMember = Boolean(
-    controller.currentUser && controller.currentUser.authProvider !== 'guest',
+    controller.currentUser &&
+    controller.currentUser.authProvider !== 'guest' &&
+    reauth !== '1',
   );
   // 인증 화면은 하단 메뉴 없이 로그인 선택과 입력에 집중한다.
   return (
@@ -150,7 +158,11 @@ export default function LoginScreen() {
         }
       >
         <LoginHero next={next} destination={destination} />
-        <ExistingSession controller={controller} />
+        {reauth === '1' ? (
+          <Text style={styles.context}>다시 로그인하고 여행을 이어가요.</Text>
+        ) : (
+          <ExistingSession controller={controller} />
+        )}
         <View style={styles.actions}>
           <GoogleLogin
             busy={controller.operation === 'google'}
@@ -162,7 +174,9 @@ export default function LoginScreen() {
             variant="email"
             disabled={controller.busy || signedInMember || controller.emailOpen}
             onPress={controller.openEmail}
-            icon={<Ionicons name="mail-outline" size={18} color="#536B87" />}
+            icon={
+              <Ionicons name="mail-outline" size={18} color={colors.muted} />
+            }
           />
           {!controller.currentUser && (
             <>

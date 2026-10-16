@@ -1,4 +1,5 @@
-import { ActivityIndicator, Image, Text, View } from 'react-native';
+import Text from '@/components/AppText';
+import { ActivityIndicator, Image, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import { socialAvailability } from './oauth';

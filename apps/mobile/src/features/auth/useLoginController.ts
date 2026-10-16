@@ -9,6 +9,8 @@ import { useRouter } from 'expo-router';
 import { useTripStore } from '@/stores/useTripStore';
 import { authenticatedDestination, completedDestination } from './destination';
 import { signInWithSocial } from './oauth';
+import { authReturn } from './authReturn';
+import { clearSocialReturn } from './socialReturn';
 import { Platform } from 'react-native';
 
 type LoginState = {
@@ -69,6 +71,7 @@ function runLoginAction(
 export default function useLoginController(
   next?: string,
   destination?: string,
+  tripId?: string,
 ) {
   // 입력 모달과 요청 잠금은 현재 로그인 화면의 수명에만 보관한다.
   const [state, set] = useState<LoginState>({
@@ -88,11 +91,14 @@ export default function useLoginController(
     // 확인된 프로필에 따라 하나의 경로로 이동한다.
     return (
       useTripStore.getState().currentUser?.authProvider === 'guest'
-        ? completedDestination(next, destination)
-        : authenticatedDestination(next, destination)
+        ? completedDestination(next, destination, tripId)
+        : authenticatedDestination(next, destination, tripId)
     ).then((target) => {
       // 실제 인증이 끝난 뒤에만 여행 화면으로 교체한다.
-      return router.replace(target);
+      return clearSocialReturn().then(() => {
+        // 복귀 목적은 라우터에 넘긴 뒤 다음 인증에 재사용하지 않는다.
+        return router.replace(target);
+      });
     });
   };
   // 화면에는 서버 인증을 사용하는 행동만 전달한다.
@@ -175,7 +181,10 @@ export default function useLoginController(
         'google',
         () => {
           // 시스템 인증 브라우저의 취소는 로그인 성공으로 처리하지 않는다.
-          return signInWithSocial('google').then((session) => {
+          return signInWithSocial(
+            'google',
+            authReturn(next, destination, tripId),
+          ).then((session) => {
             // 브라우저에서 인증을 완료한 회원만 프로필을 확인한다.
             return session ? navigate() : undefined;
           });

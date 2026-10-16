@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
-import { usePathname, useRouter } from 'expo-router';
+import { usePathname, useRouter, useGlobalSearchParams } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthReady } from './AuthBridge';
+import { authReturn, returnFromPath } from './authReturn';
 import { isPublicBrowsePath } from './publicRoutes';
 import { useTripStore } from '@/stores/useTripStore';
 import { fetchUserProfile } from '@/services/profileService';
@@ -27,6 +28,7 @@ export default function AuthGate() {
     usePathname(),
     useRouter(),
     Linking.useURL(),
+    useGlobalSearchParams(),
   );
 }
 
@@ -37,6 +39,7 @@ function useMemberGate(
   path: string,
   router: ReturnType<typeof useRouter>,
   url: string | null,
+  params: Record<string, unknown>,
 ) {
   // 게스트는 세 가지 개인정보 설정 없이 여행을 이용한다.
   return useGateEffects(
@@ -45,9 +48,11 @@ function useMemberGate(
     path,
     router,
     url,
+    params,
     useQuery({
       queryKey: ['member-profile', user?.id],
-      enabled: ready && Boolean(user && user.authProvider !== 'guest'),
+      enabled:
+        ready && path !== '/' && Boolean(user && user.authProvider !== 'guest'),
       queryFn: () => {
         // 다른 계정의 프로필을 대체하지 않는다.
         return fetchUserProfile(user!.id);
@@ -64,6 +69,7 @@ function useGateEffects(
   path: string,
   router: ReturnType<typeof useRouter>,
   url: string | null,
+  params: Record<string, unknown>,
   profile: Awaited<ReturnType<typeof fetchUserProfile>> | undefined,
 ) {
   // 인증 복귀 중에는 콜백의 일회용 교환이 먼저 끝나게 한다.
@@ -77,15 +83,18 @@ function useGateEffects(
         ? !user
           ? isPublicBrowsePath(path)
             ? undefined
-            : routeToLogin(path, url, router)
+            : routeToLogin(path, url, router, params)
           : !user.onboardingCompleted &&
               profile?.id === user.id &&
               !profile.onboardingCompleted &&
               path !== '/profile-setup'
-            ? router.replace('/profile-setup')
+            ? router.replace({
+                pathname: '/profile-setup',
+                params: gateReturn(path, params),
+              })
             : undefined
         : undefined;
-    }, [ready, path, user, profile, router, url]),
+    }, [ready, path, user, profile, router, url, params]),
     useEffect(() => {
       // 상세 프로필 확인 중 계정이 바뀌면 이전 결과를 적용하지 않는다.
       return profile && useTripStore.getState().currentUser?.id === profile.id
@@ -101,35 +110,34 @@ function routeToLogin(
   path: string,
   url: string | null,
   router: ReturnType<typeof useRouter>,
-): void {
+  params: Record<string, unknown>,
+  scope = { active: true },
+): () => void {
   // 웹 새로고침으로 들어온 최초 초대 주소도 인증 중 잃지 않는다.
-  return void (url ? Promise.resolve(url) : Linking.getInitialURL())
-    .then((incoming) => {
-      // 개인정보나 여행 저장은 인증 이후에만 진행한다.
-      return preserveIncoming(path, incoming);
-    })
-    .catch(() => {
-      // 잘못된 공유 주소도 로그인 선택을 막지 않는다.
-      return undefined;
-    })
-    .then(() => {
-      // 복귀할 화면은 고정된 앱 경로만 넘긴다.
-      return !useTripStore.getState().currentUser
-        ? path !== '/invite' && path !== '/import-place'
-          ? router.replace('/login')
-          : router.replace({
+  return (
+    void (url ? Promise.resolve(url) : Linking.getInitialURL())
+      .then((incoming) => {
+        // 개인정보나 여행 저장은 인증 이후에만 진행한다.
+        return preserveIncoming(path, incoming);
+      })
+      .catch(() => {
+        // 잘못된 공유 주소도 로그인 선택을 막지 않는다.
+        return undefined;
+      })
+      .then(() => {
+        // 복귀할 화면은 고정된 앱 경로만 넘긴다.
+        return scope.active && !useTripStore.getState().currentUser
+          ? router.replace({
               pathname: '/login',
-              params: {
-                next:
-                  path === '/invite'
-                    ? 'invite'
-                    : path === '/import-place'
-                      ? 'import-place'
-                      : '',
-              },
+              params: gateReturn(path, params),
             })
-        : undefined;
-    });
+          : undefined;
+      }),
+    () => {
+      // 경로가 바뀌면 이전 링크 확인이 새 화면을 로그인으로 덮지 않는다.
+      return void (scope.active = false);
+    }
+  );
 }
 
 // 인증 전 외부에서 들어온 후보 하나만 임시 보관한다.
@@ -140,4 +148,12 @@ function preserveIncoming(path: string, url: string | null): Promise<void> {
     : path === '/import-place' && incomingMapsText()
       ? savePendingMapsShare(incomingMapsText())
       : Promise.resolve();
+}
+
+// 온보딩 중 다시 인증해도 이미 검증한 원래 목적을 유지한다.
+function gateReturn(path: string, params: Record<string, unknown>) {
+  // 일반 화면은 실제 경로에서, 설정 화면은 허용된 복귀 파라미터에서 읽는다.
+  return path === '/profile-setup'
+    ? authReturn(params.next, params.destination, params.tripId)
+    : returnFromPath(path, params.destination);
 }

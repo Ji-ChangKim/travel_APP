@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { nicknameSchema } from '@wherego/validation';
 
 // 로그인은 기존 계정의 비밀번호 길이 정책을 바꾸지 않는다.
 export const emailLoginSchema = z.object({
@@ -13,11 +14,7 @@ export const emailLoginSchema = z.object({
 // 신규 가입의 닉네임과 최소 비밀번호 길이를 검증한다.
 export const emailSignupSchema = emailLoginSchema
   .extend({
-    nickname: z
-      .string()
-      .trim()
-      .min(2, '닉네임은 2자 이상 입력해 주세요.')
-      .max(30, '닉네임은 30자 이하로 입력해 주세요.'),
+    nickname: nicknameSchema,
     password: z.string().min(8, '비밀번호는 8자 이상 입력해 주세요.').max(128),
     confirmation: z.string(),
   })

@@ -1,5 +1,7 @@
+import Text from '@/components/AppText';
 import { useState, type Dispatch, type SetStateAction } from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Pressable, View } from 'react-native';
+import DesignInput from '@/components/DesignInput';
 import { Ionicons } from '@expo/vector-icons';
 import { loginStyles as styles, loginTheme } from './loginStyles';
 
@@ -41,7 +43,7 @@ function InputField({
     <View style={styles.field}>
       <Text style={styles.label}>{label}</Text>
       <View style={styles.inputRow}>
-        <TextInput
+        <DesignInput
           accessibilityLabel={label}
           value={value}
           onChangeText={onChange}
@@ -62,7 +64,7 @@ function InputField({
           }
           maxLength={maxLength}
           editable={!disabled}
-          style={[styles.input, styles.growInput, disabled && styles.disabled]}
+          style={[styles.input, styles.growInput]}
         />
         {secret ? (
           <Pressable

@@ -1,8 +1,8 @@
 {
   "version": "0.1.0",
-  "release": "mvp-0.1.0-internal-candidate-20261012",
+  "release": "internal-0.1.0-v5-schedule-20261014",
   "environment": "staging",
-  "releaseDate": "2026-10-12",
+  "releaseDate": "2026-10-14",
   "webOrigin": "https://tripprint-staging.pages.dev",
   "apiOrigin": "https://tripprint-api-staging.gametps.workers.dev",
   "brand": "TripPrint",

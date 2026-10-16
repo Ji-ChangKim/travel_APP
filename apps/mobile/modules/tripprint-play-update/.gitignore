@@ -1,0 +1,2 @@
+# Android 모듈의 자동 생성 산출물은 버전 관리에서 제외한다.
+/android/build/
