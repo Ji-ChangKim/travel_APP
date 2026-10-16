@@ -53,8 +53,8 @@ test('여행 중·가까운 출발·지난 계획·최근 완료·보관 순으�
       'active',
       'soon',
       'later',
-      'past',
       'complete-new',
+      'past',
       'complete-old',
       'archived',
     ],
@@ -66,11 +66,13 @@ test('제목·도시·국가 검색과 상태 필터를 함께 적용한다', ()
   // 제목 검색과 상태 불일치, 도시 검색과 국가 검색의 결과를 확인한다.
   return assert.deepEqual(
     [
-      selectTravelPlans(trips, 'PLANNED', '  KYOTO  ').map((item) => {
-        // 영문 제목의 대소문자를 구분하지 않는다.
-        return item.id;
-      }),
-      selectTravelPlans(trips, 'DRAFT', 'Kyoto'),
+      selectTravelPlans(trips, 'DRAFT', '  KYOTO  ', '2026-10-13').map(
+        (item) => {
+          // 영문 제목의 대소문자를 구분하지 않는다.
+          return item.id;
+        },
+      ),
+      selectTravelPlans(trips, 'PLANNED', 'Kyoto', '2026-10-13'),
       selectTravelPlans(trips, 'ALL', '교토').length,
       selectTravelPlans(trips, 'ALL', '일본').length,
       selectTravelPlans(trips, 'ALL', '없는 여행'),
@@ -104,9 +106,9 @@ test('완료 상태와 보관 상태의 열기 경로를 구분한다', () => {
   // 디자인의 버튼이 실제 연결 가능한 경로만 가리키는지 확인한다.
   return assert.deepEqual(
     [
-      travelPlanPath(trips[0]!),
-      travelPlanPath(trips[3]!),
-      travelPlanPath(trips[4]!),
+      travelPlanPath(trips[0]!, '2026-10-13'),
+      travelPlanPath(trips[3]!, '2026-10-13'),
+      travelPlanPath(trips[4]!, '2026-10-13'),
     ],
     ['/trips/archived', '/diary/complete-old', '/trips/soon'],
   );

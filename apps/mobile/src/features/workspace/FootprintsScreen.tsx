@@ -10,6 +10,8 @@ import { foundationQueryKey, listServerTrips } from '@wherego/api-client';
 import { useTripStore } from '@/stores/useTripStore';
 import { serverOptions } from './service';
 import { Action, styles } from './ui';
+import { tripPhase } from './tripLifecycle';
+import { useTripDateRefresh } from './useTripDateRefresh';
 import TripRecordCover from './TripRecordCover';
 import { colors } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,6 +19,7 @@ import { Ionicons } from '@expo/vector-icons';
 // 완료된 서버 여행을 발자국 다이어리 목록으로 제공한다.
 export default function FootprintsScreen() {
   // 현재 계정의 서버 여행만 조회한다.
+  useTripDateRefresh();
   const user = useTripStore((state) => {
     // 다른 사용자의 여행을 공통 기기 목록으로 합치지 않는다.
     return state.currentUser;
@@ -81,7 +84,9 @@ export default function FootprintsScreen() {
             {query.isSuccess &&
               !query.data.some((trip) => {
                 // 아직 종료되지 않은 여행을 완성된 기록으로 표시하지 않는다.
-                return trip.status === 'COMPLETED';
+                return (
+                  trip.status !== 'ARCHIVED' && tripPhase(trip) === 'COMPLETED'
+                );
               }) && (
                 <HaruState
                   kind="empty"
@@ -101,7 +106,9 @@ export default function FootprintsScreen() {
             {query.data
               ?.filter((trip) => {
                 // 완료 여행만 이 계정의 발자국 목록에 포함한다.
-                return trip.status === 'COMPLETED';
+                return (
+                  trip.status !== 'ARCHIVED' && tripPhase(trip) === 'COMPLETED'
+                );
               })
               .map((trip) => (
                 <View key={trip.id} style={styles.card}>

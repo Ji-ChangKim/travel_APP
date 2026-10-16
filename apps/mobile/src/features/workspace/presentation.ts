@@ -4,7 +4,9 @@ import { tripPhaseLabels } from './tripPresentation';
 // 편집 화면의 저장 상태 이름도 같은 공통 사전을 사용한다.
 export function tripStatusLabel(status: string): string {
   // 알 수 없는 내부 식별자는 그대로 노출하지 않는다.
-  return tripPhaseLabels[status as TripLifecycle] || '여행 상태 확인 중';
+  return status === 'ARCHIVED'
+    ? '보관한 여행'
+    : tripPhaseLabels[status as TripLifecycle] || '여행 상태 확인 중';
 }
 
 // 동행의 역할을 할 수 있는 행동으로 설명한다.

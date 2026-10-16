@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { PersistedTrip } from '@wherego/domain';
+import { tripLifecycle, type PersistedTrip } from '@wherego/domain';
 import {
   tripPhase,
   tripPresentation,
@@ -8,7 +8,7 @@ import {
   homeResumeTrips,
 } from '../../apps/mobile/src/features/workspace/tripLifecycle';
 import { selectTravelPlans } from '../../apps/mobile/src/features/workspace/travelPlans';
-import { starterValues } from '../../apps/mobile/src/features/workspace/scheduleStarters';
+import { tripOpenPath } from '../../apps/mobile/src/features/workspace/tripPresentation';
 
 const trip = {
   id: 'wakayama',
@@ -25,59 +25,123 @@ const trip = {
   coverColor: '#fff',
 } satisfies PersistedTrip;
 
-test('화면 피드백: 지난 예정 여행은 홈·뱃지·필터가 같은 날짜를 해석한다', () => {
-  // 원래 상태를 보존하면서 예정 건수와 홈 재개에서는 제외한다.
-  const frozen = Object.freeze({ ...trip });
-  assert.equal(tripPhase(frozen, '2026-10-16'), 'PAST');
-  assert.equal(tripPresentation(frozen, '2026-10-16').label, '지난 여행');
-  assert.equal(tripPresentation(frozen, '2026-10-16').action, '여행 보기');
+test('4단계: D8·D7·D1·출발일·마지막 날·종료 다음 날을 엄격하게 구분한다', () => {
+  // 출발일의 중복 구간은 여행 중을 우선한다.
   assert.deepEqual(
-    selectTravelPlans([frozen], 'PLANNED', '', '2026-10-16'),
-    [],
+    [
+      '2026-09-23',
+      '2026-09-24',
+      '2026-09-30',
+      '2026-10-01',
+      '2026-10-03',
+      '2026-10-04',
+    ].map((today) => {
+      // 같은 기준 날짜로 공통 단계와 표시 모델을 판별한다.
+      assert.equal(tripPhase(trip, today), tripPresentation(trip, today).phase);
+      return tripPhase(trip, today);
+    }),
+    ['DRAFT', 'PLANNED', 'PLANNED', 'IN_PROGRESS', 'IN_PROGRESS', 'COMPLETED'],
   );
-  assert.deepEqual(selectTravelPlans([frozen], 'PAST', '', '2026-10-16'), [
-    trip,
+});
+
+test('날짜 미정·부분 입력·잘못된 달력·역전된 기간은 준비 중이다', () => {
+  // 문자열 저장 계약을 바꾸지 않고 표시 함수가 이전 불완전 기록을 수용한다.
+  for (const dates of [
+    {},
+    { startDate: null, endDate: null },
+    { startDate: '2026-10-01' },
+    { startDate: '2026-02-30', endDate: '2026-03-01' },
+    { startDate: '2026-10-03', endDate: '2026-10-01' },
+  ]) {
+    assert.equal(
+      tripLifecycle({ ...dates, timezone: 'Asia/Tokyo' }, '2026-10-16'),
+      'DRAFT',
+    );
+    assert.equal(
+      tripPresentation({ ...dates, timezone: 'Asia/Tokyo' }, '2026-10-16')
+        .dates,
+      '날짜 미정',
+    );
+  }
+});
+
+test('종료된 예정 여행은 완료 필터·기록 버튼으로 연결하고 원본을 수정하지 않는다', () => {
+  // 날짜 경과는 명령·공개·저장 상태 변경을 실행하지 않는다.
+  const frozen = Object.freeze({ ...trip });
+  assert.equal(tripPhase(frozen, '2026-10-16'), 'COMPLETED');
+  assert.equal(tripPresentation(frozen, '2026-10-16').label, '여행 완료');
+  assert.equal(tripPresentation(frozen, '2026-10-16').action, '기록 보러가기');
+  assert.equal(tripOpenPath(frozen, '2026-10-16'), '/diary/wakayama');
+  assert.deepEqual(selectTravelPlans([frozen], 'COMPLETED', '', '2026-10-16'), [
+    frozen,
   ]);
   assert.deepEqual(homeResumeTrips([frozen], '2026-10-16'), []);
   assert.equal(frozen.status, 'PLANNED');
 });
-test('출발 전·출발일·마지막 날·종료 다음 날의 양끝 포함 계약', () => {
-  // 자정 전후에 표시 상태와 안내를 서로 반대로 만들지 않는다.
+
+test('저장된 수동 상태와 관계없이 날짜를 따르고 보관은 별도로 필터링한다', () => {
+  // 미래의 완료 확정 값도 날짜 단계를 앞당기지 않으며 보관은 홈에서 제외한다.
+  for (const status of [
+    'DRAFT',
+    'PLANNED',
+    'IN_PROGRESS',
+    'COMPLETED',
+    'ARCHIVED',
+  ] as const)
+    assert.equal(tripPhase({ ...trip, status }, '2026-09-30'), 'PLANNED');
+  const archived = { ...trip, status: 'ARCHIVED' as const };
   assert.deepEqual(
-    ['2026-09-30', '2026-10-01', '2026-10-03', '2026-10-04'].map((today) => {
-      // 같은 기준 날짜를 표시 규칙에 전달한다.
-      return tripPhase(trip, today);
-    }),
-    ['PLANNED', 'IN_PROGRESS', 'IN_PROGRESS', 'PAST'],
+    selectTravelPlans([archived], 'ARCHIVED', '', '2026-10-16'),
+    [archived],
   );
-  assert.equal(tripPresentation(trip, '2026-10-01').reminder, '오늘 출발해요');
+  assert.deepEqual(
+    selectTravelPlans([archived], 'COMPLETED', '', '2026-10-16'),
+    [],
+  );
+  assert.deepEqual(homeResumeTrips([archived], '2026-10-02'), []);
 });
-test('완료·보관은 사용자의 명시적 상태이며 날짜만으로 되돌리지 않는다', () => {
-  // 기간이 지나지 않은 조기 완료와 보관도 원래 선택을 유지한다.
-  for (const status of ['COMPLETED', 'ARCHIVED'] as const) {
-    assert.equal(tripPhase({ ...trip, status }, '2026-09-30'), status);
-    assert.deepEqual(homeResumeTrips([{ ...trip, status }], '2026-10-02'), []);
-  }
-  assert.equal(tripPhase({ ...trip, status: 'DRAFT' }, '2026-09-30'), 'DRAFT');
+
+test('동일일 여행·윤일·연도 경계에서도 완료는 종료 다음 날이다', () => {
+  // 달력 날짜 차이로 계산해 DST의 23시간·25시간 영향을 받지 않는다.
+  const one = { ...trip, startDate: '2028-02-29', endDate: '2028-02-29' };
+  assert.equal(tripPhase(one, '2028-02-22'), 'PLANNED');
+  assert.equal(tripPhase(one, '2028-02-29'), 'IN_PROGRESS');
+  assert.equal(tripPhase(one, '2028-03-01'), 'COMPLETED');
   assert.equal(
-    tripPhase({ ...trip, status: 'IN_PROGRESS' }, '2026-09-30'),
+    tripPhase(
+      { ...trip, startDate: '2027-01-01', endDate: '2027-01-02' },
+      '2026-12-25',
+    ),
     'PLANNED',
   );
 });
-test('현지 시간대·UTC 자정에서 여행 날짜를 정확히 구분한다', () => {
-  // UTC로 같은 순간에도 여행 현지의 달력 날짜는 다를 수 있다.
+
+test('여행지 자정·서로 다른 시간대와 잘못된 시간대의 UTC 복구', () => {
+  // 같은 순간의 여행지 달력에 따라 종료 여부가 달라진다.
   const now = new Date('2026-10-03T15:00:00Z');
   assert.equal(tripToday('Asia/Tokyo', now), '2026-10-04');
   assert.equal(tripToday('America/Los_Angeles', now), '2026-10-03');
-  assert.equal(tripPhase(trip, tripToday(trip.timezone, now)), 'PAST');
+  assert.equal(tripLifecycle(trip, now), 'COMPLETED');
+  assert.equal(
+    tripLifecycle({ ...trip, timezone: 'America/Los_Angeles' }, now),
+    'IN_PROGRESS',
+  );
+  assert.equal(tripToday('invalid', now), '2026-10-03');
 });
-test('홈은 현재 여행 우선 한 건만 선택하고 원본·상태를 수정하지 않는다', () => {
-  // 목록과 같은 전체 카드를 다시 만들지 않는다.
-  const future = {
+
+test('홈은 여행 중 우선·가까운 날짜 한 건을 선택하고 원본 순서를 보존한다', () => {
+  // 준비 중과 임박도 거리순이며 날짜 미정은 날짜가 정해진 여행 뒤에 둔다.
+  const far = {
     ...trip,
-    id: 'future',
+    id: 'far',
     startDate: '2026-11-01',
     endDate: '2026-11-03',
+  };
+  const near = {
+    ...trip,
+    id: 'near',
+    startDate: '2026-10-20',
+    endDate: '2026-10-21',
   };
   const active = {
     ...trip,
@@ -85,39 +149,13 @@ test('홈은 현재 여행 우선 한 건만 선택하고 원본·상태를 수�
     startDate: '2026-10-15',
     endDate: '2026-10-17',
   };
-  const trips = Object.freeze([
-    Object.freeze(trip),
-    Object.freeze(future),
-    Object.freeze(active),
-  ]);
+  const list = [far, near, active];
+  assert.deepEqual(homeResumeTrips(list, '2026-10-16'), [active]);
+  assert.deepEqual(homeResumeTrips([far, near], '2026-10-16'), [near]);
   assert.deepEqual(
-    homeResumeTrips(trips as unknown as PersistedTrip[], '2026-10-16'),
-    [active],
-  );
-  assert.deepEqual(
-    trips.map((item) => {
-      // 선택 함수가 목록 순서를 바꾸지 않아야 한다.
-      return item.id;
+    list.map((item) => {
+      /* 원본 순서를 읽는다. */ return item.id;
     }),
-    ['wakayama', 'future', 'active'],
+    ['far', 'near', 'active'],
   );
-});
-test('첫 일정 제안은 빈 기본값 또는 편집 가능한 제목·종류·시각만 제공한다', () => {
-  // 가짜 주소·위치·추천 장소·서버 저장을 만들지 않는다.
-  assert.deepEqual(starterValues(), {});
-  assert.deepEqual(starterValues('stay'), {
-    title: '숙소 체크인',
-    type: 'STAY',
-    timeSlot: '15:00',
-  });
-  assert.deepEqual(starterValues('meal'), {
-    title: '점심 식사',
-    type: 'PLACE',
-    timeSlot: '12:00',
-  });
-  assert.deepEqual(starterValues('visit'), {
-    title: '가보고 싶은 곳',
-    type: 'PLACE',
-    timeSlot: '09:00',
-  });
 });

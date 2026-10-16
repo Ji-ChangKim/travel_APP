@@ -236,6 +236,7 @@ export {
 export {
   tripLifecycle,
   tripToday,
+  validTripDates,
   type TripLifecycle,
   type TripTiming,
 } from './tripLifecycle';

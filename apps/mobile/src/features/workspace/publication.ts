@@ -26,7 +26,7 @@ export function publicationIssue(
   return snapshot.myRole !== 'owner'
     ? '여행을 만든 사람만 공개할 수 있어요. 작성한 내용은 닫기 전까지 유지돼요.'
     : snapshot.trip.status !== 'COMPLETED'
-      ? '여행 종료 후 공개할 수 있어요. 여행 설정에서 종료 상태를 확인해 주세요.'
+      ? '공개할 기록의 정리를 먼저 마쳐 주세요. 여행 설정에서 기록 정리 완료를 선택해 주세요.'
       : publicationIds(values.scheduleIds).some((id) => {
             // 다른 여행 일정과 삭제된 일정은 같은 선택 오류로 안내한다.
             return !snapshot.itinerary.some((item) => {

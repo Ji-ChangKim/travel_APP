@@ -128,7 +128,7 @@ function HomeView({
             <Action label="내 여행 다시 불러오기" onPress={onReload} />
           </HaruState>
         ) : activeTrips.length > 0 ? (
-          <HomeTripList trips={activeTrips} router={router} />
+          <HomeTripList trips={activeTrips} router={router} userId={userId} />
         ) : (
           <>
             <HomeWelcomeGreeting nickname={userNickname} />
@@ -180,7 +180,7 @@ function HomeView({
 
         <HomeGuide />
 
-        <HomeTools trips={trips} />
+        <HomeTools />
       </ScrollView>
     </SafeAreaView>
   );

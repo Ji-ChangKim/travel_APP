@@ -14,6 +14,8 @@ import { Action, ServerPhoto, styles } from './ui';
 import { serverOptions } from './service';
 import { diaryCosts, diarySchedules, scheduleLabels } from './diary';
 import TripAccessFeedback from './TripAccessFeedback';
+import { tripPhase } from './tripLifecycle';
+import { useTripDateRefresh } from './useTripDateRefresh';
 import { authReturn } from '../auth/authReturn';
 
 // 선택한 여행의 멤버 권한으로 다이어리 원본을 조회한다.
@@ -243,6 +245,7 @@ function DiaryView({
   router: ReturnType<typeof useRouter>;
 }) {
   // 로그인·권한·여행 종료 여부가 확인된 결과만 다이어리로 렌더링한다.
+  useTripDateRefresh();
   return (
     <SafeAreaView
       style={[styles.screen, { backgroundColor: colors.background }]}
@@ -281,7 +284,8 @@ function DiaryView({
         )}
         {query.data &&
           !query.isError &&
-          (query.data.trip.status === 'COMPLETED' ? (
+          (tripPhase(query.data.trip) === 'COMPLETED' ||
+          query.data.trip.status === 'COMPLETED' ? (
             <DiaryBook snapshot={query.data} userId={userId} />
           ) : (
             <Text>

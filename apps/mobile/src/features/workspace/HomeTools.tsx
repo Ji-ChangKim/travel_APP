@@ -4,24 +4,19 @@ import { useState, type Dispatch, type SetStateAction } from 'react';
 import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, type Href } from 'expo-router';
-import type { listServerTrips } from '@wherego/api-client';
 import { homeStyles as s } from './homeStyles';
 import PermissionTools from '../permissions/PermissionTools';
 
-type Trips = Awaited<ReturnType<typeof listServerTrips>> | undefined;
-
 // 부가 기능은 여행을 시작하는 화면을 가리지 않도록 접어서 제공한다.
-export default function HomeTools({ trips }: { trips: Trips }) {
+export default function HomeTools() {
   // 도구를 펼치는 선택은 현재 홈 화면에만 유지한다.
-  return <ToolsContent trips={trips} expanded={useState(false)} />;
+  return <ToolsContent expanded={useState(false)} />;
 }
 
-// 초대·장소 가져오기·보관 여행을 사용자가 원할 때 표시한다.
+// 하단 탭과 겹치지 않는 초대·장소 가져오기 도구만 표시한다.
 function ToolsContent({
-  trips,
   expanded: [open, setOpen],
 }: {
-  trips: Trips;
   expanded: [boolean, Dispatch<SetStateAction<boolean>>];
 }) {
   // 접힌 상태에는 설명 대신 도구를 여는 버튼 하나만 제공한다.
@@ -57,29 +52,6 @@ function ToolsContent({
             icon="map-outline"
             path="/import-place"
           />
-          {trips?.some((trip) => {
-            // 완료한 여행이 있을 때만 발자국 바로가기를 제공한다.
-            return trip.status === 'COMPLETED';
-          }) && (
-            <ToolLink
-              label="완성된 발자국 보기"
-              icon="footsteps-outline"
-              path="/(tabs)/footprints"
-            />
-          )}
-          {trips
-            ?.filter((trip) => {
-              // 보관 여행의 실제 제목과 읽기 경로를 유지한다.
-              return trip.status === 'ARCHIVED';
-            })
-            .map((trip) => (
-              <ToolLink
-                key={trip.id}
-                label={`보관 여행 · ${trip.title}`}
-                icon="archive-outline"
-                path={`/trips/${trip.id}`}
-              />
-            ))}
         </View>
       )}
     </View>

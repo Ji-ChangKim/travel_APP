@@ -488,17 +488,23 @@ function PlanEditorContent({
                 <DestinationFields values={form.values} onChange={onChange} />
               )}
               {form.kind === 'metadata' && (
-                <View style={styles.row}>
-                  {['PLANNED', 'IN_PROGRESS', 'COMPLETED'].map((status) => (
-                    <Action
-                      key={status}
-                      label={`${form.values.status === status ? '✓ ' : ''}${{ PLANNED: '예정', IN_PROGRESS: '여행 중', COMPLETED: '여행 종료' }[status]}`}
-                      onPress={() => {
-                        // 종료 여부는 소유자가 명시적으로 확인한다.
-                        onChange('status', status);
-                      }}
-                    />
-                  ))}
+                <View>
+                  <Text>
+                    여행 단계는 날짜에 맞춰 바뀌어요. 공개할 기록의 정리 여부를
+                    선택해 주세요.
+                  </Text>
+                  <View style={styles.row}>
+                    {['PLANNED', 'COMPLETED'].map((status) => (
+                      <Action
+                        key={status}
+                        label={`${(status === 'COMPLETED' ? form.values.status === status : form.values.status !== 'COMPLETED') ? '✓ ' : ''}${{ PLANNED: '기록 정리 중', COMPLETED: '기록 정리 완료' }[status]}`}
+                        onPress={() => {
+                          // 종료 여부는 소유자가 명시적으로 확인한다.
+                          onChange('status', status);
+                        }}
+                      />
+                    ))}
+                  </View>
                 </View>
               )}
               {form.kind === 'publish' && snapshot && (

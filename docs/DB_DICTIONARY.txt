@@ -2209,19 +2209,36 @@ Play 설치자+동일 versionCode도 이번 소스·Play 채널의 연결 증거
 2026-10-16 여행 화면 표시 객체·메뉴·시트 계약
 DB명: 해당 없음(표시 전용). 기존 D1 trips.snapshot과 게스트 저장 문서는 변경하지 않는다.
 공유 객체: TripTiming / packages/domain/src/tripLifecycle.ts
-- status: 기존 TripStatus 필수. 원본의 명시적인 완료·보관·공개 권한에 계속 사용.
-- startDate/endDate: 기존 ISO YYYY-MM-DD 필수. 종료일 당일까지 여행 중, 다음 날부터 PAST 표시.
-- timezone: 기존 IANA 시간대 필수. 이전 기록의 잘못된 값은 UTC 달력으로 표시 복구.
-파생 타입: TripLifecycle = 기존 TripStatus | PAST. PAST는 저장 상태·DB enum·API 필드가 아니다.
-- 명시적 COMPLETED/ARCHIVED 우선. 그 밖은 현지 날짜와 기간으로 IN_PROGRESS/PAST/DRAFT/PLANNED 표시.
+- status: 기존 TripStatus 선택. 저장 상태·보관·기록 정리/공개 확인에 사용하며 날짜 판별에는 사용하지 않는다.
+- startDate/endDate: 표시 입력에서 string|null|undefined. ISO YYYY-MM-DD와 실제 달력 날짜·시작≤종료를 검사한다. 누락·부분·잘못된 날짜·역전 기간은 준비 중.
+- timezone: string|null|undefined. 여행지 IANA 시간대이며 누락·잘못된 값은 UTC 달력으로 복구한다.
+- 표시 입력의 미정 수용은 DB/API 생성 계약의 필수 날짜를 완화하지 않는다. 물리 trips.snapshot과 게스트 문서 날짜 스키마는 그대로다.
+파생 타입: TripLifecycle = DRAFT|PLANNED|IN_PROGRESS|COMPLETED, 정확히 네 단계.
+- DRAFT: 준비 중. 날짜 미정 또는 출발까지8일 이상.
+- PLANNED: 임박/예정. 출발까지1~7일. D-7 포함.
+- IN_PROGRESS: 여행 중. startDate≤today≤endDate. 출발일은 D-Day 겹침에서 이 단계를 우선한다.
+- COMPLETED: 여행 완료. today>endDate. 과거 PAST 표시 단계는 제거한다.
+- 원본 status=COMPLETED라도 미래 날짜의 화면 단계는 날짜를 따른다. ARCHIVED는 별도 보관 속성이다.
 화면 객체: tripPresentation / apps/mobile/src/features/workspace/tripPresentation.ts
-- phase: TripLifecycle 필수. 배지·필터·정렬의 공통 판별.
-- label/badge: string 필수. 같은 공통 상태 이름.
-- dates: string 필수. 기존 travelDateRange의 YYYY-MM-DD – YYYY-MM-DD.
-- reminder/action/heading: string 필수. 같은 단계에서 안내·열기 행동·요약 제목을 파생.
-- priority: number 필수(0~4). 여행 중·다가오는 여행·지난 여행·완료·보관 순.
-- tripOpenPath: 명시적 COMPLETED만 /diary/{id}; 그 밖은 /trips/{id}.
-- 자동 완료·원본 mutation·공개·발자국 생성 권한 변경 없음. 날짜 경과를 완료 저장으로 처리하지 않음.
+- phase: TripLifecycle 필수. 뱃지·필터·안내·주 행동의 공통 판별.
+- label/badge:string 필수. 준비 중/임박/예정/여행 중/여행 완료 중 하나.
+- dates:string 필수. YYYY-MM-DD – YYYY-MM-DD 또는 날짜 미정.
+- archived:boolean 필수. 원본 ARCHIVED의 보관 여부이며 다섯 번째 단계가 아니다.
+- action:string 필수. 완료는 기록 보러가기, 나머지는 계획 계속하기.
+- heading/reminder:string 필수. 같은 phase·today에서 계산한 제목과 안내.
+- priority:number 필수0~3. 여행 중·임박·준비·완료의 표시 순위. 내 여행은 보관을 별도 마지막 그룹으로 둔다.
+- tripOpenPath: 날짜 기반 COMPLETED→/diary/{id}; 그 밖은 /trips/{id}.
+- 날짜 경과로 명령·저장 상태 변경·공개를 실행하지 않는다. 다이어리의 날짜 완료 기록 열람과 공개용 원본 COMPLETED 확인을 분리한다.
+- 내 여행 필터: ALL+네 단계+ARCHIVED. 보관 여행은 단계별 건수에서 제외하고 보관 필터/전체에서 찾는다.
+- 여행 설정의 원본 상태 선택은 기록 정리 중/기록 정리 완료로 안내한다. 공개는 기존 소유자·명시적 원본 COMPLETED·내용 선택 검사를 유지한다.
+화면 객체: TripBriefing / homeBriefing.ts / HomeNextSchedule.tsx
+DB명/테이블명: 해당 없음. 메모리 파생 객체이며 DB·API·기기 저장 필드 추가 없음.
+- title:string 필수, date:string(ISO) 필수, dayNumber:number 필수, timeSlot:string|null. 기존 DAY·WorkspaceSchedule만 읽는다.
+- 현재·가까운 여행 최대1건. 여행지 today/HH:mm보다 지난 일정을 제외하고 날짜·시각·sortOrder·ID로 다음 한 건 선택.
+- 시간 미정은 해당 날짜의 시간 지정 일정 뒤, 다음 날짜 앞에 둔다. DAY가 없는 일정은 제외한다.
+- 조회: 기존 GET /trips/{id}/workspace, foundationQueryKey(userId, workspace, tripId). 기존 멤버십·게스트 경로를 사용한다.
+- 실패와 빈 일정을 구분하고 실패 시 같은 여행 조회만 재시도한다. 계정/여행별 키로 이전 응답을 새 브리핑에 섞지 않는다.
+- 홈 헤더 팝업·내 여행의 홈 이동 버튼·홈 도구의 하단 탭 중복 경로는 제거한다.
 컴포넌트: ActionSheet / apps/mobile/src/components/ActionSheet.tsx
 - visible:boolean 필수, title:string 필수, onClose:()=>void 필수, children:ReactNode 필수.
 - priority:number 선택 DEFAULT 0. 기존 모달 우선순위에만 사용하고 저장하지 않음.

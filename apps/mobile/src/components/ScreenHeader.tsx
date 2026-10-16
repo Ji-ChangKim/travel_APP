@@ -15,8 +15,8 @@ export default function ScreenHeader({
   right,
 }: {
   title: string;
-  backLabel: string;
-  onBack: () => void;
+  backLabel?: string;
+  onBack?: () => void;
   disabled?: boolean;
   right?: ReactNode;
 }) {
@@ -25,19 +25,21 @@ export default function ScreenHeader({
   return (
     <View testID="screen-header" style={s.header}>
       <View style={s.row}>
-        <DesignButton
-          label=""
-          accessibilityLabel={backLabel}
-          size="icon"
-          variant="quiet"
-          disabled={disabled}
-          onPress={onBack}
-          icon={(color) => {
-            /* 모든 뒤로가기는 같은 화살표와 상태색을 사용한다. */ return (
-              <Ionicons name="arrow-back" size={24} color={color} />
-            );
-          }}
-        />
+        {onBack && (
+          <DesignButton
+            label=""
+            accessibilityLabel={backLabel}
+            size="icon"
+            variant="quiet"
+            disabled={disabled}
+            onPress={onBack}
+            icon={(color) => {
+              /* 모든 뒤로가기는 같은 화살표와 상태색을 사용한다. */ return (
+                <Ionicons name="arrow-back" size={24} color={color} />
+              );
+            }}
+          />
+        )}
         {!largeText && (
           <Text accessibilityRole="header" style={[s.title, { flex: 1 }]}>
             {title}

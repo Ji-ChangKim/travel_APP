@@ -6,7 +6,7 @@ export type TripPhase = TripLifecycle;
 
 // 기존 화면의 호출도 공유 도메인의 같은 기간 판별로 연결한다.
 export function tripPhase(trip: PersistedTrip, today?: string): TripPhase {
-  // 명시적인 완료·보관 상태는 변경하지 않는다.
+  // 날짜로 네 단계만 판별하고 원본 상태는 변경하지 않는다.
   return tripLifecycle(trip, today);
 }
 
@@ -19,8 +19,9 @@ export function homeResumeTrips(
   return (trips || [])
     .filter((trip) => {
       // 날짜가 지난 원래 예정 여행도 홈의 다음 여행으로 노출하지 않는다.
-      return ['DRAFT', 'PLANNED', 'IN_PROGRESS'].includes(
-        tripPhase(trip, today),
+      return (
+        trip.status !== 'ARCHIVED' &&
+        ['DRAFT', 'PLANNED', 'IN_PROGRESS'].includes(tripPhase(trip, today))
       );
     })
     .sort((left, right) => {
@@ -28,7 +29,9 @@ export function homeResumeTrips(
       return (
         Number(tripPhase(right, today) === 'IN_PROGRESS') -
           Number(tripPhase(left, today) === 'IN_PROGRESS') ||
-        left.startDate.localeCompare(right.startDate) ||
+        (left.startDate || '9999-12-31').localeCompare(
+          right.startDate || '9999-12-31',
+        ) ||
         left.id.localeCompare(right.id)
       );
     })

@@ -6,6 +6,7 @@ import DesignButton from '@/components/DesignButton';
 import { homeStyles as s } from './homeStyles';
 import { tripPresentation, homeResumeTrips } from './tripLifecycle';
 import { tripOpenPath } from './tripPresentation';
+import HomeNextSchedule from './HomeNextSchedule';
 
 type Trips = Awaited<ReturnType<typeof listServerTrips>>;
 export const continuingTrips = homeResumeTrips;
@@ -14,8 +15,10 @@ export const continuingTrips = homeResumeTrips;
 export default function HomeTripList({
   trips,
   router,
+  userId,
 }: {
   trips: Trips;
+  userId: string;
   router: ReturnType<typeof useRouter>;
 }) {
   // 현재·다음 여행의 재개 요약만 제공하고 전체 관리는 내 여행에서 한다.
@@ -32,6 +35,7 @@ export default function HomeTripList({
         {info.dates} · {info.label}
       </Text>
       <Text style={s.supporting}>{info.reminder}</Text>
+      <HomeNextSchedule userId={userId} tripId={trip.id} />
       <DesignButton
         label={info.action}
         variant="primary"

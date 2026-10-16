@@ -1,9 +1,8 @@
 import Text from '@/components/AppText';
-import { travelDateRange } from './travelDateRange';
 import ScreenHeader from '@/components/ScreenHeader';
 import TextInput from '@/components/DesignInput';
 import DesignButton from '@/components/DesignButton';
-import { tripPhase, tripPresentation } from './tripLifecycle';
+import { tripPresentation } from './tripLifecycle';
 import { useTripDateRefresh } from './useTripDateRefresh';
 import { colors } from '@/constants/theme';
 import { useState, type Dispatch, type SetStateAction } from 'react';
@@ -22,6 +21,7 @@ import TripAccessFeedback from './TripAccessFeedback';
 import { Action } from './ui';
 import {
   planFilters,
+  matchesPlanFilter,
   selectTravelPlans,
   travelPlanPath,
   type PlanFilter,
@@ -133,12 +133,6 @@ function PlansView({
     <SafeAreaView edges={['top', 'left', 'right']} style={s.screen}>
       <ScreenHeader
         title="내 여행 계획"
-        backLabel="홈으로"
-        onBack={() => {
-          /* 목록의 뒤로가기는 홈으로 연결한다. */ return router.replace(
-            '/(tabs)',
-          );
-        }}
         right={
           <DesignButton
             label=""
@@ -292,8 +286,9 @@ function PlanResults({
               value === 'ALL'
                 ? trips.length
                 : trips.filter((trip) => {
-                    /* 전체 목록의 실제 상태별 건수를 계산한다. */ return (
-                      tripPhase(trip) === value
+                    /* 전체 목록의 실제 상태별 건수를 계산한다. */ return matchesPlanFilter(
+                      trip,
+                      value,
                     );
                   }).length
             }`}
@@ -395,14 +390,15 @@ function PlanCard({
             ]}
           >
             {info.label}
+            {info.archived ? ' · 보관' : ''}
           </Text>
         </View>
         <Ionicons
           name={
-            trip.status === 'COMPLETED'
-              ? 'footsteps-outline'
-              : trip.status === 'ARCHIVED'
-                ? 'archive-outline'
+            info.archived
+              ? 'archive-outline'
+              : info.phase === 'COMPLETED'
+                ? 'footsteps-outline'
                 : 'airplane-outline'
           }
           size={23}
@@ -418,14 +414,10 @@ function PlanCard({
       </View>
       <View style={s.meta}>
         <Ionicons name="calendar-outline" size={16} color={colors.muted} />
-        <Text style={s.metaText}>
-          {travelDateRange(trip.startDate, trip.endDate)}
-        </Text>
+        <Text style={s.metaText}>{info.dates}</Text>
       </View>
       <View style={s.footer}>
-        {trip.status !== 'COMPLETED' && trip.status !== 'ARCHIVED' && (
-          <Text style={s.reminder}>{info.reminder}</Text>
-        )}
+        <Text style={s.reminder}>{info.reminder}</Text>
         <DesignButton
           label={info.action}
           accessibilityLabel={`${trip.title} ${info.action}`}

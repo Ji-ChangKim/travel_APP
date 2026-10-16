@@ -29,29 +29,32 @@ test('공유 도메인·화면·필터는 여행지 자정에서 같은 단계�
     ['2026-10-15T14:59:59Z', 'PLANNED'],
     ['2026-10-15T15:00:00Z', 'IN_PROGRESS'],
     ['2026-10-17T14:59:59Z', 'IN_PROGRESS'],
-    ['2026-10-17T15:00:00Z', 'PAST'],
+    ['2026-10-17T15:00:00Z', 'COMPLETED'],
   ] as const) {
     const now = new Date(instant);
     assert.equal(tripLifecycle(trip, now), expected);
     assert.equal(tripPresentation(trip, now).phase, expected);
   }
-  assert.equal(tripPhase(trip, '2026-10-18'), 'PAST');
+  assert.equal(tripPhase(trip, '2026-10-18'), 'COMPLETED');
   assert.equal(trip.status, 'PLANNED');
 });
 
 test('지난 여행·조기 완료·보관의 문구와 실제 열기 목적지는 모순되지 않는다', () => {
   // 날짜 경과를 발자국 작성·완료 처리 권한으로 바꾸지 않는다.
   const past = tripPresentation(trip, '2026-10-18');
-  assert.equal(past.label, '지난 여행');
+  assert.equal(past.label, '여행 완료');
   assert.doesNotMatch(past.reminder, /출발까지|오늘 출발|지금 여행 중/);
-  assert.equal(past.action, '여행 보기');
-  assert.equal(tripOpenPath(trip), '/trips/travel');
+  assert.equal(past.action, '기록 보러가기');
+  assert.equal(tripOpenPath(trip, '2026-10-18'), '/diary/travel');
   const completed = { ...trip, status: 'COMPLETED' as const };
-  assert.equal(tripPresentation(completed, '2026-10-01').action, '발자국 보기');
-  assert.equal(tripOpenPath(completed), '/diary/travel');
+  assert.equal(
+    tripPresentation(completed, '2026-10-01').action,
+    '계획 계속하기',
+  );
+  assert.equal(tripOpenPath(completed, '2026-10-01'), '/trips/travel');
   assert.equal(
     tripPresentation({ ...trip, status: 'ARCHIVED' }, '2026-10-16').label,
-    '보관한 여행',
+    '여행 중',
   );
 });
 

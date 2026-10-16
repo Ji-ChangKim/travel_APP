@@ -1,10 +1,12 @@
 import type { PersistedTrip } from './foundation';
 
-export type TripLifecycle = PersistedTrip['status'] | 'PAST';
-export type TripTiming = Pick<
-  PersistedTrip,
-  'status' | 'startDate' | 'endDate' | 'timezone'
->;
+export type TripLifecycle = 'DRAFT' | 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED';
+export type TripTiming = {
+  status?: PersistedTrip['status'];
+  startDate?: string | null;
+  endDate?: string | null;
+  timezone?: string | null;
+};
 
 // 서버·기기에서 같은 여행 시간대의 달력 날짜를 계산한다.
 export function tripToday(timezone: string, now = new Date()): string {
@@ -42,28 +44,49 @@ function isoCalendar(parts: Intl.DateTimeFormatPart[]): string {
     .join('-');
 }
 
-// 화면에 보일 여행 단계만 판별하며 저장 상태·공개 권한을 변경하지 않는다.
+// 여행 단계는 저장된 상태와 관계없이 여행지의 오늘 날짜로만 판별한다.
 export function tripLifecycle(
   trip: TripTiming,
   now: Date | string = new Date(),
 ): TripLifecycle {
-  // 명시적인 완료·보관이 우선이며 나머지는 여행지 달력 날짜로 판단한다.
-  return trip.status === 'ARCHIVED' || trip.status === 'COMPLETED'
-    ? trip.status
-    : datedLifecycle(
-        trip,
-        typeof now === 'string' ? now : tripToday(trip.timezone, now),
-      );
+  // 보관·공개 준비 선택을 날짜 기반 네 단계에 섞지 않는다.
+  return datedLifecycle(
+    trip,
+    typeof now === 'string' ? now : tripToday(trip.timezone || 'UTC', now),
+  );
 }
 
-// 아직 종료하지 않은 여행의 날짜 단계를 선택한다.
+// 날짜 미정·잘못된 기간은 준비 중으로 남기고 정상 기간만 비교한다.
 function datedLifecycle(trip: TripTiming, today: string): TripLifecycle {
-  // 종료일 당일까지 여행 중이고 다음 날부터 지난 여행으로 보여준다.
-  return trip.endDate < today
-    ? 'PAST'
-    : trip.startDate <= today
-      ? 'IN_PROGRESS'
-      : trip.status === 'DRAFT'
-        ? 'DRAFT'
-        : 'PLANNED';
+  // 종료 다음 날부터 완료이고 시작일은 임박보다 여행 중을 우선한다.
+  return !validTripDates(trip)
+    ? 'DRAFT'
+    : trip.endDate! < today
+      ? 'COMPLETED'
+      : trip.startDate! <= today
+        ? 'IN_PROGRESS'
+        : (Date.parse(trip.startDate!) - Date.parse(today)) / 86400000 <= 7
+          ? 'PLANNED'
+          : 'DRAFT';
+}
+
+// 달력에 존재하는 날짜와 시작·종료 순서만 유효한 기간으로 인정한다.
+export function validTripDates(trip: TripTiming): boolean {
+  // 빈 값이나 부분 입력으로 완료·여행 중을 잘못 표시하지 않는다.
+  return (
+    validCalendarDate(trip.startDate) &&
+    validCalendarDate(trip.endDate) &&
+    trip.startDate! <= trip.endDate!
+  );
+}
+
+// ISO 날짜의 형식뿐 아니라 윤일과 실제 달력 날짜도 검사한다.
+function validCalendarDate(value: string | null | undefined): boolean {
+  // 자동 보정되는 2월 30일 같은 값은 날짜 미정으로 처리한다.
+  return Boolean(
+    value &&
+    /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+    Number.isFinite(Date.parse(value)) &&
+    new Date(value).toISOString().slice(0, 10) === value,
+  );
 }

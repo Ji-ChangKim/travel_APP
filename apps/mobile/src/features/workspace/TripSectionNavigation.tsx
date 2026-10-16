@@ -122,7 +122,7 @@ export function TripMoreMenu({
             여행 관리
           </Text>
           <DesignButton
-            label="여행 정보 / 종료 상태"
+            label="여행 정보 / 기록 정리"
             disabled={disabled}
             onPress={onEditInfo}
           />

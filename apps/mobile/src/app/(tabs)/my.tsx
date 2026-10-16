@@ -361,7 +361,10 @@ function MyContent() {
                   {serverTrips.isSuccess
                     ? serverTrips.data.filter((trip) => {
                         // 앞으로 떠날 여행만 예정 통계에 포함한다.
-                        return ['PLANNED', 'DRAFT'].includes(tripPhase(trip));
+                        return (
+                          trip.status !== 'ARCHIVED' &&
+                          ['PLANNED', 'DRAFT'].includes(tripPhase(trip))
+                        );
                       }).length
                     : '—'}
                 </Text>
@@ -373,7 +376,10 @@ function MyContent() {
                   {serverTrips.isSuccess
                     ? serverTrips.data.filter((trip) => {
                         // 발자국 목록과 동일하게 완료 여행만 집계한다.
-                        return trip.status === 'COMPLETED';
+                        return (
+                          trip.status !== 'ARCHIVED' &&
+                          tripPhase(trip) === 'COMPLETED'
+                        );
                       }).length
                     : '—'}
                 </Text>

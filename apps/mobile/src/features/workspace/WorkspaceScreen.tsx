@@ -1005,10 +1005,10 @@ function WorkspaceContent({
                         snapshot.trip.endDate,
                       )}
                     </Text>
-                    {tripPresentation(snapshot.trip).phase === 'PAST' && (
+                    {tripPresentation(snapshot.trip).phase === 'COMPLETED' && (
                       <Text style={hub.meta}>
-                        여행 기간이 지났어요. 일정을 확인하고 여행 설정에서 완료
-                        여부를 정해 주세요.
+                        여행이 끝났어요. 남긴 일정과 사진, 비용을 기록에서
+                        확인해 보세요.
                       </Text>
                     )}
                     <View
@@ -1025,9 +1025,9 @@ function WorkspaceContent({
                         {memberRoleLabel(snapshot.myRole)}
                       </Text>
                     </View>
-                    {snapshot.trip.status === 'COMPLETED' && (
+                    {tripPresentation(snapshot.trip).phase === 'COMPLETED' && (
                       <Action
-                        label="발자국 다이어리 보기"
+                        label="기록 보러가기"
                         onPress={() => {
                           // 종료된 여행의 일정·사진·비용을 날짜별로 읽는다.
                           return router.push(`/diary/${snapshot.trip.id}`);

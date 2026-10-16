@@ -305,6 +305,6 @@ test('R10 서버 공개 모델도 삭제된 ID·영수증 원본·미종료·편
       { ...snapshot, trip: { ...snapshot.trip, status: 'PLANNED' } },
       {},
     ),
-    /여행 종료/,
+    /기록 정리 완료/,
   ));
 });
