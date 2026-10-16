@@ -128,7 +128,7 @@ test('가입은 이메일·닉네임·8자 비밀번호·확인 일치를 요구
       }).success,
       emailSignupSchema.safeParse({
         email: 'traveler@example.com',
-        nickname: '여',
+        nickname: 'a',
         password: 'password123',
         confirmation: 'password123',
       }).success,

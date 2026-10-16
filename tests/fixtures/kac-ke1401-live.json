@@ -1,0 +1,58 @@
+{
+  "response": {
+    "header": { "resultCode": "00", "resultMsg": "NORMAL SERVICE." },
+    "body": {
+      "numOfRows": 10,
+      "pageNo": 1,
+      "totalCount": 2,
+      "items": {
+        "item": [
+          {
+            "fid": "0000000000000012812314",
+            "boardingKor": "인천",
+            "boardingEng": "INCHEON",
+            "city": "PUS",
+            "arrivedKor": "부산/김해",
+            "arrivedEng": "GIMHAE",
+            "airport": "ICN",
+            "airlineKorean": "대한항공",
+            "airlineEnglish": "KOREAN AIR",
+            "cdsrYn": "N",
+            "airFln": "KE1401",
+            "std": "202610140635",
+            "etd": "202610140656",
+            "io": "O",
+            "line": "국내",
+            "rmkKor": "출발",
+            "rmkEng": "DEPARTED",
+            "aplRegNo": "HL8589",
+            "icaoApmCd": "A321",
+            "gate": null
+          },
+          {
+            "fid": "0000000000000012812315",
+            "boardingKor": "인천",
+            "boardingEng": "INCHEON",
+            "city": "ICN",
+            "arrivedKor": "부산/김해",
+            "arrivedEng": "GIMHAE",
+            "airport": "PUS",
+            "airlineKorean": "대한항공",
+            "airlineEnglish": "KOREAN AIR",
+            "cdsrYn": "Y",
+            "airFln": "KE1401",
+            "std": "202610140745",
+            "etd": "202610140738",
+            "io": "I",
+            "line": "국제",
+            "rmkKor": "도착",
+            "rmkEng": "ARRIVED   ",
+            "aplRegNo": "HL8589",
+            "icaoApmCd": "A321",
+            "gate": "5"
+          }
+        ]
+      }
+    }
+  }
+}

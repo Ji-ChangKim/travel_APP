@@ -1,0 +1,36 @@
+{
+  "response": {
+    "header": { "resultCode": "00", "resultMsg": "NORMAL SERVICE." },
+    "body": {
+      "numOfRows": 10,
+      "pageNo": 1,
+      "totalCount": 1,
+      "items": {
+        "item": [
+          {
+            "fid": "0000000000000013217890",
+            "boardingKor": "청주",
+            "boardingEng": "CHEONGJU",
+            "city": "TPE",
+            "arrivedKor": "타이페이/타오위안",
+            "arrivedEng": "TAOYUAN",
+            "airport": "CJJ",
+            "airlineKorean": "이스타항공",
+            "airlineEnglish": "EASTAR JET",
+            "cdsrYn": "N",
+            "airFln": "ZE781A",
+            "std": "202610140035",
+            "etd": "202610140030",
+            "io": "O",
+            "line": "국제",
+            "rmkKor": "출발",
+            "rmkEng": "DEPARTED",
+            "aplRegNo": "HL8374",
+            "icaoApmCd": "B738",
+            "gate": null
+          }
+        ]
+      }
+    }
+  }
+}

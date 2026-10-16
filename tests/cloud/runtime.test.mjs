@@ -43,6 +43,7 @@ const state = {
   version: 1,
   day: '',
   schedule: randomUUID(),
+  flight: '',
   media: randomUUID(),
   path: '',
   privateUrl: '',
@@ -53,6 +54,174 @@ const png = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a/Z8AAAAASUVORK5CYII=',
   'base64',
 );
+
+test('R08 Worker 공개 정책은 운영값 미설정에서 인증·DB 조회 없이 null을 반환한다', async () => {
+  // 실제 빌드한 Worker의 공개 라우팅과 비활성 기본 정책을 확인한다.
+  const response = await mf.dispatchFetch(
+    `${api}/public/app-config?platform=android&channel=play`,
+  );
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.data, null);
+  assert.match(body.meta.requestId, /^[a-f0-9-]{36}$/);
+  assert.match(response.headers.get('cache-control') || '', /no-store/);
+});
+
+test('R07 D1 기간 변경은 실제 날짜의 DAY ID를 유지하고 연결 날짜 제거를 원자적으로 거부한다', () => {
+  // 기존 통합 시나리오와 별도의 회원·여행으로 저장 계약을 확인한다.
+  return request(
+    '/api/auth/sign-up/email',
+    'POST',
+    {
+      name: '기간 검증자',
+      email: `${randomUUID()}@example.test`,
+      password: 'r07-strong-password!',
+    },
+    undefined,
+    { 'CF-Connecting-IP': '203.0.113.107' },
+  )
+    .then(accountResponse)
+    .then((member) => {
+      // 날짜의 순서가 바뀌어도 일정의 실제 부모가 같아야 한다.
+      return r07PeriodContract(member);
+    });
+});
+
+// 실제 D1 명령과 재조회로 기간 축소·이동·확장을 검증한다.
+function r07PeriodContract(
+  member,
+  state = { id: '', days: [], snapshot: null },
+) {
+  // 가짜 모델 응답이나 순서 기반 DAY ID를 테스트에 주입하지 않는다.
+  return request(
+    '/api/v1/trips',
+    'POST',
+    {
+      title: '기간 계약',
+      country: '일본',
+      city: '도쿄',
+      timezone: 'Asia/Tokyo',
+      startDate: '2026-11-10',
+      endDate: '2026-11-12',
+    },
+    member,
+    { 'Idempotency-Key': randomUUID() },
+  )
+    .then((response) => {
+      // 생성은 기존 API의 201 응답 계약을 사용한다.
+      return json(response, 201);
+    })
+    .then((body) => {
+      // 실제 생성한 여행 식별자로 원본을 조회한다.
+      return (
+        (state.id = body.data.tripId),
+        r07PeriodSnapshot(member, state.id)
+      );
+    })
+    .then((snapshot) => {
+      // 생성한 실제 DAY 식별자를 보관한다.
+      return (
+        (state.days = snapshot.days),
+        r07PeriodCommand(member, state.id, 1, 'trip.period', {
+          startDate: '2026-11-11',
+          endDate: '2026-11-13',
+        }).then(json)
+      );
+    })
+    .then(() => r07PeriodSnapshot(member, state.id))
+    .then((snapshot) => {
+      // 유지 날짜의 ID는 같고 새 날짜에는 새 ID가 발급되어야 한다.
+      return (
+        assert.deepEqual(
+          snapshot.days.slice(0, 2).map((day) => day.id),
+          state.days.slice(1).map((day) => day.id),
+        ),
+        assert.ok(!state.days.some((day) => day.id === snapshot.days[2].id)),
+        r07PeriodCommand(member, state.id, 2, 'schedule.save', {
+          id: randomUUID(),
+          dayId: state.days[1].id,
+          title: '날짜 유지 기록',
+          type: 'PLACE',
+          timeSlot: '10:00',
+          sortOrder: 1,
+          memo: '',
+          address: '',
+        }).then(json)
+      );
+    })
+    .then(() =>
+      r07PeriodCommand(member, state.id, 3, 'trip.period', {
+        startDate: '2026-11-10',
+        endDate: '2026-11-13',
+      }).then(json),
+    )
+    .then(() => r07PeriodSnapshot(member, state.id))
+    .then((snapshot) => {
+      // 앞에 빈 날짜를 더해도 일정은 같은 실제 날짜에 남는다.
+      return (
+        assert.equal(snapshot.days[1].id, state.days[1].id),
+        assert.equal(snapshot.days[1].dayNumber, 2),
+        assert.equal(snapshot.itinerary[0].dayId, state.days[1].id),
+        (state.snapshot = snapshot),
+        r07PeriodCommand(member, state.id, 4, 'trip.period', {
+          startDate: '2026-11-12',
+          endDate: '2026-11-13',
+        }).then((response) => {
+          // 일정이 있는 날짜의 제거는 저장 계층에서 거부해야 한다.
+          return json(response, 422);
+        })
+      );
+    })
+    .then(() => r07PeriodSnapshot(member, state.id))
+    .then((snapshot) => {
+      // 실패 요청이 날짜·DAY ID·연결 기록·버전을 일부만 바꾸지 않는다.
+      return (
+        assert.deepEqual(snapshot, state.snapshot),
+        r07PeriodCommand(member, state.id, 4, 'trip.period', {
+          startDate: '2026-11-11',
+          endDate: '2026-11-12',
+        }).then(json)
+      );
+    })
+    .then(() => r07PeriodSnapshot(member, state.id))
+    .then((snapshot) => {
+      // 앞뒤의 빈 날짜만 제거하고 원래 날짜 두 개와 기록을 유지한다.
+      return (
+        assert.deepEqual(
+          snapshot.days.map((day) => day.id),
+          state.days.slice(1).map((day) => day.id),
+        ),
+        assert.equal(snapshot.itinerary[0].dayId, state.days[1].id),
+        assert.equal(snapshot.trip.version, 5)
+      );
+    });
+}
+
+// 검증 대상 여행에 명시한 버전의 실제 명령을 전송한다.
+function r07PeriodCommand(member, tripId, version, operation, input) {
+  // 다른 통합 테스트의 여행·버전 상태를 덮어쓰지 않는다.
+  return request(
+    `/api/v1/trips/${tripId}/commands`,
+    'POST',
+    { operation, input },
+    member,
+    {
+      'Idempotency-Key': randomUUID(),
+      'If-Match': `"trip:${tripId}:${version}"`,
+    },
+  );
+}
+
+// 실제 저장 결과를 별도의 조회 요청으로 확인한다.
+function r07PeriodSnapshot(member, tripId) {
+  // 쓰기 요청의 응답만으로 DAY 보존을 판정하지 않는다.
+  return request(`/api/v1/trips/${tripId}/workspace`, 'GET', undefined, member)
+    .then(json)
+    .then((body) => {
+      // 검증할 서버 스냅샷만 다음 단계에 전달한다.
+      return body.data;
+    });
+}
 
 // 실제 D1 런타임에 배포용 스키마를 적용한다.
 before(() => {
@@ -361,6 +530,375 @@ function signup(index, headers = {}) {
   });
 }
 
+// R04 입력 계약을 독립된 실제 이메일 계정으로 검사한다.
+function r04Member(name) {
+  // 다른 인증 시나리오의 닉네임과 요청 제한을 공유하지 않는다.
+  return request(
+    '/api/auth/sign-up/email',
+    'POST',
+    {
+      name,
+      email: `${randomUUID()}@example.test`,
+      password: 'r04-strong-password!',
+    },
+    undefined,
+    { 'CF-Connecting-IP': '203.0.113.104' },
+  ).then(accountResponse);
+}
+
+// 프로필 저장 결과를 요청한 필드별 기대값과 비교한다.
+function r04ProfileStep(member, input, expected, status = 200) {
+  // 실패한 입력이 성공으로 처리되거나 저장값을 덮어쓰지 않게 검사한다.
+  return request('/api/v1/profile', 'PATCH', input, member)
+    .then((response) => {
+      // 실패 응답도 실제 HTTP 상태를 확인한다.
+      return json(response, status);
+    })
+    .then((body) => {
+      // 요청마다 확인할 프로필 필드만 비교한다.
+      return Object.entries(expected).forEach(([field, value]) => {
+        // 서버가 응답한 값과 기대값을 정확히 비교한다.
+        return assert.deepEqual(body.data?.[field], value);
+      });
+    });
+}
+
+test('R04 생일 없이 완료하고 재조회·생일 추가·생략·삭제 후에도 완료를 유지한다', () => {
+  // 완료 여부를 생일 값에서 추론하지 않고 실제 D1 저장으로 확인한다.
+  return r04Member('R04 birthday').then((member) =>
+    /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
+      member,
+      { bio: '먼저 소개' },
+      { onboardingCompleted: false, birthDate: null },
+    )
+      .then(() =>
+        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
+          member,
+          { gender: 'unspecified', birthDate: null, onboardingCompleted: true },
+          { onboardingCompleted: true, birthDate: null, gender: 'unspecified' },
+        ),
+      )
+      .then(() =>
+        /* 실제 API 요청으로 다음 입력을 검사한다. */ request(
+          '/api/v1/profile',
+          'GET',
+          undefined,
+          member,
+        ),
+      )
+      .then(json)
+      .then((body) => {
+        // 새 조회에서도 생일 없이 완료한 상태를 복원한다.
+        return assert.deepEqual(
+          [body.data.birthDate, body.data.onboardingCompleted],
+          [null, true],
+        );
+      })
+      .then(() => /* 검증용 D1 바인딩을 가져온다. */ mf.getD1Database('DB'))
+      .then((db) =>
+        /* 검증에 필요한 과거 데이터를 D1에 준비한다. */ db
+          .prepare(
+            'SELECT onboarding_completed_at,birth_date FROM profiles WHERE user_id=?',
+          )
+          .bind(member.id)
+          .first(),
+      )
+      .then((row) => {
+        // 응답만 바뀐 것이 아니라 완료 시각과 빈 생일이 DB에 저장되어야 한다.
+        return assert.ok(
+          row.onboarding_completed_at > 0 && row.birth_date === null,
+        );
+      })
+      .then(() =>
+        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
+          member,
+          { birthDate: '1996-02-29' },
+          { birthDate: '1996-02-29', onboardingCompleted: true },
+        ),
+      )
+      .then(() =>
+        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
+          member,
+          { bio: '생일 유지' },
+          { birthDate: '1996-02-29', onboardingCompleted: true },
+        ),
+      )
+      .then(() =>
+        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
+          member,
+          { birthDate: null },
+          { birthDate: null, onboardingCompleted: true },
+        ),
+      )
+      .then(() =>
+        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
+          member,
+          { birthDate: '2025-02-30' },
+          {},
+          422,
+        ),
+      )
+      .then(() =>
+        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
+          member,
+          { birthDate: '' },
+          {},
+          422,
+        ),
+      )
+      .then(() =>
+        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
+          member,
+          { onboardingCompleted: false },
+          {},
+          422,
+        ),
+      )
+      .then(() =>
+        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
+          member,
+          { bio: '오류 후 유지' },
+          { birthDate: null, onboardingCompleted: true },
+        ),
+      ),
+  );
+});
+
+test('R04 닉네임 바이트 경계와 공백을 검사하고 기존 긴 이름을 보존한다', () => {
+  // 과거 이름은 DB에 직접 준비하되 변경은 실제 인증 API로 실행한다.
+  return r04Member('R04 nickname').then((member) =>
+    /* 검증용 D1 바인딩을 가져온다. */ mf
+      .getD1Database('DB')
+      .then((db) =>
+        /* 검증에 필요한 과거 데이터를 D1에 준비한다. */ db
+          .prepare('UPDATE user SET name=? WHERE id=?')
+          .bind(' 오래된 여행자의 긴 이름 ', member.id)
+          .run(),
+      )
+      .then(() =>
+        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
+          member,
+          {
+            nickname: ' 오래된 여행자의 긴 이름 ',
+            bio: '소개만 변경',
+            onboardingCompleted: true,
+          },
+          { nickname: ' 오래된 여행자의 긴 이름 ', onboardingCompleted: true },
+        ),
+      )
+      .then(() =>
+        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
+          member,
+          { bio: '이름 생략' },
+          { nickname: ' 오래된 여행자의 긴 이름 ' },
+        ),
+      )
+      .then(() =>
+        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
+          member,
+          { nickname: '또 다른 여행자의 긴 이름' },
+          {},
+          422,
+        ),
+      )
+      .then(() =>
+        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
+          member,
+          { nickname: 'a' },
+          {},
+          422,
+        ),
+      )
+      .then(() =>
+        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
+          member,
+          { nickname: '  ' },
+          {},
+          422,
+        ),
+      )
+      .then(() =>
+        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
+          member,
+          { nickname: 'a'.repeat(20) },
+          { nickname: 'a'.repeat(20) },
+        ),
+      )
+      .then(() =>
+        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
+          member,
+          { nickname: 'a'.repeat(21) },
+          {},
+          422,
+        ),
+      )
+      .then(() =>
+        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
+          member,
+          { nickname: '가'.repeat(6) + ' a' },
+          { nickname: '가'.repeat(6) + ' a' },
+        ),
+      )
+      .then(() =>
+        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
+          member,
+          { nickname: '가'.repeat(7) },
+          {},
+          422,
+        ),
+      )
+      .then(() =>
+        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
+          member,
+          { nickname: '😀'.repeat(5) },
+          { nickname: '😀'.repeat(5) },
+        ),
+      )
+      .then(() =>
+        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
+          member,
+          { nickname: '😀'.repeat(6) },
+          {},
+          422,
+        ),
+      )
+      .then(() =>
+        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
+          member,
+          { nickname: ' xy ' },
+          { nickname: ' xy ' },
+        ),
+      )
+      .then(() =>
+        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
+          member,
+          {
+            nickname: '이름은 긴데 예전 이름이라고 주장',
+            previousNickname: '이름은 긴데 예전 이름이라고 주장',
+          },
+          {},
+          422,
+        ),
+      ),
+  );
+});
+
+test('R04 이메일 가입도 2~20바이트를 검사하고 앞뒤 공백을 보존한다', () => {
+  // 화면을 거치지 않은 가입 요청에도 같은 제한을 적용한다.
+  return ['a', 'a'.repeat(21), '가'.repeat(7), '😀'.repeat(6), '  ']
+    .reduce((previous, name) => {
+      // 중복 여부와 무관하게 길이가 잘못된 신규 이름을 거부한다.
+      return previous
+        .then(() =>
+          /* 실제 API 요청으로 다음 입력을 검사한다. */ request(
+            '/api/auth/sign-up/email',
+            'POST',
+            {
+              name,
+              email: `${randomUUID()}@example.test`,
+              password: 'r04-strong-password!',
+            },
+            undefined,
+            { 'CF-Connecting-IP': '203.0.113.105' },
+          ),
+        )
+        .then((response) => {
+          // Better Auth의 입력 오류 계약을 확인한다.
+          return assert.equal(response.status, 400);
+        });
+    }, Promise.resolve())
+    .then(() =>
+      /* 같은 계정의 다음 검증 단계만 실행한다. */ r04Member(' signup space '),
+    )
+    .then((member) =>
+      /* 실제 API 요청으로 다음 입력을 검사한다. */ request(
+        '/api/v1/profile',
+        'GET',
+        undefined,
+        member,
+      ),
+    )
+    .then(json)
+    .then((body) => {
+      // 가입 과정에서도 입력한 공백을 임의 제거하지 않는다.
+      return assert.equal(body.data.nickname, ' signup space ');
+    });
+});
+
+test('R04 인증 이름 수정 경로도 기존 이름을 유지하고 길이·중복 우회를 막는다', () => {
+  // 프로필 API 외에 인증 라이브러리의 공개 이름 수정 경로도 검사한다.
+  return r04Member('R04 collide')
+    .then(() => {
+      // 중복 검사에 쓰는 상대 계정도 이 테스트에서 직접 만든다.
+      return r04Member('R04 auth name');
+    })
+    .then((member) =>
+      /* 검증용 D1 바인딩을 가져온다. */ mf
+        .getD1Database('DB')
+        .then((db) =>
+          /* 검증에 필요한 과거 데이터를 D1에 준비한다. */ db
+            .prepare('UPDATE user SET name=? WHERE id=?')
+            .bind('기존 인증 회원의 긴 이름', member.id)
+            .run(),
+        )
+        .then(() =>
+          /* 실제 API 요청으로 다음 입력을 검사한다. */ request(
+            '/api/auth/update-user',
+            'POST',
+            { name: '기존 인증 회원의 긴 이름' },
+            member,
+          ),
+        )
+        .then(json)
+        .then(() =>
+          /* 실제 API 요청으로 다음 입력을 검사한다. */ request(
+            '/api/auth/update-user',
+            'POST',
+            { name: 'a'.repeat(21) },
+            member,
+          ),
+        )
+        .then((response) => {
+          // 별도 인증 경로에서도 잘못된 길이를 거부한다.
+          return assert.equal(response.status, 400);
+        })
+        .then(() =>
+          /* 실제 API 요청으로 다음 입력을 검사한다. */ request(
+            '/api/auth/update-user',
+            'POST',
+            { name: 'R04 collide' },
+            member,
+          ),
+        )
+        .then((response) => {
+          // 다른 회원의 이름을 가져오지 못하게 한다.
+          return assert.equal(response.status, 409);
+        })
+        .then(() =>
+          /* 실제 API 요청으로 다음 입력을 검사한다. */ request(
+            '/api/auth/update-user',
+            'POST',
+            { name: ' r04 updated ' },
+            member,
+          ),
+        )
+        .then(json)
+        .then(() =>
+          /* 실제 API 요청으로 다음 입력을 검사한다. */ request(
+            '/api/v1/profile',
+            'GET',
+            undefined,
+            member,
+          ),
+        )
+        .then(json)
+        .then((body) => {
+          // 유효한 이름만 공백을 포함해 그대로 저장한다.
+          return assert.equal(body.data.nickname, ' r04 updated ');
+        }),
+    );
+});
+
 // 공통 저장 명령에서 실제 버전과 멱등 키를 사용한다.
 function command(
   operation,
@@ -432,6 +970,12 @@ test('D1 인증·원자 여행·초대 권한·비공개 R2·공개 철회 통�
             departure: 'ICN',
             arrival: 'NRT',
             time: '10:00',
+            arrivalTime: '12:30',
+            departureTerminal: '제2터미널',
+            arrivalTerminal: '제1터미널',
+            durationMinutes: 150,
+            baggageKg: 15,
+            cabin: '일반석',
           },
         },
         state.users[0],
@@ -455,7 +999,15 @@ test('D1 인증·원자 여행·초대 권한·비공개 R2·공개 철회 통�
       /* DAY와 항공편이 함께 생성되었는지 확인한다. */ return (
         assert.equal(body.data.days.length, 3),
         assert.equal(body.data.itinerary[0].type, 'TRANSPORT'),
-        (state.day = body.data.days[0].id)
+        assert.equal(
+          body.data.itinerary[0].flight.departureTerminal,
+          '제2터미널',
+        ),
+        assert.equal(body.data.itinerary[0].flight.arrivalTime, '12:30'),
+        assert.equal(body.data.itinerary[0].flight.durationMinutes, 150),
+        assert.equal(body.data.itinerary[0].flight.baggageKg, 15),
+        (state.day = body.data.days[0].id),
+        (state.flight = body.data.itinerary[0].id)
       );
     })
     .then(() =>
@@ -482,8 +1034,89 @@ test('D1 인증·원자 여행·초대 권한·비공개 R2·공개 철회 통�
         sortOrder: 2,
         memo: '비공개 메모',
         address: '도쿄',
+        location: { latitude: 35.6812, longitude: 139.7671 },
+        afterScheduleId: null,
+        durationMinutes: 60,
+        estimatedCost: { amount: '1500', currency: 'JPY' },
       }),
     )
+    .then(() =>
+      request(
+        `/api/v1/trips/${state.trip}/workspace`,
+        'GET',
+        undefined,
+        state.users[0],
+      ),
+    )
+    .then(json)
+    .then((body) => {
+      // 실제 D1 저장·다시 조회에서도 사용자가 선택한 지도 위치를 보존한다.
+      return (
+        assert.equal(body.data.itinerary[0].id, state.schedule),
+        assert.equal(body.data.itinerary[0].durationMinutes, 60),
+        assert.deepEqual(body.data.itinerary[0].location, {
+          latitude: 35.6812,
+          longitude: 139.7671,
+        }),
+        assert.ok(
+          body.data.expenses.some((expense) => {
+            // 예상 비용은 실제 지출과 구분된 같은 일정의 기록이어야 한다.
+            return (
+              expense.scheduleId === state.schedule &&
+              expense.amount === '1500' &&
+              expense.currency === 'JPY' &&
+              expense.isActual === false
+            );
+          }),
+        )
+      );
+    })
+    .then(() =>
+      save('schedule.reorder', {
+        dayId: state.day,
+        ids: [state.flight, state.schedule],
+      }),
+    )
+    .then(() =>
+      request(
+        `/api/v1/trips/${state.trip}/workspace`,
+        'GET',
+        undefined,
+        state.users[0],
+      ),
+    )
+    .then(json)
+    .then((body) => {
+      // 순서 변경도 실제 D1 재조회에서 체류 시간·항공편·예상 비용을 보존한다.
+      return (
+        assert.deepEqual(
+          [...body.data.itinerary]
+            .sort((first, second) => {
+              // API 배열의 물리 위치 대신 화면에서 사용하는 방문 순서를 검증한다.
+              return first.sortOrder - second.sortOrder;
+            })
+            .map((item) => {
+              // 저장된 일차 순서의 식별자를 비교한다.
+              return item.id;
+            }),
+          [state.flight, state.schedule],
+        ),
+        assert.equal(
+          body.data.itinerary.find((item) => {
+            // 재정렬 후에도 같은 일정의 상세를 조회한다.
+            return item.id === state.schedule;
+          }).durationMinutes,
+          60,
+        ),
+        assert.equal(
+          body.data.itinerary.find((item) => {
+            // 항공편 상세는 일정 순서 변경의 영향을 받지 않는다.
+            return item.id === state.flight;
+          }).flight.number,
+          'KE703',
+        )
+      );
+    })
     .then(() =>
       command('schedule.delete', { id: state.schedule }, state.users[0], 1),
     )
@@ -1086,6 +1719,7 @@ function receiptScanBoundaries() {
       // 제한 후에도 권한이 있는 기존 인식 결과는 재사용한다.
       return assert.equal(body.data.merchant, 'Kagerou Cafe');
     })
+    .then(r10CachedCurrencyContract)
     .then(() => mf.getD1Database('DB'))
     .then((db) => {
       // 이전 시나리오에서 제거한 테스트 회원을 조회자로만 다시 연결한다.
@@ -1811,4 +2445,66 @@ function verifyPasswordHashes() {
         '서로 다른 회원의 비밀번호는 원문과 다른 개별 해시로 보관해야 한다.',
       );
     });
+}
+
+// 실제 D1 초안 캐시와 Worker 응답에서도 원 통화를 보존한다.
+function r10CachedCurrencyContract() {
+  // 공급자 호출 없이 캐시 조회 경로의 초안·확정 계약을 검사한다.
+  return ['TWD', 'VND', 'THB', 'CNY', 'SGD', ''].reduce(
+    (previous, currency) => {
+      // 통화마다 저장된 JSON을 실제 캐시 스키마로 다시 읽는다.
+      return previous
+        .then(() => mf.getD1Database('DB'))
+        .then((db) => {
+          // 확정 영수증 테이블이 아닌 인식 초안에만 검수 값을 넣는다.
+          return db
+            .prepare(
+              'UPDATE receipt_scans SET draft=? WHERE trip_id=? AND media_id=?',
+            )
+            .bind(
+              JSON.stringify({
+                rawText: '검수 원문',
+                merchant: '통화 검수',
+                transactionDate: '2026-10-06',
+                amount: '1234',
+                currency,
+                needsConfirmation: true,
+                items: [],
+                warnings: [],
+              }),
+              state.trip,
+              state.media,
+            )
+            .run();
+        })
+        .then(() =>
+          request(
+            `/api/v1/trips/${state.trip}/receipts/ocr`,
+            'POST',
+            { mediaId: state.media },
+            state.users[0],
+          ),
+        )
+        .then(json)
+        .then((body) => {
+          // USD 기본 통화의 여행이어도 미지원 코드와 미인식 빈 값을 그대로 반환한다.
+          assert.equal(body.data.currency, currency);
+          assert.equal(body.data.amount, '1234');
+          return command('receipt.confirm', {
+            id: randomUUID(),
+            dayId: state.day,
+            mediaId: state.media,
+            merchant: '통화 검수',
+            transactionDate: '2026-10-06',
+            amount: '1234',
+            currency,
+          });
+        })
+        .then((response) => {
+          // 확정은 거부하고 여행 버전·원본 금액을 변경하지 않는다.
+          return assert.equal(response.status, 422);
+        });
+    },
+    Promise.resolve(),
+  );
 }

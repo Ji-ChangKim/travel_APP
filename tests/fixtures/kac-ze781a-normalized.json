@@ -1,0 +1,19 @@
+{
+  "candidates": [
+    {
+      "number": "ZE781A",
+      "departure": "CJJ",
+      "arrival": "TPE",
+      "departureDate": "2026-10-14",
+      "departureTime": "00:35",
+      "airline": "이스타항공",
+      "aircraftType": "B738",
+      "aircraftRegistration": "HL8374",
+      "departureStatus": "출발",
+      "actualDepartureTime": "00:30"
+    }
+  ],
+  "source": "한국공항공사",
+  "checkedAt": "2026-10-14T10:36:03.766Z",
+  "notice": "국내 공항의 운항 정보예요. 해외 출발편·인천 국제선·먼 날짜의 항공편은 조회가 어려울 수 있어요. 비어 있는 시각과 터미널은 항공권에서 확인해 주세요."
+}

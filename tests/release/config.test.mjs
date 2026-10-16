@@ -20,6 +20,41 @@ test('Cloudflare 공개 설정은 Supabase 키 없이 통과한다', () => {
   return assert.deepEqual(getReleaseIssues(valid), []);
 });
 
+test('공공데이터 키는 공개 배포 설정에 복사하지 않고 잘못된 공급자 설정은 거부한다', () => {
+  // 서버 비밀 키와 공개 공급자 선택을 분리한다.
+  assert.equal(
+    JSON.stringify(
+      workerConfig({ ...valid, KAC_FLIGHT_SERVICE_KEY: 'private-kac-key' }),
+    ).includes('private-kac-key'),
+    false,
+  );
+  assert.equal(
+    getReleaseIssues({ ...valid, FLIGHT_LOOKUP_PROVIDER: 'unknown' }).some(
+      (message) => {
+        // 공급자 이름을 잘못 입력한 상태로 배포를 준비하지 않는다.
+        return message.startsWith('FLIGHT_LOOKUP_PROVIDER:');
+      },
+    ),
+    true,
+  );
+});
+
+test('항공 조회 제한은 배포 환경별 namespace를 사용하고 서버 키를 공개하지 않는다', () => {
+  // 생성 설정에서 로컬 제한 카운터를 잘못 재사용하지 않는다.
+  const config = workerConfig({
+    ...valid,
+    AERODATABOX_RAPIDAPI_KEY: 'private-flight-secret',
+  });
+  assert.deepEqual(config.ratelimits, [
+    {
+      name: 'FLIGHT_LOOKUP_LIMITER',
+      namespace_id: '100542',
+      simple: { limit: 6, period: 60 },
+    },
+  ]);
+  assert.equal(JSON.stringify(config).includes('private-flight-secret'), false);
+});
+
 test('Worker는 실제 D1·R2·AUTH_SECRET과 공개 주소만 사용한다', () => {
   // 서버 비밀은 설정 파일로 복사하지 않고 바인딩 이름으로만 유지한다.
   return assert.deepEqual(
@@ -27,9 +62,7 @@ test('Worker는 실제 D1·R2·AUTH_SECRET과 공개 주소만 사용한다', ()
     {
       name: 'tripprint-api-staging',
       vars: {
-        GOOGLE_CLIENT_ID: '',
-        KAKAO_CLIENT_ID: '',
-        NAVER_CLIENT_ID: '',
+        FLIGHT_LOOKUP_PROVIDER: 'kac',
         AUTH_BASE_URL: valid.EXPO_PUBLIC_API_URL,
         ALLOWED_ORIGINS: valid.RELEASE_WEB_ORIGIN,
         SUPABASE_URL: '',
@@ -40,7 +73,16 @@ test('Worker는 실제 D1·R2·AUTH_SECRET과 공개 주소만 사용한다', ()
       migrations: '../migrations',
       secrets: ['AUTH_SECRET'],
       env: undefined,
+      keepVars: true,
     },
+  );
+});
+
+test('누락·공백 OAuth 식별값은 기존 서버 로그인을 빈 값으로 덮어쓰지 않는다', () => {
+  // 생성 설정의 변수 보존과 빈 식별값 제외를 함께 검사한다.
+  return assert.deepEqual(
+    projectConfig(workerConfig({ ...valid, GOOGLE_CLIENT_ID: '  ' })),
+    projectConfig(workerConfig(valid)),
   );
 });
 
@@ -84,6 +126,7 @@ function projectConfig(config) {
     migrations: config.d1_databases[0].migrations_dir,
     secrets: config.secrets.required,
     env: config.env,
+    keepVars: config.keep_vars,
   };
 }
 

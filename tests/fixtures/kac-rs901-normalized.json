@@ -1,0 +1,23 @@
+{
+  "candidates": [
+    {
+      "number": "RS901",
+      "departure": "GMP",
+      "arrival": "CJU",
+      "departureDate": "2026-10-14",
+      "arrivalDate": "2026-10-14",
+      "departureTime": "06:00",
+      "arrivalTime": "07:15",
+      "durationMinutes": 75,
+      "airline": "에어서울",
+      "aircraftType": "A321",
+      "aircraftRegistration": "HL8072",
+      "departureGate": "3",
+      "departureStatus": "출발",
+      "actualDepartureTime": "06:26"
+    }
+  ],
+  "source": "한국공항공사",
+  "checkedAt": "2026-10-14T10:36:03.477Z",
+  "notice": "국내 공항의 운항 정보예요. 해외 출발편·인천 국제선·먼 날짜의 항공편은 조회가 어려울 수 있어요. 비어 있는 시각과 터미널은 항공권에서 확인해 주세요."
+}

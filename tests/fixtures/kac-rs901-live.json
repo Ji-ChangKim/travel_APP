@@ -1,0 +1,58 @@
+{
+  "response": {
+    "header": { "resultCode": "00", "resultMsg": "NORMAL SERVICE." },
+    "body": {
+      "numOfRows": 10,
+      "pageNo": 1,
+      "totalCount": 2,
+      "items": {
+        "item": [
+          {
+            "fid": "0000000000000013168308",
+            "boardingKor": "서울/김포",
+            "boardingEng": "GIMPO",
+            "city": "CJU",
+            "arrivedKor": "제주",
+            "arrivedEng": "JEJU",
+            "airport": "GMP",
+            "airlineKorean": "에어서울",
+            "airlineEnglish": "AIR SEOUL",
+            "cdsrYn": "N",
+            "airFln": "RS901",
+            "std": "202610140600",
+            "etd": "202610140626",
+            "io": "O",
+            "line": "국내",
+            "rmkKor": "출발",
+            "rmkEng": "DEPARTED",
+            "aplRegNo": "HL8072",
+            "icaoApmCd": "A321",
+            "gate": "3"
+          },
+          {
+            "fid": "0000000000000013168309",
+            "boardingKor": "서울/김포",
+            "boardingEng": "GIMPO",
+            "city": "GMP",
+            "arrivedKor": "제주",
+            "arrivedEng": "JEJU",
+            "airport": "CJU",
+            "airlineKorean": "에어서울",
+            "airlineEnglish": "AIR SEOUL",
+            "cdsrYn": "N",
+            "airFln": "RS901",
+            "std": "202610140715",
+            "etd": "202610140714",
+            "io": "I",
+            "line": "국내",
+            "rmkKor": "도착",
+            "rmkEng": "ARRIVED   ",
+            "aplRegNo": "HL8072",
+            "icaoApmCd": "A321",
+            "gate": "5"
+          }
+        ]
+      }
+    }
+  }
+}
