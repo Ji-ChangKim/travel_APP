@@ -1,4 +1,5 @@
 import Text from '@/components/AppText';
+import ScreenHeader from '@/components/ScreenHeader';
 import { travelDateRange } from './travelDateRange';
 import { useEffect, useState, type Dispatch, type SetStateAction } from 'react';
 import { ScrollView, View } from 'react-native';
@@ -165,11 +166,31 @@ function ImportView({ controller }: { controller: Controller }) {
   // 장소 후보는 저장 전에 사용자가 제목·날짜를 확인한다.
   return (
     <SafeAreaView style={styles.screen}>
+      <ScreenHeader
+        title="저장한 장소를 여행으로"
+        backLabel="가져오기 취소"
+        disabled={controller.state.busy}
+        onBack={() => {
+          // 취소 후보를 지우고 여행 허브로 돌아간다.
+          return void clearPendingMapsShare()
+            .then(() => {
+              // 정상 앱 시작 화면으로 복귀한다.
+              return controller.router.replace(
+                controller.userId ? '/(tabs)' : '/login',
+              );
+            })
+            .catch(() => {
+              // 임시 저장소 오류는 화면에서 재시도할 수 있다.
+              return patch(controller.set, {
+                error: '공유 입력을 정리하지 못했습니다. 다시 시도해 주세요.',
+              });
+            });
+        }}
+      />
       <ScrollView
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.header}>저장한 장소를 여행으로</Text>
         <Text style={styles.subtitle}>
           Google Maps에서 찾은 장소를 내 일정에 추가하세요. 장소와 날짜를 확인한
           뒤 직접 저장합니다.
@@ -249,26 +270,6 @@ function ImportView({ controller }: { controller: Controller }) {
             />
           </>
         )}
-        <Action
-          label="가져오기 취소"
-          disabled={controller.state.busy}
-          onPress={() => {
-            // 취소 후보를 지우고 여행 허브로 돌아간다.
-            return void clearPendingMapsShare()
-              .then(() => {
-                // 정상 앱 시작 화면으로 복귀한다.
-                return controller.router.replace(
-                  controller.userId ? '/(tabs)' : '/login',
-                );
-              })
-              .catch(() => {
-                // 임시 저장소 오류는 화면에서 재시도할 수 있다.
-                return patch(controller.set, {
-                  error: '공유 입력을 정리하지 못했습니다. 다시 시도해 주세요.',
-                });
-              });
-          }}
-        />
       </ScrollView>
     </SafeAreaView>
   );

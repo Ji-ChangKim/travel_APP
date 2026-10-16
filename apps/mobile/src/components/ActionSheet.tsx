@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Modal from './AppModal';
-import Text from './AppText';
+import ScreenTitle from './ScreenTitle';
 import { colors } from '@/constants/theme';
 
 // 확인·삭제·메뉴 선택은 네이티브 모달 위의 같은 바텀시트로 표시한다.
@@ -55,9 +55,7 @@ export default function ActionSheet({
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={s.content}
           >
-            <Text accessibilityRole="header" style={s.title}>
-              {title}
-            </Text>
+            <ScreenTitle>{title}</ScreenTitle>
             {children}
           </ScrollView>
         </View>
@@ -88,11 +86,5 @@ const s = StyleSheet.create({
     alignSelf: 'center',
     marginVertical: 12,
   },
-  content: { paddingHorizontal: 24, paddingBottom: 8, gap: 16 },
-  title: {
-    color: colors.text,
-    fontWeight: '700',
-    fontSize: 21,
-    lineHeight: 30,
-  },
+  content: { paddingHorizontal: 20, paddingBottom: 8, gap: 16 },
 });

@@ -1,4 +1,5 @@
 import Text from '@/components/AppText';
+import ScreenHeader from '@/components/ScreenHeader';
 import { travelDateRange } from './travelDateRange';
 import TripAccessFeedback from './TripAccessFeedback';
 import HaruState from '@/components/HaruState';
@@ -38,8 +39,8 @@ export default function FootprintsScreen() {
   // 항공편부터 일정·영수증·사진으로 이어지는 여행 기록을 표시한다.
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={styles.screen}>
+      <ScreenHeader title="나의 발자국" />
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.header}>나의 발자국</Text>
         <Text style={styles.subtitle}>
           함께 걸은 길과 사진, 여행의 순간을 다시 펼쳐보세요.
         </Text>

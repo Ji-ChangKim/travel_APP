@@ -57,6 +57,7 @@ export default function FlightTicketEditor(props: Props) {
         right={
           <Action
             label="완료"
+            size="header"
             variant="quiet"
             disabled={!selected || props.locked}
             onPress={() => {

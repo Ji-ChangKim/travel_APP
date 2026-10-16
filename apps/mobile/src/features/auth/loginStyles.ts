@@ -181,9 +181,9 @@ export const loginStyles = StyleSheet.create({
   formContent: {
     flexGrow: 1,
     width: '100%',
-    maxWidth: 440,
+    maxWidth: 640,
     alignSelf: 'center',
-    paddingHorizontal: 22,
+    paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 28,
     gap: 20,

@@ -111,6 +111,7 @@ export default function TripPlanningFlow({ scroll, ...props }: Props) {
             step === 'basics' ? (
               <Action
                 label="다음"
+                size="header"
                 variant="quiet"
                 disabled={props.locked}
                 onPress={next}

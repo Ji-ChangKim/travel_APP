@@ -74,6 +74,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 import TripIcon from '@/components/icons/TripIcon';
 import ScreenHeader from '@/components/ScreenHeader';
+import ScreenTitle from '@/components/ScreenTitle';
 import { TripSectionNavigation, TripMoreMenu } from './TripSectionNavigation';
 import TripTimeline, { TripDayStrip } from './TripTimeline';
 import { tripHubStyles as hub } from './tripHubStyles';
@@ -885,7 +886,6 @@ function WorkspaceContent({
       <ModalBackground>
         {id && (
           <ScreenHeader
-            title="여행 상세"
             backLabel="내 여행 목록"
             onBack={() => {
               /* 작성 중인 내용과 대기 요청을 확인한 뒤 목록으로 돌아간다. */ return requestScheduleExit(
@@ -996,7 +996,9 @@ function WorkspaceContent({
                   )}
                   <View style={hub.tripHeader}>
                     <View style={hub.titleRow}>
-                      <Text style={hub.tripTitle}>{snapshot.trip.title}</Text>
+                      <ScreenTitle style={{ flex: 1 }}>
+                        {snapshot.trip.title}
+                      </ScreenTitle>
                     </View>
                     <Text style={hub.status}>
                       {tripPresentation(snapshot.trip).label} ·{' '}

@@ -51,7 +51,8 @@
     "doctor": "npx expo-doctor",
     "test:cloud": "npm run api:build:test && node --test tests/cloud/runtime.test.mjs",
     "api:build:test": "npm --workspace=@wherego/api run build:test",
-    "check:design": "node scripts/check-design-contrast.mjs"
+    "check:design": "node scripts/check-design-contrast.mjs",
+    "test:headers:web": "node scripts/verify-header-web.mjs"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",

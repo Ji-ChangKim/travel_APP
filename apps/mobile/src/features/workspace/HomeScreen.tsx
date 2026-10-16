@@ -113,9 +113,8 @@ function HomeView({
   // 조회 실패 중에도 새 여행과 목적지 선택을 사용할 수 있다.
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={s.screen}>
+      <HomeHeader signedIn={Boolean(userId)} ready={ready} />
       <ScrollView contentContainerStyle={s.content}>
-        <HomeHeader signedIn={Boolean(userId)} ready={ready} />
-
         {!ready || loading ? (
           <HaruState kind="loading" title="내 여행 불러오는 중…" compact />
         ) : error ? (

@@ -1,11 +1,11 @@
 import TextInput from '@/components/DesignInput';
 import Text from '@/components/AppText';
+import ScreenHeader from '@/components/ScreenHeader';
 import DesignButton from '@/components/DesignButton';
 import { colors } from '@/constants/theme';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { Action, styles } from './ui';
 import { searchCountries, countryInputError } from './countries';
 import { useFormScope } from './InputFeedback';
@@ -216,24 +216,13 @@ export default function DestinationPicker({
   return (
     <>
       <SafeAreaView style={s.screen}>
-        <View style={s.header}>
-          <DesignButton
-            label=""
-            accessibilityLabel="선택 닫기"
-            size="icon"
-            variant="quiet"
-            disabled={locked}
-            onPress={onClose}
-            icon={(color) => {
-              /* 선택창 닫기에도 공통 상태색을 사용한다. */ return (
-                <Ionicons name="arrow-back" size={24} color={color} />
-              );
-            }}
-          />
-          <Text style={[styles.title, { flex: 1, marginLeft: 8 }]}>
-            {kind === 'country' ? '나라 선택' : `${country} · 도시 선택`}
-          </Text>
-        </View>
+        <ScreenHeader
+          inset={false}
+          title={kind === 'country' ? '나라 선택' : `${country} · 도시 선택`}
+          backLabel="선택 닫기"
+          onBack={onClose}
+          disabled={locked}
+        />
         <TextInput
           editable={!locked}
           accessibilityLabel={`${kind === 'country' ? '나라' : '도시'} 직접 입력`}
@@ -364,7 +353,13 @@ export default function DestinationPicker({
 }
 
 const s = StyleSheet.create({
-  screen: { flex: 1, padding: 20, gap: 16, backgroundColor: colors.background },
+  screen: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    gap: 16,
+    backgroundColor: colors.background,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

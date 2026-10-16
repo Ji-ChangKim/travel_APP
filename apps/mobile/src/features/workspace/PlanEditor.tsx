@@ -1,4 +1,5 @@
 import Text from '@/components/AppText';
+import ScreenHeader from '@/components/ScreenHeader';
 import Modal from '@/components/AppModal';
 import ReceiptReview from './ReceiptReview';
 import ReceiptConfirmation from './ReceiptConfirmation';
@@ -173,20 +174,29 @@ function PlanEditorContent({
   return (
     <>
       <SafeAreaView style={styles.modal}>
-        <ScrollView
-          ref={receiptScroll}
-          contentContainerStyle={styles.content}
-          keyboardShouldPersistTaps="handled"
-        >
-          <Text style={styles.header}>
-            {form?.kind === 'publish'
+        <ScreenHeader
+          title={
+            form?.kind === 'publish'
               ? '커뮤니티 공개'
               : form?.kind === 'receipt'
                 ? '영수증 확인'
                 : form?.kind === 'expense'
                   ? '비용 기록'
-                  : '여행 내용 작성'}
-          </Text>
+                  : form?.kind === 'metadata'
+                    ? '여행 정보 수정'
+                    : form?.kind === 'period'
+                      ? '여행 기간 변경'
+                      : '여행 내용 작성'
+          }
+          backLabel="닫기"
+          onBack={onClose}
+          disabled={busy || locked}
+        />
+        <ScrollView
+          ref={receiptScroll}
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+        >
           {form && (
             <>
               {form.kind === 'receipt' && snapshot && (
@@ -561,7 +571,6 @@ function PlanEditorContent({
               loading={busy}
               onPress={onSave}
             />
-            <Action label="닫기" disabled={busy} onPress={onClose} />
             {error.includes('동행') && (
               <Action
                 allowWhileLocked

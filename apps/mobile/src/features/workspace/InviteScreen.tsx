@@ -1,6 +1,7 @@
 import Text from '@/components/AppText';
+import ScreenHeader from '@/components/ScreenHeader';
 import { useEffect, useRef, useState } from 'react';
-import {} from 'react-native';
+import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as Crypto from 'expo-crypto';
@@ -109,39 +110,12 @@ export default function InviteScreen() {
   }
   // 초대는 자동 수락하지 않고 사용자 확인을 받는다.
   return (
-    <SafeAreaView style={[styles.screen, styles.content]}>
-      <Text style={styles.header}>여행 초대</Text>
-      <Text style={styles.subtitle}>
-        친구가 보낸 링크로 여행에 참여해 보세요. 함께 일정을 확인하고 여행을
-        준비할 수 있어요.
-      </Text>
-      <Field
-        label="초대 링크"
-        value={value}
-        onChange={(next) => {
-          // 다른 링크 입력은 별도의 수락 요청으로 처리한다.
-          if (!busy) {
-            setValue(next);
-            requestKey.current = Crypto.randomUUID();
-          }
-        }}
-      />
-      <Action
-        label={
-          busy ? '확인 중…' : user ? '초대 확인하고 참여' : '로그인하고 참여'
-        }
+    <SafeAreaView style={styles.screen}>
+      <ScreenHeader
+        title="여행 초대"
+        backLabel="내 여행으로"
         disabled={busy}
-        onPress={accept}
-      />
-      {error && (
-        <Text style={styles.error} accessibilityRole="alert">
-          {error}
-        </Text>
-      )}
-      <Action
-        label="내 여행으로"
-        disabled={busy}
-        onPress={() => {
+        onBack={() => {
           // 참여하지 않는 토큰은 명시적으로 폐기한다.
           void clearPendingInvite().then(() => {
             // 기본 여행 허브로 돌아간다.
@@ -149,6 +123,35 @@ export default function InviteScreen() {
           });
         }}
       />
+      <ScrollView contentContainerStyle={styles.content}>
+        <Text style={styles.subtitle}>
+          친구가 보낸 링크로 여행에 참여해 보세요. 함께 일정을 확인하고 여행을
+          준비할 수 있어요.
+        </Text>
+        <Field
+          label="초대 링크"
+          value={value}
+          onChange={(next) => {
+            // 다른 링크 입력은 별도의 수락 요청으로 처리한다.
+            if (!busy) {
+              setValue(next);
+              requestKey.current = Crypto.randomUUID();
+            }
+          }}
+        />
+        <Action
+          label={
+            busy ? '확인 중…' : user ? '초대 확인하고 참여' : '로그인하고 참여'
+          }
+          disabled={busy}
+          onPress={accept}
+        />
+        {error && (
+          <Text style={styles.error} accessibilityRole="alert">
+            {error}
+          </Text>
+        )}
+      </ScrollView>
     </SafeAreaView>
   );
 }

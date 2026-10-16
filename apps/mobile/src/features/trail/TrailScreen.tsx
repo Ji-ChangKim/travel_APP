@@ -1,4 +1,6 @@
 import Text from '@/components/AppText';
+import ScreenHeader from '@/components/ScreenHeader';
+import { useRouter } from 'expo-router';
 import Modal from '@/components/AppModal';
 import { useEffect, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
@@ -131,17 +133,26 @@ function selectedJourney(model: Model): TrailJourney | undefined {
 
 // 발자취의 시작·귀국·계획·실제 기록을 한 화면에 배치한다.
 function Workspace({ model }: { model: Model }) {
+  // 이전 기록 화면의 복귀 경로만 읽는다.
+  const router = useRouter();
   // 저장 준비 전에는 입력 액션을 비활성화한다.
   return (
     <SafeAreaView style={styles.screen}>
       <Hydration scope={model.scope} />
+      <ScreenHeader
+        title="나의 발자취"
+        backLabel="마이페이지로 돌아가기"
+        onBack={() => {
+          // 기기에 저장한 기록을 유지한 채 마이페이지로 돌아간다.
+          return router.replace('/my');
+        }}
+      />
       <ScrollView
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
         <View>
           <Text style={styles.eyebrow}>PLAN → EXPERIENCE → TRACE</Text>
-          <Text style={styles.hero}>나의 발자취</Text>
           <Text style={styles.description}>
             항공편으로 여행의 기준을 잡고,{'\n'}계획한 장소에 영수증과 경험을
             남겨보세요.
@@ -209,6 +220,19 @@ function Workspace({ model }: { model: Model }) {
         onRequestClose={closeEditor.bind(null, model)}
       >
         <SafeAreaView style={styles.screen}>
+          <ScreenHeader
+            title={
+              model.editor[0] === 'journey'
+                ? '새 여행 만들기'
+                : model.editor[0] === 'flight'
+                  ? '항공편으로 기준 세우기'
+                  : model.editor[0] === 'plan'
+                    ? '장소 계획 작성'
+                    : '영수증으로 상세 기록'
+            }
+            onBack={closeEditor.bind(null, model)}
+            backLabel="닫기"
+          />
           <ScrollView
             contentContainerStyle={styles.container}
             keyboardShouldPersistTaps="handled"
@@ -728,15 +752,6 @@ function EditorPanel({ model }: { model: Model }) {
   // 편명 검색은 외부 조회, 등록은 확인한 시각 입력으로 구분한다.
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>
-        {model.editor[0] === 'journey'
-          ? '새 여행 만들기'
-          : model.editor[0] === 'flight'
-            ? '항공편으로 기준 세우기'
-            : model.editor[0] === 'plan'
-              ? '장소 계획 작성'
-              : '영수증으로 상세 기록'}
-      </Text>
       {model.editor[0] === 'flight' ? (
         <View>
           <View style={styles.row}>

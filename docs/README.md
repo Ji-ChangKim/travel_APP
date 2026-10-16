@@ -29,8 +29,11 @@
 - [기획 문서 안내](planning/README.md), [제품 PRD](0.PRD/TripPrint_신사업계획서_및_PRD.md)
 - [전략 기획](전략기획서/README.md)
 - [현재 디자인 시스템](design/DESIGN.md), [앱에서 참조하는 디자인 토큰](design/design-tokens.json)
+- [화면 헤더 규격과 큰 글자 검수](design/SCREEN_HEADER_SPEC.md)
 - [홈·온보딩 보완 명세](1.uiux/HOME_ONBOARDING_SCREEN_SPEC.md), [일정 명세](1.uiux/ITINERARY_SCHEDULE_SCREEN_SPEC.md)
 - [기준 캡처 목록](1.uiux/SCREENSHOT_INDEX.txt), [캡처 메타데이터](1.uiux/SCREENSHOT_MANIFEST.json)
 - [사진·자료 출처](RESOURCE_CREDITS.txt)
 
 앱이 직접 읽는 디자인 JSON, 기능정의서 원본, 출처·이용 조건, 서로 다른 화면 상태의 기준 이미지는 유지합니다. 바이트가 같은 이미지 사본은 한 파일로 통합하며 캡처 목록에서 같은 파일을 참조합니다. 보안 키 폴더는 일반 문서 목록과 정리 대상에 포함하지 않습니다.
+
+2026-10-16 헤더 개편으로 오래된 웹 캡처 154장은 현재 검수 캡처로 교체했습니다. 현재 이미지와 보존한 Android 참고 자료는 캡처 목록에서 구분하며, [이미지 삭제 내역](1.uiux/IMAGE_CLEANUP_LOG.txt)을 함께 남깁니다.

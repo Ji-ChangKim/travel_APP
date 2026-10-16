@@ -11074,3 +11074,278 @@ test('상태 머신 IA: 홈 브리핑 조회 실패·재시도·빈 일정', asy
   expect(calls).toBe(2);
   expect(state.writes).toHaveLength(0);
 });
+
+// 화면과 글자 크기가 바뀌어도 제목·이동 버튼·여백의 계약을 검사한다.
+for (const width of [320, 390, 430]) {
+  for (const scale of [1, 2]) {
+    test(`헤더 규격 ${width} ${scale * 100}%: 전체 화면 제목·정렬·줄바꿈`, async ({
+      page,
+    }, testInfo) => {
+      // HTTP 응답만 격리하고 제품 화면과 사용자 입력으로 이동한다.
+      const snapshot = haruDetailFixture();
+      snapshot.trip.title = '도쿄 골목과 바다를 함께 걷는 긴 이름의 여행';
+      await r07Network(page, snapshot);
+      await page.route('**/api/v1/trips', (route) => {
+        // 여행 목록도 상세와 같은 제목을 반환한다.
+        return route.fulfill({ json: { data: [snapshot.trip] } });
+      });
+      await page.setViewportSize({ width, height: 844 });
+      await login(page);
+      await page.evaluate((size) => {
+        // 사용자의 글자 확대 설정만 적용한다.
+        document.documentElement.style.fontSize = `${16 * size}px`;
+      }, scale);
+      await inspectHeader(page, 'home', width, scale, testInfo);
+      await page.goto('/plans');
+      await expect(
+        page.getByText('내 여행 계획', { exact: true }),
+      ).toBeVisible();
+      await inspectHeader(page, 'plans', width, scale, testInfo);
+      await expect(
+        page.getByRole('button', { name: '홈으로', exact: true }),
+      ).toHaveCount(0);
+      await page
+        .getByRole('button', { name: '새 여행 만들기', exact: true })
+        .click();
+      await expect(page.getByTestId('trip-country')).toBeVisible();
+      await inspectHeader(page, 'create', width, scale, testInfo);
+      await page.getByTestId('trip-country').getByRole('button').click();
+      await inspectHeader(page, 'country', width, scale, testInfo);
+      await page
+        .getByRole('button', { name: '선택 닫기', exact: true })
+        .click();
+      await fields(page, {
+        '나라 검색': '일본',
+        '도시 검색': '도쿄',
+        시작일: '2026-11-10',
+        종료일: '2026-11-12',
+      });
+      await page.getByTestId('trip-city').getByRole('button').click();
+      await inspectHeader(page, 'city', width, scale, testInfo);
+      await page
+        .getByRole('button', { name: '선택 닫기', exact: true })
+        .click();
+      await page.getByRole('button', { name: '다음', exact: true }).click();
+      await expect(
+        page.getByRole('button', { name: '출발 항공편 추가하기', exact: true }),
+      ).toBeVisible();
+      await inspectHeader(page, 'flights', width, scale, testInfo);
+      await page
+        .getByRole('button', { name: '출발 항공편 추가하기', exact: true })
+        .click();
+      await inspectHeader(page, 'ticket', width, scale, testInfo);
+      await expect(
+        page.getByRole('button', { name: '완료', exact: true }),
+      ).toBeDisabled();
+      await page.goto(`/trips/${trip}`);
+      await expect(page.getByTestId('trip-section-navigation')).toBeVisible();
+      for (const section of [
+        '일정',
+        '지도',
+        '비용',
+        '사진·영수증',
+        '준비물',
+        '동행',
+      ]) {
+        // 같은 여행의 탭과 부가 기능에서 헤더 위치가 바뀌지 않는다.
+        await openTripSection(page, section);
+        await inspectHeader(page, `detail-${section}`, width, scale, testInfo);
+      }
+      await openTripSection(page, '일정');
+      await page
+        .getByRole('button', { name: '일정 추가', exact: true })
+        .click();
+      await expect(page.getByLabel('제목', { exact: true })).toBeVisible();
+      await inspectHeader(page, 'schedule-editor', width, scale, testInfo);
+      await page.goto(`/trips/${trip}`);
+      await openTripSettings(page, '여행 정보 / 기록 정리');
+      await inspectHeader(page, 'metadata', width, scale, testInfo);
+      await page.goto(`/trips/${trip}`);
+      await openTripSettings(page, '여행 기간 변경');
+      await inspectHeader(page, 'period', width, scale, testInfo);
+      for (const [route, file, title] of [
+        ['/footprints', 'footprints', '나의 발자국'],
+        ['/community', 'community', '여행 커뮤니티'],
+        ['/my', 'my', '마이페이지'],
+        ['/destinations/tokyo', 'guide', '도쿄 여행 가이드'],
+        ['/diary/' + trip, 'diary', '발자국 다이어리'],
+        ['/invite', 'invite', '여행 초대'],
+        ['/import-place', 'import', '저장한 장소를 여행으로'],
+        ['/local-records', 'legacy', '나의 발자취'],
+      ]) {
+        // 직접 진입한 화면도 같은 제목 토큰을 유지한다.
+        await page.goto(route!);
+        await expect(
+          page.getByText(title!, { exact: true }).first(),
+        ).toBeVisible();
+        await inspectHeader(page, file!, width, scale, testInfo);
+      }
+      await page.goto('/my');
+      await page
+        .getByRole('button', { name: '프로필 수정', exact: true })
+        .click();
+      await inspectHeader(page, 'profile', width, scale, testInfo);
+      await page
+        .getByRole('button', { name: '프로필 수정 닫기', exact: true })
+        .click();
+      await page.goto('/login?reauth=1');
+      await page
+        .getByRole('button', {
+          name: '이메일 계정으로 로그인 / 회원가입',
+          exact: true,
+        })
+        .click();
+      await inspectHeader(page, 'email', width, scale, testInfo);
+    });
+  }
+}
+
+// 계산된 실제 텍스트·버튼·행 높이와 화면 밖 넘침을 함께 확인한다.
+async function inspectHeader(
+  page: Page,
+  file: string,
+  width: number,
+  scale: number,
+  testInfo: import('@playwright/test').TestInfo,
+): Promise<void> {
+  // 페이지 이동 뒤 사용자 배율을 다시 적용하고 글꼴 로딩을 기다린다.
+  await page.evaluate(async (size) => {
+    // 새 문서에 유지되지 않는 웹 글자 설정을 복원한다.
+    document.documentElement.style.fontSize = `${16 * size}px`;
+    await document.fonts.ready;
+  }, scale);
+  if (file !== 'home')
+    await expect
+      .poll(() => page.locator('[data-testid="screen-title"]:visible').count())
+      .toBeGreaterThan(0);
+  if (file !== 'home')
+    await expect(
+      page.locator('[data-testid="screen-title"]:visible').first(),
+    ).toHaveCSS('font-size', `${26 * scale}px`);
+  const metrics = await page.evaluate(() => {
+    // 보이는 현재 레이어만 검사하고 가려진 배경 화면은 제외한다.
+    const visible = (node: Element) => {
+      // 닫힌 모달과 접근성이 차단된 배경은 현재 화면이 아니다.
+      return (
+        !node.closest('[aria-hidden="true"], [inert]') &&
+        node.getClientRects().length > 0
+      );
+    };
+    const titles = [
+      ...document.querySelectorAll('[data-testid="screen-title"]'),
+    ]
+      .filter(visible)
+      .map((node) => {
+        // 실제 글자 영역이 부모를 벗어나거나 잘리는지 측정한다.
+        const style = getComputedStyle(node);
+        const rect = node.getBoundingClientRect();
+        const range = document.createRange();
+        const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+        const glyphs: DOMRect[] = [];
+        let textNode: Node | null;
+        while ((textNode = walker.nextNode())) {
+          // 자동 줄바꿈 뒤 남는 공백은 제외하고 실제 글자만 측정한다.
+          for (
+            let index = 0;
+            index < (textNode.textContent || '').length;
+            index++
+          ) {
+            // 공백의 선택 범위가 행 밖으로 늘어나는 브라우저 동작을 제외한다.
+            if (/\s/.test(textNode.textContent![index]!)) continue;
+            range.setStart(textNode, index);
+            range.setEnd(textNode, index + 1);
+            glyphs.push(...range.getClientRects());
+          }
+        }
+        return {
+          text: node.textContent,
+          fontSize: parseFloat(style.fontSize),
+          lineHeight: parseFloat(style.lineHeight),
+          weight: style.fontWeight,
+          align: style.textAlign,
+          x: rect.x,
+          right: rect.right,
+          height: rect.height,
+          scrollWidth: node.scrollWidth,
+          clientWidth: node.clientWidth,
+          lines: glyphs.map((line) => ({
+            left: line.left,
+            right: line.right,
+            top: line.top,
+            bottom: line.bottom,
+          })),
+          top: rect.top,
+          bottom: rect.bottom,
+        };
+      });
+    const headers = [
+      ...document.querySelectorAll('[data-testid="screen-header-row"]'),
+    ]
+      .filter(visible)
+      .map((node) => {
+        // 보이는 컨트롤 없이 높이만 차지하는 빈 행을 검출한다.
+        const rect = node.getBoundingClientRect();
+        return {
+          height: rect.height,
+          children: node.childElementCount,
+          buttons: [...node.querySelectorAll('[role="button"]')].map(
+            (button) => {
+              // 작은 터치 영역과 화면 밖으로 밀린 버튼을 검출한다.
+              const box = button.getBoundingClientRect();
+              return {
+                name: button.getAttribute('aria-label'),
+                x: box.x,
+                right: box.right,
+                width: box.width,
+                height: box.height,
+              };
+            },
+          ),
+        };
+      });
+    return {
+      titles,
+      headers,
+      documentWidth: document.documentElement.scrollWidth,
+    };
+  });
+  expect(metrics.documentWidth).toBeLessThanOrEqual(width);
+  for (const title of metrics.titles) {
+    // 같은 제목은 어느 화면에서나 26/36·700·왼쪽 정렬을 유지한다.
+    expect(title.fontSize).toBe(26 * scale);
+    expect(title.lineHeight).toBe(36 * scale);
+    expect(title.weight).toBe('700');
+    expect(title.align).toBe('left');
+    expect(title.x).toBeGreaterThanOrEqual(19);
+    expect(title.right).toBeLessThanOrEqual(width - 19);
+    expect(title.scrollWidth).toBeLessThanOrEqual(title.clientWidth + 1);
+    for (const line of title.lines) {
+      // 글자 행이 제목 상자 밖에서 잘리지 않도록 한다.
+      expect(line.left).toBeGreaterThanOrEqual(title.x - 1);
+      expect(line.right).toBeLessThanOrEqual(title.right + 1);
+      expect(line.top).toBeGreaterThanOrEqual(title.top - 1);
+      expect(line.bottom).toBeLessThanOrEqual(title.bottom + 1);
+    }
+  }
+  for (const header of metrics.headers) {
+    // 제목 없는 이동 행은 56px이며 확대 텍스트가 있는 행만 늘어난다.
+    expect(header.children).toBeGreaterThan(0);
+    expect(header.height).toBeGreaterThanOrEqual(55.9);
+    if (scale === 1) expect(header.height).toBeCloseTo(56, 1);
+    for (const button of header.buttons) {
+      // 뒤로가기·더보기·텍스트 행동에 같은 최소 터치 영역을 보장한다.
+      expect(button.width).toBeGreaterThanOrEqual(43.9);
+      expect(button.height).toBeGreaterThanOrEqual(43.9);
+      expect(button.x).toBeGreaterThanOrEqual(19);
+      expect(button.right).toBeLessThanOrEqual(width - 19);
+    }
+  }
+  await expect.poll(() => haruReadingAudit(page)).toEqual([]);
+  await page.screenshot({
+    path: `outputs/header-standard/${file}-${width}-${scale * 100}.png`,
+  });
+  await testInfo.attach(`${file}-header-metrics`, {
+    body: JSON.stringify(metrics),
+    contentType: 'application/json',
+  });
+}

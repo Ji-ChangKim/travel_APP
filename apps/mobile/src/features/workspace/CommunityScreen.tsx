@@ -1,4 +1,5 @@
 import Text from '@/components/AppText';
+import ScreenHeader from '@/components/ScreenHeader';
 import { travelDateRange } from './travelDateRange';
 import HaruState from '@/components/HaruState';
 import { useRef, useState } from 'react';
@@ -178,8 +179,8 @@ function CommunityContent() {
   // 공개 스냅샷에만 있는 날짜·지역·일정·선택 비용을 표시한다.
   return (
     <SafeAreaView style={styles.screen}>
+      <ScreenHeader title="여행 커뮤니티" />
       <ScrollView contentContainerStyle={s.content}>
-        <Text style={styles.header}>여행 커뮤니티</Text>
         <Text style={styles.subtitle}>
           여행을 마친 사람들이 직접 선택해 공개한 일정과 사진입니다.
         </Text>

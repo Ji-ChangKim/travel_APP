@@ -1,10 +1,9 @@
 import { View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { ReactNode } from 'react';
-import Text from './AppText';
+import ScreenTitle from './ScreenTitle';
 import DesignButton from './DesignButton';
-import { colors, designTokens, typography } from '@/constants/theme';
-import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
+import { designTokens } from '@/constants/theme';
 
 // 뒤로가기·제목·우측 행동을 화면마다 같은 순서와 규격으로 표시한다.
 export default function ScreenHeader({
@@ -13,22 +12,23 @@ export default function ScreenHeader({
   onBack,
   disabled = false,
   right,
+  inset = true,
 }: {
-  title: string;
+  title?: string;
   backLabel?: string;
   onBack?: () => void;
   disabled?: boolean;
   right?: ReactNode;
+  inset?: boolean;
 }) {
-  // 큰 글꼴의 긴 제목은 별도 줄에서 읽도록 한다.
-  const { largeText } = useAppAccessibility();
+  // 글자 확대 여부로 빈 행을 만들지 않고 실제 콘텐츠만 배치한다.
   return (
-    <View testID="screen-header" style={s.header}>
-      <View style={s.row}>
-        {onBack && (
+    <View testID="screen-header" style={[s.header, inset && s.inset]}>
+      <View testID="screen-header-row" style={s.row}>
+        {onBack ? (
           <DesignButton
             label=""
-            accessibilityLabel={backLabel}
+            accessibilityLabel={backLabel || '이전 화면으로 돌아가기'}
             size="icon"
             variant="quiet"
             disabled={disabled}
@@ -39,45 +39,39 @@ export default function ScreenHeader({
               );
             }}
           />
-        )}
-        {!largeText && (
-          <Text accessibilityRole="header" style={[s.title, { flex: 1 }]}>
-            {title}
-          </Text>
-        )}
-        <View style={s.right}>{right}</View>
+        ) : title ? (
+          <ScreenTitle style={s.rootTitle}>{title}</ScreenTitle>
+        ) : null}
+        {right ? <View style={s.right}>{right}</View> : null}
       </View>
-      {largeText && (
-        <Text accessibilityRole="header" style={s.title}>
-          {title}
-        </Text>
-      )}
+      {onBack && title ? (
+        <View style={s.heading}>
+          <ScreenTitle>{title}</ScreenTitle>
+        </View>
+      ) : null}
     </View>
   );
 }
 
 const s = StyleSheet.create({
   header: {
-    minHeight: designTokens.navigation.headerMinHeight,
     width: '100%',
-    maxWidth: 640,
+    maxWidth: designTokens.navigation.headerMaxWidth,
     alignSelf: 'center',
-    paddingHorizontal: 20,
+  },
+  inset: { paddingHorizontal: designTokens.layout.screenPaddingMobile },
+  row: {
+    minHeight: designTokens.navigation.headerMinHeight,
     paddingVertical: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
-    backgroundColor: colors.background,
   },
-  row: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 8 },
-  title: {
-    color: colors.text,
-    fontSize: typography.headlineSmall.size,
-    lineHeight: typography.headlineSmall.lineHeight,
-    fontWeight: '600',
-  },
+  rootTitle: { flex: 1 },
+  heading: { paddingTop: 8, paddingBottom: 4 },
   right: {
-    minWidth: 44,
-    minHeight: 44,
     marginLeft: 'auto',
+    flexShrink: 0,
     justifyContent: 'center',
   },
 });

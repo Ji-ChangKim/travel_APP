@@ -1,4 +1,5 @@
 import Text from '@/components/AppText';
+import ScreenHeader from '@/components/ScreenHeader';
 import { travelDateRange } from './travelDateRange';
 import { colors } from '@/constants/theme';
 import ReceiptDetails from './ReceiptDetails';
@@ -250,8 +251,15 @@ function DiaryView({
     <SafeAreaView
       style={[styles.screen, { backgroundColor: colors.background }]}
     >
+      <ScreenHeader
+        title="발자국 다이어리"
+        backLabel="나의 발자국으로 돌아가기"
+        onBack={() => {
+          // 기록 목록으로 돌아가는 기존 경로를 유지한다.
+          return router.replace('/(tabs)/footprints');
+        }}
+      />
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.header}>발자국 다이어리</Text>
         {!userId && (
           <Action
             label="로그인하고 발자국 보기"
@@ -311,13 +319,6 @@ function DiaryView({
             }}
           />
         )}
-        <Action
-          label="나의 발자국으로 돌아가기"
-          onPress={() => {
-            // 완료 여행 목록으로 돌아간다.
-            return router.replace('/(tabs)/footprints');
-          }}
-        />
       </ScrollView>
     </SafeAreaView>
   );

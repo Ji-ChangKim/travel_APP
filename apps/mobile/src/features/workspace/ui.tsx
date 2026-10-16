@@ -29,7 +29,7 @@ export function Action({
   selected?: boolean;
   allowWhileLocked?: boolean;
   loading?: boolean;
-  size?: 'default' | 'chip' | 'icon' | 'day';
+  size?: 'default' | 'chip' | 'icon' | 'day' | 'header';
 }) {
   // 처리 중 중복 클릭을 실제 disabled 상태로 차단한다.
   return (
@@ -241,7 +241,7 @@ export const styles = StyleSheet.create({
   content: {
     padding: 20,
     gap: 16,
-    maxWidth: 780,
+    maxWidth: 640,
     width: '100%',
     alignSelf: 'center',
   },

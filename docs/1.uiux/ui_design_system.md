@@ -428,6 +428,8 @@ Wakayama, Japan
 
 # 11. Header
 
+이전 헤더 규격은 [화면 헤더 규격](../design/SCREEN_HEADER_SPEC.md)으로 대체했다. 화면 제목은 26/36·700·왼쪽 정렬, 이동 바는 기본 56, 좌우 여백은 20이다. 아래 수치는 이전 설계 기록이다.
+
 ## 11.1 Standard Header
 
 - Height: `56px`

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 3,
-  "revision": "3.0.0",
-  "date": "2026-10-15",
+  "revision": "3.0.1",
+  "date": "2026-10-16",
   "status": "app-integrated",
   "unit": "logical-pixel",
   "sourceScreens": {
@@ -435,7 +435,10 @@
   },
   "navigation": {
     "headerMinHeight": 56,
-    "headerTouchTarget": 44
+    "headerTouchTarget": 44,
+    "headerMaxWidth": 640,
+    "headerIconSize": 24,
+    "screenTitleStyle": "headlineLarge"
   },
   "format": {
     "dateRangeSeparator": " – "
