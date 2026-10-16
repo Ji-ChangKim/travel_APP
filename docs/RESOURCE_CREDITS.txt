@@ -1,0 +1,116 @@
+TripPrint 현재 사진·자료 출처
+정리일: 2026-10-16
+
+앱 포함 사진의 현재 목록은 아래 8개 Commons 자료를 따른다. 별도 보유한 관광청 자료는 부록의 사용 조건을 유지한다.
+
+2026-10-14 추천 도시 사진·여행 정보 출처
+
+앱 포함 사진: Wikimedia Commons에서 실제 파일·저작자·라이선스를 확인한 960px 축소본.
+관광청 사진 라이브러리의 신청되지 않은 사진을 사용하지 않음.
+CC BY/CC BY-SA는 저작자·원문·라이선스·축소 표시를 앱 상세에 제공.
+CC BY-SA 사진의 사본·수정본에는 같은 라이선스 적용. 앱 소스 전체의 라이선스를 뜻하지 않음.
+
+singapore
+파일: apps/mobile/assets/destinations/singapore.jpg
+저작자: CEphoto, Uwe Aranas
+이용 조건: CC BY-SA 3.0
+원문: https://commons.wikimedia.org/wiki/File:Singapore_Merlion-at-Marina-Bay-01.jpg
+라이선스: https://creativecommons.org/licenses/by-sa/3.0
+변경: Commons 960px 축소본. 앱에서 cover로 표시.
+
+tokyo
+파일: apps/mobile/assets/destinations/tokyo.jpg
+저작자: Morio
+이용 조건: CC BY-SA 3.0
+원문: https://commons.wikimedia.org/wiki/File:Skyscrapers_of_Shinjuku_2009_January.jpg
+라이선스: http://creativecommons.org/licenses/by-sa/3.0/
+변경: Commons 960px 축소본. 앱에서 cover로 표시.
+
+osaka
+파일: apps/mobile/assets/destinations/osaka.jpg
+저작자: 663highland
+이용 조건: CC BY 2.5
+원문: https://commons.wikimedia.org/wiki/File:Osaka_Castle_03bs3200.jpg
+라이선스: https://creativecommons.org/licenses/by/2.5
+변경: Commons 960px 축소본. 앱에서 cover로 표시.
+
+nagoya
+파일: apps/mobile/assets/destinations/nagoya.jpg
+저작자: Syced
+이용 조건: CC0
+원문: https://commons.wikimedia.org/wiki/File:Nagoya_Castle_(77130).jpg
+라이선스: http://creativecommons.org/publicdomain/zero/1.0/deed.en
+변경: Commons 960px 축소본. 앱에서 cover로 표시.
+
+bangkok
+파일: apps/mobile/assets/destinations/bangkok.jpg
+저작자: Ninara from Helsinki, Finland
+이용 조건: CC BY 2.0
+원문: https://commons.wikimedia.org/wiki/File:4Y1A1159_Bangkok_(33536795515).jpg
+라이선스: https://creativecommons.org/licenses/by/2.0
+변경: Commons 960px 축소본. 앱에서 cover로 표시.
+
+shanghai
+파일: apps/mobile/assets/destinations/shanghai.jpg
+저작자: xiquinhosilva
+이용 조건: CC BY 2.0
+원문: https://commons.wikimedia.org/wiki/File:Huangpu_Park_20124-Shanghai_(32208802494).jpg
+라이선스: https://creativecommons.org/licenses/by/2.0
+변경: Commons 960px 축소본. 앱에서 cover로 표시.
+
+taipei
+파일: apps/mobile/assets/destinations/taipei.jpg
+저작자: 毛貓大少爺
+이용 조건: CC BY-SA 2.0
+원문: https://commons.wikimedia.org/wiki/File:Taipei_Skyline_2022.06.29.jpg
+라이선스: https://creativecommons.org/licenses/by-sa/2.0
+변경: Commons 960px 축소본. 앱에서 cover로 표시.
+
+danang
+파일: apps/mobile/assets/destinations/danang.jpg
+저작자: Somerset999
+이용 조건: CC BY-SA 4.0
+원문: https://commons.wikimedia.org/wiki/File:Dragon_Bridge,_Da_Nang_during_day_-_20230819_(cropped).jpg
+라이선스: https://creativecommons.org/licenses/by-sa/4.0
+변경: Commons 960px 축소본. 앱에서 cover로 표시.
+
+여행 정보: cityGuides.ts의 도시별 sources에 관광청·지자체 링크를 포함.
+편집 추천은 인기 순위·실시간 수요·확정 행사 일정이 아님.
+위키백과 원문은 외부 조회 성공 시 별도 도시 이야기로 표시하며 CC BY-SA 4.0 출처를 제공.
+원본 Commons 메타데이터: outputs/trip-creation/commons-image-metadata.json
+
+
+2026-10-15 R11 재확인·표시 보완
+
+위 8개 Commons 파일 설명 페이지의 저작자와 선택한 라이선스를 다시 대조했다. 실제 포함 JPEG의 가로 크기는 모두960px이며 사진 파일은 교체하지 않았다.
+도시별 확인일·HTTPS 라이선스·축소/화면 자르기 표시는 apps/mobile/assets/destinations/credits.json에 반영했다.
+다낭은 Commons 원본 파일명과 원문에 cropped 이력이 있으므로 이 이전 자르기도 앱 모달에 표시한다.
+앱 내 공통 출처 모달에서 실제 작품명·저작자·원문·라이선스·변경 내용을 먼저 읽고, 명시적으로 고른 원문이나 이용 조건만 외부로 연다.
+관광청 참고 자료는 해당 제공 기관과 TripPrint 한국어 편집 사실을 표시한다. 사진의 CC 라이선스를 관광청 원문 전체에 적용하지 않는다.
+위키백과 도시 이야기는 실제 도시·문서가 일치하는 발췌에만 기여자·CC BY-SA 4.0·일반 텍스트 발췌/공백·길이 정리를 표시한다.
+사진 출처별 재확인 근거는 위 도시별 Commons 원문 URL, 라이선스 조건은 각 원문에 연결된 Creative Commons 문서다.
+발췌 이용 조건 참고: https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use/en#7._Licensing_of_Content
+이미지 크기·현재 포함 파일 SHA-256·도시별 메타데이터 대조: outputs/r11-resource-audit.json.
+사진·추가 소개·외부 열기 실패 시에도 같은 도시의 기본 가이드와 계획하기를 유지한다.
+
+
+별도 보유 자료의 이용 조건
+아래 자료를 현재 8개 도시 사진의 출처로 대체하지 않는다.
+1. 실제 적용한 공식 관광청 사진
+도시: 대만 타이베이
+원본 자료명: 台北101
+원본 식별자: 대만 관광청 galleryXml Info Id=24275
+제공 기관: 交通部觀光署 (Tourism Administration, Ministry of Transportation and Communications)
+GovernmentID: A15010000H
+공개 목록: https://media.taiwan.net.tw/api/galleryXml
+자료 안내: https://data.gov.tw/en/datasets/52790
+사진 목록: https://media.taiwan.net.tw/zh-tw/portal/media?Keyword=%E5%8F%B0%E5%8C%97101
+이용 조건: Taiwan Open Government Data License 1.0
+이용 조건 원문: https://data.gov.tw/license
+필수 표시: 원 제공 기관 명시. 앱 카드와 사진 상세의 출처·이용 조건 링크에 표시.
+원본: TIFF 1500x1000, 4,527,280 bytes.
+배포본: apps/mobile/public/assets/destinations/taipei-101-tourism.jpg.
+배포 크기: JPEG 960x640, 203,394 bytes. 풍경 변경 없이 웹용 해상도·압축만 적용.
+원본·공개 목록 증거: .release/final-audit-20261013/taiwan-gallery.xml 및 taipei-official-source.json.
+이 사진은 관광청의 공개 데이터 목록에서 받은 자료이며 관광청 홈페이지의 임의 사진을 복제한 것이 아님.
+

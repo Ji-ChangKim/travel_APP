@@ -1,9 +1,9 @@
 # WHEREGO MVP API 계약
 
 - 버전: v0.1 / 작성일: 2026-10-02 / 상태: **제안 계약, 현행 엔드포인트 아님**
-- 관련: [필수 기능](FEATURE_SPEC.md), [데이터 저장](DATA_STORAGE_SPEC.md), [권한](POLICY_DECISIONS.md)
+- 관련: [필수 기능](<../2. planning/TripPrint_화면별_상세기능정의서_v3_20261014.docx>), [데이터 저장](DATA_STORAGE_SPEC.md), [권한](POLICY_DECISIONS.md)
 - 제안 prefix: `/api/v1`. 현행 `/api/places/search`, `/api/share/link`, `/api/receipt/ocr` 목업과 분리해 이행한다.
-- M1 갱신: `/api/v1`의 생성/조회/준비물 기반은 구현했다. 실제 제공 범위·응답 차이와 미구현 경로는 [실행 기록](M0_M1_EXECUTION.md)을 기준으로 한다. 나머지 계약은 후속 목표이며 기존 목업 경로는 현재 503이다.
+- M1 갱신: `/api/v1`의 생성/조회/준비물 기반은 구현했다. 실제 제공 범위·응답 차이와 미구현 경로는 [실행 기록](../CURRENT_STATUS.txt)을 기준으로 한다. 나머지 계약은 후속 목표이며 기존 목업 경로는 현재 503이다.
 
 ## 1. 책임과 공통 규칙
 
@@ -211,3 +211,26 @@ owner 역할 변경은 target owner에 적용 불가. 탈퇴 본인은 editor/vi
 데이터 변환은 현행 도메인의 number 비용을 그대로 사용하지 말고 decimal string 및 집계 투영 계약에 맞춰 함께 변경한다. 변경 시 DB 사전·공통 validation·api-client·화면 매핑을 같은 작업으로 갱신한다.
 
 계약 인수는 정상 호출뿐 아니라 다른 계정 리소스 요청, 위조 role/userId, 교차 여행 FK, 응답 유실 재시도, 같은 키/다른 입력, 기간/순서 충돌을 [QA 문서](QA_ACCEPTANCE.md) 기준으로 검증한다.
+
+## 10. R08 공개 최소 지원 정책 (2026-10-15)
+
+`GET /public/app-config?platform=android&channel=play`는 인증·DB·외부 Play 호출 없이 운영 바인딩 `APP_UPDATE_POLICY_JSON`을 조회한다. 기존 `/public/startup`의 protocol·공통 데이터·기기 문서 버전과 별도 계약이다.
+
+응답은 `{ data: AppConfig | null, meta: { requestId } }`이며 `Cache-Control: no-store`를 사용한다. 정책 미설정은 200과 `data: null`, 잘못된 운영 JSON·범위·미래 시각은 503 `CONFIGURATION_REQUIRED`, 잘못된 쿼리는 422 `VALIDATION_FAILED`다. 설정 원문을 오류에 포함하지 않는다.
+
+| 필드                    | 타입·제약                                   | 의미                           |
+| ----------------------- | ------------------------------------------- | ------------------------------ |
+| platform                | literal android                             | 현재 지원 정책 플랫폼          |
+| channel                 | literal play                                | 실제 Play 설치 경로            |
+| latestVersionCode       | integer 1~2100000000                        | 운영에서 확정한 최신 출시 번호 |
+| minSupportedVersionCode | integer 0~latestVersionCode                 | 최소 지원 번호, 0은 필수 없음  |
+| storeUrl                | 고정 HTTPS 공식 com.tripprint.app 상세 주소 | 허용한 업데이트 목적지         |
+| checkedAt               | UTC ISO datetime, 현재+5분 이하             | 정책 생성·수정 시각            |
+
+정책 객체의 추가 필드는 거부한다. 요청은 android/play·direct·unknown, ios/app-store, web/web 조합만 허용한다. Android Play 외의 유효 요청에는 `data: null`을 반환한다. 실제 운영값은 미확정이며 모든 기본 설정은 빈 문자열이다.
+
+기기는 정책을 5초 이내에 확인한다. 실패하면 같은 플랫폼·채널의 마지막 성공 수신 후 24시간 미만 캐시만 사용한다. 실패 때 수신 시각을 연장하지 않으며 유효 캐시가 없으면 계정 점검을 계속한다. `null` 온라인 성공은 정책 해제로 저장한다.
+
+최소 지원 미만 설치라도 Play에서 최소 버전 이상을 제공할 때만 업데이트를 실행한다. 설치 불가·조회 실패는 재확인·종료 상태로 구분한다. 최신 번호와 같거나 더 높은 설치는 통과하고, 선택 업데이트는 이번 실행에서만 미룰 수 있다. 기존 `/public/startup`의 호환 실패를 정책 실패 캐시로 우회하지 않는다.
+
+운영 활성화 전에는 최신·최소 번호, 환경·트랙 대응, 실제 설치 도달 여부, 담당자와 롤백 절차를 확정해야 한다. 이번 구현은 이를 임의로 활성화하지 않는다.

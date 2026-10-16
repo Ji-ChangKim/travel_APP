@@ -20,22 +20,22 @@
 
 ## 변경 파일
 
-| 파일                                                                                                        | 변경 내용                                                             |
-| ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| `apps/api/src/places.ts`                                                                                    | Google 검색·상세 조회, 서버 키 헤더, 필드 마스크, 응답 크기·시간 제한 |
-| `apps/api/src/app.ts`                                                                                       | 인증된 장소 상세 조회 경로 추가                                       |
-| `apps/api/src/types.ts`, `apps/api/.dev.vars.example`                                                       | Google 서버 비밀 키 설정 계약                                         |
-| `apps/mobile/src/features/workspace/GooglePlace.tsx`                                                        | 최신 장소 표시·출처·Google Maps 열기                                  |
-| `apps/mobile/src/features/workspace/PlaceSearch.tsx`                                                        | Google 검색 결과 선택 및 장소 ID 전달                                 |
-| `apps/mobile/src/features/workspace/PlanEditor.tsx`                                                         | 일정 장소 연결·해제와 상세 확인                                       |
-| `apps/mobile/src/features/workspace/WorkspaceScreen.tsx`                                                    | 저장한 일정의 장소 표시·지도 열기                                     |
-| `apps/mobile/src/features/workspace/forms.ts`                                                               | 일정 폼 장소 ID 보존                                                  |
-| `packages/domain/src/workspace.ts`, `packages/validation/src/workspace.ts`                                  | 장소 ID 도메인 및 엄격 입력 계약                                      |
-| `supabase/migrations/20261003000003_google_places.sql`                                                      | 비공개 장소 ID 테이블·원자 저장·권한 유지                             |
-| `apps/api/test/places.test.ts`, `apps/api/test/workspace.test.ts`                                           | Google HTTP 계약·키 보호·멱등 저장·해제·외부 사용자 거부 검증         |
-| `tests/web/workspace.spec.ts`                                                                               | 장소 선택 후 사용자 작성 값과 Google 콘텐츠 구분 검증                 |
-| `docs/DB_DICTIONARY.txt`                                                                                    | v2.0 테이블·컬럼·제약·응답 객체 명세                                  |
-| `README.md`, `docs/BUILD_CHECKLIST.md`, `docs/PROJECT_PROGRESS_REPORT.md`, `docs/TEST_FEEDBACK_20261003.md` | 공급자 변경·설정·재빌드 안내 갱신                                     |
+| 파일                                                                                         | 변경 내용                                                             |
+| -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `apps/api/src/places.ts`                                                                     | Google 검색·상세 조회, 서버 키 헤더, 필드 마스크, 응답 크기·시간 제한 |
+| `apps/api/src/app.ts`                                                                        | 인증된 장소 상세 조회 경로 추가                                       |
+| `apps/api/src/types.ts`, `apps/api/.dev.vars.example`                                        | Google 서버 비밀 키 설정 계약                                         |
+| `apps/mobile/src/features/workspace/GooglePlace.tsx`                                         | 최신 장소 표시·출처·Google Maps 열기                                  |
+| `apps/mobile/src/features/workspace/PlaceSearch.tsx`                                         | Google 검색 결과 선택 및 장소 ID 전달                                 |
+| `apps/mobile/src/features/workspace/PlanEditor.tsx`                                          | 일정 장소 연결·해제와 상세 확인                                       |
+| `apps/mobile/src/features/workspace/WorkspaceScreen.tsx`                                     | 저장한 일정의 장소 표시·지도 열기                                     |
+| `apps/mobile/src/features/workspace/forms.ts`                                                | 일정 폼 장소 ID 보존                                                  |
+| `packages/domain/src/workspace.ts`, `packages/validation/src/workspace.ts`                   | 장소 ID 도메인 및 엄격 입력 계약                                      |
+| `supabase/migrations/20261003000003_google_places.sql`                                       | 비공개 장소 ID 테이블·원자 저장·권한 유지                             |
+| `apps/api/test/places.test.ts`, `apps/api/test/workspace.test.ts`                            | Google HTTP 계약·키 보호·멱등 저장·해제·외부 사용자 거부 검증         |
+| `tests/web/workspace.spec.ts`                                                                | 장소 선택 후 사용자 작성 값과 Google 콘텐츠 구분 검증                 |
+| `docs/DB_DICTIONARY.txt`                                                                     | v2.0 테이블·컬럼·제약·응답 객체 명세                                  |
+| `README.md`, `docs/CURRENT_STATUS.txt`, `docs/CURRENT_STATUS.txt`, `docs/CURRENT_STATUS.txt` | 공급자 변경·설정·재빌드 안내 갱신                                     |
 
 ## 검증
 

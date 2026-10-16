@@ -1,0 +1,307 @@
+{
+  "schemaVersion": 3,
+  "revision": "3.0.0",
+  "date": "2026-10-15",
+  "status": "stitch-ui-kit-only",
+  "projectId": "13238536021221568181",
+  "asset": "assets/9104657915771630257",
+  "color": {
+    "brand": {
+      "coral": "#FF6B57",
+      "navy": "#203247",
+      "sky": "#8FD3E8",
+      "sun": "#FFC857"
+    },
+    "text": {
+      "primary": "#203247",
+      "secondary": "#596574",
+      "link": "#A43E31",
+      "inverse": "#FFFFFF"
+    },
+    "surface": {
+      "canvas": "#FFF9F3",
+      "card": "#FFFFFF",
+      "subtle": "#F5F1EC"
+    },
+    "border": {
+      "subtle": "#E9E1D8",
+      "control": "#8A7B70",
+      "focus": "#203247"
+    },
+    "selection": {
+      "surface": "#FFF0EB",
+      "foreground": "#203247"
+    },
+    "action": {
+      "primary": {
+        "background": "#FF6B57",
+        "foreground": "#203247",
+        "border": "#203247"
+      },
+      "pressed": {
+        "background": "#A43E31",
+        "foreground": "#FFFFFF"
+      },
+      "secondary": {
+        "background": "#FFFFFF",
+        "foreground": "#203247",
+        "border": "#8A7B70"
+      },
+      "disabled": {
+        "background": "#EEE8E2",
+        "foreground": "#596574"
+      }
+    },
+    "status": {
+      "error": {
+        "foreground": "#9E3438",
+        "background": "#FCEEEF"
+      },
+      "success": {
+        "foreground": "#28614E",
+        "background": "#EBF4EF"
+      },
+      "warning": {
+        "foreground": "#765214",
+        "background": "#FFF4D9"
+      }
+    }
+  },
+  "font": {
+    "uiWeb": "Pretendard Variable",
+    "uiNative": "Pretendard",
+    "fallback": ["Noto Sans KR", "sans-serif"],
+    "brand": "Poppins",
+    "webStylesheet": "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css",
+    "nativeAsset": "apps/mobile/assets/brand/tripprint-v1/fonts/PretendardVariable.woff2",
+    "numericVariant": "tabular-nums",
+    "engineFallbackEnum": "NOTO_SANS"
+  },
+  "typography": {
+    "screen-title": {
+      "fontFamily": "Pretendard Variable",
+      "fontSize": "26px",
+      "lineHeight": "36px",
+      "fontWeight": "700",
+      "letterSpacing": "0px"
+    },
+    "section-title": {
+      "fontFamily": "Pretendard Variable",
+      "fontSize": "22px",
+      "lineHeight": "30px",
+      "fontWeight": "700",
+      "letterSpacing": "0px"
+    },
+    "card-title": {
+      "fontFamily": "Pretendard Variable",
+      "fontSize": "18px",
+      "lineHeight": "26px",
+      "fontWeight": "600",
+      "letterSpacing": "0px"
+    },
+    "body": {
+      "fontFamily": "Pretendard Variable",
+      "fontSize": "16px",
+      "lineHeight": "26px",
+      "fontWeight": "400",
+      "letterSpacing": "0px"
+    },
+    "metadata": {
+      "fontFamily": "Pretendard Variable",
+      "fontSize": "14px",
+      "lineHeight": "22px",
+      "fontWeight": "400",
+      "letterSpacing": "0px"
+    },
+    "button": {
+      "fontFamily": "Pretendard Variable",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "fontWeight": "600",
+      "letterSpacing": "0px"
+    },
+    "navigation": {
+      "fontFamily": "Pretendard Variable",
+      "fontSize": "13px",
+      "lineHeight": "20px",
+      "fontWeight": "600",
+      "letterSpacing": "0px"
+    },
+    "numeric": {
+      "fontFamily": "Pretendard Variable",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "fontWeight": "600",
+      "letterSpacing": "0px"
+    }
+  },
+  "spacing": [4, 8, 12, 16, 20, 24, 32, 40, 48],
+  "radius": {
+    "control": 12,
+    "card": 16,
+    "hero": 20,
+    "chip": 9999
+  },
+  "size": {
+    "primaryControl": 52,
+    "control": 48,
+    "minTouch": 44,
+    "mobileMargin": 20,
+    "cardPadding": 16
+  },
+  "contrastChecks": [
+    {
+      "role": "본문/아이보리",
+      "foreground": "#203247",
+      "background": "#FFF9F3",
+      "minimum": 4.5,
+      "ratio": 12.492822413186602,
+      "pass": true
+    },
+    {
+      "role": "본문/흰색",
+      "foreground": "#203247",
+      "background": "#FFFFFF",
+      "minimum": 4.5,
+      "ratio": 13.054485011755776,
+      "pass": true
+    },
+    {
+      "role": "보조/흰색",
+      "foreground": "#596574",
+      "background": "#FFFFFF",
+      "minimum": 4.5,
+      "ratio": 5.934831470738994,
+      "pass": true
+    },
+    {
+      "role": "보조/아이보리",
+      "foreground": "#596574",
+      "background": "#FFF9F3",
+      "minimum": 4.5,
+      "ratio": 5.679488355868999,
+      "pass": true
+    },
+    {
+      "role": "링크/아이보리",
+      "foreground": "#A43E31",
+      "background": "#FFF9F3",
+      "minimum": 4.5,
+      "ratio": 6.06795792371236,
+      "pass": true
+    },
+    {
+      "role": "링크/흰색",
+      "foreground": "#A43E31",
+      "background": "#FFFFFF",
+      "minimum": 4.5,
+      "ratio": 6.340766173339224,
+      "pass": true
+    },
+    {
+      "role": "기본 버튼",
+      "foreground": "#203247",
+      "background": "#FF6B57",
+      "minimum": 4.5,
+      "ratio": 4.657779332381318,
+      "pass": true
+    },
+    {
+      "role": "눌린 버튼",
+      "foreground": "#FFFFFF",
+      "background": "#A43E31",
+      "minimum": 4.5,
+      "ratio": 6.340766173339224,
+      "pass": true
+    },
+    {
+      "role": "비활성",
+      "foreground": "#596574",
+      "background": "#EEE8E2",
+      "minimum": 4.5,
+      "ratio": 4.882464624469171,
+      "pass": true
+    },
+    {
+      "role": "선택",
+      "foreground": "#203247",
+      "background": "#FFF0EB",
+      "minimum": 4.5,
+      "ratio": 11.758775762551155,
+      "pass": true
+    },
+    {
+      "role": "오류",
+      "foreground": "#9E3438",
+      "background": "#FCEEEF",
+      "minimum": 4.5,
+      "ratio": 6.200715956482817,
+      "pass": true
+    },
+    {
+      "role": "성공",
+      "foreground": "#28614E",
+      "background": "#EBF4EF",
+      "minimum": 4.5,
+      "ratio": 6.432433573380185,
+      "pass": true
+    },
+    {
+      "role": "주의",
+      "foreground": "#765214",
+      "background": "#FFF4D9",
+      "minimum": 4.5,
+      "ratio": 6.425212562733147,
+      "pass": true
+    },
+    {
+      "role": "입력 경계/흰색",
+      "foreground": "#8A7B70",
+      "background": "#FFFFFF",
+      "minimum": 3,
+      "ratio": 4.079405693597352,
+      "pass": true
+    },
+    {
+      "role": "입력 경계/아이보리",
+      "foreground": "#8A7B70",
+      "background": "#FFF9F3",
+      "minimum": 3,
+      "ratio": 3.9038913320257955,
+      "pass": true
+    },
+    {
+      "role": "버튼 경계/코랄",
+      "foreground": "#203247",
+      "background": "#FF6B57",
+      "minimum": 3,
+      "ratio": 4.657779332381318,
+      "pass": true
+    }
+  ],
+  "negativeExamples": [
+    {
+      "foreground": "#FFFFFF",
+      "background": "#FF6B57",
+      "ratio": 2.8027272397813645,
+      "allowed": false
+    },
+    {
+      "foreground": "#FF6B57",
+      "background": "#FFF9F3",
+      "ratio": 2.682141321366457,
+      "allowed": false
+    }
+  ],
+  "sources": [
+    "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html",
+    "https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html",
+    "https://github.com/orioncactus/pretendard"
+  ],
+  "scope": "스티치 UI Kit 기준. 앱의 기존 v2 토큰은 이번 작업에서 교체하지 않는다.",
+  "sourceScreens": [
+    "88f59027549748a18770d582a90d91ac",
+    "8477d769989249159094c66152b7e2c8",
+    "f2592cafe17e4ca8804b0ce32d051a00"
+  ]
+}

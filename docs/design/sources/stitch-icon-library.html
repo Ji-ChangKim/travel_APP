@@ -1,0 +1,1115 @@
+<!DOCTYPE html><html lang="ko" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>TripPrint 아이콘 시스템 &amp; 심볼 규격 가이드</title>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Plus Jakarta Sans & Noto Sans KR -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<!-- Tailwind Custom Configuration -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              coral: '#ff6b57',
+              'coral-hover': '#e85a47',
+              'coral-light': '#fff1ef',
+              'coral-tint': '#ffe3df',
+              navy: '#203247',
+              'navy-light': '#2c435e',
+              'navy-muted': '#4a5d73',
+              ivory: '#fef8f2',
+              'ivory-dark': '#f8f1e7',
+              sky: '#8fd3e8',
+              'sky-light': '#e9f7fc',
+              yellow: '#ffc857',
+              'yellow-light': '#fef7e6',
+              teal: '#186779',
+              'teal-light': '#e6f4f6'
+            },
+            surface: {
+              DEFAULT: '#fef8f2',
+              dim: '#dfd9d3',
+              card: '#ffffff',
+              border: '#eedfd2'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '"Noto Sans KR"', 'sans-serif'],
+            mono: ['"SF Mono"', 'Menlo', 'Consolas', 'monospace']
+          },
+          boxShadow: {
+            'soft': '0 4px 20px -2px rgba(32, 50, 71, 0.05)',
+            'card': '0 2px 10px rgba(32, 50, 71, 0.04), 0 1px 3px rgba(32, 50, 71, 0.02)',
+            'float': '0 12px 28px -4px rgba(255, 107, 87, 0.25)'
+          }
+        }
+      }
+    }
+  </script>
+<!-- BEGIN: Custom Styles -->
+<style data-purpose="base-typography">
+    body {
+      background-color: #fef8f2;
+      color: #203247;
+      font-family: 'Plus Jakarta Sans', 'Noto Sans KR', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+  </style>
+<style data-purpose="icon-interaction">
+    .icon-card {
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .icon-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px -3px rgba(32, 50, 71, 0.08);
+      border-color: #ff6b57;
+    }
+    .icon-card:hover .copy-badge {
+      opacity: 1;
+      visibility: visible;
+    }
+    .spec-grid-pattern {
+      background-size: 8px 8px;
+      background-image: linear-gradient(to right, rgba(32, 50, 71, 0.05) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(32, 50, 71, 0.05) 1px, transparent 1px);
+    }
+  </style>
+<!-- END: Custom Styles -->
+</head>
+<body class="min-h-screen flex flex-col bg-[#fef8f2] text-brand-navy">
+<!-- BEGIN: Global Header -->
+<header class="sticky top-0 z-50 bg-[#fef8f2]/90 backdrop-blur-md border-b border-surface-border">
+<div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+<!-- Logo & Spec Badge -->
+<div class="flex items-center gap-4">
+<a class="flex items-center gap-2.5 text-brand-navy group" href="#">
+<div class="w-8 h-8 rounded-lg bg-brand-coral flex items-center justify-center text-white shadow-sm shadow-brand-coral/30">
+<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"></path>
+<path d="M19.5 4.5l-2.5 1.5 1.5 2.5 2-1z" opacity="0.8"></path>
+</svg>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-lg leading-tight tracking-tight text-brand-navy">TripPrint</span>
+<span class="text-[10px] font-semibold text-brand-coral tracking-wider uppercase">Design System</span>
+</div>
+</a>
+<div class="h-4 w-[1px] bg-surface-dim"></div>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-brand-coral-light text-brand-coral border border-brand-coral/20">
+          v2.4 ICON SPEC
+        </span>
+</div>
+<!-- Navigation Links -->
+<nav class="hidden md:flex items-center gap-1">
+<a class="px-3 py-1.5 rounded-md text-xs font-semibold text-brand-navy-muted hover:text-brand-coral hover:bg-white/60 transition-colors" href="#principles">규격 원칙</a>
+<a class="px-3 py-1.5 rounded-md text-xs font-semibold text-brand-navy-muted hover:text-brand-coral hover:bg-white/60 transition-colors" href="#nav-icons">글로벌 내비게이션</a>
+<a class="px-3 py-1.5 rounded-md text-xs font-semibold text-brand-navy-muted hover:text-brand-coral hover:bg-white/60 transition-colors" href="#itinerary-icons">일정 &amp; 카테고리</a>
+<a class="px-3 py-1.5 rounded-md text-xs font-semibold text-brand-navy-muted hover:text-brand-coral hover:bg-white/60 transition-colors" href="#action-icons">액션 &amp; 유틸리티</a>
+<a class="px-3 py-1.5 rounded-md text-xs font-semibold text-brand-navy-muted hover:text-brand-coral hover:bg-white/60 transition-colors" href="#status-icons">시스템 피드백</a>
+<a class="px-3 py-1.5 rounded-md text-xs font-semibold text-brand-navy-muted hover:text-brand-coral hover:bg-white/60 transition-colors" href="#icon-finder">검색기</a>
+</nav>
+<!-- Action Buttons -->
+<div class="flex items-center gap-2.5">
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-surface-border bg-white text-brand-navy hover:bg-surface-dim/30 transition shadow-sm" type="button">
+<svg class="w-3.5 h-3.5 text-brand-navy-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          SVG 패키지 복사
+        </button>
+<button class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-brand-coral text-white hover:bg-brand-coral-hover transition shadow-sm shadow-brand-coral/20" type="button">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          에셋 ZIP 다운로드
+        </button>
+</div>
+</div>
+</header>
+<!-- END: Global Header -->
+<!-- BEGIN: Hero Header Banner -->
+<section class="max-w-7xl mx-auto px-6 pt-10 pb-8 w-full">
+<div class="bg-gradient-to-br from-white via-white to-[#fff6f0] border border-surface-border rounded-2xl p-8 relative overflow-hidden shadow-card">
+<div class="max-w-2xl relative z-10">
+<div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-brand-coral/10 text-brand-coral text-xs font-bold mb-3">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-coral animate-pulse"></span>
+          TripPrint Visual Identity • Iconography System
+        </div>
+<h1 class="text-3xl font-extrabold tracking-tight text-brand-navy sm:text-4xl leading-tight">
+          여정의 감성과 명확한 맥락을 잇는 <br class="hidden sm:block">
+<span class="text-brand-coral">TripPrint 아이콘 규격 가이드</span>
+</h1>
+<p class="mt-3 text-sm sm:text-base text-brand-navy-muted leading-relaxed">
+          모바일 여행 다이어리와 데스크톱 일정 플래너 전반에 사용되는 벡터 심볼 표준입니다. 24dp 기준 그리드, 정교한 2px 스트로크, 브랜드 코랄 포인트 시스템을 통해 시각적 일관성과 직관적인 인지성을 보장합니다.
+        </p>
+<!-- Color Token Pills -->
+<div class="flex flex-wrap items-center gap-2 mt-5 text-xs">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white border border-surface-border text-brand-navy font-mono">
+<span class="w-2.5 h-2.5 rounded-full bg-brand-coral"></span> Trip Coral (#ff6b57)
+          </span>
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white border border-surface-border text-brand-navy font-mono">
+<span class="w-2.5 h-2.5 rounded-full bg-brand-navy"></span> Journey Navy (#203247)
+          </span>
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white border border-surface-border text-brand-navy font-mono">
+<span class="w-2.5 h-2.5 rounded-full bg-brand-sky"></span> Sky (#8fd3e8)
+          </span>
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white border border-surface-border text-brand-navy font-mono">
+<span class="w-2.5 h-2.5 rounded-full bg-brand-yellow"></span> Sun Yellow (#ffc857)
+          </span>
+</div>
+</div>
+<!-- Watermark Graphic in Background -->
+<div class="absolute right-[-20px] -bottom-10 opacity-5 pointer-events-none text-brand-navy">
+<svg class="w-80 h-80" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+</svg>
+</div>
+</div>
+</section>
+<!-- END: Hero Header Banner -->
+<!-- BEGIN: Main Content Area -->
+<main class="max-w-7xl mx-auto px-6 pb-24 space-y-14 w-full">
+<!-- BEGIN: Design Principles Section -->
+<section class="scroll-mt-20" id="principles">
+<div class="flex items-center justify-between mb-4">
+<div>
+<span class="text-xs font-bold tracking-wider text-brand-coral uppercase">01 / Foundations</span>
+<h2 class="text-xl font-bold text-brand-navy tracking-tight">아이콘 제작 원칙 및 스펙 매트릭스 (Icon Specs)</h2>
+</div>
+<span class="text-xs text-brand-navy-muted">WCAG 2.1 AA Contrast Compliant • 24dp Base</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<!-- Rule 1: Grid & Bounding Box -->
+<div class="bg-white p-5 rounded-xl border border-surface-border shadow-card flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-3">
+<span class="text-[11px] font-bold uppercase tracking-wider text-brand-navy-muted">Base Grid</span>
+<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-brand-navy/5 text-brand-navy">24 x 24 dp</span>
+</div>
+<!-- Grid Visual -->
+<div class="h-28 rounded-lg border border-dashed border-brand-coral/40 bg-[#fffbf8] flex items-center justify-center relative spec-grid-pattern mb-3">
+<div class="w-12 h-12 border border-brand-coral flex items-center justify-center relative">
+<div class="w-10 h-10 border border-brand-sky/60 border-dashed flex items-center justify-center">
+<div class="w-2 h-2 rounded-full bg-brand-coral"></div>
+</div>
+<span class="absolute -top-3 left-1 text-[9px] text-brand-coral font-mono">20px Live</span>
+</div>
+</div>
+<h3 class="text-sm font-bold text-brand-navy">24dp 베이스 그리드</h3>
+<p class="text-xs text-brand-navy-muted mt-1 leading-relaxed">
+              20dp 라이브 영역과 2dp 패딩 세이프존을 유지하여 요소 간 시각적 일관성을 확보합니다.
+            </p>
+</div>
+<div class="mt-4 pt-3 border-t border-surface-border/60 text-[11px] font-mono text-brand-coral">
+            padding: 2px (safe-area)
+          </div>
+</div>
+<!-- Rule 2: Stroke & Join -->
+<div class="bg-white p-5 rounded-xl border border-surface-border shadow-card flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-3">
+<span class="text-[11px] font-bold uppercase tracking-wider text-brand-navy-muted">Stroke Weight</span>
+<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-brand-coral-light text-brand-coral">2.0px Solid</span>
+</div>
+<!-- Stroke Visual -->
+<div class="h-28 rounded-lg bg-surface-low border border-surface-border flex items-center justify-center gap-6 mb-3">
+<div class="flex flex-col items-center">
+<svg class="w-9 h-9 text-brand-navy" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"></path>
+<circle cx="12" cy="10" r="3"></circle>
+</svg>
+<span class="text-[10px] text-brand-navy-muted mt-1 font-mono">round caps</span>
+</div>
+<div class="flex flex-col items-center">
+<svg class="w-9 h-9 text-brand-coral" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<rect height="18" rx="2" ry="2" width="18" x="3" y="4"></rect>
+<line x1="16" x2="16" y1="2" y2="6"></line>
+<line x1="8" x2="8" y1="2" y2="6"></line>
+<line x1="3" x2="21" y1="10" y2="10"></line>
+</svg>
+<span class="text-[10px] text-brand-coral mt-1 font-mono">round joins</span>
+</div>
+</div>
+<h3 class="text-sm font-bold text-brand-navy">정밀 2.0px 라인 두께</h3>
+<p class="text-xs text-brand-navy-muted mt-1 leading-relaxed">
+              모서리는 <code class="text-brand-coral font-mono">round</code> 처리하여 여행의 부드러움과 친근한 온기를 표현합니다.
+            </p>
+</div>
+<div class="mt-4 pt-3 border-t border-surface-border/60 text-[11px] font-mono text-brand-navy">
+            stroke-linecap: round
+          </div>
+</div>
+<!-- Rule 3: Duotone & Brand Accent -->
+<div class="bg-white p-5 rounded-xl border border-surface-border shadow-card flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-3">
+<span class="text-[11px] font-bold uppercase tracking-wider text-brand-navy-muted">Color Logic</span>
+<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-brand-sky-light text-brand-teal">Duo-tone</span>
+</div>
+<!-- Duotone Visual -->
+<div class="h-28 rounded-lg bg-surface-low border border-surface-border flex items-center justify-center gap-6 mb-3">
+<div class="flex flex-col items-center">
+<!-- Duo-tone Map Pin with Coral Heart -->
+<svg class="w-10 h-10" fill="none" viewBox="0 0 24 24">
+<path d="M12 2C7.58 2 4 5.58 4 10c0 6.5 8 12 8 12s8-5.5 8-12c0-4.42-3.58-8-8-8z" stroke="#203247" stroke-linecap="round" stroke-width="2"></path>
+<circle cx="12" cy="9.5" fill="#ff6b57" r="3"></circle>
+</svg>
+<span class="text-[10px] text-brand-navy mt-1">네이비 + 코랄</span>
+</div>
+<div class="flex flex-col items-center">
+<!-- Duo-tone Camera with Flash Point -->
+<svg class="w-10 h-10" fill="none" viewBox="0 0 24 24">
+<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" stroke="#203247" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<circle cx="12" cy="13" r="4" stroke="#ff6b57" stroke-width="2"></circle>
+<circle cx="18.5" cy="9.5" fill="#ff6b57" r="1"></circle>
+</svg>
+<span class="text-[10px] text-brand-coral mt-1">포인트 액센트</span>
+</div>
+</div>
+<h3 class="text-sm font-bold text-brand-navy">투톤 및 브랜드 포인트</h3>
+<p class="text-xs text-brand-navy-muted mt-1 leading-relaxed">
+              기본 골격은 Journey Navy(#203247)로 잡고 핵심 초점 요소에 Trip Coral(#ff6b57)을 악센트로 적용합니다.
+            </p>
+</div>
+<div class="mt-4 pt-3 border-t border-surface-border/60 text-[11px] font-mono text-brand-teal">
+            primary: Coral / base: Navy
+          </div>
+</div>
+<!-- Rule 4: Sizing Hierarchy -->
+<div class="bg-white p-5 rounded-xl border border-surface-border shadow-card flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-3">
+<span class="text-[11px] font-bold uppercase tracking-wider text-brand-navy-muted">Scale System</span>
+<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-brand-yellow-light text-amber-700">5 단계 스케일</span>
+</div>
+<!-- Size Scale Visual -->
+<div class="h-28 rounded-lg bg-surface-low border border-surface-border flex items-end justify-center gap-3 pb-3 mb-3">
+<div class="flex flex-col items-center">
+<span class="text-[9px] font-mono text-brand-navy-muted mb-1">16</span>
+<div class="w-4 h-4 bg-brand-navy/80 rounded flex items-center justify-center text-[7px] text-white">S</div>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-[9px] font-mono text-brand-navy-muted mb-1">20</span>
+<div class="w-5 h-5 bg-brand-navy/80 rounded flex items-center justify-center text-[8px] text-white">M</div>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-[9px] font-mono text-brand-coral font-bold mb-1">24</span>
+<div class="w-6 h-6 bg-brand-coral rounded flex items-center justify-center text-[9px] text-white">Std</div>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-[9px] font-mono text-brand-navy-muted mb-1">32</span>
+<div class="w-8 h-8 bg-brand-navy/80 rounded flex items-center justify-center text-[10px] text-white">L</div>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-[9px] font-mono text-brand-navy-muted mb-1">48</span>
+<div class="w-10 h-10 bg-brand-navy/80 rounded flex items-center justify-center text-[10px] text-white">XL</div>
+</div>
+</div>
+<h3 class="text-sm font-bold text-brand-navy">5단계 반응형 스케일</h3>
+<p class="text-xs text-brand-navy-muted mt-1 leading-relaxed">
+              16px(태그/칩) • 20px(인풋/캡션) • 24px(버튼/기본) • 32px(헤더) • 48px+(엠프티/히어로).
+            </p>
+</div>
+<div class="mt-4 pt-3 border-t border-surface-border/60 text-[11px] font-mono text-amber-700">
+            ratio: 16 • 20 • 24 • 32 • 48
+          </div>
+</div>
+</div>
+</section>
+<!-- END: Design Principles Section -->
+<!-- BEGIN: Global Navigation Icons Section -->
+<section class="scroll-mt-20" id="nav-icons">
+<div class="flex items-center justify-between mb-4">
+<div>
+<span class="text-xs font-bold tracking-wider text-brand-coral uppercase">02 / App &amp; Web Navigation</span>
+<h2 class="text-xl font-bold text-brand-navy tracking-tight">글로벌 내비게이션 &amp; 하단 탭 아이콘 (GNB / Bottom Bar)</h2>
+</div>
+<div class="flex items-center gap-2 text-xs">
+<span class="inline-flex items-center gap-1 text-brand-navy-muted"><span class="w-2 h-2 rounded-full bg-brand-coral"></span>활성 상태 (Active)</span>
+<span class="inline-flex items-center gap-1 text-brand-navy-muted"><span class="w-2 h-2 rounded-full bg-brand-navy"></span>기본/비활성 (Default)</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+<!-- Nav 1: Home -->
+<div class="icon-card bg-white p-4 rounded-xl border border-surface-border flex flex-col justify-between relative group">
+<span class="copy-badge absolute top-2 right-2 px-1.5 py-0.5 rounded text-[9px] font-mono bg-brand-navy text-white opacity-0 transition-opacity">Copy SVG</span>
+<div>
+<div class="flex items-center justify-center h-20 bg-surface-low rounded-lg gap-4 mb-3">
+<!-- Default -->
+<div class="flex flex-col items-center">
+<svg class="w-7 h-7 text-brand-navy" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+<span class="text-[9px] font-mono text-brand-navy-muted mt-1">Outline</span>
+</div>
+<div class="w-[1px] h-8 bg-surface-dim"></div>
+<!-- Active -->
+<div class="flex flex-col items-center">
+<svg class="w-7 h-7 text-brand-coral" fill="currentColor" viewBox="0 0 24 24">
+<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path>
+</svg>
+<span class="text-[9px] font-mono text-brand-coral mt-1 font-bold">Filled</span>
+</div>
+</div>
+<h4 class="text-sm font-bold text-brand-navy">홈 (Home)</h4>
+<p class="text-xs text-brand-navy-muted mt-0.5">앱 첫 화면 및 맞춤형 여행 피드</p>
+</div>
+<div class="mt-3 pt-2.5 border-t border-surface-border flex items-center justify-between text-[11px] font-mono">
+<span class="text-brand-navy-muted">tp-icon-home</span>
+<span class="text-brand-coral">24px</span>
+</div>
+</div>
+<!-- Nav 2: Community / Explore -->
+<div class="icon-card bg-white p-4 rounded-xl border border-surface-border flex flex-col justify-between relative group">
+<span class="copy-badge absolute top-2 right-2 px-1.5 py-0.5 rounded text-[9px] font-mono bg-brand-navy text-white opacity-0 transition-opacity">Copy SVG</span>
+<div>
+<div class="flex items-center justify-center h-20 bg-surface-low rounded-lg gap-4 mb-3">
+<!-- Default -->
+<div class="flex flex-col items-center">
+<svg class="w-7 h-7 text-brand-navy" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+</svg>
+<span class="text-[9px] font-mono text-brand-navy-muted mt-1">Outline</span>
+</div>
+<div class="w-[1px] h-8 bg-surface-dim"></div>
+<!-- Active -->
+<div class="flex flex-col items-center">
+<svg class="w-7 h-7 text-brand-coral" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="12" cy="12" fill="#fff1ef" r="10"></circle>
+<polygon fill="#ff6b57" points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+</svg>
+<span class="text-[9px] font-mono text-brand-coral mt-1 font-bold">Duotone</span>
+</div>
+</div>
+<h4 class="text-sm font-bold text-brand-navy">지도 &amp; 탐색 (Explore)</h4>
+<p class="text-xs text-brand-navy-muted mt-0.5">둘러보기, 나침반 및 실시간 지도</p>
+</div>
+<div class="mt-3 pt-2.5 border-t border-surface-border flex items-center justify-between text-[11px] font-mono">
+<span class="text-brand-navy-muted">tp-icon-compass</span>
+<span class="text-brand-coral">24px</span>
+</div>
+</div>
+<!-- Nav 3: Add Travel Record (FAB Center) -->
+<div class="icon-card bg-white p-4 rounded-xl border border-brand-coral/40 ring-1 ring-brand-coral/20 flex flex-col justify-between relative group">
+<span class="copy-badge absolute top-2 right-2 px-1.5 py-0.5 rounded text-[9px] font-mono bg-brand-coral text-white opacity-0 transition-opacity">Copy SVG</span>
+<div>
+<div class="flex items-center justify-center h-20 bg-brand-coral-light/50 rounded-lg gap-4 mb-3">
+<!-- Floating Center Action Icon -->
+<div class="flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-brand-coral text-white flex items-center justify-center shadow-md shadow-brand-coral/30 hover:scale-105 transition-transform">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24">
+<line x1="12" x2="12" y1="5" y2="19"></line>
+<line x1="5" x2="19" y1="12" y2="12"></line>
+</svg>
+</div>
+<span class="text-[9px] font-mono text-brand-coral mt-1 font-bold">Center FAB</span>
+</div>
+</div>
+<h4 class="text-sm font-bold text-brand-navy">여행 기록 FAB (Create)</h4>
+<p class="text-xs text-brand-navy-muted mt-0.5">새 일정 추가 및 모바일 플로팅 버튼</p>
+</div>
+<div class="mt-3 pt-2.5 border-t border-surface-border flex items-center justify-between text-[11px] font-mono">
+<span class="text-brand-coral font-bold">tp-icon-fab-plus</span>
+<span class="text-brand-coral">24/48px</span>
+</div>
+</div>
+<!-- Nav 4: Travel Log / Timeline -->
+<div class="icon-card bg-white p-4 rounded-xl border border-surface-border flex flex-col justify-between relative group">
+<span class="copy-badge absolute top-2 right-2 px-1.5 py-0.5 rounded text-[9px] font-mono bg-brand-navy text-white opacity-0 transition-opacity">Copy SVG</span>
+<div>
+<div class="flex items-center justify-center h-20 bg-surface-low rounded-lg gap-4 mb-3">
+<!-- Default -->
+<div class="flex flex-col items-center">
+<svg class="w-7 h-7 text-brand-navy" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+<path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+<line x1="10" x2="16" y1="7" y2="7"></line>
+<line x1="10" x2="14" y1="11" y2="11"></line>
+</svg>
+<span class="text-[9px] font-mono text-brand-navy-muted mt-1">Outline</span>
+</div>
+<div class="w-[1px] h-8 bg-surface-dim"></div>
+<!-- Active -->
+<div class="flex flex-col items-center">
+<svg class="w-7 h-7 text-brand-coral" fill="currentColor" viewBox="0 0 24 24">
+<path d="M19 2H6c-1.2 0-2 .8-2 2v16c0 1.2.8 2 2 2h13a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zM6 4h12v12H6V4zm2 2h8v2H8V6zm0 4h5v2H8v-2z"></path>
+</svg>
+<span class="text-[9px] font-mono text-brand-coral mt-1 font-bold">Filled</span>
+</div>
+</div>
+<h4 class="text-sm font-bold text-brand-navy">여행 기록장 (Journal)</h4>
+<p class="text-xs text-brand-navy-muted mt-0.5">나의 타임라인 및 저널 북</p>
+</div>
+<div class="mt-3 pt-2.5 border-t border-surface-border flex items-center justify-between text-[11px] font-mono">
+<span class="text-brand-navy-muted">tp-icon-journal</span>
+<span class="text-brand-coral">24px</span>
+</div>
+</div>
+<!-- Nav 5: My Page -->
+<div class="icon-card bg-white p-4 rounded-xl border border-surface-border flex flex-col justify-between relative group">
+<span class="copy-badge absolute top-2 right-2 px-1.5 py-0.5 rounded text-[9px] font-mono bg-brand-navy text-white opacity-0 transition-opacity">Copy SVG</span>
+<div>
+<div class="flex items-center justify-center h-20 bg-surface-low rounded-lg gap-4 mb-3">
+<!-- Default -->
+<div class="flex flex-col items-center">
+<svg class="w-7 h-7 text-brand-navy" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+<circle cx="12" cy="7" r="4"></circle>
+</svg>
+<span class="text-[9px] font-mono text-brand-navy-muted mt-1">Outline</span>
+</div>
+<div class="w-[1px] h-8 bg-surface-dim"></div>
+<!-- Active -->
+<div class="flex flex-col items-center">
+<svg class="w-7 h-7 text-brand-coral" fill="currentColor" viewBox="0 0 24 24">
+<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
+</svg>
+<span class="text-[9px] font-mono text-brand-coral mt-1 font-bold">Filled</span>
+</div>
+</div>
+<h4 class="text-sm font-bold text-brand-navy">마이페이지 (Profile)</h4>
+<p class="text-xs text-brand-navy-muted mt-0.5">회원 정보, 배지 및 환경설정</p>
+</div>
+<div class="mt-3 pt-2.5 border-t border-surface-border flex items-center justify-between text-[11px] font-mono">
+<span class="text-brand-navy-muted">tp-icon-user</span>
+<span class="text-brand-coral">24px</span>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Global Navigation Icons Section -->
+<!-- BEGIN: Itinerary & Category Icons Section -->
+<section class="scroll-mt-20" id="itinerary-icons"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
+<div>
+<span class="text-xs font-bold tracking-wider text-brand-coral uppercase">03 / Itinerary &amp; POI Symbols</span>
+<h2 class="text-xl font-bold text-brand-navy tracking-tight">여행 일정 및 실전 중분류 카테고리 심볼 (Mid-level Taxonomy)</h2>
+</div>
+<span class="text-xs text-brand-navy-muted">일정 타임라인 카드, 지도 핀 마커 및 영수증 자동분류 연동 규격</span>
+</div>
+
+<div class="space-y-6">
+<!-- Group 1: 식음료 & 미식 중분류 -->
+<div class="bg-white/80 p-5 rounded-2xl border border-surface-border shadow-card">
+<div class="flex items-center justify-between pb-3 mb-4 border-b border-surface-border/70">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-brand-coral"></span>
+<h3 class="text-sm font-bold text-brand-navy">식음료 &amp; 미식 중분류 (Dining &amp; Gourmet)</h3>
+<span class="text-[10px] text-brand-navy-muted">식사 투어, 베이커리 휴식, 야간 주류 및 마트 쇼핑 완벽 분리</span>
+</div>
+<span class="text-[10px] font-mono px-2 py-0.5 rounded bg-brand-coral-light text-brand-coral font-semibold border border-brand-coral/20">4 POI Types</span>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+<!-- Dining -->
+<div class="icon-card bg-white p-3.5 rounded-xl border border-surface-border text-center flex flex-col items-center justify-between hover:border-brand-coral transition">
+<div class="w-12 h-12 rounded-lg bg-brand-coral-light text-brand-coral flex items-center justify-center mb-2">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<path d="M18 2v20"></path>
+<path d="M18 8a3 3 0 0 0 3-3V2h-3v6z"></path>
+<path d="M6 2v6a3 3 0 0 0 3 3h0a3 3 0 0 0 3-3V2"></path>
+<path d="M9 11v11"></path>
+</svg>
+</div>
+<span class="text-xs font-bold text-brand-navy">식당 / 맛집</span>
+<span class="text-[10px] text-brand-navy-muted">Dining / Restaurant</span>
+<span class="mt-2 text-[9px] font-mono text-brand-coral px-1.5 py-0.5 rounded bg-brand-coral-light border border-brand-coral/20">#dining #restaurant</span>
+</div>
+<!-- Cafe & Bakery -->
+<div class="icon-card bg-white p-3.5 rounded-xl border border-surface-border text-center flex flex-col items-center justify-between hover:border-brand-coral transition">
+<div class="w-12 h-12 rounded-lg bg-brand-yellow-light text-amber-700 flex items-center justify-center mb-2">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+<path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+<line x1="6" x2="6" y1="2" y2="5"></line>
+<line x1="10" x2="10" y1="2" y2="5"></line>
+<line x1="14" x2="14" y1="2" y2="5"></line>
+</svg>
+</div>
+<span class="text-xs font-bold text-brand-navy">카페 / 베이커리</span>
+<span class="text-[10px] text-brand-navy-muted">Cafe &amp; Bakery</span>
+<span class="mt-2 text-[9px] font-mono text-amber-700 px-1.5 py-0.5 rounded bg-brand-yellow-light border border-amber-200">#cafe #dessert</span>
+</div>
+<!-- Pub & Bar -->
+<div class="icon-card bg-white p-3.5 rounded-xl border border-surface-border text-center flex flex-col items-center justify-between hover:border-brand-coral transition">
+<div class="w-12 h-12 rounded-lg bg-[#fff1ef] text-brand-coral flex items-center justify-center mb-2">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<path d="M5 2h14l-7 8v9"></path>
+<path d="M8 22h8"></path>
+<circle cx="15" cy="6" r="2" fill="#ff6b57" stroke="none"></circle>
+</svg>
+</div>
+<span class="text-xs font-bold text-brand-navy">펍 / 바 / 이자카야</span>
+<span class="text-[10px] text-brand-navy-muted">Pub, Bar &amp; Izakaya</span>
+<span class="mt-2 text-[9px] font-mono text-brand-coral px-1.5 py-0.5 rounded bg-brand-coral-light border border-brand-coral/20">#pub #bar #izakaya</span>
+</div>
+<!-- Mart & CVS -->
+<div class="icon-card bg-white p-3.5 rounded-xl border border-surface-border text-center flex flex-col items-center justify-between hover:border-brand-coral transition">
+<div class="w-12 h-12 rounded-lg bg-surface-low text-brand-navy flex items-center justify-center mb-2">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="9" cy="21" r="1"></circle>
+<circle cx="20" cy="21" r="1"></circle>
+<path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+<circle cx="14" cy="10" r="2" fill="#ff6b57" stroke="none"></circle>
+</svg>
+</div>
+<span class="text-xs font-bold text-brand-navy">마트 / 편의점</span>
+<span class="text-[10px] text-brand-navy-muted">Mart &amp; Convenience</span>
+<span class="mt-2 text-[9px] font-mono text-brand-navy/70 px-1.5 py-0.5 rounded bg-surface-low border border-surface-border">#mart #grocery #cvs</span>
+</div>
+</div>
+</div>
+
+<!-- Group 2: 대중교통 & 이동 중분류 -->
+<div class="bg-white/80 p-5 rounded-2xl border border-surface-border shadow-card">
+<div class="flex items-center justify-between pb-3 mb-4 border-b border-surface-border/70">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-brand-teal"></span>
+<h3 class="text-sm font-bold text-brand-navy">대중교통 &amp; 이동 중분류 (Transit &amp; Mobility)</h3>
+<span class="text-[10px] text-brand-navy-muted">비행기 환승, 전철/지하철 탑승, 버스 정류장 및 차량 대여 구분</span>
+</div>
+<span class="text-[10px] font-mono px-2 py-0.5 rounded bg-brand-teal-light text-brand-teal font-semibold border border-brand-teal/20">4 POI Types</span>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+<!-- Flight -->
+<div class="icon-card bg-white p-3.5 rounded-xl border border-surface-border text-center flex flex-col items-center justify-between hover:border-brand-coral transition">
+<div class="w-12 h-12 rounded-lg bg-brand-sky-light text-brand-teal flex items-center justify-center mb-2">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<path d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 19 4c-2 0-4 0-3.5 1.5L12 9 3.8 7.2c-.7-.1-1.3.4-1.3 1.1 0 .4.2.8.6 1l6.9 4.7-2.5 2.5-3.2-.8c-.4-.1-.8.1-1 .4l-.3.4 4 2.5 2.5 4 .4-.3c.3-.2.5-.6.4-1l-.8-3.2 2.5-2.5 4.7 6.9c.2.4.6.6 1 .6.7 0 1.2-.6 1.1-1.3z"></path>
+</svg>
+</div>
+<span class="text-xs font-bold text-brand-navy">항공편 / 공항</span>
+<span class="text-[10px] text-brand-navy-muted">Flight &amp; Airport</span>
+<span class="mt-2 text-[9px] font-mono text-brand-teal px-1.5 py-0.5 rounded bg-brand-sky-light border border-brand-sky/30">#flight #airport</span>
+</div>
+<!-- Metro / Train -->
+<div class="icon-card bg-white p-3.5 rounded-xl border border-surface-border text-center flex flex-col items-center justify-between hover:border-brand-coral transition">
+<div class="w-12 h-12 rounded-lg bg-brand-teal-light text-brand-teal flex items-center justify-center mb-2">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<rect height="15" rx="2" width="16" x="4" y="3"></rect>
+<line x1="4" x2="20" y1="11" y2="11"></line>
+<circle cx="8" cy="15" r="1" fill="#ff6b57" stroke="none"></circle>
+<circle cx="16" cy="15" r="1" fill="#ff6b57" stroke="none"></circle>
+<path d="M8 18l-3 3"></path>
+<path d="M16 18l3 3"></path>
+<line x1="8" x2="16" y1="3" y2="3"></line>
+</svg>
+</div>
+<span class="text-xs font-bold text-brand-navy">지하철 / 전철역</span>
+<span class="text-[10px] text-brand-navy-muted">Metro &amp; Train</span>
+<span class="mt-2 text-[9px] font-mono text-brand-teal px-1.5 py-0.5 rounded bg-brand-teal-light border border-brand-teal/20">#metro #station</span>
+</div>
+<!-- Bus -->
+<div class="icon-card bg-white p-3.5 rounded-xl border border-surface-border text-center flex flex-col items-center justify-between hover:border-brand-coral transition">
+<div class="w-12 h-12 rounded-lg bg-surface-low text-brand-navy flex items-center justify-center mb-2">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<rect height="13" rx="2" width="13" x="2" y="4"></rect>
+<line x1="2" x2="15" y1="9" y2="9"></line>
+<circle cx="5.5" cy="14" r="1"></circle>
+<circle cx="11.5" cy="14" r="1"></circle>
+<path d="M4 17l-1 2"></path>
+<path d="M13 17l1 2"></path>
+<circle cx="20" cy="6" r="2" fill="#ff6b57" stroke="none"></circle>
+<line x1="20" x2="20" y1="8" y2="19"></line>
+</svg>
+</div>
+<span class="text-xs font-bold text-brand-navy">버스 / 정류장</span>
+<span class="text-[10px] text-brand-navy-muted">Bus &amp; Bus Stop</span>
+<span class="mt-2 text-[9px] font-mono text-brand-navy/70 px-1.5 py-0.5 rounded bg-surface-low border border-surface-border">#bus #transit</span>
+</div>
+<!-- Taxi & Rental -->
+<div class="icon-card bg-white p-3.5 rounded-xl border border-surface-border text-center flex flex-col items-center justify-between hover:border-brand-coral transition">
+<div class="w-12 h-12 rounded-lg bg-[#fff1ef] text-brand-coral flex items-center justify-center mb-2">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1L1 14.25V19h3"></path>
+<circle cx="6.5" cy="16.5" r="2.5"></circle>
+<circle cx="16.5" cy="16.5" r="2.5"></circle>
+<path d="M9 4h6"></path>
+</svg>
+</div>
+<span class="text-xs font-bold text-brand-navy">택시 / 렌터카 / 페리</span>
+<span class="text-[10px] text-brand-navy-muted">Taxi &amp; Car Rental</span>
+<span class="mt-2 text-[9px] font-mono text-brand-coral px-1.5 py-0.5 rounded bg-brand-coral-light border border-brand-coral/20">#taxi #rental</span>
+</div>
+</div>
+</div>
+
+<!-- Group 3 & 4: 숙소 & 휴식 + 활동 & 관광 (2열 레이아웃) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Group 3: 숙소 & 휴식 중분류 -->
+<div class="bg-white/80 p-5 rounded-2xl border border-surface-border shadow-card flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-3 mb-4 border-b border-surface-border/70">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-[#3b5998]"></span>
+<h3 class="text-sm font-bold text-brand-navy">숙소 &amp; 휴식 중분류 (Lodging &amp; Stay)</h3>
+</div>
+<span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#f0f4ff] text-[#3b5998] font-semibold border border-[#3b5998]/20">2 POI Types</span>
+</div>
+<div class="grid grid-cols-2 gap-3.5">
+<!-- Hotel -->
+<div class="icon-card bg-white p-3.5 rounded-xl border border-surface-border text-center flex flex-col items-center justify-between hover:border-brand-coral transition">
+<div class="w-12 h-12 rounded-lg bg-[#f0f4ff] text-[#3b5998] flex items-center justify-center mb-2">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<path d="M2 4v16"></path>
+<path d="M2 8h18a2 2 0 0 1 2 2v10"></path>
+<path d="M2 17h20"></path>
+<path d="M6 8v9"></path>
+<circle cx="14" cy="12" r="2" fill="#ff6b57" stroke="none"></circle>
+</svg>
+</div>
+<span class="text-xs font-bold text-brand-navy">호텔 / 리조트</span>
+<span class="text-[10px] text-brand-navy-muted">Hotel &amp; Resort</span>
+<span class="mt-2 text-[9px] font-mono text-[#3b5998] px-1.5 py-0.5 rounded bg-[#f0f4ff] border border-[#3b5998]/20">#hotel</span>
+</div>
+<!-- Guesthouse & Ryokan -->
+<div class="icon-card bg-white p-3.5 rounded-xl border border-surface-border text-center flex flex-col items-center justify-between hover:border-brand-coral transition">
+<div class="w-12 h-12 rounded-lg bg-surface-low text-brand-navy flex items-center justify-center mb-2">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<path d="M3 10l9-7 9 7v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"></path>
+<path d="M9 22V12h6v10"></path>
+<line x1="12" x2="12" y1="7" y2="7.01"></line>
+</svg>
+</div>
+<span class="text-xs font-bold text-brand-navy">호스텔 / 료칸 / 게하</span>
+<span class="text-[10px] text-brand-navy-muted">Guesthouse &amp; Ryokan</span>
+<span class="mt-2 text-[9px] font-mono text-brand-navy/70 px-1.5 py-0.5 rounded bg-surface-low border border-surface-border">#guesthouse #ryokan</span>
+</div>
+</div>
+</div>
+<p class="text-[11px] text-brand-navy-muted mt-3 pt-2.5 border-t border-surface-border/60">체크인/아웃 알림, 짐 보관 유무 및 온천/공용라운지 시설 메타데이터 매핑</p>
+</div>
+
+<!-- Group 4: 활동 & 관광 중분류 -->
+<div class="bg-white/80 p-5 rounded-2xl border border-surface-border shadow-card">
+<div class="flex items-center justify-between pb-3 mb-4 border-b border-surface-border/70">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-purple-600"></span>
+<h3 class="text-sm font-bold text-brand-navy">활동 &amp; 관광 중분류 (Activity &amp; Culture)</h3>
+</div>
+<span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#fcf0ff] text-purple-700 font-semibold border border-purple-200">4 POI Types</span>
+</div>
+<div class="grid grid-cols-2 gap-3.5">
+<!-- Landmark -->
+<div class="icon-card bg-white p-3.5 rounded-xl border border-surface-border text-center flex flex-col items-center justify-between hover:border-brand-coral transition">
+<div class="w-12 h-12 rounded-lg bg-surface-low text-brand-navy flex items-center justify-center mb-2">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<polygon points="12 2 19 21 12 17 5 21 12 2"></polygon>
+<circle cx="12" cy="10" r="2" fill="#ff6b57" stroke="none"></circle>
+</svg>
+</div>
+<span class="text-xs font-bold text-brand-navy">관광명소 / 랜드마크</span>
+<span class="text-[10px] text-brand-navy-muted">Sightseeing &amp; Landmark</span>
+<span class="mt-2 text-[9px] font-mono text-brand-navy/70 px-1.5 py-0.5 rounded bg-surface-low border border-surface-border">#landmark #sight</span>
+</div>
+<!-- Museum & Culture -->
+<div class="icon-card bg-white p-3.5 rounded-xl border border-surface-border text-center flex flex-col items-center justify-between hover:border-brand-coral transition">
+<div class="w-12 h-12 rounded-lg bg-[#fff1ef] text-brand-coral flex items-center justify-center mb-2">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<line x1="2" x2="22" y1="20" y2="20"></line>
+<polygon points="12 3 2 9 22 9 12 3"></polygon>
+<line x1="6" x2="6" y1="9" y2="16"></line>
+<line x1="10" x2="10" y1="9" y2="16"></line>
+<line x1="14" x2="14" y1="9" y2="16"></line>
+<line x1="18" x2="18" y1="9" y2="16"></line>
+<line x1="3" x2="21" y1="16" y2="16"></line>
+</svg>
+</div>
+<span class="text-xs font-bold text-brand-navy">박물관 / 미술관 / 문화재</span>
+<span class="text-[10px] text-brand-navy-muted">Culture &amp; Museum</span>
+<span class="mt-2 text-[9px] font-mono text-brand-coral px-1.5 py-0.5 rounded bg-brand-coral-light border border-brand-coral/20">#museum #culture</span>
+</div>
+<!-- Shopping & Market -->
+<div class="icon-card bg-white p-3.5 rounded-xl border border-surface-border text-center flex flex-col items-center justify-between hover:border-brand-coral transition">
+<div class="w-12 h-12 rounded-lg bg-[#fcf0ff] text-purple-700 flex items-center justify-center mb-2">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+<line x1="3" x2="21" y1="6" y2="6"></line>
+<path d="M16 10a4 4 0 0 1-8 0"></path>
+</svg>
+</div>
+<span class="text-xs font-bold text-brand-navy">쇼핑 / 백화점 / 플리마켓</span>
+<span class="text-[10px] text-brand-navy-muted">Shopping &amp; Mall</span>
+<span class="mt-2 text-[9px] font-mono text-purple-700 px-1.5 py-0.5 rounded bg-[#fcf0ff] border border-purple-200">#shopping #market</span>
+</div>
+<!-- Activity & Park -->
+<div class="icon-card bg-white p-3.5 rounded-xl border border-surface-border text-center flex flex-col items-center justify-between hover:border-brand-coral transition">
+<div class="w-12 h-12 rounded-lg bg-brand-sky-light text-brand-teal flex items-center justify-center mb-2">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<polygon points="12 6 15.5 13 8.5 13"></polygon>
+<line x1="12" x2="12" y1="16" y2="18"></line>
+<circle cx="12" cy="12" r="2" fill="#ff6b57" stroke="none"></circle>
+</svg>
+</div>
+<span class="text-xs font-bold text-brand-navy">액티비티 / 테마파크</span>
+<span class="text-[10px] text-brand-navy-muted">Activity &amp; Theme Park</span>
+<span class="mt-2 text-[9px] font-mono text-brand-teal px-1.5 py-0.5 rounded bg-brand-sky-light border border-brand-sky/30">#activity #park</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Informative Design Rationale Note -->
+<div class="mt-4 p-4 rounded-xl bg-surface-low border border-surface-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-brand-navy-muted">
+<div class="flex items-start sm:items-center gap-2.5 min-w-0">
+<span class="w-2.5 h-2.5 rounded-full bg-brand-coral flex-shrink-0 mt-1 sm:mt-0"></span>
+<p class="text-xs leading-relaxed text-brand-navy">
+<strong class="font-bold text-brand-navy">실전 중분류 설계 원칙 (Mid-level Taxonomy Rationale):</strong>
+마트/편의점에서 장보기, 저녁 펍/이자카야 한잔, 식당 맛집 투어, 랜드마크와 전철역 동선을 각각 명확히 구분하여 타임라인 일정 및 OCR 영수증 카테고리와 1:1 직관 연동을 보장합니다.
+</p>
+</div>
+<span class="text-[10px] font-mono text-brand-coral font-bold flex-shrink-0 bg-white px-2.5 py-1 rounded border border-surface-border shadow-sm">Taxonomy Spec v2.5</span>
+</div></section>
+<!-- END: Itinerary & Category Icons Section -->
+<!-- BEGIN: Action & Utility Icons Section -->
+<section class="scroll-mt-20" id="action-icons">
+<div class="flex items-center justify-between mb-4">
+<div>
+<span class="text-xs font-bold tracking-wider text-brand-coral uppercase">04 / Actions &amp; Controls</span>
+<h2 class="text-xl font-bold text-brand-navy tracking-tight">기능 및 유틸리티 액션 아이콘 (Interactive Controls)</h2>
+</div>
+<span class="text-xs text-brand-navy-muted">인풋 필드, 툴바, 팝업 및 컨텍스트 메뉴용</span>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3.5">
+<!-- Action 1: OCR Receipt Scan -->
+<div class="icon-card bg-white p-3.5 rounded-xl border border-surface-border flex flex-col items-center text-center">
+<div class="w-11 h-11 rounded-lg bg-surface-low flex items-center justify-center text-brand-coral mb-2">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
+<path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+<path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
+<path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
+<line x1="7" x2="17" y1="12" y2="12"></line>
+<line x1="7" x2="13" y1="8" y2="8"></line>
+<line x1="7" x2="15" y1="16" y2="16"></line>
+</svg>
+</div>
+<span class="text-xs font-bold text-brand-navy">영수증 스캔 (OCR)</span>
+<span class="text-[10px] text-brand-navy-muted font-mono mt-0.5">tp-scan-receipt</span>
+</div>
+<!-- Action 2: Share / Companion -->
+<div class="icon-card bg-white p-3.5 rounded-xl border border-surface-border flex flex-col items-center text-center">
+<div class="w-11 h-11 rounded-lg bg-surface-low flex items-center justify-center text-brand-navy mb-2">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="18" cy="5" r="3"></circle>
+<circle cx="6" cy="12" r="3"></circle>
+<circle cx="18" cy="19" r="3"></circle>
+<line x1="8.59" x2="15.42" y1="13.51" y2="17.49"></line>
+<line x1="15.41" x2="8.59" y1="6.51" y2="10.49"></line>
+</svg>
+</div>
+<span class="text-xs font-bold text-brand-navy">동행자 공유</span>
+<span class="text-[10px] text-brand-navy-muted font-mono mt-0.5">tp-action-share</span>
+</div>
+<!-- Action 3: Filter & Adjust -->
+<div class="icon-card bg-white p-3.5 rounded-xl border border-surface-border flex flex-col items-center text-center">
+<div class="w-11 h-11 rounded-lg bg-surface-low flex items-center justify-center text-brand-navy mb-2">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<line x1="4" x2="4" y1="21" y2="14"></line>
+<line x1="4" x2="4" y1="10" y2="3"></line>
+<line x1="12" x2="12" y1="21" y2="12"></line>
+<line x1="12" x2="12" y1="8" y2="3"></line>
+<line x1="20" x2="20" y1="21" y2="16"></line>
+<line x1="20" x2="20" y1="12" y2="3"></line>
+<line x1="1" x2="7" y1="14" y2="14"></line>
+<line x1="9" x2="15" y1="8" y2="8"></line>
+<line x1="17" x2="23" y1="16" y2="16"></line>
+</svg>
+</div>
+<span class="text-xs font-bold text-brand-navy">조건 필터</span>
+<span class="text-[10px] text-brand-navy-muted font-mono mt-0.5">tp-action-filter</span>
+</div>
+<!-- Action 4: Checklist -->
+<div class="icon-card bg-white p-3.5 rounded-xl border border-surface-border flex flex-col items-center text-center">
+<div class="w-11 h-11 rounded-lg bg-surface-low flex items-center justify-center text-brand-navy mb-2">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<polyline points="9 11 12 14 22 4"></polyline>
+<path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+</svg>
+</div>
+<span class="text-xs font-bold text-brand-navy">체크리스트</span>
+<span class="text-[10px] text-brand-navy-muted font-mono mt-0.5">tp-action-checklist</span>
+</div>
+<!-- Action 5: Search Pin -->
+<div class="icon-card bg-white p-3.5 rounded-xl border border-surface-border flex flex-col items-center text-center">
+<div class="w-11 h-11 rounded-lg bg-surface-low flex items-center justify-center text-brand-navy mb-2">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="11" cy="11" r="8"></circle>
+<line x1="21" x2="16.65" y1="21" y2="16.65"></line>
+</svg>
+</div>
+<span class="text-xs font-bold text-brand-navy">장소/경로 검색</span>
+<span class="text-[10px] text-brand-navy-muted font-mono mt-0.5">tp-action-search</span>
+</div>
+<!-- Action 6: Lock & Privacy -->
+<div class="icon-card bg-white p-3.5 rounded-xl border border-surface-border flex flex-col items-center text-center">
+<div class="w-11 h-11 rounded-lg bg-surface-low flex items-center justify-center text-brand-navy mb-2">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<rect height="11" rx="2" ry="2" width="18" x="3" y="11"></rect>
+<path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+</svg>
+</div>
+<span class="text-xs font-bold text-brand-navy">비공개 잠금</span>
+<span class="text-[10px] text-brand-navy-muted font-mono mt-0.5">tp-action-lock</span>
+</div>
+</div>
+</section>
+<!-- END: Action & Utility Icons Section -->
+<!-- BEGIN: Status & Feedback Icons Section -->
+<section class="scroll-mt-20" id="status-icons">
+<div class="flex items-center justify-between mb-4">
+<div>
+<span class="text-xs font-bold tracking-wider text-brand-coral uppercase">05 / System Feedback &amp; States</span>
+<h2 class="text-xl font-bold text-brand-navy tracking-tight">상태, 알림 및 피드백 심볼 (Status &amp; Feedback)</h2>
+</div>
+<span class="text-xs text-brand-navy-muted">Semantic Color Matrix 연동</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<!-- Status 1: Success -->
+<div class="bg-white p-4 rounded-xl border border-brand-teal/20 shadow-sm flex items-start gap-3.5">
+<div class="w-9 h-9 rounded-full bg-brand-teal-light text-brand-teal flex-shrink-0 flex items-center justify-center">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24">
+<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+<polyline points="22 4 12 14.01 9 11.01"></polyline>
+</svg>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-2">
+<h4 class="text-xs font-bold text-brand-navy">성공 / 완료 (Success)</h4>
+<span class="text-[9px] font-mono text-brand-teal bg-brand-teal-light px-1.5 rounded">#186779</span>
+</div>
+<p class="text-xs text-brand-navy-muted mt-1 leading-snug">일정 체크 완료, 결제 및 저장 성공 안내 피드백</p>
+</div>
+</div>
+<!-- Status 2: Warning -->
+<div class="bg-white p-4 rounded-xl border border-amber-200 shadow-sm flex items-start gap-3.5">
+<div class="w-9 h-9 rounded-full bg-amber-50 text-amber-600 flex-shrink-0 flex items-center justify-center">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24">
+<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+<line x1="12" x2="12" y1="9" y2="13"></line>
+<line x1="12" x2="12.01" y1="17" y2="17"></line>
+</svg>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-2">
+<h4 class="text-xs font-bold text-brand-navy">주의 / 확인요망 (Warning)</h4>
+<span class="text-[9px] font-mono text-amber-700 bg-amber-100 px-1.5 rounded">#ffc857</span>
+</div>
+<p class="text-xs text-brand-navy-muted mt-1 leading-snug">환승 시간 부족, 기상 악화 및 경로 중복 경고</p>
+</div>
+</div>
+<!-- Status 3: Error / Destructive -->
+<div class="bg-white p-4 rounded-xl border border-brand-coral/20 shadow-sm flex items-start gap-3.5">
+<div class="w-9 h-9 rounded-full bg-brand-coral-light text-brand-coral flex-shrink-0 flex items-center justify-center">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<line x1="15" x2="9" y1="9" y2="15"></line>
+<line x1="9" x2="15" y1="9" y2="15"></line>
+</svg>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-2">
+<h4 class="text-xs font-bold text-brand-navy">오류 / 취소 (Destructive)</h4>
+<span class="text-[9px] font-mono text-brand-coral bg-brand-coral-light px-1.5 rounded">#ff6b57</span>
+</div>
+<p class="text-xs text-brand-navy-muted mt-1 leading-snug">연결 실패, 일정 삭제 및 필수 항목 누락 경보</p>
+</div>
+</div>
+<!-- Status 4: Info -->
+<div class="bg-white p-4 rounded-xl border border-brand-sky/30 shadow-sm flex items-start gap-3.5">
+<div class="w-9 h-9 rounded-full bg-brand-sky-light text-sky-600 flex-shrink-0 flex items-center justify-center">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<line x1="12" x2="12" y1="16" y2="12"></line>
+<line x1="12" x2="12.01" y1="8" y2="8"></line>
+</svg>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-2">
+<h4 class="text-xs font-bold text-brand-navy">안내 / 팁 (Info)</h4>
+<span class="text-[9px] font-mono text-sky-700 bg-sky-100 px-1.5 rounded">#8fd3e8</span>
+</div>
+<p class="text-xs text-brand-navy-muted mt-1 leading-snug">로컬 여행 팁, 시차 알림 및 실시간 가이드 힌트</p>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Status & Feedback Icons Section -->
+<!-- BEGIN: Interactive Icon Finder & SVG Sandbox Section -->
+<section class="scroll-mt-20" id="icon-finder">
+<div class="bg-white rounded-2xl border border-surface-border p-6 shadow-card">
+<!-- Header & Search Toolbar -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-surface-border">
+<div>
+<span class="text-xs font-bold tracking-wider text-brand-coral uppercase">06 / Asset Explorer</span>
+<h2 class="text-xl font-bold text-brand-navy tracking-tight">인터랙티브 아이콘 검색기 및 SVG 토큰 뷰어</h2>
+</div>
+<!-- Search Input -->
+<div class="relative w-full sm:w-72">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-brand-navy-muted">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<input class="w-full pl-9 pr-4 py-2 text-xs bg-surface-low border border-surface-border rounded-lg text-brand-navy placeholder-brand-navy-muted/60 focus:outline-none focus:ring-2 focus:ring-brand-coral focus:border-brand-coral" id="iconSearchInput" placeholder="심볼명 또는 키워드 검색 (예: map, pin, star)..." type="text">
+</div>
+</div>
+<!-- Filter Chips Bar -->
+<div class="flex items-center gap-2 py-4 overflow-x-auto text-xs"><span class="text-brand-navy-muted font-medium mr-1 text-[11px]">카테고리 필터:</span>
+<button class="px-2.5 py-1 rounded-full bg-brand-coral text-white font-semibold" type="button">전체 (All)</button>
+<button class="px-2.5 py-1 rounded-full bg-surface-low border border-surface-border text-brand-navy-muted hover:text-brand-navy" type="button">식음료&amp;미식</button>
+<button class="px-2.5 py-1 rounded-full bg-surface-low border border-surface-border text-brand-navy-muted hover:text-brand-navy" type="button">대중교통&amp;이동</button>
+<button class="px-2.5 py-1 rounded-full bg-surface-low border border-surface-border text-brand-navy-muted hover:text-brand-navy" type="button">숙소&amp;휴식</button>
+<button class="px-2.5 py-1 rounded-full bg-surface-low border border-surface-border text-brand-navy-muted hover:text-brand-navy" type="button">활동&amp;관광</button>
+<button class="px-2.5 py-1 rounded-full bg-surface-low border border-surface-border text-brand-navy-muted hover:text-brand-navy" type="button">액션&amp;유틸리티</button></div>
+<!-- Icon Grid Matrix (Interactive cards) -->
+<div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 pt-2" id="iconGridContainer">
+<!-- Item 1: Bookmark -->
+<div class="icon-item p-3 rounded-lg border border-surface-border hover:border-brand-coral bg-[#fffbf8] hover:bg-white text-center flex flex-col items-center justify-center transition cursor-pointer group" data-name="bookmark 저장">
+<svg class="w-6 h-6 text-brand-navy group-hover:text-brand-coral transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span class="text-[11px] font-medium text-brand-navy mt-2 truncate w-full">bookmark</span>
+</div>
+<!-- Item 2: Calendar -->
+<div class="icon-item p-3 rounded-lg border border-surface-border hover:border-brand-coral bg-[#fffbf8] hover:bg-white text-center flex flex-col items-center justify-center transition cursor-pointer group" data-name="calendar 일정 날짜">
+<svg class="w-6 h-6 text-brand-navy group-hover:text-brand-coral transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect height="18" rx="2" ry="2" width="18" x="3" y="4"></rect><line x1="16" x2="16" y1="2" y2="6"></line><line x1="8" x2="8" y1="2" y2="6"></line><line x1="3" x2="21" y1="10" y2="10"></line></svg>
+<span class="text-[11px] font-medium text-brand-navy mt-2 truncate w-full">calendar</span>
+</div>
+<!-- Item 3: Clock -->
+<div class="icon-item p-3 rounded-lg border border-surface-border hover:border-brand-coral bg-[#fffbf8] hover:bg-white text-center flex flex-col items-center justify-center transition cursor-pointer group" data-name="clock 시간 타임라인">
+<svg class="w-6 h-6 text-brand-navy group-hover:text-brand-coral transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+<span class="text-[11px] font-medium text-brand-navy mt-2 truncate w-full">clock</span>
+</div>
+<!-- Item 4: Sun Weather -->
+<div class="icon-item p-3 rounded-lg border border-surface-border hover:border-brand-coral bg-[#fffbf8] hover:bg-white text-center flex flex-col items-center justify-center transition cursor-pointer group" data-name="sun 맑음 날씨">
+<svg class="w-6 h-6 text-brand-navy group-hover:text-brand-coral transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" x2="12" y1="1" y2="3"></line><line x1="12" x2="12" y1="21" y2="23"></line><line x1="4.22" x2="5.64" y1="4.22" y2="5.64"></line><line x1="18.36" x2="19.78" y1="18.36" y2="19.78"></line><line x1="1" x2="3" y1="12" y2="12"></line><line x1="21" x2="23" y1="12" y2="12"></line><line x1="4.22" x2="5.64" y1="19.78" y2="18.36"></line><line x1="18.36" x2="19.78" y1="5.64" y2="4.22"></line></svg>
+<span class="text-[11px] font-medium text-brand-navy mt-2 truncate w-full">sun-weather</span>
+</div>
+<!-- Item 5: Cloud Rain -->
+<div class="icon-item p-3 rounded-lg border border-surface-border hover:border-brand-coral bg-[#fffbf8] hover:bg-white text-center flex flex-col items-center justify-center transition cursor-pointer group" data-name="cloud-rain 비 날씨">
+<svg class="w-6 h-6 text-brand-navy group-hover:text-brand-coral transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="16" x2="16" y1="13" y2="21"></line><line x1="8" x2="8" y1="13" y2="21"></line><line x1="12" x2="12" y1="15" y2="23"></line><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path></svg>
+<span class="text-[11px] font-medium text-brand-navy mt-2 truncate w-full">cloud-rain</span>
+</div>
+<!-- Item 6: Navigation / Direction -->
+<div class="icon-item p-3 rounded-lg border border-surface-border hover:border-brand-coral bg-[#fffbf8] hover:bg-white text-center flex flex-col items-center justify-center transition cursor-pointer group" data-name="navigation 길찾기 방향">
+<svg class="w-6 h-6 text-brand-navy group-hover:text-brand-coral transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>
+<span class="text-[11px] font-medium text-brand-navy mt-2 truncate w-full">navigation</span>
+</div>
+<!-- Item 7: Tag / Label -->
+<div class="icon-item p-3 rounded-lg border border-surface-border hover:border-brand-coral bg-[#fffbf8] hover:bg-white text-center flex flex-col items-center justify-center transition cursor-pointer group" data-name="tag 해시태그 분류">
+<svg class="w-6 h-6 text-brand-navy group-hover:text-brand-coral transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" x2="7.01" y1="7" y2="7"></line></svg>
+<span class="text-[11px] font-medium text-brand-navy mt-2 truncate w-full">tag-label</span>
+</div>
+<!-- Item 8: Heart / Wish -->
+<div class="icon-item p-3 rounded-lg border border-surface-border hover:border-brand-coral bg-[#fffbf8] hover:bg-white text-center flex flex-col items-center justify-center transition cursor-pointer group" data-name="heart 찜 좋아요 위시리스트">
+<svg class="w-6 h-6 text-brand-coral" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>
+<span class="text-[11px] font-medium text-brand-coral mt-2 truncate w-full">heart-active</span>
+</div>
+<!-- Item 9: Ticket / Pass -->
+<div class="icon-item p-3 rounded-lg border border-surface-border hover:border-brand-coral bg-[#fffbf8] hover:bg-white text-center flex flex-col items-center justify-center transition cursor-pointer group" data-name="ticket 티켓 바우처 패스">
+<svg class="w-6 h-6 text-brand-navy group-hover:text-brand-coral transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"></path><line stroke-dasharray="2 2" x1="13" x2="13" y1="5" y2="19"></line></svg>
+<span class="text-[11px] font-medium text-brand-navy mt-2 truncate w-full">ticket-pass</span>
+</div>
+<!-- Item 10: Luggage / Bag -->
+<div class="icon-item p-3 rounded-lg border border-surface-border hover:border-brand-coral bg-[#fffbf8] hover:bg-white text-center flex flex-col items-center justify-center transition cursor-pointer group" data-name="luggage 캐리어 짐 가방">
+<svg class="w-6 h-6 text-brand-navy group-hover:text-brand-coral transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect height="13" rx="2" width="12" x="6" y="7"></rect><path d="M9 7V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v3"></path><circle cx="9" cy="20" r="1"></circle><circle cx="15" cy="20" r="1"></circle></svg>
+<span class="text-[11px] font-medium text-brand-navy mt-2 truncate w-full">luggage</span>
+</div>
+<!-- Item 11: Route / Path -->
+<div class="icon-item p-3 rounded-lg border border-surface-border hover:border-brand-coral bg-[#fffbf8] hover:bg-white text-center flex flex-col items-center justify-center transition cursor-pointer group" data-name="route 경로 동선 발자국">
+<svg class="w-6 h-6 text-brand-navy group-hover:text-brand-coral transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="6" cy="19" r="3"></circle><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"></path><circle cx="18" cy="5" r="3"></circle></svg>
+<span class="text-[11px] font-medium text-brand-navy mt-2 truncate w-full">route-path</span>
+</div>
+<!-- Item 12: Bell / Notification -->
+<div class="icon-item p-3 rounded-lg border border-surface-border hover:border-brand-coral bg-[#fffbf8] hover:bg-white text-center flex flex-col items-center justify-center transition cursor-pointer group" data-name="bell 알림 푸시">
+<svg class="w-6 h-6 text-brand-navy group-hover:text-brand-coral transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+<span class="text-[11px] font-medium text-brand-navy mt-2 truncate w-full">bell-notice</span>
+</div>
+<!-- Item 13: Sliders / Option -->
+<div class="icon-item p-3 rounded-lg border border-surface-border hover:border-brand-coral bg-[#fffbf8] hover:bg-white text-center flex flex-col items-center justify-center transition cursor-pointer group" data-name="sliders 세부설정 옵션">
+<svg class="w-6 h-6 text-brand-navy group-hover:text-brand-coral transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="4" x2="4" y1="21" y2="14"></line><line x1="4" x2="4" y1="10" y2="3"></line><line x1="12" x2="12" y1="21" y2="12"></line><line x1="12" x2="12" y1="8" y2="3"></line><line x1="20" x2="20" y1="21" y2="16"></line><line x1="20" x2="20" y1="12" y2="3"></line><line x1="1" x2="7" y1="14" y2="14"></line><line x1="9" x2="15" y1="8" y2="8"></line><line x1="17" x2="23" y1="16" y2="16"></line></svg>
+<span class="text-[11px] font-medium text-brand-navy mt-2 truncate w-full">sliders</span>
+</div>
+<!-- Item 14: Refresh / Sync -->
+<div class="icon-item p-3 rounded-lg border border-surface-border hover:border-brand-coral bg-[#fffbf8] hover:bg-white text-center flex flex-col items-center justify-center transition cursor-pointer group" data-name="refresh 새로고침 동기화">
+<svg class="w-6 h-6 text-brand-navy group-hover:text-brand-coral transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+<span class="text-[11px] font-medium text-brand-navy mt-2 truncate w-full">refresh-sync</span>
+</div>
+<!-- Item 15: Map Pin / Marker -->
+<div class="icon-item p-3 rounded-lg border border-surface-border hover:border-brand-coral bg-[#fffbf8] hover:bg-white text-center flex flex-col items-center justify-center transition cursor-pointer group" data-name="map-pin 장소 마커">
+<svg class="w-6 h-6 text-brand-coral" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+<span class="text-[11px] font-medium text-brand-coral mt-2 truncate w-full">map-pin</span>
+</div>
+<!-- Item 16: Star / Rating -->
+<div class="icon-item p-3 rounded-lg border border-surface-border hover:border-brand-coral bg-[#fffbf8] hover:bg-white text-center flex flex-col items-center justify-center transition cursor-pointer group" data-name="star 별점 평점 추천">
+<svg class="w-6 h-6 text-brand-yellow fill-current" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+<span class="text-[11px] font-medium text-brand-navy mt-2 truncate w-full">star-rating</span>
+</div>
+</div>
+<!-- Token Reference Code Snippet -->
+<div class="mt-6 p-4 rounded-xl bg-surface-low border border-surface-border flex flex-col sm:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-brand-navy flex items-center justify-center text-white text-xs font-mono">
+              &lt;/&gt;
+            </div>
+<div>
+<div class="text-xs font-bold text-brand-navy">React / Vue / Flutter Icon Component Usage</div>
+<div class="text-[11px] font-mono text-brand-navy-muted">import { IconHome, IconMapPin, IconFlight } from '@tripprint/icons-react';</div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<code class="px-2.5 py-1 text-[11px] font-mono bg-white border border-surface-border rounded text-brand-coral">
+              &lt;IconMapPin size={24} color="var(--color-primary)" /&gt;
+            </code>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Interactive Icon Finder & SVG Sandbox Section -->
+</main>
+<!-- END: Main Content Area -->
+<!-- BEGIN: Footer -->
+<footer class="mt-auto border-t border-surface-border bg-white py-8">
+<div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-brand-navy-muted">
+<div class="flex items-center gap-2">
+<span class="font-bold text-brand-navy">TripPrint Design System v2.4</span>
+<span class="">•</span>
+<span class="">Iconography &amp; Symbols Specification</span>
+<span class="">•</span>
+<span class="">All rights reserved.</span>
+</div>
+<div class="flex items-center gap-4 font-medium">
+<a class="hover:text-brand-coral transition-colors" href="#">디자인 토큰</a>
+<a class="hover:text-brand-coral transition-colors" href="#">Figma 라이브러리</a>
+<a class="hover:text-brand-coral transition-colors" href="#">GitHub Repository</a>
+<a class="hover:text-brand-coral transition-colors" href="#">버그 리포트</a>
+</div>
+</div>
+</footer>
+<!-- END: Footer -->
+<!-- BEGIN: Interactive Icon Search Filter Logic -->
+<script data-purpose="icon-search-filter">
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('iconSearchInput');
+      const iconItems = document.querySelectorAll('.icon-item');
+
+      if (!searchInput) return;
+
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+
+        iconItems.forEach((item) => {
+          const metaName = item.getAttribute('data-name')?.toLowerCase() || '';
+          if (metaName.includes(query) || query === '') {
+            item.style.display = 'flex';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+    });
+  </script>
+<!-- END: Interactive Icon Search Filter Logic -->
+
+
+</body></html>

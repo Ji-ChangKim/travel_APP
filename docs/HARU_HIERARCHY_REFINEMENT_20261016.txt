@@ -1,0 +1,63 @@
+TripPrint · 행동과 탐색 위계 개선
+2026-10-16
+
+변경 사항
+1. 홈: 이어갈 여행의 ‘여행 보기’만 코랄로 강조. ‘새 여행 만들기’는 보조 버튼.
+2. 내 여행: ‘새 여행 만들기’만 주요 버튼. 카드 열기는 작은 링크형 버튼. 대표 카드의 코랄 상단 선 제거.
+3. 여행 상세: 일정·지도·비용·더보기 네 개 메뉴. 사진·영수증, 준비물, 동행, 발자국 공유는 공통 바텀시트에서 선택. 공유 관리의 소유자 제한 유지.
+4. 일정: 고정 4분할 도구 바 제거. 본문의 ‘일정 추가’만 주요 버튼. 빈 날짜의 직접 추가·숙소·식사·관광 추천은 보조 스타일로 표시해 전체 날짜에서도 강조가 반복되지 않음.
+5. 상단 ‘동행 보기’ 중복 제거. 인원·역할은 한 번 표시하고 동행 관리는 더보기에서 접근.
+6. 촬영·앨범은 기존 사진·영수증 영역과 일정 편집에서 제공. 저장·파일 선택 경로 유지.
+7. ScreenHeader: 최소 56px, 뒤로가기 터치 44px, 화살표 24px, 제목 18/26px. 목록·상세·여행 생성·항공권 입력에 적용. 큰 글자는 제목 줄 분리.
+8. travelDateRange: YYYY-MM-DD – YYYY-MM-DD로 통일. 홈·목록·상세·발자국·다이어리·커뮤니티·여행지 탐색·공개 미리보기에서 공유.
+9. 디자인 토큰에 한 화면 주요 버튼 최대 1개, 상세 메뉴 4개, 헤더·날짜 규격을 기록.
+10. 하루·코랄·네이비·아이보리, Pretendard와 기존 눌림·초점·비활성 상태 유지.
+
+수정 파일
+apps/mobile/src/components/ScreenHeader.tsx
+apps/mobile/src/features/workspace/TripSectionNavigation.tsx
+apps/mobile/src/features/workspace/travelDateRange.ts
+같은 폴더: WorkspaceScreen, TravelPlansScreen, travelPlansStyles, HomeScreen, HomeTripList, TripTimeline, TripPlanningFlow, FlightTicketEditor
+같은 폴더: FootprintsScreen, CommunityScreen, DiaryScreen, HomeExplore, ImportPlaceScreen, PublishSelection
+문서: docs/design/design-tokens.json, docs/design/DESIGN.md
+검사: tests/web/workspace.spec.ts, playwright.haru-hierarchy.config.ts
+
+검수
+- 세 화면 폭 360·390·430px 및 글자 두 배 검사 3개 통과.
+- 빈 일정·전체 날짜의 주요 행동 검사 1개 통과.
+- 단일 주요 버튼, 고정 네 메뉴, 헤더 56px·터치 44px, 본문 높이 680px 이상, 날짜 표기 확인.
+- 실제 단색 배경 글자 대비 4.5:1 이상, 일반 정보 14px 이상 검사. 내비게이션은 13px 기준.
+- 웹 정적 화면 29개 생성, Android Hermes 번들 생성 완료.
+- 비교 페이지: outputs/haru-hierarchy/review.html
+- 실제 iOS·Android 기기 검수는 하지 않음. 화면 데이터는 검수용 HTTP 응답.
+- 이번 UI 위계 수정에는 DB·API 계약 변경이 없음. 같은 작업 공간의 여행 단계 판별·공통 시트 변경은 보존.
+
+전체 검사에서 발견한 문서 포맷
+아래 파일은 내용을 다시 쓰지 않고 Prettier 형식만 정리했다. 일부는 검사 중 다른 작업에서 이미 정리되어 변경이 없었다.
+- docs/0.PRD/TripPrint_신사업계획서_및_PRD.md
+- docs/1.uiux/HOME_ONBOARDING_SCREEN_SPEC.md
+- docs/1.uiux/ITINERARY_SCHEDULE_SCREEN_SPEC.md
+- docs/전략기획서/README.md
+- docs/ANDROID_GITHUB_BUILD.md
+- docs/APP_SERVICES_SETUP.md
+- docs/DEPLOYMENT.md
+- docs/design/SCHEDULE_RELEASE.md
+- docs/DEVELOPMENT_SETUP.md
+- docs/ERROR_CODE_SPEC.md
+- docs/GOOGLE_MAPS_SETUP.md
+- docs/planning/API_CONTRACT.md
+- docs/planning/DATA_STORAGE_SPEC.md
+- docs/planning/PLANNING_PROCESS.md
+- docs/planning/POLICY_DECISIONS.md
+- docs/planning/QA_ACCEPTANCE.md
+- docs/planning/TRAIL_CONTENT_SPEC.md
+- docs/SOCIAL_AUTH_SETUP.md
+
+회귀 검사 결과
+- e2e-regression.log: 지도·비용·준비물·동행·삭제 확인·항공권 등 15개 통과.
+- e2e-final.log: 최신 공통 시트를 반영한 뒤 여행 생성·일정 편집·입력 거부·충돌 복구와 화면 위계 8개 통과.
+- 합계 중복 없는 23개 항목 통과. 이전 번들에서 시트의 접근성 이름이 빠져 실패한 4개는 최신 번들에서 다시 확인했다.
+- gallery-check.json: 세 화면 폭과 확대 화면의 이미지 요청 실패 0개.
+
+최종 전체 검사: npm run check 통과(TypeScript·ESLint·Prettier). 결과: outputs/haru-hierarchy/check-complete.log
+

@@ -1,0 +1,1596 @@
+{
+  "capturedAt": "2026-10-14T03:19:09.342Z",
+  "viewport": "모바일 웹 390x844 / Android 원본 1080x2400",
+  "platform": "최신 로컬 앱의 모바일 웹 + Android 네이티브 보충 촬영",
+  "source": "로컬 촬영 전용 빌드. 실제 앱 UI와 사용자 입력. 인증·외부 API는 격리된 검증 응답. 실제 계정이나 서버 데이터 변경 없음.",
+  "nativeOnly": "Android 권한 안내·운영체제 알림/위치 요청·지도·지도 위치 선택·시간 선택 보충. 시스템 카메라/앨범과 외부 Google 계정 화면은 앱 페이지 범위 밖.",
+  "shots": [
+    {
+      "name": "00_앱실행",
+      "file": "00_앱실행.png",
+      "route": "/",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "1d6c84b1baecad24ffd2dde742bfdb0ed1f4a5bc88cc0eae1b059a7a323bec52"
+    },
+    {
+      "name": "01_앱로딩",
+      "file": "01_앱로딩.png",
+      "route": "/",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "cbeb403106350f729694300495295a2a2356886824debc7b9c5b089350d5c7e4"
+    },
+    {
+      "name": "02_로그인",
+      "file": "02_로그인.png",
+      "route": "/login",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "6b1b2eaf5f346117fd19b00ed027ad3f9e5f5c42950f3d838fdd47dcc4f51601"
+    },
+    {
+      "name": "03_이메일로그인",
+      "file": "03_이메일로그인.png",
+      "route": "/login",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "23b5d1b5b2fc3ca60a9c7ce8e43bcfd99a6a03e3f1c77db521b769179a99b5c4"
+    },
+    {
+      "name": "04_회원가입",
+      "file": "04_회원가입.png",
+      "route": "/login",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "c372537e8a95bd72c0ffd53db48ce5f626cd4292da4bea4b93ddd5a79f535abb"
+    },
+    {
+      "name": "05_프로필생성",
+      "file": "05_프로필생성.png",
+      "route": "/profile-setup",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "b7a57d43f85e2308554e5a32b2bcbe933f2348449f22a7b028c397fe217163c3"
+    },
+    {
+      "name": "06_메인홈",
+      "file": "06_메인홈.png",
+      "route": "/",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "60bb52fa29cc48546ca1c77872e8ef519b91f3c74b8168451cefaf9d9559e5c8"
+    },
+    {
+      "name": "06_메인홈",
+      "file": "06_메인홈_스크롤02.png",
+      "route": "/",
+      "scroll": 673,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "30818082c32287113bfcc35de1271a5592034a763094159553d800086c4b9e19"
+    },
+    {
+      "name": "06_메인홈",
+      "file": "06_메인홈_스크롤03.png",
+      "route": "/",
+      "scroll": 1042,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "56f44e37c1289c53e3a268c8f286661a6f97fd1a07de2169d2bc1eef3bec83c7"
+    },
+    {
+      "name": "07_내여행계획_빈목록",
+      "file": "07_내여행계획_빈목록.png",
+      "route": "/plans",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "5ab869384c654873a14c66092791f0bad92a428bb16b197eb975ad5c4cc27836"
+    },
+    {
+      "name": "08_여행계획생성",
+      "file": "08_여행계획생성.png",
+      "route": "/new-trip",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "1937323175f14a18752d496073959e1d5475c16e21de2b8e6ec790b2472e5e95"
+    },
+    {
+      "name": "08_여행계획생성",
+      "file": "08_여행계획생성_스크롤02.png",
+      "route": "/new-trip",
+      "scroll": 98,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "4f4ee950bb258b63a9ed8267f376742ffc66e1fd7cdc210887e6155c7ee23556"
+    },
+    {
+      "name": "09_나라선택",
+      "file": "09_나라선택.png",
+      "route": "/new-trip",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "87ed22069738f1774da2450de6fd4e471561b480b650bd9f55c70fa64b0ebe76"
+    },
+    {
+      "name": "09_나라선택",
+      "file": "09_나라선택_스크롤02.png",
+      "route": "/new-trip",
+      "scroll": 673,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "2396ddb5e8f34d4b14c45f27191dee11739c985c5a7728450281b2a3a67a7c43"
+    },
+    {
+      "name": "09_나라선택",
+      "file": "09_나라선택_스크롤03.png",
+      "route": "/new-trip",
+      "scroll": 1181,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "876266628939f9412f6332e798ad239129257b16f3f8342a272c5e8bb83f58cc"
+    },
+    {
+      "name": "09_나라선택",
+      "file": "09_나라선택_스크롤04.png",
+      "route": "/new-trip",
+      "scroll": 1689,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "7dcc2607b21ac26b4d48faef3d5effb6e8646739eb2a01bd21f44f52b5a2f755"
+    },
+    {
+      "name": "09_나라선택",
+      "file": "09_나라선택_스크롤05.png",
+      "route": "/new-trip",
+      "scroll": 2197,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "49160e08a716c5ae6a35068b50f5b663ab839a429da3831dbe55e9c8662dbb8a"
+    },
+    {
+      "name": "09_나라선택",
+      "file": "09_나라선택_스크롤06.png",
+      "route": "/new-trip",
+      "scroll": 2705,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "f771dd59691b32d419faefa82143e1e4f5c7cb85685df8dfacbd369dd77068de"
+    },
+    {
+      "name": "09_나라선택",
+      "file": "09_나라선택_스크롤07.png",
+      "route": "/new-trip",
+      "scroll": 3213,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "c0a0c4557e1f7b53b61ebe75062bebb4a4be2840c3245a0f169e84f90a35b2b2"
+    },
+    {
+      "name": "09_나라선택",
+      "file": "09_나라선택_스크롤08.png",
+      "route": "/new-trip",
+      "scroll": 3721,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "74d3eef4e856c91ef16796297635fd2b8c11338393a879205f5cc46290ba6c6c"
+    },
+    {
+      "name": "09_나라선택",
+      "file": "09_나라선택_스크롤09.png",
+      "route": "/new-trip",
+      "scroll": 4229,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "a436c698a65720d7ceb9b8ff2c6079fb684db97c088d58917b96ff88176740b4"
+    },
+    {
+      "name": "09_나라선택",
+      "file": "09_나라선택_스크롤10.png",
+      "route": "/new-trip",
+      "scroll": 4737,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "f536e8b9de258db6ffe9f780e712a995cab19f4a7b13e41fbf20a4d64998839d"
+    },
+    {
+      "name": "09_나라선택",
+      "file": "09_나라선택_스크롤11.png",
+      "route": "/new-trip",
+      "scroll": 5245,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "92c5519836d41ce1830989dcaf3c1222cb006d66ea96cbe2003f6ce4b64ae35d"
+    },
+    {
+      "name": "09_나라선택",
+      "file": "09_나라선택_스크롤12.png",
+      "route": "/new-trip",
+      "scroll": 5753,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "6f4f198b3a73abc80eb4d620769f1e3a1c9863722e91c55395ce8273f5dd40cc"
+    },
+    {
+      "name": "09_나라선택",
+      "file": "09_나라선택_스크롤13.png",
+      "route": "/new-trip",
+      "scroll": 6261,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "63f1d62ee97765f7d8dccc994a238bf654d884c7f69eba7de6877e125a4f6b57"
+    },
+    {
+      "name": "09_나라선택",
+      "file": "09_나라선택_스크롤14.png",
+      "route": "/new-trip",
+      "scroll": 6769,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "6d7dcb1bab99d4913339a00e478a704d6990efce46d0088f018cebc627c7f2c8"
+    },
+    {
+      "name": "09_나라선택",
+      "file": "09_나라선택_스크롤15.png",
+      "route": "/new-trip",
+      "scroll": 7277,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "7c458960ed48b666d2486dd44d0d9ca3d10a014a2f71962b05c6aecb9d84b92e"
+    },
+    {
+      "name": "09_나라선택",
+      "file": "09_나라선택_스크롤16.png",
+      "route": "/new-trip",
+      "scroll": 7785,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "cc26c73cb5b9a75a0ad74ef2a4db58e7a1cd5237e63b9e3d0598f8e8de0acdd0"
+    },
+    {
+      "name": "09_나라선택",
+      "file": "09_나라선택_스크롤17.png",
+      "route": "/new-trip",
+      "scroll": 8293,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "76ee9733f59bc5c29582c3cd8d78afc22d9c7a0315d25ca45640208a1834ef6b"
+    },
+    {
+      "name": "09_나라선택",
+      "file": "09_나라선택_스크롤18.png",
+      "route": "/new-trip",
+      "scroll": 8801,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "2ab32b3d43b94415b08831c2a0146fca085a4da3295388e59bc56e243be6525e"
+    },
+    {
+      "name": "09_나라선택",
+      "file": "09_나라선택_스크롤19.png",
+      "route": "/new-trip",
+      "scroll": 9309,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "a284c7398ba542d003de4936aec9eebba25c898f0514d1bcd682ae0b14bada2b"
+    },
+    {
+      "name": "09_나라선택",
+      "file": "09_나라선택_스크롤20.png",
+      "route": "/new-trip",
+      "scroll": 9817,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "88059902ba94d6f5c13f4b31e149b378e0f8f5527e92e8530bfe920f9dc96338"
+    },
+    {
+      "name": "10_도시선택",
+      "file": "10_도시선택.png",
+      "route": "/new-trip",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "a96d3b5662a16ac5925796922762a070cf077fd121b3500d7db617e192f2c196"
+    },
+    {
+      "name": "10_도시선택",
+      "file": "10_도시선택_스크롤02.png",
+      "route": "/new-trip",
+      "scroll": 260,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "389f3fbba938b72dca93b0b5a077a5da6b5f2618c9dabb946dc11d6337ffdb1f"
+    },
+    {
+      "name": "11_도시직접입력",
+      "file": "11_도시직접입력.png",
+      "route": "/new-trip",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "5a0cdc782dd0fbcd3f741fc1250893624e2d599dcd7c39bd8adf02e12811b0f0"
+    },
+    {
+      "name": "12_여행날짜선택",
+      "file": "12_여행날짜선택.png",
+      "route": "/new-trip",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "76d05348f58ea89fa4e39fe26d5be3f46c76f0e79f43505469dbfae0d611765f"
+    },
+    {
+      "name": "12_여행날짜선택",
+      "file": "12_여행날짜선택_스크롤02.png",
+      "route": "/new-trip",
+      "scroll": 126,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "7b41c500deae4f15cf2c2d3b3a6a7b6fd01576c7bc71a62f04859b2f39cface7"
+    },
+    {
+      "name": "13_여행계획생성_항공편단계",
+      "file": "13_여행계획생성_항공편단계.png",
+      "route": "/new-trip",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "8bef89c95b116a5963ec2ddc9a95f808169f3f92ab78d87da39957be6b552887"
+    },
+    {
+      "name": "14_항공편입력",
+      "file": "14_항공편입력.png",
+      "route": "/new-trip",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "b37e2e16a3ed34e5f42acdf4257498861cea6349f795aed06014b15d24985aa5"
+    },
+    {
+      "name": "14_항공편입력",
+      "file": "14_항공편입력_스크롤02.png",
+      "route": "/new-trip",
+      "scroll": 673,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "ade3ba1c2fc1957de793e70beacac7de28edf0d9a76bcdd5e291fff830b4331c"
+    },
+    {
+      "name": "14_항공편입력",
+      "file": "14_항공편입력_스크롤03.png",
+      "route": "/new-trip",
+      "scroll": 1031,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "ddd82de1a2604c106a08475701aa9c527240abf80a7adbffd5acfba98f138b51"
+    },
+    {
+      "name": "15_일정관리_항공편",
+      "file": "15_일정관리_항공편.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "878929c24fbef9ed8fe5a015e8b6b4f1a1200a52fb75c809fc28cb9e58256027"
+    },
+    {
+      "name": "15_일정관리_항공편",
+      "file": "15_일정관리_항공편_스크롤02.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 292,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "a6f190bed8b2e015f55a4bf699a2150fb7a291854b588aa552c5398dda6142b9"
+    },
+    {
+      "name": "16_항공편정보보기",
+      "file": "16_항공편정보보기.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "2b7c9502200beb2d88fe9fe8d9f4fb01596355d16a10788f0006a4f7ae4a6cd5"
+    },
+    {
+      "name": "16_항공편정보보기",
+      "file": "16_항공편정보보기_스크롤02.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 399,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "c678bb951a7d226f11e83d1d554620f493ab46e747f9706b2248fb251bc2f891"
+    },
+    {
+      "name": "17_항공편정보_전체펼침",
+      "file": "16_항공편정보보기.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "2b7c9502200beb2d88fe9fe8d9f4fb01596355d16a10788f0006a4f7ae4a6cd5"
+    },
+    {
+      "name": "17_항공편정보_전체펼침",
+      "file": "17_항공편정보_전체펼침_스크롤02.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 479,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "9874568ce5c598326ebc9ca8af7c688fa40bff1845c1467cb68eeb8ecad26ccc"
+    },
+    {
+      "name": "18_일정관리_빈날짜",
+      "file": "18_일정관리_빈날짜.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "d389a3ada5859fef424c3129a8bd102f4116a69b9e47ea611b7bc9b5a83d91e3"
+    },
+    {
+      "name": "19_일정추가",
+      "file": "19_일정추가.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "8fa7a1ad96a98a9ffe59ff86dc3732eb5985f9fde2bd252f2f33f543603fbd4c"
+    },
+    {
+      "name": "19_일정추가",
+      "file": "19_일정추가_스크롤02.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 673,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "5c577f09ed35339950a0bf087e0b600d29460858703c188e4a1fb331e303a899"
+    },
+    {
+      "name": "19_일정추가",
+      "file": "19_일정추가_스크롤03.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 1346,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "c9b40292ef227979b7a499d95e249d68b3319af67ee71430c7487e4a90cfcefb"
+    },
+    {
+      "name": "19_일정추가",
+      "file": "19_일정추가_스크롤04.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 1395,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "905483f6e36d240133f589927b38faa3c762e1656856e58a52f52e3e40afa04a"
+    },
+    {
+      "name": "20_구글장소검색",
+      "file": "20_구글장소검색.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "1c2eb8e115c2980a7eebbf28947ff127b8df2d64623e0b8fa3f1f3edf34713eb"
+    },
+    {
+      "name": "20_구글장소검색",
+      "file": "19_일정추가_스크롤02.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 673,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "5c577f09ed35339950a0bf087e0b600d29460858703c188e4a1fb331e303a899"
+    },
+    {
+      "name": "20_구글장소검색",
+      "file": "19_일정추가_스크롤03.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 1346,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "c9b40292ef227979b7a499d95e249d68b3319af67ee71430c7487e4a90cfcefb"
+    },
+    {
+      "name": "20_구글장소검색",
+      "file": "19_일정추가_스크롤04.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 1395,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "905483f6e36d240133f589927b38faa3c762e1656856e58a52f52e3e40afa04a"
+    },
+    {
+      "name": "21_구글지도공유링크확인",
+      "file": "21_구글지도공유링크확인.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "c1c09d40497a8ba2ac5a4ddd6c17465d76256fbd914d59105969c604357ea888"
+    },
+    {
+      "name": "21_구글지도공유링크확인",
+      "file": "21_구글지도공유링크확인_스크롤02.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 673,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "e5f32240717624c895e3015bc6ed1ee6cd9509a8d0060acd8755c42698935445"
+    },
+    {
+      "name": "21_구글지도공유링크확인",
+      "file": "21_구글지도공유링크확인_스크롤03.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 1346,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "6b707bc229eba17d7e2f12edf113af89c6e0d852be9dd8b6239b9db2e97ce8a9"
+    },
+    {
+      "name": "21_구글지도공유링크확인",
+      "file": "19_일정추가_스크롤04.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 1485,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "905483f6e36d240133f589927b38faa3c762e1656856e58a52f52e3e40afa04a"
+    },
+    {
+      "name": "22_일정입력",
+      "file": "21_구글지도공유링크확인.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "c1c09d40497a8ba2ac5a4ddd6c17465d76256fbd914d59105969c604357ea888"
+    },
+    {
+      "name": "22_일정입력",
+      "file": "22_일정입력_스크롤02.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 673,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "3e0b3cd3ecbe4556464c90713a18fddbc4056b3e0436f083c78d585788f7b4bc"
+    },
+    {
+      "name": "22_일정입력",
+      "file": "22_일정입력_스크롤03.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 1346,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "13268ecb63729ef5e2a849bf35a0852c25fe603906df7f6faa1535c3599dfb03"
+    },
+    {
+      "name": "22_일정입력",
+      "file": "22_일정입력_스크롤04.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 1488,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "d2bb89297eef95a6833009a96d4a9d35dea5684ff004363e30a28550a726dc59"
+    },
+    {
+      "name": "23_일정관리_장소등록",
+      "file": "23_일정관리_장소등록.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "460c5d9cd72ad8d9a9d8e2155ba6f58b7a1aade06b7dcf95194c0ddb529d2701"
+    },
+    {
+      "name": "23_일정관리_장소등록",
+      "file": "23_일정관리_장소등록_스크롤02.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 406,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "5af103a6aca5f8bdbaa0b67d797edafe1393df7fa0e260a93d687dc3d2cd15f9"
+    },
+    {
+      "name": "24_일정관리메뉴",
+      "file": "23_일정관리_장소등록.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "460c5d9cd72ad8d9a9d8e2155ba6f58b7a1aade06b7dcf95194c0ddb529d2701"
+    },
+    {
+      "name": "24_일정관리메뉴",
+      "file": "24_일정관리메뉴_스크롤02.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 600,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "1b3e3b27fe153eb4e60c643b92dd266011eae8a568745a2f41862cb781d105e4"
+    },
+    {
+      "name": "24_일정관리메뉴",
+      "file": "24_일정관리메뉴_스크롤03.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 622,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "f88182b058cdd329339a27093371d00e530b8a4dbf076f43c2f9142f11e7c66a"
+    },
+    {
+      "name": "25_일정수정",
+      "file": "19_일정추가.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "8fa7a1ad96a98a9ffe59ff86dc3732eb5985f9fde2bd252f2f33f543603fbd4c"
+    },
+    {
+      "name": "25_일정수정",
+      "file": "25_일정수정_스크롤02.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 673,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "86cbd4a2c9cdf419999d37ba171e8d4f0b43d467008f79507054c1e126093f32"
+    },
+    {
+      "name": "25_일정수정",
+      "file": "25_일정수정_스크롤03.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 1346,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "db305e6d8b38167615a1e2082ce230c9863ab3ca43a5395c8d905991ffb8dd8f"
+    },
+    {
+      "name": "25_일정수정",
+      "file": "25_일정수정_스크롤04.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 1398,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "a19ecb04bd5c1504db9dfe409b3f7f2bef74f9c19d4930dd8786bb323947065d"
+    },
+    {
+      "name": "26_여행지도",
+      "file": "26_여행지도.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "dbe4ed70fb3571de07e18f4c88db1193d10ee2b6cb6589571ad50e8777c2cc1c"
+    },
+    {
+      "name": "26_여행지도",
+      "file": "26_여행지도_스크롤02.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 175,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "2f6911c17608dc491b6e47623d66b2e5299b641b9949addeb94fd4a0b37d44d4"
+    },
+    {
+      "name": "27_일정지도위치선택",
+      "file": "27_일정지도위치선택.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "1991e456b3e4789659eabccc01c952f834ce51f3f012c549742669b00d8d4a09"
+    },
+    {
+      "name": "27_일정지도위치선택",
+      "file": "27_일정지도위치선택_스크롤02.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 673,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "ed349232ca88197602cd744a84a9b91ce2dfc4f020034e6737ad85684caff917"
+    },
+    {
+      "name": "27_일정지도위치선택",
+      "file": "27_일정지도위치선택_스크롤03.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 1346,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "1149790da6483fe48cf8619bb848af669479c5bc7d78f72aa33ae3ca3a87c392"
+    },
+    {
+      "name": "27_일정지도위치선택",
+      "file": "27_일정지도위치선택_스크롤04.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 2019,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "a3ccec9d06c654267169b33e2759d14fcb2e64ea6fb44d945a98af4eddbfceac"
+    },
+    {
+      "name": "27_일정지도위치선택",
+      "file": "27_일정지도위치선택_스크롤05.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 2301,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "77dd59e66442b05d47c386db7478ab8a072a631d26b95a0eae35f3f7c07831a9"
+    },
+    {
+      "name": "28_여행비용_빈목록",
+      "file": "28_여행비용_빈목록.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "d7ccd63c83db4aa59a0a9d84637862c8288c08cee1f23c3d9e7343706fddf787"
+    },
+    {
+      "name": "29_비용추가",
+      "file": "29_비용추가.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "5ced4f156cf53487912dc866911e662c155dbde625c75a9e31870e993d06ac2a"
+    },
+    {
+      "name": "30_여행비용",
+      "file": "30_여행비용.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "eb7eeb176fb71fc4d0a5e13ef07b9576849d41feb8c9b9607f1a1e651d673d21"
+    },
+    {
+      "name": "31_비용수정",
+      "file": "31_비용수정.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "80bc10ac53454393ad2f31bb64ba6948934f37e443cdcb5ba7f3d5ab5775ee34"
+    },
+    {
+      "name": "32_사진영수증_빈목록",
+      "file": "32_사진영수증_빈목록.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "8dba08f23f54f52aaa77e1007978326136f11bf9d5dfb9b6b0c1cfcc6c5f3387"
+    },
+    {
+      "name": "33_영수증촬영안내",
+      "file": "33_영수증촬영안내.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "e973e1fe6c50862a963d6fe5b3d46840c9152aa01a34a08f0a3651eb2bae5736"
+    },
+    {
+      "name": "33_영수증촬영안내",
+      "file": "33_영수증촬영안내_스크롤02.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 38,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "aa68df73cbb04b58f396dfeb3b12d456055d3a951ac2ede2a6a5c29286253e7c"
+    },
+    {
+      "name": "34_영수증인식중",
+      "file": "34_영수증인식중.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "36118817597a59a3432823bbde7f6d5e5157186e20acaaa0b9f9d556296ead6c"
+    },
+    {
+      "name": "35_영수증인식확인",
+      "file": "35_영수증인식확인.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "f44d587b92fb343093aa0368e2abb3cd89c6bba61a0e870b2f0ad3326910a507"
+    },
+    {
+      "name": "35_영수증인식확인",
+      "file": "35_영수증인식확인_스크롤02.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 673,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "41ede2bd103e3a99b58461e1ec8cad349d5f2825981c28888d3a3b5dc62c8f03"
+    },
+    {
+      "name": "35_영수증인식확인",
+      "file": "35_영수증인식확인_스크롤03.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 727,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "a9bc8c6fa3d506b2f137f1f707e3ae5c66341ef1455484b3347ecdb87dcc96b8"
+    },
+    {
+      "name": "36_영수증정보수정",
+      "file": "36_영수증정보수정.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "41cdd2ea491be2c0e45ac9ee5246f69dbfa58926d7bf1a99775b6cbc0d5d9780"
+    },
+    {
+      "name": "36_영수증정보수정",
+      "file": "36_영수증정보수정_스크롤02.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 673,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "0180f4547a2494ebc67241bb5a5d126bcfa606756c2584a4ba590c6850ffd487"
+    },
+    {
+      "name": "36_영수증정보수정",
+      "file": "36_영수증정보수정_스크롤03.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 1346,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "5db329168f389709a1939720d65ef851164dd7ecbcdacf5a46438a4713e7be1b"
+    },
+    {
+      "name": "36_영수증정보수정",
+      "file": "36_영수증정보수정_스크롤04.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 2019,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "c73be0add2fe00947d579f9cacb8be102cbdce775cf2673a4b1a4b379250f689"
+    },
+    {
+      "name": "36_영수증정보수정",
+      "file": "36_영수증정보수정_스크롤05.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 2315,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "9545fe9d3db5bf82a459410368dccb82ce3e552d861b3bd77a75273a61f60063"
+    },
+    {
+      "name": "37_영수증사진보관선택",
+      "file": "35_영수증인식확인.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "f44d587b92fb343093aa0368e2abb3cd89c6bba61a0e870b2f0ad3326910a507"
+    },
+    {
+      "name": "37_영수증사진보관선택",
+      "file": "37_영수증사진보관선택_스크롤02.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 673,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "2440504971202d33faabec240b738b0f9538c1845a31b8635770ca6bbadffb66"
+    },
+    {
+      "name": "37_영수증사진보관선택",
+      "file": "37_영수증사진보관선택_스크롤03.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 1010,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "364c032f1005b811890f715fa53f506d926ed3178bdfbc798288e37faebf020e"
+    },
+    {
+      "name": "38_사진영수증_등록완료",
+      "file": "38_사진영수증_등록완료.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "63082e7ca3ed60bf49846590adbda693e076fd461cf4fe4c8423a1493928234a"
+    },
+    {
+      "name": "38_사진영수증_등록완료",
+      "file": "38_사진영수증_등록완료_스크롤02.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 142,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "d5156be5abd182efe8643c5288b2220e4b6f6d226688910eeb801fa9a455310d"
+    },
+    {
+      "name": "39_여행설정",
+      "file": "39_여행설정.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "c32122ccf17afda4207ddd4c4e01c1306517533c1c45d40590725fb32808abff"
+    },
+    {
+      "name": "39_여행설정",
+      "file": "39_여행설정_스크롤02.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 510,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "95980e5693af6fdb8a35e9c04671d1051f467229e9d067cb2ccb0b1c96ca91bb"
+    },
+    {
+      "name": "40_여행정보상태변경",
+      "file": "40_여행정보상태변경.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "3c86f8cf53b7454acf29f4f3f905132f9ee9f59eb515bc5370d5318c09244ad8"
+    },
+    {
+      "name": "40_여행정보상태변경",
+      "file": "40_여행정보상태변경.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 510,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "3c86f8cf53b7454acf29f4f3f905132f9ee9f59eb515bc5370d5318c09244ad8"
+    },
+    {
+      "name": "41_여행기간변경",
+      "file": "41_여행기간변경.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "8376941b1b52816387b8295ddb008df37db1c60649087775b0b51093f44e59bb"
+    },
+    {
+      "name": "41_여행기간변경",
+      "file": "41_여행기간변경.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 510,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "8376941b1b52816387b8295ddb008df37db1c60649087775b0b51093f44e59bb"
+    },
+    {
+      "name": "42_준비물",
+      "file": "42_준비물.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "ef2850a7a461f66909c98f5d2b7f48e9adc6b8110eff7c1f955d8c3fa0696bdf"
+    },
+    {
+      "name": "43_동행관리",
+      "file": "43_동행관리.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "dc87f84af2f0b9386ee27a7bc294450c40ca216b3661b9a18a8ce680ea8c66f1"
+    },
+    {
+      "name": "44_발자국공유",
+      "file": "44_발자국공유.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "a93b3c83880d38c3fac9fccd6212431a7b6668bbe0624652d7e085547cb498be"
+    },
+    {
+      "name": "45_발자국다이어리",
+      "file": "45_발자국다이어리.png",
+      "route": "/diary/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "0803fea6130446a2d6cb937ae5b437b477c5f5fea47ee65095288540e8fc3b9d"
+    },
+    {
+      "name": "45_발자국다이어리",
+      "file": "45_발자국다이어리_스크롤02.png",
+      "route": "/diary/00000000-0000-4000-8000-000000000010",
+      "scroll": 673,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "76838f0505d0594190228749d9238f4c5a5f5bb64a2af73740db04d45a98c167"
+    },
+    {
+      "name": "45_발자국다이어리",
+      "file": "45_발자국다이어리_스크롤03.png",
+      "route": "/diary/00000000-0000-4000-8000-000000000010",
+      "scroll": 1160,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "0f0c78ed126d22dc2f6042ad3465609d851b550d68bf9a3a45a162f210bbd2dc"
+    },
+    {
+      "name": "46_공개내용선택",
+      "file": "46_공개내용선택.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "74895de1ce6d2d12168daf5f9750ee4ea500d1ed39bf4a4b81166933d21b5ba2"
+    },
+    {
+      "name": "46_공개내용선택",
+      "file": "46_공개내용선택_스크롤02.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 49,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "7cc67579ece261193ad3ce00f578128cf77c0e62ac4ccd71ad37c84d1a3ae0ea"
+    },
+    {
+      "name": "47_여행커뮤니티",
+      "file": "47_여행커뮤니티.png",
+      "route": "/community",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "1f1f10f95c267c28f4b4fa58c5749f14124b8a74c819f2196b8d8c6477354b12"
+    },
+    {
+      "name": "48_게시물신고",
+      "file": "48_게시물신고.png",
+      "route": "/community",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "40114a40fc7aca8b54630f234e54dab480d37ad14aa2417066eabbf00968e3ad"
+    },
+    {
+      "name": "49_나의발자국",
+      "file": "49_나의발자국.png",
+      "route": "/footprints",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "325704c598c36a4259f56f00eac96f819667b411f7252990bbff223bafea71a7"
+    },
+    {
+      "name": "50_내여행계획",
+      "file": "50_내여행계획.png",
+      "route": "/plans",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "ce9c2c402e9d36cbd388dc5fe63bad97eb83ca1c9b652d41e5317e8aa76a7330"
+    },
+    {
+      "name": "51_여행지가이드",
+      "file": "51_여행지가이드.png",
+      "route": "/destinations/osaka",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "bd83244155d12bb6dce1fab384703823bbcf8df2ab248a7f5f1b479f13046fad"
+    },
+    {
+      "name": "51_여행지가이드",
+      "file": "51_여행지가이드_스크롤02.png",
+      "route": "/destinations/osaka",
+      "scroll": 595,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "bfef4a5ad4de3a600b273ac52bfcfc901e3a6ef021b7e663f83d19413a621f07"
+    },
+    {
+      "name": "51_여행지가이드",
+      "file": "51_여행지가이드_스크롤03.png",
+      "route": "/destinations/osaka",
+      "scroll": 1126,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "bdbf4bac44860e907c19a33f0cae10ad00cdee4e1d7b85f1c2af2eefa307cd98"
+    },
+    {
+      "name": "52_마이페이지",
+      "file": "52_마이페이지.png",
+      "route": "/my",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "d2c51834898df5968631d25b911c4cd9e2576ec49b2296cf67672f022bb9be40"
+    },
+    {
+      "name": "53_개인프로필수정",
+      "file": "53_개인프로필수정.png",
+      "route": "/my",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "daa4fb5d3c29168b76e6de27c92f469fb1974f8ed86aa2a01943bc11eefeab06"
+    },
+    {
+      "name": "54_이기기의이전기록",
+      "file": "54_이기기의이전기록.png",
+      "route": "/local-records",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "74b7290f1d7991bd92b886d56167be0c9f9b4fc0f2c21ed0c4fdcfddb6e67991"
+    },
+    {
+      "name": "55_초대링크참여",
+      "file": "55_초대링크참여.png",
+      "route": "/invite",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "d6ae195c4a790594e28c3b5dec722a827127452da786b4487fe9a1c0675ef208"
+    },
+    {
+      "name": "56_지도장소가져오기",
+      "file": "56_지도장소가져오기.png",
+      "route": "/import-place",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "646ac2159dee9ff5aff08f0a8cc6bb9ffb739c439ec92f1b0ab9f432d13568bc"
+    },
+    {
+      "name": "57_페이지없음",
+      "file": "57_페이지없음.png",
+      "route": "/missing-ui-capture",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "797afc49a73e2c14122090c2c7439f496931344575787f1eb548c7b980254aa3"
+    },
+    {
+      "name": "58_로그인복구안내",
+      "file": "58_로그인복구안내.png",
+      "route": "/auth/callback",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "93e9d38b94936af67a667f3e038c7b717660e03b9089111a9227e1c6455ff516"
+    },
+    {
+      "name": "59_여행지가이드_도쿄",
+      "file": "59_여행지가이드_도쿄.png",
+      "route": "/destinations/tokyo",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "519d8f291ef3c0f08ffc8ecaa84c02470a10378d1d52b7e967080c1c90e8156a"
+    },
+    {
+      "name": "59_여행지가이드_도쿄",
+      "file": "59_여행지가이드_도쿄_스크롤02.png",
+      "route": "/destinations/tokyo",
+      "scroll": 595,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "b755b47dae9f1d5c0ce45645b3c491889acbcf6e59dc9264946291355a14cd5b"
+    },
+    {
+      "name": "59_여행지가이드_도쿄",
+      "file": "59_여행지가이드_도쿄_스크롤03.png",
+      "route": "/destinations/tokyo",
+      "scroll": 1080,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "3793c2fa6be135caf90a9596bf9561f50e8ba94a6363ec4bd9ff3d9c89b43a99"
+    },
+    {
+      "name": "60_여행지가이드_나고야",
+      "file": "60_여행지가이드_나고야.png",
+      "route": "/destinations/nagoya",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "efe973d3345fc65994ccafcb0270517c43f6fcb8d96e9cadc4b5cde05b82c389"
+    },
+    {
+      "name": "60_여행지가이드_나고야",
+      "file": "60_여행지가이드_나고야_스크롤02.png",
+      "route": "/destinations/nagoya",
+      "scroll": 595,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "d613a5c5f1f73219ffa943260744686f6ab454add0d60ea8922dcfc7869c1fee"
+    },
+    {
+      "name": "60_여행지가이드_나고야",
+      "file": "60_여행지가이드_나고야_스크롤03.png",
+      "route": "/destinations/nagoya",
+      "scroll": 1190,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "de52b7ab2db254906515d2d58ded79e3337bc9578a2f3f4819600089cd50c308"
+    },
+    {
+      "name": "60_여행지가이드_나고야",
+      "file": "60_여행지가이드_나고야_스크롤04.png",
+      "route": "/destinations/nagoya",
+      "scroll": 1255,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "e872e678248e1df1f485162d774f28f54fa2aceaf91546f65cb659178faf9155"
+    },
+    {
+      "name": "61_여행지가이드_타이베이",
+      "file": "61_여행지가이드_타이베이.png",
+      "route": "/destinations/taipei",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "4433c62bd2848958fc04674d3c18717e808b95f7ab2a1107419558278acb396a"
+    },
+    {
+      "name": "61_여행지가이드_타이베이",
+      "file": "61_여행지가이드_타이베이_스크롤02.png",
+      "route": "/destinations/taipei",
+      "scroll": 595,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "0976ea72d1771f509a23c86bd3ec81a44cedf951f6af286e114b3262f6484c4c"
+    },
+    {
+      "name": "61_여행지가이드_타이베이",
+      "file": "61_여행지가이드_타이베이_스크롤03.png",
+      "route": "/destinations/taipei",
+      "scroll": 1024,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "e4c9b3ae215ac07c7d1c469d0c8680be1f3e17fa855046bdab8b4dbd9c27ccc4"
+    },
+    {
+      "name": "62_여행지가이드_다낭",
+      "file": "62_여행지가이드_다낭.png",
+      "route": "/destinations/danang",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "41b39752adad0d588336b81699a1f6f70eeaacded061e987b321914e88102307"
+    },
+    {
+      "name": "62_여행지가이드_다낭",
+      "file": "62_여행지가이드_다낭_스크롤02.png",
+      "route": "/destinations/danang",
+      "scroll": 595,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "e94fb77c5b9888c05fb652fa1ae1d86bf74a3e1d42ebd617c97708be1e2096ce"
+    },
+    {
+      "name": "62_여행지가이드_다낭",
+      "file": "62_여행지가이드_다낭_스크롤03.png",
+      "route": "/destinations/danang",
+      "scroll": 1083,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "dc85d40b7512f065beded11b256690096985d9a86511949f9bf948a7208698c0"
+    },
+    {
+      "name": "63_여행지가이드_방콕",
+      "file": "63_여행지가이드_방콕.png",
+      "route": "/destinations/bangkok",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "37c1613a2e55840bd8c9fce8b4be3262dc80fcb06f8b50d9d1c6f0af6103ae72"
+    },
+    {
+      "name": "63_여행지가이드_방콕",
+      "file": "63_여행지가이드_방콕_스크롤02.png",
+      "route": "/destinations/bangkok",
+      "scroll": 595,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "62ba0832c6503ccba12fb50302d57b3c3d9cf3e80423daa1b0981fbbf5181664"
+    },
+    {
+      "name": "63_여행지가이드_방콕",
+      "file": "63_여행지가이드_방콕_스크롤03.png",
+      "route": "/destinations/bangkok",
+      "scroll": 1047,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "163eee1490d410c09dcaefa7ac2cad4f79c5a4d06e63e2c511967d3d22b8c630"
+    },
+    {
+      "name": "64_여행지가이드_상하이",
+      "file": "64_여행지가이드_상하이.png",
+      "route": "/destinations/shanghai",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "d2a98c20267ab475ac7846afb1070392baf2594c6b41604932ed108022a1563c"
+    },
+    {
+      "name": "64_여행지가이드_상하이",
+      "file": "64_여행지가이드_상하이_스크롤02.png",
+      "route": "/destinations/shanghai",
+      "scroll": 595,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "ae4ae2edbf329b4f189d5e45d793c372a568a533b79f2485896e6ecf85c12b5c"
+    },
+    {
+      "name": "64_여행지가이드_상하이",
+      "file": "64_여행지가이드_상하이_스크롤03.png",
+      "route": "/destinations/shanghai",
+      "scroll": 1047,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "eb99b4a85ba32692052657c630142d3cdee732e3ede68fa2bb92e4548e906eeb"
+    },
+    {
+      "name": "65_여행지가이드_싱가포르",
+      "file": "65_여행지가이드_싱가포르.png",
+      "route": "/destinations/singapore",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "4bff5cd2e55222135da83b19efae3a5ffd3fbb9f205230729b5f924b1b9be467"
+    },
+    {
+      "name": "65_여행지가이드_싱가포르",
+      "file": "65_여행지가이드_싱가포르_스크롤02.png",
+      "route": "/destinations/singapore",
+      "scroll": 595,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "2fd88de447c55129afdaf8d58f0795b1170118f2ce589b4ba54863405ac40a35"
+    },
+    {
+      "name": "65_여행지가이드_싱가포르",
+      "file": "65_여행지가이드_싱가포르_스크롤03.png",
+      "route": "/destinations/singapore",
+      "scroll": 1057,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "fa03ed872976b30a35218436191e3e56e6ff0160748a9022d5bd5c583fde2ff9"
+    },
+    {
+      "name": "66_기존일정항공편추가",
+      "file": "66_기존일정항공편추가.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "69f00c4475579d74772196e9b6e9860eced475a25eae86c9dfdf5c71ab76239c"
+    },
+    {
+      "name": "66_기존일정항공편추가",
+      "file": "66_기존일정항공편추가_스크롤02.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 673,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "1ecd015251a834749e1893a519c1a76bfa553baa327a895705b78957bd6f21c6"
+    },
+    {
+      "name": "66_기존일정항공편추가",
+      "file": "66_기존일정항공편추가_스크롤03.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 1346,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "043c757c39ec6eac6d28e546476ce793832e97c27d27c76784e141937bb8a4c7"
+    },
+    {
+      "name": "66_기존일정항공편추가",
+      "file": "66_기존일정항공편추가_스크롤04.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 2019,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "32b1323c96dfd29bc95446d25988ba01be718d91c8578504a0142eed166bb2a5"
+    },
+    {
+      "name": "66_기존일정항공편추가",
+      "file": "66_기존일정항공편추가_스크롤05.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 2301,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "0c42931200de88fca874598469d80eaa61da5dab62d027a68a5c8198131c8b78"
+    },
+    {
+      "name": "67_메인홈_여행도구",
+      "file": "06_메인홈.png",
+      "route": "/",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "60bb52fa29cc48546ca1c77872e8ef519b91f3c74b8168451cefaf9d9559e5c8"
+    },
+    {
+      "name": "67_메인홈_여행도구",
+      "file": "67_메인홈_여행도구_스크롤02.png",
+      "route": "/",
+      "scroll": 673,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "54d7da172a9edf568f16835a98f1b062a2b04fe686e3fbe849f085914fe82482"
+    },
+    {
+      "name": "67_메인홈_여행도구",
+      "file": "67_메인홈_여행도구_스크롤03.png",
+      "route": "/",
+      "scroll": 1170,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "5091bacc6e088ca70637a3f61d367f93bd274ac7e6a5a132c99d3dc02bd0286e"
+    },
+    {
+      "name": "67_메인홈_여행도구",
+      "file": "67_메인홈_여행도구_스크롤04.png",
+      "route": "/",
+      "scroll": 1392,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "64a8601f3ea1a15ed5e17d199148ffeefd62f682358defc74968a6036565f3f7"
+    },
+    {
+      "name": "68_여행커뮤니티_빈목록",
+      "file": "68_여행커뮤니티_빈목록.png",
+      "route": "/community",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "ceae6886f1b56f2d7f426d51969d2fcd045417ecce53ec3094594d8093241420"
+    },
+    {
+      "name": "69_여행커뮤니티_조회오류",
+      "file": "69_여행커뮤니티_조회오류.png",
+      "route": "/community",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "0c1c1856e6a5701f8290cda5165aa34f902ef15f69ea11ebc65e1b27e0adcbdc"
+    },
+    {
+      "name": "70_나의발자국_빈목록",
+      "file": "70_나의발자국_빈목록.png",
+      "route": "/footprints",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "d311a63069da9581ca6bbec0cac3478da310c710299be888c10b4575c3d85aba"
+    },
+    {
+      "name": "71_내여행계획_조회오류",
+      "file": "71_내여행계획_조회오류.png",
+      "route": "/plans",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "e2d4507e0a53ffb07c42f618daaa1c86c6c5202e1463607e43ab327b2637d8cf"
+    },
+    {
+      "name": "72_여행상세_조회오류",
+      "file": "72_여행상세_조회오류.png",
+      "route": "/trips/00000000-0000-4000-8000-000000000010",
+      "scroll": 0,
+      "size": [390, 844],
+      "format": "PNG",
+      "sha256": "d63fd305eb70632af988ed5633f54814733e05abb30a6a393faccbfa2d458538"
+    },
+    {
+      "name": "73_권한안내_Android",
+      "file": "73_권한안내_Android.png",
+      "route": "Android emulator-5554",
+      "scroll": 0,
+      "platform": "Android",
+      "size": [1080, 2400],
+      "format": "PNG",
+      "sha256": "cd38c435fd13809f3033d90063dff80fbbe332917cb304e5a3bc2872d429736d"
+    },
+    {
+      "name": "74_알림권한요청_Android",
+      "file": "74_알림권한요청_Android.png",
+      "route": "Android emulator-5554",
+      "scroll": 0,
+      "platform": "Android",
+      "size": [1080, 2400],
+      "format": "PNG",
+      "sha256": "76d7f33345ce0b9b9825649f2484923170b43d719f5412d146cad7f22ffa8aff"
+    },
+    {
+      "name": "75_위치권한요청_Android",
+      "file": "75_위치권한요청_Android.png",
+      "route": "Android emulator-5554",
+      "scroll": 0,
+      "platform": "Android",
+      "size": [1080, 2400],
+      "format": "PNG",
+      "sha256": "9a76ba2c65d3dfae97d535bf6084ad6d709bf32d468a8e3e056b5bc4b435f302"
+    },
+    {
+      "name": "76_로그인_Android",
+      "file": "76_로그인_Android.png",
+      "route": "Android emulator-5554",
+      "scroll": 0,
+      "platform": "Android",
+      "size": [1080, 2400],
+      "format": "PNG",
+      "sha256": "33a72f533bb41f1ced5334182ba61c1a18ebd0f8f8dd0b35a8a95081ddef2cd6"
+    },
+    {
+      "name": "77_여행지도_Android",
+      "file": "77_여행지도_Android.png",
+      "route": "Android emulator-5554",
+      "scroll": 0,
+      "platform": "Android",
+      "size": [1080, 2400],
+      "format": "PNG",
+      "sha256": "312af163dc42eabc7de08085a057a28b70fc82649d116ecd565189db5318f816"
+    },
+    {
+      "name": "78_일정지도위치선택_Android",
+      "file": "78_일정지도위치선택_Android.png",
+      "route": "Android emulator-5554",
+      "scroll": 0,
+      "platform": "Android",
+      "size": [1080, 2400],
+      "format": "PNG",
+      "sha256": "919693d5105e19190e5fabc87462532a5c78b34740db5587a0fc429cd9bdd4d6"
+    },
+    {
+      "name": "79_일정시간선택_Android",
+      "file": "79_일정시간선택_Android.png",
+      "route": "Android emulator-5554",
+      "scroll": 0,
+      "platform": "Android",
+      "size": [1080, 2400],
+      "format": "PNG",
+      "sha256": "e52abec0a2eb2851adcab3641d8165b087023811675c89ea9d65344c21050f39"
+    }
+  ],
+  "failures": [],
+  "runtimeErrors": [
+    "/plans: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "/new-trip: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "/plans: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "/destinations/osaka: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "/destinations/tokyo: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "/destinations/nagoya: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "/destinations/taipei: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "/destinations/danang: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "/destinations/bangkok: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "/destinations/shanghai: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "/destinations/singapore: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "/plans: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings."
+  ],
+  "completedAt": "2026-10-14T03:41:12.808439+00:00",
+  "nativeBuild": "기존 versionCode 3 개발용 네이티브 셸에 현재 워크스페이스 JavaScript 연결. versionCode 4 서명 APK 설치 검증과는 별도.",
+  "captureWarnings": [
+    "웹의 plans/new-trip/도시 가이드 직접 진입에서 React #418 복구 로그 발생. UI 렌더링과 촬영은 완료했으며 로그 원문 보존.",
+    "기존 에뮬레이터의 기기 게스트 저장소 접근 오류가 있어 지도 보충 촬영은 격리된 로컬 인증·API로 진행. 기존 기기 기록을 삭제하지 않음.",
+    "Android Google 지도 SDK의 지도 타일은 이번 에뮬레이터 촬영에서 로드되지 않았고 실제 로딩 지연 안내 상태를 그대로 촬영. 정상 지도 타일 표시를 확인한 것으로 처리하지 않음.",
+    "영수증 OCR 후보는 기존 검증 자료이며 원본은 픽셀 검증용 작은 이미지. 실제 영수증 인식 정확도를 검증한 결과가 아님."
+  ],
+  "imageCount": 172,
+  "stateCount": 80,
+  "qa": {
+    "allFilesPresent": true,
+    "format": "PNG",
+    "issues": [],
+    "codeCheck": "npm run check 통과"
+  },
+  "documentationNote": "2026-10-16 문서 정리: 촬영 시각은 원래 값을 유지. 바이트가 같은 이미지 사본은 같은 파일을 참조한다. 현재 UI 통과 증거로 해석하지 않는다."
+}

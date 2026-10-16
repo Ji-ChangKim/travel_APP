@@ -1,0 +1,1961 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TripPrint 아이콘 카탈로그</title>
+    <style>
+      @font-face {
+        font-family: Pretendard;
+        src: url('../../apps/mobile/assets/brand/tripprint-v1/fonts/PretendardVariable.woff2')
+          format('woff2');
+        font-display: swap;
+      }
+      :root {
+        --icon-size: 24px;
+        --icon-color: #203247;
+        color: #203247;
+        background: #fef8f2;
+        font-family: Pretendard, system-ui, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+      }
+      main {
+        max-width: 1280px;
+        margin: auto;
+        padding: 32px 24px;
+      }
+      h1 {
+        font-size: 32px;
+        letter-spacing: -0.03em;
+        margin: 8px 0;
+      }
+      p {
+        line-height: 1.65;
+      }
+      .eyebrow {
+        font-size: 13px;
+        color: #c84432;
+        font-weight: 700;
+      }
+      .swatches {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin: 24px 0;
+      }
+      .swatch {
+        background: #fff;
+        border-radius: 12px;
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .swatch i {
+        width: 24px;
+        height: 24px;
+        border-radius: 8px;
+        background: var(--swatch);
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        background: #fff;
+        padding: 16px;
+        border-radius: 16px;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        box-shadow: 0 4px 20px #2032470d;
+      }
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      input,
+      select {
+        min-height: 44px;
+        border: 1px solid #dfd9d3;
+        border-radius: 8px;
+        padding: 10px;
+        color: #203247;
+        background: #f8f3ed;
+        font: inherit;
+      }
+      input[type='search'] {
+        min-width: 240px;
+      }
+      input:focus-visible,
+      select:focus-visible,
+      a:focus-visible {
+        outline: 2px solid #186779;
+        outline-offset: 3px;
+      }
+      .count {
+        font-size: 14px;
+        margin: 20px 0;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+        gap: 12px;
+      }
+      .icon-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        padding: 20px 12px;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 2px 10px #2032470a;
+        min-width: 0;
+      }
+      .icon {
+        height: 64px;
+        display: flex;
+        align-items: center;
+        color: var(--icon-color);
+      }
+      .icon svg {
+        width: var(--icon-size);
+        height: var(--icon-size);
+        overflow: visible;
+      }
+      .icon-card span {
+        color: #4a5d73;
+        font-size: 12px;
+      }
+      .icon-card a {
+        font-size: 11px;
+        overflow-wrap: anywhere;
+        text-align: center;
+        color: #186779;
+      }
+      .icon-card[hidden] {
+        display: none;
+      }
+      .note {
+        padding: 16px;
+        background: #e9f7fc;
+        border-radius: 12px;
+        font-size: 13px;
+        margin-top: 28px;
+      }
+      @media (max-width: 430px) {
+        main {
+          padding: 20px 16px;
+        }
+        h1 {
+          font-size: 26px;
+        }
+        .controls {
+          position: static;
+        }
+        .controls label {
+          width: 100%;
+        }
+        input[type='search'] {
+          min-width: 0;
+          width: 100%;
+        }
+        .grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .icon-card {
+          padding: 16px 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="eyebrow">TRIPPRINT · DESIGN RESOURCE v1.0</div>
+      <h1>아이콘 모음</h1>
+      <p>스티치 원본에서 추출한 벡터를 이름·크기·색상별로 확인합니다.</p>
+      <div class="swatches">
+        <div class="swatch">
+          <i style="--swatch: #ff6b57"></i>Trip Coral #FF6B57
+        </div>
+        <div class="swatch">
+          <i style="--swatch: #203247"></i>Journey Navy #203247
+        </div>
+        <div class="swatch">
+          <i style="--swatch: #fef8f2"></i>Warm Ivory #FEF8F2
+        </div>
+      </div>
+      <div class="controls">
+        <label
+          >아이콘 검색<input
+            id="search"
+            type="search"
+            placeholder="장소, camera, flight…" /></label
+        ><label
+          >분류<select id="group">
+            <option value="">전체</option>
+            <option value="navigation">탐색</option>
+            <option value="category">여행 분류</option>
+            <option value="action">동작</option>
+            <option value="utility">도구</option>
+            <option value="status">상태</option>
+          </select></label
+        ><label
+          >크기<select id="size">
+            <option>16</option>
+            <option>20</option>
+            <option selected>24</option>
+            <option>32</option>
+            <option>48</option>
+          </select></label
+        ><label
+          >기본 색상<select id="color">
+            <option value="#203247">네이비</option>
+            <option value="#C84432">코랄 텍스트</option>
+            <option value="#186779">틸</option>
+            <option value="#FF6B57">브랜드 코랄</option>
+          </select></label
+        >
+      </div>
+      <p id="count" class="count" aria-live="polite"></p>
+      <div class="grid">
+        <article
+          class="icon-card"
+          data-search="home-outline 홈 copy svg outline filled 홈 (home) 앱 첫 화면 및 맞춤형 여행 피드 tp-icon-home 24px"
+          data-group="navigation"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+          </div>
+          <strong>홈</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-home-outline.svg"
+            download
+            >icon-home-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="home-filled 홈 copy svg outline filled 홈 (home) 앱 첫 화면 및 맞춤형 여행 피드 tp-icon-home 24px"
+          data-group="navigation"
+        >
+          <div class="icon">
+            <svg
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path>
+            </svg>
+          </div>
+          <strong>홈</strong><span>filled</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-home-filled.svg"
+            download
+            >icon-home-filled.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="compass-outline 탐색 copy svg outline duotone 지도 &amp; 탐색 (explore) 둘러보기, 나침반 및 실시간 지도 tp-icon-compass 24px"
+          data-group="navigation"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <polygon
+                points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"
+              ></polygon>
+            </svg>
+          </div>
+          <strong>탐색</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-compass-outline.svg"
+            download
+            >icon-compass-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="compass-duotone 탐색 copy svg outline duotone 지도 &amp; 탐색 (explore) 둘러보기, 나침반 및 실시간 지도 tp-icon-compass 24px"
+          data-group="navigation"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <circle cx="12" cy="12" fill="#fff1ef" r="10"></circle>
+              <polygon
+                fill="#ff6b57"
+                points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"
+              ></polygon>
+            </svg>
+          </div>
+          <strong>탐색</strong><span>duotone</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-compass-duotone.svg"
+            download
+            >icon-compass-duotone.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="plus-outline 추가 copy svg center fab 여행 기록 fab (create) 새 일정 추가 및 모바일 플로팅 버튼 tp-icon-fab-plus 24/48px"
+          data-group="navigation"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2.5"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <line x1="12" x2="12" y1="5" y2="19"></line>
+              <line x1="5" x2="19" y1="12" y2="12"></line>
+            </svg>
+          </div>
+          <strong>추가</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-plus-outline.svg"
+            download
+            >icon-plus-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="journal-outline 여행 기록 copy svg outline filled 여행 기록장 (journal) 나의 타임라인 및 저널 북 tp-icon-journal 24px"
+          data-group="navigation"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path
+                d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
+              ></path>
+              <line x1="10" x2="16" y1="7" y2="7"></line>
+              <line x1="10" x2="14" y1="11" y2="11"></line>
+            </svg>
+          </div>
+          <strong>여행 기록</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-journal-outline.svg"
+            download
+            >icon-journal-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="journal-filled 여행 기록 copy svg outline filled 여행 기록장 (journal) 나의 타임라인 및 저널 북 tp-icon-journal 24px"
+          data-group="navigation"
+        >
+          <div class="icon">
+            <svg
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <path
+                d="M19 2H6c-1.2 0-2 .8-2 2v16c0 1.2.8 2 2 2h13a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zM6 4h12v12H6V4zm2 2h8v2H8V6zm0 4h5v2H8v-2z"
+              ></path>
+            </svg>
+          </div>
+          <strong>여행 기록</strong><span>filled</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-journal-filled.svg"
+            download
+            >icon-journal-filled.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="user-outline 내 정보 copy svg outline filled 마이페이지 (profile) 회원 정보, 배지 및 환경설정 tp-icon-user 24px"
+          data-group="navigation"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <strong>내 정보</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-user-outline.svg"
+            download
+            >icon-user-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="user-filled 내 정보 copy svg outline filled 마이페이지 (profile) 회원 정보, 배지 및 환경설정 tp-icon-user 24px"
+          data-group="navigation"
+        >
+          <div class="icon">
+            <svg
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <path
+                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+              ></path>
+            </svg>
+          </div>
+          <strong>내 정보</strong><span>filled</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-user-filled.svg"
+            download
+            >icon-user-filled.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="restaurant-outline 식당 식당 / 맛집 dining / restaurant #dining #restaurant"
+          data-group="category"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <path d="M18 2v20"></path>
+              <path d="M18 8a3 3 0 0 0 3-3V2h-3v6z"></path>
+              <path d="M6 2v6a3 3 0 0 0 3 3h0a3 3 0 0 0 3-3V2"></path>
+              <path d="M9 11v11"></path>
+            </svg>
+          </div>
+          <strong>식당</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-restaurant-outline.svg"
+            download
+            >icon-restaurant-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="cafe-outline 카페 카페 / 베이커리 cafe &amp; bakery #cafe #dessert"
+          data-group="category"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+              <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+              <line x1="6" x2="6" y1="2" y2="5"></line>
+              <line x1="10" x2="10" y1="2" y2="5"></line>
+              <line x1="14" x2="14" y1="2" y2="5"></line>
+            </svg>
+          </div>
+          <strong>카페</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-cafe-outline.svg"
+            download
+            >icon-cafe-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="bar-duotone 바 펍 / 바 / 이자카야 pub, bar &amp; izakaya #pub #bar #izakaya"
+          data-group="category"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <path d="M5 2h14l-7 8v9"></path>
+              <path d="M8 22h8"></path>
+              <circle
+                cx="15"
+                cy="6"
+                r="2"
+                fill="#ff6b57"
+                stroke="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></circle>
+            </svg>
+          </div>
+          <strong>바</strong><span>duotone</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-bar-duotone.svg"
+            download
+            >icon-bar-duotone.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="grocery-duotone 마트 마트 / 편의점 mart &amp; convenience #mart #grocery #cvs"
+          data-group="category"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path
+                d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"
+              ></path>
+              <circle
+                cx="14"
+                cy="10"
+                r="2"
+                fill="#ff6b57"
+                stroke="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></circle>
+            </svg>
+          </div>
+          <strong>마트</strong><span>duotone</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-grocery-duotone.svg"
+            download
+            >icon-grocery-duotone.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="flight-outline 항공편 항공편 / 공항 flight &amp; airport #flight #airport"
+          data-group="category"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <g
+                stroke-width="1.9500000000000002"
+                transform="translate(12 12) scale(1.0256410256410255) translate(-11.5346097946167 -13.75)"
+              >
+                <path
+                  d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 19 4c-2 0-4 0-3.5 1.5L12 9 3.8 7.2c-.7-.1-1.3.4-1.3 1.1 0 .4.2.8.6 1l6.9 4.7-2.5 2.5-3.2-.8c-.4-.1-.8.1-1 .4l-.3.4 4 2.5 2.5 4 .4-.3c.3-.2.5-.6.4-1l-.8-3.2 2.5-2.5 4.7 6.9c.2.4.6.6 1 .6.7 0 1.2-.6 1.1-1.3z"
+                ></path>
+              </g>
+            </svg>
+          </div>
+          <strong>항공편</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-flight-outline.svg"
+            download
+            >icon-flight-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="metro-duotone 지하철 지하철 / 전철역 metro &amp; train #metro #station"
+          data-group="category"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <rect height="15" rx="2" width="16" x="4" y="3"></rect>
+              <line x1="4" x2="20" y1="11" y2="11"></line>
+              <circle
+                cx="8"
+                cy="15"
+                r="1"
+                fill="#ff6b57"
+                stroke="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></circle>
+              <circle
+                cx="16"
+                cy="15"
+                r="1"
+                fill="#ff6b57"
+                stroke="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></circle>
+              <path d="M8 18l-3 3"></path>
+              <path d="M16 18l3 3"></path>
+              <line x1="8" x2="16" y1="3" y2="3"></line>
+            </svg>
+          </div>
+          <strong>지하철</strong><span>duotone</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-metro-duotone.svg"
+            download
+            >icon-metro-duotone.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="bus-duotone 버스 버스 / 정류장 bus &amp; bus stop #bus #transit"
+          data-group="category"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <rect height="13" rx="2" width="13" x="2" y="4"></rect>
+              <line x1="2" x2="15" y1="9" y2="9"></line>
+              <circle cx="5.5" cy="14" r="1"></circle>
+              <circle cx="11.5" cy="14" r="1"></circle>
+              <path d="M4 17l-1 2"></path>
+              <path d="M13 17l1 2"></path>
+              <circle
+                cx="20"
+                cy="6"
+                r="2"
+                fill="#ff6b57"
+                stroke="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></circle>
+              <line x1="20" x2="20" y1="8" y2="19"></line>
+            </svg>
+          </div>
+          <strong>버스</strong><span>duotone</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-bus-duotone.svg"
+            download
+            >icon-bus-duotone.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="taxi-outline 택시 택시 / 렌터카 / 페리 taxi &amp; car rental #taxi #rental"
+          data-group="category"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <path
+                d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1L1 14.25V19h3"
+              ></path>
+              <circle cx="6.5" cy="16.5" r="2.5"></circle>
+              <circle cx="16.5" cy="16.5" r="2.5"></circle>
+              <path d="M9 4h6"></path>
+            </svg>
+          </div>
+          <strong>택시</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-taxi-outline.svg"
+            download
+            >icon-taxi-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="hotel-duotone 호텔 호텔 / 리조트 hotel &amp; resort #hotel"
+          data-group="category"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <path d="M2 4v16"></path>
+              <path d="M2 8h18a2 2 0 0 1 2 2v10"></path>
+              <path d="M2 17h20"></path>
+              <path d="M6 8v9"></path>
+              <circle
+                cx="14"
+                cy="12"
+                r="2"
+                fill="#ff6b57"
+                stroke="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></circle>
+            </svg>
+          </div>
+          <strong>호텔</strong><span>duotone</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-hotel-duotone.svg"
+            download
+            >icon-hotel-duotone.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="guesthouse-outline 게스트하우스 호스텔 / 료칸 / 게하 guesthouse &amp; ryokan #guesthouse #ryokan"
+          data-group="category"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <path d="M3 10l9-7 9 7v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"></path>
+              <path d="M9 22V12h6v10"></path>
+              <line x1="12" x2="12" y1="7" y2="7.01"></line>
+            </svg>
+          </div>
+          <strong>게스트하우스</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-guesthouse-outline.svg"
+            download
+            >icon-guesthouse-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="landmark-duotone 관광명소 관광명소 / 랜드마크 sightseeing &amp; landmark #landmark #sight"
+          data-group="category"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <polygon points="12 2 19 21 12 17 5 21 12 2"></polygon>
+              <circle
+                cx="12"
+                cy="10"
+                r="2"
+                fill="#ff6b57"
+                stroke="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></circle>
+            </svg>
+          </div>
+          <strong>관광명소</strong><span>duotone</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-landmark-duotone.svg"
+            download
+            >icon-landmark-duotone.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="museum-outline 박물관 박물관 / 미술관 / 문화재 culture &amp; museum #museum #culture"
+          data-group="category"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <line x1="2" x2="22" y1="20" y2="20"></line>
+              <polygon points="12 3 2 9 22 9 12 3"></polygon>
+              <line x1="6" x2="6" y1="9" y2="16"></line>
+              <line x1="10" x2="10" y1="9" y2="16"></line>
+              <line x1="14" x2="14" y1="9" y2="16"></line>
+              <line x1="18" x2="18" y1="9" y2="16"></line>
+              <line x1="3" x2="21" y1="16" y2="16"></line>
+            </svg>
+          </div>
+          <strong>박물관</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-museum-outline.svg"
+            download
+            >icon-museum-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="shopping-outline 쇼핑 쇼핑 / 백화점 / 플리마켓 shopping &amp; mall #shopping #market"
+          data-group="category"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <path
+                d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"
+              ></path>
+              <line x1="3" x2="21" y1="6" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+          </div>
+          <strong>쇼핑</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-shopping-outline.svg"
+            download
+            >icon-shopping-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="activity-duotone 액티비티 액티비티 / 테마파크 activity &amp; theme park #activity #park"
+          data-group="category"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <polygon points="12 6 15.5 13 8.5 13"></polygon>
+              <line x1="12" x2="12" y1="16" y2="18"></line>
+              <circle
+                cx="12"
+                cy="12"
+                r="2"
+                fill="#ff6b57"
+                stroke="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></circle>
+            </svg>
+          </div>
+          <strong>액티비티</strong><span>duotone</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-activity-duotone.svg"
+            download
+            >icon-activity-duotone.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="receipt-scan-outline 영수증 스캔 영수증 스캔 (ocr) tp-scan-receipt"
+          data-group="action"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
+              <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+              <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
+              <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
+              <line x1="7" x2="17" y1="12" y2="12"></line>
+              <line x1="7" x2="13" y1="8" y2="8"></line>
+              <line x1="7" x2="15" y1="16" y2="16"></line>
+            </svg>
+          </div>
+          <strong>영수증 스캔</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-receipt-scan-outline.svg"
+            download
+            >icon-receipt-scan-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="share-outline 공유 동행자 공유 tp-action-share"
+          data-group="action"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <circle cx="18" cy="5" r="3"></circle>
+              <circle cx="6" cy="12" r="3"></circle>
+              <circle cx="18" cy="19" r="3"></circle>
+              <line x1="8.59" x2="15.42" y1="13.51" y2="17.49"></line>
+              <line x1="15.41" x2="8.59" y1="6.51" y2="10.49"></line>
+            </svg>
+          </div>
+          <strong>공유</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-share-outline.svg"
+            download
+            >icon-share-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="filter-outline 필터 조건 필터 tp-action-filter"
+          data-group="action"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <line x1="4" x2="4" y1="21" y2="14"></line>
+              <line x1="4" x2="4" y1="10" y2="3"></line>
+              <line x1="12" x2="12" y1="21" y2="12"></line>
+              <line x1="12" x2="12" y1="8" y2="3"></line>
+              <line x1="20" x2="20" y1="21" y2="16"></line>
+              <line x1="20" x2="20" y1="12" y2="3"></line>
+              <line x1="1" x2="7" y1="14" y2="14"></line>
+              <line x1="9" x2="15" y1="8" y2="8"></line>
+              <line x1="17" x2="23" y1="16" y2="16"></line>
+            </svg>
+          </div>
+          <strong>필터</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-filter-outline.svg"
+            download
+            >icon-filter-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="checklist-outline 준비물 체크리스트 tp-action-checklist"
+          data-group="action"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <polyline points="9 11 12 14 22 4"></polyline>
+              <path
+                d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
+              ></path>
+            </svg>
+          </div>
+          <strong>준비물</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-checklist-outline.svg"
+            download
+            >icon-checklist-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="search-outline 검색 장소/경로 검색 tp-action-search"
+          data-group="action"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" x2="16.65" y1="21" y2="16.65"></line>
+            </svg>
+          </div>
+          <strong>검색</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-search-outline.svg"
+            download
+            >icon-search-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="lock-outline 비공개 비공개 잠금 tp-action-lock"
+          data-group="action"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <rect height="11" rx="2" ry="2" width="18" x="3" y="11"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+          <strong>비공개</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-lock-outline.svg"
+            download
+            >icon-lock-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="bookmark-outline 북마크 bookmark"
+          data-group="utility"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+            </svg>
+          </div>
+          <strong>북마크</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-bookmark-outline.svg"
+            download
+            >icon-bookmark-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="calendar-outline 달력 calendar"
+          data-group="utility"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect height="18" rx="2" ry="2" width="18" x="3" y="4"></rect>
+              <line x1="16" x2="16" y1="2" y2="6"></line>
+              <line x1="8" x2="8" y1="2" y2="6"></line>
+              <line x1="3" x2="21" y1="10" y2="10"></line>
+            </svg>
+          </div>
+          <strong>달력</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-calendar-outline.svg"
+            download
+            >icon-calendar-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="clock-outline 시각 clock"
+          data-group="utility"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <strong>시각</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-clock-outline.svg"
+            download
+            >icon-clock-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="sun-outline 맑음 sun-weather"
+          data-group="utility"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" x2="12" y1="1" y2="3"></line>
+              <line x1="12" x2="12" y1="21" y2="23"></line>
+              <line x1="4.22" x2="5.64" y1="4.22" y2="5.64"></line>
+              <line x1="18.36" x2="19.78" y1="18.36" y2="19.78"></line>
+              <line x1="1" x2="3" y1="12" y2="12"></line>
+              <line x1="21" x2="23" y1="12" y2="12"></line>
+              <line x1="4.22" x2="5.64" y1="19.78" y2="18.36"></line>
+              <line x1="18.36" x2="19.78" y1="5.64" y2="4.22"></line>
+            </svg>
+          </div>
+          <strong>맑음</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-sun-outline.svg"
+            download
+            >icon-sun-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="rain-outline 비 cloud-rain"
+          data-group="utility"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <g
+                stroke-width="2.2000011444091796"
+                transform="translate(12 12) scale(0.9090904361947998) translate(-11.994112730026245 -12.000143647193909)"
+              >
+                <line x1="16" x2="16" y1="13" y2="21"></line>
+                <line x1="8" x2="8" y1="13" y2="21"></line>
+                <line x1="12" x2="12" y1="15" y2="23"></line>
+                <path
+                  d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"
+                ></path>
+              </g>
+            </svg>
+          </div>
+          <strong>비</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-rain-outline.svg"
+            download
+            >icon-rain-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="navigation-outline 길 안내 navigation"
+          data-group="utility"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+            </svg>
+          </div>
+          <strong>길 안내</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-navigation-outline.svg"
+            download
+            >icon-navigation-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="tag-outline 분류 tag-label"
+          data-group="utility"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"
+              ></path>
+              <line x1="7" x2="7.01" y1="7" y2="7"></line>
+            </svg>
+          </div>
+          <strong>분류</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-tag-outline.svg"
+            download
+            >icon-tag-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="heart-filled 좋아요 heart-active"
+          data-group="utility"
+        >
+          <div class="icon">
+            <svg
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <path
+                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+              ></path>
+            </svg>
+          </div>
+          <strong>좋아요</strong><span>filled</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-heart-filled.svg"
+            download
+            >icon-heart-filled.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="ticket-outline 티켓 ticket-pass"
+          data-group="utility"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"
+              ></path>
+              <line
+                stroke-dasharray="2 2"
+                x1="13"
+                x2="13"
+                y1="5"
+                y2="19"
+              ></line>
+            </svg>
+          </div>
+          <strong>티켓</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-ticket-outline.svg"
+            download
+            >icon-ticket-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="luggage-outline 짐 luggage"
+          data-group="utility"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect height="13" rx="2" width="12" x="6" y="7"></rect>
+              <path d="M9 7V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v3"></path>
+              <circle cx="9" cy="20" r="1"></circle>
+              <circle cx="15" cy="20" r="1"></circle>
+            </svg>
+          </div>
+          <strong>짐</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-luggage-outline.svg"
+            download
+            >icon-luggage-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="route-outline 동선 route-path"
+          data-group="utility"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="6" cy="19" r="3"></circle>
+              <path
+                d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"
+              ></path>
+              <circle cx="18" cy="5" r="3"></circle>
+            </svg>
+          </div>
+          <strong>동선</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-route-outline.svg"
+            download
+            >icon-route-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="bell-outline 알림 bell-notice"
+          data-group="utility"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+          </div>
+          <strong>알림</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-bell-outline.svg"
+            download
+            >icon-bell-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="sliders-outline 세부 설정 sliders"
+          data-group="utility"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="4" x2="4" y1="21" y2="14"></line>
+              <line x1="4" x2="4" y1="10" y2="3"></line>
+              <line x1="12" x2="12" y1="21" y2="12"></line>
+              <line x1="12" x2="12" y1="8" y2="3"></line>
+              <line x1="20" x2="20" y1="21" y2="16"></line>
+              <line x1="20" x2="20" y1="12" y2="3"></line>
+              <line x1="1" x2="7" y1="14" y2="14"></line>
+              <line x1="9" x2="15" y1="8" y2="8"></line>
+              <line x1="17" x2="23" y1="16" y2="16"></line>
+            </svg>
+          </div>
+          <strong>세부 설정</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-sliders-outline.svg"
+            download
+            >icon-sliders-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="refresh-outline 새로고침 refresh-sync"
+          data-group="utility"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path
+                d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
+              ></path>
+            </svg>
+          </div>
+          <strong>새로고침</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-refresh-outline.svg"
+            download
+            >icon-refresh-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="map-pin-outline 장소 map-pin"
+          data-group="utility"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <g
+                stroke-width="2.1996892929077148"
+                transform="translate(12 12) scale(0.9092193185866944) translate(-12 -12.001554012298584)"
+              >
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </g>
+            </svg>
+          </div>
+          <strong>장소</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-map-pin-outline.svg"
+            download
+            >icon-map-pin-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="star-filled 별점 star-rating"
+          data-group="utility"
+        >
+          <div class="icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+              ></polygon>
+            </svg>
+          </div>
+          <strong>별점</strong><span>filled</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-star-filled.svg"
+            download
+            >icon-star-filled.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="success-outline 완료 성공 / 완료 (success) #186779 일정 체크 완료, 결제 및 저장 성공 안내 피드백"
+          data-group="status"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2.5"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <strong>완료</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-success-outline.svg"
+            download
+            >icon-success-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="warning-outline 주의 주의 / 확인요망 (warning) #ffc857 환승 시간 부족, 기상 악화 및 경로 중복 경고"
+          data-group="status"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2.5"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <path
+                d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+              ></path>
+              <line x1="12" x2="12" y1="9" y2="13"></line>
+              <line x1="12" x2="12.01" y1="17" y2="17"></line>
+            </svg>
+          </div>
+          <strong>주의</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-warning-outline.svg"
+            download
+            >icon-warning-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="error-outline 오류 오류 / 취소 (destructive) #ff6b57 연결 실패, 일정 삭제 및 필수 항목 누락 경보"
+          data-group="status"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2.5"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="15" x2="9" y1="9" y2="15"></line>
+              <line x1="9" x2="15" y1="9" y2="15"></line>
+            </svg>
+          </div>
+          <strong>오류</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-error-outline.svg"
+            download
+            >icon-error-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="info-outline 안내 안내 / 팁 (info) #8fd3e8 로컬 여행 팁, 시차 알림 및 실시간 가이드 힌트"
+          data-group="status"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2.5"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" x2="12" y1="16" y2="12"></line>
+              <line x1="12" x2="12.01" y1="8" y2="8"></line>
+            </svg>
+          </div>
+          <strong>안내</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-info-outline.svg"
+            download
+            >icon-info-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="map-pin-duotone 장소 "
+          data-group="utility"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <path
+                d="M12 2C7.58 2 4 5.58 4 10c0 6.5 8 12 8 12s8-5.5 8-12c0-4.42-3.58-8-8-8z"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-width="2"
+                stroke-linejoin="round"
+              ></path>
+              <circle cx="12" cy="9.5" fill="#ff6b57" r="3"></circle>
+            </svg>
+          </div>
+          <strong>장소</strong><span>duotone</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-map-pin-duotone.svg"
+            download
+            >icon-map-pin-duotone.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="camera-duotone 카메라 "
+          data-group="utility"
+        >
+          <div class="icon">
+            <svg
+              fill="none"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+            >
+              <path
+                d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+              ></path>
+              <circle
+                cx="12"
+                cy="13"
+                r="4"
+                stroke="#ff6b57"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></circle>
+              <circle cx="18.5" cy="9.5" fill="#ff6b57" r="1"></circle>
+            </svg>
+          </div>
+          <strong>카메라</strong><span>duotone</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-camera-duotone.svg"
+            download
+            >icon-camera-duotone.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="map-outline 지도 기존 tripprint 브랜드 svg"
+          data-group="utility"
+        >
+          <div class="icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 5l6-2 6 2 6-2v16l-6 2-6-2-6 2ZM9 3v16M15 5v16" />
+            </svg>
+          </div>
+          <strong>지도</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-map-outline.svg"
+            download
+            >icon-map-outline.svg</a
+          >
+        </article>
+        <article
+          class="icon-card"
+          data-search="camera-outline 카메라 기존 tripprint 브랜드 svg"
+          data-group="utility"
+        >
+          <div class="icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M8 6l2-3h4l2 3h3a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z"
+              />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+          </div>
+          <strong>카메라</strong><span>outline</span
+          ><a
+            href="../../apps/mobile/assets/icons/tripprint/icon-camera-outline.svg"
+            download
+            >icon-camera-outline.svg</a
+          >
+        </article>
+      </div>
+      <p class="note">
+        24×24 기준 · 기본 2px 선 · 원본 FAB/상태 2.5px 예외 유지 · 투톤 포인트
+        #FF6B57. 일정 화면은 이 자산을 TripIcon으로 불러옵니다.
+      </p>
+    </main>
+    <script>
+      function matches(card) {
+        /* 검색어와 선택 분류가 일치하는 카드만 찾는다. */ return (
+          card.dataset.search.includes(
+            document.querySelector('#search').value.trim().toLowerCase(),
+          ) &&
+          (!document.querySelector('#group').value ||
+            card.dataset.group === document.querySelector('#group').value)
+        );
+      }
+      function updateVisibility() {
+        /* 각 카드의 숨김 상태를 갱신한다. */ return document
+          .querySelectorAll('.icon-card')
+          .forEach((card) => {
+            /* 카드 한 개의 검색 결과를 반영한다. */ return (card.hidden =
+              !matches(card));
+          });
+      }
+      function updateCount() {
+        /* 현재 보이는 아이콘 개수를 알린다. */ return (document.querySelector(
+          '#count',
+        ).textContent =
+          document.querySelectorAll('.icon-card:not([hidden])').length +
+          '개 / 전체 53개');
+      }
+      function updateSize() {
+        /* 선택 크기를 벡터에 적용한다. */ return document.documentElement.style.setProperty(
+          '--icon-size',
+          document.querySelector('#size').value + 'px',
+        );
+      }
+      function updateColor() {
+        /* 단색 선과 채움의 현재 색을 변경한다. */ return document.documentElement.style.setProperty(
+          '--icon-color',
+          document.querySelector('#color').value,
+        );
+      }
+      document.querySelector('#search').addEventListener('input', () => {
+        /* 검색 결과의 표시와 개수를 차례로 갱신한다. */ return (
+          updateVisibility(),
+          updateCount()
+        );
+      });
+      document.querySelector('#group').addEventListener('change', () => {
+        /* 분류 결과의 표시와 개수를 차례로 갱신한다. */ return (
+          updateVisibility(),
+          updateCount()
+        );
+      });
+      document.querySelector('#size').addEventListener('change', updateSize);
+      document.querySelector('#color').addEventListener('change', updateColor);
+      updateCount();
+    </script>
+  </body>
+</html>

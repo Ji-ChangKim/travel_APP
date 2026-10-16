@@ -1,0 +1,849 @@
+<!DOCTYPE html><html lang="ko" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_standard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "on-secondary-fixed-variant": "#36485e",
+        "primary": "#ae3123",
+        "on-surface-variant": "#59413d",
+        "surface-container": "#f3ede7",
+        "secondary-fixed": "#d2e4ff",
+        "surface-container-high": "#ede7e1",
+        "on-surface": "#1d1b18",
+        "tertiary-fixed": "#b0ecff",
+        "surface-container-lowest": "#ffffff",
+        "background": "#fef8f2",
+        "on-tertiary-container": "#003844",
+        "on-primary": "#ffffff",
+        "on-background": "#1d1b18",
+        "on-error": "#ffffff",
+        "outline-variant": "#e1bfba",
+        "outline": "#8d716c",
+        "error-container": "#ffdad6",
+        "on-secondary-container": "#52647b",
+        "surface-container-low": "#f8f3ed",
+        "secondary": "#4e6077",
+        "secondary-container": "#cee1fd",
+        "on-primary-fixed": "#410000",
+        "tertiary-container": "#60a4b8",
+        "inverse-on-surface": "#f6f0ea",
+        "surface": "#fef8f2",
+        "surface-container-highest": "#e7e2dc",
+        "on-primary-fixed-variant": "#8c170e",
+        "primary-fixed-dim": "#ffb4a8",
+        "primary-fixed": "#ffdad4",
+        "surface-bright": "#fef8f2",
+        "inverse-primary": "#ffb4a8",
+        "on-tertiary-fixed-variant": "#004e5e",
+        "tertiary-fixed-dim": "#8dd1e5",
+        "surface-dim": "#dfd9d3",
+        "on-tertiary": "#ffffff",
+        "primary-container": "#ff6b57",
+        "on-secondary": "#ffffff",
+        "inverse-surface": "#32302c",
+        "on-tertiary-fixed": "#001f27",
+        "on-error-container": "#93000a",
+        "error": "#ba1a1a",
+        "tertiary": "#186779",
+        "surface-tint": "#ae3123",
+        "on-primary-container": "#6c0000",
+        "surface-variant": "#e7e2dc",
+        "on-secondary-fixed": "#091d31",
+        "secondary-fixed-dim": "#b5c8e3"
+      },
+      "borderRadius": {
+        "DEFAULT": "0.25rem",
+        "lg": "0.5rem",
+        "xl": "0.75rem",
+        "full": "9999px"
+      },
+      "spacing": {
+        "margin-desktop": "2.5rem",
+        "gutter": "1rem",
+        "space-xl": "2.25rem",
+        "gutter-desktop": "1.5rem",
+        "space-lg": "1.5rem",
+        "margin-tablet": "1.5rem",
+        "space-sm": "0.5rem",
+        "margin": "1rem",
+        "space-xs": "0.25rem",
+        "space-md": "1rem"
+      },
+      "fontFamily": {
+        "body-sm": ["Plus Jakarta Sans"],
+        "body-lg": ["Plus Jakarta Sans"],
+        "headline-lg": ["Plus Jakarta Sans"],
+        "display-lg-mobile": ["Plus Jakarta Sans"],
+        "label-sm": ["Plus Jakarta Sans"],
+        "headline-sm": ["Plus Jakarta Sans"],
+        "label-lg": ["Plus Jakarta Sans"],
+        "body-md": ["Plus Jakarta Sans"],
+        "label-md": ["Plus Jakarta Sans"],
+        "display-lg": ["Plus Jakarta Sans"],
+        "headline-md": ["Plus Jakarta Sans"]
+      },
+      "fontSize": {
+        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+        "body-lg": ["16px", {"lineHeight": "26px", "fontWeight": "500"}],
+        "headline-lg": ["28px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+        "display-lg-mobile": ["32px", {"lineHeight": "42px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+        "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "700"}],
+        "headline-sm": ["18px", {"lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+        "label-lg": ["15px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+        "body-md": ["14px", {"lineHeight": "22px", "fontWeight": "400"}],
+        "label-md": ["13px", {"lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+        "display-lg": ["40px", {"lineHeight": "52px", "letterSpacing": "-0.03em", "fontWeight": "800"}],
+        "headline-md": ["22px", {"lineHeight": "30px", "letterSpacing": "-0.015em", "fontWeight": "700"}]
+      }
+    }
+  }
+};</script></head><body class="bg-surface font-body-md text-on-surface min-h-screen"><header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 w-full px-gutter-desktop flex items-center justify-between"><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs text-primary"><span class="material-symbols-outlined text-[28px]">map</span><span class="font-headline-sm text-headline-sm text-on-surface font-extrabold tracking-tight">TripPrint</span></div><span class="hidden sm:inline-block font-label-md text-label-md text-on-surface-variant">UI Kit &amp; Design System Specification</span></div><nav class="hidden md:flex items-center gap-space-md" data-active-classes="bg-primary-container text-on-primary font-label-md rounded-full shadow-[0_4px_16px_-2px_rgba(32,50,71,0.08)]"><a class="px-space-md py-1.5 text-on-surface-variant font-label-md text-label-md hover:text-on-surface transition-colors" data-path="overview" href="#">Overview</a><a aria-current="page" class="px-space-md py-1.5 transition-colors bg-primary-container text-on-primary font-label-md rounded-full shadow-[0_4px_16px_-2px_rgba(32,50,71,0.08)]" data-path="component-catalog" href="#">Catalog</a><a class="px-space-md py-1.5 text-on-surface-variant font-label-md text-label-md hover:text-on-surface transition-colors" data-path="tokens-guide" href="#">Design Tokens</a><a class="px-space-md py-1.5 text-on-surface-variant font-label-md text-label-md hover:text-on-surface transition-colors" data-path="export-and-code" href="#">Code &amp; Assets</a></nav><div class="flex items-center gap-space-md"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-16 bg-surface"><div class="flex flex-col w-full">
+<!-- Spec Navigation & Live Filter Anchor Bar -->
+<div class="w-full bg-surface-container-low px-gutter-desktop py-space-md shadow-sm">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-md">
+<span class="px-3 py-1 rounded-full bg-primary-container text-on-primary font-label-sm text-label-sm uppercase tracking-wider">v2.4 Spec Edition</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">트립프린트 모바일/웹 UI 툴킷 가이드라인</span>
+</div>
+<div class="flex items-center gap-space-sm overflow-x-auto py-1">
+<a class="px-space-md py-1.5 rounded-full bg-surface-container-lowest text-secondary font-label-md text-label-md hover:bg-primary-container hover:text-on-primary transition-all shadow-sm flex items-center gap-1" href="#section-colors">
+<span class="material-symbols-outlined text-[16px]">palette</span> 색상 토큰
+        </a>
+<a class="px-space-md py-1.5 rounded-full bg-surface-container-lowest text-secondary font-label-md text-label-md hover:bg-primary-container hover:text-on-primary transition-all shadow-sm flex items-center gap-1" href="#section-typography">
+<span class="material-symbols-outlined text-[16px]">format_size</span> 타이포그래피
+        </a>
+<a class="px-space-md py-1.5 rounded-full bg-surface-container-lowest text-secondary font-label-md text-label-md hover:bg-primary-container hover:text-on-primary transition-all shadow-sm flex items-center gap-1" href="#section-radius">
+<span class="material-symbols-outlined text-[16px]">rounded_corner</span> 곡률 체계
+        </a>
+<a class="px-space-md py-1.5 rounded-full bg-surface-container-lowest text-secondary font-label-md text-label-md hover:bg-primary-container hover:text-on-primary transition-all shadow-sm flex items-center gap-1" href="#section-buttons">
+<span class="material-symbols-outlined text-[16px]">smart_button</span> 버튼 툴킷
+        </a>
+<a class="px-space-md py-1.5 rounded-full bg-surface-container-lowest text-secondary font-label-md text-label-md hover:bg-primary-container hover:text-on-primary transition-all shadow-sm flex items-center gap-1" href="#section-forms">
+<span class="material-symbols-outlined text-[16px]">chips</span> 칩 &amp; 폼 컨트롤
+        </a>
+</div>
+</div>
+</div>
+<div class="max-w-7xl mx-auto w-full px-gutter-desktop py-space-xl flex flex-col gap-space-xl">
+<!-- Hero / Intro Narrative Banner -->
+<div class="relative w-full rounded-2xl bg-gradient-to-r from-surface-container to-surface-container-low p-space-xl overflow-hidden shadow-sm">
+<div class="absolute -right-12 -bottom-12 w-64 h-64 rounded-full bg-primary-container/10 blur-3xl pointer-events-none"></div>
+<div class="relative z-10 max-w-3xl flex flex-col gap-space-sm">
+<div class="flex items-center gap-2 text-primary font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span class="">공식 디자인 시스템 명세서</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-surface tracking-tight">
+          여행의 온기를 담은 정밀한 시각 언어
+        </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">
+          TripPrint 디자인 토큰 및 코어 컴포넌트 라이브러리입니다. 모바일 실시간 저널링부터 데스크톱 경로 계획까지 반응형 인터페이스 전반에 일관성과 촉각적 질감을 제공합니다.
+        </p>
+<div class="flex flex-wrap items-center gap-space-md pt-2">
+<div class="flex items-center gap-2 bg-surface-container-lowest px-space-md py-2 rounded-xl shadow-sm text-secondary font-body-sm text-body-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-primary"></span> Primary: Trip Coral (#ff6b57)
+          </div>
+<div class="flex items-center gap-2 bg-surface-container-lowest px-space-md py-2 rounded-xl shadow-sm text-secondary font-body-sm text-body-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary"></span> Secondary: Journey Navy (#203247)
+          </div>
+<div class="flex items-center gap-2 bg-surface-container-lowest px-space-md py-2 rounded-xl shadow-sm text-secondary font-body-sm text-body-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-surface"></span> Canvas: Warm Ivory (#fef8f2)
+          </div>
+</div>
+</div>
+</div>
+<!-- 1. BRAND COLORS & SEMANTIC TOKENS -->
+<section class="flex flex-col gap-space-lg scroll-mt-24" id="section-colors">
+<div class="flex items-baseline justify-between">
+<div>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary">01 / Foundation</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Brand Colors &amp; Semantic Tokens</h2>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">WCAG 2.1 AA 명도 대비 기준 충족</span>
+</div>
+<!-- Color Swatches Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-md">
+<!-- Primary Trip Coral Palette -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface">Trip Coral</span>
+<span class="text-xs px-2 py-0.5 rounded bg-primary-container/20 text-primary font-bold">Key Brand</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">생동감 넘치는 여정의 시작과 주요 인터랙션(CTA)</p>
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between p-3 rounded-lg bg-primary text-on-primary">
+<span class="font-label-md text-label-md">Default CTA</span>
+<span class="font-mono text-xs opacity-90">#ff6b57</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-primary-container text-on-primary">
+<span class="font-label-md text-label-md">Hover / Pressed</span>
+<span class="font-mono text-xs opacity-90">#c84432</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-primary-fixed text-on-primary-fixed">
+<span class="font-label-md text-label-md">Light Container</span>
+<span class="font-mono text-xs">#ffdad4</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-high text-primary">
+<span class="font-label-md text-label-md">Subtle Surface Tint</span>
+<span class="font-mono text-xs">#ede7e1</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-2 rounded-lg text-[11px] font-mono text-on-surface-variant">
+            Token: <span class="text-primary">--color-primary</span>
+</div>
+</div>
+<!-- Deep Journey Navy Palette -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface">Journey Navy</span>
+<span class="text-xs px-2 py-0.5 rounded bg-secondary/10 text-secondary font-bold">Structural</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">신뢰감 있는 경로 계획 및 구조적 텍스트/카드 앵커</p>
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between p-3 rounded-lg bg-secondary text-on-secondary">
+<span class="font-label-md text-label-md">Solid Navy</span>
+<span class="font-mono text-xs opacity-90">#203247</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-on-secondary-fixed-variant text-on-secondary">
+<span class="font-label-md text-label-md">Navy Dark / Hover</span>
+<span class="font-mono text-xs opacity-90">#36485e</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-secondary-container text-on-secondary-container">
+<span class="font-label-md text-label-md">Soft Sky Slate</span>
+<span class="font-mono text-xs">#cee1fd</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-highest text-secondary">
+<span class="font-label-md text-label-md">Navy Tint 8%</span>
+<span class="font-mono text-xs">#e7e2dc</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-2 rounded-lg text-[11px] font-mono text-on-surface-variant">
+            Token: <span class="text-secondary">--color-secondary</span>
+</div>
+</div>
+<!-- Warm Canvas & Surface -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface">Warm Surfaces</span>
+<span class="text-xs px-2 py-0.5 rounded bg-surface-container text-on-surface font-bold">Paper Tactile</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">차가운 무기질 흰색 대신 여행 저널 용지의 온기 반영</p>
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between p-3 rounded-lg bg-background text-on-background shadow-inner">
+<span class="font-label-md text-label-md">Warm Ivory Canvas</span>
+<span class="font-mono text-xs">#fef8f2</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-lowest text-on-surface shadow-sm">
+<span class="font-label-md text-label-md">Pure Pure Card</span>
+<span class="font-mono text-xs">#ffffff</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-low text-on-surface">
+<span class="font-label-md text-label-md">Low Elevation</span>
+<span class="font-mono text-xs">#f8f3ed</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-dim text-on-surface">
+<span class="font-label-md text-label-md">Surface Dim Border</span>
+<span class="font-mono text-xs">#dfd9d3</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-2 rounded-lg text-[11px] font-mono text-on-surface-variant">
+            Token: <span class="text-on-surface">--color-surface-*</span>
+</div>
+</div>
+<!-- Feedback & Status Indicators -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface">Semantic Feedback</span>
+<span class="text-xs px-2 py-0.5 rounded bg-surface-container-highest text-on-surface font-bold">Functional</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">일정 상태, 경고 및 시스템 알림 피드백</p>
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between p-3 rounded-lg bg-tertiary text-on-tertiary">
+<span class="font-label-md text-label-md flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">check_circle</span> Success / 완료</span>
+<span class="font-mono text-xs">#186779</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-tertiary-fixed text-on-tertiary-fixed">
+<span class="font-label-md text-label-md flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">warning</span> Warning / 확인요망</span>
+<span class="font-mono text-xs">#b0ecff</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-error text-on-error">
+<span class="font-label-md text-label-md flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">cancel</span> Destructive / 취소</span>
+<span class="font-mono text-xs">#ba1a1a</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-secondary-fixed text-on-secondary-fixed">
+<span class="font-label-md text-label-md flex items-center gap-1.5"><span class="material-symbols-outlined text-sm">info</span> Info / 실시간안내</span>
+<span class="font-mono text-xs">#d2e4ff</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-2 rounded-lg text-[11px] font-mono text-on-surface-variant">
+            Token: <span class="text-secondary">--color-status-*</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 2. TYPOGRAPHY SYSTEM -->
+<section class="flex flex-col gap-space-lg scroll-mt-24" id="section-typography">
+<div class="flex items-baseline justify-between">
+<div>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary">02 / Hierarchy</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Typography Scale &amp; Font Stack</h2>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Font: Plus Jakarta Sans / Pretendard Fallback</span>
+</div>
+<div class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm flex flex-col gap-space-lg">
+<!-- Interactive Type Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant font-label-md text-label-md">
+<th class="py-3 px-4 rounded-l-lg">Role / Token Name</th>
+<th class="py-3 px-4">Size &amp; Line Height</th>
+<th class="py-3 px-4">Weight / Tracking</th>
+<th class="py-3 px-4 rounded-r-lg">Rendered Spec Example</th>
+</tr>
+</thead>
+<tbody class="divide-y-0">
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-4 px-4 align-top">
+<div class="font-mono text-xs text-primary font-semibold">display-lg</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Page Title / Hero Cover</div>
+</td>
+<td class="py-4 px-4 align-top font-mono text-xs text-on-surface">32px / 42px (M)<br>40px / 52px (D)</td>
+<td class="py-4 px-4 align-top font-body-sm text-body-sm text-on-surface">800 Extrabold<br><span class="font-mono text-xs text-on-surface-variant">-0.03em</span></td>
+<td class="py-4 px-4 align-top">
+<p class="font-display-lg text-display-lg text-on-surface">여정의 발자취를 온전히 기록하다</p>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-4 px-4 align-top">
+<div class="font-mono text-xs text-primary font-semibold">headline-lg</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Section Title / 대구분 헤딩</div>
+</td>
+<td class="py-4 px-4 align-top font-mono text-xs text-on-surface">28px / 38px</td>
+<td class="py-4 px-4 align-top font-body-sm text-body-sm text-on-surface">700 Bold<br><span class="font-mono text-xs text-on-surface-variant">-0.02em</span></td>
+<td class="py-4 px-4 align-top">
+<p class="font-headline-lg text-headline-lg text-on-surface">제주 올레길 7코스 3박 4일 일정표</p>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-4 px-4 align-top">
+<div class="font-mono text-xs text-primary font-semibold">headline-md</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Heading 1 / 일정 세부 일정 헤더</div>
+</td>
+<td class="py-4 px-4 align-top font-mono text-xs text-on-surface">22px / 30px</td>
+<td class="py-4 px-4 align-top font-body-sm text-body-sm text-on-surface">700 Bold<br><span class="font-mono text-xs text-on-surface-variant">-0.015em</span></td>
+<td class="py-4 px-4 align-top">
+<p class="font-headline-md text-headline-md text-on-surface">1일차 : 서귀포 매일올레시장 산책</p>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-4 px-4 align-top">
+<div class="font-mono text-xs text-primary font-semibold">headline-sm</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Heading 2 / Card Title &amp; Dialog Title</div>
+</td>
+<td class="py-4 px-4 align-top font-mono text-xs text-on-surface">18px / 26px</td>
+<td class="py-4 px-4 align-top font-body-sm text-body-sm text-on-surface">700 Bold<br><span class="font-mono text-xs text-on-surface-variant">-0.01em</span></td>
+<td class="py-4 px-4 align-top">
+<p class="font-headline-sm text-headline-sm text-on-surface">성산 일출봉 해맞이 전망대 탐방</p>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-4 px-4 align-top">
+<div class="font-mono text-xs text-primary font-semibold">body-lg</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Subheading / Action / Lead Body</div>
+</td>
+<td class="py-4 px-4 align-top font-mono text-xs text-on-surface">16px / 26px</td>
+<td class="py-4 px-4 align-top font-body-sm text-body-sm text-on-surface">500 Medium</td>
+<td class="py-4 px-4 align-top">
+<p class="font-body-lg text-body-lg text-on-surface">푸른 바다 능선을 따라 걸으며 찍은 풍경 로그와 로컬 카페 기록</p>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-4 px-4 align-top">
+<div class="font-mono text-xs text-primary font-semibold">label-lg</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Large Button Label / Emphasized Pill</div>
+</td>
+<td class="py-4 px-4 align-top font-mono text-xs text-on-surface">15px / 20px</td>
+<td class="py-4 px-4 align-top font-body-sm text-body-sm text-on-surface">600 SemiBold<br><span class="font-mono text-xs text-on-surface-variant">+0.01em</span></td>
+<td class="py-4 px-4 align-top">
+<p class="font-label-lg text-label-lg text-on-surface">일정에 장소 추가하기</p>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-4 px-4 align-top">
+<div class="font-mono text-xs text-primary font-semibold">body-md</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Body 1 (Default / Journal Body)</div>
+</td>
+<td class="py-4 px-4 align-top font-mono text-xs text-on-surface">14px / 22px</td>
+<td class="py-4 px-4 align-top font-body-sm text-body-sm text-on-surface">400 Regular</td>
+<td class="py-4 px-4 align-top">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                    오후 2시쯤 도착하여 체크인 후 짐을 풀고 바로 해안 산책로로 향했다. 시원한 파도 소리가 피로를 한순간에 씻어내렸다.
+                  </p>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-4 px-4 align-top">
+<div class="font-mono text-xs text-primary font-semibold">body-sm / label-md</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Body 2 (Dense) &amp; Small Action Label</div>
+</td>
+<td class="py-4 px-4 align-top font-mono text-xs text-on-surface">13px / 18px</td>
+<td class="py-4 px-4 align-top font-body-sm text-body-sm text-on-surface">400 Reg &amp; 600 SemiBold</td>
+<td class="py-4 px-4 align-top">
+<div class="flex items-center gap-2">
+<span class="font-body-sm text-body-sm text-on-surface-variant">도보 15분 예상 (1.2km)</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-md text-label-md text-secondary">수정</span>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="py-4 px-4 align-top">
+<div class="font-mono text-xs text-primary font-semibold">label-sm</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Caption / Micro Tag / Overline</div>
+</td>
+<td class="py-4 px-4 align-top font-mono text-xs text-on-surface">11px / 14px</td>
+<td class="py-4 px-4 align-top font-body-sm text-body-sm text-on-surface">700 Bold<br><span class="font-mono text-xs text-on-surface-variant">+0.04em</span></td>
+<td class="py-4 px-4 align-top">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary bg-primary-fixed px-2 py-0.5 rounded">CHECKPOINT #03 • DEPARTED</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- 3. ROUNDNESS / BORDER RADIUS SYSTEM -->
+<section class="flex flex-col gap-space-lg scroll-mt-24" id="section-radius">
+<div class="flex items-baseline justify-between">
+<div>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary">03 / Geometry</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Roundness (Border Radius System)</h2>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Core Default: 8px (ROUND_EIGHT)</span>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-space-md">
+<!-- 4px (rounded-sm) -->
+<div class="bg-surface-container-lowest p-space-md rounded-lg shadow-sm flex flex-col items-center text-center gap-space-sm group hover:-translate-y-1 transition-transform">
+<div class="w-16 h-16 bg-primary-fixed flex items-center justify-center rounded-sm shadow-inner group-hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-on-primary-fixed group-hover:text-on-primary">tag</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">4px</span>
+<span class="font-mono text-[11px] text-primary">rounded-sm</span>
+</div>
+<p class="font-body-sm text-[12px] text-on-surface-variant">초소형 인디케이터, 테그 라벨, 뱃지 닷</p>
+</div>
+<!-- 8px (rounded-md - CORE DEFAULT) -->
+<div class="bg-surface-container-lowest p-space-md rounded-lg shadow-sm flex flex-col items-center text-center gap-space-sm relative overflow-hidden group hover:-translate-y-1 transition-transform">
+<div class="absolute top-0 right-0 bg-primary text-on-primary font-label-sm text-[9px] px-1.5 py-0.5 rounded-bl">CORE</div>
+<div class="w-16 h-16 bg-primary-container flex items-center justify-center rounded-md shadow-sm group-hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-on-primary">smart_button</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">8px</span>
+<span class="font-mono text-[11px] text-primary font-bold">rounded-md</span>
+</div>
+<p class="font-body-sm text-[12px] text-on-surface-variant">버튼 기본형, 입력창 (Input), 드롭다운</p>
+</div>
+<!-- 12px (rounded-lg) -->
+<div class="bg-surface-container-lowest p-space-md rounded-lg shadow-sm flex flex-col items-center text-center gap-space-sm group hover:-translate-y-1 transition-transform">
+<div class="w-16 h-16 bg-secondary-container flex items-center justify-center rounded-lg shadow-sm group-hover:bg-secondary transition-colors">
+<span class="material-symbols-outlined text-on-secondary-container group-hover:text-on-secondary">grid_view</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">12px</span>
+<span class="font-mono text-[11px] text-secondary">rounded-lg</span>
+</div>
+<p class="font-body-sm text-[12px] text-on-surface-variant">스탠다드 카드, 모달 내부 요소, 썸네일</p>
+</div>
+<!-- 16px (rounded-xl) -->
+<div class="bg-surface-container-lowest p-space-md rounded-lg shadow-sm flex flex-col items-center text-center gap-space-sm group hover:-translate-y-1 transition-transform">
+<div class="w-16 h-16 bg-tertiary-fixed flex items-center justify-center rounded-xl shadow-sm group-hover:bg-tertiary transition-colors">
+<span class="material-symbols-outlined text-on-tertiary-fixed group-hover:text-on-tertiary">vertical_align_top</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">16px</span>
+<span class="font-mono text-[11px] text-tertiary">rounded-xl</span>
+</div>
+<p class="font-body-sm text-[12px] text-on-surface-variant">서페이스 카드, 하단 바텀 시트 탑 코너</p>
+</div>
+<!-- 24px (rounded-2xl) -->
+<div class="bg-surface-container-lowest p-space-md rounded-lg shadow-sm flex flex-col items-center text-center gap-space-sm group hover:-translate-y-1 transition-transform">
+<div class="w-16 h-16 bg-surface-container-high flex items-center justify-center rounded-2xl shadow-sm group-hover:bg-surface-dim transition-colors">
+<span class="material-symbols-outlined text-on-surface">picture_in_picture</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">24px</span>
+<span class="font-mono text-[11px] text-on-surface">rounded-2xl</span>
+</div>
+<p class="font-body-sm text-[12px] text-on-surface-variant">메인 모달 팝업, 다이얼로그, 히어로 카드</p>
+</div>
+<!-- Full (rounded-full) -->
+<div class="bg-surface-container-lowest p-space-md rounded-lg shadow-sm flex flex-col items-center text-center gap-space-sm group hover:-translate-y-1 transition-transform">
+<div class="w-16 h-16 bg-primary flex items-center justify-center rounded-full shadow-md group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-on-primary">add</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">Full</span>
+<span class="font-mono text-[11px] text-primary">rounded-full</span>
+</div>
+<p class="font-body-sm text-[12px] text-on-surface-variant">필터 칩, 플로팅 액션 버튼(FAB), 원형 뱃지</p>
+</div>
+</div>
+</section>
+<!-- 4. BUTTON TOOLKIT & STATES -->
+<section class="flex flex-col gap-space-lg scroll-mt-24" id="section-buttons">
+<div class="flex items-baseline justify-between">
+<div>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary">04 / Interactive</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Button Toolkit &amp; State Matrix</h2>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Height Variants: L(52px) · M(44px) · S(36px)</span>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-space-lg">
+<!-- Primary CTA Buttons (Trip Coral) -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-primary"></span> Primary CTA Button (Trip Coral)
+            </h3>
+<span class="font-mono text-xs text-primary">#ff6b57 / #c84432</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">핵심 전환 액션(일정 생성, 저장하기, 예약하기)</p>
+<div class="flex flex-col gap-space-md pt-2">
+<!-- Large 52px -->
+<div class="flex flex-col gap-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Large (52px) - Default &amp; Hover State</span>
+<div class="flex flex-wrap items-center gap-space-md">
+<button class="h-[52px] px-8 rounded-full bg-primary text-on-primary font-label-lg text-label-lg shadow-md hover:bg-primary-container active:scale-[0.98] transition-all flex items-center justify-center gap-2" type="button">
+<span class="material-symbols-outlined text-[20px]">add_location_alt</span>
+<span class="">새로운 여정 생성</span>
+</button>
+<button class="h-[52px] px-8 rounded-full bg-primary-container text-on-primary font-label-lg text-label-lg shadow-lg flex items-center justify-center gap-2" type="button">
+<span class="">Hover / Pressed 활성</span>
+</button>
+</div>
+</div>
+<!-- Medium 44px -->
+<div class="flex flex-col gap-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Medium (44px) - Standard Core</span>
+<div class="flex flex-wrap items-center gap-space-md">
+<button class="h-[44px] px-6 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-sm hover:bg-primary-container active:scale-[0.98] transition-all flex items-center justify-center gap-2" type="button">
+<span class="">일정 저장</span>
+<span class="material-symbols-outlined text-[18px]">check</span>
+</button>
+<button class="h-[44px] px-6 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-sm opacity-40 cursor-not-allowed flex items-center justify-center gap-2" disabled="" type="button">
+<span class="material-symbols-outlined text-[18px]">lock</span>
+<span class="">비활성 (Disabled)</span>
+</button>
+</div>
+</div>
+<!-- Small 36px -->
+<div class="flex flex-col gap-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Small (36px) - Compact Contextual</span>
+<div class="flex flex-wrap items-center gap-space-md">
+<button class="h-[36px] px-4 rounded-full bg-primary text-on-primary font-label-sm text-label-sm shadow-sm hover:bg-primary-container active:scale-[0.98] transition-all flex items-center justify-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px]">bookmark</span>
+<span class="">저장</span>
+</button>
+<button class="h-[36px] px-4 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm hover:bg-primary-fixed-dim transition-all flex items-center justify-center gap-1.5" type="button">
+<span class="">초대 링크&nbsp;</span>
+<span class="material-symbols-outlined text-[16px]">share</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Secondary, Outline & Minimal Actions -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-secondary"></span> Secondary / Ghost / FAB
+            </h3>
+<span class="font-mono text-xs text-secondary">Journey Navy (#203247)</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">보조 컨트롤 및 미니멀 링크 액션</p>
+<div class="flex flex-col gap-space-md pt-2">
+<!-- Navy Secondary & Outline Button -->
+<div class="flex flex-col gap-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Secondary Solid &amp; Outline Variant</span>
+<div class="flex flex-wrap items-center gap-space-md">
+<button class="h-[44px] px-6 rounded-full bg-secondary text-on-secondary font-label-md text-label-md shadow-sm hover:bg-on-secondary-fixed-variant active:scale-[0.98] transition-all flex items-center justify-center gap-2" type="button">
+<span class="material-symbols-outlined text-[18px]">map</span>
+<span class="">지도 보기</span>
+</button>
+<button class="h-[44px] px-6 rounded-full bg-surface-container-low text-secondary font-label-md text-label-md hover:bg-surface-container transition-all flex items-center justify-center gap-2" type="button">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+<span class="">초기화</span>
+</button>
+</div>
+</div>
+<!-- Ghost, Minimal Links & FAB -->
+<div class="flex flex-col gap-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Text Link / Minimal &amp; Floating Action Button (FAB)</span>
+<div class="flex flex-wrap items-center justify-between gap-space-md pt-1">
+<div class="flex items-center gap-space-md">
+<button class="font-label-md text-label-md text-primary hover:underline flex items-center gap-1" type="button">
+<span class="">더 불러오기</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-sm">arrow_back</span>
+<span class="">돌아가기</span>
+</button>
+<button class="font-label-md text-label-md text-secondary hover:text-on-surface flex items-center gap-1" type="button">
+<span class="">닫기</span>
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+<!-- FAB (56px) with Warm Coral Shadow Glow -->
+<button class="w-14 h-14 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-[0_12px_32px_-4px_rgba(255,107,87,0.35)] hover:scale-110 active:scale-95 transition-all group" title="새 장소 기록" type="button">
+<span class="material-symbols-outlined text-[28px] group-hover:rotate-90 transition-transform">add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 5. CHIPS, BADGES & FORM CONTROLS -->
+<section class="flex flex-col gap-space-lg scroll-mt-24" id="section-forms">
+<div class="flex items-baseline justify-between">
+<div>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary">05 / Controls</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Chips, Badges &amp; Form Fields</h2>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Form States: Default · Focus · Error · Filled</span>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg">
+<!-- Filter Chips & Status Badges Column -->
+<div class="lg:col-span-5 bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm flex flex-col gap-space-lg">
+<!-- Filter Chips Section -->
+<div class="flex flex-col gap-space-sm">
+<span class="font-headline-sm text-headline-sm text-on-surface">Filter Chips (선택 / 비선택 상태)</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">다중 태그 필터 및 여정 정렬용 캡슐 컨트롤</p>
+<div class="flex flex-wrap gap-2 pt-2">
+<!-- Selected State -->
+<button class="px-4 py-1.5 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-sm flex items-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px]">check</span>
+<span class="">전체 일정</span>
+</button>
+<!-- Selected Navy -->
+<button class="px-4 py-1.5 rounded-full bg-secondary text-on-secondary font-label-md text-label-md shadow-sm flex items-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px]">directions_walk</span>
+<span class="">도보 여행</span>
+</button>
+<!-- Unselected Default -->
+<button class="px-4 py-1.5 rounded-full bg-surface-container-low text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition-colors flex items-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px]">restaurant</span>
+<span class="">미식 탐방</span>
+</button>
+<!-- Unselected with Count -->
+<button class="px-4 py-1.5 rounded-full bg-surface-container-low text-on-surface-variant font-label-md text-label-md hover:bg-surface-container transition-colors flex items-center gap-1.5" type="button">
+<span class="">카페/디저트</span>
+<span class="w-4 h-4 rounded-full bg-surface-container-high text-[10px] flex items-center justify-center font-bold">12</span>
+</button>
+</div>
+</div>
+<!-- Semantic Status Badges -->
+<div class="flex flex-col gap-space-sm pt-2">
+<span class="font-headline-sm text-headline-sm text-on-surface">Category &amp; Itinerary Badges</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">일정 타임라인 및 여행 상태 표시 규격</p>
+<div class="grid grid-cols-2 gap-2 pt-2">
+<div class="p-2.5 rounded-xl bg-surface-container-low flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-primary font-bold">여행 중 (Active)</span>
+</div>
+<div class="p-2.5 rounded-xl bg-surface-container-low flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
+<span class="font-label-sm text-label-sm text-secondary font-bold">예정 (Upcoming)</span>
+</div>
+<div class="p-2.5 rounded-xl bg-surface-container-low flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary"></span>
+<span class="font-label-sm text-label-sm text-tertiary font-bold">완료 (Finished)</span>
+</div>
+<div class="p-2.5 rounded-xl bg-surface-container-low flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[16px]">restaurant</span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">식사 / 다이닝</span>
+</div>
+<div class="p-2.5 rounded-xl bg-surface-container-low flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[16px]">directions_car</span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">교통 / 이동</span>
+</div>
+<div class="p-2.5 rounded-xl bg-surface-container-low flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-[16px]">hotel</span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">숙소 / 체크인</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Form Inputs & Selects Matrix Column -->
+<div class="lg:col-span-7 bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Form Controls &amp; Input Fields</h3>
+<span class="font-mono text-xs text-primary font-semibold">ROUND_EIGHT (8px)</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">텍스트 입력, 날짜 선택기, 드롭다운 셀렉트 박스</p>
+<form class="flex flex-col gap-space-md pt-2" onsubmit="event.preventDefault();">
+<!-- Standard Text Input (Focus state preview) -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface flex items-center justify-between">
+<span class="">장소명 / 목적지 검색</span>
+<span class="font-body-sm text-xs text-primary">필수 입력</span>
+</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3.5 text-primary text-[20px]">search</span>
+<input class="w-full h-11 pl-11 pr-4 rounded-md bg-surface-container-low text-on-surface font-body-md text-body-md shadow-inner focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary transition-all" placeholder="방문할 명소나 주소를 입력하세요" type="text" value="서귀포시 칠십리로 123">
+</div>
+<span class="font-body-sm text-[12px] text-on-surface-variant">정확한 도로명 주소를 입력하면 지도 핀이 자동으로 동기화됩니다.</span>
+</div>
+<!-- Two Columns: Date Picker & Dropdown -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+<!-- Date Picker -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface">여행 일자 선택</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3.5 text-secondary text-[20px]">calendar_today</span>
+<input class="w-full h-11 pl-11 pr-4 rounded-md bg-surface-container-low text-on-surface font-body-md text-body-md cursor-pointer hover:bg-surface-container transition-colors" readonly="" type="text" value="2025. 05. 14 (수)">
+</div>
+</div>
+<!-- Select Dropdown -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface">이동 수단 구분</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3.5 text-secondary text-[20px]">commute</span>
+<select class="w-full h-11 pl-11 pr-9 rounded-md bg-surface-container-low text-on-surface font-body-md text-body-md appearance-none cursor-pointer hover:bg-surface-container focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+<option selected="">도보 및 대중교통</option>
+<option>렌터카 / 자가용</option>
+<option>자전거 / 바이크</option>
+<option>기타 이동 수단</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 pointer-events-none text-on-surface-variant text-[20px]">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Checkbox & Switch Micro-controls -->
+<div class="flex flex-wrap items-center justify-between gap-space-md pt-2 p-3 rounded-lg bg-surface-container-low">
+<label class="flex items-center gap-2 cursor-pointer select-none">
+<input checked="" class="w-5 h-5 rounded-md text-primary accent-primary cursor-pointer" type="checkbox">
+<span class="font-body-md text-body-md text-on-surface font-medium">동행자에게 위치 실시간 공유</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer select-none">
+<input class="w-5 h-5 rounded-md text-primary accent-primary cursor-pointer" type="checkbox">
+<span class="font-body-md text-body-md text-on-surface-variant">사진 자동 태깅 활성화</span>
+</label>
+</div>
+</form>
+</div>
+</div>
+</section>
+<!-- 6. COMPONENT SPEC WORKBENCH (LIVE TRIP CARD DEMO) -->
+<section class="flex flex-col gap-space-lg">
+<div class="flex items-baseline justify-between">
+<div>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary">06 / Live Composition</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Integrated Travel Card Sample</h2>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">모든 토큰(컬러·타이포·곡률·버튼)이 결합된 라이브 컴포넌트</span>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- Live Itinerary Card Preview (4 cols) -->
+<div class="lg:col-span-5 bg-surface-container-lowest rounded-2xl p-space-md shadow-md flex flex-col gap-space-md relative overflow-hidden">
+<div class="relative w-full h-48 rounded-xl overflow-hidden shadow-inner">
+<img class="w-full h-full object-cover" data-alt="A warm and inviting travel photograph of a tranquil ocean road in Jeju Island during golden hour with gentle waves, soft coral sunlight filtering through palm trees, warm beige and soft navy tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXKNqKmEiKsqqXQ3sd795AyTpJ4NTngJNYoe4fkXaLq5eqzd5_3SV-DTrB92LSHs_oFQ2yo3KQR-e68bOs4U2lKPacJYz1Vwh0hl5QVvHBXMt_0shwY4FbqraG-wacu-xv4LGBXuzIyVEzEwTwUEc3zokxkwKp8dEzXFG-42DzRmemwGTWp4U83P4ZgwfpfYL5bdma5wL1oLtvx6DXIkEsHf0G0WspSNoeIZ9FU1Jdi4fJxBArGECHSg">
+<div class="absolute top-3 left-3 bg-surface-container-lowest/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
+<span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+<span class="font-label-sm text-label-sm text-primary font-bold">DAY 1 • TRAVELING</span>
+</div>
+<div class="absolute bottom-3 right-3 bg-secondary/80 backdrop-blur-sm px-2.5 py-1 rounded-full text-on-secondary font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">photo_camera</span> 14 Photos
+            </div>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-secondary uppercase font-bold tracking-wider">ROUTE 02 • CAFE &amp; TRAIL</span>
+<span class="font-body-sm text-xs text-on-surface-variant">오후 03:40 방문</span>
+</div>
+<h4 class="font-headline-md text-headline-md text-on-surface">바다를 마주보는 돌담 카페 '소금별'</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">
+              바다 냄새와 따뜻한 드립 커피의 향이 머무는 곳. 테라스에서 바라보는 파도 물결이 눈부셨던 순간.
+            </p>
+</div>
+<!-- Timeline checkpoints segment -->
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-low text-on-surface">
+<div class="flex items-center gap-2">
+<span class="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-xs">2</span>
+<span class="font-body-sm text-body-sm font-semibold">이전 경유지에서 도보 12분</span>
+</div>
+<span class="px-2 py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-[11px] font-bold">확정 일정</span>
+</div>
+<!-- Bottom Action Buttons -->
+<div class="flex items-center justify-between pt-2">
+<button class="h-10 px-5 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-sm hover:bg-primary-container transition-colors flex items-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[18px]">edit_note</span>
+<span class="">기록 추가</span>
+</button>
+<div class="flex items-center gap-2">
+<button class="w-10 h-10 rounded-full bg-surface-container text-secondary flex items-center justify-center hover:bg-surface-dim transition-colors" title="지도 위치 열기" type="button">
+<span class="material-symbols-outlined text-[20px]">near_me</span>
+</button>
+<button class="w-10 h-10 rounded-full bg-surface-container text-secondary flex items-center justify-center hover:bg-surface-dim transition-colors" title="공유하기" type="button">
+<span class="material-symbols-outlined text-[20px]">share</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Token Implementation Cheat Sheet (7 cols) -->
+<div class="lg:col-span-7 bg-surface-container-low rounded-2xl p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface">Tailwind Token Reference &amp; Guidelines</span>
+<span class="font-mono text-xs bg-surface-container-highest px-2 py-1 rounded text-on-surface">CSS Tokens</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            컴포넌트 설계 시 엄격하게 준수해야 하는 규칙: 임의 헥스코드(arbitrary hex) 및 비표준 Tailwind 컬러 클래스 사용 금지.
+          </p>
+<div class="bg-inverse-surface rounded-xl p-space-md text-inverse-on-surface font-mono text-xs overflow-x-auto leading-relaxed shadow-inner">
+<span class="text-tertiary-fixed">// 1. Button Radius &amp; Padding Specification</span><br>
+            .btn-primary-lg {<br>
+            &nbsp;&nbsp;height: 52px; border-radius: 9999px; /* rounded-full */<br>
+            &nbsp;&nbsp;background-color: var(--color-primary); /* #ff6b57 */<br>
+            &nbsp;&nbsp;padding-left: 2rem; padding-right: 2rem;<br>
+            &nbsp;&nbsp;font-family: 'Plus Jakarta Sans'; font-size: 15px; font-weight: 600;<br>
+            }<br><br>
+<span class="text-tertiary-fixed">// 2. Input Field Core Token</span><br>
+            .input-standard {<br>
+            &nbsp;&nbsp;height: 44px; border-radius: 8px; /* ROUND_EIGHT */<br>
+            &nbsp;&nbsp;background-color: var(--color-surface-container-low); /* #f8f3ed */<br>
+            &nbsp;&nbsp;color: var(--color-on-surface); /* #1d1b18 */<br>
+            }<br><br>
+<span class="text-tertiary-fixed">// 3. Card Container Geometry</span><br>
+            .surface-card {<br>
+            &nbsp;&nbsp;border-radius: 16px; /* rounded-xl */<br>
+            &nbsp;&nbsp;background-color: var(--color-surface-container-lowest); /* #ffffff */<br>
+            &nbsp;&nbsp;box-shadow: 0 4px 16px -2px rgba(32, 50, 71, 0.05);<br>
+            }
+          </div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm pt-2">
+<div class="p-3 rounded-lg bg-surface-container-lowest flex items-start gap-2 shadow-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">테두리 없는 구조 (No-Border Rule)</span>
+<span class="font-body-sm text-[12px] text-on-surface-variant">선 대신 배경 명도 차이(surface-container-low)로 구획</span>
+</div>
+</div>
+<div class="p-3 rounded-lg bg-surface-container-lowest flex items-start gap-2 shadow-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">대비 일치 원칙 (Contrast Rule)</span>
+<span class="font-body-sm text-[12px] text-on-surface-variant">bg-primary 사용 시 항상 text-on-primary 매핑 적용</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div></main><footer class="w-full bg-surface-container-low py-space-xl"><div class="w-full px-gutter-desktop flex flex-col sm:flex-row items-center justify-between gap-space-md"><div class="flex items-center gap-space-xs text-on-surface-variant font-body-sm text-body-sm"><span class="">© 2025 TripPrint Design System. All rights reserved.</span></div><div class="flex items-center gap-space-lg text-on-surface-variant font-label-sm text-label-sm"><a class="hover:text-on-surface transition-colors" href="#">Guidelines</a><a class="hover:text-on-surface transition-colors" href="#">Tokens Spec</a><a class="hover:text-on-surface transition-colors" href="#">GitHub Repository</a></div></div></footer>
+
+</body></html>

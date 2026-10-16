@@ -1,7 +1,7 @@
 # WHEREGO MVP 인수·검증 명세
 
 - 버전: v0.1 / 작성일: 2026-10-02 / 상태: **검증 계획, 아래 케이스 실행 미완료**
-- 기준: [필수 기능](FEATURE_SPEC.md), [화면](UX_SCREEN_SPEC.md), [API](API_CONTRACT.md), [저장](DATA_STORAGE_SPEC.md)
+- 기준: [필수 기능](<../2. planning/TripPrint_화면별_상세기능정의서_v3_20261014.docx>), [화면](<../2. planning/TripPrint_화면별_상세기능정의서_v3_20261014.docx>), [API](API_CONTRACT.md), [저장](DATA_STORAGE_SPEC.md)
 - 담당: QA·개발, 제품 인수: 제품 오너. 실명·실행일·빌드는 미정이다.
 
 ## 1. 검증 환경과 기록

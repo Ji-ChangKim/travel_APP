@@ -2,9 +2,9 @@
 
 2026-10-07: 현재 Cloudflare D1·R2·Better Auth 구성과 TripPrint 새 주소 전환 상태는 [로그인·회원 설정 적용 안내](AUTH_ONBOARDING.md)를 따른다. 사용자 승인 후 `tripprint-api-staging`과 `tripprint-staging.pages.dev` 배포 및 테스트 D1 회원 설정 변경을 완료했다. `tripprint-api-production`은 미배포 목표다. [Google·Play 내부 테스트](GOOGLE_PLAY_INTERNAL_TEST.md)에 실제 계정 로그인과 AAB 준비 절차를 기록한다. 아래 Supabase 중심의 2026-10-03 기록은 당시 준비 내역이다.
 
-빌드 단계별 완료 여부는 [빌드 준비 체크리스트](BUILD_CHECKLIST.md)에 기록한다.
+빌드 단계별 완료 여부는 [빌드 준비 체크리스트](CURRENT_STATUS.txt)에 기록한다.
 
-**현재 작업 목표는 Android 내부 테스트용 MVP APK다.** 스토어 심사·제출과 운영 공개는 이번 빌드 조건에 포함하지 않는다. 먼저 [Android MVP 빌드](MVP_ANDROID_BUILD.md)를 따르고, 아래 production·스토어 항목은 추후 공개 단계에서 확인한다.
+**현재 작업 목표는 Android 내부 테스트용 MVP APK다.** 스토어 심사·제출과 운영 공개는 이번 빌드 조건에 포함하지 않는다. 먼저 [Android MVP 빌드](CURRENT_STATUS.txt)를 따르고, 아래 production·스토어 항목은 추후 공개 단계에서 확인한다.
 
 2026-10-03. 로컬 구현과 검증을 완료했으며, 이 문서는 **계정 설정 후 staging 배포 → 실제 인수 → production 배포** 순서를 정의한다. 현재 실제 Supabase·소셜 제공자·OCR 연결과 서명된 모바일 빌드는 완료하지 않았다. 환경 검사 성공은 원격 서비스 연결 성공을 의미하지 않는다.
 

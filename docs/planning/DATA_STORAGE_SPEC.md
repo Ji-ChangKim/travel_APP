@@ -3,7 +3,7 @@
 - 버전: v0.1 / 작성일: 2026-10-02 / 상태: **목표 모델 제안, M1 일부 구현·로컬 검증**
 - DB 식별: Supabase 프로젝트의 PostgreSQL `postgres`, 애플리케이션 스키마 `public`
 - 현재 근거: `supabase/migrations/` 기존 3개+M1 2개 SQL, domain/validation의 foundation 모듈, [DB 사전 v1.5](../DB_DICTIONARY.txt)
-- 구현 범위와 미실행 원격 적용은 [M0·M1 실행 기록](M0_M1_EXECUTION.md)을 참조한다. 아래 기능별 원자 명령 전부가 구현된 것은 아니다.
+- 구현 범위와 미실행 원격 적용은 [M0·M1 실행 기록](../CURRENT_STATUS.txt)을 참조한다. 아래 기능별 원자 명령 전부가 구현된 것은 아니다.
 - 관련: MVP-01~10, D-01/04/05/08/09/10/12/13/14
 
 ## 1. 어디에 무엇을 저장하는가

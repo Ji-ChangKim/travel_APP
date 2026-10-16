@@ -1,6 +1,6 @@
 # GitHub에서 직접 TripPrint Android 빌드하기
 
-로컬 Android Studio에서는 `apps/mobile/android` 폴더를 연다. 네이티브 프로젝트 생성, SDK·JDK 연결과 실제 검증 결과는 [Android Studio 연결 점검](ANDROID_STUDIO_LINK_CHECK_20261012.txt)을 확인한다. 저장소 루트에도 해당 폴더를 가리키는 Gradle 연결 설정을 추가했다. 컴퓨터별 SDK·JDK 경로와 생성된 Android 프로젝트는 Git에서 제외한다.
+로컬 Android Studio에서는 `apps/mobile/android` 폴더를 연다. 네이티브 프로젝트 생성, SDK·JDK 연결과 실제 검증 결과는 [Android Studio 연결 점검](CURRENT_STATUS.txt)을 확인한다. 저장소 루트에도 해당 폴더를 가리키는 Gradle 연결 설정을 추가했다. 컴퓨터별 SDK·JDK 경로와 생성된 Android 프로젝트는 Git에서 제외한다.
 
 현재 Android Play Internal은 GitHub Linux 실행 환경에서 Gradle로 APK·AAB를 만든다. EXPO_TOKEN 검사와 EAS Build·Submit 호출을 제거했다. Expo 계정·로그인·빌드 서비스를 사용하지 않는다. 앱의 Expo SDK와 Router는 유지하며 로컬 Expo CLI는 네이티브 프로젝트 생성과 JS 번들 묶기에 사용한다.
 
@@ -57,6 +57,6 @@ Google 제출 자격은 다음 순서로 준비한다.
 
 검사 후 JDK 17·Android SDK를 준비하고 앱 설정에서 네이티브 프로젝트를 생성해 Gradle assembleRelease 또는 bundleRelease를 실행한다. scripts/android-ci.gradle에서 버전과 선택한 업로드 서명을 적용한다. 키는 임시 폴더에 복원하고 종료 시 삭제한다. Gradle 설정 캐시는 사용하지 않는다. 현재 서버 주소는 배포된 staging 설정을 공유한다.
 
-2026-10-12 확인: [실행 #2](https://github.com/Ji-ChangKim/travel_APP/actions/runs/37604959612)에서 Linux Gradle 컴파일과 `tripprint-apk-1002` 보관이 성공했다. Play 제출 단계는 건너뛰었으므로 AAB 업로드·내부 테스트 출시 성공의 증거는 아니다. 이번 게스트 탐색 수정은 새 빌드가 필요하다. 빌드 전에 DB/API·Workers D1/R2 인증·저장 및 Chrome 사용자 흐름을 검사하도록 보강했다. 최신 요구사항별 판정과 실기기 인수 절차는 [내부 테스트 준비 보고](PLAY_INTERNAL_READINESS_20261012.txt)를 따른다. 공개 운영 트랙 승격은 이 workflow에 포함하지 않는다. Actions 성공이 Google 심사 승인을 의미하지는 않는다.
+2026-10-12 확인: [실행 #2](https://github.com/Ji-ChangKim/travel_APP/actions/runs/37604959612)에서 Linux Gradle 컴파일과 `tripprint-apk-1002` 보관이 성공했다. Play 제출 단계는 건너뛰었으므로 AAB 업로드·내부 테스트 출시 성공의 증거는 아니다. 이번 게스트 탐색 수정은 새 빌드가 필요하다. 빌드 전에 DB/API·Workers D1/R2 인증·저장 및 Chrome 사용자 흐름을 검사하도록 보강했다. 최신 요구사항별 판정과 실기기 인수 절차는 [내부 테스트 준비 보고](CURRENT_STATUS.txt)를 따른다. 공개 운영 트랙 승격은 이 workflow에 포함하지 않는다. Actions 성공이 Google 심사 승인을 의미하지는 않는다.
 
 참고: [Gradle 명령줄 빌드](https://developer.android.com/build/building-cmdline), [로컬 Android 릴리스 빌드](https://docs.expo.dev/guides/local-app-production/), [Play 업로드 Action](https://github.com/r0adkll/upload-google-play).

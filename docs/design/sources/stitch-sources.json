@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-14",
+  "projectId": "13238536021221568181",
+  "projectTitle": "All-in-One Travel Planner",
+  "resources": [
+    {
+      "canvasLabel": "UI TOOL KIT",
+      "title": "TripPrint UI 툴킷 & 디자인 시스템 규격 가이드",
+      "screenResource": "projects/13238536021221568181/screens/be0798095fa44a728bbd9296558db91a",
+      "apiImageSize": {
+        "width": 2560,
+        "height": 8222
+      },
+      "files": [
+        {
+          "file": "stitch-ui-toolkit.html",
+          "sha256": "2d0706ffc1654139b637679679cc0ea7d8907a01ca1d95b47789f2e6e11a0b9d"
+        },
+        {
+          "file": "stitch-ui-toolkit.png",
+          "sha256": "ec35240790dca6330733835ffef77362f710478b3aefd95a7bdaf12c1463e3c0",
+          "actualImageSize": {
+            "width": 65536,
+            "height": 4292935722
+          }
+        }
+      ]
+    },
+    {
+      "canvasLabel": "아이콘 모음",
+      "title": "TripPrint 아이콘 시스템 & 심볼 규격 가이드",
+      "screenResource": "projects/13238536021221568181/screens/3c4e7db80d9f4dcba7fb58c5f7186c32",
+      "apiImageSize": {
+        "width": 2560,
+        "height": 5206
+      },
+      "files": [
+        {
+          "file": "stitch-icon-library.html",
+          "sha256": "21e1b9e01d4bd44d82e06dc0d348cdaa919a55aa51df2d479ff3846ea73a3df9"
+        },
+        {
+          "file": "stitch-icon-library.png",
+          "sha256": "47d9eb42366872fd44c88786e1436cee608992494959cb533fec7b6e40ecfaa1",
+          "actualImageSize": {
+            "width": 65536,
+            "height": 4292935722
+          }
+        }
+      ]
+    }
+  ]
+}

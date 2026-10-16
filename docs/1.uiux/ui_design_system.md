@@ -1,3 +1,5 @@
+> 현재 APP의 색상·글자·버튼 기준은 [하루 디자인 시스템 v3](../design/DESIGN.md)와 [공통 토큰](../design/design-tokens.json)을 따릅니다. 아래 문서는 이전 설계 참고용이며 색상값을 현재 앱에 다시 적용하지 않습니다.
+
 # Travel App UI Design System
 
 > 문서명: `ui_design_system.md`  

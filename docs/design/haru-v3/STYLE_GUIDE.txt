@@ -1,0 +1,101 @@
+# TripPrint UI Kit v3 · 하루와 함께하는 여행 노트
+
+상태: 스티치 UI Kit 기준. 실제 앱 적용은 별도 작업이다.
+기준 화면: 홈 d26e476490734615a9a802d6681d75da / 공동 일정 f461c3c3e1b24a4d9f12cbc2bbe8993d / 발자국 e521d92e10ad4f9385ba337e6988b46b.
+여행 계획·공유·기록에 따뜻한 하루의 분위기를 연결한다.
+
+## 브랜드
+기존 하루 원본과 코랄·네이비·아이보리를 유지한다. 사진과 노트의 여백, 작은 경로 점선을 사용한다. 캐릭터를 매 화면 크게 반복하지 않는다. 지도·일정에서는 정보가 먼저 읽힌다.
+TripPrint는 띄어쓰지 않는다. 로고는 Poppins700, Trip 네이비 / Print 코랄, 두 단어 사이 추가 간격 없음. 본문에 Poppins·Newsreader·Plus Jakarta Sans를 쓰지 않는다.
+원본 하루: projects/13238536021221568181/screens/14189600632858413182. 캐릭터의 검은 단발, 고리 모양 머리카락, 호박색 눈, 파란 체크 셔츠, 크림색 반바지, 흰 가방, 민트 캐리어를 보존한다.
+
+## 색상 토큰
+canvas #FFF9F3
+surface #FFFFFF
+surface.subtle #F5F1EC
+text.primary #203247
+text.secondary #596574
+text.link #A43E31
+brand.coral #FF6B57
+brand.navy #203247
+brand.sky #8FD3E8
+brand.sun #FFC857
+selection.background #FFF0EB
+selection.foreground #203247
+border.subtle #E9E1D8 (장식 구분선만)
+border.control #8A7B70 (식별에 필요한 입력·컨트롤 경계)
+focus #203247
+action.primary.background #FF6B57
+action.primary.foreground #203247
+action.primary.pressed.background #A43E31
+action.primary.pressed.foreground #FFFFFF
+action.secondary.background #FFFFFF
+action.secondary.foreground #203247
+action.disabled.background #EEE8E2
+action.disabled.foreground #596574
+status.error.foreground #9E3438 / background #FCEEEF
+status.success.foreground #28614E / background #EBF4EF
+status.warning.foreground #765214 / background #FFF4D9
+
+밝은 코랄은 작은 글자색으로 쓰지 않는다. 흰색 글자를 밝은 코랄 위에 놓지 않는다.
+Primary 버튼의 밝은 코랄 배경은 네이비 글자·아이콘과 1px 네이비 경계를 함께 사용한다.
+눌림 상태는 딥 코랄과 흰 글자로 함께 전환한다. 투명도만 낮추지 않는다.
+선택·오류·성공은 체크·아이콘·설명을 병행한다. 색으로만 뜻을 전달하지 않는다.
+사진 위 본문 금지. 사진의 날짜 도장은 불투명한 흰 배경과 네이비 글자로 표시한다.
+
+## 글꼴
+한글·영문 UI·숫자: Pretendard Variable, 네이티브 명칭 Pretendard. 숫자 tabular-nums.
+엔진 enum NOTO_SANS는 호환 fallback이다. 실제 각 HTML에는 아래 CSS를 직접 로드해야 한다.
+<link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+CSS font-family: "Pretendard Variable", Pretendard, "Noto Sans KR", sans-serif.
+반드시 h1-h6,p,label,button,input,textarea,nav,table 등 각 텍스트 스타일에도 적용한다. 아이콘 폰트는 Material Symbols Outlined를 별도로 보존한다.
+로고에만 Poppins700을 별도로 로드한다. 문서 토큰만 바꾸고 HTML 로딩을 빠뜨리지 않는다.
+
+## 글자 크기 (모바일 논리 px)
+화면 제목26/36 700
+섹션 제목22/30 700
+카드 제목18/26 600
+본문16/26 400
+보조 설명·날짜·주소14/22 400
+버튼16/24 600
+하단 메뉴13/20 600 (짧은 라벨의 최소 크기)
+가격·시간16/24 600 tabular-nums
+긴 한글·해외 지명은 줄바꿈한다. 보조 정보에 11px·12px를 쓰지 않는다.
+작은 글자를 투명하게 표시하지 않는다. 일반 글자4.5:1, 식별에 필요한 비텍스트 경계3:1 이상.
+
+## 간격·형태
+4/8/12/16/20/24/32/40/48px.
+모바일390px 기준 좌우20px. 카드 안16px, 구역 사이24-32px.
+버튼·입력 높이48px, 주 행동52px, 터치영역44px 이상.
+버튼·입력 모서리12px, 카드16px, 큰 여행 표지20px. 칩은 pill.
+선택 컨트롤은 체크 또는 네이비 경계. 초점은2px 네이비+2px 흰 여백.
+그림자는 rgba(32,50,71,0.06) 정도로 제한한다.
+
+## 컴포넌트 상태
+버튼: primary/secondary/text/destructive, default/pressed/focus/loading/disabled.
+입력: default/focus/filled/error/disabled. placeholder도text.secondary.
+체크박스·라디오·토글: selected/unselected/disabled, 네이비 체크와 읽히는 경계.
+필터·DAY선택·탭: 선택 배경selection, 네이비 글자, 체크 또는 밑줄.
+하단 메뉴: 홈/내 여행/발자국/커뮤니티/MY. 선택=옅은코랄+네이비아이콘/글자.
+Trip 내부 탭: 일정/지도/비용/준비물/멤버. 글로벌 메뉴와 분리.
+
+## 여행 컴포넌트
+다가오는 여행 카드: 사진·제목·기간·동행자·계획 계속하기.
+일정 항목: 네이비 시간·장소·작은 사진·작성자·전철/도보 연결.
+동행자 묶음과 초대 버튼. 허위 실시간 접속 표시 없음.
+발자국 카드: 풍경 사진·기억 한줄·기간·나만 보기/전체 공개·기록 펼치기.
+공개 범위 선택과 공유 전 확인. 임의 좋아요·조회수·기록 개수 없음.
+지출 항목: 통화 코드와 금액을 정렬. 통화 변환값·시간대 자동 변환 기능을 지어내지 않는다.
+빈 상태: 하루와 "아직 남긴 발자국이 없어요" / "새 여행 만들기".
+로딩: 진행 표시+ "여행을 불러오는 중이에요".
+오류: 경고 아이콘+ "여행을 불러오지 못했어요" / "다시 시도" / "돌아가기".
+긴 글·긴 지명·날짜·공개 범위·disabled·error를 실제 크기로 확인한다.
+
+## 사용하지 않는 표현
+흰색/밝은코랄 조합, 작은 밝은코랄 링크, 흐린회색14px본문, serif제목, 가짜실시간편집/예약/AI기능, 지도스크린샷을 여행사진으로 대체, 매 화면 큰캐릭터, 종이질감을 본문 뒤에 반복.
+
+## 대비 계산 기준
+W3C WCAG2.2 SC1.4.3 / SC1.4.11. 지정 전경·배경의 sRGB 상대휘도 계산으로 판단하고 반올림 전 값을 사용한다.
+본문/아이보리12.49:1, 보조/흰색5.93:1, 보조/아이보리5.68:1, 링크/아이보리6.07:1, 네이비/밝은코랄4.66:1.
+대비표는 고정 조합의 검증이며 앱 전체 접근성 인증을 뜻하지 않는다.
+

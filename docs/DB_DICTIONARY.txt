@@ -1,7 +1,7 @@
 ================================================================================
  travel_APP (WHEREGO) 데이터베이스 및 도메인 객체 사전 (DB_DICTIONARY.txt)
  문서 버전: v1.8 (M1 물리 DB는 5절, 기기 객체는 6절, 인증은 7절, 서버 앱은 8절)
- 최종 수정일: 2026-10-03
+ 최종 수정일: 2026-10-15
  데이터베이스 환경: Supabase PostgreSQL 15+
  프로젝트 목적: 여행 계획(PLAN) -> 공유(SHARE) -> 여행 중(TRAVEL) -> 기록/정산(RECORD)
 ================================================================================
@@ -774,7 +774,7 @@ DB명: WHEREGO / Supabase PostgreSQL (물리 스키마 변경 없음)
 - 발자취 device-draft는 기기 공용 독립 초안이며 계정 서버 데이터로 간주하지 않음.
 
 [완성 범위와 향후 저장 변경]
-사용자 요구 7개는 docs/planning/APP_COMPLETION_SCOPE.md에 기록했다.
+사용자 요구 7개는 docs/2. planning/TripPrint_화면별_상세기능정의서_v3_20261014.docx에 기록했다.
 v1.7 당시 영수증 OCR/사진/커뮤니티 게시의 신규 테이블은 미생성이었다.
 v1.8 신규 마이그레이션 및 객체는 아래 8절을 최신 기준으로 적용한다.
 새 스키마·객체 구현 시 사진 비공개 권한, 원자 영수증/지출 연결,
@@ -935,7 +935,7 @@ WorkspaceSnapshot: trip PersistedTrip,myRole owner|editor|viewer,
 CommunityPost: id/authorId UUID,author/title/body string,publishedAt ISO,
   photoPaths string[],snapshot{country,city,startDate,endDate,itinerary,costs}.
 ReceiptDraft: rawText string<=10000,merchant string<=100,transactionDate string,
-  amount string,currency KRW|JPY|USD,needsConfirmation true.
+  amount string,currency string<=12(원 통화 코드 또는 빈 값),needsConfirmation true.
   인식 실패 필드는 빈 값 가능. 저장 시 stricter receiptInputSchema 검증.
 WorkspaceCommand: operation별 discriminated union, strict input, 공통 Zod 계약.
 PlanForm: kind trip|schedule|expense|receipt|publish|metadata|period,id UUID,
@@ -1277,7 +1277,7 @@ merchant string 최대100자, address string 최대200자: 읽지 못한 경우 
 transactionDate string: YYYY-MM-DD 실제 달력 또는 빈 값.
 transactionTime string: HH:mm 또는 빈 값. 입점 시간 대신 실제 결제 시간을 사용.
 amount string: 최종 결제 합계 또는 빈 값. 세금·거스름돈·메뉴 합계로 덮어쓰지 않음.
-currency enum KRW/JPY/USD: 인식 불가 시 여행 기본 통화와 확인 경고를 함께 반환.
+currency string 최대12자: 읽은 원 통화 코드(TWD/VND/THB/CNY/SGD 등 포함)를 보존. 미인식은 빈 값. 기본 통화로 대체하지 않음. 확정 저장은 KRW/JPY/USD만 허용.
 category enum food/transport/stay/activity/shopping/etc: 지출 분류 후보.
 items ReceiptItem[]; warnings string[] 최대12개, 각200자; needsConfirmation literal true.
 공급자 출력은 서버 스키마로 검증. 초안 생성만으로 일정·비용을 만들지 않음.
@@ -1495,14 +1495,749 @@ currentViews / previousViews integer >=0|null: Wikimedia Analytics all-access/us
   봇 집계를 제외하며 실제 0회와 API 버킷 누락(null)을 구분. 월간 종료일은 최근 완료 월의 말일.
 
 객체 DiscoveryImage.
-url HTTPS URL NOT NULL: upload.wikimedia.org 또는 thumb.wikimedia.org 썸네일만 허용.
-sourceUrl HTTPS URL NOT NULL: commons.wikimedia.org의 파일 출처 페이지.
-author string NOT NULL length 1~500: extmetadata.Artist HTML 태그 제거 후 일반 텍스트 표시.
-license string NOT NULL length 1~100: CC BY/CC BY-SA 1.0~4.0, CC0 또는 Public domain 허용 목록.
-licenseUrl HTTPS URL NOT NULL: creativecommons.org. URL·저작자 누락과 비상업/불명 라이선스는 사진 제외.
-사진 요청 실패는 원문 소개·여행 생성 흐름을 막지 않음. 원본 이미지는 DB/R2에 복사하지 않음.
+url HTTPS URL NOT NULL: upload.wikimedia.org, thumb.wikimedia.org 썸네일 또는 tripprint-staging.pages.dev에 배포한 검증된 공식 관광청 사진.
+sourceUrl HTTPS URL NOT NULL: commons.wikimedia.org의 파일 출처 또는 media.taiwan.net.tw의 공식 공개 자료 목록.
+author string NOT NULL length 1~500: Commons의 HTML 제거 저작자 또는 공식 공개 데이터의 원 제공 기관 표시.
+license string NOT NULL length 1~100: Commons CC BY/CC BY-SA 1.0~4.0, CC0, Public domain 또는 공식 등록 사진의 Taiwan Open Government Data License 1.0.
+licenseUrl HTTPS URL NOT NULL: creativecommons.org 또는 data.gov.tw. URL·저작자 누락과 비상업/불명 라이선스는 사진 제외.
+공식 등록 사진: apps/api/src/discoveryAssets.ts, 타이베이 Info Id=24275 / GovernmentID=A15010000H.
+공식 JPEG는 apps/mobile/public/assets/destinations에 웹 정적 리소스로 보관. 사용자 DB/R2에 사진을 복사하지 않음.
+사진 조회는 소개 응답 직후 통계와 독립적으로 시작. 공개 캐시는 공식 사진 반영을 위해 tripprint-discovery-v2로 구분.
+사진 요청 실패는 원문 소개·여행 생성 흐름을 막지 않음. 실제 사진 메타데이터가 없는 도시는 홈 카드 후보에서 제외.
 
 화면 편집 데이터: apps/mobile/src/features/workspace/HomeDiscovery.tsx ideas 배열.
 12개월별 도시 키 3개. '이달의 여행 아이디어'는 편집 선정이며 계절·기후 API 추천이나 실제 방문 순위가 아님.
 도시 상세에서 선택한 키는 기존 로그인/게스트 시작을 거쳐 new-trip?destination={key}로 유지.
 ======================================================================
+
+앱 시작 확인 계약 (2026-10-12)
+DB명/테이블명: 없음. 기존 회원·기기 여행 테이블과 원본 문서를 변경하지 않음.
+객체 StartupManifest (packages/validation/src/startup.ts), GET /public/startup, 인증 불필요.
+protocolVersion positive integer NOT NULL: 시작 API 계약 버전. 현재 1만 지원. 미지원 성공 응답은 캐시로 우회하지 않고 업데이트 안내.
+commonDataVersion string NOT NULL regex ^[a-f0-9]{64}$: 실제 discoveryDestinations와 discoveryPeriods의 SHA-256.
+  도시 카탈로그 또는 월간 조회 범위 변경을 감지한다. 공급자 사진·소개 원문의 실시간 버전은 아니며 해당 데이터는 기존 discovery 갱신 정책 유지.
+guestDataVersion positive integer NOT NULL: 서버·앱이 현재 지원하는 기기 여행 문서 버전. 현재 1. 임의 변환이나 초기화 없음.
+응답 meta.requestId UUID NOT NULL: 현재 요청 추적 ID. 인증·개인 여행 데이터는 응답에 포함하지 않음.
+
+기기 설정 저장소: Android/iOS SecureStore, 웹 localStorage.
+tripprint.startup.manifest.v1 StartupManifest JSON|null: 실제 성공한 마지막 온라인 확인 결과만 저장. 손상된 메모는 재조회.
+  버전 변경 시 ['public'] 공개 조회 캐시만 비움. 사용자 프로필·개인 기록·사진은 삭제하지 않음.
+tripprint.startup.intro.v1 literal 'seen'|null: 완료한 연출만 기록. 처음 약 2300ms, 이후 약 650ms. OS 동작 줄이기 설정에서는 정적 표시.
+기기 여행 검사: 기존 wherego_guest_profile_session의 비활성 프로필까지 조회, tripprint-guest-{UUID} 문서의 version=1 및 ownerId 일치 검증.
+  파손·미지원 버전·소유자 불일치 시 원본 JSON을 수정/삭제하지 않고 진입 중지 및 재시도·업데이트 제공.
+  네트워크 실패 시 이전 성공 버전 메모 또는 유효한 기기 여행이 있을 때만 오프라인 진행. 최초 기록 없는 실행은 재시도.
+
+객체 PlayUpdate (Android 로컬 Expo 모듈 TripPrintPlayUpdate, Google Play app-update 2.1.0).
+status enum current|available|unavailable NOT NULL: 공식 UPDATE_NOT_AVAILABLE만 current. 조회 실패·직접 설치 APK·UNKNOWN은 unavailable.
+packageName literal com.tripprint.app NOT NULL: 현재 설치된 앱 패키지.
+installedVersionCode positive integer NOT NULL: Android PackageInfo의 실제 versionCode.
+installedVersionName string NOT NULL: Android PackageInfo의 실제 versionName.
+availableVersionCode positive integer|null: UPDATE_AVAILABLE 또는 진행 중인 업데이트일 때만 공식 반환 값. 최신/미확인에서는 null.
+reason optional string: 조회 진단용으로만 허용. 사용자 화면에 기술 오류를 표시하지 않음.
+웹/iOS: status=not-applicable. 모듈 미탑재·8초 타임아웃: unavailable. 실패를 최신 버전으로 판정하지 않음.
+업데이트 발견 시 공식 앱 상세로 이동하거나 호환되는 현재 버전으로 시작 가능. 연출·필수 확인을 건너뛰는 버튼은 없음.
+자동 로그인: 저장 토큰의 서버 세션과 상세 프로필 복원 완료 후 목적지 결정. 연결 장애로 회원 토큰 삭제하지 않으며 재시도 제공.
+======================================================================
+
+2026-10-12 내부 테스트 저장 복구·사진 처리 계약 보충
+DB명/테이블명: 신규 테이블 없음. 기존 회원·여행·사진·기기 문서의 컬럼·타입·제약조건 변경 없음.
+저장 복구 상태의 보관 위치: WorkspaceContent 화면 메모리. DB·SecureStore·localStorage에 저장하지 않음.
+pending (()=>Promise<unknown>)|null: 아직 확정되지 않은 동일 업무 요청. 응답 유실은 본문·버전·멱등 키 유지.
+pendingRebase ((version:number)=>(()=>Promise<unknown>))|null: 실제 VERSION_CONFLICT 최신 조회 성공 후 새 키·버전으로만 요청 생성.
+pendingUsesForm boolean NOT NULL default false: 폼 요청은 입력 수정으로 복구, 사진 등록·준비물 명령은 보관한 본문으로 복구.
+running boolean NOT NULL default false: 화면별 동기 실행 잠금. 연속 클릭·사진 선택의 중복 시작 방지.
+conflict boolean NOT NULL default false: HTTP 409이며 공개 error.code=VERSION_CONFLICT인 경우만 true.
+확정 입력 거부 HTTP 400/403/404/410/413/422/428/429: 폼·원본을 유지하고 대기 요청을 해제해 수정 허용.
+HTTP 401/408/5xx, 통신 실패·성공 본문 손상: 동일 요청을 보존. 일반 조회만으로 저장 여부를 확정하거나 폐기하지 않음.
+실제 저장 성공 뒤 최신 조회 실패: 대기 요청 제거, 저장 완료 안내 및 조회 재시도. 중복 저장 요청 생성하지 않음.
+FoundationClientError.status number NOT NULL / payload unknown|null: 비JSON 실패도 상태 보존, 원본 HTML·내부 본문은 null 처리.
+사진 업로드 userId UUID string NOT NULL: 선택을 시작한 계정. 업로드 직전 실제 세션 UUID·현재 화면 UUID 모두 일치 필수.
+기기 사진 삭제: 기존 guestWorkspaceRequest의 문서 변경·원본 정리로 완료. 서버 원본 path가 없는 완료 결과는 원격 삭제하지 않음.
+사진 조회 캐시 키: ['wherego', userId, 'media:'+tripId, mediaId]. 다운로드 실패 상태는 사진별 화면 메모리로 분리.
+일시적인 전경 인증 통신 실패는 이미 확인한 회원과 폼을 유지. 실제 401·만료는 기존 토큰 폐기·접근 차단 유지.
+======================================================================
+
+[2026-10-13 앱 시작 선택 권한 안내]
+DB명: 없음. 서버 DB·테이블·컬럼·마이그레이션 변경 없음.
+기기 저장소: Expo SecureStore.
+키 tripprint.permissions.guide.v1 / 타입 string / 값 'true' / 선택 / 기본 없음.
+설명: 시작 권한 안내를 닫았다는 기기 단위 기록. 계정별 권한 동의나 실제 허용 상태를 대체하지 않음.
+기존 tripprint.notifications.asked.v1은 이전 알림 안내 기록이며 새 알림·위치 통합 안내의 확인 여부로 사용하지 않음.
+메모리 객체 PermissionKind: 'notifications' | 'location'.
+메모리 객체 PermissionStatus.granted boolean NOT NULL: 운영체제가 반환한 실제 허용 상태.
+메모리 객체 PermissionStatus.canAskAgain boolean NOT NULL: 운영체제에서 다시 요청 가능한지 여부.
+메모리 객체 PermissionSnapshot.notifications / location PermissionStatus NOT NULL: 권한 조회 결과. 서버 전송·영구 저장 없음.
+메모리 객체 PermissionGuide.requested boolean NOT NULL default false: 홈에서 안내 다시 열기 요청. 닫을 때 false.
+위치 latitude / longitude number: 현재 지도 열기 작업의 메모리에서만 사용. 유한수·위도 ±90·경도 ±180 검증.
+좌표를 Google Maps 검색 URL에 전달하며 앱 서버·DB·SecureStore에는 저장하지 않음.
+위치 조회: 버튼 선택 시 사용 중 권한만 사용. 첫 결과·오류·12초 시간 초과·앱 이탈·화면 종료 시 구독 해제.
+선택 권한 거절은 여행 계획·기록 기능을 차단하지 않음. 영구 거절 시 기기 설정으로 이동.
+======================================================================
+
+[2026-10-13 기본 지도·방문 순서 표시]
+DB명: Cloudflare D1 wherego-staging / 테이블 trips / 기존 컬럼 snapshot TEXT NOT NULL(JSON).
+객체 WorkspaceSnapshot.itinerary[].location / 타입 {latitude:number, longitude:number}|null / 선택.
+latitude number 유한수 NOT NULL: -90 이상 90 이하. longitude number 유한수 NOT NULL: -180 이상 180 이하.
+제약: 위치 객체는 위도·경도 쌍만 허용하며 추가 속성은 거부. 기존 일정은 필드 누락 허용.
+설명: 사용자가 지도에서 누르거나 직접 붙여 넣어 선택한 여행 일정의 실제 위치. 도시 중심점·주소 자동 변환으로 생성하지 않음.
+명령 schedule.save.input.location: 생략 시 기존 일정의 위치 보존, null이면 명시적 위치 삭제, 객체이면 전체 좌표 쌍 갱신.
+저장: 기존 원자 변경·버전·멱등 키·소유자/편집자 검증을 유지한 trips.snapshot JSON 안에 보관. 새로운 D1 테이블·SQL 컬럼·DDL 마이그레이션 없음.
+게스트: 같은 WorkspaceSchedule 계약을 기기의 기존 여행 저장소에 보관. 회원과 마찬가지로 좌표 유효 범위 검사.
+기존 PostgreSQL/Supabase 배포는 이번 지도 좌표 확장 대상 아님. 현재 릴리스는 Cloudflare만 허용.
+화면 전용 PlanForm.values.mapLocation string: 좌표 객체 JSON 또는 ''. 서버 명령에서는 제거하고 검증할 location 객체/null로 변환.
+공개 발자국: 기존 공개 프로젝션을 유지하고 새 location 객체를 자동 공개하지 않음.
+메모리 객체 MapStop.item WorkspaceSchedule / order integer >=1 / coordinate 선택 MapCoordinate.
+지도 번호: 선택 날짜 내 sortOrder 오름차순. 동률은 저장 목록의 기존 순서 유지. 누락 위치의 번호도 생략하지 않음.
+연결선: 위치가 있는 연속 일정 사이만 연결. 누락 위치에서 선을 끊음. 도로·소요 시간·최단 동선으로 표시하지 않음.
+빌드 전용 GOOGLE_MAPS_ANDROID_API_KEY string: Maps SDK for Android 전용 제한 키. Native Manifest에만 주입하며 서버·웹 번들·Expo 공개 설정으로 복사하지 않음.
+공개 설정 extra.androidMapsEnabled boolean NOT NULL: 키 형식 설정 여부만 표시. 실제 SDK 인증·타일 로드는 기기에서 검증.
+Map ID 미설정 기본 모바일 SDK 사용. Places·Routes·Geocoding 요청은 이 지도 기능에서 실행하지 않음.
+======================================================================
+
+======================================================================
+[2026-10-14 여행 생성 2단계·도시 여행 가이드]
+DB명: 기존 Cloudflare D1 wherego-staging. 새 테이블·컬럼·마이그레이션 없음.
+테이블 trips / 기존 snapshot TEXT NOT NULL(JSON): 여행 생성·DAY·선택 항공편 저장 계약 유지.
+기기 게스트: 동일 계약을 기존 로컬 여행 문서에 저장. 서버로 자동 전송하지 않음.
+PlanForm.values: 기존 Record<string,string> 유지. title 선택(최대50), country/city 필수(각1~50), startDate/endDate 실제 YYYY-MM-DD.
+첫 단계: 나라·도시·기간만 검사. 기간 1~90일, 종료>=시작. 제목·항공편·통화·시간대 입력을 진행 조건에 포함하지 않음.
+직접 입력한 나라·도시도 허용. 나라 변경 시 이전 도시 초기화, 국가 기본 시간대와 기존 지원 통화 적용.
+시간대 검증: Intl.DateTimeFormat으로 실제 지원 여부 확인. Hermes의 Intl.supportedValuesOf 유무에 의존하지 않음.
+여행 생성 화면 상태 tripStep: 'basics'|'flight', 기본 basics. 메모리에만 존재하며 서버 전송 없음.
+선택 모달 상태 kind: 'country'|'city', query string 최대50, manual boolean 기본false. 확정 전 부모 폼 변경 없음.
+countryCities: 국가명 키 -> readonly string[] 주요 도시 목록. 완전한 행정구역 목록이 아니며 없는 도시는 직접 입력 가능.
+cityTimezones: 도시명 키 -> IANA 시간대 string. 복수 시간대 국가의 일부 주요 도시 선택 시 보정.
+CalendarSelection: startDate/endDate YYYY-MM-DD 또는 ''. 시작 선택 후 종료 선택. 완료 후 새 선택·시작 이전 날짜는 새 기간 시작.
+공개 경로 /destinations/[key]: DiscoveryDestination.key 카탈로그의 8개 도시만 조회. 잘못된 키는 복귀 안내.
+새 객체 CityGuide: 앱 번들에 포함한 관광청 자료 기반 편집 가이드. DB 저장·API 계약 변경 없음.
+CityGuide.intro string NOT NULL: 편집 도시 설명.
+CityGuide.photoDescription string NOT NULL: 실제 사진 풍경 설명·접근성 이름.
+CityGuide.photo ImageSourcePropType NOT NULL: 앱 번들 JPEG 정적 참조. 타 도시·생성 사진 대체 없음.
+CityGuide.places/foods Array<{title:string,description:string}> NOT NULL: 명소·먹거리 이름 및 짧은 설명.
+CityGuide.seasons Array<{months:string,description:string}> NOT NULL: 월 범위와 통상 볼거리. 당해 행사 날짜·개화 확정값 아님.
+CityGuide.sources Array<{label:string,url:string}> NOT NULL: 고정 HTTPS 관광청·지자체 출처.
+사진 credits.json: 도시 키별 file, sourceUrl, author, license, licenseUrl, originalUrl, thumbnailUrl, changes, checkedAt.
+사진 제약: Commons 저작자·CC BY/CC BY-SA/CC0 확인 후 960px 축소본을 번들에 보관. 표시 출처·이용 조건 링크 제공.
+bundledDiscoveryCity: 실제 편집 소개만 사용하며 조회 통계 currentViews/previousViews는 null. 인기 순위를 추정하지 않음.
+외부 위키백과 소개는 기존 public discovery 계약·출처 표시로만 보충. 조회 실패에도 앱의 편집 가이드·사진 제공.
+======================================================================
+
+2026-10-14 v4 항공편 상세 입력·저장·조회 계약
+DB명: Cloudflare D1 wherego-staging / 운영 환경은 기존 release 설정의 DB 바인딩 사용.
+테이블명: trips. 기존 snapshot TEXT(JSON) 컬럼의 itinerary 배열에 선택 객체 flight 추가.
+물리 테이블·컬럼 추가 없음. 서버 공통 검증과 JSON 문서 모델을 함께 배포하며 SQL 마이그레이션은 추가하지 않음.
+기기 게스트 DB: 기존 guestWorkspace 문서의 trips[].itinerary[].flight에 동일 계약 저장.
+도메인 객체명: FlightDetails / WorkspaceSchedule.flight / PersistedTripInput.flight.
+2026-10-14 항공 조회 확장: FlightDetails.arrivalDate optional string, 실제 YYYY-MM-DD 현지 도착일.
+  저장 DB: 기존 Cloudflare D1 trips.snapshot TEXT(JSON)의 itinerary[].flight.arrivalDate와 기기 guestWorkspace JSON.
+  새 테이블/SQL 컬럼/마이그레이션 없음. 생략한 구형 항공편도 유효. 날짜 변경선의 현지 도착일이므로 출발일과의 문자열 대소 비교로 거부하지 않음.
+  기존 flight 저장 계약과 같은 사용자 확인/공유 권한을 사용하고 공개 커뮤니티 투영에는 추가하지 않음.
+조회 전용 객체 flightLookupQuery: number string NOT NULL(공백 제거·대문자·편명 정규식), date string NOT NULL(실제 YYYY-MM-DD 출발일).
+조회 전용 객체 flightLookupCandidate: number/출발 departure/도착 arrival string NOT NULL, IATA 공항3글자, 서로 다름.
+  departureDate string NOT NULL YYYY-MM-DD, departureTime string NOT NULL HH:mm.
+  arrivalDate optional YYYY-MM-DD, arrivalTime optional HH:mm, departureTerminal/arrivalTerminal optional string 최대40,
+  durationMinutes optional integer 1..10080(명시 UTC 예정 출도착 차이), airline optional string 최대200.
+  공급자 null 선택값은 생략. 수하물·좌석 등급은 조회 객체에 없음. 요청 편명과 출발일이 일치하는 구간만 반환, 최대20개.
+조회 전용 객체 flightLookupResponse: candidates array 최대20, source enum AeroDataBox|한국공항공사, checkedAt string ISO UTC datetime, notice optional string 최대600.
+  경로 GET /api/v1/flights/lookup. 서버 키 KAC_FLIGHT_SERVICE_KEY 또는 명시 선택한 AERODATABOX_RAPIDAPI_KEY는 Worker secret, 원본 응답/후보 DB 저장 없음.
+  키/제한 바인딩 누락과 공급자 실패는 FLIGHT_UNAVAILABLE 503, 사용자·공급자 한도 초과는 FLIGHT_RATE_LIMITED 429, 결과 없음은 빈 후보200.
+  FLIGHT_LOOKUP_LIMITER는 Cloudflare RateLimit 바인딩, 사용자별6회/60초 위치별 근사 제한. DB 테이블 아님.
+화면 전용 PlanForm.values.flightArrivalDate string, 기본 빈 문자열. 조회 적용은 선택 시에만 기존 flight 문자열 필드/출발 timeSlot 또는 flightTime에 반영.
+  busy/error/result/chosen/manual/AbortController는 조회 컴포넌트 메모리 상태이며 DB 컬럼이나 저장 명령 필드가 아님.
+2026-10-15 여행 생성 흐름·복수 항공편 계약:
+- DB명: Cloudflare D1 / 테이블명: trips / 컬럼: snapshot TEXT(JSON). 기기 저장소: guestWorkspace JSON의 trips[].itinerary. 물리 스키마 변경 없음.
+- 생성 객체 PersistedTripInput.city: string, trim, 최대50, 생략 시 빈 문자열. 도시 선택은 필수가 아니며 가짜 도시·나라명으로 대체하지 않음.
+- trip.update.input.city: string, trim, 최대50, 빈 문자열 허용. 도시를 비운 여행도 다른 내용을 수정할 수 있음.
+- 생성 객체 PersistedTripInput.title: optional string, trim, 최대50. 비어 있으면 실제 actor nickname과 country로 '{닉네임}의 {나라} 여행' 생성. DB 저장 후 title은 string.
+- 생성 객체 PersistedTripInput.flights: optional array, 최대30. 기존 flight와 동시에 전달 불가. 구형 단일 flight는 계속 허용.
+- flights[].date: 실제 달력 YYYY-MM-DD string NOT NULL. 여행 startDate~endDate 안의 출발일. 해당 DAY id로 일정 연결.
+- flights[].time: HH:mm string NOT NULL, 00:00~23:59. 저장 시 itinerary[].timeSlot에만 보관.
+- flights[].role: enum outbound|inbound|additional NOT NULL. outbound와 inbound는 각각 최대1. 생성 목록 슬롯용이며 일정 상세에 복사하지 않음.
+- flights[] 나머지 필드: 기존 FlightDetails와 동일. number/IATA 구간 검증, 같은 공항 구간 금지, 선택 도착일·시각·터미널·기체 정보의 기존 제약 유지.
+- 실제 저장: itinerary[].type=TRANSPORT, 출발 날짜의 dayId, number와 공항쌍을 조합한 title, 순서 sortOrder, flight 상세. 생성용 flight/flights 배열은 trip 속성에 중복 저장하지 않음.
+- PlanForm.values.flights: JSON 문자열, 기본 '[]'. 항공권 입력 페이지의 후보는 완료 전까지 화면 상태. 완료한 항공편만 폼 목록 갱신. 조회 실패·뒤로가기에서 기존 목록 보존.
+- 항공사 카탈로그: 번들 data/airlines.json 및 airlines-kac.json의 {code:string 2자리 영문·숫자, name:string}. 항공사 선택용 읽기 자원. 운항·예약 확인 또는 DB 테이블 아님.
+- 국가 대륙/지역·한글 초성, 날짜 MM-DD/YY-MM-DD는 표시·검색 전용. 저장 날짜 형식은 YYYY-MM-DD 유지.
+- 새 앱/API 동시 배포 필요. 기기 게스트도 같은 생성 검증·newTrip 모델 사용. 기존 저장 여행·항공편 상세와 SQL 물리 컬럼은 그대로 읽을 수 있음.
+
+2026-10-14 한국공항공사 실제 조회 반영:
+- DB명: Cloudflare D1, 테이블명: trips, 컬럼: snapshot(JSON TEXT). 기기 저장: guestWorkspace JSON. 물리 컬럼·제약 변경 없음.
+- 조회 전용 객체 flightLookupCandidate.departureStatus: optional string 최대80. 출발 행 rmkKor의 조회 당시 상태. DB 저장 안 함.
+- 조회 전용 객체 flightLookupCandidate.actualDepartureTime: optional string HH:mm, 00:00~23:59. 출발 완료 상태와 같은 날짜의 유효한 etd가 함께 있을 때만 반환. DB 저장 안 함.
+- 기존 arrivalDate(string YYYY-MM-DD), arrivalTime(string HH:mm), durationMinutes(positive integer <=10080): 한국 공항쌍의 유일한 출발·도착 행 결합 조건을 통과한 계획시각만 채움. 다른 항공기·항공사·중복 운항·역전 시각 결합 금지. 한쪽 기체 미배정은 추정하지 않음.
+- departureGate는 후보 조회 당시 출발 게이트이며 DB 저장·터미널 대입 안 함. 원격 실시간 자동 갱신 기능 없음.
+- 출발 공항 이름 검증 목록에 실제 응답의 ICN 추가. 인천 국제선 전체 제공을 의미하지 않음.
+
+2026-10-14 한국공항공사 공공데이터 연결:
+  DB명 Cloudflare D1(환경별 기존 DB), 테이블 trips, 컬럼 snapshot TEXT(JSON)의 itinerary[].flight.
+  기기 게스트 저장소 guestWorkspace의 trips[].itinerary[].flight에도 같은 선택 계약 적용.
+  FlightDetails.aircraftType/aircraftRegistration: optional string, trim, 최대40, 기종/항공기 고유 등록번호. 생략한 구형 항공편도 유효.
+  flightLookupCandidate.aircraftType/aircraftRegistration: optional string 최대40, 제공된 경우에만 선택 후 저장.
+  flightLookupCandidate.departureGate: optional string 최대40, 후보 표시용 게이트이며 터미널로 저장하지 않음.
+  PlanForm.values.flightAircraftType/flightAircraftRegistration: 화면 전용 string, 미입력은 빈 문자열, 저장 시 FlightDetails 선택 필드로 검증.
+  FLIGHT_LOOKUP_PROVIDER: 서버 공개 설정 string kac|aerodatabox, 기본 kac. 유료 공급자로 자동 전환 없음. DB 컬럼 아님.
+  KAC_FLIGHT_SERVICE_KEY: Worker 서버 비밀, 앱·DB·문서·로그에 기록하지 않음. 인코딩/디코딩 키는 서버에서 한 번만 URL 인코딩.
+  공급자 행 io=O, 관할 airport 코드와 boardingKor 이름이 일치하고 std 계획시각의 날짜가 조회 출발일과 일치할 때만 후보 생성.
+  출발 행은 airport=관할 출발 공항, city=상대 도착 공항으로 가이드 예시·이름을 대조. io=I 행의 도착시각을 출발시각으로 저장하지 않음.
+  std는 유효한 YYYYMMDDHHmm 출발 계획시각, etd 실제시각을 계획시각으로 덮어쓰지 않음. 8자리 날짜만 있는 시각은 제외.
+  도착일·도착시각·소요시간은 국내선의 유일한 출발·도착 기록 결합 시에만 자동 입력. 해외 구간·모호한 기록은 비워 둠. 터미널·예약 수하물·좌석 등급은 자동 생성하지 않음.
+  새 SQL 테이블/물리 컬럼/마이그레이션 없음. 기존 사용자 확인 저장·멤버 권한·공개 투영 정책 유지.
+
+FlightDetails.number: string NOT NULL, trim, 대문자 편명 ^[A-Z0-9]{2,3}[0-9]{1,4}[A-Z]?$. 사용자 확인 항공 편명.
+FlightDetails.departure: string NOT NULL, 대문자 IATA 3글자 코드 ^[A-Z]{3}$. 출발 공항.
+FlightDetails.arrival: string NOT NULL, 같은 코드 형식, departure와 달라야 함. 도착 공항.
+FlightDetails.departureTerminal: optional string, trim, 최대40글자. 사용자가 확인한 출발 터미널.
+FlightDetails.arrivalTerminal: optional string, trim, 최대40글자. 사용자가 확인한 도착 터미널.
+FlightDetails.arrivalTime: optional string HH:mm, 00:00~23:59. 도착 공항의 현지 시각이며 자동 날짜·시차 계산을 하지 않음.
+FlightDetails.durationMinutes: optional integer, 1~10080. 사용자가 확인한 소요시간(분). 출발/도착 시각의 차이로 추측하지 않음.
+FlightDetails.baggageKg: optional finite number, 0~100. 무료 위탁수하물 kg. 숫자 0과 정보 누락은 구분.
+FlightDetails.cabin: optional string, trim, 최대40글자. 일반석 등 사용자가 확인한 좌석 등급. 잔여 좌석 수 의미 아님.
+WorkspaceSchedule.flight: optional FlightDetails|null. TRANSPORT 유형에만 상세 객체 연결 가능.
+schedule.save.input.flight: 생략하면 동일 ID의 기존 상세 보존. null이면 명시적 해제. 객체면 공통 스키마 검증 후 전체 교체.
+일정 유형을 TRANSPORT 이외로 바꾸면 기존 항공편 상세를 null로 해제. 서버 권한·버전·멱등성 검증은 기존 경로 사용.
+PersistedTripInput.flight: FlightDetails + time string(HH:mm 또는 ''). 여행 생성 시 첫 DAY에 연결.
+생성 전용 time은 WorkspaceSchedule.timeSlot으로 이전. WorkspaceSchedule.flight에는 중복 저장하지 않음.
+WorkspaceSchedule.dayId → days[].tripDate가 출발일·외부 검색의 탑승일 기준. 도착 날짜·운항 상태·예약 인증은 저장하지 않음.
+
+기존 일정 호환: TRANSPORT 제목이 편명 + 공항3글자 → 공항3글자와 정확히 일치하고 flight가 null이 아닐 때 구간만 표시용 복원.
+이 복원에서 터미널·도착 시각·소요시간·수하물·좌석 기본값은 만들지 않음. 조회만으로 DB를 변경하지 않음.
+명시적 null에서는 제목이 항공편 형식이어도 재추론하지 않음.
+공개 커뮤니티 snapshot의 기존 선택 프로젝션에 flight 상세는 추가하지 않음. 자동 공개 범위 확장 없음.
+
+화면 전용 PlanForm.values: flightEnabled 'true'|'false', flightNumber/flightDeparture/flightArrival,
+flightDepartureTerminal/flightArrivalTerminal/flightArrivalTime/flightDurationMinutes/flightBaggageKg/flightCabin string.
+새 여행은 기존 flightTime/flightSkipped도 사용. 일정 편집의 출발 시각은 기존 timeSlot 입력 사용.
+화면 전용 flight 접두사 필드는 일반 일정 입력에서 제외하고 검증한 flight 객체로만 전송.
+구형 작성 초안에 flightEnabled가 없으면 flight 필드를 보내지 않아 기존 상세를 보존.
+항공편 일정의 제목이 비었으면 입력한 편명·출발/도착 공항으로 자동 구성.
+검색 제공자: 네이버/구글 고정 HTTPS 호스트. 편명·선택 DAY 날짜·항공편 키워드로 검색. 과금 API·운항 조회 계약 추가 없음.
+실제 계정의 여행에 예시 항공편을 주입하지 않음. 사진의 값은 검증 자료와 Stitch 디자인에서만 사용.
+배포 순서: 위 선택 객체를 이해하는 API 먼저 → 웹/Android v4 앱. 이전 API의 strict 검증에서는 새 상세 입력이 거부될 수 있음.
+기존 Supabase SQL 계약에는 새 상세 필드를 추가하지 않음. 현행 Cloudflare/기기 게스트 경로에서 지원.
+======================================================================
+
+[2026-10-14 / 일정 화면 구조·방문 순서·체류시간·예상 비용]
+DB명: 현행 Cloudflare D1 여행 저장소 및 기기 게스트 문서.
+테이블명: trips. 물리 컬럼 신설 없음. 기존 snapshot JSON의 itinerary/expenses에 저장.
+도메인 객체: WorkspaceSchedule, WorkspaceExpense, PlanForm, WorkspaceCommand.
+
+WorkspaceSchedule.durationMinutes
+- 타입: optional integer|null. 제약: 정수 1~1440분. 설명: 사용자가 입력한 방문 체류시간.
+- 기존 기록의 속성 생략은 허용. schedule.save에서 생략하면 기존 값을 보존하고 null이면 해제.
+- FlightDetails.durationMinutes(비행 소요시간)와 별개. 도로 이동시간을 추정한 값이 아님.
+
+schedule.save.input.afterScheduleId
+- 타입: optional UUID|null. DB 저장 컬럼 아님. 선택한 DAY 안의 삽입 기준 일정 ID.
+- null은 맨 앞. UUID는 동일 DAY의 다른 실제 일정만 허용. 자기 ID·다른 DAY·없는 ID 거부.
+- 생략은 기존 클라이언트의 sortOrder 저장 동작 유지.
+- 명시적 삽입은 같은 DAY의 기존 목록을 보존하고 sortOrder를 1부터 다시 부여.
+- 기존 일정 이동은 원래 ID·사진 연결을 보존. 확정 영수증과 다른 결제일 DAY로의 이동 거부.
+
+schedule.save.input.estimatedCost
+- 타입: optional {amount:string,currency:'KRW'|'JPY'|'USD'}|null. DB 일정 속성으로 복사하지 않음.
+- amount는 공통 decimalExpenseSchema의 양수/통화 정밀도 제약 적용. KRW/JPY 소수 금액 거부.
+- 객체면 expenses에 isActual=false, source='schedule-plan'으로 같은 변경 안에서 저장.
+- 기존 schedule-plan 비용은 ID 재사용하여 갱신. 새 비용만 UUID 발급. dayId/scheduleId/title 연결.
+- null이면 해당 일정의 source='schedule-plan' 비용만 해제. 생략하면 기존 예상 비용 보존.
+- 실제 지출·영수증·다른 출처의 일반 예상 비용은 삭제하거나 덮어쓰지 않음.
+- 환율·원화 환산·예약 확인 등 추정 정보는 저장하거나 표시하지 않음.
+
+schedule.reorder
+- 입력: {dayId:UUID,ids:UUID[]}. 명령 전용 객체. 최대10000 ID, 중복 불허.
+- 선택한 DAY에 존재하는 전체 일정 ID가 정확히 한 번씩 포함되어야 함. 누락/혼합/없는 ID 거부.
+- 선택 날짜의 sortOrder만 갱신하고 다른 DAY와 사진/비용 객체를 유지.
+- 기존 역할·보관 상태·If-Match 버전·Idempotency-Key 검증을 같은 명령 경로로 사용.
+
+PlanForm.values 추가(화면 전용 문자열)
+- durationMinutes: '' 또는 분 단위 정수 문자열. 저장 시 number|null 변환.
+- afterScheduleId: 'last'(마지막), ''(맨 앞), UUID. 기존 편집에서 생략하면 기존 순서 유지.
+- estimatedAmount: '' 또는 공통 금액 문자열. estimatedCurrency: KRW/JPY/USD.
+- 날짜 변경 시 afterScheduleId를 last로 초기화. 미리보기 지도는 선택한 실제 좌표만 표시.
+
+배포 호환성: Cloudflare API/앱이 같은 새 계약을 사용해야 한다. 구형 strict API는 새 입력을 거부한다.
+본 변경은 로컬 구현이며 원격 API 배포를 수행한 것으로 보지 않는다. 기기 게스트는 공통 모델 사용.
+======================================================================
+기획 재검토에 따른 일정·비용 연결 정책 보완 (2026-10-14)
+- DB: Cloudflare D1 / 테이블: trips / 컬럼: snapshot (JSON TEXT), 물리 스키마 변경 없음.
+- schedule.delete: 선택 일정에 연결되고 source=schedule-plan인 자동 예상 비용은 제거한다.
+  실제 지출과 수동 예상 비용은 삭제하지 않고 scheduleId=null인 독립 기록으로 보존한다.
+  사진은 기존대로 연결만 해제하며 영수증 연결 일정 삭제 보호는 유지한다.
+- schedule.save: 일정에 연결된 expenses[].dayId(UUID)는 부모 일정의 선택 DAY로 함께 변경한다.
+  금액·통화·실제 여부·출처는 보존한다. 영수증 거래 날짜와 다른 DAY로 이동하는 요청은 계속 거부한다.
+- 시간 충돌 안내는 입력된 timeSlot과 durationMinutes만 사용한 화면 계산이며 저장 시각을 자동 수정하지 않는다.
+
+======================================================================
+[2026-10-14 / v3 P0 계정·삭제 확인·공통 이탈 보호]
+DB명: 현행 Cloudflare D1 및 기기 게스트 저장소. 물리 DB 변경 없음.
+테이블명: user/profiles/trips/uploads/posts 등 기존 테이블 유지.
+컬럼·타입·제약조건: 기존 스키마와 WorkspaceCommand 계약 유지. 아래 객체는 화면 수명 안의 메모리에만 존재.
+
+ProfileSaveScope (apps/mobile/src/features/auth/profileSave.ts)
+- accountId: string, 요청을 시작한 실제 계정 UUID. 다른 UUID 응답은 반영하지 않음.
+- active: boolean, 현재 프로필 화면 수명 여부. 화면 해제 뒤 응답·오류·정리 콜백을 무효화.
+- sequence: number, 화면 효과 해제 또는 새 요청 때 증가. 이전 요청의 늦은 콜백을 구분.
+- running: boolean, 동기 중복 제출 잠금. 요청 확정 전 동일 화면의 중복 PATCH 방지.
+- 저장 위치 없음. 비밀번호·인증 토큰·요청 원문을 이 객체에 보관하지 않음.
+- profileUpdateState: 현재 프로필이 없거나 updates.id가 현재 UUID와 다르면 기존 상태 유지.
+- 기존 프로필 선택 필드·닉네임 길이·온보딩 완료 계약은 이번 변경에서 확장하지 않음.
+
+WorkspaceConfirmation (apps/mobile/src/features/workspace/workspaceConfirmation.ts)
+- tripId: string(UUID), 확인을 연 여행의 실제 식별자.
+- version: number(여행의 양의 정수 버전), 확인 뒤 최신 캐시 버전과 같아야 실행 가능.
+- command: WorkspaceCommand, 기존 {operation,input} 명령을 변경 없이 보관.
+- title/message/label: string, 대상·삭제 영향·명시 실행 버튼의 사용자 문구.
+- 일정·수동 비용·영수증·사진 삭제, 동행 제거·초대 취소·게시 철회에 사용.
+- 확인 직전 현재 계정·여행·버전·대상 존재·역할·보관 상태 검사. 실제 API의 권한·CAS·멱등성 검사는 유지.
+- 사진 확인창의 원본은 기존 비공개 media URL 조회를 재사용. 공개 저장·신규 파일 업로드 없음.
+- 영수증 삭제는 기록·실제 지출 제거, 장소·보관 사진 유지. 사진 삭제의 게시 철회 영향은 기존 모델과 동일.
+
+EditableForm 및 공통 이탈 Guard (scheduleExitGuard.tsx)
+- EditableForm.kind/id: string, 폼 종류와 폼 식별자. PlanForm과 프로필 폼이 같은 비교 구조를 사용.
+- EditableForm.values: Record<string,unknown>, 현재 화면의 입력값. 서버 전송 구조가 아님.
+- 기준값 id/values: string, 같은 폼 종류·ID의 최초 JSON과 현재 입력을 비교. 폼 교체 때 기준 재설정.
+- owner: string|null, React 화면 인스턴스 식별자. 숨겨진 탭·이전 계정의 정리가 현재 화면 보호를 지우지 않음.
+- title: string, 일정 또는 일반 내용의 미저장 확인 제목.
+- blocked/busy/commit: boolean, 변경 보호·저장/결과확인 잠금·명시 이동의 실행 상태.
+- pending/discard: function|null, 확인한 이동과 폼 닫기 콜백. 서버·파일·localStorage에 직렬화하지 않음.
+- 여행 생성·일정·비용·영수증·공개·여행 정보·기간·프로필 폼 보호. 저장 성공의 이동은 보호 해제 렌더 뒤 한 번 실행.
+- 앱 종료 후 영구 초안 복원 추가 없음. 응답 유실의 기존 본문·키는 WorkspaceContent 메모리에 유지하며 복구 전 이동을 막음.
+======================================================================
+
+2026-10-15 R04 프로필 입력·온보딩 계약
+======================================================================
+이 절은 위의 가입 nickname trim 2~30자, 프로필 API 1~50자, 성별+생일 필수 완료 설명을 대체한다.
+DB명: Cloudflare D1 wherego-staging 및 각 배포 환경의 DB 바인딩.
+물리 스키마: 기존 0001·0005·0006 유지. birth_date와 onboarding_completed_at이 이미 NULL을 허용하므로 새 DDL·데이터 변환은 없다.
+
+테이블 user
+- id TEXT PRIMARY KEY NOT NULL: 실제 인증 계정 UUID. 기존 계정·여행 소유권을 유지한다.
+- name TEXT NOT NULL: 공개 닉네임. 신규 가입·실제 이름 변경은 공백 포함 UTF-8 2~20바이트. 한글 3바이트, 일반 공백·ASCII 영문 1바이트, 보조 평면 이모지 4바이트.
+- 공백만 있는 신규 이름은 거부한다. 입력값을 trim하거나 자르지 않고 그대로 저장한다.
+- 기존 회원의 이름은 길이·공백과 관계없이 원문 유지. 본인 DB 이름과 정확히 같은 입력 또는 nickname 생략은 이름 UPDATE 대상에서 제외한다. 다른 이름으로 바꾸면 새 제한을 적용한다.
+- user_nickname_unique UNIQUE(lower(trim(name))) 유지. 이름 길이에 공백을 세는 규칙과 중복 비교의 공백 정규화는 별개다. ASCII 대소문자·앞뒤 일반 공백만 다른 이름도 중복이다.
+- OAuth 신규 이름이 길이 제한을 넘거나 중복이면 Quest-[A-Z0-9]{6} 고유 후보를 발급한다. 기존 회원 이름을 일괄 변경하지 않는다.
+- updatedAt INTEGER NOT NULL: 프로필 저장 성공 시 UTC 밀리초로 갱신. 다른 기존 컬럼은 변경하지 않는다.
+
+테이블 profiles
+- user_id TEXT PRIMARY KEY REFERENCES user(id): 본인 인증 계정만 조회·수정한다.
+- details TEXT NOT NULL DEFAULT '{}': JSON 객체. bio string|null(최대300자), travelStyles string[](최대20개·각50자). 생략한 항목은 json_patch로 기존 값을 유지한다.
+- gender TEXT NULL CHECK(gender IN ('female','male','unspecified')): 선택 값. unspecified는 성별을 밝히지 않음. 수정 요청에서 생략하면 기존 값 유지.
+- birth_date TEXT NULL: 선택 생년월일. 문자열은 YYYY-MM-DD의 실제 달력 날짜, 1900-01-01~오늘. 요청에서 생략하면 기존 값 유지, null이면 삭제, 빈 문자열·잘못된 날짜는 422.
+- onboarding_completed_at INTEGER NULL: 설정 완료 UTC 밀리초. onboardingCompleted:true 요청으로 생일과 무관하게 최초 시각 기록. 기존 시각은 coalesce로 유지한다. 일반 소개·이름 수정만으로 새 완료를 만들지 않는다.
+- 구버전 앱 호환: 유효한 gender와 birthDate를 함께 보낸 기존 요청도 완료 시각 기록. 기존 게스트는 생일 없이 완료 상태를 응답한다.
+- 이름·소개·성별·생일·완료 기록은 D1.batch로 함께 확정. 실패한 요청의 일부만 저장하지 않는다.
+- 생일과 성별은 본인 프로필 응답에만 포함하며 커뮤니티·동행의 공개 객체에 추가하지 않는다.
+
+API 요청 객체 ProfileUpdate (packages/domain/src/index.ts)
+- nickname?: string. 새 이름의 UTF-8 제한은 변경 시 검사. 기존 이름 예외는 서버의 본인 DB 값으로만 판정한다.
+- bio?: string|null, travelStyles?: string[], gender?: female|male|unspecified.
+- birthDate?: string|null. undefined=보존, null=삭제, 유효 날짜=저장.
+- onboardingCompleted?: true. false·null은 허용하지 않는다. 계정 ID·인증 방식·previousNickname 같은 추가 필드는 strict 검증으로 거부한다.
+- PATCH /api/v1/profile 및 GET /api/v1/profile 응답: Profile.nickname 원문, gender|null, birthDate|null, onboardingCompleted boolean. 일반 회원은 완료 시각 존재 여부, 게스트는 true.
+- POST /api/auth/sign-up/email의 name과 POST /api/auth/update-user의 name도 같은 바이트 규칙·중복 검사. 직접 인증 경로로 제한을 우회하지 못한다. 인증 경로의 기존 이름은 본인 DB와 비교해 허용한다.
+
+앱 Profile·기기 저장 객체
+- Profile.birthDate?: string|null: 선택 생일. Profile.onboardingCompleted?: boolean: 서버 확정 완료 상태. 생일 유무로 추론하지 않는다.
+- 프로필 설정 제출: nickname 원문, gender 선택(선택 안 함 허용), birthDate 날짜|null, onboardingCompleted:true. 생일 없이 설정 완료 후 원래 목적 경로로 이동한다.
+- 공통 nicknameBytes/validProfileNickname/nicknameSchema: 가입·설정·편집·서버에서 같은 UTF-8 계산. TextEncoder가 없는 모바일 실행 환경에서도 계산한다. 기존 읽기 객체에는 새 길이 제한을 적용하지 않는다.
+- 저장소: 웹 localStorage / iOS·Android SecureStore. key=wherego_guest_profile_session. 원격 인증 토큰과 별도로 보관한다.
+- StoredGuestProfile.id UUID string, nickname string(min1·기존 길이 보존), authProvider='guest', createdAt/updatedAt string: 필수.
+- avatarUrl?: string|null, bio?: string|null, travelStyles?: string[], gender?: female|male|unspecified|null, birthDate?: string|null: 서버 확정 선택 값을 저장·복원한다.
+- onboardingCompleted boolean DEFAULT true: 과거 게스트 저장값의 필드 누락을 호환. 명시한 true/false 값은 보존한다.
+- osPlatform?: web|ios|android, linkedId?: string, linkedAt?: string: 확인한 계정 메타데이터. 인증 토큰·알 수 없는 필드는 저장 객체에서 제거한다.
+- active boolean DEFAULT true: 일반 회원 전환·로그아웃 시 false. 자동 복원에서는 비활성 프로필을 반환하지 않지만 게스트 재선택 시 기존 개인정보와 기록을 복원한다.
+- 일반 회원은 이 저장소에 저장하지 않는다. 앱 재실행 시 실제 세션으로 본인 프로필을 다시 조회한다.
+======================================================================
+
+2026-10-15 R05 입력 오류·제출 잠금
+======================================================================
+DB명·테이블: Cloudflare D1 및 기존 기기 여행 문서 유지. 이번 변경은 화면 메모리 객체이며 새 테이블·컬럼·마이그레이션·저장 형식 변경은 없다.
+
+FormFeedbackState (apps/mobile/src/features/workspace/formFeedback.ts)
+- fields Record<string,string>: 현재 화면의 입력 라벨과 오류 안내. 서버 저장 계약의 Zod 오류 경로를 제목·날짜·주소·메모·금액·항공편·영수증 품목 입력에 연결한다.
+- attempt number: 명시적 검증 시도에서 증가. 입력을 고칠 때는 유지하여 다른 입력으로 초점을 빼앗지 않는다.
+- 오류 입력은 원문을 유지한다. title: 일정·비용·공개 1~100자, 여행 제목 최대50자. memo 최대300자, address 최대200자, details 최대1000자, body 최대2000자는 기존 서버 스키마를 그대로 사용한다.
+- 시간: 기존 HH:mm 00:00~23:59. 좌표: 유한한 latitude -90~90, longitude -180~180. JSON 파손·좌표 누락도 입력 오류로 분류한다.
+- 금액: 기존 decimalExpenseSchema. KRW·JPY는 양의 정수, USD는 소수 둘째 자리까지의 양수. 새 환율·합계 계산 규칙은 추가하지 않는다.
+- revisedFormFeedback: 수정한 필드와 연관된 안내만 제거하며 제출 순번은 유지한다.
+
+폼 입력 Scope·Target (apps/mobile/src/features/workspace/InputFeedback.tsx)
+- locked boolean: 현재 작업 실행·사진 인식·미확정 요청·삭제 확인 상태에서 파생. 별도 저장 실행기나 서버 잠금이 아니다.
+- feedback FormFeedbackState: 같은 폼의 필드 안내와 제출 순번.
+- targets Record<string,Target>: 현재 화면에 연결된 입력·선택 영역. Target.node는 View 참조, Target.focus는 실제 입력 초점 콜백. 서버·localStorage·SecureStore에 직렬화하지 않는다.
+- seen number ref: 마지막으로 초점을 이동한 제출 순번. 새 오류에서만 다음 프레임에 첫 등록 입력으로 초점·스크롤을 이동한다. 폼 해제·오류 변경 시 예약 프레임을 취소한다.
+- Field·ScheduleField: 실제 editable과 접근성 disabled를 적용하고 오류를 필드 옆에 표시한다. 날짜·국가·도시·기간 선택도 같은 잠금을 사용한다.
+- Action·ScheduleButton.allowWhileLocked boolean DEFAULT false: 입력 선택은 잠그고, 저장 결과 재확인 및 버전 충돌 최신 조회 행동만 예외로 제공한다. 실제 실행 중 busy는 이 예외보다 우선한다.
+
+SubmissionLock (apps/mobile/src/features/forms/submissionLock.ts)
+- current boolean: 한 화면의 요청 실행 여부를 담은 동기 ref. 서버 호출 전에 true를 기록하여 같은 프레임의 연타를 차단한다.
+- submitOnce<T>(lock,task): 이미 실행 중이면 undefined, 아니면 Promise<T>. 동기 예외·비동기 실패·성공 후 잠금을 해제한다.
+- 프로필 설정 완료와 공개 게시물 신고·차단에서 사용한다. 기존 이메일 인증·프로필 편집·여행 저장의 잠금은 유지한다.
+- 신고 사유는 기존 reportSchema의 trim 1~500자, 준비물 이름은 checklistAddSchema의 trim 1~100자를 전송 전에 검사한다. 앞뒤 공백을 뺀 뒤 내부 공백은 길이에 포함한다.
+
+기존 복구 계약과 국가 입력
+- WorkspaceContent.running/pending/pendingRebase 및 멱등 키·버전 계약 유지. 응답 유실에서는 입력·선택을 잠그고 최초 본문·키를 그대로 재시도한다.
+- 확정된 입력 거절은 기존 canReviseWorkspaceRequest에 따라 잠금을 해제해 수정·새 요청을 허용한다. 실제 VERSION_CONFLICT는 최신 조회 성공 이후에만 새 요청으로 전환한다.
+- newTripForm과 PlanForm.values의 저장 구조 유지. 여행 제목을 저장 직전 slice(0,50)으로 자르던 처리를 제거하여 초과 입력을 스키마 오류로 돌려준다.
+- countryInputError는 countries.ts에 이미 기록된 checkedAt=2026-10-05 정책과 같은 prohibitedCodes를 사용한다. 직접 입력한 한국어 이름·코드·등록된 영문 별칭도 동일 판정. 일부 지역 제한은 기존 선택 가능 범위를 유지한다. 정책 목록·확인일은 변경하지 않는다.
+- 일반 회원의 신고 화면은 계정 UUID별로 상태 수명을 분리한다. 신고 대상 ID와 사유는 최초 제출 시점에 고정하고 처리 중 입력·취소를 막는다.
+======================================================================
+======================================================================
+R06 내 여행·인증 복귀 계약 (2026-10-15)
+
+DB명: 해당 없음 (클라이언트 인증 복귀·조회 오류 객체). 물리 테이블·API·마이그레이션 변경 없음.
+객체명: AuthReturn / 위치: apps/mobile/src/features/auth/authReturn.ts
+- next: 선택 문자열. plans / trip / diary / footprints / new-trip / community / invite / import-place만 허용한다.
+  배열·임의 URL·알 수 없는 값은 빈 객체로 정리하고 기존 기본 홈으로 복귀한다.
+- destination: 선택 문자열. next=new-trip일 때만 기존 homeDestination 카탈로그의 key를 허용한다.
+  등록되지 않은 목적지는 빈 문자열로 바꾸고 기존 도시·나라 기본값 주입 정책을 유지한다.
+- tripId: 선택 UUID 문자열. next=trip 또는 diary에 필수다. 누락·배열·잘못된 UUID는 plans로 정리한다.
+  인증 완료·온보딩 저장 뒤에도 원래 UUID와 상세/다이어리 구분을 유지한다. 서버의 실제 멤버십 검사는 계속 적용한다.
+- 일반 경로: /plans, /trips/{tripId}, /diary/{tripId}, /(tabs)/footprints 및 기존 고정 내부 목적지.
+- 우선순위: 기존 pendingAuthDestination의 대기 초대 → 대기 지도 공유 → AuthReturn → 기본 홈.
+- AuthGate: 실제 보호 경로에서 복귀 목적을 만든다. profile-setup의 재인증은 이미 전달된 목적을 재검증한다.
+  경로가 바뀌면 이전 비동기 링크 확인의 로그인 이동을 취소한다.
+
+저장 객체명: OAuthReturnCandidate / 저장 키: tripprint.oauth.return.v1
+- 저장소: 웹 sessionStorage(동일 탭), iOS·Android Expo SecureStore(같은 기기).
+- 필드: AuthReturn의 검증한 속성 + savedAt:number(Unix 밀리초).
+- 제약: now >= savedAt, now - savedAt < 3,600,000. 정확히 한 시간 경과·미래 시각·손상 JSON은 폐기한다.
+- 인증 전 후보를 기록하고 웹/앱 콜백에서 읽는다. 성공 시 라우터 파라미터에 목적을 넘긴 뒤 후보를 지운다.
+  네이티브 인증 취소도 후보를 지운다. 다음 인증은 이전 후보를 덮어쓴다.
+- 인증 토큰·코드·검증자·임의 원문 URL·개인정보는 이 객체에 저장하지 않는다. 기존 PKCE 저장 키는 별개로 유지한다.
+- 저장소 읽기 실패는 기본 목적지로, 정리 실패는 완료한 인증을 막지 않는 방식으로 처리한다.
+
+객체명: TripAccessFailure / 위치: authReturn.ts, TripAccessFeedback.tsx
+- 값: login | list | retry. FoundationClientError의 실제 HTTP 상태로 결정한다.
+- 401: 로그인하고 이어가기. 현재 plans/trip/diary/footprints 목적과 로그인 화면 전용 reauth=1을 전달하고 기존 공통 이탈 보호를 확인한다.
+  reauth는 AuthReturn의 저장 속성이 아니다. 정확히 문자열 1일 때만 이전 회원 세션의 이어가기 대신 실제 Google·이메일 인증을 선택하게 한다.
+  기존 계정 객체만 남아 있어도 새 로그인 버튼이 잠기지 않는다. 권한 오류·통신 오류에는 이 표시를 붙이지 않는다.
+- 403·404: 비공개 상세·다이어리는 /plans로 돌아간다. /plans 자체의 접근 실패는 홈으로 돌아간다.
+- 나머지 HTTP 상태·통신 오류: 현재 화면에서 재시도하며 임의 로그아웃이나 로그인 이동을 하지 않는다.
+- 서버 세션 부재는 service.ts에서 명시적인 401 오류를 반환한다. 다른 계정 UUID는 계정 변경 오류로 거부한다.
+- 조회 실패 시 과거 캐시의 상세·다이어리 원본을 정상 조회처럼 표시하지 않는다.
+======================================================================
+
+
+2026-10-15 R07 여행 정보·기간
+======================================================================
+DB명·테이블: Cloudflare D1 trips.snapshot 및 기기 여행 문서의 기존 구조를 사용한다. 새 테이블·컬럼·마이그레이션은 없다.
+
+여행 정보 편집 계약
+- trip.update.input: title string trim 후 1~50자, country string trim 후 1~50자, city string trim 후 최대50자, status DRAFT|PLANNED|IN_PROGRESS|COMPLETED. 기존 strict 서버 스키마만 사용한다.
+- countryChangeValues(kind, previous, next): 화면 메모리 Record<string,string>. 다른 국가로 변경하면 metadata에서 city=''만 반환한다. 같은 국가 재선택은 빈 객체를 반환해 도시를 보존한다.
+- 생성 폼 trip의 기존 국가별 도시 초기화·시간대·기본 통화 설정은 유지한다. 정보 편집에서는 timezone·defaultCurrency를 전송하거나 변경하지 않는다.
+- 국가·도시 선택 취소는 입력을 바꾸지 않는다. 국가 변경 시 기존 도시 오류도 해제하며 이후 도시 선택·직접 입력은 기존 정책을 따른다.
+
+RemovedTripDate (apps/mobile/src/features/workspace/tripPeriod.ts)
+- 저장 위치: 편집 화면 메모리. DB·기기 저장 없음.
+- date string YYYY-MM-DD: 새 여행 기간 밖으로 빠지는 실제 날짜. 날짜별 한 행, 오름차순.
+- dayId UUID string|null, dayNumber positive integer|null: 원본 DAY 식별자와 표시 순서. DAY 없이 남은 과거 영수증 날짜는 둘 다 null.
+- schedules nonnegative integer: 해당 DAY의 일정 수.
+- expenses nonnegative integer: 해당 DAY 또는 그 DAY의 일정을 참조하는 비용 수. 두 참조가 겹쳐도 한 번만 집계하며 날짜 미지정 전역 비용은 제외한다.
+- receipts nonnegative integer: receipt.date가 해당 날짜인 영수증 수. DAY 참조가 아닌 실제 결제일로 집계한다.
+
+TripPeriodImpact (같은 파일)
+- 저장 위치: 편집 화면 메모리. 원본과 입력을 변경하지 않는 계산 결과.
+- removed RemovedTripDate[]: 제거 영향 행. 기존 DAY 날짜와 영수증 실제 결제일의 합집합을 기준으로 계산한다.
+- addedDays nonnegative integer: 새 기간의 전체 날짜 수에서 실제 날짜가 유지되는 DAY 수를 뺀 값.
+- blocked boolean: 제거 영향 행에 일정·비용·영수증 중 하나라도 존재하면 true.
+- 입력이 미완성·역순·90일 초과 등 기존 trip.period 스키마에 맞지 않으면 결과는 null이며 기존 필드 오류 검증을 사용한다.
+- 새 저장은 blocked일 때 화면과 제출 검증에서 차단한다. 기존 pending 요청의 동일 키·본문 재시도는 공통 복구 계약에 맡긴다.
+
+DAY ID 유지 계약: 현재 D1·기기 공통 workspaceModel
+- days[].id UUID: 이전 DAY의 tripDate가 새 날짜와 같으면 재사용한다. DAY 순서 기준으로 날짜를 이동하지 않는다.
+- days[].tripDate YYYY-MM-DD: 새 startDate~endDate의 연속된 실제 날짜. 새로 포함한 날짜만 새 ID를 생성한다.
+- days[].dayNumber positive integer: 새 시작일 기준 1부터 재계산한다. 표시 순서가 바뀌어도 같은 날짜의 ID와 연결 기록은 유지한다.
+- 제거 DAY에 일정 또는 DAY 비용이 있거나 영수증 실제 결제일이 새 기간 밖이면 서버 모델이 변경을 거부한다. 일정의 비용 연결도 화면 안내에서 포함한다.
+- 허용된 변경은 같은 날짜의 일정·비용·영수증·미디어 객체를 보존한다. 실패 시 원본·버전은 변하지 않는다.
+- 기존 If-Match 버전 검사와 Idempotency-Key 재시도를 유지한다. 확정 거절 후 입력 수정, 응답 유실 후 동일 요청 복구, 충돌 후 최신 조회를 구분한다.
+- 구 PostgreSQL 경로의 순서 기준 날짜 이동과는 계약이 다르다. 이번 검증 대상은 실제 사용 중인 D1 및 기기 공통 모델이며 구 SQL은 변경하지 않았다.
+======================================================================
+
+
+2026-10-15 R08 시작 점검·최소 지원 정책
+======================================================================
+DB명·테이블명: 물리 DB 없음. D1·회원 테이블·기기 여행 문서 형식은 유지한다. 공개 운영 바인딩과 시작 화면 메모만 추가한다.
+
+AppConfig (packages/validation/src/startup.ts)
+- 조회: GET /public/app-config?platform=android&channel=play. 인증 불필요. 요청에 회원 토큰·기기 ID·여행 목록 없음.
+- platform literal android NOT NULL, channel literal play NOT NULL: 적용 플랫폼·설치 경로. Android direct/unknown, iOS app-store, 웹 web 조회는 data:null.
+- latestVersionCode integer 1~2100000000 NOT NULL: 운영에서 확정한 최신 출시 코드. Play의 실제 설치 가능 코드와 구분한다.
+- minSupportedVersionCode integer 0~2100000000 NOT NULL, <=latestVersionCode: 최소 지원 코드. 0은 필수 업데이트 없음. 실제 운영값은 미확정.
+- storeUrl literal HTTPS https://play.google.com/store/apps/details?id=com.tripprint.app NOT NULL: 공식 패키지 상세만 허용. 다른 호스트·패키지·추가 매개변수 거부.
+- checkedAt UTC ISO datetime NOT NULL: 정책을 생성·수정한 운영 시각. 현재보다 5분 넘는 미래 시각 거부. 캐시 유효기간 계산 시각과 구분한다.
+- strict 객체: 추가 필드 거부. 응답 data AppConfig|null, meta.requestId UUID. 빈 설정은 200 data:null, 잘못된 설정은 503 CONFIGURATION_REQUIRED, 잘못된 요청은 422 VALIDATION_FAILED. Cache-Control:no-store.
+- 운영 저장소: Worker vars APP_UPDATE_POLICY_JSON string. 기본·staging·production 모두 빈 문자열로 유지한다. 환경별 정책을 배포 전 검증해야 하며 임의 최소 버전을 기본값으로 만들지 않는다.
+
+PolicyCache (apps/mobile/src/features/startup/updatePolicy.ts)
+- 저장소: Android/iOS SecureStore, 웹 localStorage. key=tripprint.startup.policy.android.play.v1. 현재 Android Play에서만 읽고 쓴다.
+- policy AppConfig|null NOT NULL: 마지막 온라인 성공 정책. null 성공은 정책 해제이며 오래된 필수 정책을 교체한다.
+- receivedAt nonnegative integer epoch milliseconds NOT NULL: 실제 성공 응답 수신 시각. 미래 시각 또는 수신 후 24시간 이상이면 무효.
+- 조회 실패·캐시 사용에서는 수신 시각을 갱신하지 않는다. 파손·만료·대상 채널 불일치·미래 생성 시각은 사용하지 않으며 원본 여행은 삭제하지 않는다.
+- 저장 실패에서도 유효 온라인 정책은 이번 실행에 사용한다. 유효 캐시가 없는 정책 조회 실패는 계정·데이터 점검을 계속한다.
+
+PolicyResult·UpdateDecision (같은 파일)
+- policy AppConfig|null, source online|cached|unavailable|not-applicable: 확인 경로를 구분한다. 정책 미확인과 최신 버전 성공을 혼동하지 않는다.
+- UpdateDecision.kind pass|optional|required|blocked, action none|store|immediate: 정책과 실제 Play 응답을 합친 결과.
+- 설치 경로가 Play이고 설치 번호가 확인되어야 최소 지원 정책을 적용한다. 최신 정책 코드와 같거나 더 높은 설치 버전은 통과한다.
+- 설치 번호<최소 지원 번호이고 Play의 설치 가능 코드>=최소 지원 번호이면 필수. 즉시 업데이트가 허용되면 immediate, 아니면 공식 store.
+- 최소 지원에 도달할 수 없는 단계 배포·조회 실패는 blocked. 자동 스토어 이동을 반복하지 않고 재확인·앱 닫기를 제공한다.
+- 필수가 아니며 Play에 실제 더 높은 설치 가능 코드가 있으면 선택 업데이트. 나중에 선택은 이번 시작 화면 실행 동안만 유지한다.
+
+Android TripPrintPlayUpdate 네이티브 객체 보완
+- installedApp(): packageName=com.tripprint.app, installedVersionCode positive integer, installedVersionName string, channel play|direct|unknown. PackageInfo와 설치자 com.android.vending에서 읽는다.
+- 설치 정보는 Play 네트워크 조회와 별개로 읽는다. Play 8초 제한·실패에서도 확인한 설치 정보는 유지한다.
+- checkForUpdate(): 기존 current|available|unavailable, availableVersionCode|null 유지. immediateAllowed boolean, flexibleAllowed boolean 추가. 구 모듈 누락은 unknown/false로 호환하며 설치 경로를 추측하지 않는다.
+- startImmediateUpdate(minimumCode integer): 새 AppUpdateInfo에서 Play 설치 경로·최소 도달 코드·IMMEDIATE 허용 여부를 재검사한다. accepted|cancelled|unavailable 반환. 매번 새 조회 객체 사용.
+- 선택 업데이트는 공식 스토어에서 실행한다. flexibleAllowed는 실제 허용 정보만 노출하며 백그라운드 다운로드를 시작하지 않는다.
+- 업데이트 취소·앱 복귀에서는 완료로 간주하지 않고 설치 번호·정책을 다시 확인한다. 같은 버튼의 중복 실행은 잠근다.
+
+시작 점검 메모리·재시도
+- TanStack keys ['startup','local'|'common'|'play'], ['startup','policy',channel], ['startup','destination',userId,onboardingCompleted]. 점검 결과·진행·오류는 항목별로 유지한다.
+- 다시 시도는 실패했고 진행 중이 아닌 항목과 실패한 인증 복원만 실행한다. 성공한 공통·Play·기기·목적지·연출 결과를 일괄 초기화하지 않는다.
+- 정책 5초, 기존 Play·공통 버전 8초, 기존 세션 확인 15초. 5초 이후 준비 안내를 연결 확인 안내로 바꾼다.
+- 세션 네트워크 실패는 토큰을 지우지 않는다. 프로필 실패는 빈 온보딩을 확정하지 않는다. 로그인 이동도 데이터·필수 정책 검사를 우회하지 않는다.
+- 기존 protocol=1·guestData=1 호환 실패는 이전 캐시로 우회하지 않는다. 기기 원본 검증 실패도 초기화하지 않는다.
+- StartupPolicyGate: Android 직접 링크에서도 같은 Play·정책 조회 키를 공유하고 필수/설치 불가 상태의 화면 조작을 막는다. 다른 플랫폼에는 적용하지 않는다.
+- 운영 확정 필요: 실제 최신/최소 번호, 정책 생성 시각, 환경·테스트 트랙 매핑, 최소 버전의 배포 도달 여부, 정책 담당자·롤백 절차. 임의값으로 필수 업데이트 활성화 안 함.
+======================================================================
+
+
+2026-10-15 R09 일정 현재 위치
+======================================================================
+DB명·테이블명: 새 물리 DB·테이블·컬럼 없음. D1 trips.snapshot.itinerary[].location 및 기기 여행 문서의 기존 좌표 계약은 유지한다.
+
+LocationPermission (apps/mobile/src/features/permissions/currentLocation.ts)
+- 저장 위치: 이번 요청의 메모리. 기기 설정·DB에 허용 상태를 영구 동의로 저장하지 않는다.
+- granted boolean, canAskAgain boolean NOT NULL: 매 사용 전 실제 OS 권한 응답. 이번만 허용은 다음 사용 때 다시 확인한다.
+- android?.accuracy fine|coarse|none, ios?.accuracy full|reduced와 scope string: OS가 제공한 정확도·사용 중 범위. 대략/제한 정확도를 정밀로 바꾸지 않는다.
+- 백그라운드 권한·방문 인증·자동 기록 동의로 확장하지 않는다. 영구 거절은 명시적인 설정 버튼, 일반 거절은 재시도·수동 선택으로 복구한다.
+
+LocationReading·LocationFix (같은 파일)
+- LocationReading.coords.latitude finite number -90~90, longitude finite number -180~180, accuracy number|null: OS의 측정 좌표와 오차 반경.
+- timestamp finite epoch milliseconds: 실제 측정 시각. 이번 후보는 60초 이내 측정만 사용하며 현재보다 5초 넘는 미래 시각도 거부한다.
+- LocationFix.coordinate {latitude,longitude}: 확인한 후보 좌표. 실제 0,0도 유효 측정이면 허용하지만 누락·실패의 기본값으로 0,0을 만들지 않는다.
+- accuracyMeters finite nonnegative number NOT NULL: OS 측정 오차 반경. 누락·null·비정상 값은 후보를 만들지 않는다. 표시 반경은 올림해 안내하며 권한 정확도와 별도로 보여준다.
+- approximate boolean NOT NULL: Android coarse 또는 iOS reduced이면 true. 임의 거리 기준으로 OS 권한 종류를 추측하지 않는다.
+- 측정 시각·오차 반경·권한 종류는 일정 저장 데이터에 추가하지 않는다. 확인 전 후보는 화면 메모리에만 존재한다.
+
+LocationResult (같은 파일)
+- status located|denied|services-off|inaccurate|unavailable|ready NOT NULL.
+- located일 때 fix LocationFix 필수. denied일 때 canAskAgain boolean 필수. 다른 상태에는 적용 가능한 좌표가 없다.
+- services-off: 위치 서비스 꺼짐. inaccurate: 좌표 범위·정확도·측정 시각 불충족. unavailable: 조회/구독/설정 실행 오류. ready: 설정 복귀에서 상태만 확인함.
+- 조회 전에 서비스·권한을 확인하고 허용 후에도 서비스를 재확인한다. 위치 구독은 기존 oneShotLocation의 첫 응답·실패·12초 제한·취소에서 종료한다.
+
+LocationRequest·전경 복귀 대기 (currentLocation.ts, locationForeground.ts)
+- pending AbortController|null: 메모리 요청 식별자이자 동기 제출 잠금. 연타는 하나만 실행한다.
+- 취소하면 AbortSignal로 구독·대기를 종료한다. 취소할 수 없는 OS 권한 응답도 이후 위치 구독을 시작하지 못하게 검사한다.
+- 이전 요청의 성공·실패·finally는 새 요청을 적용하거나 진행 표시를 해제하지 못한다.
+- 권한 창의 일시 inactive/background에서는 OS 선택 결과를 기다리되 실제 전경 복귀 전에는 위치 구독을 시작하지 않는다.
+- OS 권한 응답 후 전경 복귀 대기는 최대12초이며 취소·복귀·제한 시간에서 이벤트 구독을 해제한다.
+- 일반 위치 조회 중 background 전환, 화면 blur·종료·잠금은 즉시 요청을 취소한다. 전경 복귀만으로 좌표 조회를 자동 시작하지 않는다.
+
+useCurrentLocation·일정 후보 수명
+- 폼 범위 key: tripId, form.id, dayId, 일정 type, googlePlaceId, mapLocation. 변경 시 기존 후보·요청 객체를 폐기한다. 계정 화면의 기존 별도 수명 보호도 유지한다.
+- busy boolean, result LocationResult|undefined: 폼별 Zustand 외부 이벤트 저장소 메모리. 전역 상태·기기 파일로 저장하지 않는다. 설정 복귀 플래그·요청 순번도 화면 메모리에만 둔다. 종료된 폼·이전 설정 요청의 늦은 결과는 반영하지 않는다.
+- 설정 복귀는 실제 서비스·권한 상태만 재조회한다. 권한 창·GPS 조회·후보 적용·API 저장을 자동 실행하지 않는다.
+- Android 서비스 꺼짐은 LOCATION_SOURCE_SETTINGS, 권한 거절은 앱 설정으로 이동한다. iOS는 앱 설정, 웹은 사이트 설정 안내와 수동 입력을 제공한다.
+- 지도·좌표·현재 위치는 후보 표시까지만 수행한다. 위치 적용에서만 부모 mapLocation에 {latitude,longitude} JSON을 반영하고 이전 googlePlaceId를 해제한다.
+- 실제 저장은 기존 schedule.save 성공에서만 확정한다. 제목·주소·DAY·시각·메모·비용·사진은 후보 조회로 변경하지 않는다.
+- 지도 접기·닫기·취소·수동 입력 시작·다른 DAY/장소 선택은 이전 GPS 결과를 무효화하며 원본 일정은 유지한다.
+- 저장 중에는 새 위치 적용을 막고 진행 중 조회를 취소한다. 적용하지 않은 후보는 저장 요청에 포함하지 않는다.
+- 홈 PermissionTools도 같은 서비스로 일회 위치를 읽고 실제 Google Maps 링크를 연다. 위치를 저장하거나 지속 추적하지 않는다.
+======================================================================
+
+======================================================================
+[2026-10-15 R10 영수증 합계 확인·통화 보존·공개 예외]
+DB명: Cloudflare D1 / 현재 환경별 DB, 기기 WorkspaceSnapshot 저장소.
+테이블: receipt_scans. 변경 컬럼: draft TEXT NOT NULL CHECK json_valid (기존 컬럼 유지).
+ReceiptDraft.currency: string, trim, 최대12자, 누락 기본값 ''. 지원 여부와 무관하게 읽은 원 통화를 보존한다.
+ReceiptDraft.amount/items: 기존 십진 문자열과 행 합계를 유지. 미지원 통화를 USD나 기본 통화로 환산·재해석하지 않는다.
+확정 receipt.confirm.currency, WorkspaceReceipt.currency, WorkspaceExpense.currency: KRW|JPY|USD 유지. 새 통화 추가·물리 스키마 변경 없음.
+AI 인식·텍스트 OCR·캐시 읽기·앱 응답 검증이 같은 초안 계약을 따른다. 미지원 코드는 인식 실패가 아닌 확정 불가 안내다.
+과거 이미 잘못 대체된 초안/확정 기록은 원 통화를 추측해 일괄 변경하지 않는다. 새 사진에서 읽은 원본과 구분한다.
+
+화면 객체: PlanForm(kind=receipt). DB 테이블 없음.
+totalDifferenceAccepted: string 'true'|'false', 기본 'false'. 품목 합계와 결제 총액 차이의 명시 확인.
+receiptConfirmed, keepPhoto: 기존 별도 정보 확인·사진 보관 선택 유지. totalDifferenceAccepted는 API 요청/DB에 저장하지 않는다.
+품목 합계: 유효한 행 amount가 모두 있을 때만 BigInt 센트 합산. 수량×단가를 다시 더하지 않음. 빈 품목/잘못된 금액은 0으로 처리하지 않음.
+차이 객체: {itemTotal:string,difference:string}|null. 차이는 총액−품목 합계, 음수 부호·두 자리 소수 보존.
+총액·품목·통화·상호·주소·결제일시·연결·메모·수정 시작/수정 선택 시 두 확인을 무효화. 사진 보관 선택은 독립적으로 유지.
+차이가 있으면 별도 차이 확인 + 정보 확인 + 사진 선택 후 제출. 실제 지출에는 결제 총액 한 번만 기록.
+미지원 코드에서는 통화 버튼으로 다른 통화로 바꾸어 확정하지 않는다. 원본 보관·직접 일정 추가를 안내.
+미인식 빈 통화는 사용자가 원본을 보고 지원하는 실제 결제 통화를 선택한다. 자동 기본 선택 없음.
+
+공개 객체: publicSelection(WorkspaceSnapshot, {scheduleIds,photoIds,includeCosts}) -> Pick<CommunityPost,'photoPaths'|'snapshot'>.
+DB 테이블: posts.snapshot TEXT(JSON), trips.snapshot (기존 컬럼·공개 저장 형식 유지).
+공개 필드: 선택 일정의 title/date/timeSlot/address, 선택 일반 사진 경로, 나라·도시·기간, 명시 선택 시 전체 여행의 실제 지출 통화별 합계.
+제외: 영수증 원본·품목·구매 상세·일정 메모·Google 원본 링크·동행 정보·예상 지출. 비용 공개는 일정 선택과 무관한 전체 실제 지출임을 화면에 안내.
+앱 미리보기와 서버 게시 저장은 같은 publicSelection을 사용. 미리보기 사진은 현재 계정의 기존 비공개 접근 권한으로만 조회.
+publicationIssue: 현재 소유자/COMPLETED 상태, 선택 일정의 DAY, 선택 일반 사진의 존재 검사. 삭제·비공개 선택은 자동 제외 없이 명시적 재선택 요구.
+버전 충돌 최신 조회 후 제목·본문·기존 선택 유지. 선택 비우기는 사용자 명시 행동. 응답 유실은 기존 본문·버전·멱등 키 재시도 유지.
+======================================================================
+
+======================================================================
+[2026-10-15 R11 도시 가이드 출처·사진 실패 화면 계약]
+DB명/테이블명: 해당 없음. 도시별 공개 로컬 가이드와 화면 상태이며 개인 여행 DB에 저장하지 않는다.
+기존 카탈로그: DiscoveryDestination.key = tokyo|osaka|nagoya|bangkok|shanghai|taipei|danang|singapore.
+기존 CityGuide.photo, photoDescription, sources[{label,url}]와 assets/destinations/credits.json의 동일 key를 사용한다.
+credits.json: file string(도시key.jpg), sourceUrl HTTPS Commons 파일 설명 페이지, author string(원문 저작자), license string(해당 파일의 선택 라이선스), licenseUrl HTTPS, originalUrl/thumbnailUrl string, changes string, checkedAt YYYY-MM-DD.
+변경: checkedAt 2026-10-15 재확인. 기존 HTTP 라이선스 URL은 같은 HTTPS 문서로 변경. 모든 실제 자산 가로960px, 도시별 세로값 유지. 다낭은 원본 파일 자체의 cropped 이력도 유지한다.
+GuideAttribution (화면 전용): id string, title string(원문 작품명/참고 자료명), author string(저작자 또는 제공 기관), sourceUrl string, license string, licenseUrl string|null, changes string, checkedAt optional string.
+사진: 실제 포함 자산의 저작자·라이선스·원문·이전 자르기/축소/화면 자르기 표시. 다른 도시/추가 소개 API 이미지의 크레딧을 재사용하지 않는다.
+관광청 참고 자료: 원문 제공 기관과 TripPrint 편집 사실 표시. 사진 CC 라이선스로 원문 사이트를 재라이선스하지 않는다. 원문 사이트 이용 조건으로 안내하며 별도 라이선스 URL을 만들지 않는다.
+도시 이야기: 실제 표시할 DiscoveryCity.key와 원문 /wiki/{DiscoveryDestination.article}이 함께 일치할 때만 위키백과 기여자·CC BY-SA 4.0·일반 텍스트 일부 발췌/공백·길이 정리 표시.
+잘못된 원문/누락/추가 소개 실패에서는 기본 CityGuide를 유지하고 발췌 출처를 생성하지 않는다. 기존 /public/discovery 응답 형식은 유지한다.
+
+CitySourcesModal 상태(휘발성): error string, busy boolean, request{active:boolean,busy:boolean}.
+8개 도시 공통 모달. 읽기·진입·닫기는 외부 열기·인증·저장을 하지 않는다. 명시적 원문/이용 조건 버튼에서만 해당 HTTPS 주소를 연다.
+HTTP·실행 스킴·파일·인증 정보·비표준 포트는 외부 열기에서 거부한다. 현재 화면에서 제공하는 실제 원문만 버튼에 연결한다.
+브라우저: 사용자 클릭에서 새 빈 창 확인 후 opener 제거·해당 주소 이동. 팝업 차단도 오류로 안내. 네이티브: 같은 검증 후 Linking.openURL 사용.
+실패는 같은 버튼 재시도와 가이드 계속 읽기를 제공한다. 닫기·화면 blur·도시 변경 이후 이전 모달의 늦은 오류/잠금 해제는 새 모달 상태를 바꾸지 않는다.
+Android 뒤로·웹 Escape·닫기 버튼은 출처만 닫는다. 모달 종료 후 가이드 스크롤·현재 도시 유지.
+
+CityGuidePhoto 상태(휘발성): attempt number, 시도별 failed boolean. 도시key:attempt로 이미지 수명을 분리한다.
+상세·홈 카드 공통 사용. 실패 시 해당 도시 이름·대체색·안내만 표시하며 다른 도시 사진으로 바꾸지 않는다.
+상세 사진 재시도는 같은 포함 자산을 다시 읽는다. 홈 카드는 본래 도시 가이드 이동을 유지한다.
+기본 소개·볼거리·먹거리·계절 안내·계획하기는 사진/추가 소개/외부 링크 실패와 독립적으로 유지한다.
+도시 경로 변경 시 이전 사진 실패·모달 상태를 초기화. 직접 URL·실제 이전 화면 back/직접 진입 home replace·인증 후 destination 전달 계약 유지.
+물리 DB·API·개인/기기 저장·패키지 변경 없음.
+======================================================================
+
+
+======================================================================
+[2026-10-15 R12 공통 전환·접근성 화면 객체]
+DB명: 해당 없음. 화면 메모리와 운영체제 설정 구독만 사용한다.
+테이블명: 해당 없음. 물리 DB·API·기기 저장 스키마 변경 없음.
+
+객체: AppAccessibility (앱 공통 읽기 전용 스냅샷)
+ready boolean: 접근성 초기 조회 두 건의 완료 여부, 기본 false.
+reduceMotion boolean: 실제 동작 줄이기 설정, 조회 전/실패 기본 true.
+screenReader boolean: 네이티브 실제 화면 읽기 설정, 조회 전/실패 기본 true.
+foreground boolean: AppState.currentState === active, 정적 렌더 기본 false.
+fontScale number: 네이티브 PixelRatio.getFontScale, 웹 루트 글꼴 px/16 (최소1).
+largeText boolean: fontScale >= 1.3. 자동 순환을 중단하고 수동 이전·다음은 유지.
+제약: 초기 조회보다 늦게 온 설정 이벤트 우선. 마지막 구독 해제 뒤 이벤트와 비동기 결과 폐기.
+웹의 화면 읽기 API 상수값을 실제 감지로 해석하지 않는다. 웹 키보드 초점 시 자동 이동 정지.
+네이티브 글꼴은 OS 배율을 그대로 사용하며 별도 배율을 중복 적용하지 않는다.
+
+객체: TransitionPresence<T> / Presence<T>
+present boolean: 닫기 전환이 끝날 때까지 실제 창을 유지하는 상태.
+visible boolean: 현재 열기 요청 상태, 닫기 시작부터 입력·읽기 차단.
+phase hidden|opening|open|closing: 화면의 확정 전환 단계.
+node T|null: 열림의 최신 내용 또는 닫기 중 마지막 내용, 종료 시 null.
+generation number: 내부 전환 순번. 중단·닫기·재열기·해제 이전 완료는 무시.
+제약: 페이지200ms, 배경 열기150ms, 패널 열기200ms, 닫기150ms.
+접근성 확인 전·동작 줄이기·네이티브 화면 읽기·백그라운드는 즉시 최종 상태로 정착.
+모달 캐시에 남은 닫는 폼은 ModalActive=false로 위치 요청과 출처 열기 결과를 폐기.
+
+객체: ModalLayer / ModalDepth / ModalActive
+id symbol: 해당 마운트의 고유 ID. 저장·전송 금지.
+depth number: 실제 부모 모달 깊이+1+priority. 이탈 확인 priority100.
+order number: 같은 깊이에서 마지막 등록 우선. native boolean, strict boolean.
+제약: 최상위 모달만 뒤로·Escape·초점 순환 처리. 종료 시 원래 초점·배경 속성 복원.
+일반 편집은 페이지 뒤 내용만 읽기 제외하고 전역 하단 메뉴의 기존 이탈 확인을 유지.
+네이티브 선택기·확인창은 전역 메뉴도 읽기·입력 제외. 중첩 선택기를 닫아도 부모 폼은 유지.
+AppModal.blockNavigation boolean|undefined: 배경 투명도와 별개로 메뉴 차단 결정. 프로필·기록 편집은 false로 기존 메뉴 이탈 보호를 유지한다.
+웹은 aria-hidden/inert 원래 값을 복원. 네이티브는 accessibilityViewIsModal/읽기 제외 속성 적용.
+ModalBackground.hidden boolean: 등록된 모달이 있으면 여행·프로필·여행 생성 본문과 하단 일정 도구를 no-hide-descendants로 제외한다. 모달은 본문 컨테이너 밖에 배치한다.
+
+객체: CarouselState / 순환 타이머 (기존 화면 메모리 계약 보완)
+interaction number: 마지막 수동 조작 시각(ms). 기본 순환과 조작 후 대기 모두5000ms.
+paused/dragging/hovering boolean: 명시 정지·키보드 읽기·터치·마우스 읽기 중 순환 중단.
+제약: 실제 전경·현재 경로·여러 카드·측정 너비·미차단 상태에서만 자동 이동.
+모달·큰 글꼴·읽기·동작 줄이기·백그라운드에서 정지. 복귀 시 밀린 이동 없이 새5초 대기.
+콜백 실행 직전에도 최신 기기 설정·전경·모달을 검사. 화면 밖 카드 읽기·키보드 초점 제외.
+======================================================================
+
+
+======================================================================
+[2026-10-15 R13 BI·로딩 / R14 인수 기록 객체]
+DB명: 해당 없음. 화면 메모리·로컬 검수 결과만 사용한다.
+테이블명: 해당 없음. 물리 DB·회원·여행·API 스키마 변경 없음.
+
+객체: LaunchSession (프로세스 메모리, Zustand)
+biDone boolean: 00 완료 또는 직접 링크 진입. 기본 false, 완료 후 되돌리지 않는다.
+introDone boolean: 01 표시 완료 또는 직접 링크 진입. 기본 false, 재시도에도 유지한다.
+nativeReady boolean: 실제 영상 첫 프레임·정적 이미지·복귀 화면 레이아웃 준비. 기본 false.
+제약: 저장·전송하지 않는다. 새 프로세스의 앱 아이콘 진입은 00부터 시작한다.
+인증 콜백·직접 링크·백그라운드 복귀에는 00을 재생하지 않는다.
+
+객체: BiState / LaunchEnvironment (화면 수명)
+phase waiting|video|poster|fade|done: 첫 프레임 대기·재생·정적 대체·종료 전환·완료.
+frame boolean: 실제 onFirstFrameRender 수신 여부. 메타데이터 성공으로 대체하지 않는다.
+foreground/ready/restricted boolean: 전경·설정 확인·동작 줄이기/화면 읽기/조회 불명 보호.
+failure missing|timeout|decode|duration|stalled|reduced|undefined: 내부 대체 원인, 화면에 노출하지 않는다.
+제약: 로컬 승인 영상만 허용. 현재 tripprint_bi.mp4는 미제작이므로 bundledBiVideo=null이다.
+Metro require.context는 지정 폴더의 정확한 파일명 하나만 포함하며 없으면 빈 목록으로 빌드에 성공한다.
+승인 영상 파일을 해당 경로에 추가한 다음 빌드하면 자동 포함한다. 원격 URL·임의 대체 영상은 허용하지 않는다.
+추후 영상은 1~3초·무음·contain·반복 없음·백그라운드/PIP 없음으로 연결한다.
+첫 프레임 500ms 제한, 실제 종료 뒤 전체500ms fade. 재생 종료 누락은3500ms 보호 제한.
+사용자 확정(2026-10-15): 영상 없음/실패 시 흰 배경(#FFFFFF) 중앙240dp 로고 아이콘.
+기존 투명 TripPrint_symbol-coral-clean_1024x1024.png를 사용하며 기본 OS 스플래시도 같은 자산·배경·폭이다.
+정적 이미지/최후 브랜드 글자가 실제 준비된 뒤1000ms 표시하고500ms fade한다.
+동작 줄이기·화면 읽기·설정 불명은 정적1000ms 뒤 전환을 생략한다.
+메타데이터·오류·첫 프레임·종료의 중복/늦은 응답은 선택한 대체나 완료를 되돌리지 않는다.
+
+객체: ForegroundTimer / LoadingState
+remaining number(ms): 현재 구간의 남은 실제 전경 시간. 백그라운드·해제 동안 감소하지 않는다.
+revision number: 취소·중단·새 예약 이전 타이머 응답을 폐기하는 내부 순번.
+LoadingState.phase thumbnail|copy|ready: 썸네일1000ms(위80dp ease-out) → 문구1000ms(아래24dp ease-out) → 스피너.
+제약: 01 첫 화면부터 계정·기기·공통·Play·정책 점검을 시작한다. 00에는 시작하지 않는다.
+로딩 점검 실패는 기존 성공 결과와 인증 토큰을 보존하고 실패한 검사만 재시도한다.
+표시5초 뒤 연결 확인 문구. 표시 타이머는 배경에서 중단하되 API 자체의 연결 제한은 유지한다.
+백그라운드에서 점검이 끝나도 전경 복귀 전에는 목적지로 이동하지 않는다. replace 한 번만 허용.
+스피너는 가짜 백분율을 표시하지 않으며 동작 줄이기·화면 읽기·배경에서는 회전하지 않는다.
+
+기기 저장: 기존 tripprint.startup.intro.v1 문자열 seen은 구버전 호환 이력으로 유지한다.
+제약: 01 실제 표시 완료 시만 기록하며 새 실행의 BI 시간/재생 여부를 바꾸지 않는다. 새 저장 키 없음.
+
+객체: R14DevicePreflight (outputs/r14-device-preflight.json, 개발/QA 로컬 기록)
+generatedAt string(ISO UTC), packageName string, expected {versionName:string,versionCode:number}.
+devices {serial:string,state:device|unauthorized|offline}[], device {serial,model,android,sdk}|null.
+installed {versionCode:number|null,versionName:string|null,installer:string|null}|null.
+artifact {path:string,bytes:number,sha256:string,playAssociation:unverified}|null.
+status needs-device|needs-adb|needs-current-install|needs-play-install|ready-for-manual-acceptance.
+physicalAcceptance not-run: 사전 점검 성공을 수동 인수 성공으로 올리지 않는다.
+reason string: 다음 준비 행동. 비밀번호·토큰·회원 데이터·전체 dumpsys·logcat은 저장하지 않는다.
+제약: 다중 기기는 명시 serial 선택. 읽기 전용 조회이며 설치/삭제/권한 변경/로그 수집 없음.
+Play 설치자+동일 versionCode도 이번 소스·Play 채널의 연결 증거를 대신하지 않는다.
+======================================================================
+
+======================================================================
+2026-10-16 여행 화면 표시 객체·메뉴·시트 계약
+DB명: 해당 없음(표시 전용). 기존 D1 trips.snapshot과 게스트 저장 문서는 변경하지 않는다.
+공유 객체: TripTiming / packages/domain/src/tripLifecycle.ts
+- status: 기존 TripStatus 필수. 원본의 명시적인 완료·보관·공개 권한에 계속 사용.
+- startDate/endDate: 기존 ISO YYYY-MM-DD 필수. 종료일 당일까지 여행 중, 다음 날부터 PAST 표시.
+- timezone: 기존 IANA 시간대 필수. 이전 기록의 잘못된 값은 UTC 달력으로 표시 복구.
+파생 타입: TripLifecycle = 기존 TripStatus | PAST. PAST는 저장 상태·DB enum·API 필드가 아니다.
+- 명시적 COMPLETED/ARCHIVED 우선. 그 밖은 현지 날짜와 기간으로 IN_PROGRESS/PAST/DRAFT/PLANNED 표시.
+화면 객체: tripPresentation / apps/mobile/src/features/workspace/tripPresentation.ts
+- phase: TripLifecycle 필수. 배지·필터·정렬의 공통 판별.
+- label/badge: string 필수. 같은 공통 상태 이름.
+- dates: string 필수. 기존 travelDateRange의 YYYY-MM-DD – YYYY-MM-DD.
+- reminder/action/heading: string 필수. 같은 단계에서 안내·열기 행동·요약 제목을 파생.
+- priority: number 필수(0~4). 여행 중·다가오는 여행·지난 여행·완료·보관 순.
+- tripOpenPath: 명시적 COMPLETED만 /diary/{id}; 그 밖은 /trips/{id}.
+- 자동 완료·원본 mutation·공개·발자국 생성 권한 변경 없음. 날짜 경과를 완료 저장으로 처리하지 않음.
+컴포넌트: ActionSheet / apps/mobile/src/components/ActionSheet.tsx
+- visible:boolean 필수, title:string 필수, onClose:()=>void 필수, children:ReactNode 필수.
+- priority:number 선택 DEFAULT 0. 기존 모달 우선순위에만 사용하고 저장하지 않음.
+- React Native Modal 계층, dim 55%, 하단 고정·Safe Area·스크롤·배경 읽기/입력 차단.
+- 취소/바깥 탭/시스템 뒤로는 onClose만 호출. 명령·권한·저장 잠금은 기존 호출자가 관리.
+내비게이션: hasGlobalNavigation(path:string):boolean
+- 최상위 /, /plans, /footprints, /community, /my만 true. 상세·생성·인증·그 밖의 경로는 false.
+- 최상위 화면의 전체 편집 모달 중에도 전역 메뉴를 표시하지 않는다.
+======================================================================
+
+
+[2026-10-16 빈 일정 시작·날짜 갱신 화면 메모리]
+DB명/테이블명: 해당 없음. 물리 DB·API·기기 저장 스키마 변경 없음.
+ScheduleStarter: stay|meal|visit, 화면 제안 선택 전용. 기본 선택 없음.
+starterValues: title/type/timeSlot만 채우는 문자열 사전. 숙소 STAY15:00, 식사 PLACE12:00, 관광 PLACE09:00.
+제약: 예시 시각·제목은 수정 가능. 주소·좌표·비용·인기 순위 생성 없음. 현재 DAY ID는 scheduleForm의 기존 dayId 계약으로 보존한다.
+선택은 미저장 폼만 열며 실제 저장 전 명령 없음. 쓰기 권한·보관 읽기·저장 잠금·이탈 보호는 기존 화면 경계를 사용한다.
+useTripDateRefresh: 전경의 다음 분 시작·AppState active 복귀에서 표시만 갱신하는 공유 구독. 마지막 구독 해제 시 예약/이벤트 정리.
+제약: 현지 자정도 다음 분 경계에서 현재 달력 날짜로 재계산. 배경 반복 예약 없음. 여행 상태·버전·공개·기록을 저장하거나 조회하지 않는다.

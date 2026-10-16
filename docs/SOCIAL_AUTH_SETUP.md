@@ -60,26 +60,26 @@ npm run mobile
 
 ## 이번 변경 파일과 역할
 
-| 파일                                                                                             | 변경                                                                                |
-| ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
-| `apps/mobile/src/features/auth/model.ts`                                                         | 실제 프로필/계정 초기화, 공개 키·콜백·PKCE 흐름 검증                                |
-| `apps/mobile/src/features/auth/oauth.ts`                                                         | 제공자 URL 발급·인증 창·웹 이동·실제 코드 교환·중복 콜백 조정                       |
-| `apps/mobile/src/features/auth/pkceCrypto.ts`                                                    | 네이티브 보안 난수·SHA-256 보완, 약한 폴백 차단                                     |
-| `apps/mobile/src/features/auth/AuthBridge.tsx`                                                   | SDK 세션 복원·갱신·로그아웃 구독, 계정 Query 캐시 제거                              |
-| `apps/mobile/src/app/auth/callback.tsx`                                                          | 공통 복귀 화면·실패 안내·새 로그인 복귀                                             |
-| `apps/mobile/src/app/_layout.tsx`                                                                | 전역 인증 연결 등록                                                                 |
-| `apps/mobile/src/app/login.tsx`                                                                  | 임시 소셜 인증 제거, 실제 서비스 연결, 웹/모바일 실패 안내                          |
-| `apps/mobile/src/app/(tabs)/my.tsx`                                                              | 실제 세션 종료 성공 후 이동, 실패 안내                                              |
-| `apps/mobile/src/stores/useTripStore.ts`                                                         | 가짜 소셜 사용자 생성 제거, 실제 로그아웃, 계정 컬렉션 초기화·게스트 복원 충돌 방지 |
-| `apps/mobile/src/services/supabase.ts`                                                           | PKCE 설정                                                                           |
-| `packages/domain/src/index.ts`                                                                   | 이메일 Auth 유형을 게스트와 구분                                                    |
-| `app.config.ts`, `apps/mobile/app.config.ts`, `apps/mobile/package.json`, `package-lock.json`    | Expo 호환 인증 브라우저 의존성과 플러그인 설정                                      |
-| `.env.example`                                                                                   | 웹 복귀 주소 공개 설정 예제                                                         |
-| `package.json`, `tests/auth/auth.test.ts`, `tests/web/auth.spec.ts`                              | 인증 경계 테스트 명령과 콜백 브라우저 테스트                                        |
-| `docs/DB_DICTIONARY.txt`                                                                         | v1.7 인증 도메인·계정 상태·PKCE 명세                                                |
-| `docs/planning/APP_COMPLETION_SCOPE.md`                                                          | 사용자 7개 완성 기준과 선행 작업                                                    |
-| `docs/planning/README.md`, `POLICY_DECISIONS.md`, `DAILY_MILESTONES.md`, `TRAIL_CONTENT_SPEC.md` | 최신 요구 우선 적용·기존 범위 및 일정과의 차이                                      |
-| `docs/PROJECT_PROGRESS_REPORT.md`, `docs/SOCIAL_AUTH_SETUP.md`                                   | 실제 변경 범위와 외부 환경 준비·검증 한계                                           |
+| 파일                                                                                            | 변경                                                                                |
+| ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `apps/mobile/src/features/auth/model.ts`                                                        | 실제 프로필/계정 초기화, 공개 키·콜백·PKCE 흐름 검증                                |
+| `apps/mobile/src/features/auth/oauth.ts`                                                        | 제공자 URL 발급·인증 창·웹 이동·실제 코드 교환·중복 콜백 조정                       |
+| `apps/mobile/src/features/auth/pkceCrypto.ts`                                                   | 네이티브 보안 난수·SHA-256 보완, 약한 폴백 차단                                     |
+| `apps/mobile/src/features/auth/AuthBridge.tsx`                                                  | SDK 세션 복원·갱신·로그아웃 구독, 계정 Query 캐시 제거                              |
+| `apps/mobile/src/app/auth/callback.tsx`                                                         | 공통 복귀 화면·실패 안내·새 로그인 복귀                                             |
+| `apps/mobile/src/app/_layout.tsx`                                                               | 전역 인증 연결 등록                                                                 |
+| `apps/mobile/src/app/login.tsx`                                                                 | 임시 소셜 인증 제거, 실제 서비스 연결, 웹/모바일 실패 안내                          |
+| `apps/mobile/src/app/(tabs)/my.tsx`                                                             | 실제 세션 종료 성공 후 이동, 실패 안내                                              |
+| `apps/mobile/src/stores/useTripStore.ts`                                                        | 가짜 소셜 사용자 생성 제거, 실제 로그아웃, 계정 컬렉션 초기화·게스트 복원 충돌 방지 |
+| `apps/mobile/src/services/supabase.ts`                                                          | PKCE 설정                                                                           |
+| `packages/domain/src/index.ts`                                                                  | 이메일 Auth 유형을 게스트와 구분                                                    |
+| `app.config.ts`, `apps/mobile/app.config.ts`, `apps/mobile/package.json`, `package-lock.json`   | Expo 호환 인증 브라우저 의존성과 플러그인 설정                                      |
+| `.env.example`                                                                                  | 웹 복귀 주소 공개 설정 예제                                                         |
+| `package.json`, `tests/auth/auth.test.ts`, `tests/web/auth.spec.ts`                             | 인증 경계 테스트 명령과 콜백 브라우저 테스트                                        |
+| `docs/DB_DICTIONARY.txt`                                                                        | v1.7 인증 도메인·계정 상태·PKCE 명세                                                |
+| `docs/2. planning/TripPrint_화면별_상세기능정의서_v3_20261014.docx`                             | 사용자 7개 완성 기준과 선행 작업                                                    |
+| `docs/planning/README.md`, `POLICY_DECISIONS.md`, `CURRENT_STATUS.txt`, `TRAIL_CONTENT_SPEC.md` | 최신 요구 우선 적용·기존 범위 및 일정과의 차이                                      |
+| `docs/CURRENT_STATUS.txt`, `docs/SOCIAL_AUTH_SETUP.md`                                          | 실제 변경 범위와 외부 환경 준비·검증 한계                                           |
 
 기존 미커밋 DB/API/발자취 구현은 보존했다. 커밋·푸시·운영 배포·실제 OAuth 계정 생성은 수행하지 않았다.
 

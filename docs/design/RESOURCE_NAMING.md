@@ -1,0 +1,87 @@
+# 디자인 리소스 파일명 규격
+
+- 버전: 1.0.0
+- 적용일: 2026-10-14
+- 대상: 이번에 추가하는 디자인 문서·토큰·아이콘·참고 원본·미리보기.
+- 기존 앱 참조 파일은 이 작업에서 일괄 변경하지 않는다.
+
+## 공통 규칙
+
+폴더·리소스 이름은 소문자 ASCII 영문과 숫자, 단어 구분은 하이픈을 사용한다. 공백·한글·밑줄·일련번호 중심 이름은 사용하지 않는다. 확장자는 소문자다. 설명 문서만 `DESIGN.md`, `RESOURCE_NAMING.md`, `LICENSE.txt`처럼 고정 역할명을 사용한다.
+
+`final`, `new`, `latest`, `copy`, 날짜·임시 버전 접미사를 운영 리소스 파일명에 넣지 않는다. 버전·작성일·원본 ID·해시는 문서 메타데이터와 manifest에서, 변경 이력은 Git에서 관리한다. 기존 보고서/브랜드 파일에는 소급 적용하지 않는다.
+
+## 저장 구조
+
+```text
+docs/design/
+  DESIGN.md
+  RESOURCE_NAMING.md
+  design-tokens.json
+  icon-catalog.html
+  sources/
+    stitch-ui-toolkit.html
+    stitch-ui-toolkit.png
+    stitch-icon-library.html
+    stitch-icon-library.png
+    stitch-sources.json
+
+apps/mobile/assets/icons/tripprint/
+  icon-{meaning}-{variant}.svg
+  icon-manifest.json
+  LICENSE.txt
+
+apps/mobile/assets/fonts/
+  pretendard-{regular|bold}.otf
+  font-manifest.json
+  LICENSE.txt
+
+apps/mobile/src/components/icons/
+  TripIcon.tsx
+  tripprint-icons.ts
+
+scripts/
+  export-design-kit.mjs
+```
+
+원본은 재서식하지 않고 그대로 보관한다.
+
+## 아이콘
+
+형식은 `icon-{meaning}-{variant}.svg`다. `meaning`은 동작/대상의 영문 단수형, `variant`는 `outline`, `filled`, `duotone` 중 하나다. manifest ID는 앞의 `icon-`과 확장자를 제외한 값으로 정한다.
+
+| 의미      | 파일명 예시                | manifest ID       |
+| --------- | -------------------------- | ----------------- |
+| 지도      | `icon-map-outline.svg`     | `map-outline`     |
+| 사진      | `icon-camera-duotone.svg`  | `camera-duotone`  |
+| 선택한 홈 | `icon-home-filled.svg`     | `home-filled`     |
+| 항공편    | `icon-flight-outline.svg`  | `flight-outline`  |
+| 완료      | `icon-success-outline.svg` | `success-outline` |
+
+색·크기·권한 상태는 파일명에 넣지 않는다. 선택 상태는 표현이 달라지는 경우에만 변형으로 구분하고, 색만 바뀌면 같은 자산을 사용한다. 카테고리는 폴더를 늘리는 대신 manifest의 group으로 관리한다.
+
+래스터가 실제로 필요한 경우 `icon-{meaning}-{variant}-{size}.png`, 배율이 필요한 네이티브 파생본은 `icon-map-outline-24@2x.png`를 사용한다. SVG의 기준 크기는 내부 `viewBox`와 manifest에 있으므로 `24x24`를 이름에 중복하지 않는다. 이번 패키지는 SVG만 생성한다.
+
+허용 아이콘 정규식:
+
+```regex
+^icon-[a-z0-9]+(?:-[a-z0-9]+)*-(?:outline|filled|duotone)\.svg$
+```
+
+## 원본·미리보기·출처
+
+원본은 `stitch-{source-role}.{ext}`. 임시 다운로드 URL 대신 Stitch 프로젝트/화면 ID·실제 이미지 크기·캡처일·SHA-256을 `stitch-sources.json`에 기록한다. `2560` 등 API 메타데이터와 내려받은 이미지의 실제 픽셀 크기를 구분한다.
+
+카탈로그는 `icon-catalog.html`. 필요할 때 추가하는 검수 캡처는 `icon-catalog-{width}x{height}.png`로 저장한다. 분석용 일회성 캡처는 `scratch/`에 두고 앱 운영 자산에 포함하지 않는다.
+
+`LICENSE.txt`에는 확인한 출처·원본 권리 표기·추출 및 보정 내역을 적는다. 원본에서 확인하지 못한 오픈소스 라이선스나 실제로 없는 패키지 이름을 임의로 부여하지 않는다.
+
+## 재생성
+
+```sh
+node scripts/export-design-kit.mjs
+```
+
+로컬에 저장한 원본 HTML과 기존 브랜드 map/camera SVG를 사용한다. 외부 CDN·검색·계정 접속은 필요하지 않다. 설치된 Chrome과 프로젝트의 Playwright/Prettier를 사용한다. source → SVG → 해시/목록 → 오프라인 카탈로그 순서로 생성한다.
+
+삭제·개명은 해당 파일의 앱 참조와 manifest를 확인한 뒤 진행한다. 레거시 브랜드 파일을 새 규격과 중복된다는 이유로 삭제하지 않는다.

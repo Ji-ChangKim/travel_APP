@@ -79,7 +79,7 @@ npm run api:dev
 
 `apps/api/wrangler.jsonc`의 env.staging.vars에 공개 URL/키/실제 Origin 설정. production 별도 설정. 공급자 비밀 키가 추가되면 환경별 Wrangler secret binding 사용. `api:build`는 명시한 staging dry-run이며 실제 배포하지 않는다.
 
-실제 적용·인수 결과는 [M0·M1 실행 기록](planning/M0_M1_EXECUTION.md)에 기록한다. 운영 전 동시성·PostgREST·OAuth 복귀·모바일 저장·요청 보존/청소·계정 삭제/백업·지도·Expo 취약점 호환 패치 확인이 필요하다.
+실제 적용·인수 결과는 [M0·M1 실행 기록](CURRENT_STATUS.txt)에 기록한다. 운영 전 동시성·PostgREST·OAuth 복귀·모바일 저장·요청 보존/청소·계정 삭제/백업·지도·Expo 취약점 호환 패치 확인이 필요하다.
 
 근거: [Workers 권장사항](https://developers.cloudflare.com/workers/best-practices/workers-best-practices/), [Supabase API 보안](https://supabase.com/docs/guides/api/securing-your-api), [Auth getUser](https://supabase.com/docs/reference/javascript/auth-getuser), [Wrangler 타입](https://developers.cloudflare.com/workers/wrangler/commands/#types), [PGlite](https://pglite.dev/docs/).
 

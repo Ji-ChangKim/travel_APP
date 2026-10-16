@@ -1,8 +1,10 @@
 # TripPrint 구글 로그인과 Play 내부 테스트
 
-최신 1차 MVP 후보는 `0.1.0 / mvp-0.1.0-internal-candidate-20261012`입니다. 추천 자동 슬라이드·최종 검사·성능 및 실기기 인수 절차는 [MVP 마무리 보고](MVP_1_RELEASE_PERFORMANCE_20261012.txt)를 따릅니다. 로컬 후보 준비와 원격 배포·AAB 업로드·내부 테스트 출시를 구분합니다.
+2026-10-15 현재 R00~R13 구현과 로컬 검증을 마쳤으며 **내부 테스트용 빌드 생성 직전까지 준비 완료** 상태입니다. 빌드 입력과 실행 시 확인 사항은 [빌드 직전 인계 문서](PLAY_INTERNAL_PREBUILD.txt), 최종 기기 검수는 [R14 검수표](qa/DEVICE_ACCEPTANCE.txt)를 따릅니다. 이번 작업에서는 빌드·업로드를 시작하지 않았습니다. 아래 2026-10-12와 2026-10-07 기록은 당시 준비 상태입니다.
 
-2026-10-12 최신 점검은 [내부 테스트 준비 보고](PLAY_INTERNAL_READINESS_20261012.txt)와 [기기 게스트 구현 보고](GUEST_LOCAL_ACCOUNTS_20261012.txt)를 따른다. 게스트는 Google 인증 없는 기기 계정이며 여행·사진을 로컬 저장한다. 배포 전에 새 API와 `0006_unique_nicknames.sql`을 적용해야 한다. 아래 과거 준비 상태와 실제 AAB/Play 출시 완료 여부를 구분한다. 지난 GitHub 성공 실행은 APK 생성이며 Play 제출은 건너뛰었다.
+2026-10-12 기준 1차 MVP 후보는 `0.1.0 / mvp-0.1.0-internal-candidate-20261012`입니다. 추천 자동 슬라이드·최종 검사·성능 및 실기기 인수 절차는 [MVP 마무리 보고](CURRENT_STATUS.txt)를 따릅니다. 로컬 후보 준비와 원격 배포·AAB 업로드·내부 테스트 출시를 구분합니다.
+
+2026-10-12 최신 점검은 [내부 테스트 준비 보고](CURRENT_STATUS.txt)와 [기기 게스트 구현 보고](CURRENT_STATUS.txt)를 따른다. 게스트는 Google 인증 없는 기기 계정이며 여행·사진을 로컬 저장한다. 배포 전에 새 API와 `0006_unique_nicknames.sql`을 적용해야 한다. 아래 과거 준비 상태와 실제 AAB/Play 출시 완료 여부를 구분한다. 지난 GitHub 성공 실행은 APK 생성이며 Play 제출은 건너뛰었다.
 
 2026-10-07 현재 목표는 실제 Google 로그인 검증과 Play Console 내부 테스트에서 앱을 설치하는 것이다. Android 앱 식별자는 `com.tripprint.app`이다. Google OAuth 클라이언트 관리 이름은 `TripPrint-dev`이며 웹 애플리케이션 유형을 사용한다.
 
