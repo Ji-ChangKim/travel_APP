@@ -19,7 +19,9 @@ import {
   type CityGuide,
 } from './cityGuides';
 import { discoveryStyles as s } from './discoveryStyles';
-import { Action, styles } from './ui';
+import { Action } from './ui';
+import { styles } from './workspaceStyles';
+
 import { loadDiscovery } from './discoveryService';
 import CityGuidePhoto from './CityGuidePhoto';
 import CitySourcesModal from './CitySourcesModal';

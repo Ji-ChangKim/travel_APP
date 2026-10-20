@@ -1,6 +1,8 @@
 import { Platform, View } from 'react-native';
 import Text from '@/components/AppText';
-import { Action, styles } from '../workspace/ui';
+import { Action } from '../workspace/ui';
+import { styles } from '../workspace/workspaceStyles';
+
 import type { LocationResult } from './currentLocation';
 
 // 권한·서비스·측정 정확도에 맞는 다음 행동을 안내한다.

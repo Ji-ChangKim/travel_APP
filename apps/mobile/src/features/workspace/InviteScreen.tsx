@@ -15,8 +15,10 @@ import {
   savePendingInvite,
   clearPendingInvite,
 } from './invite';
-import { workspaceError } from './WorkspaceScreen';
-import { Action, Field, styles } from './ui';
+import { workspaceError } from './workspaceFailure';
+import { Action, Field } from './ui';
+import { styles } from './workspaceStyles';
+
 // 받은 링크를 확인하고 로그인 계정으로 명시적으로 참여한다.
 export default function InviteScreen() {
   // 수락 요청의 동일 키를 화면 재시도에서 유지한다.

@@ -1,8 +1,10 @@
 import { colors } from '@/constants/theme';
-import { Image, StyleSheet, View } from 'react-native';
-import HaruState from './HaruState';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import Text from './AppText';
+import LoadingBrand from './LoadingBrand';
+import LoadingIndicator from './LoadingIndicator';
 
-// 시작·인증 준비 중에 브랜드와 하루의 실제 대기 안내를 표시한다.
+// 시작·인증 준비 중에 로고와 간결한 실제 대기 안내를 표시한다.
 export default function TripPrintLoading({
   message = '여행을 준비하고 있어요',
 }: {
@@ -11,17 +13,13 @@ export default function TripPrintLoading({
   // 호출 화면의 메시지를 유지하며 가짜 완료 상태를 표시하지 않는다.
   return (
     <View style={styles.screen}>
-      <Image
-        source={require('../../assets/brand/tripprint-v1/TripPrint_logo-horizontal_1024x320.png')}
-        style={styles.logo}
-        resizeMode="contain"
-        accessibilityLabel="TripPrint 트립프린트"
-      />
-      <HaruState
-        kind="loading"
-        title={message}
-        description="잠시만 기다려 주세요."
-      />
+      <ScrollView contentContainerStyle={styles.content}>
+        <LoadingBrand />
+        <LoadingIndicator />
+        <Text accessibilityLiveRegion="polite" style={styles.caption}>
+          {message}
+        </Text>
+      </ScrollView>
     </View>
   );
 }
@@ -30,14 +28,23 @@ export default function TripPrintLoading({
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+    backgroundColor: colors.surface,
+    width: '100%',
+  },
+  content: {
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.background,
-    padding: 24,
-    gap: 24,
+    padding: 20,
+    gap: 16,
     width: '100%',
-    maxWidth: 480,
+    maxWidth: 640,
     alignSelf: 'center',
   },
-  logo: { width: 164, height: 52 },
+  caption: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: colors.muted,
+    textAlign: 'center',
+  },
 });

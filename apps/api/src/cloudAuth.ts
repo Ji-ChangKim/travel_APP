@@ -3,6 +3,7 @@ import { anonymous, bearer } from 'better-auth/plugins';
 import { linkGuest } from './guestLink';
 import { naverOAuth, socialProviders } from './socialProviders';
 import { rejectRequest } from './errors';
+import { assertActiveAccount, resumeRetiredAccount } from './accountRetirement';
 import type { VerifiedSession } from './types';
 import {
   availableGuestNickname,
@@ -27,6 +28,15 @@ export function cloudAuth(env: Env, callbackState?: string) {
     ],
     emailAndPassword: { enabled: true, minPasswordLength: 8 },
     databaseHooks: {
+      session: {
+        create: {
+          before: async (session) => {
+            // 새 로그인에서만 유예를 취소하며 만료된 계정은 복원하지 않는다.
+            await resumeRetiredAccount(env, session.userId);
+            return { data: session };
+          },
+        },
+      },
       user: {
         create: {
           before: (user, context) => {
@@ -117,8 +127,9 @@ export function cloudSession(
     .api.getSession({
       headers: new Headers({ Authorization: `Bearer ${token}` }),
     })
-    .then((result) => {
+    .then(async (result) => {
       // 임의 사용자 ID와 만료 토큰으로 여행에 접근하지 못하게 한다.
+      if (result) await assertActiveAccount(env, result.user.id);
       return result
         ? { userId: result.user.id, token }
         : rejectRequest('SESSION_EXPIRED');

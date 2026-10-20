@@ -1,6 +1,7 @@
 import Text from '@/components/AppText';
 import { View } from 'react-native';
-import { Field, styles } from './ui';
+import { Field } from './ui';
+import { styles } from './workspaceStyles';
 
 const labels = {
   flightArrivalDate: '도착일 (현지, YYYY-MM-DD, 선택)',

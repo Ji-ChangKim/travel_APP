@@ -6,7 +6,9 @@ import { useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { FormAnchor, useFormScope } from './InputFeedback';
 import { Platform, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Action, styles } from './ui';
+import { Action } from './ui';
+import { styles } from './workspaceStyles';
+
 import DestinationPicker from './DestinationPicker';
 
 // 현지 달력 날짜를 UTC 변환 없이 문자열로 만든다.

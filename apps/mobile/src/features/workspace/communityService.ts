@@ -1,20 +1,29 @@
 import { z } from 'zod';
-import { communityPostSchema } from '@wherego/validation';
-import { getCommunity } from '@wherego/api-client';
+import {
+  communityPostSchema,
+  communityFeedSearch,
+  type CommunityFeedFilters,
+} from '@wherego/validation';
+import { getCommunity, requestSignal } from '@wherego/api-client';
 import { apiBaseUrl, serverOptions } from './service';
 import { useTripStore } from '@/stores/useTripStore';
 
 // 회원은 차단이 적용된 피드를, 로그인하지 않은 방문자는 공개 피드를 읽는다.
-export function loadCommunity(userId: string, offset = 0) {
+export function loadCommunity(
+  userId: string,
+  offset = 0,
+  filters: Partial<CommunityFeedFilters> = {},
+  signal?: AbortSignal,
+) {
   // 공개 조회를 위해 익명 계정이나 인증 토큰을 새로 만들지 않는다.
   return userId && useTripStore.getState().currentUser?.authProvider !== 'guest'
     ? serverOptions(userId).then((options) => {
         // 인증된 계정의 차단 목록은 서버에서 적용한다.
-        return getCommunity(options, offset);
+        return getCommunity(options, offset, filters, signal);
       })
     : fetch(
-        `${apiBaseUrl().replace(/\/$/, '')}/public/community?offset=${offset}`,
-        { signal: AbortSignal.timeout(15000) },
+        `${apiBaseUrl().replace(/\/$/, '')}/public/community?${communityFeedSearch(filters, offset)}`,
+        { signal: requestSignal(signal) },
       ).then(readPublicCommunity);
 }
 

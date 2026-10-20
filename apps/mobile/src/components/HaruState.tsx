@@ -1,7 +1,8 @@
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
 import type { ReactNode } from 'react';
-import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
+import LoadingIndicator from './LoadingIndicator';
 
 // 상태에 맞는 하루의 포즈와 보조기기 설명을 선택한다.
 const poses = {
@@ -34,7 +35,18 @@ export default function HaruState({
   children?: ReactNode;
 }) {
   // 가짜 진행률이나 자동 이동 없이 호출 화면의 상태와 행동만 보여준다.
-  return (
+  return kind === 'loading' ? (
+    <View style={[styles.loading, compact && styles.loadingCompact]}>
+      <LoadingIndicator />
+      <View style={styles.loadingCopy}>
+        <Text accessibilityLiveRegion="polite" style={styles.loadingTitle}>
+          {title}
+        </Text>
+        {description && <Text style={styles.description}>{description}</Text>}
+        {children && <View style={styles.actions}>{children}</View>}
+      </View>
+    </View>
+  ) : (
     <View style={[styles.card, compact && styles.compact]}>
       <Image
         source={poses[kind].source}
@@ -44,12 +56,6 @@ export default function HaruState({
       />
       <View style={[styles.copy, compact && styles.compactCopy]}>
         <View style={styles.heading}>
-          {kind === 'loading' && (
-            <ActivityIndicator
-              color={colors.primary}
-              accessibilityLabel="불러오는 중"
-            />
-          )}
           <Text
             style={[styles.title, compact && styles.compactTitle]}
             accessibilityRole={kind === 'error' ? 'alert' : undefined}
@@ -67,6 +73,22 @@ export default function HaruState({
 
 // 작은 화면에서도 읽히는 안내를 브랜드의 따뜻한 바탕 위에 배치한다.
 const styles = StyleSheet.create({
+  loading: {
+    width: '100%',
+    minHeight: 128,
+    padding: 20,
+    gap: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingCompact: { minHeight: 80 },
+  loadingCopy: { width: '100%', maxWidth: 360, gap: 8, alignItems: 'center' },
+  loadingTitle: {
+    fontSize: 16,
+    lineHeight: 26,
+    color: colors.text,
+    textAlign: 'center',
+  },
   card: {
     width: '100%',
     alignItems: 'center',

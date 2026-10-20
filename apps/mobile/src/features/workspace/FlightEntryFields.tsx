@@ -1,5 +1,7 @@
 import { View } from 'react-native';
-import { Action, styles } from './ui';
+import { Action } from './ui';
+import { styles } from './workspaceStyles';
+
 import FlightLookup from './FlightLookup';
 export { FlightExtraFields } from './FlightManualFields';
 

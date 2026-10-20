@@ -9,6 +9,8 @@ import {
   workspaceSnapshotSchema,
   workspaceTripSchema,
   workspaceCommandSchema,
+  communityFeedSearch,
+  type CommunityFeedFilters,
   type WorkspaceCommand,
 } from '@wherego/validation';
 import { requestFoundation, type FoundationClientOptions } from './foundation';
@@ -16,9 +18,10 @@ import { requestFoundation, type FoundationClientOptions } from './foundation';
 // 앱과 웹의 원본 여행 목록을 조회한다.
 export function listServerTrips(
   options: FoundationClientOptions,
+  signal?: AbortSignal,
 ): Promise<PersistedTrip[]> {
   // 런타임 스키마 검증을 통과한 서버 자료만 반환한다.
-  return requestFoundation(options, '/trips').then((response) => {
+  return requestFoundation(options, '/trips', { signal }).then((response) => {
     // 알 수 없는 값을 타입 단언으로 넘기지 않는다.
     return z.array(workspaceTripSchema).parse(response.data);
   });
@@ -27,11 +30,13 @@ export function listServerTrips(
 export function getWorkspace(
   options: FoundationClientOptions,
   id: string,
+  signal?: AbortSignal,
 ): Promise<WorkspaceSnapshot> {
   // 실제 서버에서 계정 멤버십을 검사한다.
   return requestFoundation(
     options,
     `/trips/${encodeURIComponent(id)}/workspace`,
+    { signal },
   ).then((response) => {
     // 사진·영수증·멤버 계약을 함께 검증한다.
     return workspaceSnapshotSchema.parse(response.data);
@@ -91,25 +96,31 @@ export function acceptServerInvite(
 export function getCommunity(
   options: FoundationClientOptions,
   offset = 0,
+  filters: Partial<CommunityFeedFilters> = {},
+  signal?: AbortSignal,
 ): Promise<CommunityPost[]> {
   // 서버 페이지 크기에 맞춰 피드를 이어 읽는다.
-  return requestFoundation(options, `/community?offset=${offset}`).then(
-    (response) => {
-      // 공개 스냅샷에 민감한 여행 필드가 들어오지 않게 계약을 제한한다.
-      return z.array(communityPostSchema).parse(response.data);
-    },
-  );
+  return requestFoundation(
+    options,
+    `/community?${communityFeedSearch(filters, offset)}`,
+    { signal },
+  ).then((response) => {
+    // 공개 스냅샷에 민감한 여행 필드가 들어오지 않게 계약을 제한한다.
+    return z.array(communityPostSchema).parse(response.data);
+  });
 }
 // 파일의 짧은 조회 URL을 읽는다.
 export function getServerMediaUrl(
   options: FoundationClientOptions,
   tripId: string,
   mediaId: string,
+  signal?: AbortSignal,
 ): Promise<string> {
   // 원본 경로를 임의로 클라이언트가 요청하지 않는다.
   return requestFoundation(
     options,
     `/trips/${encodeURIComponent(tripId)}/media/${encodeURIComponent(mediaId)}/url`,
+    { signal },
   ).then((response) => {
     // 성공 URL 형식만 반환한다.
     return z.object({ url: z.string().url() }).parse(response.data).url;

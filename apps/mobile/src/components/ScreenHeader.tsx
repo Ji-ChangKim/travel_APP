@@ -13,6 +13,7 @@ export default function ScreenHeader({
   disabled = false,
   right,
   inset = true,
+  inlineTitle = false,
 }: {
   title?: string;
   backLabel?: string;
@@ -20,6 +21,7 @@ export default function ScreenHeader({
   disabled?: boolean;
   right?: ReactNode;
   inset?: boolean;
+  inlineTitle?: boolean;
 }) {
   // 글자 확대 여부로 빈 행을 만들지 않고 실제 콘텐츠만 배치한다.
   return (
@@ -42,9 +44,12 @@ export default function ScreenHeader({
         ) : title ? (
           <ScreenTitle style={s.rootTitle}>{title}</ScreenTitle>
         ) : null}
+        {onBack && title && inlineTitle ? (
+          <ScreenTitle style={s.rootTitle}>{title}</ScreenTitle>
+        ) : null}
         {right ? <View style={s.right}>{right}</View> : null}
       </View>
-      {onBack && title ? (
+      {onBack && title && !inlineTitle ? (
         <View style={s.heading}>
           <ScreenTitle>{title}</ScreenTitle>
         </View>

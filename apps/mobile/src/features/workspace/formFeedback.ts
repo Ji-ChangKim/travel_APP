@@ -32,9 +32,9 @@ export const formFieldLabels: Record<string, string> = {
   transactionDate: '실제 결제 날짜',
   transactionTime: '실제 결제 시간',
   details: '구매 내역',
-  body: '커뮤니티 본문',
-  planTitle: '이날 계획 제목',
-  planConcept: '이날 여행 컨셉',
+  body: '공유 소개 · 선택',
+  planTitle: '이날 제목 · 선택',
+  planConcept: '이날 소개 · 선택',
   description: '계획 설명·추천 메뉴·팁',
   choiceGroup: '같은 선택지 묶음',
   choiceLabel: '선택지 안내',
@@ -100,7 +100,7 @@ function addIssue(
 function issueLabel(path: (string | number)[], kind: string): string {
   // 예상 비용의 소수 검사 실패도 해당 금액 입력으로 이동한다.
   return kind === 'trip' && path.at(-1) === 'title'
-    ? '나의 여행 주제'
+    ? '여행 이름 · 선택'
     : path.includes('estimatedCost')
       ? '예상 지출 금액'
       : typeof path[0] === 'number' && kind === 'receipt'
@@ -201,7 +201,7 @@ export function revisedFormFeedback(
         // 기간과 통화 변경은 서로 연관된 필드 안내를 함께 정리한다.
         return ![
           formFieldLabels[key],
-          ...(key === 'title' ? ['나의 여행 주제'] : []),
+          ...(key === 'title' ? ['여행 이름 · 선택'] : []),
           ...(key === 'country' ? ['도시'] : []),
           ...(key.startsWith('flight')
             ? Object.values(formFieldLabels).filter((value) =>

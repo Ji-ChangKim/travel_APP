@@ -19,6 +19,8 @@ export const colors = {
   brandCoral: tokens.color.brand.coral,
   selected: tokens.color.selection.text,
   selectedSurface: tokens.color.selection.surface,
+  selectedFill: tokens.control.daySelected.background,
+  selectedFillText: tokens.control.daySelected.foreground,
   secondary: tokens.color.action.link,
   secondaryDark: tokens.color.brand.navy,
   secondarySoft: tokens.color.surface.low,

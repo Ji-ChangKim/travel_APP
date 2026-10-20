@@ -1,7 +1,9 @@
 import Text from '@/components/AppText';
 import { useState } from 'react';
 import { Linking, View } from 'react-native';
-import { Action, Field, styles } from './ui';
+import { Action, Field } from './ui';
+import { styles } from './workspaceStyles';
+
 import SharedPlaceInput from './SharedPlaceInput';
 import { ScheduleButton, ScheduleField } from './ScheduleControls';
 import { scheduleStyles as schedule } from './scheduleTheme';

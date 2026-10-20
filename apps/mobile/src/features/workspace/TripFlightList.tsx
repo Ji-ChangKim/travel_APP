@@ -1,6 +1,8 @@
 import Text from '@/components/AppText';
 import { View } from 'react-native';
-import { Action, styles } from './ui';
+import { Action } from './ui';
+import { styles } from './workspaceStyles';
+
 import FlightRoutePreview from './FlightRoutePreview';
 import type { FlightSlot, TripFlight } from './tripFlightModel';
 

@@ -8,6 +8,7 @@ import {
 test('장소 검색은 인증된 v1 경로·공통 응답·취소 신호를 사용한다', async () => {
   // 이름에 포함된 경로·예약 문자가 검색 파라미터를 벗어나지 않게 한다.
   const controller = new AbortController();
+  const signals: AbortSignal[] = [];
   let calls = 0;
   const result = await searchPlaces(
     {
@@ -23,7 +24,9 @@ test('장소 검색은 인증된 v1 경로·공통 응답·취소 신호를 사�
           new Headers(init?.headers).get('Authorization'),
           'Bearer fixture-session',
         );
-        assert.equal(init?.signal, controller.signal);
+        assert.ok(init?.signal);
+        assert.equal(init.signal.aborted, false);
+        signals.push(init.signal);
         return Response.json({
           data: [{ id: 'fixture-place', title: '식당', address: '도쿄' }],
           meta: { requestId: 'fixture' },
@@ -34,6 +37,8 @@ test('장소 검색은 인증된 v1 경로·공통 응답·취소 신호를 사�
     controller.signal,
   );
   assert.equal(calls, 1);
+  controller.abort();
+  assert.equal(signals[0]?.aborted, true);
   assert.deepEqual(result.data, [
     { id: 'fixture-place', title: '식당', address: '도쿄' },
   ]);

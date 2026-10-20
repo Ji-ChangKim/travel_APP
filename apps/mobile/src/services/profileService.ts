@@ -1,3 +1,4 @@
+import { UserFacingError } from './userFacingError';
 import type { Profile, ProfileUpdate } from '@wherego/domain';
 import { z } from 'zod';
 import { requestFoundation, FoundationClientError } from '@wherego/api-client';
@@ -57,7 +58,7 @@ export function updateUserProfile(
       // 다른 계정의 정보와 원본 서버 오류를 숨긴다.
       return error instanceof FoundationClientError && error.status === 409
         ? Promise.reject(
-            new Error(
+            new UserFacingError(
               '이미 사용 중인 닉네임이에요. 다른 닉네임을 입력해 주세요.',
             ),
           )
@@ -70,7 +71,9 @@ function savedProfile(profile: Profile, userId: string): Promise<Profile> {
   // 일반 회원 프로필을 게스트 저장소에 넣지 않는다.
   return profile.id !== userId ||
     useTripStore.getState().currentUser?.id !== userId
-    ? Promise.reject(new Error('계정이 변경됐어요. 다시 로그인해 주세요.'))
+    ? Promise.reject(
+        new UserFacingError('계정이 변경됐어요. 다시 로그인해 주세요.'),
+      )
     : (profile.authProvider === 'guest' &&
       useTripStore.getState().currentUser?.id === profile.id
         ? saveGuestSession(profile)
@@ -80,7 +83,7 @@ function savedProfile(profile: Profile, userId: string): Promise<Profile> {
         return useTripStore.getState().currentUser?.id === userId
           ? profile
           : Promise.reject(
-              new Error('계정이 변경됐어요. 다시 로그인해 주세요.'),
+              new UserFacingError('계정이 변경됐어요. 다시 로그인해 주세요.'),
             );
       });
 }

@@ -11,7 +11,7 @@ import { travelDateRange } from './travelDateRange';
 export const tripNavigationLabels = { plans: '내 여행 보기' } as const;
 export const tripPhaseLabels: Record<TripLifecycle, string> = {
   DRAFT: '준비 중',
-  PLANNED: '임박/예정',
+  PLANNED: '여행 예정',
   IN_PROGRESS: '여행 중',
   COMPLETED: '여행 완료',
 };

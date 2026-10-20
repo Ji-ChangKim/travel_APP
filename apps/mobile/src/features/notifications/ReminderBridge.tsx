@@ -34,9 +34,12 @@ function useReminderQuery(id: string, permissionRevision: number) {
     useQuery({
       queryKey: foundationQueryKey(id, 'trips'),
       enabled: Boolean(id),
-      queryFn: () => {
+      queryFn: ({ signal }) => {
         // 확인된 계정의 서버 여행만 읽는다.
-        return serverOptions(id).then(listServerTrips);
+        return serverOptions(id).then((options) => {
+          // 알림 계정의 마지막 조회 구독이 끝나면 연결도 정리한다.
+          return listServerTrips(options, signal);
+        });
       },
       retry: false,
     }).data,

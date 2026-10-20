@@ -7,9 +7,11 @@ export type AuthReturn = {
     | 'plans'
     | 'trip'
     | 'diary'
+    | 'record'
     | 'footprints'
     | 'new-trip'
     | 'community'
+    | 'account'
     | 'invite'
     | 'import-place';
   destination?: string;
@@ -23,7 +25,7 @@ export function authReturn(
   tripId?: unknown,
 ): AuthReturn {
   // 배열·임의 URL·잘못된 여행 ID를 내부 이동에 사용하지 않는다.
-  return next === 'trip' || next === 'diary'
+  return next === 'trip' || next === 'diary' || next === 'record'
     ? z.string().uuid().safeParse(tripId).success
       ? { next, tripId: tripId as string }
       : { next: 'plans' }
@@ -36,6 +38,7 @@ export function authReturn(
             )?.key || '',
         }
       : next === 'plans' ||
+          next === 'account' ||
           next === 'community' ||
           next === 'invite' ||
           next === 'import-place' ||
@@ -50,9 +53,13 @@ export function returnFromPath(
   destination?: unknown,
 ): AuthReturn {
   // 상세 경로의 전체 형식이 일치해야 원래 여행 ID를 보존한다.
-  return /^\/(trips|diary)\/[^/]+$/.test(path)
+  return /^\/(trips|diary|record)\/[^/]+$/.test(path)
     ? authReturn(
-        path.startsWith('/trips/') ? 'trip' : 'diary',
+        path.startsWith('/trips/')
+          ? 'trip'
+          : path.startsWith('/record/')
+            ? 'record'
+            : 'diary',
         undefined,
         path.split('/')[2],
       )
@@ -82,22 +89,26 @@ function verifiedReturnPath(params: AuthReturn) {
     ? (`/trips/${params.tripId}` as const)
     : params.next === 'diary'
       ? (`/diary/${params.tripId}` as const)
-      : params.next === 'new-trip'
-        ? {
-            pathname: '/new-trip' as const,
-            params: { destination: params.destination || '' },
-          }
-        : params.next === 'community'
-          ? ('/(tabs)/community' as const)
-          : params.next === 'footprints'
-            ? ('/(tabs)/footprints' as const)
-            : params.next === 'plans'
-              ? ('/plans' as const)
-              : params.next === 'invite'
-                ? ('/invite' as const)
-                : params.next === 'import-place'
-                  ? ('/import-place' as const)
-                  : ('/(tabs)' as const);
+      : params.next === 'record'
+        ? (`/record/${params.tripId}` as const)
+        : params.next === 'new-trip'
+          ? {
+              pathname: '/new-trip' as const,
+              params: { destination: params.destination || '' },
+            }
+          : params.next === 'community'
+            ? ('/(tabs)/community' as const)
+            : params.next === 'account'
+              ? ('/account' as const)
+              : params.next === 'footprints'
+                ? ('/(tabs)/footprints' as const)
+                : params.next === 'plans'
+                  ? ('/plans' as const)
+                  : params.next === 'invite'
+                    ? ('/invite' as const)
+                    : params.next === 'import-place'
+                      ? ('/import-place' as const)
+                      : ('/(tabs)' as const);
 }
 
 // 로그인 만료와 접근 불가를 통신 장애와 구분한다.

@@ -14,7 +14,8 @@ export function ScheduleButton({
   onPress,
   disabled = false,
   primary = false,
-  selected = false,
+  selected,
+  selectionStyle,
   accessibilityLabel,
   allowWhileLocked = false,
 }: {
@@ -24,6 +25,7 @@ export function ScheduleButton({
   disabled?: boolean;
   primary?: boolean;
   selected?: boolean;
+  selectionStyle?: 'check' | 'fill';
   accessibilityLabel?: string;
   allowWhileLocked?: boolean;
 }) {
@@ -36,6 +38,7 @@ export function ScheduleButton({
       disabled={(useFormScope().locked && !allowWhileLocked) || disabled}
       variant={primary ? 'primary' : 'secondary'}
       selected={selected}
+      selectionStyle={selectionStyle}
       icon={
         icon
           ? (color) => {

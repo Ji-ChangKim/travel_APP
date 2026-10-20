@@ -1,6 +1,7 @@
 TripPrint 실제 서버 등록·저장 검증
 기준일: 2026-10-16 / Asia/Seoul
-최신 판정: API a4d5dc1c 반영 후 실제 staging 검사19개 중16개 통과·3개 실패. Android 빌드 HOLD. 아래14/19 기록은 반영 전 실행이며 최신 결과는 문서 끝의 재검사를 따른다.
+최신 판정:2026-10-19 실제 staging 검사19/19 통과. 이전14/19·16/19는 아래 이력이다. 항공 조회는 정상 응답/후보0건이며 실편 검색 인수와 구분한다. 최신 디자인/계정 적용 결과는 REDESIGN_IMPLEMENTATION.txt.
+최종 재실행:API a219ebeb-9bcc-4041-b6b0-8744e8feeb3c에서 outputs/customer-journey/live/qa-20261019031848-7fd2db/result.json 19/19. 이전 실패 설명은 이력이며 최신 온보딩·OCR·저장·재조회·공유 판정과 구분한다.
 
 검증 범위
 https://tripprint-api-staging.gametps.workers.dev에 실제 HTTPS 요청을 보냈다. 앱과 같은 이메일 인증, Bearer 세션, travelapp:// Origin, 여행 버전, 멱등 키를 사용했다. 응답을 가로채거나 로컬 DB로 대체하지 않았다. workspace 응답은 현재 앱의 공통 스키마로 검사했다.
@@ -78,3 +79,10 @@ DB 대조: outputs/customer-journey/live/d1-both-qa-readback.json
 
 [장소 검색 별도 실제 재검사 / 2026-10-16]
 사용자 키 등록과 무료 호출 제한 반영 뒤 새 검수 계정으로 인증 장소 검색을 실제 요청했다. HTTP200, 결과4개·오사카 성 포함, 세션 종료. 증거:outputs/community-osaka/thumbnail-authenticated-search.json. LIVE-04 장소 검색은 해결됐다. 이전 전체19개 실행16/19는 당시 결과로 보존하며 전체를 다시 검사했다고 표기하지 않는다. 사진19/19와 월별 DB 집계·키 보존·웹 표시 결과는 GOOGLE_PLACE_PHOTOS.txt를 따른다. OCR·항공조회·Android 실기기 인수는 별도다.
+
+
+[2026-10-19 전체 실제 재검사]
+실행:outputs/customer-journey/live/qa-20261019030154-a574cb/result.json. 실제 HTTPS 고객 검사19/19 통과, 실패0. 실행 로그:outputs/redesign-implementation/customer-journey-final.log. API는 동일 staging의 검수 후보 ee2cc0d2다. 합성 영수증이며 고객 실물 영수증은 사용하지 않았다.
+확인:생일 없는 온보딩, 여행/DAY/일반 일정·항공권 등록, 같은 키 중복 방지·오래된 버전 거절, 영수증 파일 업로드/해시 대조, 실제 서버 AI OCR(QA CAFE·JPY1200·Lunch800/Tea400), 확인/수정/경비 동기화, 재로그인 재조회, 기록 완료·선택 공개·비공개 제외·철회·원본 보존·인증 없는 접근 차단·세션 철회.
+장소 검색200/결과1, 항공 조회200/후보0·한국공항공사. 공급자 통신이 복구된 결과이며 해당 과거 날짜에 실제 항공편을 찾았다는 뜻은 아니다. 내부 테스트 설치본의 지도/촬영/Google 인증 인수를 대체하지 않는다.
+이 실행의 임시 공개본은 철회했고 보조 세션도 종료했다. 별도 UI 검수 여행 c3df0b9d 공개본과 기존 사용자 오사카 공개본은 유지한다. 계정90일 유예의 실제 앱 확인과 로컬 시간 경계 검사는 REDESIGN_IMPLEMENTATION.txt에서 구분한다.

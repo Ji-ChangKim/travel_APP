@@ -183,8 +183,8 @@ const s = StyleSheet.create({
   },
   map: { flex: 1 },
   pin: {
-    minWidth: 44,
-    minHeight: 44,
+    minWidth: 48,
+    minHeight: 48,
     padding: 4,
     borderRadius: 28,
     borderWidth: 3,

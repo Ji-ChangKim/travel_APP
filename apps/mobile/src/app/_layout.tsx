@@ -9,6 +9,7 @@ import GlobalNavigation from '@/components/GlobalNavigation';
 import AppFontProvider from '@/components/AppFontProvider';
 import ScheduleExitDialog from '@/features/workspace/scheduleExitGuard';
 import AuthGate from '@/features/auth/AuthGate';
+import AuthRecoveryBoundary from '@/features/auth/AuthRecoveryBoundary';
 import NotificationPermission from '@/features/notifications/NotificationPermission';
 
 import { colors } from '@/constants/theme';
@@ -85,26 +86,28 @@ export default function RootLayout() {
         <LaunchBridge />
         <SafeAreaProvider>
           <StartupPolicyGate>
-            <AuthGate />
-            <View
-              testID="app-page-content"
-              style={{ flex: 1 }}
-              onLayout={direct ? nativeFrameReady : undefined}
-            >
-              <Stack
-                screenLayout={pageLayout}
-                screenOptions={{
-                  animation: 'none',
-                  headerShown: false,
-                  contentStyle: { backgroundColor: colors.background },
-                }}
+            <AuthRecoveryBoundary>
+              <AuthGate />
+              <View
+                testID="app-page-content"
+                style={{ flex: 1 }}
+                onLayout={direct ? nativeFrameReady : undefined}
               >
-                <Stack.Screen name="login" options={{ animation: 'none' }} />
-              </Stack>
-              <JourneyNotifications />
-            </View>
-            <GlobalNavigation />
-            <ScheduleExitDialog />
+                <Stack
+                  screenLayout={pageLayout}
+                  screenOptions={{
+                    animation: 'none',
+                    headerShown: false,
+                    contentStyle: { backgroundColor: colors.background },
+                  }}
+                >
+                  <Stack.Screen name="login" options={{ animation: 'none' }} />
+                </Stack>
+                <JourneyNotifications />
+              </View>
+              <GlobalNavigation />
+              <ScheduleExitDialog />
+            </AuthRecoveryBoundary>
             <StatusBar style="dark" />
             <NavigationBar hidden />
           </StartupPolicyGate>

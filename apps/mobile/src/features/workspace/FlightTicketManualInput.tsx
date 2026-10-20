@@ -1,7 +1,8 @@
 import Text from '@/components/AppText';
 import { View } from 'react-native';
 import { DateField } from './TravelInputs';
-import { Field, styles } from './ui';
+import { Field } from './ui';
+import { styles } from './workspaceStyles';
 
 // 조회되지 않는 지난 항공권도 확인한 정보만 입력해 기록한다.
 export default function FlightTicketManualInput({

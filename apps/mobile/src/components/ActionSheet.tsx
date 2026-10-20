@@ -3,24 +3,34 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Modal from './AppModal';
 import ScreenTitle from './ScreenTitle';
+import DesignButton from './DesignButton';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/constants/theme';
 
-// 확인·삭제·메뉴 선택은 네이티브 모달 위의 같은 바텀시트로 표시한다.
+// 선택 목록은 하단 시트로, 한 번의 결정은 중앙 확인으로 표시한다.
 export default function ActionSheet({
   visible,
   title,
   onClose,
   children,
   priority = 0,
+  variant = 'sheet',
+  dismissDisabled = false,
 }: {
   visible: boolean;
   title: string;
   onClose: () => void;
   children: ReactNode;
   priority?: number;
+  variant?: 'sheet' | 'confirm';
+  dismissDisabled?: boolean;
 }) {
   // 하단 시스템 영역과 키보드 탐색을 공통 모달 계층에서 보호한다.
   const insets = useSafeAreaInsets();
+  function closeSheet(): void {
+    // 확정 요청 처리 중에는 닫기·배경·시스템 뒤로로 중복 행동을 시작하지 않는다.
+    return dismissDisabled ? undefined : onClose();
+  }
   return (
     <Modal
       native
@@ -28,34 +38,50 @@ export default function ActionSheet({
       visible={visible}
       accessibilityLabel={title}
       priority={priority}
-      animationType="slide"
-      onRequestClose={onClose}
+      animationType={variant === 'confirm' ? 'fade' : 'slide'}
+      onRequestClose={closeSheet}
     >
-      <View style={s.layer}>
+      <View style={[s.layer, variant === 'confirm' && s.centerLayer]}>
         <Pressable
           testID="action-sheet-dismiss"
           accessible={false}
           style={StyleSheet.absoluteFill}
-          onPress={onClose}
+          disabled={dismissDisabled}
+          onPress={closeSheet}
         />
         <View
           testID="action-sheet"
           accessibilityViewIsModal
           style={[
             s.sheet,
+            variant === 'confirm' && s.confirm,
             {
               paddingBottom: Math.max(16, insets.bottom),
               marginTop: insets.top + 16,
             },
           ]}
         >
-          <View accessible={false} style={s.handle} />
+          {variant === 'sheet' && <View accessible={false} style={s.handle} />}
           <ScrollView
             bounces={false}
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={s.content}
           >
-            <ScreenTitle>{title}</ScreenTitle>
+            <View style={s.titleRow}>
+              <ScreenTitle style={{ flex: 1 }}>{title}</ScreenTitle>
+              <DesignButton
+                label=""
+                accessibilityLabel="닫기"
+                size="icon"
+                variant="quiet"
+                disabled={dismissDisabled}
+                onPress={closeSheet}
+                icon={(color) => {
+                  // 안전한 닫기를 첫 조작 대상으로 두고 제목과 겹치지 않게 한다.
+                  return <Ionicons name="close" size={24} color={color} />;
+                }}
+              />
+            </View>
             {children}
           </ScrollView>
         </View>
@@ -66,7 +92,19 @@ export default function ActionSheet({
 
 const s = StyleSheet.create({
   layer: { flex: 1, justifyContent: 'flex-end' },
+  centerLayer: { justifyContent: 'center', paddingHorizontal: 20 },
+  confirm: {
+    width: '100%',
+    maxWidth: 350,
+    alignSelf: 'center',
+    borderRadius: 24,
+    paddingTop: 20,
+  },
+  titleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
   sheet: {
+    width: '100%',
+    maxWidth: 640,
+    alignSelf: 'center',
     maxHeight: '90%',
     backgroundColor: colors.surface,
     borderTopLeftRadius: 24,

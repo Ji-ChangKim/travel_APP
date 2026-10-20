@@ -30,7 +30,7 @@ export default function ScheduleConflictNotice({
         accessibilityRole="button"
         accessibilityLabel="시간 경고 자세히"
         accessibilityState={{ expanded }}
-        style={{ minHeight: 44, justifyContent: 'center' }}
+        style={{ minHeight: 48, justifyContent: 'center' }}
         onPress={() => {
           // 긴 경고가 일정을 가리지 않게 상세는 선택해서 읽는다.
           return setExpanded(!expanded);

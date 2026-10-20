@@ -1,3 +1,4 @@
+import { UserFacingError } from './userFacingError';
 import { Platform } from 'react-native';
 import { File, Paths } from 'expo-file-system';
 import * as Crypto from 'expo-crypto';
@@ -61,7 +62,9 @@ function checkedGuestImage(
           });
         })
       : Promise.reject(
-          new Error('이 기기의 여행을 다시 열고 사진을 선택해 주세요.'),
+          new UserFacingError(
+            '이 기기의 여행을 다시 열고 사진을 선택해 주세요.',
+          ),
         );
   });
 }
@@ -111,11 +114,15 @@ function readImageData(
     return typeof reader.result === 'string' &&
       /^data:image\/(png|jpeg);base64,/.test(reader.result)
       ? resolve(reader.result)
-      : reject(new Error('사진을 읽지 못했어요. 다시 선택해 주세요.'));
+      : reject(
+          new UserFacingError('사진을 읽지 못했어요. 다시 선택해 주세요.'),
+        );
   }),
   (reader.onerror = () => {
     // 원본 파일 경로는 안내에 포함하지 않는다.
-    return reject(new Error('사진을 읽지 못했어요. 다시 선택해 주세요.'));
+    return reject(
+      new UserFacingError('사진을 읽지 못했어요. 다시 선택해 주세요.'),
+    );
   }),
   reader.readAsDataURL(blob));
 }

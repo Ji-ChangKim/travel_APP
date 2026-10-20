@@ -1,6 +1,10 @@
 import { z } from 'zod';
 import type { Context } from 'hono';
-import { communityPostSchema, foundationUuidSchema } from '@wherego/validation';
+import {
+  communityPostSchema,
+  foundationUuidSchema,
+  workspaceSnapshotSchema,
+} from '@wherego/validation';
 import type { CommunityPost } from '@wherego/domain';
 import type { ApiEnvironment } from './types';
 import { runRpc } from './backend';
@@ -37,6 +41,11 @@ const placeSchema = z.object({
 });
 type PhotoPlace = z.infer<typeof placeSchema>;
 type Ctx = Context<ApiEnvironment>;
+type PhotoLocation = Pick<CommunityPost['snapshot'], 'country' | 'city'>;
+type PhotoSchedule = Pick<
+  CommunityPost['snapshot']['itinerary'][number],
+  'title' | 'googlePlaceId'
+>;
 
 // 공급자 링크는 HTTPS의 지정 Google 호스트에만 연결한다.
 export function googlePhotoLink(value: string | undefined): string | undefined {
@@ -71,10 +80,10 @@ async function googleJson(response: Response): Promise<unknown> {
 async function findPhotoPlace(
   fetcher: typeof fetch,
   c: Ctx,
-  post: CommunityPost,
-  place: CommunityPost['snapshot']['itinerary'][number],
+  location: PhotoLocation,
+  place: PhotoSchedule,
 ): Promise<PhotoPlace | null> {
-  // 비공개 여행 원본과 고객 메모는 공급자에 보내지 않는다.
+  // 장소 조회에 필요한 나라·도시·장소만 보내고 메모·예약·DAY 원문은 제외한다.
   const operation = place.googlePlaceId ? 'place-details' : 'text-search';
   await reserveGoogleCall(c.env, operation);
   const response = await fetcher(
@@ -97,7 +106,7 @@ async function findPhotoPlace(
         ? {}
         : {
             body: JSON.stringify({
-              textQuery: `${post.snapshot.country} ${post.snapshot.city} ${place.title}`,
+              textQuery: `${location.country} ${location.city} ${place.title}`,
               languageCode: 'ko',
               pageSize: 1,
             }),
@@ -184,6 +193,43 @@ export async function publicPlanPhoto(
         })
       : undefined;
   if (!place) return rejectRequest('RESOURCE_NOT_FOUND');
+  return respondPhoto(fetcher, c, post.snapshot, place);
+}
+
+// 공개 전 미리보기는 현재 여행 멤버의 저장된 장소만 조회한다.
+export async function previewPlanPhoto(
+  fetcher: typeof fetch,
+  c: Ctx,
+): Promise<Response> {
+  // 로그인·멤버십·일정 소속 검사를 Google 호출과 사용량 예약보다 먼저 끝낸다.
+  const tripId = foundationUuidSchema.parse(c.req.param('tripId'));
+  const scheduleId = foundationUuidSchema.parse(c.req.param('scheduleId'));
+  const snapshot = workspaceSnapshotSchema.parse(
+    await runRpc(
+      c.env,
+      c.get('session'),
+      'wherego_workspace',
+      { p_trip: tripId },
+      fetcher,
+    ),
+  );
+  const place = snapshot.itinerary.find((item) => {
+    // 임의 검색어 대신 실제 저장된 PLACE 일정만 허용한다.
+    return item.id === scheduleId && item.type === 'PLACE';
+  });
+  return place
+    ? respondPhoto(fetcher, c, snapshot.trip, place)
+    : rejectRequest('RESOURCE_NOT_FOUND');
+}
+
+// 미리보기와 공개 화면에 같은 사진 선택·출처·한도·오류 계약을 적용한다.
+async function respondPhoto(
+  fetcher: typeof fetch,
+  c: Ctx,
+  location: PhotoLocation,
+  place: PhotoSchedule,
+): Promise<Response> {
+  // 비공개 미리보기도 기존 한도를 공유하고 공급자 응답은 저장하지 않는다.
   if (!c.env.GOOGLE_PLACES_API_KEY || !c.env.PLACES_PHOTO_LIMITER)
     return rejectRequest('CONFIGURATION_REQUIRED');
   if (
@@ -194,7 +240,7 @@ export async function publicPlanPhoto(
     ).success
   )
     return rejectRequest('PLACE_PHOTO_RATE_LIMITED');
-  const data = await findPhotoPlace(fetcher, c, post, place)
+  const data = await findPhotoPlace(fetcher, c, location, place)
     .then((matched) => {
       // 사진 없는 장소를 다른 이미지나 다른 지점으로 대체하지 않는다.
       return matched ? photoDisplay(fetcher, c, matched) : null;

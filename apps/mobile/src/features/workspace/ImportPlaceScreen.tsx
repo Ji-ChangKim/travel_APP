@@ -9,7 +9,9 @@ import { useQuery } from '@tanstack/react-query';
 import { foundationQueryKey, listServerTrips } from '@wherego/api-client';
 import { useTripStore } from '@/stores/useTripStore';
 import { serverOptions } from './service';
-import { Action, Field, styles } from './ui';
+import { Action, Field } from './ui';
+import { styles } from './workspaceStyles';
+
 import {
   incomingMapsText,
   pendingMapsShare,
@@ -91,9 +93,12 @@ function useImportTrips(userId: string) {
     queryKey: foundationQueryKey(userId, 'trips'),
     enabled: Boolean(userId),
     retry: false,
-    queryFn: () => {
+    queryFn: ({ signal }) => {
       // 여행에 없는 임시 목업을 추가하지 않는다.
-      return serverOptions(userId).then(listServerTrips);
+      return serverOptions(userId).then((options) => {
+        // 가져오기 화면의 마지막 구독이 끝나면 목록 조회를 중단한다.
+        return listServerTrips(options, signal);
+      });
     },
   });
 }

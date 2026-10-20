@@ -1,7 +1,17 @@
 import Text from '@/components/AppText';
-import { colors } from '@/constants/theme';
 import { Image, StyleSheet, View } from 'react-native';
-import DesignButton from '@/components/DesignButton';
+import { LedgerAction } from './LedgerUI';
+import { ledgerColors } from './ledgerTheme';
+
+const colors = {
+  surface: ledgerColors.surface,
+  selectedSurface: ledgerColors.soft,
+  border: ledgerColors.line,
+  text: ledgerColors.ink,
+  muted: ledgerColors.muted,
+  primary: ledgerColors.accent,
+  textLight: ledgerColors.surface,
+};
 
 interface Props {
   returning?: boolean;
@@ -45,9 +55,9 @@ export default function HomeEmptyHero({
       </Text>
 
       <View style={{ alignSelf: 'stretch' }}>
-        <DesignButton
+        <LedgerAction
           label={returning ? '다음 여행 계획 만들기' : '첫 여행 계획 만들기'}
-          variant="primary"
+          primary
           disabled={disabled}
           onPress={onCreateTrip}
         />
@@ -104,8 +114,8 @@ const styles = StyleSheet.create({
   },
   title: {
     width: '100%',
-    fontSize: 22,
-    lineHeight: 30,
+    fontSize: 24,
+    lineHeight: 32,
     fontWeight: '700',
     color: colors.text,
     textAlign: 'center',

@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import type { WorkspaceSnapshot } from '@wherego/domain';
+import { communityFeedCard } from '../../apps/mobile/src/features/workspace/communityFeedCard';
 import {
   communityPostSchema,
   newTrip,
@@ -37,6 +38,39 @@ const places = [
   [3, '쿠시카츠 다루마 신세카이 총본점'],
   [4, '구로몬 시장'],
 ] as const;
+
+test('피드 캐시는 카드 정보만 보관하고 오사카 계획 원문은 변경하지 않는다', () => {
+  // 19장소의 긴 계획은 상세 재조회에 맡기고 목록 캐시에 중복 유지하지 않는다.
+  const snapshot = osakaPlan();
+  const published = transform(
+    snapshot,
+    workspaceCommandSchema.parse({
+      operation: 'community.publish',
+      input: {
+        title: snapshot.trip.title,
+        body: '여행 소개',
+        kind: 'plan',
+        scheduleIds: snapshot.itinerary.map((item) => {
+          // 실제 원문의 공유 가능한 일정만 선택한다.
+          return item.id;
+        }),
+        photoIds: [],
+        includeCosts: false,
+      },
+    }),
+  ).post;
+  const post = communityPostSchema.parse(published);
+  const original = JSON.stringify(post);
+  const card = communityFeedCard(post);
+  assert.equal(card.id, post.id);
+  assert.equal(card.title, post.title);
+  assert.equal(card.scheduleCount, 19);
+  assert.equal(card.city, '오사카');
+  assert.equal('snapshot' in card, false);
+  assert.equal('body' in card, false);
+  assert.ok(JSON.stringify(card).length < original.length / 10);
+  assert.equal(JSON.stringify(post), original);
+});
 
 // 원문의 정확한 장소 제목 행만 찾고 본문 안의 언급은 경계로 쓰지 않는다.
 function placeStart(title: string): number {
@@ -150,6 +184,8 @@ test('오사카 원문의 4DAY·19장소·설명·선택 관계는 계획 공유
   });
   const post = communityPostSchema.parse(transform(snapshot, command).post);
   assert.equal(post.kind, 'plan');
+  assert.equal(post.title, snapshot.trip.title);
+  assert.notEqual(post.title, input.title);
   assert.throws(() =>
     transform(snapshot, {
       operation: 'community.publish',

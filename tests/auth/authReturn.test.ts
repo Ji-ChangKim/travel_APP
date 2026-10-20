@@ -1,3 +1,4 @@
+import { isPublicBrowsePath } from '../../apps/mobile/src/features/auth/publicRoutes';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { FoundationClientError } from '@wherego/api-client';
@@ -10,6 +11,22 @@ import {
 } from '../../apps/mobile/src/features/auth/authReturn';
 
 const tripId = '00000000-0000-4000-8000-000000000010';
+
+test('기록 편집은 로그인 후 같은 여행으로 돌아가며 임의 경로는 허용하지 않는다', () => {
+  // 새로운 작성 화면도 인증·온보딩의 검증된 복귀 계약을 따른다.
+  assert.equal(
+    authReturnPath(returnFromPath(`/record/${tripId}`)),
+    `/record/${tripId}`,
+  );
+  assert.deepEqual(authReturn('record', undefined, `${tripId}/other`), {
+    next: 'plans',
+  });
+  assert.deepEqual(returnFromPath(`/record/${tripId}/other`), {});
+  assert.equal(
+    authReturnPath(authReturn('record', undefined, tripId), '/invite'),
+    '/invite',
+  );
+});
 
 test('R06 내 여행·상세·다이어리의 직접 링크 목적을 보존한다', () => {
   // 기존 여행 UUID와 화면 종류가 인증 전후 같아야 한다.
@@ -155,4 +172,13 @@ test('R06 손상·만료·미래 시각의 OAuth 복귀 후보를 거부한다',
     }),
     Array(7).fill({}),
   );
+});
+
+test('G11 계정 관리 공개 안내는 로그인 후 같은 안전한 내부 경로로 복귀한다', () => {
+  // 외부 삭제 안내 URL은 인증 없이 읽되 요청은 실제 인증 이후에만 가능하다.
+  assert.equal(isPublicBrowsePath('/account'), true);
+  assert.equal(isPublicBrowsePath('/account/other-user'), false);
+  assert.deepEqual(authReturn('account'), { next: 'account' });
+  assert.equal(authReturnPath(returnFromPath('/account')), '/account');
+  assert.deepEqual(authReturn('https://evil.test/account'), {});
 });

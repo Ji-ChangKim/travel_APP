@@ -44,6 +44,8 @@ Thumbs.db
 .idea/
 outputs/
 scratch/
+# 사용자 전달용으로 생성한 보고서 원본은 로컬에 보관한다.
+/output/
 
 # 보안 키 및 접근 토큰 문서
 docs/98. keys/

@@ -1,0 +1,47 @@
+TripPrint PD 보고서 P0 실행·인수 결과
+기준일:2026-10-19 / staging 서버·웹 범위 / Android 빌드 없음
+
+1. 판정과 범위
+P0 최신 서버·웹 반영, 실제 고객 저장·재조회·공유, 신규 UI 화면 대조를 순서대로 진행했다. UI 팀장 인수는 직접 확인한 웹 캡처 범위의 조건부 컴펌이다. 모든 장애 조합·Android 설치본 통과를 뜻하지 않는다.
+제품 더미 여행·금액·사진·사용자는 없다. 별도 QA 계정/여행에 로고 업로드와 합성 영수증을 실제 저장해 검사했다. 실제 구매 영수증으로 보고하지 않는다. 사용자 오사카 fb1c44f7-3d8a-4f97-8d40-7107bbf8a038 원본은 변경하지 않았다.
+
+2. 최신 반영
+API:https://tripprint-api-staging.gametps.workers.dev
+API 버전:1031bbc6-5e21-4fe6-80b8-e067ce89a9f8
+웹:https://tripprint-staging.pages.dev
+최종 웹:https://5ee757f9.tripprint-staging.pages.dev
+기존17개 연결과 런타임, 인증 운영값·비밀 키·D1·R2·AI·호출 제한·정기 실행 보존. 비밀 키 값은 읽지 않았다. 증거:outputs/p0-final/deployment-preservation.json. 후보는 api-candidate.json이며 인증 운영값이 빈 개발 구성을 그대로 배포하지 않았다.
+최종 웹 스크립트 SHA-256 대조와 직접 /record 링크200:outputs/p0-final/web-bundle-match.json. 이번 작업의 DB 구조 변경 없음.
+
+3. 실제 서버
+고객19/19:실제 가입·선택 생일·여행/DAY·항공권 수동 입력·일정 수정·멱등 요청·409·지출·R2 사진 업/다운로드 바이트 일치·실제 OCR·영수증 확정/수정·재로그인 복원·선택 공개/철회·401. 수정 뒤 실제 경비 JPY2000 복원. 항공 조회200·후보0건은 실편 검색 성공으로 계산하지 않는다.
+근거:outputs/customer-journey/live/qa-20261019062534-eb2324/result.json 및 outputs/p0-final/customer-server.log.
+실제 Google 사진6/6:원본 저장/새 조회, 공개 전 사진 조회의 원본/버전 비변경, 공개 후 같은 장소·출처·저작자, 원문 보존/메모 제외, 철회 뒤 공개 사진404/개인 미리보기 유지, 재공개/사용자 원본 보존. 근거:outputs/p0-final/preview-live.log.
+
+4. 신규 UI의 실제 저장·재조회·공유
+여행 a97a6a9e-70c3-4eef-b42d-1bd3090aa1cb에서 실제 이메일 로그인 → 사진1장 업로드 → 공동 메모·장소 팁 저장 → 기록 상세 복귀 → 공유 일정/사진 선택 → 실제 Google 사진 미리보기 → 범위 확인 → 공개 → 실제 화면 조회.
+영수증 UI에서 합성 사진을 실제 업로드하고 OCR의 QA CAFE·2026-10-01 12:30·Lunch800/Tea400·JPY1200을 확인했다. 사진 보관을 선택해 기존 하나마루켄 일정에 확정했다. 새 로그인으로 영수증과 같은 ID의 실제 지출·원본 사진을 확인했다. 고정 OCR 결과를 제품에 넣지 않았다.
+UI 결과8/8:메모 저장·사진 원본·공유 소개/장소 팁/DAY·선택 사진/메모 제외·미리보기/공개 Google 일치·익명401·영수증/지출 같은 ID·영수증 원본/품목 자동 공개 제외. 증거:outputs/p0-final/ui-save-share-result.json 및 ui-save-share.log.
+공개본 dfa6eef6-473f-439b-a68f-235ac401159d는 UI에서 철회했다. 게시물/공개 사진404, 새 로그인 뒤 사진·메모·영수증·경비 보존, 사용자 원본19개 장소 공개 유지를 확인했다. 증거:outputs/p0-final/ui-withdraw-result.json. QA 원본은 보존하고 임시 공개본만 닫았다.
+
+5. 검수 중 수정
+- /record/* Pages 재작성·웹 산출물 검사 누락 보완.
+- 기록 저장 후 자동 캐시 갱신 대기 대신 직접 재조회·캐시 반영. 잠금 해제 렌더에서 상세로 한 번 복귀.
+- 저장/재조회401·403·404는 원본 가림. 일반 네트워크 오류만 편집 원문 보존. 사진 재조회 실패도 이전 URL 렌더링 제외.
+- 공개 작성자 한 줄 메타·카드 중복220자 원문 제거로 사진 우선. 전체 원문은 우→좌 상세 유지. 가격·영업시간의 작성자 원문 안내 추가.
+- 영수증 확인 사진 contain으로 원본 전체 표시. 일반 사진 크롭 유지. 기록 메모 오류 명칭 보완.
+- 직접 여행의 공통 글꼴 중복 대기 제거. 별도 인증 복원 실패에도 AuthRecoveryBoundary 재시도 연결. Stack 유지, 뒤 원본 터치/화면 읽기 차단. 실패를 인증 성공으로 만들거나 토큰을 지우지 않는다. 최초503 강제 장애의 실제 복구 조작은 미실행이며 소스 검토만 완료했다.
+
+6. 디자인·캡처
+참조:DESIGN.md·design-tokens.json·SCREEN_HEADER_SPEC.md·ledger-tokens.json·STITCH_CURRENT_INTEGRATION.txt·사용자 Stitch 원본.
+실제 공개320/390/430·태블릿1024, 긴 제목·DAY 소개·원문 상세·DAY 채움 선택 치수 유지·실제 Google8/8 로딩 확인. 측정 화면 가로 넘침0·48 미만 행동 영역0. 증거:outputs/p0-final/responsive-measurements.json.
+200%는 같은 웹 실행본의 root 글꼴32px와 실제 staging 공개 GET을 쓰는 QA다. Android OS 글꼴·모든 private200% 입력 조합의 검수가 아니다.
+주요 실제 캡처는 outputs/p0-final/에 보관:public-320/390/430-100.png, public-320/390/430/1024-200.png, public-tablet.png, place-detail-mobile.png, archive-tablet.png, archive-search-empty.png, diary-mobile/tablet.png, record-tablet.png, record-validation-tablet.png, share-selection-mobile/tablet.png, share-preview-mobile.png, share-exit-confirm.png, receipt-capture-mobile/tablet.png, receipt-review-whole-mobile/tablet.png, diary-receipt-saved-tablet.png, record-access-denied.png, public-withdrawn.png, trip-direct-entry-mobile.png.
+UI 팀장 기본7개+추가11개 캡처 직접 대조:보이는 범위에 새 P0/P1 차단 문제 없음. 원본310의 인기 수치·좋아요·복제·인증은 실제 계약이 없어 미복제. 장소별 사진 연결 없는 공개 응답에 임의 갤러리 생성 없음.
+별도 인수:Android OS·실제 카메라·TalkBack·모든 빈/장애 조합·세션503 강제 복구. 비차단 권고:철회 안내의 발견 경로를 명시적 행동으로 보완.
+
+7. 자동 검사와 인계
+최종 npm run check 종료0:outputs/p0-final/check-delivery.log. TypeScript·ESLint 경고0·Prettier·대비69/69 통과. 최종 소스/테스트406개 해시 변경0:source-stability.json.
+계약216/216:auth-delivery.log. 릴리스 정적49/49:release-acceptance.log. 웹 산출물5/5:web-artifacts-tests.log. 격리 Worker/D1 사진·기록4/4:outputs/stitch-current/cloud-ready.log.
+초기 제한 권한의 릴리스 검사42/49는 프로젝트 파일 접근 권한으로 재실행해49/49 통과했다. 초기 실패 로그를 보존하며 Android 빌드 성공으로 바꾸지 않는다.
+versionCode9 / versionName0.1.0 유지. APK·AAB·Android 번들·Play 업로드·Git 커밋/푸시 없음. 운영 정책·실편 조회·설치본 인수는 P1/P2로 유지한다. PD 보고서 output/pdf/TripPrint_PD_개발현황보고서_20261019.pdf는 검토본1.1이다.

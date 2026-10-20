@@ -1,15 +1,16 @@
 import Text from '@/components/AppText';
 import { useState, type ReactNode } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
-import { colors, radii, typography } from '@/constants/theme';
+import { colors, radii, typography, designTokens } from '@/constants/theme';
 
-type Variant = 'primary' | 'secondary' | 'danger' | 'quiet';
+type Variant = 'primary' | 'secondary' | 'danger' | 'destructive' | 'quiet';
 interface Props {
   label: string;
   accessibilityLabel?: string;
   onPress: () => void;
   variant?: Variant;
   selected?: boolean;
+  selectionStyle?: 'check' | 'fill';
   checked?: boolean;
   expanded?: boolean;
   disabled?: boolean;
@@ -20,8 +21,16 @@ interface Props {
 
 // 주요·보조·위험 행동의 표시 상태를 한 컴포넌트에서 통일한다.
 export default function DesignButton(props: Props) {
-  // 초점 상태는 각 버튼 안에서만 유지한다.
-  return <ButtonView {...props} focusState={useState(false)} />;
+  // 단일 선택은 채움색으로 표시하고 다중 체크는 별도 checked 상태를 사용한다.
+  return (
+    <ButtonView
+      {...props}
+      selectionStyle={
+        props.checked === undefined ? props.selectionStyle || 'fill' : 'check'
+      }
+      focusState={useState(false)}
+    />
+  );
 }
 
 // 버튼의 의미와 실제 잠금 상태에 맞는 글자색을 선택한다.
@@ -29,22 +38,26 @@ function foreground(props: Props, pressed = false): string {
   // 비활성 상태를 선택이나 주요 행동보다 먼저 처리한다.
   return props.disabled
     ? colors.muted
-    : props.variant === 'danger'
-      ? colors.danger
-      : props.selected
-        ? colors.selected
-        : props.variant === 'primary'
-          ? pressed
-            ? colors.actionPressedForeground
-            : colors.actionForeground
-          : props.variant === 'quiet'
-            ? props.size === 'icon' || props.size === 'header'
-              ? colors.text
-              : colors.secondary
-            : colors.text;
+    : props.variant === 'destructive'
+      ? colors.textLight
+      : props.variant === 'danger'
+        ? colors.danger
+        : props.selected
+          ? props.selectionStyle === 'fill'
+            ? colors.selectedFillText
+            : colors.selected
+          : props.variant === 'primary'
+            ? pressed
+              ? colors.actionPressedForeground
+              : colors.actionForeground
+            : props.variant === 'quiet'
+              ? props.size === 'icon' || props.size === 'header'
+                ? colors.text
+                : colors.secondary
+              : colors.text;
 }
 
-// 색 외에도 체크·초점 테두리·실제 disabled 속성으로 상태를 전달한다.
+// 선택 방식과 초점 테두리·실제 disabled 속성으로 상태를 전달한다.
 function ButtonView({
   focusState: [focused, setFocused],
   ...props
@@ -83,6 +96,7 @@ function ButtonView({
           props.variant === 'primary' && s.primary,
           props.variant === 'quiet' && s.quiet,
           props.variant === 'danger' && s.danger,
+          props.variant === 'destructive' && s.destructive,
           props.size === 'chip' && s.chip,
           props.size === 'icon' && s.icon,
           props.size === 'day' && s.day,
@@ -91,6 +105,11 @@ function ButtonView({
           pressed && props.variant === 'primary' && s.primaryPressed,
           props.selected && s.selected,
           pressed && props.selected && s.pressed,
+          props.selected && props.selectionStyle === 'fill' && s.selectedFill,
+          pressed &&
+            props.selected &&
+            props.selectionStyle === 'fill' &&
+            s.selectedFillPressed,
           props.disabled && s.disabled,
           focused && s.focused,
         ];
@@ -109,18 +128,15 @@ function ButtonContents(props: Props & { pressed: boolean }) {
   // 비활성은 읽히는 회색을 유지하고 로딩은 기본 버튼 색을 보존한다.
   return (
     <>
-      {props.loading ? (
+      {(props.selected !== undefined || props.checked !== undefined) &&
+      props.selectionStyle !== 'fill' &&
+      props.size !== 'day' ? (
+        <SelectionIndicator {...props} />
+      ) : props.loading ? (
         <ActivityIndicator
           color={foreground(props, props.pressed)}
           size="small"
         />
-      ) : props.selected && props.size !== 'day' ? (
-        <Text
-          accessible={false}
-          style={[s.label, { color: foreground(props, props.pressed) }]}
-        >
-          ✓
-        </Text>
       ) : props.icon ? (
         <View accessible={false}>
           {props.icon(foreground(props, props.pressed))}
@@ -131,6 +147,9 @@ function ButtonContents(props: Props & { pressed: boolean }) {
           style={[
             s.label,
             (props.size === 'chip' || props.size === 'day') && s.compactLabel,
+            props.selected &&
+              props.selectionStyle === 'fill' &&
+              s.selectedLabel,
             { color: foreground(props, props.pressed) },
           ]}
         >
@@ -141,7 +160,71 @@ function ButtonContents(props: Props & { pressed: boolean }) {
   );
 }
 
+// 선택 전에도 같은 체크 공간을 확보해 버튼과 주변 항목의 크기를 유지한다.
+function SelectionIndicator(props: Props & { pressed: boolean }) {
+  // 투명한 같은 글자가 글꼴 확대까지 따라가며 실제 표시만 겹쳐 바꾼다.
+  return (
+    <View
+      accessible={false}
+      aria-hidden
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+      style={[
+        s.indicator,
+        props.checked !== undefined && s.checkIndicator,
+        props.checked && s.checkedIndicator,
+      ]}
+    >
+      <Text accessible={false} style={[s.label, { opacity: 0 }]}>
+        ✓
+      </Text>
+      <View pointerEvents="none" style={s.indicatorContent}>
+        {props.loading ? (
+          <ActivityIndicator
+            color={foreground(props, props.pressed)}
+            size="small"
+          />
+        ) : props.selected || props.checked ? (
+          <Text
+            accessible={false}
+            style={[
+              s.label,
+              {
+                color: props.checked
+                  ? colors.surface
+                  : foreground(props, props.pressed),
+              },
+            ]}
+          >
+            ✓
+          </Text>
+        ) : props.icon ? (
+          props.icon(foreground(props, props.pressed))
+        ) : null}
+      </View>
+    </View>
+  );
+}
+
 const s = StyleSheet.create({
+  indicator: { flexShrink: 0 },
+  checkIndicator: {
+    minWidth: 24,
+    minHeight: 24,
+    borderWidth: 1,
+    borderRadius: 4,
+    borderColor: colors.borderStrong,
+  },
+  checkedIndicator: { backgroundColor: colors.text, borderColor: colors.text },
+  indicatorContent: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   button: {
     minHeight: 48,
     paddingHorizontal: 16,
@@ -162,27 +245,27 @@ const s = StyleSheet.create({
   },
   checkbox: { justifyContent: 'flex-start' },
   chip: {
-    minHeight: 44,
+    minHeight: designTokens.accessibility.minimumTouchTarget,
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: radii.pill,
   },
   icon: {
     flexShrink: 0,
-    minHeight: 44,
-    minWidth: 44,
+    minHeight: designTokens.accessibility.minimumTouchTarget,
+    minWidth: designTokens.accessibility.minimumTouchTarget,
     paddingHorizontal: 8,
     paddingVertical: 8,
   },
   header: {
     flexShrink: 0,
-    minWidth: 44,
-    minHeight: 44,
+    minWidth: designTokens.accessibility.minimumTouchTarget,
+    minHeight: designTokens.accessibility.minimumTouchTarget,
     paddingHorizontal: 8,
     paddingVertical: 8,
   },
   day: {
-    minHeight: 44,
+    minHeight: designTokens.accessibility.minimumTouchTarget,
     paddingHorizontal: 0,
     paddingVertical: 6,
     borderRadius: 12,
@@ -197,10 +280,20 @@ const s = StyleSheet.create({
   },
   quiet: { backgroundColor: 'transparent', borderColor: 'transparent' },
   danger: { backgroundColor: colors.dangerSoft, borderColor: colors.danger },
+  destructive: { backgroundColor: colors.danger, borderColor: colors.danger },
   selected: {
     backgroundColor: colors.selectedSurface,
     borderColor: colors.selected,
   },
+  selectedFill: {
+    backgroundColor: colors.selectedFill,
+    borderColor: colors.selectedFill,
+  },
+  selectedFillPressed: {
+    backgroundColor: colors.primaryPressed,
+    borderColor: colors.primaryPressed,
+  },
+  selectedLabel: { textDecorationLine: 'underline' },
   pressed: { backgroundColor: colors.surfaceMuted },
   disabled: {
     backgroundColor: colors.disabledSurface,

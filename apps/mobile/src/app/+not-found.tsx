@@ -2,7 +2,8 @@ import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import HaruState from '@/components/HaruState';
-import { Action, styles } from '@/features/workspace/ui';
+import { Action } from '@/features/workspace/ui';
+import { styles } from '@/features/workspace/workspaceStyles';
 
 // 존재하지 않는 주소에서도 서비스의 시작점으로 돌아가도록 안내한다.
 export default function NotFoundScreen() {

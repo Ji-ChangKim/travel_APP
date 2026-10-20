@@ -1,7 +1,7 @@
 {
   "schemaVersion": 3,
-  "revision": "3.0.1",
-  "date": "2026-10-16",
+  "revision": "3.0.3",
+  "date": "2026-10-19",
   "status": "app-integrated",
   "unit": "logical-pixel",
   "sourceScreens": {
@@ -163,7 +163,7 @@
     "inlineGap": 8,
     "groupGap": 12,
     "sectionGap": 24,
-    "minimumTouchTarget": 44,
+    "minimumTouchTarget": 48,
     "referenceMobileWidth": 390,
     "reviewMobileWidths": [360, 390, 430]
   },
@@ -180,12 +180,12 @@
       "foreground": "#FFFFFF"
     },
     "medium": {
-      "height": 44,
+      "height": 48,
       "paddingHorizontal": 24
     },
     "small": {
       "visualHeight": 36,
-      "touchHeight": 44,
+      "touchHeight": 48,
       "paddingHorizontal": 16
     },
     "input": {
@@ -197,8 +197,8 @@
       "iconSize": 24
     },
     "daySelected": {
-      "background": "#FFF0EB",
-      "foreground": "#203247"
+      "background": "#203247",
+      "foreground": "#FFFFFF"
     },
     "disabled": {
       "background": "#EEE8E2",
@@ -435,7 +435,7 @@
   },
   "navigation": {
     "headerMinHeight": 56,
-    "headerTouchTarget": 44,
+    "headerTouchTarget": 48,
     "headerMaxWidth": 640,
     "headerIconSize": 24,
     "screenTitleStyle": "headlineLarge"
@@ -451,7 +451,7 @@
     "placeholderContrastMinimum": 4.5,
     "disabledTextContrastMinimum": 4.5,
     "focusOutlineWidth": 2,
-    "minimumTouchTarget": 44,
+    "minimumTouchTarget": 48,
     "textResizePercent": 200,
     "reflowCssWidth": 320,
     "projectRule": "큰 글자·비활성 글자도 4.5:1로 제작한다. 로고·장식은 정보 전달용 글자로 사용하지 않는다."

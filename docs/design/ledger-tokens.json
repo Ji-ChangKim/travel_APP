@@ -1,0 +1,35 @@
+{
+  "version": "1.0.0",
+  "source": "stitch_.zip / waypoint_ledger / 2026-10-19",
+  "scope": "발자국·기록 편집·영수증·공개 계획·공개 선택",
+  "color": {
+    "canvas": "#F8F9FF",
+    "surface": "#FFFFFF",
+    "soft": "#EFF4FF",
+    "selected": "#DCE9FF",
+    "ink": "#0B1C30",
+    "muted": "#45464D",
+    "accent": "#AE3115",
+    "navy": "#131B2E",
+    "border": "#76777D",
+    "line": "#D3E4FE",
+    "private": "#FFFDF5",
+    "privateText": "#78350F"
+  },
+  "layout": {
+    "breakpoint": 1024,
+    "mobileGutter": 20,
+    "mobileMax": 640,
+    "wideGutter": 24,
+    "wideMax": 1200,
+    "sidebar": 256
+  },
+  "control": { "minimumHeight": 48, "primaryHeight": 52, "radius": 12 },
+  "type": {
+    "title": [24, 32],
+    "section": [20, 28],
+    "place": [18, 26],
+    "body": [16, 26],
+    "meta": [14, 22]
+  }
+}

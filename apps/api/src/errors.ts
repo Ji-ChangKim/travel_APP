@@ -7,6 +7,7 @@ import type { ApiEnvironment } from './types';
 export const errorStatuses = {
   AUTH_REQUIRED: 401,
   SESSION_EXPIRED: 401,
+  REAUTHENTICATION_REQUIRED: 403,
   ROLE_FORBIDDEN: 403,
   RESOURCE_NOT_FOUND: 404,
   VERSION_CONFLICT: 409,

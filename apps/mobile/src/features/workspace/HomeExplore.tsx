@@ -15,9 +15,9 @@ export default function HomeExplore({ userId }: { userId: string }) {
     <ExploreContent
       query={useQuery({
         queryKey: foundationQueryKey(userId || 'public', 'home-community'),
-        queryFn: () => {
+        queryFn: ({ signal }) => {
           // 가상의 인기 여행 대신 공개 서버 원본을 읽는다.
-          return loadCommunity(userId);
+          return loadCommunity(userId, 0, {}, signal);
         },
         retry: false,
       })}

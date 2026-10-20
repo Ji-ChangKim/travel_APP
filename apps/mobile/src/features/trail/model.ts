@@ -1,3 +1,4 @@
+import { UserFacingError } from '@/services/userFacingError';
 import type {
   TrailFlight,
   TrailJourney,
@@ -170,5 +171,5 @@ export function flightSearchUrl(flightNumber: string, date: string): string {
 // 사용자 입력 실패를 명확히 전달한다.
 export function failTrail(message: string): never {
   // 호출 화면에서 입력을 유지하고 오류를 표시한다.
-  throw new Error(message);
+  throw new UserFacingError(message);
 }

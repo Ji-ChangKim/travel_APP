@@ -6,7 +6,7 @@ import { tripOpenPath } from './tripPresentation';
 export const planFilters = [
   ['ALL', '전체'],
   ['DRAFT', '준비 중'],
-  ['PLANNED', '임박/예정'],
+  ['PLANNED', '여행 예정'],
   ['IN_PROGRESS', '여행 중'],
   ['COMPLETED', '완료'],
   ['ARCHIVED', '보관'],

@@ -42,7 +42,7 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "npm run check:design && npm run typecheck && npm run lint && npm run format:check",
+    "check": "npm run check:design && npm run check:architecture && npm run typecheck && npm run lint && npm run format:check",
     "build:web": "npm --workspace=@wherego/mobile run build:web",
     "build:apk": "npm --workspace=@wherego/mobile run build:apk",
     "build:all": "npm --workspace=@wherego/mobile run build:all",
@@ -52,7 +52,8 @@
     "test:cloud": "npm run api:build:test && node --test tests/cloud/*.test.mjs",
     "api:build:test": "npm --workspace=@wherego/api run build:test",
     "check:design": "node scripts/check-design-contrast.mjs",
-    "test:headers:web": "node scripts/verify-header-web.mjs"
+    "test:headers:web": "node scripts/verify-header-web.mjs",
+    "check:architecture": "node scripts/check-code-boundaries.mjs"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",

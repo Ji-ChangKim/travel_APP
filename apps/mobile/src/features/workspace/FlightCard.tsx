@@ -296,7 +296,7 @@ const s = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     gap: 8,
-    minHeight: 44,
+    minHeight: 48,
   },
   expandText: { color: colors.text, fontSize: 14 },
   details: {
@@ -309,7 +309,7 @@ const s = StyleSheet.create({
   link: {
     flex: 1,
     minWidth: 94,
-    minHeight: 44,
+    minHeight: 48,
     backgroundColor: colors.surface,
     borderRadius: 8,
     flexDirection: 'row',

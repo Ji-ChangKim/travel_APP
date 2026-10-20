@@ -4,6 +4,7 @@ import { database } from './cloudStore';
 import { rejectRequest } from './errors';
 import type { ApiEnvironment } from './types';
 import { nicknameExists } from './nicknames';
+import { registerRetirementRoutes } from './accountRetirement';
 import {
   nicknameError,
   validProfileNickname,
@@ -185,5 +186,7 @@ export function registerProfileRoutes(
   app: Hono<ApiEnvironment>,
 ): Hono<ApiEnvironment> {
   // 상위 인증 미들웨어를 통과해야 사용할 수 있다.
-  return app.get('/api/v1/profile', profile).patch('/api/v1/profile', update);
+  return registerRetirementRoutes(
+    app.get('/api/v1/profile', profile).patch('/api/v1/profile', update),
+  );
 }

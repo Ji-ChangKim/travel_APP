@@ -7,6 +7,12 @@ import {
 } from 'react-native';
 import { topModal } from './modalLayers';
 
+type ModalFocusMemory = {
+  node: HTMLElement | null;
+  opener: Element | null;
+  inside: HTMLElement | null;
+};
+
 // 활성 창 하나의 초점·Escape·배경 읽기 수명을 관리한다.
 export function useModalAccessibility(
   ref: RefObject<View | null>,
@@ -18,6 +24,11 @@ export function useModalAccessibility(
 ): void {
   // 콜백 변경 때문에 읽던 초점을 첫 입력으로 되돌리지 않는다.
   const latest = useRef(close);
+  const focusMemory = useRef<ModalFocusMemory>({
+    node: null,
+    opener: null,
+    inside: null,
+  });
   useLayoutEffect(() => {
     // 닫기 행동만 갱신하고 사용자가 읽던 위치는 유지한다.
     latest.current = close;
@@ -27,7 +38,13 @@ export function useModalAccessibility(
     if (!active || (native && Platform.OS !== 'web')) return;
     const node = ref.current;
     if (Platform.OS === 'web' && node instanceof HTMLElement)
-      return connectWebModal(node, id, strict, () => latest.current?.());
+      return connectWebModal(
+        node,
+        id,
+        strict,
+        () => latest.current?.(),
+        focusMemory.current,
+      );
     let alive = true;
     if (node) {
       // 실제 화면 읽기 기능이 켜진 네이티브에서만 모달 영역으로 초점을 옮긴다.
@@ -58,9 +75,16 @@ function connectWebModal(
   id: symbol,
   strict: boolean,
   close: () => void,
+  memory: ModalFocusMemory,
 ): () => void {
   // 입력 패널에서는 기존 전역 메뉴 이탈 보호를 그대로 사용할 수 있다.
-  const previous = document.activeElement;
+  if (memory.node !== node) {
+    // 새로 열린 창의 시작점만 보관하고 중첩 확인 복귀 때는 덮어쓰지 않는다.
+    memory.node = node;
+    memory.opener = document.activeElement;
+    memory.inside = null;
+  }
+  const previous = memory.opener;
   const restored = hideBehind(node, strict);
   if (!node.getAttribute('aria-label'))
     node.setAttribute(
@@ -78,17 +102,28 @@ function connectWebModal(
     if (event.key === 'Tab') cycleFocus(node, strict, event);
   };
   document.addEventListener('keydown', keydown, true);
+  const rememberFocus = (event: FocusEvent) => {
+    // 중첩 창이 열리며 버튼이 잠기기 전에 읽던 위치를 보관한다.
+    if (event.target instanceof HTMLElement) memory.inside = event.target;
+  };
+  node.addEventListener('focusin', rememberFocus);
   node.tabIndex = -1;
-  (focusable(node)[0] || node).focus({ preventScroll: true });
+  const items = focusable(node);
+  (memory.inside && items.includes(memory.inside)
+    ? memory.inside
+    : items[0] || node
+  ).focus({ preventScroll: true });
   return () => {
     // 이전 배경 속성을 정확히 복원하고 새 창의 초점을 빼앗지 않는다.
     document.removeEventListener('keydown', keydown, true);
+    node.removeEventListener('focusin', rememberFocus);
     restored.forEach((restore) => {
       // 숨기기 전의 읽기·입력 상태로 돌린다.
       restore();
     });
     if (
       previous instanceof HTMLElement &&
+      (!topModal() || topModal()?.id === id) &&
       previous.isConnected &&
       !previous.closest('[inert]')
     )
@@ -101,7 +136,10 @@ function hideBehind(node: HTMLElement, strict: boolean): (() => void)[] {
   // 루트 이탈 확인창은 전역 메뉴까지 포함해 배경 전체를 막는다.
   const restores: (() => void)[] = [];
   let current: HTMLElement | null = node;
-  while (current?.parentElement && current.parentElement !== document.body) {
+  while (
+    current?.parentElement &&
+    (strict || current.parentElement !== document.body)
+  ) {
     const parent: HTMLElement = current.parentElement;
     for (const sibling of parent.children)
       if (
@@ -110,7 +148,12 @@ function hideBehind(node: HTMLElement, strict: boolean): (() => void)[] {
         !['SCRIPT', 'STYLE'].includes(sibling.tagName)
       )
         restores.push(hideElement(sibling));
-    if (!strict && parent.dataset.testid === 'app-page-content') break;
+    // 전체 화면 창은 body에 붙은 앱 루트도 가리고 자기 포털은 남긴다.
+    if (
+      parent === document.body ||
+      (!strict && parent.dataset.testid === 'app-page-content')
+    )
+      break;
     current = parent;
   }
   return restores;

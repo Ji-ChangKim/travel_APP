@@ -7,6 +7,9 @@ const tokens = JSON.parse(
   readFileSync(path.join(root, 'docs/design/design-tokens.json'), 'utf8'),
 );
 const c = tokens.color;
+const ledger = JSON.parse(
+  readFileSync(path.join(root, 'docs/design/ledger-tokens.json'), 'utf8'),
+).color;
 
 // sRGB 원색을 선형 상대 휘도로 변환하며 계산 중 반올림하지 않는다.
 function luminance(hex) {
@@ -105,6 +108,32 @@ for (const name of ['canvas', 'card', 'low']) {
 }
 checks.push(
   pair('focus/primary', c.border.focus, c.action.primary, 3, 'non-text'),
+);
+
+for (const background of ['canvas', 'surface', 'soft', 'selected', 'private']) {
+  for (const foreground of ['ink', 'muted', 'accent'])
+    checks.push(
+      pair(
+        `ledger.${foreground}/${background}`,
+        ledger[foreground],
+        ledger[background],
+        4.5,
+      ),
+    );
+  checks.push(
+    pair(
+      `ledger.focus/${background}`,
+      ledger.ink,
+      ledger[background],
+      3,
+      'non-text',
+    ),
+  );
+}
+checks.push(
+  pair('ledger.primary', ledger.surface, ledger.accent, 4.5),
+  pair('ledger.selected', ledger.surface, ledger.navy, 4.5),
+  pair('ledger.private', ledger.privateText, ledger.private, 4.5),
 );
 
 const failures = checks.filter((item) => {

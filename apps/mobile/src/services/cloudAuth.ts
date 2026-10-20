@@ -1,3 +1,4 @@
+import { UserFacingError } from './userFacingError';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import { z } from 'zod';
@@ -44,7 +45,7 @@ export function authBaseUrl(): string {
 // 안전한 인증 안내만 전달한다.
 function fail(message: string): never {
   // 서버 오류 원문과 토큰을 화면에 포함하지 않는다.
-  throw new Error(message);
+  throw new UserFacingError(message);
 }
 // 플랫폼별 저장소에서 토큰을 읽는다.
 function readToken(): Promise<string | null> {
@@ -214,6 +215,15 @@ export function signOutCloud(): Promise<void> {
     .then(() => {
       /* 화면 상태도 초기화한다. */ return void notifySession(null);
     });
+}
+
+// 서버에서 모든 세션 철회가 확인된 뒤 기기 인증만 정리한다.
+export function clearRevokedCloudSession(): Promise<void> {
+  // 네트워크 재로그아웃의 실패로 이미 끝난 탈퇴 요청을 실패로 바꾸지 않는다.
+  return writeToken(null).then(() => {
+    // 인증 구독자가 계정 캐시와 화면을 정리하게 한다.
+    return void notifySession(null);
+  });
 }
 // 확인된 인증 이벤트를 앱 상태와 연결한다.
 export function subscribeCloud(

@@ -6,10 +6,18 @@ import {
   hasUnsafeReleaseValues,
 } from '../../scripts/release-artifact-checks.mjs';
 
+test('폐기한 루트 프로토타입의 데모 여행을 배포 청크에서 거부', () => {
+  // 예전 초기 스토어를 다시 연결해도 배포 전 검사에서 중단한다.
+  for (const id of ['trip-demo-1', 'trip-demo-2']) {
+    assert.equal(hasUnsafeReleaseValues(JSON.stringify({ id })), true);
+  }
+});
+
 test('가져오기와 발자국 직접 접근 HTML을 필수 산출물로 검사', () => {
   // 새 화면이 빠진 과거 웹 빌드를 공개하지 않도록 한다.
   return assert.ok(
     releasePages.includes('diary/[id].html') &&
+      releasePages.includes('record/[id].html') &&
       releasePages.includes('import-place.html'),
   );
 });
@@ -18,7 +26,7 @@ test('여행과 다이어리 모두 URL 유지 rewrite 필요', () => {
   // Windows와 CI의 줄바꿈 차이는 허용한다.
   return assert.equal(
     hasReleaseRewrites(
-      '/trips/* /trips/[id] 200\r\n/diary/* /diary/[id] 200\r\n',
+      '/trips/* /trips/[id] 200\r\n/diary/* /diary/[id] 200\r\n/record/* /record/[id] 200\r\n',
     ),
     true,
   );
@@ -29,6 +37,7 @@ test('다이어리 rewrite 누락과 외부 이동을 거부', () => {
   return assert.ok(
     [
       '/trips/* /trips/[id] 200',
+      '/trips/* /trips/[id] 200\n/diary/* /diary/[id] 200',
       '/trips/* /trips/[id] 200\n/diary/* /diary/[id].html 302',
     ].every((content) => {
       // 일부 화면만 연결된 빌드는 준비 완료가 아니다.
@@ -70,4 +79,15 @@ test('일반 공개 설정은 산출물 검사에서 허용', () => {
     hasUnsafeReleaseValues('https://wherego-staging.pages.dev'),
     false,
   );
+});
+
+test('식별자 이름 없이 들어간 Stitch 키와 개인 키 원문도 배포 전에 거부', () => {
+  // 환경 변수 이름을 없앤 값만 번들에 들어가도 비밀 검사가 작동해야 한다.
+  for (const value of [
+    `AQ.${'x'.repeat(40)}`,
+    ['-----BEGIN ', 'PRIVATE KEY-----'].join(''),
+    ['-----BEGIN ', 'RSA PRIVATE KEY-----'].join(''),
+  ]) {
+    assert.equal(hasUnsafeReleaseValues(value), true);
+  }
 });

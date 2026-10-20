@@ -143,3 +143,4 @@ export {
 } from './discovery';
 
 export * from './receiptReview';
+export * from './communityFeed';

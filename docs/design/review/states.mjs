@@ -1,0 +1,450 @@
+import { state, currentTrip, currentPlace } from './model.mjs';
+import {
+  action,
+  button,
+  card,
+  check,
+  escapeText,
+  field,
+  haru,
+  select,
+  textarea,
+} from './components.mjs';
+
+export const exceptions = {
+  emptyHome: [
+    '아직 등록한 여행이 없어요',
+    '새 여행을 준비하거나 다녀온 여행을 기록해 보세요.',
+    '여행 만들기',
+    'create',
+    '공개 계획 둘러보기',
+    'discover',
+    'empty',
+  ],
+  emptySchedule: [
+    '이날의 첫 장소를 정해요',
+    '숙소나 식당, 가고 싶은 곳부터 추가해 보세요.',
+    '장소 검색',
+    'search',
+    '도시 가이드에서 골라보기',
+    'guide',
+    'empty',
+  ],
+  emptySearch: [
+    '검색 결과가 없어요',
+    '이름이나 주소를 바꿔 찾아보세요. 직접 입력할 수도 있어요.',
+    '다시 검색',
+    'search',
+    '장소 직접 입력',
+    'editor',
+    'empty',
+  ],
+  emptyFootprints: [
+    '다녀온 여행을 남겨보세요',
+    '여행했던 날짜와 장소부터 차근차근 정리해요.',
+    '다녀온 여행 기록하기',
+    'create',
+    '내 여행 보기',
+    'trips',
+    'empty',
+  ],
+  offline: [
+    '연결이 끊겼어요',
+    '인터넷 연결을 확인한 뒤 다시 시도해 주세요. 지금 작성하던 내용은 유지해요.',
+    '연결 후 다시 시도',
+    'schedule',
+    '작성 화면으로',
+    'editor',
+    'error',
+  ],
+  loadError: [
+    '여행을 불러오지 못했어요',
+    '연결 상태를 확인하고 다시 불러와 주세요.',
+    '다시 불러오기',
+    'trips',
+    '이전 화면으로',
+    'home',
+    'error',
+  ],
+  saveError: [
+    '저장하지 못했어요',
+    '작성한 내용은 그대로예요. 확인한 뒤 다시 저장해 주세요.',
+    '작성 내용 확인',
+    'editor',
+    '',
+    '',
+    'error',
+  ],
+  conflict: [
+    '동행자가 일정을 먼저 바꿨어요',
+    '내가 작성한 내용을 보관했어요. 최신 일정과 비교한 뒤 다시 저장해 주세요.',
+    '작성 내용 확인',
+    'editor',
+    '최신 일정 보기',
+    'schedule',
+    'error',
+  ],
+  locationDenied: [
+    '위치 권한이 꺼져 있어요',
+    '설정에서 위치를 허용하거나 주소로 장소를 찾아주세요.',
+    '설정 확인',
+    'locationReturn',
+    '주소로 찾기',
+    'search',
+    'error',
+  ],
+  locationApprox: [
+    '위치가 넓은 범위로 잡혔어요',
+    '정확한 위치를 다시 확인하거나 주소로 장소를 찾아주세요.',
+    '다시 확인',
+    'location',
+    '주소로 찾기',
+    'search',
+    'error',
+  ],
+  locationOff: [
+    '휴대폰 위치 서비스가 꺼져 있어요',
+    '위치 서비스를 켠 뒤 돌아와 주세요. 주소로도 장소를 정할 수 있어요.',
+    '설정 확인',
+    'locationReturn',
+    '주소로 찾기',
+    'search',
+    'error',
+  ],
+  cameraDenied: [
+    '카메라를 사용할 수 없어요',
+    '휴대폰 설정에서 권한을 확인하거나 앨범 사진을 골라주세요.',
+    '앨범에서 선택',
+    'photoMethod',
+    '금액 직접 입력',
+    'expenseEditor',
+    'error',
+  ],
+  ocrError: [
+    '영수증을 읽지 못했어요',
+    '사진을 다시 고르거나 보이는 금액을 직접 입력해 주세요.',
+    '다른 사진 선택',
+    'photoMethod',
+    '금액 직접 입력',
+    'expenseEditor',
+    'error',
+  ],
+  unsupportedCurrency: [
+    '이 통화는 아직 저장할 수 없어요',
+    '현재는 KRW·JPY·USD를 지원해요. 영수증의 통화를 다시 확인해 주세요.',
+    '통화 다시 확인',
+    'receipt',
+    '영수증 원본 보기',
+    'receiptPhoto',
+    'error',
+  ],
+  receiptMismatch: [
+    '품목 합계와 총액이 달라요',
+    '품목 합계는 JPY 2,000, 총액은 JPY 2,400이에요. 세금·할인·추가 품목을 원본에서 확인해 주세요.',
+    '금액 확인하기',
+    'receipt',
+    '영수증 원본 보기',
+    'receiptPhoto',
+    'error',
+  ],
+  photoError: [
+    '사진을 불러오지 못했어요',
+    '장소 설명은 계속 읽을 수 있어요. 잠시 후 사진을 다시 불러와 주세요.',
+    '장소 설명 보기',
+    'publicPlace',
+    '공개 일정으로',
+    'public',
+    'error',
+  ],
+  withdrawn: [
+    '공개가 중단된 여행이에요',
+    '작성자가 공개를 중단했거나 내용을 삭제했어요.',
+    '다른 여행 찾아보기',
+    'discover',
+    '',
+    '',
+    'empty',
+  ],
+  forbidden: [
+    '이 여행을 수정할 수 없어요',
+    '보기 권한으로 참여하고 있어요. 변경이 필요하면 여행을 만든 사람에게 요청해 주세요.',
+    '일정 읽기',
+    'schedule',
+    '동행 정보 보기',
+    'members',
+    'error',
+  ],
+  inviteExpired: [
+    '초대 링크를 사용할 수 없어요',
+    '만료되었거나 취소된 초대예요. 여행을 만든 사람에게 새 링크를 요청해 주세요.',
+    '내 여행으로',
+    'trips',
+    '',
+    '',
+    'error',
+  ],
+  sessionExpired: [
+    '다시 로그인해 주세요',
+    '작성 중인 내용을 확인한 뒤 원래 여행으로 돌아갈 수 있어요.',
+    '로그인',
+    'login',
+    '작성 내용 확인',
+    'editor',
+    'error',
+  ],
+  emptyCost: [
+    '아직 등록한 지출이 없어요',
+    '영수증을 확인하거나 금액을 직접 입력해 보세요.',
+    '금액 직접 입력',
+    'expenseEditor',
+    '영수증 등록',
+    'capture',
+    'empty',
+  ],
+  guest: [
+    '로그인하고 여행을 저장해요',
+    '내 여행과 동행 일정을 이어서 보려면 로그인해 주세요.',
+    '로그인',
+    'login',
+    '공개 여행 둘러보기',
+    'discover',
+    'empty',
+  ],
+  mapError: [
+    '지도를 불러오지 못했어요',
+    '잠시 후 다시 시도해 주세요. 등록한 장소는 목록에서 확인할 수 있어요.',
+    '다시 불러오기',
+    'map',
+    '장소 목록 보기',
+    'schedule',
+    'error',
+  ],
+  flightEmpty: [
+    '항공편을 찾지 못했어요',
+    '편명과 출발일을 확인하거나 항공권에 적힌 내용을 직접 입력해 주세요.',
+    '다시 조회',
+    'flightSearch',
+    '항공권 직접 입력',
+    'flightEditor',
+    'empty',
+  ],
+};
+
+// 예외는 같은 실패 화면으로 합치지 않고 원인과 복구를 구분한다.
+export function exceptionView(key = state.screen) {
+  // 실패한 기능과 무관한 생성·공개 행동은 제안하지 않는다.
+  const item = exceptions[key];
+  return `<section class="exception-state">${haru(item[6])}<h2>${item[0]}</h2><p>${item[1]}</p>${key === 'conflict' ? card('보관한 내 입력', `<p>${escapeText(currentPlace().name)}</p><p class="meta preserve">${escapeText(state.drafts.editor?.description || currentPlace().description)}</p>`) : ''}${button(item[2], item[3], 'primary')}${item[4] ? button(item[4], item[5], 'quiet') : ''}</section>`;
+}
+
+export const popups = {
+  tripMenu: {
+    type: 'sheet',
+    title: '여행 관리',
+    text: '이 여행의 예약과 기록을 함께 정리해요.',
+    options: [
+      ['항공·예약', 'flight'],
+      ['사진과 영수증', 'media'],
+      ['준비물', 'checklist'],
+      ['동행 관리', 'members'],
+      ['선택해서 공유', 'share'],
+      ['여행 정보 수정', 'metadata'],
+      ['여행 기간 변경', 'changePeriod'],
+    ],
+  },
+  leave: {
+    type: 'confirm',
+    title: '작성한 내용을 두고 나갈까요?',
+    text: '저장하지 않은 내용은 여행에 반영되지 않아요.',
+    cancel: '계속 작성',
+    confirm: '나가기',
+    command: 'discardDraft',
+    danger: true,
+  },
+  deleteSchedule: {
+    type: 'confirm',
+    title: '이 일정을 삭제할까요?',
+    text: '삭제 전에 연결된 사진과 지출을 확인해 주세요. 이 화면에서는 삭제 후 되돌릴 수 없어요.',
+    cancel: '일정 유지',
+    confirm: '일정 삭제',
+    command: 'deleteSchedule',
+    danger: true,
+  },
+  periodImpact: {
+    type: 'confirm',
+    title: '빠지는 날짜의 기록을 확인해 주세요',
+    text: 'DAY 4에 일정 1개가 있어요. 연결된 기록을 확인한 뒤 기간을 바꿔주세요.',
+    cancel: '기간 다시 선택',
+    confirm: '연결 기록 확인',
+    target: 'schedule',
+  },
+  publishConfirm: {
+    type: 'confirm',
+    title: '선택한 내용을 공개할까요?',
+    text: '공개 링크를 가진 누구나 선택한 일정과 설명을 볼 수 있어요. 개인 메모와 영수증 원본은 공개되지 않아요.',
+    cancel: '미리보기로',
+    confirm: '선택한 내용 공개',
+    command: 'publish',
+  },
+  withdrawConfirm: {
+    type: 'confirm',
+    title: '이 여행의 공개를 중단할까요?',
+    text: '공개 화면에서 더 이상 볼 수 없어요. 내 여행 원본은 그대로 남아요.',
+    cancel: '공개 유지',
+    confirm: '공개 중단',
+    command: 'withdraw',
+    danger: true,
+  },
+  logoutConfirm: {
+    type: 'confirm',
+    title: '로그아웃할까요?',
+    text: '계정에 저장한 여행은 다시 로그인하면 볼 수 있어요. 저장하지 않은 입력이 있다면 먼저 확인해 주세요.',
+    cancel: '계속 이용',
+    confirm: '로그아웃',
+    target: 'login',
+  },
+  deleteAccount: {
+    type: 'secure',
+    title: '회원 탈퇴',
+    text: '탈퇴하면 로그아웃되고 탈퇴 멤버로 표시돼요. 90일 안에 다시 로그인하면 복구돼요. 이후 계정 연결 정보는 삭제하며, 여행·사진·영수증은 계정과 분리해 보관해요.',
+    cancel: '계정 유지',
+    confirm: '탈퇴 유예 시작',
+    command: 'accountReview',
+    danger: true,
+  },
+  memberRole: {
+    type: 'sheet',
+    title: '동행 권한',
+    text: '이 여행에서 할 수 있는 일을 골라주세요.',
+    options: [
+      ['편집 가능 · 일정과 기록 수정', 'members'],
+      ['보기만 가능 · 일정 확인', 'members'],
+    ],
+    cancel: '변경 안 함',
+  },
+  memberRemove: {
+    type: 'confirm',
+    title: '동행자의 참여를 해제할까요?',
+    text: '해제된 동행자는 이 여행을 볼 수 없어요. 남아 있는 기록의 처리 내용을 먼저 확인해 주세요.',
+    cancel: '참여 유지',
+    confirm: '참여 해제',
+    target: 'members',
+    danger: true,
+  },
+  inviteCreate: {
+    type: 'sheet',
+    title: '초대 링크 만들기',
+    text: '함께할 동행자에게 전달할 링크예요.',
+    body: `${select('초대할 권한', 'inviteRole', ['편집 가능', '보기만 가능'])}<p class="meta">링크를 전달받은 사람이 참여할 수 있어요. 필요한 사람에게만 보내주세요.</p>`,
+    cancel: '취소',
+    confirm: '링크 만들기',
+    command: 'invitePreview',
+  },
+  guideSource: {
+    type: 'sheet',
+    title: '도시 가이드 출처',
+    text: '화면에 사용한 자료와 사진의 출처예요.',
+    body: '<div id="city-source-details" class="stack"></div>',
+    cancel: '닫기',
+  },
+  photoSource: {
+    type: 'sheet',
+    title: '장소 사진 정보',
+    text: '사진의 제공자와 원본을 확인할 수 있어요.',
+    body: '<div id="place-photo-credits"><p>사진 정보를 불러오지 못했어요.</p><p class="meta">사진을 다시 불러온 뒤 확인해 주세요.</p></div>',
+    cancel: '닫기',
+  },
+  currency: {
+    type: 'sheet',
+    title: '통화 선택',
+    text: '결제한 통화를 골라주세요.',
+    options: [
+      ['JPY · 일본 엔', 'expenseEditor'],
+      ['KRW · 한국 원', 'expenseEditor'],
+      ['USD · 미국 달러', 'expenseEditor'],
+    ],
+    cancel: '취소',
+  },
+  calendar: {
+    type: 'sheet',
+    title: '여행 기간',
+    text: '시작일과 마지막 날을 골라주세요.',
+    body: `${field('시작일', 'calendarStart', '2026-11-10', 'date')}${field('종료일', 'calendarEnd', '2026-11-13', 'date')}<p class="meta">선택한 기간에 맞춰 날짜별 일정을 만들어요.</p>`,
+    cancel: '취소',
+    confirm: '선택한 기간 사용',
+    command: 'choosePeriod',
+  },
+  time: {
+    type: 'sheet',
+    title: '방문 시각',
+    text: '정해진 시간이 없다면 미정으로 남겨도 돼요.',
+    body: `${field('시각', 'chosenTime', '09:30', 'time')}${check('시간 미정', 'timeUnknown')}`,
+    cancel: '취소',
+    confirm: '이 시각 사용',
+    command: 'chooseTime',
+  },
+  photoMethod: {
+    type: 'sheet',
+    title: '사진 등록',
+    text: '여행 사진 또는 영수증을 골라주세요.',
+    options: [
+      ['카메라로 촬영', 'receipt'],
+      ['앨범에서 선택', 'receipt'],
+    ],
+    cancel: '취소',
+  },
+  report: {
+    type: 'sheet',
+    title: '공개 내용 신고',
+    text: '신고 사유를 알려주세요.',
+    body: `${select('사유', 'reportReason', ['개인정보 노출', '부적절한 내용', '저작권 침해', '기타'])}${textarea('상세 내용 · 선택', 'reportDetail', '', 'maxlength="500"')}`,
+    cancel: '취소',
+    confirm: '신고 내용 확인',
+    command: 'reportPreview',
+  },
+  block: {
+    type: 'confirm',
+    title: '이 작성자를 차단할까요?',
+    text: '차단한 작성자의 공개 여행을 목록에서 숨겨요.',
+    cancel: '취소',
+    confirm: '작성자 차단',
+    target: 'discover',
+    danger: true,
+  },
+  locationReturn: {
+    type: 'confirm',
+    title: '위치 설정을 확인해 주세요',
+    text: '설정에서 위치 권한과 서비스를 확인한 뒤 돌아와 주세요. 돌아온 뒤 다시 위치를 찾을 수 있어요.',
+    cancel: '주소로 찾기',
+    cancelTarget: 'search',
+    confirm: '위치 다시 확인',
+    target: 'location',
+  },
+};
+
+// 팝업의 제목·설명·복구·확정 행동을 같은 구조로 표시한다.
+export function popupContents(key) {
+  // 길어지는 본문은 내부에서 스크롤하고 행동은 안전 영역 안에 둔다.
+  const item = popups[key];
+  return `<div class="popup-title"><h2 id="popup-title">${item.title}</h2><button class="icon-button" data-close-popup aria-label="닫기">×</button></div><div class="popup-scroll"><p id="popup-description">${item.text}</p>${key === 'publishConfirm' ? `<p class="meta">선택한 일정 ${state.selected.length}개 · 일반 사진 ${state.selectedPhotos ? '1' : '0'}장 · 비용 ${state.includeCosts ? '포함' : '제외'}</p>` : ''}${item.body || ''}${
+    item.options
+      ? `<div class="option-list">${item.options
+          .map(([label, target]) => {
+            // 행 전체를 터치해도 같은 목적지로 이동한다.
+            return button(
+              label,
+              key === 'photoMethod' && state.photoMode === 'photo'
+                ? 'photo'
+                : target,
+            );
+          })
+          .join('')}</div>`
+      : ''
+  }${key === 'deleteSchedule' ? `<p class="meta">${escapeText(currentPlace().name)} · 연결 항목을 확인한 뒤 삭제해요.</p>` : ''}${key === 'deleteAccount' ? `${field('확인 문구', 'deleteWord', '', 'text', 'placeholder="탈퇴를 입력해 주세요"')}<p class="meta">본인 확인 후 진행해요. 동행자의 원본 기록과 내 계정 기록의 처리 범위를 먼저 확인해 주세요.</p>` : ''}</div><div class="popup-actions">${item.confirm ? (item.target ? button(item.confirm, item.target, item.danger ? 'danger' : 'primary') : action(item.confirm, item.command, item.danger ? 'danger' : 'primary', key === 'deleteAccount' ? 'disabled' : '')) : ''}<button class="button ${item.confirm ? '' : 'primary'}" data-close-popup ${item.cancelTarget ? `data-cancel-target="${item.cancelTarget}"` : ''}>${item.cancel || '닫기'}</button></div>`;
+}
+
+// 팝업이 열린 배경은 해당 원본 여행의 맥락을 유지한다.
+export function popupBackdropLabel() {
+  // 공개 팝업도 별도 여행 제목을 새로 만들지 않는다.
+  return escapeText(currentTrip().title);
+}

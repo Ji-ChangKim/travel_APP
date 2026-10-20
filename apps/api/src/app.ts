@@ -23,7 +23,7 @@ import { registerDiscoveryRoutes } from './discovery';
 import { startupManifest } from './startup';
 import { appConfig } from './appConfig';
 import { lookupFlights } from './flights';
-import { publicPlanPhoto } from './placePhotos';
+import { previewPlanPhoto, publicPlanPhoto } from './placePhotos';
 
 type ApiContext = Context<ApiEnvironment>;
 
@@ -332,6 +332,10 @@ export function createApp(fetcher: typeof fetch = fetch): Hono<ApiEnvironment> {
                 getGooglePlace.bind(null, fetcher),
               )
               .get('/api/v1/trips', listTrips.bind(null, fetcher))
+              .get(
+                '/api/v1/trips/:tripId/places/:scheduleId/photo',
+                previewPlanPhoto.bind(null, fetcher),
+              )
               .post('/api/v1/trips', createTrip.bind(null, fetcher))
               .get('/api/v1/trips/:tripId', getTrip.bind(null, fetcher))
               .post(

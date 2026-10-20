@@ -31,5 +31,5 @@ export const workspaceSections = [
   ['photos', '사진·영수증'],
   ['preparation', '준비물'],
   ['companions', '동행'],
-  ['share', '발자국 공유'],
+  ['share', '여행 공유'],
 ] as const;

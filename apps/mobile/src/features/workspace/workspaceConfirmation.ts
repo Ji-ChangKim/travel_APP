@@ -1,5 +1,6 @@
 import type { WorkspaceSnapshot } from '@wherego/domain';
 import type { WorkspaceCommand } from '@wherego/validation';
+import { publicSelection } from '@wherego/validation';
 
 // 삭제 확인은 선택한 원본 버전과 명령을 화면 수명 안에서만 보관한다.
 export type WorkspaceConfirmation = {
@@ -49,6 +50,8 @@ function confirmationDetails(
 ): Details | null {
   // 대상 ID로 찾은 이름만 사용하며 다른 항목을 대신 선택하지 않는다.
   switch (command.operation) {
+    case 'community.publish':
+      return publicationConfirmation(snapshot, command.input);
     case 'schedule.delete':
       return {
         title: '일정을 삭제할까요?',
@@ -99,6 +102,22 @@ function confirmationDetails(
     default:
       return null;
   }
+}
+
+// 미리보기와 같은 선택 사본에서 공개 수와 기존 링크의 변경 범위를 만든다.
+function publicationConfirmation(
+  snapshot: WorkspaceSnapshot,
+  input: Extract<WorkspaceCommand, { operation: 'community.publish' }>['input'],
+  preview = publicSelection(snapshot, input),
+): Details {
+  // 원본 전체 개수가 아닌 이번에 선택한 항목만 공개 대상으로 안내한다.
+  return {
+    title: snapshot.postId
+      ? '공개 내용을 바꿀까요?'
+      : '선택한 내용을 공개할까요?',
+    label: snapshot.postId ? '공개 내용 바꾸기' : '선택한 내용 공개',
+    message: `링크를 가진 누구나 ‘${input.title}’의 선택 일정 ${preview.snapshot.itinerary.length}개·사진 ${preview.photoPaths.length}장${input.includeCosts ? '·통화별 실제 지출 합계' : ''}을 볼 수 있어요. 개인 메모·예약번호·동행 정보·영수증 원본과 품목은 공개하지 않아요.${snapshot.postId ? ' 기존 링크의 내용은 이번 선택으로 바뀌며 내 여행 원본은 그대로 남아요.' : ''}`,
+  };
 }
 
 // 수동 비용의 제목과 금액을 확인 화면에 고정한다.
@@ -157,6 +176,27 @@ function confirmationTargetExists(
 ): boolean {
   // 삭제된 항목의 ID를 다른 항목에 재사용하지 않는다.
   switch (command.operation) {
+    case 'community.publish':
+      return (
+        snapshot.myRole === 'owner' &&
+        (command.input.kind === 'plan'
+          ? command.input.scheduleIds.length > 0
+          : snapshot.trip.status === 'COMPLETED') &&
+        command.input.scheduleIds.every((id) => {
+          // 확인 사이 삭제되거나 다른 여행에서 온 일정은 허용하지 않는다.
+          return snapshot.itinerary.some((item) => {
+            // 선택 ID가 같은 여행의 실제 일정인지 검사한다.
+            return item.id === id;
+          });
+        }) &&
+        command.input.photoIds.every((id) => {
+          // 영수증 원본은 공개 사진으로 확인하지 않는다.
+          return snapshot.media.some((item) => {
+            // 기존에 등록한 일반 사진만 허용한다.
+            return item.id === id && item.purpose === 'photo';
+          });
+        })
+      );
     case 'schedule.delete':
       return snapshot.itinerary.some((item) => {
         /* 같은 일정 ID만 허용한다. */ return item.id === command.input.id;

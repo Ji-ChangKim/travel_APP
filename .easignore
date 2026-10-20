@@ -52,3 +52,11 @@ docs/98. keys/
 /.idea/
 /.agents/
 /.codex/
+
+# 보고서와 화면 제작 원본은 앱 실행에 쓰지 않는다. 런타임 디자인 토큰은 포함한다.
+/output/
+/docs/1.uiux/
+/docs/design/sources/
+/docs/design/pages/
+/docs/design/review/
+/docs/qa/

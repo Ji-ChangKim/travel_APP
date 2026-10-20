@@ -7,6 +7,7 @@ import {
   receiptOcrSchema,
   reportSchema,
   workspaceCommandSchema,
+  communityFeedQuerySchema,
   type WorkspaceCommand,
 } from '@wherego/validation';
 import { backendClient, runRpc } from './backend';
@@ -132,15 +133,25 @@ function feed(fetcher: typeof fetch, c: Ctx): Promise<Response> {
     c.get('session') || { userId: '', token: c.env.SUPABASE_ANON_KEY },
     'wherego_community',
     {
-      p_offset: z.coerce
-        .number()
-        .int()
-        .min(0)
-        .max(10000)
-        .parse(c.req.query('offset') || 0),
+      ...communityFeedArgs(c),
     },
     fetcher,
   ).then(respond.bind(null, c));
+}
+// D1 필터를 SQL 페이지 나누기 전에 적용하고 레거시 기본 피드 계약은 유지한다.
+function communityFeedArgs(c: Ctx) {
+  // 지원하지 않는 저장소의 검색을 성공한 빈 결과로 가장하지 않는다.
+  const query = communityFeedQuerySchema.parse(c.req.query());
+  return c.env.DB
+    ? {
+        p_offset: query.offset,
+        p_query: query.q,
+        p_kind: query.kind,
+        p_days: query.days,
+      }
+    : query.q || query.kind !== 'all' || query.days !== 'all'
+      ? rejectRequest('VALIDATION_FAILED')
+      : { p_offset: query.offset };
 }
 // 목록 페이지 수와 무관하게 현재 공개된 계획 한 건을 조회한다.
 function publicPost(fetcher: typeof fetch, c: Ctx): Promise<Response> {

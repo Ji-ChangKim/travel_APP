@@ -78,9 +78,12 @@ function usePlansQuery(userId: string, ready: boolean) {
   return useQuery({
     queryKey: foundationQueryKey(userId, 'trips'),
     enabled: ready && Boolean(userId),
-    queryFn: () => {
+    queryFn: ({ signal }) => {
       // 기기 여행과 회원 여행은 기존 서비스가 권한에 맞게 분리한다.
-      return serverOptions(userId).then(listServerTrips);
+      return serverOptions(userId).then((options) => {
+        // 마지막 화면 구독이 끝나면 목록 조회도 중단한다.
+        return listServerTrips(options, signal);
+      });
     },
     retry: false,
   });

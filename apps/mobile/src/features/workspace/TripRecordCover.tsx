@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import { foundationQueryKey, getWorkspace } from '@wherego/api-client';
 import { serverOptions } from './service';
-import { ServerPhoto } from './ui';
+import ServerPhoto from './ServerPhoto';
 
 // 홈과 발자국 표지는 해당 계정이 볼 수 있는 여행 사진만 사용한다.
 export default function TripRecordCover({
@@ -27,11 +27,11 @@ export default function TripRecordCover({
         queryKey: foundationQueryKey(userId, 'workspace', tripId),
         enabled: Boolean(userId && tripId),
         retry: false,
-        queryFn: () => {
+        queryFn: ({ signal }) => {
           // 사진을 공개 URL로 바꾸지 않고 기존 여행 권한으로 조회한다.
           return serverOptions(userId).then((options) => {
             // 선택 여행 하나의 원본을 읽는다.
-            return getWorkspace(options, tripId);
+            return getWorkspace(options, tripId, signal);
           });
         },
       })}

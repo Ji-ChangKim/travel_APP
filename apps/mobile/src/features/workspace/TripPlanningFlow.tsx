@@ -1,21 +1,14 @@
-import ModalBackground from '../accessibility/ModalBackground';
-import ActionSheet from '@/components/ActionSheet';
-import Text from '@/components/AppText';
-import ScreenHeader from '@/components/ScreenHeader';
-import { colors } from '@/constants/theme';
 import { useState, type RefObject } from 'react';
-import { Image, ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import type { PlanForm } from './forms';
+import { ScrollView } from 'react-native';
+import { renderTripPlanning } from './TripPlanningFlowView';
 import type { FieldErrors } from './formFeedback';
 import { formFailureFields, formInputFields } from './formFeedback';
-import { tripCreationInput, tripBasicsError } from './tripCreation';
-import { Action, styles } from './ui';
-import TripFields from './TripFields';
-import TripFlightList from './TripFlightList';
+import type { PlanForm } from './forms';
+import { tripBasicsError, tripCreationInput } from './tripCreation';
+
+import { tripToday } from '@wherego/domain';
 import FlightTicketEditor from './FlightTicketEditor';
 import type { FlightTicketDraft } from './flightTicketDraft';
-import { tripToday } from '@wherego/domain';
 import {
   saveTripFlight,
   tripFlights,
@@ -43,7 +36,6 @@ export default function TripPlanningFlow({ scroll, ...props }: Props) {
   const [ticketDrafts, setTicketDrafts] = useState<
     Record<string, FlightTicketDraft>
   >({});
-  const [skip, setSkip] = useState(false);
   const [basicsError, setBasicsError] = useState('');
   const items = tripFlights(props.form.values);
   const recording =
@@ -120,163 +112,16 @@ export default function TripPlanningFlow({ scroll, ...props }: Props) {
         }}
       />
     );
-  return (
-    <SafeAreaView style={styles.modal}>
-      <ModalBackground>
-        <ScreenHeader
-          title={
-            step === 'basics'
-              ? recording
-                ? '다녀온 여행 기록하기'
-                : '여행 계획 만들기'
-              : '항공편 선택'
-          }
-          backLabel={
-            step === 'basics'
-              ? '내 여행으로 돌아가기'
-              : '여행지와 날짜로 돌아가기'
-          }
-          onBack={back}
-          disabled={props.locked}
-          right={
-            step === 'basics' ? (
-              <Action
-                label="다음"
-                size="header"
-                variant="quiet"
-                disabled={props.locked}
-                onPress={next}
-              />
-            ) : undefined
-          }
-        />
-        <ScrollView
-          ref={scroll}
-          contentContainerStyle={[
-            styles.content,
-            { maxWidth: 640, paddingBottom: 32 },
-          ]}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View
-            style={[styles.card, { backgroundColor: colors.selectedSurface }]}
-          >
-            <Text style={styles.subtitle}>
-              {step === 'basics' ? '1 / 2 · 여행지와 날짜' : '2 / 2 · 항공편'}
-            </Text>
-            <View
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}
-            >
-              <Text
-                style={{
-                  flex: 1,
-                  color: colors.text,
-                  fontSize: 16,
-                  lineHeight: 26,
-                }}
-              >
-                {step === 'basics'
-                  ? recording
-                    ? '어디를, 언제 다녀오셨나요?'
-                    : '어디로, 언제 떠날까요?'
-                  : '항공편을 더하거나 나중에 입력해도 괜찮아요.'}
-              </Text>
-              {step === 'basics' && (
-                <Image
-                  source={require('../../../assets/brand/haru-v1/TripPrint_Haru_empty_1024x1536.png')}
-                  resizeMode="contain"
-                  accessibilityLabel="손을 흔드는 하루"
-                  style={{ width: 48, height: 56 }}
-                />
-              )}
-            </View>
-          </View>
-          {step === 'basics' ? (
-            <TripFields
-              values={props.form.values}
-              onChange={(key, value) => {
-                // 입력을 고치면 이전 첫 단계 안내만 지운다.
-                return void (setBasicsError(''), props.onChange(key, value));
-              }}
-            />
-          ) : (
-            <>
-              <TripFlightList
-                items={items}
-                onEdit={setSlot}
-                onRemove={(index) => {
-                  // 삭제한 슬롯만 비우고 다른 구간과 여행 초안을 유지한다.
-                  return props.onChange(
-                    'flights',
-                    JSON.stringify(
-                      items.filter((_, position) => position !== index),
-                    ),
-                  );
-                }}
-              />
-              {props.locked && !props.busy ? (
-                <Action
-                  label="다시 저장하기"
-                  allowWhileLocked
-                  variant="primary"
-                  onPress={props.onSave}
-                />
-              ) : items.length ? (
-                <Action
-                  label={
-                    props.busy
-                      ? '저장 중…'
-                      : recording
-                        ? '여행 기록 만들기'
-                        : '여행 만들기'
-                  }
-                  variant="primary"
-                  loading={props.busy}
-                  allowWhileLocked
-                  onPress={props.onSave}
-                />
-              ) : (
-                <Action
-                  label={props.busy ? '저장 중…' : '건너뛰기'}
-                  loading={props.busy}
-                  variant={props.busy ? 'primary' : 'secondary'}
-                  disabled={props.locked && !props.busy}
-                  onPress={() => {
-                    // 항공편 없이 저장하기 전에 한 번만 안내한다.
-                    return setSkip(true);
-                  }}
-                />
-              )}
-            </>
-          )}
-          {basicsError || props.error ? (
-            <Text accessibilityRole="alert" style={styles.error}>
-              {basicsError || props.error}
-            </Text>
-          ) : null}
-        </ScrollView>
-      </ModalBackground>
-      <ActionSheet
-        visible={skip}
-        title="항공편 안내"
-        onClose={() => {
-          // 시스템 뒤로는 안내만 닫으며 여행을 생성하지 않는다.
-          return setSkip(false);
-        }}
-      >
-        <Text style={styles.subtitle}>
-          항공편은 여행을 만든 뒤에도 입력할 수 있어요.
-        </Text>
-        <Action
-          label="확인"
-          variant="primary"
-          disabled={props.locked}
-          onPress={() => {
-            // 확인한 경우에만 기존 저장 흐름으로 여행을 만든다.
-            return void (setSkip(false), props.onSave());
-          }}
-        />
-      </ActionSheet>
-    </SafeAreaView>
-  );
+  return renderTripPlanning({
+    step,
+    recording,
+    back,
+    props,
+    next,
+    scroll,
+    setBasicsError,
+    items,
+    setSlot,
+    basicsError,
+  });
 }

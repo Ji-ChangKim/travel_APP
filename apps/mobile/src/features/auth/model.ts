@@ -1,3 +1,4 @@
+import { UserFacingError } from '@/services/userFacingError';
 import type { User } from '@supabase/supabase-js';
 import type { AuthProvider, OsPlatform, Profile } from '@wherego/domain';
 
@@ -166,5 +167,5 @@ function requireCode(code: string | null): string {
 // 사용자에게 안전한 인증 오류를 전달한다.
 export function failAuth(message: string): never {
   // 상세 공급자 응답이나 민감 URL을 포함하지 않는다.
-  throw new Error(message);
+  throw new UserFacingError(message);
 }

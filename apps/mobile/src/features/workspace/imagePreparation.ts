@@ -1,3 +1,4 @@
+import { UserFacingError } from '@/services/userFacingError';
 // 파일 이름이나 MIME 대신 실제 JPG/PNG 헤더를 확인한다.
 export function imageMime(buffer: ArrayBuffer): 'image/jpeg' | 'image/png' {
   // 전체 원본을 읽지 않고 네 바이트 헤더만으로 지원 형식을 판별한다.
@@ -12,7 +13,7 @@ export function imageMime(buffer: ArrayBuffer): 'image/jpeg' | 'image/png' {
       ? 'image/png'
       : (() => {
           // 지원하지 않는 파일도 다시 선택할 수 있는 안내를 제공한다.
-          throw new Error('JPG 또는 PNG 사진을 선택해 주세요.');
+          throw new UserFacingError('JPG 또는 PNG 사진을 선택해 주세요.');
         })();
 }
 

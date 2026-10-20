@@ -1,3 +1,4 @@
+import { UserFacingError } from '@/services/userFacingError';
 import { Platform } from 'react-native';
 import { File, Paths } from 'expo-file-system';
 import * as DocumentPicker from 'expo-document-picker';
@@ -207,7 +208,9 @@ function preserveAttachment(
           // 실제 파일 복사가 끝난 뒤에만 영구 첨부 URI를 반환한다.
           return attachmentRecord(asset, uri);
         })
-    : Promise.reject(new Error('2MB 이하 JPG·PNG·PDF 파일을 선택해 주세요.'));
+    : Promise.reject(
+        new UserFacingError('2MB 이하 JPG·PNG·PDF 파일을 선택해 주세요.'),
+      );
 }
 
 // 웹 선택기의 임시 blob 대신 base64 원본을 보존한다.
@@ -294,5 +297,5 @@ function activateDownload(link: HTMLAnchorElement): void {
 // 첨부 검증 실패를 사용자 메시지로 전달한다.
 function invalidAttachment(): never {
   // 허용 형식과 크기를 구체적으로 안내한다.
-  throw new Error('2MB 이하 JPG·PNG·PDF 파일을 선택해 주세요.');
+  throw new UserFacingError('2MB 이하 JPG·PNG·PDF 파일을 선택해 주세요.');
 }

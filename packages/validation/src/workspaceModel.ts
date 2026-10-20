@@ -417,7 +417,7 @@ function publicPost(
         // 여행 소유자의 공개 닉네임만 사용한다.
         return member.userId === snapshot.trip.ownerId;
       })?.nickname || '여행자',
-    title: input.title,
+    title: input.kind === 'plan' ? snapshot.trip.title : input.title,
     body: input.body,
     publishedAt: new Date().toISOString(),
     ...publicSelection(snapshot, input),
@@ -881,13 +881,14 @@ function changePeriod(
   end: string,
   identify: WorkspaceId,
 ): Change {
-  // 일정·비용·영수증이 존재하는 날짜의 제거를 거부한다.
+  // DAY 소개·일정·비용·영수증이 있는 날짜를 조용히 버리지 않는다.
   return s.days.some((day) => {
     /* 범위 밖에 연결 데이터가 있는지 검사한다. */ return (
       (day.tripDate < start || day.tripDate > end) &&
-      (s.itinerary.some((item) => {
-        /* 날짜의 일정을 검사한다. */ return item.dayId === day.id;
-      }) ||
+      (Boolean(day.planTitle || day.planConcept) ||
+        s.itinerary.some((item) => {
+          /* 날짜의 일정을 검사한다. */ return item.dayId === day.id;
+        }) ||
         s.expenses.some((item) => {
           /* 날짜의 비용을 검사한다. */ return item.dayId === day.id;
         }))

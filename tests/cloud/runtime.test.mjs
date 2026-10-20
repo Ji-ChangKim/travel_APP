@@ -239,7 +239,16 @@ test('여행계획은 DAY·장소 원문으로 D1 저장하며 단건 공개 조
               item.tripId,
               member.id,
               Date.now() + index,
-              JSON.stringify({ ...post, id: item.postId }),
+              JSON.stringify({
+                ...post,
+                id: item.postId,
+                title: `다른 여행 ${index}`,
+                snapshot: {
+                  ...post.snapshot,
+                  country: '대한민국',
+                  city: '서울',
+                },
+              }),
             ),
         ];
       }),
@@ -251,6 +260,40 @@ test('여행계획은 DAY·장소 원문으로 D1 저장하며 단건 공개 조
         // 검수 대상이 실제로 첫 목록에서 빠져 있어야 한다.
         return item.id === postId;
       }),
+    );
+    const filtered = (
+      await json(
+        await request(
+          '/public/community?q=%EC%98%A4%EC%82%AC%EC%B9%B4&kind=plan&days=4',
+        ),
+      )
+    ).data;
+    assert.deepEqual(
+      filtered.map((item) => item.id),
+      [postId],
+    );
+    assert.equal(
+      (await json(await request('/public/community?q=%25'))).data.length,
+      0,
+    );
+    assert.equal(
+      (await json(await request('/public/community?kind=record'))).data.length,
+      0,
+    );
+    assert.equal(
+      (
+        await json(
+          await request(
+            '/public/community?days=short&q=%EC%98%A4%EC%82%AC%EC%B9%B4',
+          ),
+        )
+      ).data.length,
+      0,
+    );
+    assert.equal((await request('/public/community?kind=private')).status, 422);
+    assert.equal(
+      (await request(`/public/community?q=${'a'.repeat(101)}`)).status,
+      422,
     );
     assert.deepEqual(
       (await json(await request(`/public/community/${postId}`))).data,
@@ -292,6 +335,60 @@ test('여행계획은 DAY·장소 원문으로 D1 저장하며 단건 공개 조
     (await request(`/public/community/${randomUUID()}`)).status,
     404,
   );
+  const replaced = await save('community.publish', {
+    kind: 'plan',
+    title: '갱신한 오사카 계획',
+    body: '다시 공개한 소개',
+    scheduleIds: [selected],
+    photoIds: [],
+    includeCosts: false,
+  });
+  assert.equal(replaced.id, postId);
+  const readReplaced = (
+    await json(await request(`/public/community/${postId}`))
+  ).data;
+  assert.equal(readReplaced.title, original.trip.title);
+  assert.equal(readReplaced.body, '다시 공개한 소개');
+  assert.equal(
+    (
+      await db
+        .prepare('SELECT COUNT(*) AS count FROM posts WHERE trip_id=?')
+        .bind(tripId)
+        .first()
+    ).count,
+    1,
+  );
+  await save('day.plan', {
+    dayId: original.days[3].id,
+    planTitle: '마지막 날',
+    planConcept: '일정 없는 날의 소개 원문',
+  });
+  const blockedShrink = await request(
+    `/api/v1/trips/${tripId}/commands`,
+    'POST',
+    {
+      operation: 'trip.period',
+      input: { startDate: '2026-10-01', endDate: '2026-10-03' },
+    },
+    member,
+    {
+      'Idempotency-Key': randomUUID(),
+      'If-Match': `"trip:${tripId}:${version}"`,
+    },
+  );
+  assert.equal(blockedShrink.status, 422);
+  const afterShrink = (
+    await json(
+      await request(
+        `/api/v1/trips/${tripId}/workspace`,
+        'GET',
+        undefined,
+        member,
+      ),
+    )
+  ).data;
+  assert.equal(afterShrink.trip.version, version);
+  assert.equal(afterShrink.days[3].planConcept, '일정 없는 날의 소개 원문');
   await save('community.withdraw', {});
   assert.equal((await request(`/public/community/${postId}`)).status, 404);
   assert.ok(
@@ -481,6 +578,7 @@ before(() => {
         '0004_receipt_scans.sql',
         '0005_member_onboarding.sql',
         '0006_unique_nicknames.sql',
+        '0007_account_retirements.sql',
       ]
         .map((file) => {
           /* 배포 마이그레이션을 순서대로 읽는다. */ return readFileSync(
@@ -2811,3 +2909,410 @@ function r10CachedCurrencyContract() {
     Promise.resolve(),
   );
 }
+
+test('G11 탈퇴 유예·재로그인 복구·90일 익명화는 동행 권한과 개인 여행을 보존한다', async () => {
+  // 로컬 Worker에서 실제 회원·여행·파일·세션을 만들고 예약 실행까지 검사한다.
+  const accounts = [];
+  for (let index = 0; index < 2; index++) {
+    const email = `retirement-${randomUUID()}@example.test`;
+    const password = 'retirement-strong-password!';
+    const response = await request(
+      '/api/auth/sign-up/email',
+      'POST',
+      { name: `G11-${randomUUID().slice(0, 8)}`, email, password },
+      undefined,
+      { 'CF-Connecting-IP': `203.0.113.${230 + index}` },
+    );
+    accounts.push({ ...(await accountResponse(response)), email, password });
+  }
+  let owner = accounts[0];
+  const editor = accounts[1];
+  const db = await mf.getD1Database('DB');
+  await json(
+    await request(
+      '/api/v1/profile',
+      'PATCH',
+      {
+        bio: 'PRIVATE-PROFILE',
+        birthDate: '1990-01-01',
+        onboardingCompleted: true,
+      },
+      owner,
+    ),
+  );
+  const journeys = [];
+  for (let index = 0; index < 2; index++) {
+    const created = (
+      await json(
+        await request(
+          '/api/v1/trips',
+          'POST',
+          {
+            title: `G11 여행 ${index}`,
+            country: '일본',
+            city: '오사카',
+            startDate: '2026-10-01',
+            endDate: '2026-10-04',
+            timezone: 'Asia/Tokyo',
+          },
+          owner,
+          { 'Idempotency-Key': randomUUID() },
+        ),
+        201,
+      )
+    ).data;
+    journeys.push(created.tripId);
+  }
+  const tripId = journeys[0];
+  let snapshot = (
+    await json(
+      await request(
+        `/api/v1/trips/${tripId}/workspace`,
+        'GET',
+        undefined,
+        owner,
+      ),
+    )
+  ).data;
+  let version = snapshot.trip.version;
+  async function apply(operation, input, actor = owner) {
+    // 단계별로 서버 확정 버전을 이어가며 타인의 여행에 쓰지 않는다.
+    const result = (
+      await json(
+        await request(
+          `/api/v1/trips/${tripId}/commands`,
+          'POST',
+          { operation, input },
+          actor,
+          {
+            'Idempotency-Key': randomUUID(),
+            'If-Match': `"trip:${tripId}:${version}"`,
+          },
+        ),
+      )
+    ).data;
+    version = result.tripVersion;
+    return result;
+  }
+  const scheduleId = randomUUID();
+  await apply('schedule.save', {
+    id: scheduleId,
+    dayId: snapshot.days[0].id,
+    title: '남겨 둘 장소',
+    type: 'PLACE',
+    sortOrder: 1,
+    planContent: { description: '함께한 계획 원문' },
+  });
+  const mediaId = randomUUID();
+  const upload = (
+    await json(
+      await request(`/files/${tripId}/${mediaId}`, 'POST', png, owner, {
+        'Content-Type': 'image/png',
+      }),
+      201,
+    )
+  ).data;
+  await apply('media.register', {
+    id: mediaId,
+    path: upload.path,
+    mimeType: 'image/png',
+    purpose: 'photo',
+    scheduleId,
+  });
+  const oldUrl = (
+    await json(
+      await request(
+        `/api/v1/trips/${tripId}/media/${mediaId}/url`,
+        'GET',
+        undefined,
+        owner,
+      ),
+    )
+  ).data.url;
+  const invitation = await apply('invite.create', { role: 'editor' });
+  version = (
+    await json(
+      await request(
+        '/api/v1/invites/accept',
+        'POST',
+        { token: invitation.token },
+        editor,
+        { 'Idempotency-Key': randomUUID() },
+      ),
+    )
+  ).data.tripVersion;
+  const postId = (
+    await apply('community.publish', {
+      kind: 'plan',
+      title: 'G11',
+      body: '함께한 여행',
+      scheduleIds: [scheduleId],
+      photoIds: [],
+      includeCosts: false,
+    })
+  ).id;
+  // 동의 누락·타인 ID 지정과 오래된 인증은 탈퇴 상태를 만들지 않는다.
+  assert.equal(
+    (await request('/api/v1/account/retirement', 'POST', { confirm: true }))
+      .status,
+    401,
+  );
+  assert.equal(
+    (
+      await request(
+        '/api/v1/account/retirement',
+        'POST',
+        { confirm: false },
+        owner,
+      )
+    ).status,
+    422,
+  );
+  assert.equal(
+    (
+      await request(
+        '/api/v1/account/retirement',
+        'POST',
+        { confirm: true, userId: editor.id },
+        owner,
+      )
+    ).status,
+    422,
+  );
+  await db
+    .prepare('UPDATE session SET createdAt=? WHERE userId=?')
+    .bind(Date.now() - 11 * 60000, owner.id)
+    .run();
+  assert.equal(
+    (
+      await request(
+        '/api/v1/account/retirement',
+        'POST',
+        { confirm: true },
+        owner,
+      )
+    ).status,
+    403,
+  );
+  assert.equal(
+    await db
+      .prepare('SELECT user_id FROM account_retirements WHERE user_id=?')
+      .bind(owner.id)
+      .first(),
+    null,
+  );
+  await db
+    .prepare('UPDATE session SET createdAt=? WHERE userId=?')
+    .bind(Date.now(), owner.id)
+    .run();
+  const requested = await json(
+    await request(
+      '/api/v1/account/retirement',
+      'POST',
+      { confirm: true },
+      owner,
+    ),
+  );
+  assert.equal(
+    Date.parse(requested.data.purgeAfter) -
+      Date.parse(requested.data.requestedAt),
+    90 * 86400000,
+  );
+  assert.equal(
+    (await request('/api/v1/trips', 'GET', undefined, owner)).status,
+    401,
+  );
+  assert.equal((await mf.dispatchFetch(oldUrl)).status, 404);
+  snapshot = (
+    await json(
+      await request(
+        `/api/v1/trips/${tripId}/workspace`,
+        'GET',
+        undefined,
+        editor,
+      ),
+    )
+  ).data;
+  assert.equal(snapshot.trip.ownerId, owner.id);
+  assert.equal(snapshot.myRole, 'editor');
+  assert.equal(
+    snapshot.members.find((x) => {
+      /* 같은 탈퇴 멤버의 표시 이름만 찾는다. */ return x.userId === owner.id;
+    }).nickname,
+    '탈퇴 멤버',
+  );
+  assert.equal(
+    (await json(await request(`/public/community/${postId}`))).data.author,
+    '탈퇴 멤버',
+  );
+  version = snapshot.trip.version;
+  await apply(
+    'day.plan',
+    {
+      dayId: snapshot.days[0].id,
+      planTitle: '동행자가 추가한 내용',
+      planConcept: '탈퇴 유예 중에도 내 여행',
+    },
+    editor,
+  );
+  const signed = await request(
+    '/api/auth/sign-in/email',
+    'POST',
+    { email: owner.email, password: owner.password },
+    undefined,
+    { 'CF-Connecting-IP': '203.0.113.232' },
+  );
+  owner = { ...owner, ...(await accountResponse(signed)) };
+  assert.equal(
+    await db
+      .prepare('SELECT user_id FROM account_retirements WHERE user_id=?')
+      .bind(owner.id)
+      .first(),
+    null,
+  );
+  snapshot = (
+    await json(
+      await request(
+        `/api/v1/trips/${tripId}/workspace`,
+        'GET',
+        undefined,
+        owner,
+      ),
+    )
+  ).data;
+  assert.notEqual(
+    snapshot.members.find((x) => {
+      /* 같은 탈퇴 멤버의 표시 이름만 찾는다. */ return x.userId === owner.id;
+    }).nickname,
+    '탈퇴 멤버',
+  );
+  assert.equal(snapshot.days[0].planTitle, '동행자가 추가한 내용');
+  assert.equal(
+    (await json(await request(`/public/community/${postId}`))).data.author,
+    snapshot.members.find((x) => {
+      /* 같은 탈퇴 멤버의 표시 이름만 찾는다. */ return x.userId === owner.id;
+    }).nickname,
+  );
+  await json(
+    await request(
+      '/api/v1/account/retirement',
+      'POST',
+      { confirm: true },
+      owner,
+    ),
+  );
+  // 시간 경계 검사는 운영 DB가 아닌 격리된 D1의 요청 시각만 앞당긴다.
+  await db
+    .prepare(
+      'UPDATE account_retirements SET requested_at=?,purge_after=? WHERE user_id=?',
+    )
+    .bind(Date.now() - 91 * 86400000, Date.now() - 1000, owner.id)
+    .run();
+  assert.equal(
+    (
+      await (
+        await mf.getWorker()
+      ).scheduled({ scheduledTime: Date.now(), cron: '0 * * * *' })
+    ).outcome,
+    'ok',
+  );
+  const erased = await db
+    .prepare('SELECT name,email,image FROM user WHERE id=?')
+    .bind(owner.id)
+    .first();
+  assert.equal(erased.email, `deleted-${owner.id}@tripprint.invalid`);
+  assert.equal(erased.image, null);
+  assert.equal(
+    (
+      await db
+        .prepare('SELECT COUNT(*) AS n FROM account WHERE userId=?')
+        .bind(owner.id)
+        .first()
+    ).n,
+    0,
+  );
+  assert.equal(
+    (
+      await db
+        .prepare('SELECT COUNT(*) AS n FROM profiles WHERE user_id=?')
+        .bind(owner.id)
+        .first()
+    ).n,
+    0,
+  );
+  assert.equal(
+    (
+      await db
+        .prepare('SELECT COUNT(*) AS n FROM mutation_requests WHERE actor_id=?')
+        .bind(owner.id)
+        .first()
+    ).n,
+    0,
+  );
+  assert.equal(
+    (
+      await db
+        .prepare('SELECT state FROM account_retirements WHERE user_id=?')
+        .bind(owner.id)
+        .first()
+    ).state,
+    'purged',
+  );
+  for (const id of journeys)
+    assert.ok(
+      await db
+        .prepare('SELECT id FROM trips WHERE id=? AND owner_id=?')
+        .bind(id, owner.id)
+        .first(),
+    );
+  assert.ok(await (await mf.getR2Bucket('MEDIA')).head(upload.path));
+  snapshot = (
+    await json(
+      await request(
+        `/api/v1/trips/${tripId}/workspace`,
+        'GET',
+        undefined,
+        editor,
+      ),
+    )
+  ).data;
+  assert.equal(snapshot.trip.ownerId, owner.id);
+  assert.equal(snapshot.myRole, 'editor');
+  assert.equal(snapshot.media[0].path, upload.path);
+  assert.equal(
+    (await json(await request(`/public/community/${postId}`))).data.author,
+    '탈퇴 멤버',
+  );
+  assert.equal(
+    (
+      await request(
+        '/api/auth/sign-in/email',
+        'POST',
+        { email: owner.email, password: owner.password },
+        undefined,
+        { 'CF-Connecting-IP': '203.0.113.233' },
+      )
+    ).status,
+    401,
+  );
+  const userBefore = erased.email;
+  assert.equal(
+    (
+      await (
+        await mf.getWorker()
+      ).scheduled({ scheduledTime: Date.now(), cron: '0 * * * *' })
+    ).outcome,
+    'ok',
+  );
+  assert.equal(
+    (
+      await db
+        .prepare('SELECT email FROM user WHERE id=?')
+        .bind(owner.id)
+        .first()
+    ).email,
+    userBefore,
+  );
+  // 로컬 공개 fixture가 다른 피드 검사에 섞이지 않게 정확한 행만 제거한다.
+  await db.prepare('DELETE FROM posts WHERE id=?').bind(postId).run();
+});

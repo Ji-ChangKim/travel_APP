@@ -1,9 +1,11 @@
 import type { Context, Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
+import type { R2ObjectBody } from '@cloudflare/workers-types';
 import { foundationUuidSchema } from '@wherego/validation';
 import { cloudSession } from './cloudAuth';
 import { database, readTrip, type Actor } from './cloudStore';
 import { rejectRequest } from './errors';
+import { publicImage } from './publicImage';
 import type { ApiEnvironment } from './types';
 type Ctx = Context<ApiEnvironment>;
 
@@ -258,7 +260,7 @@ function canRead(c: Ctx, path: string): Promise<boolean> {
     ? publicPath(c.env, path)
     : database(c.env)
         .prepare(
-          "SELECT 1 FROM trip_members m JOIN trips t ON t.id=m.trip_id JOIN json_each(t.snapshot,'$.media') media WHERE m.trip_id=? AND m.user_id=? AND json_extract(media.value,'$.path')=?",
+          "SELECT 1 FROM trip_members m JOIN trips t ON t.id=m.trip_id JOIN json_each(t.snapshot,'$.media') media WHERE m.trip_id=? AND m.user_id=? AND json_extract(media.value,'$.path')=? AND NOT EXISTS(SELECT 1 FROM account_retirements r WHERE r.user_id=m.user_id)",
         )
         .bind(path.split('/')[0], c.req.query('user') || '', path)
         .first()
@@ -280,18 +282,20 @@ function download(c: Ctx): Promise<Response> {
                     .get(path)
                     .then((object) => {
                       /* 이미지 MIME과 nosniff를 고정한다. */ return object
-                        ? new Response(
-                            object.body as unknown as ReadableStream<Uint8Array>,
-                            {
-                              headers: {
-                                'Content-Type':
-                                  object.httpMetadata?.contentType ||
-                                  'application/octet-stream',
-                                'Cache-Control': 'no-store',
-                                'X-Content-Type-Options': 'nosniff',
+                        ? c.req.query('user') === 'public'
+                          ? publicDownload(object)
+                          : new Response(
+                              object.body as unknown as ReadableStream<Uint8Array>,
+                              {
+                                headers: {
+                                  'Content-Type':
+                                    object.httpMetadata?.contentType ||
+                                    'application/octet-stream',
+                                  'Cache-Control': 'no-store',
+                                  'X-Content-Type-Options': 'nosniff',
+                                },
                               },
-                            },
-                          )
+                            )
                         : rejectRequest('RESOURCE_NOT_FOUND');
                     })
                 : rejectRequest('RESOURCE_NOT_FOUND');
@@ -300,6 +304,25 @@ function download(c: Ctx): Promise<Response> {
       },
     );
   });
+}
+
+// 기존 원본도 공개 응답에서는 개인정보 메타정보를 제거한다.
+async function publicDownload(object: R2ObjectBody): Promise<Response> {
+  // 비공개 원본은 그대로 보존하고 공개 파일을 읽는 시점에 동일한 보호를 적용한다.
+  return object.size > 4194304
+    ? rejectRequest('PAYLOAD_TOO_LARGE')
+    : new Response(
+        new Uint8Array(publicImage(new Uint8Array(await object.arrayBuffer())))
+          .buffer,
+        {
+          headers: {
+            'Content-Type':
+              object.httpMetadata?.contentType || 'application/octet-stream',
+            'Cache-Control': 'no-store',
+            'X-Content-Type-Options': 'nosniff',
+          },
+        },
+      );
 }
 
 // 등록 참조가 없는 본인 업로드 원본만 삭제한다.

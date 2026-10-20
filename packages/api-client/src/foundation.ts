@@ -1,4 +1,7 @@
 import type { PersistedTripInput } from '@wherego/domain';
+import { requestPolicy } from './requestPolicy';
+
+export type FoundationRequestInit = RequestInit & { timeoutMs?: number };
 
 export interface FoundationClientOptions {
   baseUrl: string;
@@ -49,7 +52,10 @@ function rejectResponse(status: number, payload: unknown): never {
 function request(
   options: FoundationClientOptions,
   path: string,
-  init: RequestInit = {},
+  {
+    timeoutMs = requestPolicy.defaultTimeoutMs,
+    ...init
+  }: FoundationRequestInit = {},
 ): Promise<FoundationResponse> {
   // 캐시와 글로벌 세션을 두지 않고 요청 옵션으로만 인증을 전달한다.
   return (options.fetcher ?? fetch)(
@@ -61,9 +67,35 @@ function request(
         ...init.headers,
         Authorization: `Bearer ${options.accessToken}`,
       },
-      signal: init.signal ?? AbortSignal.timeout(15000),
+      signal: requestSignal(init.signal, timeoutMs),
     },
   ).then(readResponse);
+}
+
+// 화면의 취소 신호와 통신 제한 시간을 함께 적용한다.
+export function requestSignal(
+  signal?: AbortSignal | null,
+  timeoutMs: number = requestPolicy.defaultTimeoutMs,
+): AbortSignal {
+  // 영수증처럼 처리 시간이 긴 요청의 명시적 제한 시간을 기본값으로 덮지 않는다.
+  return signal
+    ? AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)])
+    : AbortSignal.timeout(timeoutMs);
+}
+
+// 공개 오류 객체의 정확한 코드만 읽고 원문 전체를 문자열로 변환하지 않는다.
+export function foundationErrorCode(error: unknown): string | undefined {
+  // HTTP 오류의 알려진 경로만 허용해 메시지에 들어간 코드 단어를 오인하지 않는다.
+  return error instanceof FoundationClientError &&
+    error.payload !== null &&
+    typeof error.payload === 'object' &&
+    'error' in error.payload &&
+    error.payload.error !== null &&
+    typeof error.payload.error === 'object' &&
+    'code' in error.payload.error &&
+    typeof error.payload.error.code === 'string'
+    ? error.payload.error.code
+    : undefined;
 }
 
 // 계정별 조회 키를 생성한다.

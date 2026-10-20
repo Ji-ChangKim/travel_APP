@@ -122,7 +122,7 @@ const s = StyleSheet.create({
     gap: 6,
   },
   expand: {
-    minHeight: 44,
+    minHeight: 48,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

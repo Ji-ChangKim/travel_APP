@@ -5,7 +5,9 @@ import { FoundationClientError, searchPlaces } from '@wherego/api-client';
 import { z } from 'zod';
 import { GoogleAttribution, googlePlaceSchema } from './GooglePlace';
 import { serverOptions } from './service';
-import { Action, styles } from './ui';
+import { Action } from './ui';
+import { styles } from './workspaceStyles';
+
 import { ScheduleButton } from './ScheduleControls';
 
 type Props = {

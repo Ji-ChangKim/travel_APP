@@ -1,6 +1,6 @@
 import { useTopModal } from '@/features/accessibility/modalLayers';
 import Text from '@/components/AppText';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { usePathname, useRouter, useSegments } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,6 +8,8 @@ import { useTripStore } from '@/stores/useTripStore';
 import { colors } from '@/constants/theme';
 import { requestScheduleExit } from '@/features/workspace/scheduleExitGuard';
 import { hasGlobalNavigation } from './navigationPolicy';
+import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
+import { ledgerColors, ledgerLayout } from '@/features/workspace/ledgerTheme';
 
 // 하루 UI Kit의 다섯 메뉴를 실제 기존 경로에 연결한다.
 const items = [
@@ -26,18 +28,18 @@ const items = [
     activeIcon: 'calendar',
   },
   {
+    label: '발견',
+    path: '/(tabs)/community',
+    match: '/community',
+    icon: 'compass-outline',
+    activeIcon: 'compass',
+  },
+  {
     label: '발자국',
     path: '/(tabs)/footprints',
     match: '/footprints',
     icon: 'footsteps-outline',
     activeIcon: 'footsteps',
-  },
-  {
-    label: '커뮤니티',
-    path: '/(tabs)/community',
-    match: '/community',
-    icon: 'people-outline',
-    activeIcon: 'people',
   },
   {
     label: 'MY',
@@ -85,8 +87,20 @@ function NavigationContent({
 }) {
   const modal = useTopModal();
   const blocked = Boolean(modal && (modal.strict || modal.native));
+  const { width } = useWindowDimensions();
+  const { largeText } = useAppAccessibility();
+  const sidebar =
+    width >= ledgerLayout.breakpoint &&
+    !largeText &&
+    (path === '/footprints' ||
+      path.startsWith('/diary/') ||
+      path.startsWith('/record/') ||
+      /^\/community\/[^/]+$/.test(path));
   // 상세·작성 화면은 메뉴를 숨기고 선택 시트 뒤의 메뉴 조작도 막는다.
-  return !starting && hasGlobalNavigation(path) && !(modal && !modal.strict) ? (
+  return !sidebar &&
+    !starting &&
+    hasGlobalNavigation(path) &&
+    !(modal && !modal.strict) ? (
     <View
       accessibilityLabel="하단 내비게이션"
       accessibilityElementsHidden={blocked}
@@ -95,7 +109,7 @@ function NavigationContent({
       pointerEvents={blocked ? 'none' : 'auto'}
       style={[styles.container, { paddingBottom: bottom }]}
     >
-      {items
+      {[items[0], items[1], items[3], items[2], items[4]]
         .filter((item) => {
           // 로그인 전 공개 탐색 범위를 확장하지 않는다.
           return allowed || item.match === '/' || item.match === '/community';
@@ -155,11 +169,31 @@ function TabItem({
         ];
       }}
     >
-      <Ionicons
-        name={isSelected ? item.activeIcon : item.icon}
-        size={23}
-        color={isSelected ? colors.text : colors.muted}
-      />
+      <View
+        style={
+          item.match === '/footprints'
+            ? {
+                backgroundColor: isSelected
+                  ? ledgerColors.accent
+                  : ledgerColors.soft,
+                borderRadius: 20,
+                padding: 8,
+              }
+            : undefined
+        }
+      >
+        <Ionicons
+          name={isSelected ? item.activeIcon : item.icon}
+          size={23}
+          color={
+            item.match === '/footprints' && isSelected
+              ? ledgerColors.surface
+              : isSelected
+                ? colors.text
+                : colors.muted
+          }
+        />
+      </View>
       <Text
         variant="navigation"
         style={[

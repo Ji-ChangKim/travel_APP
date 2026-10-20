@@ -2315,3 +2315,114 @@ DB명:wherego-staging / 마이그레이션:apps/api/migrations/0007_google_usage
 API:GET /public/community/:postId/places/:scheduleId/photo. 공개 행과 kind=plan·PLACE·선택 ID를 먼저 검사한다. 철회/미선택404, UUID422, 키/제한 바인딩/집계 누락503, 요청·월 한도429, 공급자 실패503, 정상 사진 없음200 data=null. Cache-Control:no-store. 저장된 Google ID가 있으면 해당 지점 상세를 우선하고 이전 공개 계획은 공개 도시·장소명으로 Text Search 결과1건을 사용한다. 조회된 지점 이름·주소·공식 지도 출처를 표시해 확인하도록 한다.
 Worker 바인딩:PLACES_PHOTO_LIMITER, 공개 사진 IP별40회/60초. namespace_id 기본100551/staging100552/production100553. GOOGLE_PLACES_API_KEY 서버 비밀 키는 앱·로그·공개 응답에 포함하지 않는다. Google 클라우드 키의 API 제한·할당량·동일 결제 계정의 전체 사용량은 별도 확인해야 한다.
 기기:현재 DAY만 사진을 조회, 화면 종료·DAY 변경·백그라운드에 취소. React Query gcTime0, 영구 저장 없음. 이미지 실패는 새 사진 조회로 재시도하며 다른 장소/가짜 썸네일로 대체하지 않는다.
+
+[2026-10-16 기존 여행계획 작성·공유 연결]
+DB명:wherego-staging / 테이블:trips.snapshot·posts.snapshot. 기존 JSON 컬럼 유지, 새 DDL·기기 저장 필드 없음.
+객체/컬럼:CommunityPost.title:string. kind=plan은 community.publish 시 WorkspaceTrip.title을 서버에서 복사한다. 클라이언트도 같은 값을 전송하며 별도 공개 제목 입력란을 표시하지 않는다. kind=record의 기존 제목 계약은 유지한다.
+객체/컬럼:WorkspaceDay.planTitle/planConcept, WorkspaceSchedule.planContent.description/choiceGroup/choiceLabel/choiceKind. 기존 DAY 정리·일정 수정 폼에서 작성하고 저장·재조회·선택 공개한다. 개인 memo는 공개 제외. body는 기존 선택 게시 소개이며 여행 기본정보 필드를 추가하지 않는다.
+화면 객체:PlanDescription은 공개용 planContent만 읽는다. ScreenHeader.inlineTitle:boolean 선택 DEFAULT false. 공유 상세에서만 true이며 뒤로가기 옆 실제 여행 제목을 표시한다. 사진은 88×88 썸네일과 Google Maps 표기, 제공자 원본 접근을 유지한다.
+제약:공유는 선택 일정과 해당 DAY의 사본이다. 개인 원본 수정으로 공개 사본을 자동 변경하지 않으며 명시적 재게시가 필요하다. 원문에 없는 실제 날짜·항공편·지출·완료 상태를 생성하지 않는다.
+
+[2026-10-17 장소 설명 상세 화면]
+DB명/테이블명:해당 없음. 기존 trips.snapshot·posts.snapshot·기기 저장·API 계약 변경 없음.
+화면 객체:PlanDescription.opened:boolean DEFAULT false, 현재 장소의 읽기 상세 표시 상태. address?:string|null은 기존 저장 주소의 읽기 입력. title·planContent.description/choiceLabel/choiceKind만 표시하며 memo 입력 없음.
+화면 객체:AppModal.slideFrom?:right DEFAULT 생략. 설정 시 패널 translateX가 현재 화면 너비→0으로 이동(열기200ms), 닫기는0→너비(150ms). 기존 모달 전환·취소·초점·중첩 계층·Android 뒤로 계약 유지. 접근성/배경 즉시 완료, 화면 종료 뒤 늦은 완료 폐기. 영구 저장 없음.
+
+
+[2026-10-19 필수 보완·공개 흐름 및 발견 검색]
+DB명:wherego-staging. 테이블:trips(snapshot JSON, version INTEGER), posts(snapshot JSON, trip_id UNIQUE). 기존 컬럼/제약 유지, 새 DDL 없음.
+WorkspaceSchedule.planContent:기존 JSON 객체|null 선택. description:string 원문 개행/공백 유지. choiceGroup?:string, choiceLabel?:string, choiceKind?:기존 enum. 세부 선택 관계만 수정해도 명령에 포함한다. 필드 미전송은 원본 보존, 명시 null은 해제. 묶음 해제 시 관련 라벨/종류도 제거한다.
+WorkspaceDay.planTitle/planConcept:기존 string|null 선택. 기간에서 제거되는 DAY에 둘 중 하나라도 있으면 trip.period를 거부한다. 일정·지출·영수증 보호와 함께 적용하고 원본/버전을 유지한다. 남는 날짜 DAY ID 불변.
+화면 객체 RemovedTripDate:date:string YYYY-MM-DD, dayPlans:number(0 또는1, DAY 소개 존재), schedules:number, photos:number(해당 날짜 일정에 연결된 일반 사진), expenses:number, receipts:number. 모두0 이상 정수. 영향 안내용 파생값이며 별도 DB 저장 없음.
+HTTP GET /public/community 또는 /api/v1/community:query q:string trim후0~100자 DEFAULT '', kind:all|plan|record DEFAULT all, days:all|short|4|long DEFAULT all, offset:integer 0~10000 DEFAULT0. short=전체 여행1~3일, 4=4일, long=5일 이상. 전체 기간은 startDate~endDate 양끝 포함. D1은 필터 후 최신20개/OFFSET을 적용한다. q는 제목/국가/도시의 대소문자 무관 부분 검색이며 %, _, 따옴표는 SQL 패턴/명령으로 해석하지 않는다. 기본 무필터 legacy 호출 유지, legacy 필터 미지원은 명시 검증 실패.
+CommunityPost:기존 여행당 공개본 한 개. 재공개는 같은 id/postId와 링크에서 선택 사본 갱신. plan/record 변경도 기존 행을 대체한다. 철회는 개인 원본 유지 및 외부 접근 차단, 이후 새 게시 ID 가능. 원본 수정만으로 사본 갱신하지 않는다.
+화면 객체 PublishFlow.preview:boolean DEFAULT false, WorkspaceConfirmation.fromForm:boolean. 선택→미리보기→범위 확인 후 명령. 취소/실패 시 폼 유지 및 기존 중복 제출 잠금 적용. 새 영구 저장 없음.
+신규 앱 공개 제목:trip.title 사용. 기존 record의 서버 제목 계약/저장 데이터는 보존. record 단건은 공개된 필드만 사용하며 비공개 원본을 합치지 않는다.
+
+
+[2026-10-19 계정 탈퇴 유예·복구·개인 인증 정보 삭제]
+DB명:wherego-staging. 마이그레이션:0007_account_retirements.sql.
+테이블:account_retirements. user_id TEXT PRIMARY KEY REFERENCES user(id):탈퇴 본인 고정. requested_at INTEGER NOT NULL:요청 epoch 밀리초. purge_after INTEGER NOT NULL CHECK(purge_after>requested_at):요청+90*86400000. state TEXT NOT NULL DEFAULT pending CHECK IN(pending,purged). purged_at INTEGER nullable:익명 참조 전환 완료 시각. INDEX retirements_due(state,purge_after). 이름/이메일/토큰은 이 표에 복사하지 않는다.
+POST /api/v1/account/retirement:입력 {confirm:true} 엄격 검사, 외부 userId 지정 불가. 실제 인증과 최근10분 내 세션 생성, 비게스트 확인. 요청 성공은 {requestedAt:ISO datetime,purgeAfter:ISO datetime}. 재인증 필요403 REAUTHENTICATION_REQUIRED, 미인증401, 잘못된 확인/추가 필드422. pending INSERT·여행 표시 이름·공개 작성자명·모든 세션 철회를 D1 batch로 확정한다.
+trips.snapshot.members[].nickname 및 posts.snapshot.author:pending 동안 ‘탈퇴 멤버’. trips.version/snapshot.trip.version을 같이 올려 이전 폼의 덮어쓰기를 막는다. owner_id·snapshot.trip.ownerId·trip_members.role은 보존한다. 모든 동행은 기존 역할로 내 여행 접근/편집을 계속하며 임의 소유권 이전은 없다.
+복구:Better Auth의 새 session.create.before에서 pending/기한을 확인한다. purge_after 이전이면 여행/공개 표시 이름 복원과 pending 삭제를 같은 batch로 수행한다. 기존 토큰 get-session 또는 비공개 파일 서명 조회로 복구하지 않는다. 기한 경계는 SQL에서도 재검사한다. 만료 후 로그인은 복구를 거부하고 만료 연결 정보를 정리한다.
+예약:Worker scheduled, staging cron 0 * * * *. 만료 pending을100개씩 처리한다. 재실행은 purged를 다시 지우거나 바꾸지 않는다. 복구와 만료 SQL은 pending/기한 조건으로 경쟁 결과를 확정한다.
+최종 처리:session·account(OAuth 연결/토큰/이메일 비밀번호)·profiles·mutation_requests·blocks의 본인 연결 정보를 제거한다. verification은 해당 이메일과 정확히 일치하는 항목만 제거한다. user 행은 여행 외래키 보존을 위한 tombstone으로 유지하며 name은 고유 임시값, email은 deleted-{UUID}@tripprint.invalid, image NULL,emailVerified0,isAnonymous1로 바꾼다. 이전 이메일/인증 연결로 이 행에 로그인할 수 없다. 물리 user 행 삭제·동행에게 owner_id 이전은 하지 않는다.
+보존:단독/공동 trips·일정·사진·영수증·비용·게시 사본 및 참조 ID는 사용자 확정 정책에 따라 보존한다. R2 원본도 유지한다. 여행 원문/사진에 포함된 개인정보까지 자동 비식별화됐다고 약속하지 않는다. 그 삭제 요청 경로와 보존 고지는 별도 출시 인수 항목이다.
+화면:513 /account는 공개 안내를 읽을 수 있고 실제 요청만 본인 인증으로 보호한다. 808은 중앙 확인. 성공 후 기기 토큰과 계정 캐시를 비운다. 실패/다른 계정 전환의 늦은 결과는 새 계정을 로그아웃시키지 않는다. 게스트 기기 여행은 서버 회원 탈퇴 요청으로 지우지 않는다.
+
+[2026-10-19 공개 전 Google 사진 미리보기]
+DB명:wherego-staging. 기존 trips.snapshot·trip_members·posts.snapshot·google_api_usage를 사용하며 테이블/컬럼/마이그레이션 추가 없음.
+GET /api/v1/trips/{tripId}/places/{scheduleId}/photo:tripId/scheduleId는 UUID. 실제 Bearer 세션·유효 계정·여행 멤버십과 일정 소속을 검증한다. type=PLACE만 허용한다. 잘못된 UUID422, 미인증401, 비멤버/없는 일정/다른 유형404. 검증 전 Google 호출이나 사용량 예약 없음. 조회로 posts·trip.version·DAY/장소 원문은 변경하지 않는다.
+응답 {data:null|PlacePhoto,meta:{requestId:string}}. PlacePhoto:imageUrl:string HTTPS googleusercontent,placeId:string,matchedTitle:string,matchedAddress:string,sourceUrl:string 검증된 Google HTTPS,authors:Array<{name:string,url?:string,avatarUrl?:string}>. Cache-Control:no-store. 사진 없음은 null, 공급자 장애503, 한도429. 공개 /public/community/{postId}/places/{scheduleId}/photo와 같은 사진 선택·출처 검증·월 사용량 예약 함수를 사용한다. 공개 경로는 계속 현재 공개본의 선택 장소만 허용한다.
+외부 전달 범위:저장된 googlePlaceId 우선. 없으면 trip.country/city와 schedule.title만 검색한다. 메모·예약번호·DAY 소개·계정·여행 ID는 공급자에 보내지 않는다. Google 사진 이름·표시 URL·저작자 데이터는 D1/R2/공유 사본에 저장하지 않는다. 기존 한도를 두 경로가 공유한다.
+화면 객체 CommunityPlanView.photoPreview?:{tripId:UUID,userId:UUID}. 미리보기에서만 전달하며 공개 상세는 post.id를 사용한다. PlacePhoto.preview는 같은88×88·Google표기·원본/재시도 컴포넌트의 인증된 조회 입력이다. 조회 키는 private/public·여행/공개ID·일정ID·계정으로 분리한다. 화면 종료·DAY/계정 전환·배경에서는 이전 결과를 현재 항목에 적용하지 않는다. 영구 저장 없음.
+
+[2026-10-19 로딩 표시 객체]
+DB/저장 변경 없음. LoadingIndicator.phase:Animated.Value 0~1,900ms 반복·세 점의 투명도만 변경. 실제 완료율이 아니다. 접근성 미확인/동작 줄이기/화면 읽기는 정적, 백그라운드/해제는 반복 중단. LoadingTimeline.thumbnail180ms/copy120ms는 진입 연출이며 인증/정책/저장소 점검 성공을 대신하지 않는다. 인증 복귀와 점검 재시도는 완료한 연출을 다시 시작하지 않는다. BI 영상 누락의 흰 배경 중앙 심볼 계약은 유지한다.
+2026-10-19 Stitch 기록 화면 연결 계약
+DB명:기존 tripprint D1 / 기기 게스트 저장소. 신규 테이블·컬럼·DDL 없음.
+테이블:trips.snapshot의 WorkspaceSnapshot JSON. 기존 명령·버전·권한 계약을 유지한다.
+객체:ArchiveSummary {trips:number,countries:number,cities:number}. 실제 완료 여행 목록에서 파생하며 별도 저장하지 않는다. ARCHIVED 제외, 날짜 상태 공통 판정. 도시/국가는 중복 제거하고 빈 값 제외.
+객체:ArchiveDetails {photos:WorkspaceMedia[],schedules:number,places:number,receipts:number}. 멤버 권한 재조회 원본에서만 파생. photos는purpose=photo, places는type=PLACE. 영수증 원본은 일반 사진에서 제외.
+객체:RecordEditor의 PlanForm(kind=schedule,id=기존UUID,values=기존 입력 문자열). schedule.memo는최대300자·멤버 공동 원본·공개 제외, schedule.planContent.description은최대4000자·선택한 장소 공개 때만 포함. DAY ID·장소 ID·Google ID·위치·항공·선택지·예상 지출은 기존 저장값을 보존한다.
+객체:PendingRecord {command:WorkspaceCommand,version:number,key:string(UUID)}. 화면 메모리에만 보관하며 응답 유실 시 같은 원문/버전/멱등 키로 재확인한다. 계정 전환/화면 종료 후 결과를 적용하지 않는다. 서버/기기에 새 비밀 키를 저장하지 않는다.
+미디어:기존 media.upload→media.register(purpose=photo,scheduleId=선택 일정UUID), media.delete를 사용한다. 사진 변경은 즉시 저장, 메모/장소 팁은 기록 저장으로 확정한다. 공통 getWorkspace로 새 원본을 확인한다.
+공개:기존 community.publish 선택 투영을 유지한다. 메모·예약번호·동행 정보·영수증 원본/품목은 제외. 사용자 사진의 공개 경로를 임의로 장소에 대응시키지 않는다. 좋아요·팔로워·인식 신뢰도 등 신규 저장 계약은 추가하지 않았다.
+
+[2026-10-19 · 발견 목록의 클라이언트 읽기 모델]
+DB명/테이블명: 해당 없음. D1·서버 응답·영속 도메인 계약 변경 없음.
+객체명: communityFeedCard 반환값 (apps/mobile/src/features/workspace/communityFeedCard.ts).
+용도: 검증한 CommunityPost를 발견 목록 캐시에 넣기 전에 카드용 값만 추출한다.
+id: string, 필수, 원본 공개 게시물 ID, 목록 행 식별자.
+kind: 'plan' | 'record' | undefined, 원본 공개 유형을 그대로 유지한다.
+title: string, 필수, 원본 여행 제목.
+author: string, 필수, 공개 작성자 표시명.
+authorId: string, 필수, 신고·차단 대상의 원본 작성자 ID.
+photoPath: string | undefined, 첫 공개 사진 경로만 보관한다. 서명 URL·개인 사진을 새로 만들지 않는다.
+country/city: string, 필수, 공개 스냅샷의 국가·도시.
+scheduleCount: number, 필수, 0 이상의 정수, 선택 공개한 일정 배열의 실제 개수.
+제약: body·DAY 소개·장소 설명/팁·비용·일정 배열을 참조하지 않는다. 원본 객체를 수정하지 않는다.
+상세를 열면 공개 게시물 ID로 원본을 재조회한다. 서버 전송량은 이번 변경으로 줄어들지 않는다.
+
+[2026-10-19 · CTO 검수의 클라이언트 계약 분리]
+DB명/테이블명: 해당 없음. 저장 스키마·API 입력 본문·공유 사본 계약 변경 없음.
+FoundationRequestInit: RequestInit 확장 객체. timeoutMs?: number, 요청별 제한 시간(밀리초).
+  기본15000, 이미지 업로드30000, 영수증 인식75000을 requestPolicy에서 관리한다.
+  timeoutMs는 fetch 옵션으로 전송하지 않고 AbortSignal과 결합한다. 사용자 입력 필드가 아니다.
+UserFacingError: Error 확장 객체. message:string, 클라이언트 코드에서 작성한 복구 안내만 넣는다.
+  서버/SDK 오류 문자열을 이 객체로 감싸지 않는다. 일반 Error.message는 화면에 그대로 표시하지 않는다.
+  userFacingMessage(error:unknown,fallback:string):string은 로그인·프로필·기기 기록에도 같은 표시 경계를 적용한다.
+WorkspaceDraftKind: 'expense'|'plan-share'|'record-share'|'metadata'|'period', 비영속 작성 초안 종류.
+  workspaceDraft의 id:string은 컨트롤러가 생성한다. 반환값은 기존 PlanForm(kind,id,values)과 동일하다.
+  일정·사진·비용은 공유 초안에서 자동 선택하지 않는다. period와 metadata는 원본 여행의 값을 보존한다.
+PrivatePhotoView 입력: uri?:string, failed/fetching:boolean, attempt:number,
+  fit:'cover'|'contain', onFailure/onRetry:()=>void. 조회·인증·캐시는 표현 객체에 넣지 않는다.
+WorkspaceView 입력: useWorkspaceController 반환 타입. 비영속 화면 상태와 행동만 전달한다.
+  대기 요청 클로저·실행 잠금 참조·ID 생성·조회/저장/인식 통신은 컨트롤러에 둔다.
+[2026-10-19 · 큰 화면의 역할 분리와 비영속 행동 계약]
+DB명/테이블명: 해당 없음. 서버 저장 스키마·API 본문·공유 투영·버전·멱등 키 변경 없음.
+WorkspaceScreenActions: 현재 원본을 받는 클라이언트 이벤트 행동 객체. 화면은 명령 본문이나 새 일정 UUID를 만들지 않는다.
+입력 snapshot?:WorkspaceSnapshot, command:(WorkspaceCommand,after?,fromForm?)=>void,
+  edit:(PlanForm)=>void, removeRegisteredImage:(path?:string)=>Promise<void>,
+  createSchedule:typeof scheduleForm, createReceiptEdit:typeof savedReceiptForm.
+제약: 생성 시 요청·ID 생성·파일 삭제를 실행하지 않는다. 실제 앱은 기존 원본 폼 생성 함수를 주입한다.
+  startSchedule/addSchedule/chooseCoursePlace는 행동 실행 시 한 번 만든 ID와 DAY를 함께 유지한다.
+  deleteMedia의 파일 정리는 등록 삭제가 확정된 기존 후속 콜백에서만 실행한다.
+PlanEditor.conflicted?:boolean: 비영속 표시 상태, 기본false. 실제 VERSION_CONFLICT 판정과 동기화한다.
+  화면 문구의 한글·부분 문자열로 충돌 여부를 추측하지 않는다. 잠금/재시도 참조는 화면에 넘기지 않는다.
+recordDetails(snapshot,scheduleId): {photos:WorkspaceMedia[],costs:{currency:string,amount:string}[]}.
+  같은 일정의 purpose=photo만 선택한다. 비용의 실제 여부·통화별 합산은 기존 diaryCosts 계약을 유지한다.
+useWorkspaceSaveSession/Commands/FormActions/MediaActions/ChecklistActions,
+  useRecordPersistence, useProfileEditorActions/LogoutActions: 상위 컨트롤러의 현재 요청 수명에 묶인 행동 훅.
+  계정·화면 수명·원문·버전·요청 키·잠금은 기존 참조를 공유한다. 모듈 전역에 사용자 상태나 토큰을 보관하지 않는다.
+표현 객체: 각 *View와 WorkspaceSections/Dialogs의 Props 타입. 서버 DTO를 확장하거나 새 저장 테이블을 만들지 않는다.
+
+[2026-10-20 보안 P0 공개 이미지 응답 계약]
+DB/테이블: 기존 Cloudflare D1 uploads·trips·posts 및 비공개 R2 MEDIA. 컬럼·인덱스·제약조건 변경 없음.
+객체/타입: publicImage(bytes:Uint8Array):Uint8Array, 비영속 공개 응답 바이트.
+제약: 공개 서명·현재 공개 선택 검증을 통과한 JPG/PNG만 변환한다. 최대 4MiB이며 손상된 세그먼트 경계는 거부한다.
+설명: 공개 다운로드에서 EXIF GPS·촬영자·XMP·IPTC·주석·PNG 텍스트 등 부가 메타정보를 제거한다.
+  압축 픽셀과 색상 정보는 유지하고 EXIF 방향은 1~8 범위의 태그 하나만 재작성한다.
+  공개된 기존 파일에도 읽기 시점에 같은 보호를 적용하며 비공개 원본·파일 경로·미디어 ID·등록 데이터는 변경하지 않는다.
+  변환은 완전한 이미지 디코더·악성 파일 검사·사진 픽셀에 보이는 개인정보 삭제를 대신하지 않는다.

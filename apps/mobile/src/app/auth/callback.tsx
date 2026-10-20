@@ -1,8 +1,11 @@
+import { userFacingMessage } from '@/services/userFacingError';
 import { useEffect, useState } from 'react';
 import { Platform, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import HaruState from '@/components/HaruState';
-import { Action, styles } from '@/features/workspace/ui';
+import { Action } from '@/features/workspace/ui';
+import { styles } from '@/features/workspace/workspaceStyles';
+
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { completeSocialAuth, socialRedirectUrl } from '@/features/auth/oauth';
@@ -70,9 +73,10 @@ export default function AuthCallbackScreen() {
         // 공급자 원문 대신 서비스의 안전한 메시지를 보여준다.
         if (active) {
           setMessage(
-            error instanceof Error && /[가-힣]/.test(error.message)
-              ? error.message
-              : '로그인을 완료하지 못했어요. 다시 시도해 주세요.',
+            userFacingMessage(
+              error,
+              '로그인을 완료하지 못했어요. 다시 시도해 주세요.',
+            ),
           );
           setFailed(true);
         }

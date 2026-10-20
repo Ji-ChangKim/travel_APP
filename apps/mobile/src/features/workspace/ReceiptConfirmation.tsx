@@ -1,8 +1,11 @@
 import Text from '@/components/AppText';
 import { View } from 'react-native';
-import { Action, styles } from './ui';
+import { styles } from './workspaceStyles';
+
+import { LedgerAction as Action } from './LedgerUI';
 import type { PlanForm } from './forms';
 import { receiptDifference, receiptCurrencyIssue } from './receiptFlow';
+import { ledgerStyles as l } from './ledgerTheme';
 
 // 정보 확인과 사진 보관을 서로 다른 사용자 선택으로 받는다.
 export default function ReceiptConfirmation({
@@ -27,8 +30,8 @@ export default function ReceiptConfirmation({
         </Text>
       )}
       {difference && (
-        <View style={styles.card}>
-          <Text style={styles.title}>품목 합계와 결제 총액이 달라요</Text>
+        <View style={l.card}>
+          <Text style={l.section}>품목 합계와 결제 총액이 달라요</Text>
           <Text>
             품목 합계 · {difference.itemTotal} {form.values.currency}
           </Text>
@@ -54,10 +57,10 @@ export default function ReceiptConfirmation({
           />
         </View>
       )}
-      <View style={styles.card}>
+      <View style={l.card}>
         <Text style={styles.label}>1 · 정보 확인</Text>
-        <Text style={styles.title}>영수증 정보가 맞나요?</Text>
-        <Text style={styles.subtitle}>
+        <Text style={l.section}>영수증 정보가 맞나요?</Text>
+        <Text style={l.meta}>
           {form.values.receiptOperation === 'update'
             ? '장소, 결제 일시, 메뉴와 금액을 확인해 주세요. 기존 영수증과 실제 지출에 수정한 내용을 반영해요.'
             : '장소, 결제 일시, 메뉴와 금액을 확인해 주세요. 맞다면 선택한 날짜의 일정에 추가할 수 있어요.'}
@@ -91,17 +94,17 @@ export default function ReceiptConfirmation({
         />
       </View>
       {form.values.receiptOperation === 'update' && (
-        <Text style={styles.subtitle}>
+        <Text style={l.meta}>
           처음 선택한 영수증 사진 보관 여부는 유지돼요. 수정한 내용은 기존
           지출에 반영돼요.
         </Text>
       )}
       {form.values.receiptConfirmed === 'true' &&
         form.values.receiptOperation !== 'update' && (
-          <View style={styles.card}>
+          <View style={l.card}>
             <Text style={styles.label}>2 · 사진 보관</Text>
-            <Text style={styles.title}>영수증 사진도 함께 보관할까요?</Text>
-            <Text style={styles.subtitle}>
+            <Text style={l.section}>영수증 사진도 함께 보관할까요?</Text>
+            <Text style={l.meta}>
               사진을 보관하면 나와 여행 친구가 원본을 다시 볼 수 있어요.
               커뮤니티에는 공개되지 않아요.
             </Text>
@@ -124,7 +127,7 @@ export default function ReceiptConfirmation({
               }}
             />
             {form.values.keepPhoto && (
-              <Text style={styles.subtitle}>
+              <Text style={l.meta}>
                 {form.values.keepPhoto === 'true'
                   ? '장소·메뉴·실제 지출과 영수증 사진을 함께 저장해요.'
                   : '장소·메뉴·실제 지출만 저장해요. 등록이 끝나면 인식에 사용한 사진은 삭제해요.'}

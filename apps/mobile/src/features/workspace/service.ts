@@ -1,3 +1,4 @@
+import { UserFacingError } from '@/services/userFacingError';
 import * as ImagePicker from 'expo-image-picker';
 import {
   ImageManipulator,
@@ -12,11 +13,10 @@ import type { FoundationClientOptions } from '@wherego/api-client';
 import {
   FoundationClientError,
   getServerMediaUrl,
-  requestFoundation,
+  requestPolicy,
+  requestSignal,
 } from '@wherego/api-client';
 import { z } from 'zod';
-import { receiptDraftSchema } from '@wherego/validation';
-import type { ReceiptDraft } from '@wherego/domain';
 import { getCloudSession } from '@/services/cloudAuth';
 import { useTripStore } from '@/stores/useTripStore';
 import { guestWorkspaceOptions } from '@/services/guestWorkspaceClient';
@@ -68,7 +68,7 @@ export function apiBaseUrl(): string {
 // 사용자에게 안전한 서비스 실패를 전달한다.
 function fail(message: string): never {
   // 원본 토큰·파일·SQL 오류 문자열을 출력하지 않는다.
-  throw new Error(message);
+  throw new UserFacingError(message);
 }
 // 촬영 또는 사진 선택 동작을 제공한다.
 export function selectImage(
@@ -261,7 +261,9 @@ function uploadBytes(
   return bytes.byteLength > 4194304 ||
     bytes.byteLength === 0 ||
     (mime && mime !== 'image/jpeg' && mime !== 'image/png')
-    ? Promise.reject(new Error('JPG/PNG 사진을 4MB 이하로 선택해 주세요.'))
+    ? Promise.reject(
+        new UserFacingError('JPG/PNG 사진을 4MB 이하로 선택해 주세요.'),
+      )
     : putImage(userId, tripId, Crypto.randomUUID(), bytes, imageMime(bytes));
 }
 // 등록 참조를 지운 파일 원본 하나를 제거한다.
@@ -278,7 +280,7 @@ export function removeImage(userId: string, path?: string): Promise<void> {
           : fetch(`${apiBaseUrl()}/files?path=${encodeURIComponent(path)}`, {
               method: 'DELETE',
               headers: { Authorization: `Bearer ${session.access_token}` },
-              signal: AbortSignal.timeout(15000),
+              signal: requestSignal(),
             }).then((response) => {
               // 실패는 원본 삭제 성공으로 표시하지 않는다.
               return response.ok
@@ -314,7 +316,10 @@ function putImage(
               'Content-Type': mimeType,
             },
             body: bytes,
-            signal: AbortSignal.timeout(30000),
+            signal: requestSignal(
+              undefined,
+              requestPolicy.imageUploadTimeoutMs,
+            ),
           }).then((response) => {
             // 서버 확정 경로와 MIME만 등록에 사용한다.
             return response.ok
@@ -336,22 +341,8 @@ function putImage(
           });
   });
 }
-// 등록한 영수증 사진의 인식 초안을 요청한다.
-export function scanServerReceipt(
-  options: FoundationClientOptions,
-  trip: string,
-  media: string,
-): Promise<ReceiptDraft> {
-  // 추출 결과는 사용자 확인 전까지 기록되지 않는다.
-  return requestFoundation(options, `/trips/${trip}/receipts/ocr`, {
-    method: 'POST',
-    signal: AbortSignal.timeout(75000),
-    body: JSON.stringify({ mediaId: media }),
-  }).then((response) => {
-    // 후보 데이터만 해석하며 금액을 자동 확정하지 않는다.
-    return receiptDraftSchema.parse(response.data);
-  });
-}
+// 영수증 통신은 화면·사진 선택과 독립된 계약으로 유지한다.
+export { scanServerReceipt } from './workspaceReceipts';
 // 설치된 메시지 앱의 공유 시트로 초대 링크를 전달한다.
 export function shareInvite(title: string, token: string): Promise<unknown> {
   // 실제 웹 복귀 기본 경로를 사용하는 HTTPS 링크를 만든다.

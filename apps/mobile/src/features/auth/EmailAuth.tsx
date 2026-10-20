@@ -1,3 +1,4 @@
+import { userFacingMessage } from '@/services/userFacingError';
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
 import Modal from '@/components/AppModal';
@@ -115,9 +116,7 @@ function showEmailError(set: ChangeState, error: unknown): void {
           ? /[가-힣]/.test(error.issues[0]?.message || '')
             ? error.issues[0]!.message
             : '로그인을 완료하지 못했어요. 잠시 후 다시 시도해 주세요.'
-          : error instanceof Error && /[가-힣]/.test(error.message)
-            ? error.message
-            : '연결을 확인하고 다시 시도해 주세요.',
+          : userFacingMessage(error, '연결을 확인하고 다시 시도해 주세요.'),
   });
 }
 

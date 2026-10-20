@@ -7,6 +7,7 @@ import {
   Platform,
   StyleSheet,
   View,
+  useWindowDimensions,
   type ModalProps,
 } from 'react-native';
 import { useModalMotion } from '@/features/accessibility/useModalMotion';
@@ -29,15 +30,18 @@ export default function AppModal({
   priority = 0,
   accessibilityLabel,
   blockNavigation,
+  slideFrom,
   ...props
 }: Omit<ModalProps, 'onRequestClose'> & {
   onRequestClose?: () => void;
   native?: boolean;
   priority?: number;
   blockNavigation?: boolean;
+  slideFrom?: 'right';
 }) {
   // 상위 창이 닫히면 중첩 창도 요청을 유지하지 않는다.
   const parentActive = useContext(ModalActive);
+  const { width } = useWindowDimensions();
   // 닫기 150ms 동안 마지막 내용을 보존하되 입력은 막는다.
   const motion = useModalMotion(
     visible && parentActive,
@@ -108,7 +112,7 @@ export default function AppModal({
         style={[
           StyleSheet.absoluteFill,
           {
-            backgroundColor: transparent ? '#0B14218C' : colors.background,
+            backgroundColor: transparent ? '#20324766' : colors.background,
             opacity: motion.backdrop,
           },
         ]}
@@ -118,13 +122,22 @@ export default function AppModal({
         pointerEvents={motion.visible ? 'auto' : 'none'}
         style={{
           flex: 1,
-          opacity: motion.panel,
+          opacity: slideFrom ? 1 : motion.panel,
           transform: [
             {
-              translateY: motion.panel.interpolate({
-                inputRange: [0, 1],
-                outputRange: [animationType === 'slide' ? 16 : 0, 0],
-              }),
+              ...(slideFrom
+                ? {
+                    translateX: motion.panel.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [width, 0],
+                    }),
+                  }
+                : {
+                    translateY: motion.panel.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [animationType === 'slide' ? 16 : 0, 0],
+                    }),
+                  }),
             },
           ],
         }}

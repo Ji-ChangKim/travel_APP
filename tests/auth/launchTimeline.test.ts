@@ -239,22 +239,22 @@ test('R13 재생 중 동작 줄이기 변경은 정적으로 전환하고 되돌
   assert.equal(bi.getSnapshot().phase, 'done');
 });
 
-test('R13 01 썸네일·문구 각 1초와 중단·재연결·정적 완료 계약', () => {
+test('시작 로고180ms·문구120ms와 중단·재연결·정적 완료 계약', () => {
   // 실제 점검과 별개인 표시 구간은 복귀나 재시도로 반복하지 않는다.
   const clock = new Clock();
   const loading = new LoadingTimeline(clock);
   const disconnect = loading.connect(normal);
-  clock.tick(400);
+  clock.tick(80);
   loading.update({ ...normal, foreground: false });
   clock.tick(10000);
   loading.update(normal);
-  clock.tick(600);
+  clock.tick(100);
   assert.equal(loading.getSnapshot().phase, 'copy');
-  clock.tick(200);
+  clock.tick(20);
   disconnect();
   clock.tick(10000);
   loading.connect(normal);
-  clock.tick(799);
+  clock.tick(99);
   assert.equal(loading.getSnapshot().phase, 'copy');
   clock.tick(1);
   assert.equal(loading.getSnapshot().phase, 'ready');

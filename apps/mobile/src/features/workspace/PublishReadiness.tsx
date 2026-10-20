@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import Text from '@/components/AppText';
 import ActionSheet from '@/components/ActionSheet';
-import { Action, styles } from './ui';
+import { Action } from './ui';
+import { styles } from './workspaceStyles';
 
 // 개인 기록의 정리 완료와 커뮤니티 게시를 별도 행동으로 연결한다.
 export default function PublishReadiness({
@@ -31,6 +32,7 @@ export default function PublishReadiness({
         }}
       />
       <ActionSheet
+        variant="confirm"
         visible={confirm}
         title="기록 정리를 마칠까요?"
         onClose={() => {
@@ -40,7 +42,7 @@ export default function PublishReadiness({
       >
         <Text style={styles.subtitle}>
           개인 기록은 계속 수정할 수 있어요. 이 단계에서는 게시하지 않아요. 완료
-          후 ‘공개 내용 작성’에서 공개할 내용을 선택해 주세요.
+          후 ‘여행기록 공유하기’에서 공개할 내용을 선택해 주세요.
         </Text>
         <Action
           label="계속 정리하기"

@@ -7,6 +7,7 @@ import { saveSocialReturn, clearSocialReturn } from './socialReturn';
 import type { AuthReturn } from './authReturn';
 import type { SocialProvider } from './model';
 import { failAuth, readOAuthCode } from './model';
+import { oauthStep } from './oauthSteps';
 import {
   acceptSession,
   authBaseUrl,
@@ -103,13 +104,21 @@ export function signInWithSocial(
   target: AuthReturn = {},
 ): Promise<CloudSession | null> {
   // 보안 난수로 만든 검증자는 URL에 포함하지 않는다.
-  return saveSocialReturn(target).then(() => {
+  return oauthStep('return', () => {
+    // 기존 목적 저장은 화면·문구를 바꾸지 않는다.
+    return saveSocialReturn(target);
+  }).then(() => {
     // 복귀 정보를 보관한 뒤 새 PKCE 인증을 시작한다.
-    return prepareSocial(
-      provider,
-      Crypto.randomUUID().replace(/-/g, '') +
-        Crypto.randomUUID().replace(/-/g, ''),
-    );
+    return oauthStep('nonce', () => {
+      // 보안 난수 생성 실패도 원문 없이 구분한다.
+      return (
+        Crypto.randomUUID().replace(/-/g, '') +
+        Crypto.randomUUID().replace(/-/g, '')
+      );
+    }).then((verifier) => {
+      // 검증자는 로그에 남기지 않고 기존 준비 단계로만 전달한다.
+      return prepareSocial(provider, verifier);
+    });
   });
 }
 
@@ -121,24 +130,35 @@ function prepareSocial(
   // 다른 인증 시도의 완료 Promise를 재사용하지 않는다.
   return Promise.resolve((exchange = null))
     .then(() => storeVerifier(verifier))
-    .then(() => Promise.all([challenge(verifier), getCloudSession()]))
+    .then(() =>
+      Promise.all([
+        oauthStep('proof', () => {
+          // 보안 해시를 약한 대체 값으로 바꾸지 않는다.
+          return challenge(verifier);
+        }),
+        oauthStep('session', getCloudSession),
+      ]),
+    )
     .then(([proof, session]) => {
       // 연결할 게스트 토큰은 HTTPS 헤더로만 전달한다.
-      return fetch(`${authBaseUrl()}/api/social/prepare`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(Platform.OS !== 'web' ? { Origin: 'travelapp://' } : {}),
-          ...(session?.user.isAnonymous
-            ? { Authorization: `Bearer ${session.access_token}` }
-            : {}),
-        },
-        body: JSON.stringify({
-          provider,
-          challenge: proof,
-          redirectUri: socialRedirectUrl(),
-        }),
-        signal: AbortSignal.timeout(15000),
+      return oauthStep('prepare', () => {
+        // 네트워크와 입력 검증 실패를 기기 암호 실패와 구분한다.
+        return fetch(`${authBaseUrl()}/api/social/prepare`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(Platform.OS !== 'web' ? { Origin: 'travelapp://' } : {}),
+            ...(session?.user.isAnonymous
+              ? { Authorization: `Bearer ${session.access_token}` }
+              : {}),
+          },
+          body: JSON.stringify({
+            provider,
+            challenge: proof,
+            redirectUri: socialRedirectUrl(),
+          }),
+          signal: AbortSignal.timeout(15000),
+        });
       });
     })
     .then((response) => {
@@ -146,9 +166,12 @@ function prepareSocial(
       return response.ok
         ? response.json().then((body) => {
             // 서버 발급 인증 주소만 연다.
-            return openSocial(
-              z.object({ url: z.string().url() }).parse(body).url,
-            );
+            return oauthStep('open', () => {
+              // 실제 이동 실패만 안전한 단계 코드로 기록한다.
+              return openSocial(
+                z.object({ url: z.string().url() }).parse(body).url,
+              );
+            });
           })
         : failAuth(
             '이 로그인 방법은 지금 사용할 수 없어요. 다른 방법으로 계속해 주세요.',

@@ -1,3 +1,4 @@
+import { UserFacingError, userFacingMessage } from '@/services/userFacingError';
 import { create } from 'zustand';
 import type { TrailJourney } from '@wherego/domain';
 import { readTrailWorkspace, writeTrailWorkspace } from './storage';
@@ -61,7 +62,7 @@ export function saveTrailJourney(
     !useTrailStore.getState().saving
     ? persistJourney(scope, journey, useTrailStore.getState().journeys)
     : Promise.reject(
-        new Error(
+        new UserFacingError(
           '기록을 불러오는 중이거나 저장 중입니다. 잠시 후 다시 시도해 주세요.',
         ),
       );
@@ -119,10 +120,10 @@ function applyStorageError(
   // 읽기 실패 상태를 임의 빈 여행으로 덮어쓰지 않는다.
   return useTrailStore.getState().scope === scope
     ? useTrailStore.setState({
-        error:
-          error instanceof Error
-            ? error.message
-            : '기기 저장소를 확인해 주세요.',
+        error: userFacingMessage(
+          error,
+          '기기 저장소를 확인하고 다시 시도해 주세요.',
+        ),
         saving: false,
         loading: keepLoading,
       })

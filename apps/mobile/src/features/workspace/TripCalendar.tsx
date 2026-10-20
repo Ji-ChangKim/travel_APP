@@ -1,25 +1,52 @@
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
 import { useState, type Dispatch, type SetStateAction } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DesignButton from '@/components/DesignButton';
-import { styles } from './ui';
+import { styles } from './workspaceStyles';
+
 import { FormAnchor, useFormScope } from './InputFeedback';
 
 import { calendarCells, calendarSelection, monthStart } from './calendarModel';
+import { DateField } from './TravelInputs';
+import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 
 // 두 날짜를 하나의 표시된 달력에서 선택한다.
 export default function TripCalendar(props: {
   values: Record<string, string>;
   onChange: (key: string, value: string) => void;
 }) {
-  // 월 이동은 여행 기간을 변경하지 않는다.
-  return (
-    <CalendarContent
-      {...props}
-      monthState={useState(() => monthStart(props.values.startDate || ''))}
-    />
+  // 좁은 화면이나 큰 글자에서7열의 날짜 터치 영역을 줄이지 않고 플랫폼 선택기를 쓴다.
+  const { width } = useWindowDimensions();
+  const { fontScale } = useAppAccessibility();
+  const monthState = useState(() => monthStart(props.values.startDate || ''));
+  return width < 400 || fontScale > 1.3 ? (
+    <View style={styles.card}>
+      <Text style={styles.title}>여행 기간</Text>
+      <DateField
+        label="시작일"
+        value={props.values.startDate || ''}
+        mode="date"
+        maximumDate={props.values.endDate || undefined}
+        onChange={(value) => {
+          // 날짜 필드의 원문을 기존 생성 초안에 전달한다.
+          return props.onChange('startDate', value);
+        }}
+      />
+      <DateField
+        label="종료일"
+        value={props.values.endDate || ''}
+        mode="date"
+        minimumDate={props.values.startDate || undefined}
+        onChange={(value) => {
+          // 종료일도 같은 저장 검증을 사용한다.
+          return props.onChange('endDate', value);
+        }}
+      />
+    </View>
+  ) : (
+    <CalendarContent {...props} monthState={monthState} />
   );
 }
 

@@ -164,6 +164,7 @@ export default function ScheduleExitDialog() {
   }, [commit, pending]);
   return (
     <ActionSheet
+      variant="confirm"
       title={state.title}
       priority={100}
       visible={Boolean(state.pending && !state.commit)}

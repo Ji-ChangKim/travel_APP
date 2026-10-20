@@ -4,8 +4,11 @@ import Modal from '@/components/AppModal';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { Action, styles } from './ui';
+import { styles } from './workspaceStyles';
+
 import { useTripStore } from '@/stores/useTripStore';
+import { ledgerStyles as l, ledgerColors as c } from './ledgerTheme';
+import { LedgerAction as Action, LedgerBrand, useLedgerWide } from './LedgerUI';
 
 // 시스템 카메라를 열기 전에 촬영 방법과 사진 처리 선택을 안내한다.
 export default function ReceiptCapture({
@@ -13,12 +16,14 @@ export default function ReceiptCapture({
   busy,
   onCapture,
   onLibrary,
+  onManual,
   onClose,
 }: {
   visible: boolean;
   busy: boolean;
   onCapture: () => void;
   onLibrary: () => void;
+  onManual?: () => void;
   onClose: () => void;
 }) {
   // 게스트 사진은 전송하지 않고 기기에 보관한 뒤 직접 확인한다.
@@ -26,6 +31,7 @@ export default function ReceiptCapture({
     // 현재 선택한 계정의 저장 범위만 읽는다.
     return state.currentUser?.authProvider === 'guest';
   });
+  const wide = useLedgerWide();
   // 실제 카메라는 기기의 촬영 화면을 사용하며 이 화면에서는 결과를 만들지 않는다.
   return (
     <Modal
@@ -34,10 +40,11 @@ export default function ReceiptCapture({
       animationType="slide"
       onRequestClose={onClose}
     >
-      <SafeAreaView style={styles.modal}>
-        <ScrollView contentContainerStyle={styles.content}>
+      <SafeAreaView style={[styles.modal, { backgroundColor: c.canvas }]}>
+        <ScrollView contentContainerStyle={[l.content, wide && l.wideContent]}>
+          <LedgerBrand />
           <Text style={styles.label}>사진 촬영 → 정보 확인 → 일정 등록</Text>
-          <Text style={styles.header}>영수증 한 장으로 기록해요</Text>
+          <Text style={l.title}>영수증 한 장으로 지출 기록</Text>
           <Text style={styles.subtitle}>
             {local
               ? '사진을 이 기기에 보관하고 장소, 결제 일시와 금액을 직접 입력해요.'
@@ -47,14 +54,14 @@ export default function ReceiptCapture({
             style={{
               borderWidth: 2,
               borderStyle: 'dashed',
-              borderColor: colors.primary,
+              borderColor: c.accent,
               borderRadius: 24,
               padding: 28,
               minHeight: 240,
               alignItems: 'center',
               justifyContent: 'center',
               gap: 14,
-              backgroundColor: colors.background,
+              backgroundColor: c.soft,
             }}
           >
             <Ionicons name="receipt-outline" size={84} color={colors.primary} />
@@ -63,7 +70,7 @@ export default function ReceiptCapture({
               상호와 날짜, 메뉴, 합계가 잘리지 않게 담아주세요.
             </Text>
           </View>
-          <View style={styles.card}>
+          <View style={l.card}>
             <Text style={styles.title}>
               {local
                 ? '나중에도 내용을 확인할 수 있게 촬영해요'
@@ -88,6 +95,13 @@ export default function ReceiptCapture({
             disabled={busy}
             onPress={onLibrary}
           />
+          {onManual && (
+            <Action
+              label="사진 없이 지출 직접 입력"
+              disabled={busy}
+              onPress={onManual}
+            />
+          )}
           <Action
             label="나중에 할게요"
             variant="quiet"

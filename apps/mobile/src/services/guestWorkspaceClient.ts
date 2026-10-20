@@ -1,8 +1,6 @@
+import { UserFacingError } from './userFacingError';
 import * as Crypto from 'expo-crypto';
-import {
-  FoundationClientError,
-  type FoundationClientOptions,
-} from '@wherego/api-client';
+import type { FoundationClientOptions } from '@wherego/api-client';
 import { WorkspaceModelError } from '@wherego/validation';
 import { useTripStore } from '@/stores/useTripStore';
 import { guestRemoteHeaders } from './guestRemoteHeaders';
@@ -198,22 +196,7 @@ function rejectedGuestResponse(error: unknown): Response {
 // 실제 기기 쓰기 실패를 사용자 재시도 안내로 전달한다.
 function failStorage(): never {
   // 개인 데이터와 파일 경로를 오류에 포함하지 않는다.
-  throw new Error(
+  throw new UserFacingError(
     '이 기기에 저장하지 못했어요. 저장 공간을 확인하고 다시 시도해 주세요.',
-  );
-}
-
-// 가입이 필요한 원격 공유 요청을 같은 화면에서 안내한다.
-export function isMembershipRequired(error: unknown): boolean {
-  // 단순 권한 부족과 회원 전환이 필요한 행동을 구분한다.
-  return (
-    error instanceof FoundationClientError &&
-    error.status === 403 &&
-    Boolean(
-      error.payload &&
-      typeof error.payload === 'object' &&
-      'error' in error.payload &&
-      JSON.stringify(error.payload.error).includes('MEMBERSHIP_REQUIRED'),
-    )
   );
 }

@@ -2,6 +2,8 @@ import type { PersistedTripInput } from '@wherego/domain';
 import {
   workspaceCommandSchema,
   communityPostSchema,
+  communityFeedQuerySchema,
+  type CommunityFeedFilters,
 } from '@wherego/validation';
 import {
   changed,
@@ -68,7 +70,15 @@ function dispatch(actor: Actor, name: string, args: Args): Promise<unknown> {
     case 'wherego_trip_snapshot':
       return readTrip(actor, String(args.p_trip));
     case 'wherego_community':
-      return feed(actor, Number(args.p_offset || 0));
+      return feed(
+        actor,
+        Number(args.p_offset || 0),
+        communityFeedQuerySchema.parse({
+          q: args.p_query,
+          kind: args.p_kind,
+          days: args.p_days,
+        }),
+      );
     case 'wherego_community_post':
       return database(actor.env)
         .prepare('SELECT snapshot FROM posts WHERE id=?')
@@ -160,13 +170,34 @@ function eraseReceiptPhoto(m: Mutation, path: string): Promise<unknown> {
 }
 
 // 공개 게시물의 현재 차단 필터를 적용한다.
-function feed(actor: Actor, offset: number): Promise<unknown> {
+function feed(
+  actor: Actor,
+  offset: number,
+  filters: CommunityFeedFilters,
+): Promise<unknown> {
   // 비공개 여행 JSON을 커뮤니티 조회에 사용하지 않는다.
   return database(actor.env)
     .prepare(
-      'SELECT snapshot FROM posts WHERE NOT EXISTS(SELECT 1 FROM blocks WHERE actor_id=? AND blocked_id=posts.author_id) ORDER BY published_at DESC,id LIMIT 20 OFFSET ?',
+      `SELECT snapshot FROM posts WHERE NOT EXISTS(SELECT 1 FROM blocks WHERE actor_id=? AND blocked_id=posts.author_id)
+      AND (?='all' OR COALESCE(json_extract(snapshot,'$.kind'),'record')=?)
+      AND (?='' OR instr(lower(COALESCE(json_extract(snapshot,'$.title'),'')||' '||COALESCE(json_extract(snapshot,'$.snapshot.country'),'')||' '||COALESCE(json_extract(snapshot,'$.snapshot.city'),'')),lower(?))>0)
+      AND (?='all' OR (?='short' AND julianday(json_extract(snapshot,'$.snapshot.endDate'))-julianday(json_extract(snapshot,'$.snapshot.startDate'))+1 BETWEEN 1 AND 3)
+        OR (?='4' AND julianday(json_extract(snapshot,'$.snapshot.endDate'))-julianday(json_extract(snapshot,'$.snapshot.startDate'))+1=4)
+        OR (?='long' AND julianday(json_extract(snapshot,'$.snapshot.endDate'))-julianday(json_extract(snapshot,'$.snapshot.startDate'))+1>=5))
+      ORDER BY published_at DESC,id LIMIT 20 OFFSET ?`,
     )
-    .bind(actor.session.userId, offset)
+    .bind(
+      actor.session.userId,
+      filters.kind,
+      filters.kind,
+      filters.q,
+      filters.q,
+      filters.days,
+      filters.days,
+      filters.days,
+      filters.days,
+      offset,
+    )
     .all<{ snapshot: string }>()
     .then((result) => {
       /* 공개 스냅샷만 JSON으로 반환한다. */ return result.results.map(

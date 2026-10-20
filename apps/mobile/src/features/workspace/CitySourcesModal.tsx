@@ -5,7 +5,9 @@ import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { DiscoveryDestination } from '@wherego/domain';
 import type { DiscoveryCity } from '@wherego/validation';
-import { Action, styles } from './ui';
+import { Action } from './ui';
+import { styles } from './workspaceStyles';
+
 import { discoveryStyles as s } from './discoveryStyles';
 import {
   informationAttributions,

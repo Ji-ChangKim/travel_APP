@@ -4,8 +4,8 @@ export const launchTime = {
   firstFrame: 500,
   poster: 1000,
   fade: 500,
-  thumbnail: 1000,
-  copy: 1000,
+  thumbnail: 180,
+  copy: 120,
   playbackLimit: 3500,
 } as const;
 export type LaunchEnvironment = {
@@ -191,7 +191,7 @@ type LoadingState = {
   foreground: boolean;
 };
 
-// 01의 썸네일과 문구를 실제 점검과 독립적으로 순서대로 표시한다.
+// 로고180ms·문구120ms 진입을 실제 점검과 독립적으로 관리한다.
 export class LoadingTimeline {
   private state: LoadingState = { phase: 'thumbnail', foreground: false };
   private timer: ForegroundTimer;

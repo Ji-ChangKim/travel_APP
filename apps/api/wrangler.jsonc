@@ -49,6 +49,8 @@
   "observability": { "enabled": true, "head_sampling_rate": 1 },
   "env": {
     "staging": {
+      // 탈퇴 요청별 90일이 지난 계정 연결 정보만 시간 단위로 정리한다.
+      "triggers": { "crons": ["0 * * * *"] },
       "ratelimits": [
         {
           "name": "FLIGHT_LOOKUP_LIMITER",

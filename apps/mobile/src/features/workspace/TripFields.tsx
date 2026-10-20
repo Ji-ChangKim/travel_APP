@@ -1,5 +1,7 @@
 import { View } from 'react-native';
-import { Field, styles } from './ui';
+import { Field } from './ui';
+import { styles } from './workspaceStyles';
+
 import { DestinationFields } from './TravelInputs';
 import TripCalendar from './TripCalendar';
 
@@ -16,7 +18,7 @@ export default function TripFields({
     <>
       <View style={styles.card}>
         <Field
-          label="나의 여행 주제"
+          label="여행 이름 · 선택"
           placeholder="예: 가을 골목을 걷는 교토 여행"
           value={values.title || ''}
           onChange={(value) => {

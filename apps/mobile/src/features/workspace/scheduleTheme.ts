@@ -83,7 +83,7 @@ export const scheduleStyles = StyleSheet.create({
   },
   button: {
     maxWidth: '100%',
-    minHeight: 44,
+    minHeight: tokens.accessibility.minimumTouchTarget,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: tokens.radius.button,

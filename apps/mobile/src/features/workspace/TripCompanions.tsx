@@ -65,7 +65,7 @@ const s = StyleSheet.create({
     fontWeight: '600',
   },
   meta: { color: colors.muted, fontSize: 14, lineHeight: 22, flexShrink: 1 },
-  link: { minHeight: 44, paddingHorizontal: 4, justifyContent: 'center' },
+  link: { minHeight: 48, paddingHorizontal: 4, justifyContent: 'center' },
   label: {
     color: colors.secondary,
     fontSize: 14,

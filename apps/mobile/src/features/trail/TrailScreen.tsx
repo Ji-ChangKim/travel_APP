@@ -1,3 +1,4 @@
+import { UserFacingError, userFacingMessage } from '@/services/userFacingError';
 import Text from '@/components/AppText';
 import ScreenHeader from '@/components/ScreenHeader';
 import { useRouter } from 'expo-router';
@@ -932,7 +933,7 @@ function requiredJourney(model: Model): TrailJourney {
 // 선택 누락 오류를 전달한다.
 function missingJourney(): never {
   // 입력을 잃지 않고 다시 여행을 선택하게 한다.
-  throw new Error('먼저 여행을 선택해 주세요.');
+  throw new UserFacingError('먼저 여행을 선택해 주세요.');
 }
 
 // 여행 내부의 한 유형만 수정한다.
@@ -998,7 +999,7 @@ function requiredAttachment(model: Model): TrailReceipt['attachment'] {
 // 첨부 누락을 안내한다.
 function missingAttachment(): never {
   // 사용자가 작성한 구매 내역은 화면에 유지한다.
-  throw new Error('영수증 원본 사진 또는 PDF를 선택해 주세요.');
+  throw new UserFacingError('영수증 원본 사진 또는 PDF를 선택해 주세요.');
 }
 
 // 저장 후 해당 콘텐츠를 선택한다.
@@ -1074,9 +1075,10 @@ function runAction(model: Model, action: () => unknown): void {
                 return `${issue.path.join('.') || '입력'}: ${issue.message}`;
               })
               .join('\n')
-          : error instanceof Error
-            ? error.message
-            : '작업을 다시 확인해 주세요.',
+          : userFacingMessage(
+              error,
+              '작업을 다시 확인하고 다시 시도해 주세요.',
+            ),
       );
     });
 }

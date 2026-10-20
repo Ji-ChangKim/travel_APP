@@ -11,7 +11,9 @@ import { View } from 'react-native';
 import { mapsSharePreviewSchema, sharedMapsUrl } from '@wherego/validation';
 import { requestFoundation } from '@wherego/api-client';
 import { serverOptions } from './service';
-import { Action, Field, styles } from './ui';
+import { Action, Field } from './ui';
+import { styles } from './workspaceStyles';
+
 import { ScheduleButton, ScheduleField } from './ScheduleControls';
 import { scheduleStyles as schedule } from './scheduleTheme';
 

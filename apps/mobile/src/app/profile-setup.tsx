@@ -29,7 +29,7 @@ import {
   TravelerPortrait,
 } from '@/features/auth/AuthFormChrome';
 import { loginStyles as styles } from '@/features/auth/loginStyles';
-import { workspaceError } from '@/features/workspace/WorkspaceScreen';
+import { workspaceError } from '@/features/workspace/workspaceFailure';
 import type { Profile } from '@wherego/domain';
 import { useQueryClient } from '@tanstack/react-query';
 import {

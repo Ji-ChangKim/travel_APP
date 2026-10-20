@@ -155,7 +155,15 @@ export function useLoadingMotion(
     const value = state.phase === 'thumbnail' ? thumbnail : copy;
     if (state.phase === 'copy') thumbnail.setValue(1);
     const remaining = timeline.remaining();
-    value.setValue(Easing.out(Easing.cubic)(1 - remaining / 1000));
+    value.setValue(
+      Easing.out(Easing.cubic)(
+        1 -
+          remaining /
+            (state.phase === 'thumbnail'
+              ? launchTime.thumbnail
+              : launchTime.copy),
+      ),
+    );
     if (!state.foreground) return;
     const animation = Animated.timing(value, {
       toValue: 1,

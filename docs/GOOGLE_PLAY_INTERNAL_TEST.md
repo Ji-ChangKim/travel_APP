@@ -1,65 +1,32 @@
-# TripPrint 구글 로그인과 Play 내부 테스트
+# TripPrint Google 로그인과 내부 테스트
 
-2026-10-15 현재 R00~R13 구현과 로컬 검증을 마쳤으며 **내부 테스트용 빌드 생성 직전까지 준비 완료** 상태입니다. 빌드 입력과 실행 시 확인 사항은 [빌드 직전 인계 문서](PLAY_INTERNAL_PREBUILD.txt), 최종 기기 검수는 [R14 검수표](qa/DEVICE_ACCEPTANCE.txt)를 따릅니다. 이번 작업에서는 빌드·업로드를 시작하지 않았습니다. 아래 2026-10-12와 2026-10-07 기록은 당시 준비 상태입니다.
+기준일: 2026-10-20. 개발 측은 로그인·인증 복귀 구현과 빌드 전 검사를 준비했습니다. 사용자가 직접 빌드한 뒤 Play 내부 테스트에서 게스트·Google 로그인을 확인합니다. 실제 Google 성공 로그인이나 새 설치본 검수를 완료한 상태로 표시하지 않습니다.
 
-2026-10-12 기준 1차 MVP 후보는 `0.1.0 / mvp-0.1.0-internal-candidate-20261012`입니다. 추천 자동 슬라이드·최종 검사·성능 및 실기기 인수 절차는 [MVP 마무리 보고](CURRENT_STATUS.txt)를 따릅니다. 로컬 후보 준비와 원격 배포·AAB 업로드·내부 테스트 출시를 구분합니다.
+**설정과 실행 순서는 [내부 테스트 AAB 빌드 안내](ANDROID_GITHUB_BUILD.md)를 따릅니다.** 기본 경로는 GitHub Actions의 `Android Play Internal`에서 `main`·`aab`·`submit_play=false`·`draft`로 파일을 만든 뒤 Play Console에 직접 업로드하는 방식입니다. 현재 `versionCode=9`이며 이미 사용한 번호라면 `ver.text`를 수정하고 푸시해야 합니다.
 
-2026-10-12 최신 점검은 [내부 테스트 준비 보고](CURRENT_STATUS.txt)와 [기기 게스트 구현 보고](CURRENT_STATUS.txt)를 따른다. 게스트는 Google 인증 없는 기기 계정이며 여행·사진을 로컬 저장한다. 배포 전에 새 API와 `0006_unique_nicknames.sql`을 적용해야 한다. 아래 과거 준비 상태와 실제 AAB/Play 출시 완료 여부를 구분한다. 지난 GitHub 성공 실행은 APK 생성이며 Play 제출은 건너뛰었다.
+## 인증 연결 기준
 
-2026-10-07 현재 목표는 실제 Google 로그인 검증과 Play Console 내부 테스트에서 앱을 설치하는 것이다. Android 앱 식별자는 `com.tripprint.app`이다. Google OAuth 클라이언트 관리 이름은 `TripPrint-dev`이며 웹 애플리케이션 유형을 사용한다.
+| 구분                   | 값                                                                           |
+| ---------------------- | ---------------------------------------------------------------------------- |
+| Android 패키지         | `com.tripprint.app`                                                          |
+| API                    | `https://tripprint-api-staging.gametps.workers.dev`                          |
+| Google OAuth 서버 콜백 | `https://tripprint-api-staging.gametps.workers.dev/api/auth/callback/google` |
+| 웹 복귀                | `https://tripprint-staging.pages.dev/auth/callback`                          |
+| Android 앱 복귀        | `travelapp://auth/callback`                                                  |
 
-## 준비 상태
+Google 서버 콜백과 앱 복귀 주소는 역할이 다릅니다. `GOOGLE_CLIENT_ID`·`GOOGLE_CLIENT_SECRET`·`AUTH_SECRET`은 서버 인증 설정에서 유지하며 서버 Secret 원문을 앱에 넣지 않습니다. Stitch MCP 키도 앱 배포 설정과 무관합니다.
 
-- Google JSON의 Client ID·Client Secret 존재와 Redirect URI를 확인했다. 원문은 Git 제외 폴더에 보관한다.
-- 현재 테스트 서버 주소는 `https://tripprint-api-staging.gametps.workers.dev`, 웹 주소는 `https://tripprint-staging.pages.dev`다.
-- Google에 등록한 Redirect URI는 `https://tripprint-api-staging.gametps.workers.dev/api/auth/callback/google`다.
-- 사용자 승인 후 새 Worker에 `AUTH_SECRET`과 `GOOGLE_CLIENT_SECRET` 두 키만 등록했다.
-- 기존 D1의 `0005_member_onboarding.sql`과 새 API·웹 배포를 완료했다. API 버전은 `b23e81c4-22ca-426d-bd54-c2eda8af8b0d`, 고정 웹 배포는 `https://090f6fd0.tripprint-staging.pages.dev`다.
-- 실제 서버의 Google 활성 상태·인증 시작·PKCE·state·정확한 콜백·취소 복귀·재사용 거부·CORS를 확인했다. 실제 계정 성공 로그인은 사용자의 계정 선택·동의 후 확인해야 한다.
-- Expo CLI는 현재 로그아웃 상태다. 사용자가 직접 로그인해야 실제 클라우드 빌드·서명 설정을 확인할 수 있다.
-- 실제 구글 계정 성공 로그인·실기기 설치·Play 내부 테스트 출시는 아직 미실행이다.
+OAuth 앱이 테스트 상태이면 로그인할 계정을 Google OAuth 테스트 사용자에 등록합니다. Play 내부 테스터 목록과는 별개입니다. 서버의 Google 사용 가능 표시·PKCE·state·일회용 교환 검사만으로 실제 사용자 로그인 성공을 판단하지 않습니다.
 
-로컬 검증: `npm run check` 전체 통과, 릴리스 설정·빌드 hook 테스트 13개 통과, 루트·모바일 Android 네이티브 연결 검사 2개 통과, 배포 웹 산출물 검사 통과. `play-internal`은 서버 공개 설정이 누락되면 빌드를 중단한다. `.env.mvp`도 새 TripPrint 공개 주소로 일치시켰다. `npm run mvp:prepare`의 Android Hermes 번들 생성도 통과했다. 생성된 `.hbc`에 실제 TripPrint API 주소 포함 및 두 서버 비밀 키 원문 미포함을 확인했다. `.hbc`는 설치할 APK/AAB가 아니다.
+## 설치 후 확인
 
-실제 웹 검증: 새 Chrome 세션에서 Google 버튼이 활성화되고 카카오·네이버 버튼은 비활성화된 것을 확인했다. Google 클릭 후 OAuth 오류가 없는 `/v3/signin/identifier` 로그인 입력 화면에 도착했다. 계정 입력·동의는 자동 수행하지 않았다. 판정은 `.release/google-login/web-verification.json`에, 로그인 화면은 `.release/google-login/tripprint-google-login-ready.png`에 보관한다. 배포 `release.json`의 릴리스 `test-1-google-auth` 및 API 주소도 일치한다.
+1. 게스트로 여행·일정을 만들고 앱 재실행 후 같은 기기 기록이 복원되는지 확인합니다.
+2. 여행 만들기 또는 상세에서 Google 로그인을 진행하고 같은 목적과 여행 ID로 돌아오는지 확인합니다.
+3. 신규 회원은 닉네임 등 필요한 프로필을 저장합니다. 생년월일은 선택이며 비워도 온보딩을 완료할 수 있어야 합니다. 기존 회원 정보는 유지합니다.
+4. 회원 여행·DAY 소개·장소 설명·개인 메모를 저장하고 재로그인 후 서버에서 같은 내용을 확인합니다.
+5. 선택 공개·미리보기·실제 링크를 비교하고 비공개 메모·영수증·인증 정보가 제외되는지 확인합니다.
+6. 인증 취소·백그라운드 복귀·로그아웃·계정 전환에서 중복 처리나 이전 계정 정보 노출이 없는지 확인합니다.
 
-## 구글 로그인 검증 순서
+게스트 여행은 기기에 남으며 Google 로그인만으로 서버에 자동 업로드되지 않습니다. 이전 기기 여행과 회원 여행을 구분하고, 같은 기기에서 게스트를 다시 선택하면 기존 기록을 이어갈 수 있어야 합니다.
 
-1. 새 서버 적용 후 API `/health`와 `/api/social/providers`를 확인한다. Google만 사용 가능한 상태인지 검사한다.
-2. 새 웹의 로그인 화면에서 **구글로 계속하기**를 선택한다. 실제 Google 계정 선택과 동의는 사용자가 진행한다.
-3. 신규 회원이면 닉네임·성별·생년월일을 저장하고 홈으로 이동하는지 확인한다.
-4. 앱 종료·재실행 후 로그인과 회원 정보가 복원되는지 확인한다.
-5. 로그아웃 → 구글 로그인 취소 → 재시도를 확인한다. 취소한 경우 계정이나 완료되지 않은 회원 설정을 성공으로 표시하지 않아야 한다.
-6. 게스트로 여행 하나를 만든 뒤 **마이 → 로그인 / 회원가입**에서 Google 로그인한다. 기기 여행이 자동 업로드되지 않고 회원 여행과 구분되는지 확인한다. 로그아웃 뒤 같은 기기에서 게스트로 다시 시작하면 이전 기기 여행을 이어갈 수 있어야 한다.
-7. 내부 테스트 앱에서도 외부 인증 브라우저가 열리고, 인증 후 `travelapp://auth/callback`으로 새 앱에 복귀하여 위 절차가 동작하는지 확인한다.
-
-서버의 준비·PKCE·state·일회용 교환 검사 성공은 Google 계정의 실제 인증 성공과 다르다. 인수 결과는 실제 실행한 단계만 완료로 기록한다. 사용자 정보·로그인 토큰·OAuth 비밀은 검증 로그나 문서에 기록하지 않는다.
-
-## Play Console 내부 테스트 빌드
-
-Play 내부 테스트에 업로드하는 파일은 AAB다. Google Play가 기기에 맞는 APK를 만들어 설치한다. APK 파일을 직접 내려받아 설치할 때는 기존 `preview` 프로필을 사용한다.
-
-루트와 모바일 `eas.json`에 `play-internal` 프로필을 추가했다. `preview`의 테스트 서버 공개 설정·버전 번호 자동 증가·preview 환경을 상속하고 `distribution: store`, `android.buildType: app-bundle`을 사용한다. 기존 운영 production 프로필을 테스트 서버로 바꾸지 않는다. EAS 빌드 hook은 `preview`와 `play-internal` 모두에서 서버 공개 설정 누락을 차단한다.
-
-Expo의 **GitHub에서 빌드를 시작하세요** 화면에서도 같은 프로필을 사용할 수 있다. GitHub 빌드에 사용할 Android 이미지는 `latest`로 지정했다. 입력값은 기본 디렉터리 `apps/mobile`, 플랫폼 Android, Git 참조 `main`, EAS 빌드 프로필 `play-internal`, 환경 `Preview`다. 한국어 자동 번역 화면에서는 Preview가 **시사**로 표시될 수 있다. EAS 제출은 체크하지 않고 완성된 AAB를 Play Console에 직접 업로드한다. 현재 빌드 설정은 배포된 staging 서버를 사용한다.
-
-GitHub 빌드는 Android 서명 자격 증명이 미리 준비되어 있어야 한다. 서명 키가 없거나 초기 설정 오류가 나오면 아래 터미널 빌드 절차로 서명 키 설정과 첫 빌드를 완료한 뒤 GitHub 빌드를 사용한다.
-
-1. 프로젝트 루트 터미널에서 `npm run eas:login`을 실행해 직접 로그인한다. 비밀번호는 채팅에 보내지 않는다. 연결된 Expo 프로젝트 소유자는 `rupang`이며 ID는 `3b23b462-262c-4b64-aff2-5fb03280e6b5`다.
-2. 해당 계정에서 프로젝트 접근과 `com.tripprint.app`의 Android 업로드 서명 키를 확인한다. 기존 Play 업로드 키가 있으면 그 키를 사용한다. 처음 빌드하는 경우 EAS의 keystore 생성 절차를 따른다. 서명 키 파일·비밀번호를 Git에 넣지 않는다.
-3. 실제 Google 로그인 검증 후 `npm run mobile:build:play-internal`로 AAB를 생성한다.
-4. 완료된 Build ID와 AAB 파일을 확인한다. Play Console의 **TripPrint → 테스트 및 출시 → 테스트 → 내부 테스트 → 새 버전 만들기**에서 AAB를 업로드한다.
-5. 내부 테스터에 설치할 Google 계정을 추가하고 내부 테스트 버전을 출시한다. 테스터 참여 링크를 해당 기기에서 열어 참여한 뒤 Google Play로 설치한다.
-6. 설치된 앱에서 Google 로그인·회원 설정·게스트 로컬 저장·계정 전환·로그인 복원·하단 메뉴·알림 권한 안내를 검사한다.
-
-Play Console에 서비스를 업로드하는 계정 인증·테스터 목록·업로드 서명 키 확인이 필요하다. 현재 코드 설정만으로 Play Console 출시가 완료되지는 않는다. 첫 업로드는 콘솔에서 진행할 수 있으며, Play API 서비스 계정 키가 없는 상태를 자동 제출 성공으로 표시하지 않는다.
-
-## EAS 없이 GitHub에서 직접 빌드하기
-
-현재 기본 workflow는 GitHub 실행 환경에서 Gradle로 APK·AAB를 빌드한다. 이전 EXPO_TOKEN 검사와 EAS Build·Submit 호출을 제거했다. Expo 라이브러리는 유지하며 로컬 CLI는 네이티브 프로젝트 생성에만 사용한다. 위 EAS 프로필과 명령은 선택 가능한 기존 경로다.
-
-실행 화면에서 artifact_type=apk, submit_play 체크 해제로 계정 인증 없이 직접 설치 파일을 만들 수 있다. Play AAB에는 업로드 서명이, 자동 제출에는 Google 서비스 계정 JSON이 필요하다. 결과는 GitHub 실행의 Artifacts와 Play Console에서 확인한다.
-
-자세한 실행값·Secrets·버전 코드·배포 확인은 [GitHub 직접 Android 빌드 안내](ANDROID_GITHUB_BUILD.md)를 따른다.
-
-참고: [Expo APK와 AAB](https://docs.expo.dev/build-reference/apk/), [Google Play 내부 테스트](https://support.google.com/googleplay/android-developer/answer/9845334?hl=ko), [Expo Android 제출](https://docs.expo.dev/submit/android/).
+현재 구현·검사와 남은 조건은 [보안 후속 보고](qa/SECURITY_P0_FOLLOWUP.txt), 설치본 결과는 [DEVICE_ACCEPTANCE.txt의 AUTH 항목](qa/DEVICE_ACCEPTANCE.txt)에 기록합니다. 비밀번호·토큰·인증 코드·키 원문은 검수 자료에 넣지 않습니다. AAB 생성과 Play 등록·실제 설치·인증 성공은 각각 확인합니다.

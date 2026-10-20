@@ -8,6 +8,8 @@ export type RemovedTripDate = {
   schedules: number;
   expenses: number;
   receipts: number;
+  dayPlans: number;
+  photos: number;
 };
 export type TripPeriodImpact = {
   removed: RemovedTripDate[];
@@ -93,6 +95,18 @@ function recordsForDate(
     date,
     dayId: day?.id || null,
     dayNumber: day?.dayNumber || null,
+    dayPlans: day?.planTitle || day?.planConcept ? 1 : 0,
+    photos: snapshot.media.filter((media) => {
+      // 사진이 연결된 실제 일정의 날짜를 사용하며 여행 공용 사진은 제외한다.
+      return Boolean(
+        day &&
+        media.purpose === 'photo' &&
+        snapshot.itinerary.some((item) => {
+          // 사진 한 장은 연결된 일정 기준으로 한 번만 센다.
+          return item.dayId === day.id && item.id === media.scheduleId;
+        }),
+      );
+    }).length,
     schedules: snapshot.itinerary.filter((item) => {
       // 해당 날짜의 일정만 제거 영향에 포함한다.
       return Boolean(day && item.dayId === day.id);
@@ -134,7 +148,12 @@ function impactWithDates(
       }).length,
     blocked: removed.some((date) => {
       // 연결 기록이 하나라도 있는 날짜는 자동으로 삭제하지 않는다.
-      return date.schedules > 0 || date.expenses > 0 || date.receipts > 0;
+      return (
+        date.dayPlans > 0 ||
+        date.schedules > 0 ||
+        date.expenses > 0 ||
+        date.receipts > 0
+      );
     }),
   };
 }

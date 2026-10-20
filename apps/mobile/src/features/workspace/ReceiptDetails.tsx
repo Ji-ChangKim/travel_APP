@@ -1,7 +1,7 @@
 import Text from '@/components/AppText';
 import { View } from 'react-native';
 import type { WorkspaceReceipt } from '@wherego/domain';
-import { styles } from './ui';
+import { styles } from './workspaceStyles';
 
 // 저장한 영수증의 일시·주소·메뉴별 지출을 기록과 다이어리에 동일하게 표시한다.
 export default function ReceiptDetails({

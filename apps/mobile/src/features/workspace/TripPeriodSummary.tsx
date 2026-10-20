@@ -1,6 +1,7 @@
 import { View } from 'react-native';
 import Text from '@/components/AppText';
-import { styles } from './ui';
+import { styles } from './workspaceStyles';
+
 import { periodBlockedMessage, type TripPeriodImpact } from './tripPeriod';
 
 // 변경할 기간에서 빠지는 날짜와 보존할 기록을 저장 전에 안내한다.
@@ -40,7 +41,8 @@ export default function TripPeriodSummary({
                 {date.date}
               </Text>
               <Text>
-                일정 {date.schedules}개 · 비용 {date.expenses}개 · 영수증{' '}
+                DAY 소개 {date.dayPlans}개 · 일정 {date.schedules}개 · 사진{' '}
+                {date.photos}개 · 비용 {date.expenses}개 · 영수증{' '}
                 {date.receipts}개
               </Text>
             </View>

@@ -1,3 +1,4 @@
+import { schedulePlanInput } from './schedulePlanInput';
 import { publicationIssue } from './publication';
 import { receiptItems, receiptCanSave } from './receiptFlow';
 import * as Crypto from 'expo-crypto';
@@ -159,30 +160,7 @@ function commandValue(form: PlanForm, snapshot: WorkspaceSnapshot) {
           operation: 'schedule.save',
           input: {
             ...scheduleValues(form.values),
-            ...(form.values.planDescription !== undefined
-              ? {
-                  planContent:
-                    form.values.planDescription || form.values.planChoiceGroup
-                      ? {
-                          description: form.values.planDescription || '',
-                          ...(form.values.planChoiceGroup
-                            ? { choiceGroup: form.values.planChoiceGroup }
-                            : {}),
-                          ...(form.values.planChoiceLabel
-                            ? { choiceLabel: form.values.planChoiceLabel }
-                            : {}),
-                          ...(form.values.planChoiceGroup
-                            ? {
-                                choiceKind:
-                                  form.values.planChoiceKind === 'backup'
-                                    ? 'backup'
-                                    : 'choice',
-                              }
-                            : {}),
-                        }
-                      : null,
-                }
-              : {}),
+            ...schedulePlanInput(form.values),
             title:
               form.values.title?.trim() ||
               (form.values.type === 'TRANSPORT' &&
@@ -290,7 +268,7 @@ function commandValue(form: PlanForm, snapshot: WorkspaceSnapshot) {
                     ...(form.values.kind === 'plan'
                       ? { kind: 'plan' as const }
                       : {}),
-                    title: form.values.title,
+                    title: snapshot.trip.title,
                     body: form.values.body,
                     scheduleIds: (form.values.scheduleIds || '')
                       .split(',')

@@ -20,10 +20,14 @@ export default function HomeNextSchedule({
     queryKey: foundationQueryKey(userId, 'workspace', tripId),
     enabled: Boolean(userId && tripId),
     retry: false,
-    queryFn: () => {
+    queryFn: ({ signal }) => {
       // 기존 권한 검증이 있는 조회 경로만 사용한다.
       return serverOptions(userId).then((options) => {
-        /* 선택한 여행을 읽는다. */ return getWorkspace(options, tripId);
+        /* 선택한 여행을 읽는다. */ return getWorkspace(
+          options,
+          tripId,
+          signal,
+        );
       });
     },
   });

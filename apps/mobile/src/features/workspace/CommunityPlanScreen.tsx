@@ -1,17 +1,18 @@
-import { ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
 import { communityPostSchema, foundationUuidSchema } from '@wherego/validation';
-import ScreenHeader from '@/components/ScreenHeader';
+import { LedgerScreen } from './LedgerUI';
+import { ledgerStyles } from './ledgerTheme';
 import HaruState from '@/components/HaruState';
 import CommunityPlanView from './CommunityPlanView';
-import { Action, styles } from './ui';
+import CommunityRecordView from './CommunityRecordView';
+import { Action } from './ui';
 import { apiBaseUrl } from './service';
-import { communityStyles } from './communityStyles';
 import { useAuthReady } from '@/features/auth/AuthBridge';
 import { useTripStore } from '@/stores/useTripStore';
+import { requestSignal } from '@wherego/api-client';
 
 // 공개 여행계획 한 건을 주소로 직접 열 수 있게 한다.
 export default function CommunityPlanScreen() {
@@ -43,32 +44,31 @@ function PublicPlanContent() {
       // 경로를 떠나거나 다른 계획을 열면 이전 조회를 취소한다.
       return fetch(
         `${apiBaseUrl()}/public/community/${encodeURIComponent(postId)}`,
-        { signal },
+        { signal: requestSignal(signal) },
       ).then(readPlan);
     },
     retry: false,
   });
+  const post = query.isSuccess && startupReady ? query.data : undefined;
   return (
-    <SafeAreaView style={styles.screen}>
-      <ScreenHeader
-        title="공유 여행계획"
-        backLabel="커뮤니티로 돌아가기"
-        onBack={() => {
-          // 직접 링크로 들어와도 공개 계획 목록으로 돌아간다.
-          return router.replace('/(tabs)/community');
-        }}
-      />
-      <ScrollView contentContainerStyle={communityStyles.content}>
+    <LedgerScreen
+      title={post?.title || '공유된 여행'}
+      onBack={() => {
+        // 직접 링크로 들어와도 공개 계획 목록으로 돌아간다.
+        return router.replace('/(tabs)/community');
+      }}
+    >
+      <ScrollView contentContainerStyle={ledgerStyles.content}>
         {!startupReady || (query.isPending && validId) ? (
-          <HaruState kind="loading" title="여행계획을 불러오는 중이에요." />
+          <HaruState kind="loading" title="공유된 여행을 불러오는 중이에요." />
         ) : null}
         {startupReady && (!validId || query.isError) && (
           <HaruState
             kind="error"
-            title="여행계획을 열 수 없어요"
+            title="공유된 여행을 열 수 없어요"
             description={
               query.error?.message ||
-              '주소를 다시 확인하거나 커뮤니티에서 다른 계획을 살펴보세요.'
+              '주소를 다시 확인하거나 발견에서 다른 여행을 살펴보세요.'
             }
           >
             {validId && (
@@ -83,24 +83,13 @@ function PublicPlanContent() {
             )}
           </HaruState>
         )}
-        {query.data?.kind === 'plan' ? (
-          <CommunityPlanView key={query.data.id} post={query.data} />
-        ) : query.data ? (
-          <View style={styles.card}>
-            <Action
-              label="커뮤니티에서 여행 기록 보기"
-              onPress={() => {
-                // 이전 형식의 공유 기록은 기존 공개 화면에서 읽는다.
-                return router.replace({
-                  pathname: '/(tabs)/community',
-                  params: { postId: query.data.id },
-                });
-              }}
-            />
-          </View>
+        {post?.kind === 'plan' ? (
+          <CommunityPlanView key={post.id} post={post} showTitle={false} />
+        ) : post ? (
+          <CommunityRecordView post={post} />
         ) : null}
       </ScrollView>
-    </SafeAreaView>
+    </LedgerScreen>
   );
 }
 
@@ -110,14 +99,12 @@ async function readPlan(response: Response) {
   if (!response.ok)
     throw new Error(
       response.status === 404
-        ? '공유가 끝났거나 찾을 수 없는 여행계획이에요. 커뮤니티에서 다른 계획을 살펴보세요.'
-        : '여행계획을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.',
+        ? '공개가 중단됐거나 찾을 수 없는 여행이에요. 발견에서 다른 여행을 살펴보세요.'
+        : '여행을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.',
     );
   const data: unknown = await response.json();
   const parsed = z.object({ data: communityPostSchema }).safeParse(data);
   if (!parsed.success)
-    throw new Error(
-      '여행계획을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.',
-    );
+    throw new Error('여행을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.');
   return parsed.data.data;
 }
