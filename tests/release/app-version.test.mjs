@@ -1,10 +1,30 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmdirSync, unlinkSync, writeFileSync } from 'node:fs';
+import {
+  mkdtempSync,
+  readFileSync,
+  rmdirSync,
+  unlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { test } from 'node:test';
 import { parseAppVersion, readAppVersion } from '../../scripts/app-version.cjs';
 import withAppVersion from '../../apps/mobile/plugins/withAppVersion.cjs';
+
+test('공개 릴리스 안내는 Android 빌드와 같은 버전 번호를 표시한다', () => {
+  // 배포 안내에 이전 빌드 번호가 남는 것을 차단한다.
+  const metadata = JSON.parse(
+    readFileSync(
+      new URL('../../apps/mobile/public/release.json', import.meta.url),
+      'utf8',
+    ),
+  );
+  const version = readAppVersion();
+  assert.equal(metadata.versionCode, version.versionCode);
+  assert.equal(metadata.version, version.versionName);
+  assert.match(metadata.release, new RegExp(`-v${version.versionCode}-`));
+});
 
 test('메모장 BOM·CRLF·한글 주석·항목 주변 공백을 지원한다', () => {
   // 같은 파일을 Expo와 Android Studio에서 읽을 수 있는 형식으로 제한한다.
