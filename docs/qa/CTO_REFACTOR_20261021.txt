@@ -1,0 +1,223 @@
+CTO 코드 분석 및 리팩터링 기록
+작성일: 2026-10-21
+
+1. 요청과 판단 기준
+
+전체 수기 코드의 구조·의존성·함수 길이·분기·예외 경로를 조사하고, 실제 사용처와
+데이터 보호 조건을 확인한 뒤 문제가 있는 부분을 수정했다. 최신 요청에 따라 주석은
+코드의 동작을 반복하기보다 호환성·보안·순서 보장 등 코드만으로 드러나지 않는 이유를 설명한다.
+단일 책임을 한 줄짜리 함수나 쉼표 연산자로 해석하지 않는다. 같은 업무를 위한 여러 문장은 허용한다.
+AGENTS.md의 코드 작성 규칙도 이 최신 요청에 맞춰 단일 책임과 필요한 이유·제약 주석으로 정리했다.
+
+전체 정적 조사와 모든 함수의 수동 검토는 구분한다. 함수 길이·분기 수는 검토 후보를 찾는
+보조 지표이며, 숫자가 크다는 이유만으로 화면 구성 함수나 테스트를 잘게 나누지 않았다.
+의존 패키지, Expo가 생성한 Android/iOS 프로젝트, 번들·빌드 캐시는 수기 코드 조사에서 제외했다.
+실행 중인 병행 작업의 헤더·GNB·스타일·화면 문구 변경을 보존했다.
+
+2. 확인한 문제와 수정
+
+[저장 경로가 다른 예전 임시 기능]
+useTripStore.ts에는 현재 여행 저장에서 쓰지 않는 14개 액션과 날짜 계산·초대 코드 함수가 남아 있었다.
+임시 사용자 ID, 임의 방문 좌표, 메모리상의 초대 참여·공유 토큰 발급을 포함했다.
+앱·공유 패키지·스크립트·테스트에서 사용처가 없음을 검색한 뒤 제거했다.
+현재 로그인·프로필·로그아웃과 이전 기록 조회용 캐시는 유지했다. 사용자 여행 원본은 삭제하지 않았다.
+기기 게스트와 회원 여행의 실제 저장 경로는 기존 workspace 서비스로 유지했다.
+
+[여러 업무 규칙이 모인 일정 변경 함수]
+workspaceModel.ts의 큰 명령 분기에서 일정 저장·정렬·삭제를 workspaceSchedules.ts로 분리했다.
+오류·변경 결과·공통 참조 검사는 workspaceModelCore.ts로 옮겼다.
+기존 외부 import와 오류 클래스는 재공개해 호출부와의 호환성을 보존했다.
+일정 수정에서 기존 항목을 네 번 찾던 코드를 한 번만 찾도록 바꿨다.
+정렬 검증·위치 반영은 Set과 Map으로 처리해 반복 탐색을 줄였다.
+공통 모델에 직접 전달한 중복 정렬 ID도 거부한다. 누락된 방문의 순서를 망가뜨리지 않게 했다.
+DAY 생성도 실제 날짜별 기존 항목을 한 번만 색인해 식별자와 계획 소개를 보존한다.
+생략한 항공·위치·체류시간·계획 설명과 명시적 null의 차이는 유지했다.
+
+[화면마다 반복된 여행 조회 정책]
+12개 파일의 14개 조회 구성을 tripQueries.ts로 모았다.
+같은 계정·여행의 캐시 키, 실제 서비스 경로, 취소 신호, 자동 재시도 정책을 함께 정의했다.
+인증 복원·화면 활성 여부·입력 유효성 등 조회 시작 조건은 각 화면에 남겼다.
+공개 목록과 개인 원본을 섞거나, 조회 실패를 예시 데이터로 대체하지 않는다.
+
+[폼 변환과 공개 선택의 중복]
+forms.ts의 긴 중첩 조건을 formCommands.ts의 명령별 변환으로 나눴다.
+공개 선택은 미리보기와 같은 publicationInput을 사용한다.
+저장 경계의 기존 스키마 검증, 영수증 확인·사진 보관 선택 검사는 유지했다.
+새 여행 폼이 일반 수정 경로에 잘못 들어와도 공개 명령으로 처리하지 않는다.
+새 일정의 마지막 삽입 위치는 전체 배열을 정렬하지 않고 선택 날짜에서 한 번 찾는다.
+
+[저장 재시도와 계정 전환]
+workspaceSaveSession.ts의 쉼표 연산자와 중첩 조건을 순서가 드러나는 문장으로 풀었다.
+계정 확인을 함수로 전달받아 화면과 인증 모듈을 불러오지 않고 저장 복구를 검사할 수 있게 했다.
+응답 유실은 원래 요청을 보존하고, 확인된 입력 거부만 수정 가능 상태로 되돌린다.
+실제 버전 충돌의 최신 조회 뒤에만 새 버전 후보를 만들며 자동 재저장하지 않는다.
+저장 성공 뒤 조회 실패와 미저장을 구분한다. 계정 변경 뒤의 늦은 조회·오류도 화면에 반영하지 않는다.
+공개 일정 담기의 재시도 식별에는 게시물·계정·입력을 함께 포함했다.
+담기 저장 후 목록 갱신을 기다리는 동안 계정이 바뀌면 이전 여행으로 이동하지 않는다.
+
+[늦은 인증 응답이 새 로그인 토큰을 지우는 경합]
+cloudAuth.ts는 과거 토큰의 401·빈 세션·로그아웃 응답을 받으면 현재 토큰을 무조건 지웠다.
+sessionTokenStorage.ts에서 읽기·수락·조건부 삭제를 같은 대기열로 처리한다.
+대상 토큰이 현재 토큰과 일치할 때만 삭제하고 종료 이벤트를 보낸다.
+저장 실패는 호출자에게 전달하며 대기열만 복구해 후속 정상 로그인을 막지 않는다.
+토큰 저장 키·보안 저장소·실제 인증 서버·가입 계약은 유지했다.
+로그아웃 완료 시에도 시작했던 계정이 그대로인지 확인해 새 계정의 프로필을 비우지 않는다.
+
+[서버 비동기 흐름과 순환 참조]
+cloudRpc.ts의 깊은 조건과 실패를 만들었다가 다시 잡는 Promise를 제거했다.
+기존 멤버십 확인 → 멱등 결과 재생 → 버전 검사 → 저장 순서를 유지했다.
+최초 생성은 기존 멤버십이 없는 별도 경로를 유지했다.
+업로드는 입력 형식 확인 후 실제 소유자·여행·MIME을 대조하고 같은 저장 규칙을 적용한다.
+원본을 보관하지 않는 영수증의 삭제는 DB 확정 뒤에만 실행한다.
+공개 오류 변환도 응답마다 한 번만 수행한다.
+cloudAuth.ts와 accountRetirement.ts의 상호 import는 탈퇴 정책을 accountRetirementPolicy.ts로 나눠 해소했다.
+재로그인 복구, 90일 유예, 익명화, 원자 저장과 기존 import 경로는 유지했다.
+
+[검수 소스 해시에서 빠진 디자인 입력]
+앱이 실제로 import하는 docs/design/design-tokens.json과 ledger-tokens.json이 release-source-manifest.mjs에서 빠져 있었다.
+디자인 토큰만 바뀌면 다른 번들이어도 이전 검수 해시와 같게 기록될 수 있어 빌드 입력에 추가했다.
+모바일 실행 코드가 상대 경로로 읽는 JSON과 실제 파일 해시가 모두 포함되는 회귀 검사를 추가했다.
+
+3. 검토한 보호 조건
+
+인증·현재 계정 비교, 멤버십·역할, 변경 버전, 멱등 키, DAY·일정 참조,
+영수증·비용·사진 연결, 선택 공개와 개인 원본 보존, 요청 제한 시간·취소,
+외부 공급자 실패의 공개 오류 변환, 게스트 문서 저장 실패를 중심으로 확인했다.
+Workers 검토는 Cloudflare 공식 best practices와 설치된 Wrangler/Workers 타입을 참고했다.
+https://developers.cloudflare.com/workers/best-practices/workers-best-practices/
+
+4. 검증 기록
+
+최종 검사 결과·소스 해시·파일 목록은 아래 6~7절에 기록했다.
+검수 자료: outputs/cto-refactor-20261021/
+실제 고객 DB·공개 게시물·키·원격 배포는 이번 검사에서 변경하지 않는다.
+로컬 HTTP 응답과 임시 DB 검사를 외부 OCR·항공 공급자 성공으로 보고하지 않는다.
+
+5. 검토 범위의 한계
+
+기존 전체 화면 검사는 170/225, 55건 실패 기록이 있다. 이번 구조 정리의 검사와 구분하며
+현재 전체 화면 회귀를 새로 통과한 것으로 합산하지 않는다.
+긴 화면 구성 함수와 통합 컨트롤러는 길이만으로 분리하지 않았다. 화면 표현과 저장·검증의 경계,
+구체적으로 확인한 중복·순환 참조·데이터 보호 문제를 우선 정리했다.
+작은 이벤트 핸들러의 표현식을 전부 기계적으로 바꾸거나 공개 서버에 시험 데이터를 넣지 않았다.
+Play 설치본의 카메라·지도·음성·OS 검수와 AAB 준비의 기존 운영 조건은 별도다.
+기존 9번 후보의 해시는 이 변경 이후 현재 소스를 승인하는 근거로 사용할 수 없다.
+버전은 9 / 0.1.0을 유지한다. 이 기록은 서비스 최종 승인이나 배포 승인서가 아니다.
+
+6. 최종 결과
+
+수기 소스·설정·검사 코드 536개 파일을 조사했다.
+JS/TS 함수·메서드·콜백 6606개를 정적 분석했다.
+파일 구분: API 52, 모바일 335,
+공유 패키지 25, 스크립트 26,
+테스트 72. 나머지는 루트 설정이다.
+이 함수 수는 수동 정독 수나 결함 수를 뜻하지 않는다. Kotlin 모듈은 별도 소스 검토 범위이며 JS/TS 함수 수에 포함하지 않는다.
+
+주요 함수의 변화(선언 범위의 줄 수, 중첩 콜백 포함):
+- 전역 스토어 구성: 342 → 39. 미사용 임시 액션을 제거한 결과다.
+- 공통 변경 명령 분기: 255 → 151. 일정 저장·정렬·삭제 규칙을 분리했다.
+- 폼별 명령 선택: 135 → 44. 개별 입력 변환은 책임별 함수에 남겼다.
+- 실행 import 그래프 463개 파일: 상호 import 1그룹 → 0그룹.
+  정적 ES import/export와 프로젝트 별칭을 기준으로 검사했다. 동적 로딩 전체를 증명하는 수치는 아니다.
+- 이번 수정 파일의 JSX 태그·본문·style 대조 9개: 모두 일치.
+  조회용 속성이나 이벤트 구현 자체를 시각 규격으로 오인하지 않는다.
+
+최종 검사:
+- npm run check: 통과. 타입·린트·포맷·디자인 토큰·코드 경계를 포함한다.
+- 인증·공유 모델: 265/265 통과. 이번에 추가한 업무·복구·인증 저장 검사는 17개다.
+- API: 119/119 통과.
+- 로컬 Worker·D1/R2: 37/37 통과.
+- 릴리스 계약: 62/62 통과. JSON 빌드 입력 검사를 1개 추가했다.
+- 내 여행·공개 일정 담기: 13/13 통과.
+- 저장 응답 유실·버전 충돌·항공권·DAY 소개·계획 설명: 6/6 통과.
+
+선택 화면 검사의 첫 실행은 5/6이었다. CP-04가 예전 '이날 계획 제목/이날 여행 컨셉'을
+찾아 멈춘 것을 현재 '이날 제목 · 선택/이날 소개 · 선택'으로 맞췄다.
+DAY ID·연결 장소·저장 내용·새로고침의 검증은 줄이지 않았다.
+해당 검사 1/1 재확인 뒤 현재 검사 소스로 선택 화면 6개를 모두 다시 실행해 통과했다.
+전체 225개 화면 검사를 통과한 것으로 합산하지 않는다.
+
+로그:
+  quality-verified.log, auth-verified.log, api-verified.log, cloud-verified.log,
+  release-verified.log, my-trips-verified.log, workspace-final.log
+자료:
+  baseline-audit.json, after-audit.json, metrics-summary.json,
+  dependencies-and-parity.json, query-migrations.json, source-correspondence.json
+캡처:
+  my-trips/screens/empty-390.png
+  my-trips/screens/populated-large-320.png
+  import/screens/imported-my-trips-390.png
+  import/screens/import-sheet-large-320.png
+
+캡처 확인:
+DESIGN.md, design-tokens.json, SCREEN_HEADER_SPEC.md, MY_TRIPS_SPEC.md와 대조했다.
+현재 헤더 '내 여행 계획', 실제 빈 원본, 가져온 사본, GNB 5개를 확인했다.
+320px·큰 글자에서는 제목과 GNB 문구가 여러 줄로 확장된다. 카드와 목록은 스크롤해 읽는다.
+이번 변경은 조회·저장 구조 정리이며 병행 작업의 전반적인 디자인 완성도를 승인한 것은 아니다.
+
+소스:
+모바일 빌드 입력 596개 SHA-256
+59031817dd676fc82857df746d16d1fe979be25f02e8ae335e5a25f578c9a759
+API 소스 SHA-256
+b235414197a00359253f532355cf2bf34b1275bfaa5e2efebca79b7a762fe321
+API·DB 검사 이후 모바일 입력 해시가 바뀐 차이는 manifest 도구와 ledger-tokens.json의
+입력 목록 추가다. API 소스는 조사 시점과 일치한다. 모델·서버 변경을 재검사 없이 숨긴 차이가 아니다.
+릴리스·웹 검수본·내 여행 검사·최종 품질 검사의 모바일 입력 해시는 일치하며 실행 중 바뀌지 않았다.
+실제 고객 데이터·공급자 키·기기 권한 확인은 이 해시와 별개다.
+
+검수용 웹 폴더 apps/mobile/.release/cto-review-20261021은 로컬 응답 주소를 사용한다.
+원격 배포나 AAB 생성에 사용하지 않는다. 출력·임시 스크립트·검수 번들은 Git 제외 상태를 확인했다.
+커밋·푸시·배포·AAB/APK 생성은 이번 작업에서 실행하지 않았다.
+
+7. 변경 파일
+
+아래는 이번 구조·복구·검사·문서 변경 경로다. 각 파일에 이미 있던 병행 변경은 보존했다.
+  apps/api/src/cloudRpc.ts
+  apps/api/src/errors.ts
+  apps/mobile/src/stores/useTripStore.ts
+  packages/validation/src/workspaceModel.ts
+  packages/validation/src/workspaceModelCore.ts
+  packages/validation/src/workspaceSchedules.ts
+  apps/mobile/src/features/workspace/forms.ts
+  apps/mobile/src/features/workspace/formCommands.ts
+  apps/mobile/src/features/workspace/tripQueries.ts
+  apps/mobile/src/features/workspace/workspaceSaveSession.ts
+  apps/mobile/src/features/workspace/useCommunityImport.ts
+  scripts/check-code-boundaries.mjs
+  tests/auth/formCommands.test.ts
+  tests/auth/workspaceSaveSession.test.ts
+  tests/auth/schedule.test.ts
+  apps/mobile/src/features/notifications/ReminderBridge.tsx
+  apps/mobile/src/features/profile/useMyAccountController.ts
+  apps/mobile/src/features/workspace/DiaryScreen.tsx
+  apps/mobile/src/features/workspace/FootprintsScreen.tsx
+  apps/mobile/src/features/workspace/HomeNextSchedule.tsx
+  apps/mobile/src/features/workspace/ImportPlaceScreen.tsx
+  apps/mobile/src/features/workspace/MyTripsScreen.tsx
+  apps/mobile/src/features/workspace/RecordEditorScreen.tsx
+  apps/mobile/src/features/workspace/TravelPlansScreen.tsx
+  apps/mobile/src/features/workspace/TripRecordCover.tsx
+  apps/mobile/src/features/workspace/useMyTripDetails.ts
+  apps/mobile/src/features/workspace/useWorkspaceController.ts
+  apps/mobile/src/services/cloudAuth.ts
+  apps/mobile/src/services/sessionTokenStorage.ts
+  tests/auth/sessionTokenStorage.test.ts
+  apps/api/src/accountRetirement.ts
+  apps/api/src/accountRetirementPolicy.ts
+  apps/api/src/cloudAuth.ts
+  scripts/release-source-manifest.mjs
+  tests/release/source-inputs.test.mjs
+  AGENTS.md
+  docs/DB_DICTIONARY.txt
+  docs/qa/PREBUILD_V9_20261021.md
+  docs/qa/CTO_REFACTOR_20261021.txt
+  tests/web/workspace.spec.ts
+
+병행 통합 과정의 포맷만 정리한 경로:
+  apps/mobile/src/features/workspace/PublicFeedCard.tsx
+  apps/mobile/src/features/workspace/PublicFeedControls.tsx
+  apps/mobile/src/features/workspace/publicFeedStyles.ts
+  docs/2. planning/TripPrint_IA_정보구조도.md
+  docs/2. planning/TripPrint_PRD_노션용.md
+  tests/web/workspace.spec.ts (위에 기록한 CP-04 두 레이블은 별도 검사 수정)
+기존 전체 변경을 이번 리팩터링만의 결과로 보고하지 않는다.

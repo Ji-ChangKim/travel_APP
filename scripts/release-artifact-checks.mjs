@@ -25,7 +25,18 @@ export function hasReleaseRewrites(content) {
 // 브라우저 번들에 포함하면 안 되는 테스트 설정과 서버 키를 찾는다.
 export function hasUnsafeReleaseValues(content) {
   // 검사 결과에는 발견한 실제 값을 포함하지 않는다.
-  return /AQ\.[A-Za-z0-9_-]{30,}|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|wherego-test\.supabase\.co|sb_publishable_fixture|sb_secret_[A-Za-z0-9_-]+|DEFAULT_DB_SECURITY_CODE|INTERNAL_SECRET_SALT|DB 보안 연동 코드|Base64 XOR|AUTH_SECRET|SUPABASE_SERVICE_ROLE_KEY|CLOUDFLARE_API_TOKEN|제주 푸른 바다 힐링 여행|도쿄 골목 산책과 미식 여행|trip-demo-[12]|JEJU-2026|TOKYO-777|preview@example\.test|home@example\.test|fixture@example\.test|가을 도쿄 산책|시라하마에서 보내는 하루/.test(
+  return /https?:\/\/(?:localhost|127(?:\.\d{1,3}){3}|\[::1\])(?=[:/"\s]|$)|AQ\.[A-Za-z0-9_-]{30,}|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|wherego-test\.supabase\.co|sb_publishable_fixture|sb_secret_[A-Za-z0-9_-]+|DEFAULT_DB_SECURITY_CODE|INTERNAL_SECRET_SALT|DB 보안 연동 코드|Base64 XOR|AUTH_SECRET|SUPABASE_SERVICE_ROLE_KEY|CLOUDFLARE_API_TOKEN|제주 푸른 바다 힐링 여행|도쿄 골목 산책과 미식 여행|trip-demo-[12]|JEJU-2026|TOKYO-777|preview@example\.test|home@example\.test|fixture@example\.test|가을 도쿄 산책|시라하마에서 보내는 하루/.test(
     content,
+  );
+}
+
+// 웹 정적 호스팅에 필수 보안 헤더 설정이 포함되어 있는지 검사한다.
+export function hasSecurityHeaders(content) {
+  // nosniff, DENY, HSTS, Referrer-Policy 설정 존재 여부를 확인한다.
+  return (
+    /X-Content-Type-Options:\s*nosniff/i.test(content) &&
+    /X-Frame-Options:\s*DENY/i.test(content) &&
+    /Strict-Transport-Security/i.test(content) &&
+    /Referrer-Policy:\s*strict-origin-when-cross-origin/i.test(content)
   );
 }

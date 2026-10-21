@@ -1,11 +1,14 @@
 import type { ApiEnvironment } from './types';
 import { ApiError, rejectRequest } from './errors';
 
-export type GoogleOperation = 'text-search' | 'place-details' | 'place-photo';
+export type GoogleOperation =
+  'text-search' | 'place-details' | 'place-photo' | 'route' | 'recommendation';
 export const googleMonthlyLimits = {
   'text-search': 4000,
   'place-details': 4000,
   'place-photo': 900,
+  route: 1000,
+  recommendation: 1000,
 } as const;
 
 // Google 무료 사용량과 같은 미국 태평양 시간의 달을 구한다.
@@ -25,8 +28,12 @@ export async function reserveGoogleCall(
 ): Promise<void> {
   // DB나 집계 테이블이 없으면 무제한 호출로 우회하지 않는다.
   if (!env.DB) return rejectRequest('CONFIGURATION_REQUIRED');
+  const table =
+    operation === 'route' || operation === 'recommendation'
+      ? 'planning_provider_usage'
+      : 'google_api_usage';
   const reservation = await env.DB.prepare(
-    'INSERT INTO google_api_usage(month,operation,hits) VALUES(?,?,1) ON CONFLICT(month,operation) DO UPDATE SET hits=hits+1 WHERE hits < ? RETURNING hits',
+    `INSERT INTO ${table}(month,operation,hits) VALUES(?,?,1) ON CONFLICT(month,operation) DO UPDATE SET hits=hits+1 WHERE hits < ? RETURNING hits`,
   )
     .bind(googleBillingMonth(), operation, googleMonthlyLimits[operation])
     .first<{ hits: number }>()

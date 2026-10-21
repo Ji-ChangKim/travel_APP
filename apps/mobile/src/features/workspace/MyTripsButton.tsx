@@ -26,6 +26,7 @@ export default function MyTripsButton({
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
+      aria-selected={selected}
       accessibilityState={{ selected, disabled }}
       disabled={disabled}
       onPress={onPress}

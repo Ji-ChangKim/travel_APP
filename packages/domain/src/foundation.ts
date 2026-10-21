@@ -24,6 +24,7 @@ export interface FlightDetails {
 
 // 서버 여행 생성의 입력 필드를 정의한다.
 export interface PersistedTripInput {
+  destinations?: import('./planning').TripDestination[];
   title?: string;
   country: string;
   city: string;

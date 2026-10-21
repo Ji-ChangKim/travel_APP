@@ -4,7 +4,32 @@ import {
   releasePages,
   hasReleaseRewrites,
   hasUnsafeReleaseValues,
+  hasSecurityHeaders,
 } from '../../scripts/release-artifact-checks.mjs';
+
+test('포트에 관계없이 로컬 검수 주소가 포함된 배포 번들을 거부한다', () => {
+  // 다른 정적 문구에 staging 주소가 있어도 실제 로컬 요청 설정을 놓치지 않는다.
+  for (const url of [
+    'http://127.0.0.1:8810',
+    'http://localhost:19006',
+    'https://127.1.2.3:443',
+    'http://[::1]:8081',
+  ]) {
+    assert.equal(
+      hasUnsafeReleaseValues(
+        JSON.stringify({
+          api: url,
+          text: 'https://tripprint-api-staging.gametps.workers.dev',
+        }),
+      ),
+      true,
+    );
+  }
+  assert.equal(
+    hasUnsafeReleaseValues('https://tripprint-api-staging.gametps.workers.dev'),
+    false,
+  );
+});
 
 test('폐기한 루트 프로토타입의 데모 여행을 배포 청크에서 거부', () => {
   // 예전 초기 스토어를 다시 연결해도 배포 전 검사에서 중단한다.
@@ -90,4 +115,21 @@ test('식별자 이름 없이 들어간 Stitch 키와 개인 키 원문도 배�
   ]) {
     assert.equal(hasUnsafeReleaseValues(value), true);
   }
+});
+
+test('정적 웹 호스팅 보안 헤더(_headers) 필수 규격 검증', () => {
+  // nosniff, DENY, HSTS, Referrer-Policy가 모두 포함된 설정은 통과한다.
+  const validHeaders = `/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=31536000; includeSubDomains`;
+  assert.equal(hasSecurityHeaders(validHeaders), true);
+
+  // 필수 보안 헤더 중 하나라도 누락되면 실패한다.
+  const missingHsts = `/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin`;
+  assert.equal(hasSecurityHeaders(missingHsts), false);
 });

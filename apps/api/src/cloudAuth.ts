@@ -3,7 +3,10 @@ import { anonymous, bearer } from 'better-auth/plugins';
 import { linkGuest } from './guestLink';
 import { naverOAuth, socialProviders } from './socialProviders';
 import { rejectRequest } from './errors';
-import { assertActiveAccount, resumeRetiredAccount } from './accountRetirement';
+import {
+  assertActiveAccount,
+  resumeRetiredAccount,
+} from './accountRetirementPolicy';
 import type { VerifiedSession } from './types';
 import {
   availableGuestNickname,

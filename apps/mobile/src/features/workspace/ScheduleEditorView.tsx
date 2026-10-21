@@ -1,5 +1,6 @@
 import Text from '@/components/AppText';
 import type { WorkspaceSnapshot } from '@wherego/domain';
+import { destinationForDay } from '@wherego/domain';
 import { View } from 'react-native';
 import type { PlanForm } from './forms';
 import GooglePlace from './GooglePlace';
@@ -139,7 +140,9 @@ export function renderSchedulePlace({ props }: RenderSchedulePlaceProps) {
           return props.onChange('title', value);
         }}
         userId={props.userId}
-        city={props.snapshot.trip.city}
+        city={
+          destinationForDay(props.snapshot, props.form.values.dayId || '').city
+        }
         disabled={props.busy || props.locked}
         initialShare={props.form.values.sharedMapsText}
         onSelect={(id, title) => {
@@ -240,7 +243,11 @@ export function renderScheduleHeading({ props }: RenderScheduleHeadingProps) {
                 : '방문할 장소를 추가해요'}
         </Text>
         <Text style={s.meta}>
-          {props.snapshot.trip.city} ·{' '}
+          {
+            destinationForDay(props.snapshot, props.form.values.dayId || '')
+              .city
+          }{' '}
+          ·{' '}
           {scheduleDate(
             props.snapshot.days.find((day) => {
               // 선택 날짜의 현지 달력 날짜를 표시한다.

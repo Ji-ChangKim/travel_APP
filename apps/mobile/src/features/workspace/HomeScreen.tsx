@@ -96,7 +96,6 @@ function HomeContent({
 // 실제로 사용할 수 있는 여행 생성·조회·공개 탐색 행동을 홈에 연결한다.
 function HomeView({
   userId,
-  trips,
   loading,
   error,
   onReload,
@@ -132,40 +131,49 @@ function HomeView({
           <>
             <HomeWelcomeGreeting nickname={userNickname} />
             <HomeEmptyHero
-              returning={Boolean(trips?.length)}
               disabled={!ready}
               onCreateTrip={() => {
                 // 새 여행 계획 생성 폼으로 즉시 이동한다.
                 return startTrip(router, userId);
               }}
+              onExplore={() => {
+                // 공개 여행 탐색은 로그인 여부와 관계없이 연다.
+                return router.push('/(tabs)/footprints');
+              }}
             />
           </>
         )}
 
-        <View style={s.planning}>
-          <Action
-            label="새 여행 만들기"
-            variant="secondary"
-            disabled={!ready}
-            onPress={() => {
-              // 목록 조회 결과와 별개로 실제 여행 생성 폼을 연다.
-              return startTrip(router, userId);
-            }}
-          />
-          <View style={s.destinations}>
-            {homeDestinations.slice(0, 3).map((destination) => (
-              <Action
-                key={destination.key}
-                label={`${destination.city} 선택`}
-                disabled={!ready}
-                onPress={() => {
-                  // 템플릿을 복사한 것처럼 안내하지 않고 목적지만 폼에 채운다.
-                  return startTrip(router, userId, destination.key);
-                }}
-              />
-            ))}
+        {(!ready || loading || Boolean(error) || activeTrips.length > 0) && (
+          <View style={s.planning}>
+            <Action
+              label="새 여행 만들기"
+              variant="secondary"
+              disabled={!ready}
+              onPress={() => {
+                // 목록 조회 결과와 별개로 실제 여행 생성 폼을 연다.
+                return startTrip(router, userId);
+              }}
+            />
+            <View style={s.destinations}>
+              {homeDestinations.slice(0, 3).map((destination) => (
+                <Action
+                  key={destination.key}
+                  label={`${destination.city} 선택`}
+                  disabled={!ready}
+                  onPress={() => {
+                    // 템플릿을 복사한 것처럼 안내하지 않고 목적지만 폼에 채운다.
+                    return startTrip(router, userId, destination.key);
+                  }}
+                />
+              ))}
+            </View>
           </View>
-        </View>
+        )}
+
+        <HomeGuide />
+
+        <HomeExplore userId={userId} />
 
         <HomeDiscovery
           disabled={!ready}
@@ -174,10 +182,6 @@ function HomeView({
             return startTrip(router, userId, key);
           }}
         />
-
-        <HomeExplore userId={userId} />
-
-        <HomeGuide />
 
         <HomeTools />
       </ScrollView>

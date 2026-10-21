@@ -1,8 +1,14 @@
 import type { sendWorkspaceCommand } from '@wherego/api-client';
-import type { WorkspaceSchedule, WorkspaceSnapshot } from '@wherego/domain';
+import type {
+  WorkspaceSchedule,
+  WorkspaceSnapshot,
+  TravelLeg,
+} from '@wherego/domain';
 import type { WorkspaceCommand } from '@wherego/validation';
 import type { PlanForm, scheduleForm } from './forms';
 import type { savedReceiptForm } from './receiptFlow';
+import { copiedScheduleForm } from './scheduleCopy';
+import type { RecommendedPlace } from './DayRecommendations';
 
 type Options = {
   snapshot?: WorkspaceSnapshot;
@@ -31,6 +37,23 @@ export function createWorkspaceScreenActions(options: Options) {
     createReceiptEdit,
   } = options;
   return {
+    saveTravelLeg: (input: TravelLeg) => {
+      // 이동수단만 기존 원자 저장 경로에 전달한다.
+      return command({ operation: 'schedule.route', input });
+    },
+    chooseRecommendation: (dayId: string, item: RecommendedPlace) => {
+      // 추천 선택은 새 일정의 작성 초안이며 저장 버튼을 눌러야 확정된다.
+      if (!snapshot) return;
+      const form = createSchedule(snapshot, undefined, dayId);
+      edit({
+        ...form,
+        values: {
+          ...form.values,
+          title: item.title,
+          googlePlaceId: item.placeId,
+        },
+      });
+    },
     completeTrip: () => {
       // 정리 상태만 바꾸고 기존 여행 제목과 여행지는 보존한다.
       return snapshot
@@ -157,6 +180,17 @@ export function createWorkspaceScreenActions(options: Options) {
     editSchedule: (item: WorkspaceSchedule) => {
       // 기존 위치·항공·설명과 같은 일정 ID를 유지한다.
       return snapshot ? edit(createSchedule(snapshot, item)) : undefined;
+    },
+    copySchedule: (item: WorkspaceSchedule) => {
+      // 새 일정으로 확인·저장하기 전까지 서버 자료와 연결 기록을 복사하지 않는다.
+      return snapshot
+        ? edit(
+            copiedScheduleForm(
+              createSchedule(snapshot, item),
+              createSchedule(snapshot, undefined, item.dayId),
+            ),
+          )
+        : undefined;
     },
     deleteSchedule: (item: WorkspaceSchedule) => {
       // 연결 기록 보호는 기존 일정 삭제 확인 경로에서 검사한다.

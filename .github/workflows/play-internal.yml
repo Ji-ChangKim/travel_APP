@@ -138,6 +138,11 @@ jobs:
             *) echo '::error::지원하지 않는 산출물입니다.'; exit 1 ;;
           esac
           ./gradlew "$task" --init-script "$GITHUB_WORKSPACE/scripts/android-ci.gradle" --no-daemon --no-configuration-cache --max-workers=2 -Dorg.gradle.jvmargs='-Xmx4g -XX:MaxMetaspaceSize=1g'
+          # Play 분석에 필요한 R8 가독화 파일이 빠진 AAB는 완료로 안내하지 않는다.
+          if [ "$ARTIFACT_TYPE" = 'aab' ] && [ ! -s app/build/outputs/mapping/release/mapping.txt ]; then
+            echo '::error::R8 mapping.txt가 없습니다. release 최적화 설정을 확인하세요.'
+            exit 1
+          fi
 
       - name: 설치 파일 또는 Play 업로드 파일 보관
         uses: actions/upload-artifact@v4
@@ -146,6 +151,7 @@ jobs:
           path: |
             apps/mobile/android/app/build/outputs/apk/release/*.apk
             apps/mobile/android/app/build/outputs/bundle/release/*.aab
+            apps/mobile/android/app/build/outputs/mapping/release/mapping.txt
           if-no-files-found: error
           retention-days: 14
 

@@ -56,7 +56,16 @@ function EditorContent({ scroll, ...props }: Props) {
   return (
     <>
       <ScreenHeader
-        title="일정 추가 및 정리"
+        title={
+          props.snapshot.itinerary.some((item) => {
+            // 원본 일정 ID가 있을 때만 수정 화면으로 안내한다.
+            return item.id === props.form.id;
+          })
+            ? '일정 수정'
+            : props.form.copySourceTitle
+              ? '일정 복사'
+              : '일정 추가 및 정리'
+        }
         backLabel="닫기"
         onBack={props.onClose}
         disabled={props.busy || props.locked}
@@ -68,6 +77,13 @@ function EditorContent({ scroll, ...props }: Props) {
         contentContainerStyle={s.content}
       >
         {renderScheduleHeading({ props })}
+        {props.form.copySourceTitle ? (
+          <Text style={s.meta}>
+            {props.form.copySourceTitle}의 내용을 가져왔어요. 날짜와 시간을
+            확인한 뒤 저장하면 새 일정이 생겨요. 사진·영수증·실제 지출은
+            복사하지 않아요.
+          </Text>
+        ) : null}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}

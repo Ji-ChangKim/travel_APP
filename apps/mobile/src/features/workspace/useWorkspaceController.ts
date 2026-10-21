@@ -1,11 +1,7 @@
+import { tripListQueryOptions, workspaceQueryOptions } from './tripQueries';
 import { useTripStore } from '@/stores/useTripStore';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  foundationQueryKey,
-  getWorkspace,
-  listServerTrips,
-  sendWorkspaceCommand,
-} from '@wherego/api-client';
+import { sendWorkspaceCommand } from '@wherego/api-client';
 import type { WorkspaceSchedule } from '@wherego/domain';
 import * as Crypto from 'expo-crypto';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -14,7 +10,7 @@ import { type FormFeedbackState } from './formFeedback';
 import { newTripForm, scheduleForm, type PlanForm } from './forms';
 import { savedReceiptForm } from './receiptFlow';
 import { requestScheduleExit, useScheduleExitGuard } from './scheduleExitGuard';
-import { serverOptions, shareInvite } from './service';
+import { shareInvite } from './service';
 import { useSharedSchedule } from './useSharedSchedule';
 import { useTripDateRefresh } from './useTripDateRefresh';
 import { useWorkspaceChecklistActions } from './workspaceChecklistActions';
@@ -24,7 +20,7 @@ import { workspaceDraft, type WorkspaceDraftKind } from './workspaceDrafts';
 import { workspaceError } from './workspaceFailure';
 import { useWorkspaceFormActions } from './workspaceFormActions';
 import { useWorkspaceMediaActions } from './workspaceMediaActions';
-import { useWorkspaceSaveSession } from './workspaceSaveSession';
+import { createWorkspaceSaveSession as useWorkspaceSaveSession } from './workspaceSaveSession';
 import { useWorkspaceScreenActions } from './workspaceScreenActions';
 
 // 여행 조회·명령·충돌·폼 상태를 관리하며 화면을 그리지 않는다.
@@ -100,28 +96,12 @@ export function useWorkspaceController({
   const running = useRef(false);
   const conflict = useRef(false);
   const trips = useQuery({
-    queryKey: foundationQueryKey(userId, 'trips'),
+    ...tripListQueryOptions(userId),
     enabled: Boolean(userId && !id && !creating),
-    queryFn: ({ signal }) => {
-      // 실제 서버 목록만 사용한다.
-      return serverOptions(userId).then((options) => {
-        // 마지막 화면 구독이 끝나면 목록 조회도 중단한다.
-        return listServerTrips(options, signal);
-      });
-    },
-    retry: false,
   });
   const workspace = useQuery({
-    queryKey: foundationQueryKey(userId, 'workspace', id),
+    ...workspaceQueryOptions(userId, id),
     enabled: Boolean(userId && id),
-    queryFn: ({ signal }) => {
-      // URL 입력을 서버 멤버십 검증에 전달한다.
-      return serverOptions(userId).then((options) => {
-        // 확장 스냅샷을 검증해서 읽는다.
-        return getWorkspace(options, id!, signal);
-      });
-    },
-    retry: false,
   });
   const snapshot = workspace.data;
   const writable = Boolean(
@@ -132,9 +112,11 @@ export function useWorkspaceController({
   const owner = snapshot?.myRole === 'owner';
   // 권한·화면 해제·개발 모드 재구독을 고려해 후보를 일정 확인 폼으로 인계한다.
   useSharedSchedule(snapshot, writable, importing, setForm, setError);
-  // 성공한 변경 이후 현재 계정의 서버 자료를 다시 읽는다.
+  // 저장 콜백을 구성하는 훅이며 ref는 렌더가 아닌 사용자 명령에서만 읽는다.
   const { refresh, execute, clearPending, finishOperation, reload } =
     useWorkspaceSaveSession({
+      isCurrentAccount: () =>
+        useTripStore.getState().currentUser?.id === userId,
       cache,
       userId,
       pending,

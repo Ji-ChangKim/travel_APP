@@ -1,9 +1,11 @@
 import { View } from 'react-native';
-import { Field } from './ui';
+import { Field, Action } from './ui';
 import { styles } from './workspaceStyles';
 
 import { DestinationFields } from './TravelInputs';
 import TripCalendar from './TripCalendar';
+import DestinationCollection from './DestinationCollection';
+import { destinationDraftItems } from './destinationForms';
 
 // 구매한 항공권의 날짜를 먼저 정하고 여행지와 선택 제목을 입력한다.
 export default function TripFields({
@@ -18,6 +20,28 @@ export default function TripFields({
     <>
       <TripCalendar values={values} onChange={onChange} />
       <DestinationFields values={values} onChange={onChange} />
+      {values.expandDestinations === 'true' ? (
+        <DestinationCollection
+          maxItems={19}
+          disabled={false}
+          items={destinationDraftItems(values.additionalDestinations)}
+          values={values}
+          onChange={onChange}
+          onItemsChange={(items) => {
+            // 추가 도시만 초안에 담고 대표 여행지는 위 입력을 유지한다.
+            onChange('additionalDestinations', JSON.stringify(items));
+          }}
+        />
+      ) : (
+        <Action
+          label="여러 도시 여행하기"
+          disabled={!values.city?.trim()}
+          onPress={() => {
+            // 필요한 사람만 추가 도시 입력을 연다.
+            onChange('expandDestinations', 'true');
+          }}
+        />
+      )}
       <View style={styles.card}>
         <Field
           label="여행 이름 · 선택"

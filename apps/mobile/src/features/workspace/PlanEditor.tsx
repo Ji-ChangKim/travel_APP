@@ -9,6 +9,7 @@ import { Action } from './ui';
 import { FormFeedback } from './InputFeedback';
 import { LedgerAction, useLedgerWide } from './LedgerUI';
 import ScheduleEditor from './ScheduleEditor';
+import DestinationEditor from './DestinationEditor';
 import TripPlanningFlow from './TripPlanningFlow';
 import { type FieldErrors, type FormFeedbackState } from './formFeedback';
 import type { PlanForm } from './forms';
@@ -152,11 +153,28 @@ function PlanEditorContent({
         locked={locked}
         busy={busy}
         error={error}
+        conflicted={conflicted}
+        onReload={onReload}
         scroll={scroll}
         backActionRef={publishBack}
         onChange={onChange}
         onSave={onSave}
         onClose={onClose}
+      />
+    );
+  if (form?.kind === 'destinations' && snapshot)
+    return (
+      <DestinationEditor
+        form={form}
+        snapshot={snapshot}
+        locked={locked}
+        busy={busy}
+        error={error}
+        onChange={onChange}
+        onSave={onSave}
+        onClose={onClose}
+        conflicted={conflicted}
+        onReload={onReload}
       />
     );
   if (form?.kind === 'schedule' && snapshot)

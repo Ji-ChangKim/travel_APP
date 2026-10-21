@@ -1,0 +1,463 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><meta content="mobile_tab" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-primary-container": "#7c839b", "on-primary-fixed": "#131b2e", "surface": "#f8f9ff", "secondary-fixed": "#ffdad2", "on-primary": "#ffffff", "on-secondary-fixed": "#3d0600", "secondary-fixed-dim": "#ffb4a3", "primary": "#000000", "tertiary-fixed": "#85f8c4", "on-error": "#ffffff", "tertiary-container": "#002114", "primary-fixed-dim": "#bec6e0", "on-secondary-container": "#640f00", "outline": "#76777d", "inverse-surface": "#213145", "surface-bright": "#f8f9ff", "on-tertiary-fixed-variant": "#005137", "surface-container-high": "#dce9ff", "surface-tint": "#565e74", "surface-container-highest": "#d3e4fe", "error": "#ba1a1a", "surface-container-low": "#eff4ff", "on-error-container": "#93000a", "tertiary": "#000000", "inverse-primary": "#bec6e0", "on-background": "#0b1c30", "secondary-container": "#fd6a49", "on-surface-variant": "#45464d", "primary-container": "#131b2e", "surface-container": "#e5eeff", "secondary": "#ae3115", "inverse-on-surface": "#eaf1ff", "error-container": "#ffdad6", "surface-variant": "#d3e4fe", "background": "#f8f9ff", "outline-variant": "#c6c6cd", "surface-dim": "#cbdbf5", "primary-fixed": "#dae2fd", "surface-container-lowest": "#ffffff", "on-surface": "#0b1c30", "on-secondary": "#ffffff", "on-tertiary": "#ffffff", "on-primary-fixed-variant": "#3f465c", "on-secondary-fixed-variant": "#8c1900", "tertiary-fixed-dim": "#68dba9", "on-tertiary-container": "#069669", "on-tertiary-fixed": "#002114" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-sm": "0.5rem", "gutter-sm": "0.75rem", "gutter": "1rem", "space-2xl": "2rem", "space-xs": "0.25rem", "margin": "1.25rem", "space-2xs": "0.125rem", "margin-sm": "1rem", "space-md": "0.75rem", "space-lg": "1rem", "space-3xl": "2.5rem", "space-xl": "1.5rem" }, fontFamily: { "label-sm": ["Inter"], "label-lg": ["Inter"], "currency-tabular": ["Inter"], "body-sm": ["Inter"], "label-md": ["Inter"], "headline-lg": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "body-md": ["Inter"], "body-lg": ["Inter"], "headline-xl": ["Plus Jakarta Sans"] }, fontSize: { "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "600" }], "label-lg": ["14px", { "lineHeight": "18px", "fontWeight": "600" }], "currency-tabular": ["14px", { "lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "600" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "700" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }], "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }] } } } };</script><style>@layer base{html,body{width:100%;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col"><header class="fixed top-0 inset-x-0 z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-16 px-margin flex items-center justify-between"><div class="flex items-center gap-space-xs"><span class="font-headline-lg text-headline-lg text-on-surface tracking-tight">My Trips</span></div><div class="flex items-center gap-space-xs"><button class="w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[24px]">search</span></button><button class="w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[24px]">notifications</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center ml-space-2xs"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-28 bg-surface"><div class="flex flex-col w-full pb-8">
+<!-- Top Intro Section -->
+<div class="px-margin pt-4 pb-2 flex items-center justify-between"><div><h1 class="font-headline-md text-headline-md text-on-surface tracking-tight font-bold">내 여행 아카이브</h1><p class="font-body-sm text-body-sm text-on-surface-variant mt-1">나의 모든 여정과 소중한 기록</p></div><a class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-secondary text-on-secondary shadow-sm hover:opacity-95 active:scale-95 transition-all" href="#"><span class="material-symbols-outlined text-[18px]">add</span><span class="font-label-md text-label-md font-semibold">새 여행</span></a></div>
+<!-- Search & Sorting Filter Strip -->
+<div class="px-margin mt-2 flex items-center justify-between gap-2 overflow-x-auto no-scrollbar py-1"><div class="flex items-center gap-2 shrink-0" id="filterChipsTrack"><button class="filter-chip px-3.5 py-1.5 rounded-full bg-secondary text-on-secondary font-label-md text-label-md shadow-sm transition-all active:scale-95" data-filter="all" type="button">전체</button><button class="filter-chip px-3.5 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md shadow-sm transition-all hover:text-on-surface" data-filter="active" type="button">여행 중</button><button class="filter-chip px-3.5 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md shadow-sm transition-all hover:text-on-surface" data-filter="upcoming" type="button">예정</button><button class="filter-chip px-3.5 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md shadow-sm transition-all hover:text-on-surface" data-filter="completed" type="button">다녀옴</button></div><div class="relative shrink-0"><button class="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-surface-container-lowest text-on-surface-variant hover:text-on-surface text-[12px] font-label-sm shadow-sm transition-colors" id="sortToggleBtn" type="button"><span class="material-symbols-outlined text-[16px]">swap_vert</span><span id="currentSortLabel" class="">최신순</span></button></div></div>
+<!-- Trips Card Stream -->
+<div class="px-margin mt-4 flex flex-col gap-4" id="tripsArchiveContainer">
+<!-- CARD 1: Traveling Now (일본 교토) -->
+<article class="trip-card group flex flex-col rounded-2xl bg-surface-container-lowest shadow-[0_1px_4px_rgba(15,23,42,0.06)] overflow-hidden transition-all duration-200 hover:shadow-md" data-search="교토 일본 가을 단풍 산책 kyoto" data-status="active">
+<!-- Media Header Banner -->
+<div class="relative w-full h-44 overflow-hidden">
+<div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="Scenic historical Kyoto street at autumn dawn, traditional Japanese wooden machiya townhouses lined with radiant red and gold maple leaves, soft morning golden sunlight casting subtle shadows on stone pavement, cinematic travel documentary photography style with rich earthy terracotta and calm indigo hues." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAY3TnX_aFPMioPu1WQclR5FiMTX0QzJUZ4Ff1Dtg3qWReP12uDwsrbqEKKJMVh04sgdQjf3QBRiYC-1Oe_z51etPSaicfcrOEz1Cm4EzRrJAknFlmS8sLqjZSSLcrcu4VHEaCbk3mnNaKf6xnYCSbSkZLe1B27GPFucs24Uhula7PKb0QY6TNo-Lv4zVw98Jjp3pMrmQuB0Yz9NKorMiVhuWum9EnE38x_RJkoFABxX9ReY73Kcalm6w')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent"></div>
+<!-- Live Status Pill & Day Indicator -->
+<div class="absolute top-3 left-3 flex items-center gap-2">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-lowest/90 backdrop-blur-md shadow-sm">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-on-tertiary-container opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-on-tertiary-container"></span>
+</span>
+<span class="font-label-sm text-label-sm text-on-tertiary-container font-semibold">여행 중</span>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-md font-label-sm text-label-sm text-on-primary">
+            D+2일차
+          </span>
+</div>
+<!-- Privacy Status Pin -->
+<div class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/35 backdrop-blur-md flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[16px]">lock_open</span>
+</div>
+<!-- Destination Brief On Image -->
+<div class="absolute bottom-3 inset-x-3 flex flex-col">
+<div class="flex items-center gap-1.5 text-on-primary/90 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px] text-secondary-container">location_on</span>
+<span>일본 교토 (Kyoto) · 4박 5일</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-primary tracking-tight mt-0.5 drop-shadow-sm">
+            2026 교토 가을 단풍 산책
+          </h2>
+</div>
+</div>
+<!-- Card Body & Ongoing Itinerary Intel -->
+<div class="p-4 flex flex-col gap-3">
+<!-- Date & Day Progress Bar -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">calendar_today</span>
+<span>2026.10.05 ~ 10.09</span>
+</div>
+<span class="text-secondary font-semibold">5개 Day 중 2일차 진행</span>
+</div>
+<!-- Progress Visual -->
+<div class="w-full h-1.5 rounded-full bg-surface-container overflow-hidden">
+<div class="h-full bg-secondary rounded-full" style="width: 40%"></div>
+</div>
+</div>
+<!-- Next Schedule Real-time Cardlet -->
+<div class="rounded-xl bg-surface-container-low p-3 flex items-start gap-2.5">
+<div class="w-7 h-7 rounded-lg bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[16px]">near_me</span>
+</div>
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-secondary font-semibold">오늘의 다음 일정</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">17:00</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface truncate mt-0.5">산넨자카 &amp; 니넨자카 다도 체험 (티룸 카호)</p>
+</div>
+</div>
+<!-- Action Ribbon -->
+<div class="pt-1 flex items-center gap-2">
+<a class="flex-1 h-10 rounded-xl bg-secondary text-on-secondary font-label-md text-label-md flex items-center justify-center gap-1.5 hover:opacity-95 active:scale-[0.98] transition-all shadow-sm" href="#">
+<span class="material-symbols-outlined text-[17px]">timeline</span>
+<span>일정 관리 (210)</span>
+</a>
+<a class="h-10 px-3.5 rounded-xl bg-surface-container text-on-surface font-label-md text-label-md flex items-center justify-center gap-1 hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[17px]">receipt_long</span>
+<span>비용</span>
+</a>
+<button aria-label="메뉴 더보기" class="w-10 h-10 rounded-xl bg-surface-container text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</div>
+</article>
+<!-- CARD 2: Upcoming Trip (일본 도쿄) -->
+<article class="trip-card group flex flex-col rounded-2xl bg-surface-container-lowest shadow-[0_1px_4px_rgba(15,23,42,0.06)] overflow-hidden transition-all duration-200 hover:shadow-md" data-search="도쿄 일본 미식 디자인 위크 tokyo japan" data-status="upcoming">
+<!-- Media Header Banner -->
+<div class="relative w-full h-36 overflow-hidden">
+<div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="Modern Tokyo architecture and bustling stylish culinary quarter at twilight, vibrant Tokyo cityscape with warm modern neon glow, sleek architectural framing, refined contemporary documentary travel editorial aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCKK3Vr3NEns8UqgdVzAQyONXfZ23-WRRro_f_vRpDqohNN3fwo1I_VEfV-uHg4KJ7-nn9ZHkp0UbZ9Jm4oNoQlrDvZQlwalnr8TdLORDbZev-neQhKyTjP7GtwY1SRsWFt3bwigLozEaBU2uxniO4Qt7Vc_agHgRU7ksmeMqYgmF1ZI0HMnbefwfwwTTwiegML3DTum-42b3TXFFRCuxrlaj-H_1S1piBVHtjQi7ZsQnc1IklAIBuFEA')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<!-- Status Badges -->
+<div class="absolute top-3 left-3 flex items-center gap-1.5">
+<span class="px-2.5 py-1 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm font-semibold shadow-sm">
+            D-5
+          </span>
+<span class="px-2.5 py-1 rounded-full bg-surface-container-lowest/90 backdrop-blur-md font-label-sm text-label-sm text-secondary font-medium">
+            여행 예정
+          </span>
+</div>
+<div class="absolute bottom-3 inset-x-3 flex flex-col">
+<div class="flex items-center gap-1.5 text-on-primary/90 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px] text-secondary-container">location_on</span>
+<span>일본 도쿄 (Tokyo) · 3박 4일</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-primary tracking-tight mt-0.5">
+            2026 도쿄 미식 &amp; 디자인 위크
+          </h2>
+</div>
+</div>
+<!-- Content Details -->
+<div class="p-4 flex flex-col gap-3">
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">calendar_today</span>
+<span>2026.10.24 ~ 10.27</span>
+</div>
+<span class="text-on-surface-variant font-medium">등록 장소 12곳</span>
+</div>
+<!-- Archival Tags Mini-panel -->
+<div class="grid grid-cols-2 gap-2">
+<div class="p-2.5 rounded-xl bg-surface-container-low flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[18px]">flight_takeoff</span>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-[10px] text-on-surface-variant uppercase">항공편</span>
+<span class="font-label-sm text-label-sm text-on-surface truncate">ICN ➔ HND (완료)</span>
+</div>
+</div>
+<div class="p-2.5 rounded-xl bg-surface-container-low flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">hotel</span>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-[10px] text-on-surface-variant uppercase">숙소</span>
+<span class="font-label-sm text-label-sm text-on-surface truncate">시부야 스트림 호텔</span>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="pt-1 flex items-center gap-2">
+<a class="flex-1 h-10 rounded-xl bg-primary-container text-on-primary font-label-md text-label-md flex items-center justify-center gap-1.5 hover:opacity-95 active:scale-[0.98] transition-all" href="#">
+<span class="material-symbols-outlined text-[17px]">edit_calendar</span>
+<span>일정 이어보기</span>
+</a>
+<button aria-label="메뉴 더보기" class="w-10 h-10 rounded-xl bg-surface-container text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+</div>
+</div>
+</article>
+<!-- CARD 3: Planning Trip (스위스 알프스) -->
+<article class="trip-card group flex flex-col rounded-2xl bg-surface-container-lowest shadow-[0_1px_4px_rgba(15,23,42,0.06)] overflow-hidden transition-all duration-200 hover:shadow-md" data-search="스위스 인터라켄 체르마트 알프스 트레킹 기차 여행 swiss" data-status="planning">
+<!-- Media Header Banner -->
+<div class="relative w-full h-36 overflow-hidden">
+<div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="Majestic snow-capped Swiss Alps mountain peaks overlooking lush green alpine valleys and a red scenic Swiss mountain train traversing a stone viaduct, crisp morning blue sky, editorial wanderlust photography." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDnXvth5uhZ8AFf3ZjpIMWOlrlUbaDL0_vGdADcOVKi7fYbevKaCnOVl8iYlQx8I1WSVCJ87AcH1xi10q8MsjJzuvq7vxKO3rttQ3oUQdoZjGTKXHSr-pyk2ukxaUC6EyR-RgKzrLJd1WkXPOVSl8UohvLVXMP5s5-9H7sLHfcVk1sd1km9Jrz51fMLiflWgsNSLMbpiqjOGmLZ1qveugyVZnlxhCBM-BUsctSbQ6FHhCgnEwNYfkx8fQ')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute top-3 left-3 flex items-center gap-1.5">
+<span class="px-2.5 py-1 rounded-full bg-surface-container-high/90 backdrop-blur-md font-label-sm text-label-sm text-on-surface-variant font-medium">
+            준비 중
+          </span>
+</div>
+<div class="absolute bottom-3 inset-x-3 flex flex-col">
+<div class="flex items-center gap-1.5 text-on-primary/90 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px] text-secondary-container">location_on</span>
+<span>스위스 인터라켄, 체르마트 · 7박 8일</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-primary tracking-tight mt-0.5">
+            2027 스위스 알프스 트레킹 &amp; 기차 여행
+          </h2>
+</div>
+</div>
+<!-- Details -->
+<div class="p-4 flex flex-col gap-3">
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">calendar_today</span>
+<span>2027.05.10 ~ 05.17</span>
+</div>
+<span class="text-on-surface-variant font-medium">체크리스트 8/15 완료</span>
+</div>
+<!-- Planning Milestone Track -->
+<div class="rounded-xl bg-surface-container-low p-3 flex items-center justify-between gap-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[18px]">checklist</span>
+<span class="font-body-sm text-body-sm text-on-surface">일정 및 숙소 조율 중</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary font-semibold">53%</span>
+</div>
+<!-- Actions -->
+<div class="pt-1 flex items-center gap-2">
+<a class="flex-1 h-10 rounded-xl bg-surface-container text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 hover:bg-surface-container-high active:scale-[0.98] transition-all" href="#">
+<span class="material-symbols-outlined text-[17px]">edit_note</span>
+<span>계획 세우기</span>
+</a>
+<button aria-label="메뉴 더보기" class="w-10 h-10 rounded-xl bg-surface-container text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+</div>
+</div>
+</article>
+<!-- CARD 4: Completed Trip (태국 방콕) -->
+<article class="trip-card group flex flex-col rounded-2xl bg-surface-container-lowest shadow-[0_1px_4px_rgba(15,23,42,0.06)] overflow-hidden transition-all duration-200 hover:shadow-md" data-search="방콕 태국 올드타운 감성 카페 투어 bangkok thailand" data-status="completed">
+<!-- Media Header Banner -->
+<div class="relative w-full h-36 overflow-hidden">
+<div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="Charming warm vintage coffee shop in Bangkok Old Town with rustic terracotta brickwork, tropical potted green plants, warm golden ambient interior lighting and analog film travel vibe." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA061GY25J6vffdUhAZsff0MncKixoYadzbj2FTQMyl0GgRDKBo52qcyPPCynlEd1vSqGAsA0sdzBY9ZZ5td9V5Z7jWZ6qc7E3FDkycz5OJ22-grFfU90JRxHV9J1n0tLVTJ_iQdJGwygPAjZLPd8njZ1TJxzeWR_YEQ1_9mRlO9FAJ1Z0e9hURDYkYnqGJN4zGCILHcYRbupWE1qXp8R_7MvmzcZ7EW-oJVc6MnVCqaH2fdIONYCUDRQ')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute top-3 left-3 flex items-center gap-1.5">
+<span class="px-2.5 py-1 rounded-full bg-surface-container-lowest/90 backdrop-blur-md font-label-sm text-label-sm text-on-surface-variant font-medium">
+            여행 완료
+          </span>
+<span class="px-2 py-0.5 rounded-full bg-black/40 backdrop-blur-md font-label-sm text-[11px] text-on-primary flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px]">photo_camera</span> 42장
+          </span>
+</div>
+<div class="absolute bottom-3 inset-x-3 flex flex-col">
+<div class="flex items-center gap-1.5 text-on-primary/90 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px] text-secondary-container">location_on</span>
+<span>태국 방콕 (Bangkok) · 4박 5일</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-primary tracking-tight mt-0.5">
+            2025 방콕 올드타운 감성 카페 투어
+          </h2>
+</div>
+</div>
+<!-- Details -->
+<div class="p-4 flex flex-col gap-3">
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">calendar_today</span>
+<span>2025.11.12 ~ 11.16</span>
+</div>
+<span class="text-on-surface-variant font-medium">영수증 18건 정리완료</span>
+</div>
+<!-- Archival Summary Pill -->
+<div class="rounded-xl bg-surface-container-low p-3 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[18px]">auto_stories</span>
+<span class="font-body-sm text-body-sm text-on-surface">발자국 스토리 발행 완료</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-tertiary-container flex items-center gap-1 font-semibold">
+<span class="material-symbols-outlined text-[14px]">public</span> 공개 중
+          </span>
+</div>
+<!-- Actions -->
+<div class="pt-1 flex items-center gap-2">
+<a class="flex-1 h-10 rounded-xl bg-secondary-fixed text-on-secondary-fixed font-label-md text-label-md flex items-center justify-center gap-1.5 hover:opacity-95 active:scale-[0.98] transition-all" href="#">
+<span class="material-symbols-outlined text-[17px]">explore</span>
+<span>발자국 기록 보기 (410)</span>
+</a>
+<button class="h-10 px-3.5 rounded-xl bg-surface-container text-on-surface font-label-md text-label-md flex items-center justify-center gap-1 hover:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[17px]">lock_reset</span>
+<span>공개 관리</span>
+</button>
+</div>
+</div>
+</article>
+<!-- CARD 5: Completed Trip 2 (프랑스 파리) -->
+<article class="trip-card group flex flex-col rounded-2xl bg-surface-container-lowest shadow-[0_1px_4px_rgba(15,23,42,0.06)] overflow-hidden transition-all duration-200 hover:shadow-md" data-search="파리 프랑스 미술관 산책 paris france" data-status="completed">
+<div class="relative w-full h-36 overflow-hidden">
+<div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500 ease-out" data-alt="Classic Parisian cafe terrace overlooking the Seine river and Haussmann architecture on an overcast autumnal morning, elegant analog travel journal photography." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBvm1XWjF1Ti0uWxH42LrokZylm-rcebWhHo33W22Pc6vTpTXsEgA1XT76U58SLdsLHwupTpaBUn8_OgCI4aohg-HYzM4H9abyMQoqGPxotuBgksBG765bKKJhNPNtSKDhNqucEq9Y9CH7rUPIE5fK2OYLHHe-f3xDLH1YPdAzLkmoxwLtdRcOky4pbXPoPOiQWZZVJItnR3grthMYevFwKSBhzeZZ84hF7zkAgP_UuTrlAsCnfmQkHmg')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute top-3 left-3 flex items-center gap-1.5">
+<span class="px-2.5 py-1 rounded-full bg-surface-container-lowest/90 backdrop-blur-md font-label-sm text-label-sm text-on-surface-variant font-medium">
+            여행 완료
+          </span>
+<span class="px-2 py-0.5 rounded-full bg-black/40 backdrop-blur-md font-label-sm text-[11px] text-on-primary flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px]">photo_camera</span> 68장
+          </span>
+</div>
+<div class="absolute bottom-3 inset-x-3 flex flex-col">
+<div class="flex items-center gap-1.5 text-on-primary/90 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px] text-secondary-container">location_on</span>
+<span>프랑스 파리 (Paris) · 6박 7일</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-primary tracking-tight mt-0.5">
+            2025 파리 미술관 산책 &amp; 센 강 러닝
+          </h2>
+</div>
+</div>
+<div class="p-4 flex flex-col gap-3">
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">calendar_today</span>
+<span>2025.04.18 ~ 04.24</span>
+</div>
+<span class="text-on-surface-variant font-medium">지출 EUR 1,420</span>
+</div>
+<div class="rounded-xl bg-surface-container-low p-3 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[18px]">lock</span>
+<span class="font-body-sm text-body-sm text-on-surface">나만의 비공개 아카이브</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">비공개</span>
+</div>
+<div class="pt-1 flex items-center gap-2">
+<a class="flex-1 h-10 rounded-xl bg-surface-container text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined text-[17px]">menu_book</span>
+<span>기록 열람하기</span>
+</a>
+<button aria-label="메뉴 더보기" class="w-10 h-10 rounded-xl bg-surface-container text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+</div>
+</div>
+</article>
+</div>
+<!-- Dynamic Empty State (Hidden by default, shown when filtered search yields no result) -->
+<div class="hidden px-margin py-12 flex-col items-center justify-center text-center" id="tripsEmptyState">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant mb-3">
+<span class="material-symbols-outlined text-[32px]">travel_explore</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">검색된 여행이 없습니다</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-[240px]">
+      다른 검색어나 상태 필터를 선택하여 나의 지난 여행을 찾아보세요.
+    </p>
+<button class="mt-4 px-4 py-2 rounded-xl bg-surface-container text-on-surface font-label-sm text-label-sm hover:bg-surface-container-high transition-colors" id="resetSearchFilterBtn" type="button">
+      필터 초기화
+    </button>
+</div>
+<!-- New Trip Planning Warm Invitation Banner -->
+<div class="px-margin mt-6">
+<div class="rounded-2xl p-5 bg-gradient-to-r from-surface-container-highest to-surface-container flex items-center justify-between gap-4 shadow-sm">
+<div class="flex flex-col gap-1 min-w-0">
+<span class="font-label-sm text-label-sm text-secondary font-semibold">Ready to wander?</span>
+<h4 class="font-headline-sm text-headline-sm text-on-surface tracking-tight truncate">새로운 여행을 계획 중인가요?</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">도시 선택부터 지도 코스, 예산 관리까지 한 번에</p>
+</div>
+<a class="shrink-0 px-4 py-2.5 rounded-xl bg-secondary text-on-secondary font-label-md text-label-md shadow-sm hover:opacity-95 active:scale-95 transition-all flex items-center gap-1" href="#">
+<span>여행 만들기</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Footer Micro-branding -->
+<footer class="mt-8 px-margin text-center flex flex-col items-center justify-center gap-1">
+<div class="flex items-center gap-1.5 text-outline">
+<span class="material-symbols-outlined text-[15px]">local_airport</span>
+<span class="font-label-sm text-[11px] tracking-wider uppercase font-semibold">TripPrint Archive Journal</span>
+</div>
+<p class="font-body-sm text-[12px] text-outline">
+      나만의 감성 여행 아카이브와 일정 가이드북 · 기록은 계속됩니다
+    </p>
+</footer>
+</div>
+<script>
+  (function initTripArchiveInteractions() {
+    const searchInput = document.getElementById('tripSearchInput');
+    const clearBtn = document.getElementById('clearSearchBtn');
+    const filterChips = document.querySelectorAll('.filter-chip');
+    const cards = document.querySelectorAll('.trip-card');
+    const emptyState = document.getElementById('tripsEmptyState');
+    const resetBtn = document.getElementById('resetSearchFilterBtn');
+    const sortToggleBtn = document.getElementById('sortToggleBtn');
+    const currentSortLabel = document.getElementById('currentSortLabel');
+
+    let currentFilter = 'all';
+    let currentSort = 'latest'; // 'latest' | 'departure'
+
+    function filterAndRender() {
+      const query = (searchInput.value || '').trim().toLowerCase();
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const cardStatus = card.getAttribute('data-status');
+        const cardSearchText = card.getAttribute('data-search') || '';
+
+        const statusMatch = (currentFilter === 'all') || (cardStatus === currentFilter);
+        const searchMatch = !query || cardSearchText.toLowerCase().includes(query);
+
+        if (statusMatch && searchMatch) {
+          card.classList.remove('hidden');
+          card.classList.add('flex');
+          visibleCount++;
+        } else {
+          card.classList.remove('flex');
+          card.classList.add('hidden');
+        }
+      });
+
+      if (visibleCount === 0) {
+        emptyState.classList.remove('hidden');
+        emptyState.classList.add('flex');
+      } else {
+        emptyState.classList.remove('flex');
+        emptyState.classList.add('hidden');
+      }
+
+      if (query.length > 0) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+    }
+
+    // Filter Chips
+    filterChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        filterChips.forEach(c => {
+          c.classList.remove('bg-secondary', 'text-on-secondary');
+          c.classList.add('bg-surface-container-lowest', 'text-on-surface-variant');
+        });
+        chip.classList.remove('bg-surface-container-lowest', 'text-on-surface-variant');
+        chip.classList.add('bg-secondary', 'text-on-secondary');
+
+        currentFilter = chip.getAttribute('data-filter');
+        filterAndRender();
+      });
+    });
+
+    // Search events
+    if (searchInput) {
+      searchInput.addEventListener('input', filterAndRender);
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        filterAndRender();
+        searchInput.focus();
+      });
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        if (searchInput) searchInput.value = '';
+        currentFilter = 'all';
+        filterChips.forEach((c, idx) => {
+          if (idx === 0) {
+            c.classList.add('bg-secondary', 'text-on-secondary');
+            c.classList.remove('bg-surface-container-lowest', 'text-on-surface-variant');
+          } else {
+            c.classList.remove('bg-secondary', 'text-on-secondary');
+            c.classList.add('bg-surface-container-lowest', 'text-on-surface-variant');
+          }
+        });
+        filterAndRender();
+      });
+    }
+
+    // Sort toggle micro-interaction
+    if (sortToggleBtn) {
+      sortToggleBtn.addEventListener('click', () => {
+        const container = document.getElementById('tripsArchiveContainer');
+        if (!container) return;
+
+        const cardArray = Array.from(cards);
+        if (currentSort === 'latest') {
+          currentSort = 'departure';
+          currentSortLabel.textContent = '출발일순';
+          cardArray.reverse();
+        } else {
+          currentSort = 'latest';
+          currentSortLabel.textContent = '최신순';
+          cardArray.reverse();
+        }
+
+        cardArray.forEach(card => container.appendChild(card));
+      });
+    }
+  })();
+</script></main><nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_-4px_16px_rgba(0,0,0,0.04)]" data-active-classes="text-secondary font-semibold"><div class="h-16 px-gutter-sm flex items-center justify-around relative"><a class="flex-1 flex flex-col items-center justify-center min-h-[44px] text-outline hover:text-on-surface transition-colors" data-path="home" href="#"><span class="material-symbols-outlined text-[22px]">home</span><span class="font-label-sm text-label-sm mt-0.5">홈</span></a><a aria-current="page" class="flex-1 flex flex-col items-center justify-center min-h-[44px] transition-colors text-secondary font-semibold" data-path="my-trips" href="#"><span class="material-symbols-outlined text-[22px]">luggage</span><span class="font-label-sm text-label-sm mt-0.5">내 여행</span></a><div class="flex-1 flex flex-col items-center justify-center relative"><a class="-top-5 absolute flex items-center justify-center w-12 h-12 rounded-full bg-secondary text-on-secondary shadow-[0_6px_16px_rgba(174,49,21,0.35)] hover:scale-105 active:scale-95 transition-all" data-path="create-trip" href="#"><span class="material-symbols-outlined text-[26px] font-bold">add</span></a><span class="font-label-sm text-label-sm mt-6 text-on-surface-variant">여행 만들기</span></div><a class="flex-1 flex flex-col items-center justify-center min-h-[44px] text-outline hover:text-on-surface transition-colors" data-path="footprint" href="#"><span class="material-symbols-outlined text-[22px]">explore</span><span class="font-label-sm text-label-sm mt-0.5">발자국</span></a><a class="flex-1 flex flex-col items-center justify-center min-h-[44px] text-outline hover:text-on-surface transition-colors" data-path="my-page" href="#"><span class="material-symbols-outlined text-[22px]">person</span><span class="font-label-sm text-label-sm mt-0.5">MY</span></a></div></nav>
+
+</body></html>

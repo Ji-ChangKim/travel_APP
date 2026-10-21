@@ -83,7 +83,8 @@
         "FLIGHT_LOOKUP_PROVIDER": "kac",
         // 최소 지원 운영값을 확정한 뒤 검증된 정책 JSON을 설정한다.
         "APP_UPDATE_POLICY_JSON": "",
-        "GOOGLE_CLIENT_ID": "",
+        // 기존 Google 로그인 화면에 사용한 공개 OAuth 클라이언트 ID를 유지한다.
+        "GOOGLE_CLIENT_ID": "207444121388-am7f5hlplgv2lcjsrjgrrpckv1dge7j4.apps.googleusercontent.com",
         "KAKAO_CLIENT_ID": "",
         "NAVER_CLIENT_ID": "",
         "SUPABASE_URL": "",

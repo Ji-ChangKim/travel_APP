@@ -45,8 +45,38 @@ export const calendarDateSchema = z
   .refine(isCalendarDate, '실제 달력 날짜를 YYYY-MM-DD로 입력해 주세요.');
 
 // M1 여행 생성 계약은 기존 화면의 필수 제목 계약과 별도로 정의한다.
+export const tripDestinationSchema = z
+  .object({
+    id: z.string().uuid(),
+    country: z.string().trim().min(1).max(50),
+    city: z.string().trim().min(1).max(50),
+    timezone: z
+      .string()
+      .max(100)
+      .refine(isSupportedTimezone, '유효한 현지 시간대를 입력해 주세요.'),
+  })
+  .strict();
+
+export const tripDestinationsSchema = z
+  .array(tripDestinationSchema)
+  .min(1)
+  .max(20)
+  .refine((items) => {
+    // 중복 ID나 같은 도시를 여러 개 만들어 DAY 배정을 모호하게 하지 않는다.
+    return (
+      new Set(items.map((item) => item.id)).size === items.length &&
+      new Set(
+        items.map(
+          (item) =>
+            `${item.country.trim().toLocaleLowerCase()}:${item.city.trim().toLocaleLowerCase()}`,
+        ),
+      ).size === items.length
+    );
+  }, '같은 도시는 한 번만 추가할 수 있어요.');
+
 export const persistedTripCreateSchema = z
   .object({
+    destinations: tripDestinationsSchema.optional(),
     title: z.string().trim().max(50).optional(),
     country: z.string().trim().min(1).max(50),
     city: z.string().trim().max(50).default(''),
@@ -65,6 +95,17 @@ export const persistedTripCreateSchema = z
       .default('#246A54'),
   })
   .strict()
+  .refine(
+    (input) =>
+      !input.destinations ||
+      (input.destinations[0]!.country === input.country &&
+        input.destinations[0]!.city === input.city &&
+        input.destinations[0]!.timezone === input.timezone),
+    {
+      message: '첫 여행지와 대표 여행지 정보를 확인해 주세요.',
+      path: ['destinations'],
+    },
+  )
   .refine(isAllowedTripPeriod, {
     message: '여행 기간은 시작일 포함 1~90일이어야 합니다.',
     path: ['endDate'],

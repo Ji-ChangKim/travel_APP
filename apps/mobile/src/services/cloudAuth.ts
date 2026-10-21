@@ -1,9 +1,14 @@
 import { UserFacingError } from './userFacingError';
+import { createSessionTokenStorage } from './sessionTokenStorage';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import { z } from 'zod';
 import type { Profile, OsPlatform } from '@wherego/domain';
 import { clearGuestSession, saveGuestSession } from './guestAuthService';
+const tokens = createSessionTokenStorage({
+  read: readToken,
+  write: writeToken,
+});
 const tokenKey = 'wherego.cloud.session.v1';
 const cloudUserSchema = z.object({
   id: z.string().uuid(),
@@ -73,16 +78,10 @@ function writeToken(token: string | null): Promise<void> {
       ? SecureStore.setItemAsync(tokenKey, token)
       : SecureStore.deleteItemAsync(tokenKey);
 }
-// 인증 구독자에게 확인된 세션을 전달한다.
 function notifySession(session: CloudSession | null): CloudSession | null {
-  // 다른 계정의 이전 세션을 전달하지 않는다.
-  return (
-    (revision += 1),
-    listeners.forEach((listener) => {
-      /* 화면 인증 상태를 갱신한다. */ return listener(session);
-    }),
-    session
-  );
+  revision += 1;
+  listeners.forEach((listener) => listener(session));
+  return session;
 }
 // 표준 인증 REST 계약으로 가입 또는 로그인을 실행한다.
 export function emailSession(
@@ -92,7 +91,8 @@ export function emailSession(
   name?: string,
 ): Promise<CloudSession> {
   // 비밀번호는 지정된 인증 서버로만 보낸다.
-  return readToken()
+  return tokens
+    .read()
     .then((token) =>
       fetch(`${authBaseUrl()}/api/auth/${mode}/email`, {
         method: 'POST',
@@ -126,116 +126,88 @@ export function emailSession(
           });
     });
 }
-// 발급 세션 저장이 끝난 뒤 이벤트를 보낸다.
 export function acceptSession(
   user: CloudUser,
   token: string,
 ): Promise<CloudSession> {
-  // 저장 실패를 로그인 성공으로 처리하지 않는다.
-  return writeToken(token).then(() => {
-    // 회원 선택 뒤 이전 게스트가 자동 복원되지 않게 현재 기기 선택을 저장한다.
-    return (
-      user.isAnonymous
-        ? saveGuestSession(
-            cloudProfile(
-              user,
-              Platform.OS === 'ios'
-                ? 'ios'
-                : Platform.OS === 'android'
-                  ? 'android'
-                  : 'web',
-            ),
-          )
-        : clearGuestSession()
-    ).then(() => {
-      /* 실제 발급 사용자만 전달한다. */ return notifySession({
-        user,
-        access_token: token,
-      })!;
+  // 토큰·게스트 선택·이벤트를 같은 저장 순서에 묶어 인증 상태의 역전을 막는다.
+  return tokens.accept(token, async () => {
+    if (user.isAnonymous) {
+      await saveGuestSession(
+        cloudProfile(
+          user,
+          Platform.OS === 'ios'
+            ? 'ios'
+            : Platform.OS === 'android'
+              ? 'android'
+              : 'web',
+        ),
+      );
+    } else {
+      await clearGuestSession();
+    }
+    const session = { user, access_token: token };
+    notifySession(session);
+    return session;
+  });
+}
+export async function getCloudSession(): Promise<CloudSession | null> {
+  const token = await tokens.read();
+  if (!token) return null;
+  const response = await fetch(`${authBaseUrl()}/api/auth/get-session`, {
+    headers: { Authorization: `Bearer ${token}` },
+    signal: AbortSignal.timeout(15000),
+  });
+  if (response.status === 401) {
+    await tokens.clearIfCurrent(token, () => {
+      notifySession(null);
     });
-  });
-}
-// 서버에서 토큰의 만료·철회를 확인한다.
-export function getCloudSession(): Promise<CloudSession | null> {
-  // 기기 사용자 ID만으로 인증 여부를 판단하지 않는다.
-  return readToken().then((token) => {
-    /* 토큰이 없으면 로그인 상태가 아니다. */ return !token
-      ? null
-      : fetch(`${authBaseUrl()}/api/auth/get-session`, {
-          headers: { Authorization: `Bearer ${token}` },
-          signal: AbortSignal.timeout(15000),
-        }).then((response) => {
-          /* 서버 응답으로 세션을 확인한다. */ return response.ok
-            ? response.json().then((data: unknown) => {
-                /* 만료된 세션만 폐기한다. */ return data
-                  ? {
-                      user: z.object({ user: cloudUserSchema }).parse(data)
-                        .user,
-                      access_token:
-                        response.headers.get('set-auth-token') || token,
-                    }
-                  : writeToken(null).then(() => {
-                      /* 만료 토큰을 정리한다. */ return notifySession(null);
-                    });
-              })
-            : response.status === 401
-              ? writeToken(null).then(() => {
-                  /* 거부된 토큰을 제거한다. */ return notifySession(null);
-                })
-              : fail(
-                  '로그인 상태를 확인하지 못했어요. 잠시 후 다시 시도해 주세요.',
-                );
-        });
-  });
-}
-// 서버 세션을 철회하고 기기 토큰을 제거한다.
-export function signOutCloud(): Promise<void> {
-  // 서버 철회 실패를 성공으로 처리하지 않는다.
-  return readToken()
-    .then((token) => {
-      /* 실제 서버 철회를 요청한다. */ return token
-        ? fetch(`${authBaseUrl()}/api/auth/sign-out`, {
-            method: 'POST',
-            headers: {
-              Authorization: `Bearer ${token}`,
-              ...authHeaders(),
-            },
-            body: '{}',
-            signal: AbortSignal.timeout(15000),
-          }).then((response) => {
-            /* 실제 철회 성공을 확인한다. */ return response.ok
-              ? undefined
-              : fail('로그아웃에 실패했습니다. 다시 시도해 주세요.');
-          })
-        : undefined;
-    })
-    .then(() => {
-      /* 철회 후 기기에서 삭제한다. */ return writeToken(null);
-    })
-    .then(() => {
-      /* 화면 상태도 초기화한다. */ return void notifySession(null);
+    return null;
+  }
+  if (!response.ok)
+    return fail('로그인 상태를 확인하지 못했어요. 잠시 후 다시 시도해 주세요.');
+  const data: unknown = await response.json();
+  if (!data) {
+    await tokens.clearIfCurrent(token, () => {
+      notifySession(null);
     });
+    return null;
+  }
+  return {
+    user: z.object({ user: cloudUserSchema }).parse(data).user,
+    access_token: response.headers.get('set-auth-token') || token,
+  };
 }
-
-// 서버에서 모든 세션 철회가 확인된 뒤 기기 인증만 정리한다.
-export function clearRevokedCloudSession(): Promise<void> {
-  // 네트워크 재로그아웃의 실패로 이미 끝난 탈퇴 요청을 실패로 바꾸지 않는다.
-  return writeToken(null).then(() => {
-    // 인증 구독자가 계정 캐시와 화면을 정리하게 한다.
-    return void notifySession(null);
+export async function signOutCloud(): Promise<void> {
+  const token = await tokens.read();
+  if (token) {
+    const response = await fetch(`${authBaseUrl()}/api/auth/sign-out`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, ...authHeaders() },
+      body: '{}',
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!response.ok)
+      return fail('로그아웃에 실패했습니다. 다시 시도해 주세요.');
+  }
+  // 철회 대상이었던 토큰만 정리하며 기다리는 동안 로그인한 계정은 유지한다.
+  await tokens.clearIfCurrent(token, () => {
+    notifySession(null);
   });
 }
-// 확인된 인증 이벤트를 앱 상태와 연결한다.
+export async function clearRevokedCloudSession(): Promise<void> {
+  const token = await tokens.read();
+  await tokens.clearIfCurrent(token, () => {
+    notifySession(null);
+  });
+}
 export function subscribeCloud(
   listener: (session: CloudSession | null) => void,
 ): () => void {
-  // 화면 해제 시 구독을 제거한다.
-  return (
-    listeners.add(listener),
-    () => {
-      /* 중복 구독 누수를 방지한다. */ return void listeners.delete(listener);
-    }
-  );
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
 }
 // D1 사용자를 화면용 프로필로 변환한다.
 export function cloudProfile(user: CloudUser, osPlatform: OsPlatform): Profile {

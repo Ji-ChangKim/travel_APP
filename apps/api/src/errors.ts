@@ -66,17 +66,18 @@ export function renderError(
   c: Context<ApiEnvironment>,
 ): Response {
   // SQL 원문과 토큰을 제외한 코드 및 요청 추적 ID를 반환한다.
+  const failure = publicError(error);
   return c.json(
     {
       error: {
-        code: publicError(error).code,
-        message: publicError(error).message,
+        code: failure.code,
+        message: failure.message,
         ...(error instanceof ZodError
           ? { fieldErrors: error.flatten().fieldErrors }
           : {}),
       },
       meta: { requestId: c.get('requestId') },
     },
-    errorStatuses[publicError(error).code],
+    errorStatuses[failure.code],
   );
 }

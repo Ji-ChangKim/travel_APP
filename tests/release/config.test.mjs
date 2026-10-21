@@ -60,7 +60,7 @@ test('항공·사진 조회 제한은 배포 환경별 namespace를 사용하고
   assert.equal(JSON.stringify(config).includes('private-flight-secret'), false);
 });
 
-test('Worker는 실제 D1·R2·AUTH_SECRET과 공개 주소만 사용한다', () => {
+test('Worker는 실제 D1·R2·AUTH_SECRET과 공개 인증 설정만 사용한다', () => {
   // 서버 비밀은 설정 파일로 복사하지 않고 바인딩 이름으로만 유지한다.
   return assert.deepEqual(
     projectConfig(workerConfig({ ...valid, AUTH_SECRET: 'private-value' })),
@@ -72,6 +72,8 @@ test('Worker는 실제 D1·R2·AUTH_SECRET과 공개 주소만 사용한다', ()
         ALLOWED_ORIGINS: valid.RELEASE_WEB_ORIGIN,
         SUPABASE_URL: '',
         SUPABASE_ANON_KEY: '',
+        GOOGLE_CLIENT_ID:
+          '207444121388-am7f5hlplgv2lcjsrjgrrpckv1dge7j4.apps.googleusercontent.com',
       },
       database: 'DB',
       media: 'MEDIA',

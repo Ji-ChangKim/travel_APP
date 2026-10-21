@@ -7,8 +7,12 @@ import { communityPostSchema, foundationUuidSchema } from '@wherego/validation';
 import { LedgerScreen } from './LedgerUI';
 import { ledgerStyles } from './ledgerTheme';
 import HaruState from '@/components/HaruState';
-import CommunityPlanView from './CommunityPlanView';
 import CommunityRecordView from './CommunityRecordView';
+import CommunityImportButton from './CommunityImportButton';
+import PlanDetailTimelineView from './PlanDetailTimelineView';
+import { adaptCommunityPostToTimeline } from './timelinePlanAdapters';
+import PublicPlanExecution from './PublicPlanExecution';
+import PlanAttachments from './PlanAttachments';
 import { Action } from './ui';
 import { apiBaseUrl } from './service';
 import { useAuthReady } from '@/features/auth/AuthBridge';
@@ -51,6 +55,7 @@ function PublicPlanContent() {
     retry: false,
   });
   const post = query.isSuccess && startupReady ? query.data : undefined;
+
   return (
     <LedgerScreen
       title={post?.title || '공유된 여행'}
@@ -59,37 +64,52 @@ function PublicPlanContent() {
         return returnToScreen(router, '/(tabs)/footprints');
       }}
     >
-      <ScrollView contentContainerStyle={ledgerStyles.content}>
-        {!startupReady || (query.isPending && validId) ? (
-          <HaruState kind="loading" title="공유된 여행을 불러오는 중이에요." />
-        ) : null}
-        {startupReady && (!validId || query.isError) && (
-          <HaruState
-            kind="error"
-            title="공유된 여행을 열 수 없어요"
-            description={
-              query.error?.message ||
-              '주소를 다시 확인하거나 발자국에서 다른 여행을 살펴보세요.'
-            }
-          >
-            {validId && (
-              <Action
-                label="다시 불러오기"
-                loading={query.isFetching}
-                onPress={() => {
-                  // 실패한 공개 조회만 다시 요청한다.
-                  return void query.refetch();
-                }}
-              />
-            )}
-          </HaruState>
-        )}
-        {post?.kind === 'plan' ? (
-          <CommunityPlanView key={post.id} post={post} showTitle={false} />
-        ) : post ? (
+      {!startupReady || (query.isPending && validId) ? (
+        <HaruState kind="loading" title="공유된 여행을 불러오는 중이에요." />
+      ) : startupReady && (!validId || query.isError) ? (
+        <HaruState
+          kind="error"
+          title="공유된 여행을 열 수 없어요"
+          description={
+            query.error?.message ||
+            '주소를 다시 확인하거나 발자국에서 다른 여행을 살펴보세요.'
+          }
+        >
+          {validId && (
+            <Action
+              label="다시 불러오기"
+              loading={query.isFetching}
+              onPress={() => {
+                // 실패한 공개 조회만 다시 요청한다.
+                return void query.refetch();
+              }}
+            />
+          )}
+        </HaruState>
+      ) : post?.kind === 'plan' ? (
+        <PlanDetailTimelineView
+          showTitle={false}
+          data={adaptCommunityPostToTimeline(post, 'footprint')}
+          extraContent={
+            <PlanAttachments
+              snapshot={post.snapshot}
+              photoPaths={post.photoPaths}
+            />
+          }
+          bottomAction={
+            <PublicPlanExecution
+              key={post.id}
+              title={post.title}
+              postId={post.id}
+            />
+          }
+        />
+      ) : post ? (
+        <ScrollView contentContainerStyle={ledgerStyles.content}>
+          <CommunityImportButton postId={post.id} />
           <CommunityRecordView post={post} />
-        ) : null}
-      </ScrollView>
+        </ScrollView>
+      ) : null}
     </LedgerScreen>
   );
 }

@@ -69,6 +69,45 @@ function displayPlace(place: z.infer<typeof responseSchema>['places'][number]) {
   };
 }
 
+// 추천에서도 일반 검색과 같은 고정 공급자·상한·필드 계약을 사용한다.
+export async function searchGooglePlaces(
+  env: ApiEnvironment['Bindings'],
+  query: string,
+  fetcher: typeof fetch,
+  includedType?:
+    'tourist_attraction' | 'restaurant' | 'cafe' | 'park' | 'museum',
+) {
+  // Google 응답은 메모리에서만 검증하며 임의 URL을 받지 않는다.
+  const textQuery = querySchema.parse(query);
+  if (!env.GOOGLE_PLACES_API_KEY)
+    return rejectRequest('CONFIGURATION_REQUIRED');
+  await reserveGoogleCall(env, 'text-search');
+  try {
+    const response = await fetcher(
+      'https://places.googleapis.com/v1/places:searchText',
+      {
+        method: 'POST',
+        headers: googleHeaders(env.GOOGLE_PLACES_API_KEY),
+        body: JSON.stringify({
+          textQuery,
+          languageCode: 'ko',
+          pageSize: 10,
+          ...(includedType ? { includedType, strictTypeFiltering: true } : {}),
+        }),
+        redirect: 'manual',
+        signal: AbortSignal.timeout(10000),
+      },
+    );
+    if (!response.ok) return rejectRequest('BACKEND_UNAVAILABLE');
+    const bytes = await readBounded(response, 65536);
+    return responseSchema
+      .parse(JSON.parse(new TextDecoder().decode(bytes)))
+      .places.map(displayPlace);
+  } catch {
+    return rejectRequest('BACKEND_UNAVAILABLE');
+  }
+}
+
 // 고정 공급자에만 인증된 장소 검색 요청을 전송한다.
 export async function searchPlaces(
   fetcher: typeof fetch,

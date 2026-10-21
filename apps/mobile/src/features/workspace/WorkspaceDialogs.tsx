@@ -179,6 +179,12 @@ export function renderWorkspaceMoreMenu({
       owner={owner}
       selected={activeSection}
       disabled={busy || scanning || hasPending}
+      onEditDestinations={() => {
+        // 도시 편집도 기존 초안과 이탈 보호를 거친다.
+        if (!snapshot) return;
+        setShowTripMore(false);
+        openDraft('destinations');
+      }}
       onEditInfo={() => {
         // 메뉴를 닫고 소유자의 기존 정보·종료 상태 폼을 연다.
         return snapshot

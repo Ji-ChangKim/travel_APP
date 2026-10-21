@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { CommunityPost, WorkspaceSnapshot } from '@wherego/domain';
+import { validTravelLeg } from '@wherego/domain';
 import {
   calendarDateSchema,
   isSupportedTimezone,
@@ -61,43 +62,121 @@ export function importCommunityTrip(
     identify(),
     identify,
   );
+  return importedPlanning(
+    workspaceSnapshotSchema.parse({
+      ...snapshot,
+      days: snapshot.days.map((day) => {
+        // 일부 DAY만 공개한 계획도 원래 날짜 간격을 유지한다.
+        const published = post.snapshot.days?.find((entry) => {
+          // 공개 DAY 번호 대신 실제 날짜와 출발일의 차이를 대조한다.
+          return (
+            dayOffset(post.snapshot.startDate, entry.date) === day.dayNumber - 1
+          );
+        });
+        return {
+          ...day,
+          ...(published?.planTitle !== undefined
+            ? { planTitle: published.planTitle }
+            : {}),
+          ...(published?.planConcept !== undefined
+            ? { planConcept: published.planConcept }
+            : {}),
+        };
+      }),
+      itinerary: post.snapshot.itinerary.map((item, index) => {
+        // 개인 메모·결제·사진·항공권 상세는 공개 객체에 있더라도 복사하지 않는다.
+        const day =
+          snapshot.days[dayOffset(post.snapshot.startDate, item.date)];
+        if (!day) throw new WorkspaceModelError('VALIDATION_FAILED');
+        return {
+          id: identify(),
+          dayId: day.id,
+          title: item.title,
+          type: item.type || 'PLACE',
+          timeSlot: item.timeSlot,
+          sortOrder: item.sortOrder || index + 1,
+          memo: null,
+          address: item.address,
+          ...(item.googlePlaceId ? { googlePlaceId: item.googlePlaceId } : {}),
+          ...(item.planContent ? { planContent: { ...item.planContent } } : {}),
+        };
+      }),
+    }),
+    post,
+    identify,
+  );
+}
+
+// 담은 사람의 새 ID에 도시·DAY·이동수단 관계를 다시 연결한다.
+function importedPlanning(
+  snapshot: WorkspaceSnapshot,
+  source: CommunityPost,
+  identify: WorkspaceId,
+): WorkspaceSnapshot {
+  const destinationIds = new Map(
+    (source.snapshot.destinations || []).map((destination) => [
+      destination.id,
+      identify(),
+    ]),
+  );
+  const destinations = source.snapshot.destinations?.map(
+    (destination, index) => ({
+      ...destination,
+      id: destinationIds.get(destination.id)!,
+      ...(index === 0 ? { timezone: snapshot.trip.timezone } : {}),
+    }),
+  );
+  const scheduleIds = new Map(
+    source.snapshot.itinerary.map((item, index) => [
+      item.id,
+      snapshot.itinerary[index]!.id,
+    ]),
+  );
   return workspaceSnapshotSchema.parse({
     ...snapshot,
+    trip: {
+      ...snapshot.trip,
+      ...(destinations ? { destinations } : {}),
+    },
     days: snapshot.days.map((day) => {
-      // 일부 DAY만 공개한 계획도 원래 날짜 간격을 유지한다.
-      const published = post.snapshot.days?.find((entry) => {
-        // 공개 DAY 번호 대신 실제 날짜와 출발일의 차이를 대조한다.
-        return (
-          dayOffset(post.snapshot.startDate, entry.date) === day.dayNumber - 1
-        );
-      });
+      const sourceDay = source.snapshot.days?.find(
+        (entry) =>
+          dayOffset(source.snapshot.startDate, entry.date) ===
+          day.dayNumber - 1,
+      );
       return {
         ...day,
-        ...(published?.planTitle !== undefined
-          ? { planTitle: published.planTitle }
-          : {}),
-        ...(published?.planConcept !== undefined
-          ? { planConcept: published.planConcept }
+        ...(destinations
+          ? {
+              destinationId:
+                destinationIds.get(sourceDay?.destinationId || '') ||
+                destinations[0]!.id,
+            }
           : {}),
       };
     }),
-    itinerary: post.snapshot.itinerary.map((item, index) => {
-      // 개인 메모·결제·사진·항공권 상세는 공개 객체에 있더라도 복사하지 않는다.
-      const day = snapshot.days[dayOffset(post.snapshot.startDate, item.date)];
-      if (!day) throw new WorkspaceModelError('VALIDATION_FAILED');
-      return {
-        id: identify(),
-        dayId: day.id,
-        title: item.title,
-        type: item.type || 'PLACE',
-        timeSlot: item.timeSlot,
-        sortOrder: item.sortOrder || index + 1,
-        memo: null,
-        address: item.address,
-        ...(item.googlePlaceId ? { googlePlaceId: item.googlePlaceId } : {}),
-        ...(item.planContent ? { planContent: { ...item.planContent } } : {}),
-      };
-    }),
+    ...(source.snapshot.travelLegs
+      ? {
+          travelLegs: source.snapshot.travelLegs.flatMap((leg) => {
+            const fromScheduleId = scheduleIds.get(leg.fromScheduleId);
+            const toScheduleId = scheduleIds.get(leg.toScheduleId);
+            const dayId = snapshot.itinerary.find(
+              (item) => item.id === toScheduleId,
+            )?.dayId;
+            return fromScheduleId &&
+              toScheduleId &&
+              dayId &&
+              validTravelLeg(snapshot, {
+                dayId,
+                fromScheduleId,
+                toScheduleId,
+                mode: leg.mode,
+              })
+              ? [{ fromScheduleId, toScheduleId, dayId, mode: leg.mode }]
+              : [];
+          }),
+        }
+      : {}),
   });
 }
 

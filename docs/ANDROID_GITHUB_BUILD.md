@@ -1,6 +1,8 @@
 # TripPrint 내부 테스트용 AAB 만들기
 
-기준일: 2026-10-20. 사용자가 직접 빌드한 뒤 Google Play 내부 테스트에서 게스트·Google 로그인과 저장·재조회·공유를 확인합니다. 이번 개발 작업에서는 Android 빌드·Play 업로드를 실행하지 않았습니다.
+기준일: 2026-10-21. 사용자가 직접 빌드한 뒤 Google Play 내부 테스트에서 게스트·Google 로그인과 저장·재조회·공유를 확인합니다. 이번 개발 작업에서는 Android 빌드·Play 업로드를 실행하지 않았습니다.
+
+2026-10-21 최신 후보는11번입니다. 반영 내용은 [11번 릴리스 노트](releases/TripPrint_261021_Ver11.md), 검증 결과와 남은 조건은 [11번 점검 기록](qa/PREBUILD_V11_20261021.md)을 따릅니다. 사용자가 직접 빌드합니다. AAB 빌드가 성공하려면 비어 있지 않은 R8 mapping.txt가 있어야 하며 같은 다운로드 자료에 함께 보관합니다. 실제 AAB 버전·서명·해시·가독화 파일은 빌드 성공 후 검사합니다.
 
 기본 경로는 **GitHub Actions에서 AAB 생성 → 다운로드 → Play Console 수동 업로드**입니다. Expo 계정이나 Play 자동 제출용 서비스 계정 없이 사용할 수 있습니다. 앱은 기존 staging 서버를 사용합니다.
 
@@ -9,13 +11,15 @@
 - 저장소: [Ji-ChangKim/travel_APP](https://github.com/Ji-ChangKim/travel_APP), 브랜치 `main`.
 - 실행 화면: [Android Play Internal](https://github.com/Ji-ChangKim/travel_APP/actions/workflows/play-internal.yml).
 - 앱 식별자: `com.tripprint.app`.
-- 현재 버전: `ver.text`의 `versionCode=9`, `versionName=0.1.0`.
-- **Play에서 9를 이미 사용했다면 `ver.text`를 사용한 최대 번호보다 큰 정수로 수정하고 커밋·푸시한 뒤 실행**합니다. 원격 Play의 사용 번호는 이번 작업에서 확인하지 않았습니다.
+- 현재 버전: `ver.text`의 `versionCode=11`, `versionName=0.1.0`.
+- **Play에서11을 이미 사용했다면 `ver.text`를 사용한 최대 번호보다 큰 정수로 수정하고 커밋·푸시한 뒤 실행**합니다. 원격 Play의 사용 번호는 이번 작업에서 확인하지 않았습니다.
 - 현재 workflow에는 `version_code` 입력란이 없습니다. 실행 번호로 자동 증가하지 않고 `ver.text`를 그대로 사용합니다.
 
 `main` 푸시에는 일반 CI만 자동 실행됩니다. Android Play Internal과 서버·웹 배포는 수동 실행 전용입니다. 빌드 전 대상 커밋의 CI 결과를 확인합니다.
 
-**현재 빌드 착수 조건:** 2026-10-20 푸시 전 검사에서 전체 웹 화면 회귀검사의 예전 메뉴·문구 기대값이 현재 UI와 맞지 않는 사례가 확인됐습니다. 핵심 보호 흐름을 보완했지만 전체 207건의 통과를 확인하지 않았습니다. Android workflow도 같은 검사를 필수로 실행하므로, 대상 커밋의 CI가 모두 통과한 뒤 아래 빌드를 시작합니다. 검사 단계를 건너뛰지 않습니다. 상세 결과는 [빌드 전 점검 기록](PLAY_INTERNAL_PREBUILD.txt)을 따릅니다.
+11번 후보의 전체 웹237개를 실행한 뒤 실패·영향 범위를 수정·재검사해 최종237개 모두 확인했습니다. 이전9번 후보의 화면 검사 HOLD 사유는 이 결과로 갱신합니다. Android workflow도 화면 검사를 필수로 실행합니다. 상세 범위는 [11번 점검 기록](qa/PREBUILD_V11_20261021.md)을 따릅니다. GitHub 빌드는 최신 변경을 반영한 대상 커밋의 필수 CI가 모두 통과한 뒤 시작하며 검사 단계를 건너뛰지 않습니다.
+
+11번 후보에는 아직 로컬 수정·신규 파일이 있습니다. 현재 원격 main으로 실행한 빌드에 이 변경이 포함됐다고 간주하지 않습니다. 검증한 최신 변경을 main에 반영한 커밋을 선택해야 하며 이번 준비 작업에서는 커밋·푸시하지 않았습니다.
 
 ## 2. GitHub Actions Secrets
 
@@ -59,7 +63,7 @@ Google OAuth 등록 콜백은 `https://tripprint-api-staging.gametps.workers.dev
 5. `release_status`는 **`draft`**로 둡니다. 제출을 끄면 이 값으로 Play 작업이 실행되지 않습니다.
 6. 버전·Secrets를 확인한 뒤 사용자가 **Run workflow**를 눌러 시작합니다.
 
-코드·API·인증·웹 흐름 검사 후 Android 프로젝트 생성과 Gradle 빌드가 진행됩니다. 성공한 실행의 **Artifacts → `tripprint-aab-9`**에서 ZIP을 받아 `app-release.aab`를 꺼냅니다. 버전 번호를 바꾸면 이름의 숫자도 바뀌며 파일 보관 기간은 14일입니다.
+코드·API·인증·웹 흐름 검사 후 Android 프로젝트 생성과 Gradle 빌드가 진행됩니다. 성공한 실행의 **Artifacts → `tripprint-aab-11`**에서 ZIP을 받아 `app-release.aab`를 꺼냅니다. 버전 번호를 바꾸면 이름의 숫자도 바뀌며 파일 보관 기간은14일입니다.
 
 실패 시 `build-and-submit`의 실패 단계를 확인합니다. 키·서명 누락은 해당 설정을 바로잡고, 코드·검사 실패는 수정한 새 커밋으로 실행합니다. 검사 단계를 삭제하거나 강제로 성공 처리하지 않습니다.
 

@@ -14,6 +14,7 @@ export interface SchedulePlanContent {
   choiceKind?: 'choice' | 'backup';
 }
 export interface WorkspaceDay {
+  destinationId?: string;
   id: string;
   dayNumber: number;
   tripDate: string;
@@ -73,6 +74,7 @@ export interface WorkspaceReceipt {
   category?: ReceiptCategory;
 }
 export interface WorkspaceSnapshot {
+  travelLegs?: import('./planning').TravelLeg[];
   trip: PersistedTrip;
   myRole: MemberRole;
   days: WorkspaceDay[];
@@ -107,8 +109,11 @@ export interface CommunityPost {
   publishedAt: string;
   photoPaths: string[];
   snapshot: {
+    destinations?: import('./planning').TripDestination[];
+    travelLegs?: Omit<import('./planning').TravelLeg, 'dayId'>[];
     days?: {
       dayNumber: number;
+      destinationId?: string;
       date: string;
       planTitle?: string;
       planConcept?: string;

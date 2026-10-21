@@ -72,6 +72,48 @@ const inserted = apply(second, 'schedule.save', {
   estimatedCost: { amount: '1500', currency: 'JPY' },
 });
 
+test('공통 모델도 중복 정렬 ID를 거부해 생략된 방문의 순서를 망가뜨리지 않는다', () => {
+  // 타입을 공유하는 기기 코드가 스키마 검증을 빠뜨려도 데이터 누락을 허용하지 않는다.
+  const original = structuredClone(inserted);
+  assert.throws(
+    () =>
+      transform(inserted, {
+        operation: 'schedule.reorder',
+        input: { dayId: base.days[0]!.id, ids: [a, a, b] },
+      }),
+    { code: 'VALIDATION_FAILED' },
+  );
+  assert.deepEqual(inserted, original);
+});
+
+test('이전 앱의 생략은 위치·계획 소개를 보존하고 명시적 null은 지운다', () => {
+  const enriched = apply(first, 'schedule.save', {
+    ...input(a),
+    location: { latitude: 35.68, longitude: 139.76 },
+    planContent: { description: '공유용 설명' },
+    durationMinutes: 45,
+  });
+  const legacy = apply(enriched, 'schedule.save', input(a));
+  assert.deepEqual(
+    legacy.itinerary[0]!.location,
+    enriched.itinerary[0]!.location,
+  );
+  assert.deepEqual(
+    legacy.itinerary[0]!.planContent,
+    enriched.itinerary[0]!.planContent,
+  );
+  assert.equal(legacy.itinerary[0]!.durationMinutes, 45);
+  const cleared = apply(legacy, 'schedule.save', {
+    ...input(a),
+    location: null,
+    planContent: null,
+    durationMinutes: null,
+  });
+  assert.equal(cleared.itinerary[0]!.location, null);
+  assert.equal(cleared.itinerary[0]!.planContent, null);
+  assert.equal(cleared.itinerary[0]!.durationMinutes, null);
+});
+
 test('일정 삭제는 자동 예상 비용만 제거하고 실제·수동 비용은 보존한다', () => {
   // 사용자가 별도로 기록한 지출과 예산은 일정 삭제로 지우지 않는다.
   const actualId = randomUUID();

@@ -26,9 +26,10 @@ for (const projectRoot of [repository, join(repository, 'apps/mobile')]) {
         projectRoot,
         '--json',
       ],
-      { encoding: 'utf8', timeout: 30000, cwd: repository },
+      // 루트 의존성 탐색은 병렬 검수에서 느려질 수 있어 BI 연결 검사와 같은 한도를 쓴다.
+      { encoding: 'utf8', timeout: 60000, cwd: repository },
     );
-    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.status, 0, result.error?.message || result.stderr);
     const { modules } = JSON.parse(result.stdout);
     for (const name of [
       'expo-navigation-bar',

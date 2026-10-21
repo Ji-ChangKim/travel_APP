@@ -1,6 +1,12 @@
 import { z } from 'zod';
 import { flightDetailsSchema } from './flight';
 import {
+  destinationsInputSchema,
+  travelLegSchema,
+  publicTravelLegSchema,
+} from './planning';
+import {
+  tripDestinationsSchema,
   calendarDateSchema,
   decimalExpenseSchema,
   foundationUuidSchema,
@@ -229,6 +235,15 @@ export const workspaceCommandSchema = z.discriminatedUnion('operation', [
     .strict(),
   z
     .object({
+      operation: z.literal('trip.destinations'),
+      input: destinationsInputSchema,
+    })
+    .strict(),
+  z
+    .object({ operation: z.literal('schedule.route'), input: travelLegSchema })
+    .strict(),
+  z
+    .object({
       operation: z.literal('media.register'),
       input: z
         .object({
@@ -316,6 +331,7 @@ export const reportSchema = z
 
 // 불완전한 서버 결과를 화면 데이터로 사용하지 않는다.
 export const workspaceTripSchema = z.object({
+  destinations: tripDestinationsSchema.optional(),
   id: foundationUuidSchema,
   ownerId: foundationUuidSchema,
   title: z.string(),
@@ -330,6 +346,7 @@ export const workspaceTripSchema = z.object({
   version: z.number().int().positive(),
 });
 export const workspaceSnapshotSchema = z.object({
+  travelLegs: z.array(travelLegSchema).max(10000).optional(),
   trip: workspaceTripSchema,
   myRole: z.enum(['owner', 'editor', 'viewer']),
   days: z.array(
@@ -337,6 +354,7 @@ export const workspaceSnapshotSchema = z.object({
       id: foundationUuidSchema,
       dayNumber: z.number(),
       tripDate: calendarDateSchema,
+      destinationId: foundationUuidSchema.optional(),
       planTitle: z.string().max(200).optional(),
       planConcept: z.string().max(2000).optional(),
     }),
@@ -443,10 +461,13 @@ export const communityPostSchema = z.object({
   publishedAt: z.string(),
   photoPaths: z.array(z.string()),
   snapshot: z.object({
+    destinations: tripDestinationsSchema.optional(),
+    travelLegs: z.array(publicTravelLegSchema).max(10000).optional(),
     days: z
       .array(
         z.object({
           dayNumber: z.number().int().positive(),
+          destinationId: foundationUuidSchema.optional(),
           date: calendarDateSchema,
           planTitle: z.string().max(200).optional(),
           planConcept: z.string().max(2000).optional(),

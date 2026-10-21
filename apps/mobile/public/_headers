@@ -1,0 +1,12 @@
+# 모든 정적 웹 응답에 브라우저 보안 헤더를 적용한다.
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(self), microphone=(), geolocation=(self)
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+# 캐싱이 안전한 정적 에셋은 장기 캐시와 스니핑 방지를 함께 지정한다.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff

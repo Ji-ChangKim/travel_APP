@@ -16,7 +16,8 @@ export const publicFeedColors = {
   borderLight: 'rgba(198, 198, 205, 0.3)',
   borderDivider: 'rgba(198, 198, 205, 0.2)',
   outline: '#76777D',
-  location: 'rgba(0, 0, 0, 0.5)',
+  // 사진 오버레이와 별개로 밝은 표지에서도 흰 지역명을 충분히 읽게 한다.
+  location: 'rgba(0, 0, 0, 0.56)',
 };
 const c = publicFeedColors;
 
@@ -64,7 +65,7 @@ export const publicFeedStyles = StyleSheet.create({
   pressed: { transform: [{ scale: 0.98 }] },
   chips: { flexDirection: 'row', gap: 8, paddingVertical: 4 },
   chip: {
-    minHeight: 34,
+    minHeight: 48,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 9999,
@@ -108,7 +109,7 @@ export const publicFeedStyles = StyleSheet.create({
     flexShrink: 1,
   },
   textButton: {
-    minHeight: 36,
+    minHeight: 48,
     paddingHorizontal: 4,
     paddingVertical: 6,
     flexDirection: 'row',

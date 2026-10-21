@@ -6,12 +6,18 @@ import type {
   WorkspaceSnapshot,
 } from '@wherego/domain';
 import { View } from 'react-native';
-import CommunityPlanView from './CommunityPlanView';
+import PlanDetailTimelineView from './PlanDetailTimelineView';
+import PlanAttachments from './PlanAttachments';
+import { adaptCommunityPostToTimeline } from './timelinePlanAdapters';
 import { LedgerAction } from './LedgerUI';
 import ServerPhoto from './ServerPhoto';
 import type { PlanForm } from './forms';
 import { ledgerStyles as l } from './ledgerTheme';
-import { publicationIds, togglePublication } from './publication';
+import {
+  publicationIds,
+  togglePublication,
+  togglePublicationDay,
+} from './publication';
 import { travelDateRange } from './travelDateRange';
 import { styles } from './workspaceStyles';
 // renderPublicationSelection이 읽는 값과 실행 가능한 행동의 계약이다.
@@ -195,15 +201,32 @@ export function renderPublicationPreview({
       )}
       {form.values.kind !== 'plan' && <Text>{form.values.body}</Text>}
       {form.values.kind === 'plan' && (
-        <CommunityPlanView
-          key={form.values.scheduleIds}
+        <PlanDetailTimelineView
           showTitle={mode === 'both'}
-          photoPreview={{ tripId: snapshot.trip.id, userId }}
-          post={{
-            title: snapshot.trip.title,
-            body: form.values.body || '',
-            snapshot: preview.snapshot,
-          }}
+          key={form.values.scheduleIds}
+          embedded
+          preview={{ tripId: snapshot.trip.id, userId }}
+          extraContent={
+            <PlanAttachments
+              snapshot={preview.snapshot}
+              preview={{
+                tripId: snapshot.trip.id,
+                userId,
+                mediaIds: publicationIds(form.values.photoIds),
+              }}
+            />
+          }
+          data={adaptCommunityPostToTimeline(
+            {
+              id: snapshot.postId || snapshot.trip.id,
+              author:
+                snapshot.members.find((member) => member.isMe)?.nickname || '',
+              title: snapshot.trip.title,
+              body: form.values.body || '',
+              snapshot: preview.snapshot,
+            },
+            'footprint',
+          )}
         />
       )}
       <Text>
@@ -222,28 +245,30 @@ export function renderPublicationPreview({
             </View>
           );
         })}
-      {publicationIds(form.values.photoIds).map((id) => {
-        /* 현재 항목의 표시 또는 선택값만 갱신한다. */ return (
-          <ServerPhoto
-            key={id}
-            userId={userId}
-            tripId={snapshot.trip.id}
-            mediaId={id}
-          />
-        );
-      })}
-      {!preview.photoPaths.length && <Text>공개할 사진이 없어요.</Text>}
-      {form.values.includeCosts === 'true' ? (
-        Object.entries(preview.snapshot.costs).map(([currency, amount]) => {
+      {form.values.kind !== 'plan' &&
+        publicationIds(form.values.photoIds).map((id) => {
           /* 현재 항목의 표시 또는 선택값만 갱신한다. */ return (
-            <Text key={currency}>
-              공개 실제 비용 · {amount} {currency}
-            </Text>
+            <ServerPhoto
+              key={id}
+              userId={userId}
+              tripId={snapshot.trip.id}
+              mediaId={id}
+            />
           );
-        })
-      ) : (
-        <Text>비용은 공개하지 않아요.</Text>
-      )}
+        })}
+      {!preview.photoPaths.length && <Text>공개할 사진이 없어요.</Text>}
+      {form.values.kind !== 'plan' &&
+        (form.values.includeCosts === 'true' ? (
+          Object.entries(preview.snapshot.costs).map(([currency, amount]) => {
+            /* 현재 항목의 표시 또는 선택값만 갱신한다. */ return (
+              <Text key={currency}>
+                공개 실제 비용 · {amount} {currency}
+              </Text>
+            );
+          })
+        ) : (
+          <Text>비용은 공개하지 않아요.</Text>
+        ))}
     </View>
   );
 }
@@ -280,6 +305,20 @@ export function renderPublicationChoices({
         }{' '}
         / {items.length}개 일정 선택
       </Text>
+      <LedgerAction
+        label={`DAY ${day.dayNumber} 일정 전체 ${items.every((item) => publicationIds(form.values.scheduleIds).includes(item.id)) ? '해제' : '선택'}`}
+        disabled={busy}
+        onPress={() => {
+          // 날짜 단위 명시적 선택은 사진과 비용 공개 선택을 바꾸지 않는다.
+          return onChange(
+            'scheduleIds',
+            togglePublicationDay(
+              form.values.scheduleIds || '',
+              items.map((item) => item.id),
+            ),
+          );
+        }}
+      />
       {items.map((item) => {
         // 다중 선택은 고정 체크 공간과 같은 원본 설명을 사용한다.
         return (

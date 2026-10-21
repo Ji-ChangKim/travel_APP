@@ -341,13 +341,17 @@ export function consumeStatement(
 }
 
 // 새 여행과 최초 멤버·재시도 결과를 하나의 batch로 저장한다.
-export function insertTrip(m: Mutation, snapshot: Snapshot): Promise<unknown> {
+export function insertTrip(
+  m: Mutation,
+  snapshot: Snapshot,
+  source?: { postId: string; snapshot: string },
+): Promise<unknown> {
   // 같은 요청이 경쟁해도 첫 요청이 기록한 여행 ID만 생성한다.
   return database(m.env)
     .batch([
       database(m.env)
         .prepare(
-          'INSERT OR IGNORE INTO mutation_requests(actor_id,request_key,input_hash,result,created_at) VALUES(?,?,?,?,?)',
+          `INSERT OR IGNORE INTO mutation_requests(actor_id,request_key,input_hash,result,created_at) SELECT ?,?,?,?,?${source ? ' WHERE EXISTS(SELECT 1 FROM posts WHERE id=? AND snapshot=? AND NOT EXISTS(SELECT 1 FROM blocks WHERE actor_id=? AND blocked_id=posts.author_id))' : ''}`,
         )
         .bind(
           m.session.userId,
@@ -359,6 +363,7 @@ export function insertTrip(m: Mutation, snapshot: Snapshot): Promise<unknown> {
             trip: snapshot.trip,
           }),
           Date.now(),
+          ...(source ? [source.postId, source.snapshot, m.session.userId] : []),
         ),
       database(m.env)
         .prepare(
@@ -384,6 +389,8 @@ export function insertTrip(m: Mutation, snapshot: Snapshot): Promise<unknown> {
     ])
     .then((result) => {
       /* 확정 요청 키의 결과만 사용한다. */ return replay(m).then((data) => {
+        // 공개 원본이 저장 직전에 바뀌면 빈 성공이나 일부 여행을 남기지 않는다.
+        if (!data) return rejectRequest('RESOURCE_NOT_FOUND');
         /* 최초 저장과 재생을 구분한다. */ return {
           data,
           replayed: !result[0]?.meta.changes,

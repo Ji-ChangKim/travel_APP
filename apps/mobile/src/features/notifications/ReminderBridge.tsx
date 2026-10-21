@@ -1,10 +1,11 @@
+import { tripListQueryOptions } from '../workspace/tripQueries';
 import { useEffect } from 'react';
 import { AppState, Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { useQuery } from '@tanstack/react-query';
 import { useTripStore } from '@/stores/useTripStore';
-import { foundationQueryKey, listServerTrips } from '@wherego/api-client';
-import { serverOptions } from '@/features/workspace/service';
+import { listServerTrips } from '@wherego/api-client';
+
 import { usePermissionRevision } from './permissionState';
 
 type Trips = Awaited<ReturnType<typeof listServerTrips>>;
@@ -31,18 +32,7 @@ function useReminderQuery(id: string, permissionRevision: number) {
   // 홈과 같은 서버 원본 캐시를 사용한다.
   return useReminderEffects(
     id,
-    useQuery({
-      queryKey: foundationQueryKey(id, 'trips'),
-      enabled: Boolean(id),
-      queryFn: ({ signal }) => {
-        // 확인된 계정의 서버 여행만 읽는다.
-        return serverOptions(id).then((options) => {
-          // 알림 계정의 마지막 조회 구독이 끝나면 연결도 정리한다.
-          return listServerTrips(options, signal);
-        });
-      },
-      retry: false,
-    }).data,
+    useQuery({ ...tripListQueryOptions(id), enabled: Boolean(id) }).data,
     permissionRevision,
   );
 }

@@ -216,3 +216,30 @@ test('허용 Origin만 CORS 응답하며 목업 경로는 503 반환', async () 
     return undefined;
   });
 });
+
+test('API 전역 응답에 OWASP ASVS 표준 보안 헤더 포함 검증', async () => {
+  // 헬스체크 및 일반 API 경로에서 표준 보안 헤더가 올바르게 반환되는지 확인한다.
+  return Promise.resolve(createApp().request('/health', {}, env)).then(
+    (response) => {
+      // MIME 타입 스니핑 방지 헤더를 확인한다.
+      assert.equal(response.headers.get('X-Content-Type-Options'), 'nosniff');
+      // 클릭재킹 차단 프레임 옵션 헤더를 확인한다.
+      assert.equal(response.headers.get('X-Frame-Options'), 'DENY');
+      // 리퍼러 누출 제한 정책 헤더를 확인한다.
+      assert.equal(
+        response.headers.get('Referrer-Policy'),
+        'strict-origin-when-cross-origin',
+      );
+      // 레거시 XSS 필터 비활성화 헤더를 확인한다.
+      assert.equal(response.headers.get('X-XSS-Protection'), '0');
+      // 권한 정책 헤더를 확인한다.
+      assert.equal(
+        response.headers.get('Permissions-Policy'),
+        'camera=(), microphone=(), geolocation=()',
+      );
+      // 비인가 캐싱 방지 헤더를 확인한다.
+      assert.equal(response.headers.get('Cache-Control'), 'no-store');
+      return undefined;
+    },
+  );
+});

@@ -1,208 +1,39 @@
-import type {
-  CommunityPost,
-  PersistedTripInput,
-  WorkspaceSnapshot,
-  WorkspaceSchedule,
-} from '@wherego/domain';
+import type { CommunityPost, PersistedTripInput } from '@wherego/domain';
+import { tripDestinations, validTravelLeg } from '@wherego/domain';
+import {
+  updateTripDestinations,
+  representativeDestinations,
+} from './workspaceDestinations';
 import type { WorkspaceCommand } from './workspace';
-// 로컬 저장과 서버 저장이 같은 여행 규칙 오류를 공유한다.
-export class WorkspaceModelError extends Error {
-  // 내부 서버 상태 없이 공개 도메인 오류 코드만 보관한다.
-  constructor(
-    readonly code: 'ROLE_FORBIDDEN' | 'TRIP_ARCHIVED' | 'VALIDATION_FAILED',
-  ) {
-    // 플랫폼별 저장 계층이 오류를 사용자 안내로 변환한다.
-    super(code);
-  }
-}
-
-// 유효하지 않은 여행 변경 후보를 중단한다.
-function rejectRequest(code: WorkspaceModelError['code']): never {
-  // 서버와 로컬에서 동일하게 저장을 거부한다.
-  throw new WorkspaceModelError(code);
-}
-
-export type Snapshot = WorkspaceSnapshot;
-type ScheduleInput = Extract<
-  WorkspaceCommand,
-  { operation: 'schedule.save' }
->['input'];
-
-// 삽입 위치와 확정 영수증의 날짜 관계를 검사한다.
-function validSchedulePlacement(s: Snapshot, input: ScheduleInput): boolean {
-  // 다른 날짜의 장소를 기준으로 삼거나 확정 결제일을 옮기지 않는다.
-  return (
-    validDay(s, input.dayId) &&
-    (input.afterScheduleId === undefined ||
-      input.afterScheduleId === null ||
-      s.itinerary.some((item) => {
-        // 자기 자신을 삽입 기준으로 선택할 수 없다.
-        return (
-          item.id === input.afterScheduleId &&
-          item.id !== input.id &&
-          item.dayId === input.dayId
-        );
-      })) &&
-    !s.receipts.some((receipt) => {
-      // 확정 영수증과 연결된 일정은 결제일이 같은 DAY에만 둔다.
-      return (
-        receipt.scheduleId === input.id &&
-        receipt.date !==
-          s.days.find((day) => {
-            // 선택 날짜의 현지 달력 날짜를 읽는다.
-            return day.id === input.dayId;
-          })?.tripDate
-      );
-    })
-  );
-}
-
-// 명령 전용 값을 영구 일정 속성에서 제외한다.
-function scheduleStoredInput(
-  input: ScheduleInput,
-): Omit<ScheduleInput, 'afterScheduleId' | 'estimatedCost'> {
-  // 삽입 위치와 예상 비용은 각각 순서와 비용 객체로 저장한다.
-  return Object.fromEntries(
-    Object.entries(input).filter(([key]) => {
-      // 명령 보조 속성은 스냅샷 일정에 복사하지 않는다.
-      return key !== 'afterScheduleId' && key !== 'estimatedCost';
-    }),
-  ) as Omit<ScheduleInput, 'afterScheduleId' | 'estimatedCost'>;
-}
-
-// 저장 일정의 삽입 위치를 한 번에 반영한다.
-function placedSchedule(
-  s: Snapshot,
-  input: ScheduleInput,
-  item: WorkspaceSchedule,
-): WorkspaceSchedule[] {
-  // 이전 앱이 삽입 위치를 보내지 않으면 기존 정렬 계약을 유지한다.
-  return input.afterScheduleId === undefined
-    ? saveItem(s.itinerary, item)
-    : [
-        ...s.itinerary.filter((other) => {
-          // 이동 전 일정과 목적 날짜의 일정만 재정렬 대상으로 분리한다.
-          return other.id !== item.id && other.dayId !== item.dayId;
-        }),
-        ...insertedSchedules(s.itinerary, item, input.afterScheduleId).map(
-          (other, index) => {
-            // 같은 날짜 안에서만 연속된 순서 번호를 부여한다.
-            return { ...other, sortOrder: index + 1 };
-          },
-        ),
-      ];
-}
-
-// 선택 날짜의 목록에 일정 하나를 끼워 넣는다.
-function insertedSchedules(
-  items: WorkspaceSchedule[],
-  item: WorkspaceSchedule,
-  after: string | null,
-): WorkspaceSchedule[] {
-  // 입력 배열을 수정하지 않고 목적 날짜의 정렬 결과로 삽입한다.
-  return insertAt(
-    items
-      .filter((other) => {
-        // 편집 중인 자기 자신은 미리보기 목록에서 제거한다.
-        return other.dayId === item.dayId && other.id !== item.id;
-      })
-      .sort((a, b) => {
-        // 저장된 방문 순서를 기준으로 삼는다.
-        return a.sortOrder - b.sortOrder;
-      }),
-    item,
-    after,
-  );
-}
-
-// 앞·뒤 목록을 합쳐 삽입 결과를 만든다.
-function insertAt(
-  items: WorkspaceSchedule[],
-  item: WorkspaceSchedule,
-  after: string | null,
-): WorkspaceSchedule[] {
-  // null은 첫 일정이며 유효한 기준 ID는 앞선 검증에서 확인한다.
-  return [
-    ...items.slice(
-      0,
-      after === null
-        ? 0
-        : items.findIndex((other) => {
-            // 선택한 앞 일정의 위치만 찾는다.
-            return other.id === after;
-          }) + 1,
-    ),
-    item,
-    ...items.slice(
-      after === null
-        ? 0
-        : items.findIndex((other) => {
-            // 나머지 일정의 상대 순서를 유지한다.
-            return other.id === after;
-          }) + 1,
-    ),
-  ];
-}
-
-// 일정과 예상 비용을 같은 변경 결과로 저장한다.
-function scheduleEstimates(
-  s: Snapshot,
-  input: ScheduleInput,
-  identify: WorkspaceId,
-): Snapshot['expenses'] {
-  // 실제 지출과 영수증 비용은 수정하거나 삭제하지 않는다.
-  return input.estimatedCost === undefined
-    ? s.expenses
-    : input.estimatedCost === null
-      ? s.expenses.filter((expense) => {
-          // 이 입력 화면에서 만든 예상 비용만 해제한다.
-          return (
-            expense.scheduleId !== input.id ||
-            expense.source !== 'schedule-plan'
-          );
-        })
-      : saveItem(s.expenses, {
-          id:
-            s.expenses.find((expense) => {
-              // 다시 저장할 때 같은 예상 비용 ID를 재사용한다.
-              return (
-                expense.scheduleId === input.id &&
-                expense.source === 'schedule-plan'
-              );
-            })?.id || identify(),
-          dayId: input.dayId,
-          scheduleId: input.id,
-          title: `${input.title} 예상 비용`,
-          ...input.estimatedCost,
-          isActual: false,
-          category:
-            input.type === 'STAY'
-              ? 'stay'
-              : input.type === 'TRANSPORT'
-                ? 'transport'
-                : 'activity',
-          source: 'schedule-plan',
-        });
-}
-// 플랫폼이 제공하는 보안 UUID 생성기를 요청마다 전달한다.
-export type WorkspaceId = () => string;
+import {
+  changed,
+  rejectRequest,
+  saveItem,
+  without,
+  validDay,
+  validSchedule,
+  type Snapshot,
+  type Change,
+  type WorkspaceId,
+} from './workspaceModelCore';
+import {
+  saveSchedule,
+  reorderSchedules,
+  deleteSchedule,
+} from './workspaceSchedules';
+export {
+  WorkspaceModelError,
+  changed,
+  type Snapshot,
+  type Change,
+  type WorkspaceId,
+} from './workspaceModelCore';
 
 // 서버의 Web Crypto UUID 생성기를 기본값으로 사용한다.
 function randomId(): string {
   // 네이티브 앱은 Expo UUID 함수를 별도로 주입한다.
   return crypto.randomUUID();
 }
-export type Change = {
-  snapshot: Snapshot;
-  result: Record<string, unknown>;
-  post?: CommunityPost | null;
-  invite?: {
-    id: string;
-    token: string;
-    role: 'editor' | 'viewer';
-    expires: number;
-  };
-};
 
 // 달력 날짜를 UTC 기준으로 이동한다.
 function dateAt(start: string, offset: number): string {
@@ -211,36 +42,26 @@ function dateAt(start: string, offset: number): string {
     .toISOString()
     .slice(0, 10);
 }
-
-// 날짜를 유지하는 DAY 목록을 생성한다.
 export function tripDays(
   start: string,
   end: string,
   previous: Snapshot['days'] = [],
   identify: WorkspaceId = randomId,
 ): Snapshot['days'] {
-  // 같은 날짜의 ID를 유지해 기존 일정 참조를 보존한다.
-  return Array.from(
-    {
-      length: Math.round((Date.parse(end) - Date.parse(start)) / 86400000) + 1,
-    },
-    (_, index) => {
-      // 생성한 날짜에 대응하는 기존 ID만 재사용한다.
-      return {
-        ...previous.find((day) => {
-          // 같은 실제 날짜의 공개용 계획 제목과 컨셉을 기간 변경에서도 보존한다.
-          return day.tripDate === dateAt(start, index);
-        }),
-        id:
-          previous.find((day) => {
-            // 날짜가 동일한 DAY를 찾는다.
-            return day.tripDate === dateAt(start, index);
-          })?.id || identify(),
-        dayNumber: index + 1,
-        tripDate: dateAt(start, index),
-      };
-    },
-  );
+  // 같은 날짜의 DAY와 계획 소개를 유지해 기간 확장에서도 기존 연결을 보존한다.
+  const previousByDate = new Map(previous.map((day) => [day.tripDate, day]));
+  const length =
+    Math.round((Date.parse(end) - Date.parse(start)) / 86400000) + 1;
+  return Array.from({ length }, (_, index) => {
+    const tripDate = dateAt(start, index);
+    const existing = previousByDate.get(tripDate);
+    return {
+      ...existing,
+      id: existing?.id || identify(),
+      dayNumber: index + 1,
+      tripDate,
+    };
+  });
 }
 
 // 실제 계정과 입력으로 새로운 여행 스냅샷을 만든다.
@@ -265,7 +86,14 @@ export function newTrip(
         coverColor: input.coverColor || '#E84025',
       },
       myRole: 'owner',
-      days: tripDays(input.startDate, input.endDate, [], identify),
+      days: tripDays(input.startDate, input.endDate, [], identify).map(
+        (day) => ({
+          ...day,
+          ...(input.destinations
+            ? { destinationId: input.destinations[0]!.id }
+            : {}),
+        }),
+      ),
       itinerary: [],
       expenses: [],
       checklists: [],
@@ -357,51 +185,6 @@ function tripMetadata(input: PersistedTripInput) {
   ) as Omit<PersistedTripInput, 'flight' | 'flights'>;
 }
 
-// 기존 ID를 교체하거나 새 항목을 추가한다.
-function saveItem<T extends { id: string }>(items: T[], item: T): T[] {
-  // ID 중복을 생성하지 않는다.
-  return [
-    ...items.filter((previous) => {
-      // 수정 대상 ID만 제외한다.
-      return previous.id !== item.id;
-    }),
-    item,
-  ];
-}
-
-// 지정 ID 한 개를 제거한다.
-function without<T extends { id: string }>(items: T[], id: string): T[] {
-  // 다른 항목은 유지한다.
-  return items.filter((item) => {
-    // 삭제 대상만 걸러낸다.
-    return item.id !== id;
-  });
-}
-
-// 일정 부모가 현재 여행에 속하는지 검사한다.
-function validDay(snapshot: Snapshot, id?: string): boolean {
-  // 다른 여행 DAY ID의 주입을 거부한다.
-  return (
-    !id ||
-    snapshot.days.some((day) => {
-      // 동일 여행의 DAY 목록에서만 찾는다.
-      return day.id === id;
-    })
-  );
-}
-
-// 선택한 일정과 DAY의 관계를 검사한다.
-function validSchedule(snapshot: Snapshot, id?: string, day?: string): boolean {
-  // 부모 일정이 다른 날짜에 속하면 저장하지 않는다.
-  return (
-    !id ||
-    snapshot.itinerary.some((item) => {
-      // 일정 ID와 선택 날짜를 동시에 대조한다.
-      return item.id === id && (!day || item.dayId === day);
-    })
-  );
-}
-
 // 완료 여행에서 사용자가 선택한 정보만 공개 스냅샷으로 만든다.
 function publicPost(
   snapshot: Snapshot,
@@ -444,6 +227,49 @@ export function publicSelection(
       );
     }),
     snapshot: {
+      ...(input.kind === 'plan' && snapshot.trip.destinations
+        ? {
+            destinations: tripDestinations(snapshot.trip).filter(
+              (destination, index) =>
+                index === 0 ||
+                snapshot.days.some(
+                  (day) =>
+                    day.destinationId === destination.id &&
+                    snapshot.itinerary.some(
+                      (item) =>
+                        item.dayId === day.id &&
+                        input.scheduleIds.includes(item.id),
+                    ),
+                ),
+            ),
+          }
+        : {}),
+      ...(input.kind === 'plan' && snapshot.travelLegs
+        ? {
+            travelLegs: snapshot.travelLegs
+              .filter(
+                (leg) =>
+                  input.scheduleIds.includes(leg.fromScheduleId) &&
+                  input.scheduleIds.includes(leg.toScheduleId) &&
+                  Boolean(
+                    snapshot.itinerary.find(
+                      (item) => item.id === leg.fromScheduleId,
+                    )?.googlePlaceId,
+                  ) &&
+                  Boolean(
+                    snapshot.itinerary.find(
+                      (item) => item.id === leg.toScheduleId,
+                    )?.googlePlaceId,
+                  ) &&
+                  validTravelLeg(snapshot, leg),
+              )
+              .map(({ fromScheduleId, toScheduleId, mode }) => ({
+                fromScheduleId,
+                toScheduleId,
+                mode,
+              })),
+          }
+        : {}),
       country: snapshot.trip.country,
       city: snapshot.trip.city,
       startDate: snapshot.trip.startDate,
@@ -512,6 +338,7 @@ function publicPlanDays(snapshot: Snapshot, selected: string[]) {
       // 원본 식별자 대신 DAY 번호와 명시적 계획 제목·컨셉만 공개한다.
       return {
         dayNumber: day.dayNumber,
+        ...(day.destinationId ? { destinationId: day.destinationId } : {}),
         date: day.tripDate,
         planTitle: day.planTitle,
         planConcept: day.planConcept,
@@ -595,14 +422,16 @@ export function transform(
   identify: WorkspaceId = randomId,
 ): Change {
   // 조회자, 보관 여행과 소유자 전용 명령을 보호한다.
-  return snapshot.myRole === 'viewer'
-    ? rejectRequest('ROLE_FORBIDDEN')
-    : snapshot.trip.status === 'ARCHIVED'
-      ? rejectRequest('TRIP_ARCHIVED')
-      : /^(invite\.|member\.|community\.|trip\.)/.test(command.operation) &&
-          snapshot.myRole !== 'owner'
-        ? rejectRequest('ROLE_FORBIDDEN')
-        : applyCommand(snapshot, command, identify);
+  if (snapshot.myRole === 'viewer') return rejectRequest('ROLE_FORBIDDEN');
+  if (snapshot.trip.status === 'ARCHIVED')
+    return rejectRequest('TRIP_ARCHIVED');
+  if (
+    /^(invite\.|member\.|community\.|trip\.)/.test(command.operation) &&
+    snapshot.myRole !== 'owner'
+  ) {
+    return rejectRequest('ROLE_FORBIDDEN');
+  }
+  return applyCommand(snapshot, command, identify);
 }
 
 // 검증된 입력의 도메인 변화 하나를 선택한다.
@@ -613,6 +442,19 @@ function applyCommand(
 ): Change {
   // 각 분기는 한 종류의 명령 결과만 반환한다.
   switch (command.operation) {
+    case 'trip.destinations':
+      return updateTripDestinations(s, command.input);
+    case 'schedule.route':
+      return validTravelLeg(s, command.input)
+        ? changed(s, {
+            travelLegs: [
+              ...(s.travelLegs || []).filter(
+                (leg) => leg.toScheduleId !== command.input.toScheduleId,
+              ),
+              command.input,
+            ],
+          })
+        : rejectRequest('VALIDATION_FAILED');
     case 'day.plan':
       return validDay(s, command.input.dayId)
         ? changed(s, {
@@ -629,115 +471,11 @@ function applyCommand(
           })
         : rejectRequest('VALIDATION_FAILED');
     case 'schedule.save':
-      return validSchedulePlacement(s, command.input)
-        ? changed(
-            s,
-            {
-              itinerary: placedSchedule(s, command.input, {
-                ...scheduleStoredInput(command.input),
-                planContent:
-                  command.input.planContent === undefined
-                    ? s.itinerary.find((item) => {
-                        // 이전 앱의 수정에서도 공유용 계획 원문을 보존한다.
-                        return item.id === command.input.id;
-                      })?.planContent
-                    : command.input.planContent,
-                durationMinutes:
-                  command.input.durationMinutes === undefined
-                    ? s.itinerary.find((item) => {
-                        // 이전 앱의 수정에서도 기존 체류시간을 보존한다.
-                        return item.id === command.input.id;
-                      })?.durationMinutes
-                    : command.input.durationMinutes,
-                // 이전 앱의 수정에서는 상세를 보존하고 유형 변경 또는 null에서만 해제한다.
-                flight:
-                  command.input.type !== 'TRANSPORT'
-                    ? null
-                    : command.input.flight === undefined
-                      ? s.itinerary.find((item) => {
-                          // 같은 일정의 기존 항공편만 보존한다.
-                          return item.id === command.input.id;
-                        })?.flight
-                      : command.input.flight,
-                // 이전 앱이 위치 필드를 보내지 않아도 새 앱에서 선택한 위치를 보존한다.
-                location:
-                  command.input.location === undefined
-                    ? s.itinerary.find((item) => {
-                        // 같은 일정의 기존 위치만 재사용하며 null은 명시적 삭제로 처리한다.
-                        return item.id === command.input.id;
-                      })?.location
-                    : command.input.location,
-                timeSlot: command.input.timeSlot || null,
-                memo: command.input.memo || null,
-                ...(command.input.googlePlaceId
-                  ? { googlePlaceId: command.input.googlePlaceId }
-                  : { googlePlaceId: undefined }),
-              }),
-              expenses: scheduleEstimates(s, command.input, identify).map(
-                (expense) => {
-                  // 일정에 연결된 수동 비용도 방문 날짜와 함께 이동한다.
-                  return expense.scheduleId === command.input.id
-                    ? { ...expense, dayId: command.input.dayId }
-                    : expense;
-                },
-              ),
-            },
-            { id: command.input.id },
-          )
-        : rejectRequest('VALIDATION_FAILED');
+      return saveSchedule(s, command.input, identify);
     case 'schedule.reorder':
-      return validDay(s, command.input.dayId) &&
-        command.input.ids.length ===
-          s.itinerary.filter((item) => {
-            // 선택 날짜의 모든 일정이 요청에 포함되어야 한다.
-            return item.dayId === command.input.dayId;
-          }).length &&
-        command.input.ids.every((id) => {
-          // 다른 날짜나 존재하지 않는 일정은 정렬하지 않는다.
-          return s.itinerary.some((item) => {
-            // 요청한 날짜의 일정만 변경 대상으로 허용한다.
-            return item.id === id && item.dayId === command.input.dayId;
-          });
-        })
-        ? changed(s, {
-            itinerary: s.itinerary.map((item) => {
-              // 다른 날짜와 사진·비용 연결은 그대로 유지한다.
-              return item.dayId === command.input.dayId
-                ? { ...item, sortOrder: command.input.ids.indexOf(item.id) + 1 }
-                : item;
-            }),
-          })
-        : rejectRequest('VALIDATION_FAILED');
+      return reorderSchedules(s, command.input);
     case 'schedule.delete':
-      return s.receipts.some((item) => {
-        /* 영수증 부모 삭제를 막는다. */ return (
-          item.scheduleId === command.input.id
-        );
-      })
-        ? rejectRequest('VALIDATION_FAILED')
-        : changed(s, {
-            itinerary: without(s.itinerary, command.input.id),
-            media: s.media.map((item) => {
-              /* 사진은 삭제하지 않고 일정 연결만 해제한다. */ return item.scheduleId ===
-                command.input.id
-                ? { ...item, scheduleId: null }
-                : item;
-            }),
-            expenses: s.expenses
-              .filter((item) => {
-                // 삭제한 방문에서 자동으로 만든 예상 비용만 함께 제거한다.
-                return (
-                  item.scheduleId !== command.input.id ||
-                  item.source !== 'schedule-plan'
-                );
-              })
-              .map((item) => {
-                /* 독립 비용으로 연결을 해제한다. */ return item.scheduleId ===
-                  command.input.id
-                  ? { ...item, scheduleId: null }
-                  : item;
-              }),
-          });
+      return deleteSchedule(s, command.input.id);
     case 'expense.save':
       return validDay(s, command.input.dayId) &&
         validSchedule(s, command.input.scheduleId, command.input.dayId) &&
@@ -764,7 +502,21 @@ function applyCommand(
         ? rejectRequest('VALIDATION_FAILED')
         : changed(s, { expenses: without(s.expenses, command.input.id) });
     case 'trip.update':
-      return changed(s, { trip: { ...s.trip, ...command.input } });
+      return changed(s, {
+        trip: {
+          ...s.trip,
+          ...command.input,
+          ...(s.trip.destinations
+            ? {
+                destinations: representativeDestinations(
+                  s,
+                  command.input.country,
+                  command.input.city,
+                ),
+              }
+            : {}),
+        },
+      });
     case 'trip.period':
       return changePeriod(
         s,
@@ -861,17 +613,6 @@ function applyCommand(
     case 'community.withdraw':
       return changed(s, { postId: null }, {}, { post: null });
   }
-}
-
-// 변경 필드만 합성해 저장 후보를 만든다.
-export function changed(
-  s: Snapshot,
-  patch: Partial<Snapshot>,
-  result: Record<string, unknown> = {},
-  extra: Partial<Change> = {},
-): Change {
-  // 버전 증가는 저장 계층이 CAS 시 확정한다.
-  return { snapshot: { ...s, ...patch }, result, ...extra };
 }
 
 // DAY 축소 시 기존 기록을 잃지 않게 검사한다.

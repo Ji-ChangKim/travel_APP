@@ -30,6 +30,7 @@ import { rejectRequest } from './errors';
 import type { VerifiedSession } from './types';
 import { z } from 'zod';
 import { mediaBucket } from './cloudMedia';
+import { importPublicTrip } from './communityImport';
 
 // API 계약을 D1 명령과 조회로 연결한다.
 export function cloudRpc(
@@ -210,138 +211,96 @@ function feed(
     });
 }
 
-// 변경 전에 멤버십과 재시도 상태를 검사한다.
-function mutate(m: Mutation, name: string): Promise<unknown> {
-  // 초대 수락과 최초 생성은 별도 권한 경로를 사용한다.
-  return name === 'wherego_accept_invite'
-    ? accept(m)
-    : name === 'wherego_create_trip'
-      ? replay(m).then((data) => {
-          /* 생성은 기존 멤버십이 없다. */ return data
-            ? { data, replayed: true }
-            : actorName(m).then((nickname) => {
-                /* 실제 가입 계정으로 최초 멤버를 만든다. */ return insertTrip(
-                  m,
-                  newTrip(
-                    m.args.p_input as PersistedTripInput,
-                    m.session.userId,
-                    nickname,
-                  ),
-                );
-              });
-        })
-      : readTrip(m, String(m.args.p_trip)).then((snapshot) => {
-          /* 재시도에도 현재 멤버십을 다시 확인한다. */ return replay(m).then(
-            (data) => {
-              /* 확정된 결과만 재생한다. */ return data
-                ? { data, replayed: true }
-                : snapshot.trip.version !== Number(m.args.p_version)
-                  ? rejectRequest('VERSION_CONFLICT')
-                  : mutationChange(m, name, snapshot);
-            },
-          );
-        });
+async function mutate(m: Mutation, name: string): Promise<unknown> {
+  if (name === 'wherego_accept_invite') return accept(m);
+  if (name === 'wherego_import_community') return importPublicTrip(m);
+  if (name === 'wherego_create_trip') return createTripMutation(m);
+
+  // 멤버십이 철회된 사용자는 과거에 성공한 요청도 재생할 수 없다.
+  const snapshot = await readTrip(m, String(m.args.p_trip));
+  const data = await replay(m);
+  if (data) return { data, replayed: true };
+  if (snapshot.trip.version !== Number(m.args.p_version)) {
+    return rejectRequest('VERSION_CONFLICT');
+  }
+  return mutationChange(m, name, snapshot);
 }
 
-// 버전이 확인된 여행에서 명령 후보를 계산한다.
-function mutationChange(
+async function createTripMutation(m: Mutation): Promise<unknown> {
+  // 최초 생성에는 기존 멤버십이 없으므로 별도 경로에서 같은 키를 재생한다.
+  const data = await replay(m);
+  if (data) return { data, replayed: true };
+  const nickname = await actorName(m);
+  return insertTrip(
+    m,
+    newTrip(m.args.p_input as PersistedTripInput, m.session.userId, nickname),
+  );
+}
+
+async function mutationChange(
   m: Mutation,
   name: string,
   snapshot: Snapshot,
 ): Promise<unknown> {
-  // 업로드 등록은 실제 서버 메타데이터를 확인한 후 저장한다.
-  return prepareChange(m, name, snapshot).then((change) => {
-    /* 초대 생성의 해시 저장을 동일 트랜잭션으로 묶는다. */ return change.invite
-      ? digest(change.invite.token).then((hash) => {
-          /* 원문 토큰 대신 해시를 저장한다. */ return commit(
-            m,
-            snapshot,
-            change,
-            inviteStatement(m, change, hash),
-          );
-        })
-      : commit(m, snapshot, change);
-  });
+  const change = await prepareChange(m, name, snapshot);
+  if (!change.invite) return commit(m, snapshot, change);
+  // 초대 토큰 원문은 저장하지 않고 해시를 여행 변경과 같은 트랜잭션에 넣는다.
+  const hash = await digest(change.invite.token);
+  return commit(m, snapshot, change, inviteStatement(m, change, hash));
 }
 
-// 레거시 체크리스트 계약과 공통 명령을 계산한다.
-function prepareChange(
+async function prepareChange(
   m: Mutation,
   name: string,
   snapshot: Snapshot,
 ): Promise<Change> {
-  // 역할 권한은 체크리스트 경로에도 동일하게 적용한다.
-  return snapshot.myRole === 'viewer'
-    ? Promise.reject(new Error('ROLE_FORBIDDEN')).catch(() => {
-        /* 공개 오류 코드만 전달한다. */ return rejectRequest('ROLE_FORBIDDEN');
-      })
-    : snapshot.trip.status === 'ARCHIVED'
-      ? Promise.reject(new Error('TRIP_ARCHIVED')).catch(() => {
-          /* 보관 여행은 수정하지 않는다. */ return rejectRequest(
-            'TRIP_ARCHIVED',
-          );
-        })
-      : name === 'wherego_add_checklist'
-        ? Promise.resolve(
-            changed(snapshot, {
-              checklists: [
-                ...snapshot.checklists,
-                {
-                  id: crypto.randomUUID(),
-                  title: String(m.args.p_title),
-                  isCompleted: false,
-                },
-              ],
-            }),
-          )
-        : name === 'wherego_set_checklist'
-          ? Promise.resolve(
-              snapshot.checklists.some((item) => {
-                /* 해당 여행의 항목만 수정한다. */ return (
-                  item.id === m.args.p_item
-                );
-              })
-                ? changed(snapshot, {
-                    checklists: snapshot.checklists.map((item) => {
-                      /* 원하는 완료 상태를 명시적으로 저장한다. */ return item.id ===
-                        m.args.p_item
-                        ? { ...item, isCompleted: Boolean(m.args.p_completed) }
-                        : item;
-                    }),
-                  })
-                : rejectRequest('RESOURCE_NOT_FOUND'),
-            )
-          : name === 'wherego_command'
-            ? verifiedCommand(m, snapshot)
-            : Promise.reject(new Error('FEATURE_NOT_READY')).catch(() => {
-                /* 미지원 계약을 성공으로 바꾸지 않는다. */ return rejectRequest(
-                  'FEATURE_NOT_READY',
-                );
-              });
+  // 체크리스트도 일반 일정 변경과 같은 쓰기 권한을 적용한다.
+  if (snapshot.myRole === 'viewer') return rejectRequest('ROLE_FORBIDDEN');
+  if (snapshot.trip.status === 'ARCHIVED')
+    return rejectRequest('TRIP_ARCHIVED');
+
+  switch (name) {
+    case 'wherego_add_checklist':
+      return changed(snapshot, {
+        checklists: [
+          ...snapshot.checklists,
+          {
+            id: crypto.randomUUID(),
+            title: String(m.args.p_title),
+            isCompleted: false,
+          },
+        ],
+      });
+    case 'wherego_set_checklist':
+      if (!snapshot.checklists.some((item) => item.id === m.args.p_item)) {
+        return rejectRequest('RESOURCE_NOT_FOUND');
+      }
+      return changed(snapshot, {
+        checklists: snapshot.checklists.map((item) =>
+          item.id === m.args.p_item
+            ? { ...item, isCompleted: Boolean(m.args.p_completed) }
+            : item,
+        ),
+      });
+    case 'wherego_command':
+      return verifiedCommand(m, snapshot);
+    default:
+      return rejectRequest('FEATURE_NOT_READY');
+  }
 }
 
-// 실제 업로드 존재를 검사한 공통 도메인 명령만 적용한다.
-function verifiedCommand(m: Mutation, snapshot: Snapshot): Promise<Change> {
-  // 클라이언트의 임의 파일 경로와 MIME을 신뢰하지 않는다.
-  return m.args.p_operation === 'media.register'
-    ? verifyUpload(m, m.args.p_input as Record<string, unknown>).then(() => {
-        /* 업로드 검증이 끝난 뒤 등록한다. */ return transform(
-          snapshot,
-          workspaceCommandSchema.parse({
-            operation: m.args.p_operation,
-            input: m.args.p_input,
-          }),
-        );
-      })
-    : Promise.resolve(
-        transform(
-          snapshot,
-          workspaceCommandSchema.parse({
-            operation: m.args.p_operation,
-            input: m.args.p_input,
-          }),
-        ),
-      );
+async function verifiedCommand(
+  m: Mutation,
+  snapshot: Snapshot,
+): Promise<Change> {
+  const command = workspaceCommandSchema.parse({
+    operation: m.args.p_operation,
+    input: m.args.p_input,
+  });
+  // 형식 검사에 통과해도 실제 업로드 소유자와 MIME이 일치해야 등록할 수 있다.
+  if (command.operation === 'media.register')
+    await verifyUpload(m, command.input);
+  return transform(snapshot, command);
 }
 
 // 사진 등록 전 D1의 업로드 소유자와 MIME을 확인한다.

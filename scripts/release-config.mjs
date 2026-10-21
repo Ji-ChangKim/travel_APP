@@ -144,13 +144,13 @@ function configuredSocialClients(template, env) {
   return Object.fromEntries(
     Object.entries({
       GOOGLE_CLIENT_ID:
-        env.GOOGLE_CLIENT_ID ||
+        env.GOOGLE_CLIENT_ID?.trim() ||
         template.env[env.RELEASE_ENV].vars.GOOGLE_CLIENT_ID,
       KAKAO_CLIENT_ID:
-        env.KAKAO_CLIENT_ID ||
+        env.KAKAO_CLIENT_ID?.trim() ||
         template.env[env.RELEASE_ENV].vars.KAKAO_CLIENT_ID,
       NAVER_CLIENT_ID:
-        env.NAVER_CLIENT_ID ||
+        env.NAVER_CLIENT_ID?.trim() ||
         template.env[env.RELEASE_ENV].vars.NAVER_CLIENT_ID,
     }).filter(([, value]) => {
       // 공백만 있는 공개 식별값도 기존 서버 설정을 덮어쓰지 못하게 한다.

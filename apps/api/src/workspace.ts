@@ -8,6 +8,7 @@ import {
   reportSchema,
   workspaceCommandSchema,
   communityFeedQuerySchema,
+  communityImportSchema,
   type WorkspaceCommand,
 } from '@wherego/validation';
 import { backendClient, runRpc } from './backend';
@@ -164,6 +165,31 @@ function publicPost(fetcher: typeof fetch, c: Ctx): Promise<Response> {
     fetcher,
   ).then(respond.bind(null, c));
 }
+
+// 공개 원본을 현재 계정 소유의 독립 여행으로 담는다.
+function importCommunity(fetcher: typeof fetch, c: Ctx): Promise<Response> {
+  // 기존 저장소에 구현되지 않은 계약을 성공으로 가장하지 않는다.
+  return c.env.DB
+    ? body(c)
+        .then((input) => {
+          // 작성자·여행 내용·새 소유자는 입력에서 받지 않는다.
+          return runRpc(
+            c.env,
+            c.get('session'),
+            'wherego_import_community',
+            {
+              p_post: foundationUuidSchema.parse(c.req.param('postId')),
+              p_input: communityImportSchema.parse(input),
+              p_key: foundationUuidSchema.parse(
+                c.req.header('Idempotency-Key'),
+              ),
+            },
+            fetcher,
+          );
+        })
+        .then(mutation.bind(null, c))
+    : rejectRequest('CONFIGURATION_REQUIRED');
+}
 // 공개 게시물 신고를 저장한다.
 function report(fetcher: typeof fetch, c: Ctx): Promise<Response> {
   // 신고자는 JWT 계정으로만 기록한다.
@@ -277,6 +303,10 @@ export function registerWorkspaceRoutes(
     .get('/api/v1/community', feed.bind(null, fetcher))
     .get('/public/community', feed.bind(null, fetcher))
     .get('/public/community/:postId', publicPost.bind(null, fetcher))
+    .post(
+      '/api/v1/community/:postId/import',
+      importCommunity.bind(null, fetcher),
+    )
     .post('/api/v1/community/reports', report.bind(null, fetcher))
     .post('/api/v1/community/blocks', block.bind(null, fetcher))
     .post('/api/v1/trips/:tripId/receipts/ocr', ocr.bind(null, fetcher))

@@ -17,8 +17,14 @@ const ignored = new Set([
 export function releaseSourceManifest() {
   // 계정·서명 비밀과 환경 파일의 원문은 수집하지 않는다.
   const paths = [
+    '.github/workflows',
+    '.easignore',
+    'eas.json',
     'apps/mobile/src',
     'apps/mobile/assets',
+    'apps/mobile/public',
+    'docs/design/design-tokens.json',
+    'docs/design/ledger-tokens.json',
     'apps/mobile/modules',
     'apps/mobile/plugins',
     'apps/mobile/android/app/src',
@@ -32,6 +38,8 @@ export function releaseSourceManifest() {
     'metro.config.js',
     'babel.config.js',
     'apps/mobile/package.json',
+    'apps/mobile/eas.json',
+    'apps/mobile/.easignore',
     'apps/mobile/app.config.ts',
     'apps/mobile/metro.config.js',
     'apps/mobile/babel.config.js',

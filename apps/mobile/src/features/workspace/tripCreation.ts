@@ -5,6 +5,7 @@ import {
 } from '@wherego/validation';
 import { countryDefaults, countryInputError } from './countries';
 import { flightFromValues } from './flightModel';
+import { createdDestinations } from './destinationForms';
 
 // 첫 단계는 여행지와 유효한 기간만 확인하며 제목·항공편은 요구하지 않는다.
 export function tripBasicsError(values: Record<string, string>): string {
@@ -28,13 +29,17 @@ export function tripBasicsError(values: Record<string, string>): string {
 // 숨겨진 기본값과 선택 항공편을 저장 계약에 맞게 조합한다.
 export function tripCreationInput(values: Record<string, string>) {
   // 제목은 비워도 자동 생성되며 통화·시간대는 추가 입력 없이 정한다.
+  const timezone =
+    values.timezone || countryDefaults(values.country || '').timezone;
+  const destinations = createdDestinations(values, timezone);
   return persistedTripCreateSchema.parse({
+    ...(destinations ? { destinations } : {}),
     title: values.title?.trim() || undefined,
     country: values.country?.trim(),
     city: values.city?.trim() || '',
     startDate: values.startDate,
     endDate: values.endDate,
-    timezone: values.timezone || countryDefaults(values.country || '').timezone,
+    timezone,
     defaultCurrency: values.defaultCurrency || 'KRW',
     ...(values.flights !== undefined
       ? { flights: JSON.parse(values.flights) }

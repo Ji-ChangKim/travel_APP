@@ -85,6 +85,7 @@ export function TripMoreMenu({
   onClose,
   onEditInfo,
   onEditPeriod,
+  onEditDestinations,
   disabled,
 }: {
   visible: boolean;
@@ -94,6 +95,7 @@ export function TripMoreMenu({
   onClose: () => void;
   onEditInfo: () => void;
   onEditPeriod: () => void;
+  onEditDestinations: () => void;
   disabled: boolean;
 }) {
   // 기존 소유자 권한에 맞는 항목만 표시한다.
@@ -130,6 +132,11 @@ export function TripMoreMenu({
             label="여행 기간 변경"
             disabled={disabled}
             onPress={onEditPeriod}
+          />
+          <DesignButton
+            label="여행 도시 관리"
+            disabled={disabled}
+            onPress={onEditDestinations}
           />
         </>
       )}

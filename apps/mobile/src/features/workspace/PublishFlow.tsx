@@ -20,10 +20,12 @@ export default function PublishFlow({
   userId,
   locked,
   busy,
+  conflicted,
   error,
   scroll,
   onChange,
   onSave,
+  onReload,
   onClose,
   backActionRef,
 }: {
@@ -32,10 +34,12 @@ export default function PublishFlow({
   userId: string;
   locked: boolean;
   busy: boolean;
+  conflicted: boolean;
   error: string;
   scroll: RefObject<ScrollView | null>;
   onChange: (key: string, value: string) => void;
   onSave: () => void;
+  onReload: () => void;
   onClose: () => void;
   backActionRef?: RefObject<(() => void) | null>;
 }) {
@@ -139,17 +143,31 @@ export default function PublishFlow({
             <View style={styles.row}>
               <Action
                 label={
-                  busy ? '공개 중…' : preview ? '공개 범위 확인' : '미리보기'
+                  busy
+                    ? '공개 중…'
+                    : locked && !conflicted
+                      ? '다시 공개하기'
+                      : preview
+                        ? '공개 범위 확인'
+                        : '미리보기'
                 }
                 variant="primary"
                 loading={busy}
                 allowWhileLocked
-                disabled={Boolean(issue) || (locked && !busy)}
+                disabled={conflicted || (!locked && Boolean(issue))}
                 onPress={() => {
-                  // 공개 명령의 대상·버전·범위는 다음 중앙 확인에서 다시 고정한다.
-                  return preview ? onSave() : step(true);
+                  // 응답 유실 뒤에는 기존 요청을 재개하며 새 공개만 중앙 확인을 거친다.
+                  return preview || locked ? onSave() : step(true);
                 }}
               />
+              {conflicted && (
+                <Action
+                  label="최신 내용 불러오기"
+                  allowWhileLocked
+                  disabled={busy}
+                  onPress={onReload}
+                />
+              )}
               {preview && (
                 <Action
                   label="선택 내용 수정"

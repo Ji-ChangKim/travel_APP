@@ -1,9 +1,10 @@
 import { colors } from '@/constants/theme';
+import { homeColors } from './homeTheme';
 import { StyleSheet } from 'react-native';
 
-// 아이보리 바탕과 네이비 본문에 코랄 행동과 여행 노트의 여백을 더한다.
+// 홈은 최신 HTML의 바탕과 여백을 사용하고 공통 여행 화면은 유지한다.
 export const homeStyles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.background },
+  screen: { flex: 1, backgroundColor: homeColors.canvas },
   content: {
     paddingHorizontal: 20,
     paddingTop: 12,
@@ -143,5 +144,4 @@ export const homeStyles = StyleSheet.create({
     lineHeight: 22,
     flexShrink: 1,
   },
-  exploreLink: { minHeight: 44, justifyContent: 'center', paddingLeft: 14 },
 });

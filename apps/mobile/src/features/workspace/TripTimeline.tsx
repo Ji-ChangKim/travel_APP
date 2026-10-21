@@ -2,7 +2,12 @@ import Text from '@/components/AppText';
 import DesignButton from '@/components/DesignButton';
 import TripIcon from '@/components/icons/TripIcon';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
-import type { WorkspaceSchedule, WorkspaceSnapshot } from '@wherego/domain';
+import type {
+  WorkspaceSchedule,
+  WorkspaceSnapshot,
+  TravelLeg,
+} from '@wherego/domain';
+import { destinationForDay } from '@wherego/domain';
 import { useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import { renderTimelinePlace, s } from './TripTimelineView';
@@ -13,6 +18,11 @@ import { scheduleFlight } from './flightModel';
 import ScheduleConflictNotice from './scheduleConflicts';
 import { scheduleDate, schedulesForDay } from './schedulePresentation';
 import { scheduleStyles as shared } from './scheduleTheme';
+import DayRecommendations, {
+  type RecommendedPlace,
+} from './DayRecommendations';
+import TravelRoute from './TravelRoute';
+import { useTripStore } from '@/stores/useTripStore';
 
 type Day = WorkspaceSnapshot['days'][number];
 export interface Props {
@@ -27,9 +37,12 @@ export interface Props {
   onCapture: (item: WorkspaceSchedule) => void;
   onPhoto: (item: WorkspaceSchedule) => void;
   onEdit: (item: WorkspaceSchedule) => void;
+  onCopy: (item: WorkspaceSchedule) => void;
   onDelete: (item: WorkspaceSchedule) => void;
   onExpense: (item: WorkspaceSchedule) => void;
   onReorder: (ids: string[]) => void;
+  onRecommend: (item: RecommendedPlace) => void;
+  onRoute: (leg: TravelLeg) => void;
 }
 
 // 다른 여행 작업은 짧은 보조 탭으로 제공한다.
@@ -124,6 +137,11 @@ function TimelineContent(
   },
 ) {
   // 순서 변경은 상위 화면의 버전·재시도 계약으로 저장한다.
+  const remote = useTripStore(
+    (state) =>
+      state.currentUser?.id === props.userId &&
+      state.currentUser.authProvider !== 'guest',
+  );
   return (
     <View style={s.timeline}>
       <View style={s.heading}>
@@ -139,6 +157,9 @@ function TimelineContent(
           </View>
           <Text style={shared.meta}>
             DAY {props.day.dayNumber} · {props.day.tripDate}
+            {props.snapshot.trip.destinations?.length
+              ? ` · ${destinationForDay(props.snapshot, props.day.id).city}`
+              : ''}
           </Text>
           {props.day.planTitle ? (
             <Text style={s.headingText}>{props.day.planTitle}</Text>
@@ -179,6 +200,20 @@ function TimelineContent(
           onPress={props.onPlan}
         />
       )}
+      {remote &&
+        props.canCreate &&
+        Boolean(
+          destinationForDay(props.snapshot, props.day.id).city.trim(),
+        ) && (
+          <DayRecommendations
+            key={`${props.userId}:${props.day.id}:${props.snapshot.trip.version}`}
+            snapshot={props.snapshot}
+            dayId={props.day.id}
+            userId={props.userId}
+            disabled={props.disabled}
+            onChoose={props.onRecommend}
+          />
+        )}
       {props.arranging[0] && (
         <Text style={shared.meta}>화살표를 눌러 방문 순서를 바꿔 보세요.</Text>
       )}
@@ -213,6 +248,58 @@ function TimelineContent(
                 <Text style={s.sectionTitle}>다음 일정</Text>
               ) : null}
               {renderTimelinePlace({ item, props, index, items })}
+              {remote &&
+                index < items.length - 1 &&
+                (props.canCreate ||
+                  props.snapshot.travelLegs?.some(
+                    (leg) =>
+                      leg.fromScheduleId === item.id &&
+                      leg.toScheduleId === items[index + 1]!.id,
+                  )) &&
+                (item.googlePlaceId || item.location) &&
+                (items[index + 1]?.googlePlaceId ||
+                  items[index + 1]?.location) && (
+                  <TravelRoute
+                    key={`${props.userId}:${props.snapshot.trip.version}:${item.id}:${items[index + 1]!.id}`}
+                    source={{
+                      preview: {
+                        tripId: props.snapshot.trip.id,
+                        userId: props.userId,
+                      },
+                    }}
+                    leg={
+                      props.snapshot.travelLegs?.find(
+                        (leg) =>
+                          leg.fromScheduleId === item.id &&
+                          leg.toScheduleId === items[index + 1]!.id,
+                      ) || {
+                        dayId: props.day.id,
+                        fromScheduleId: item.id,
+                        toScheduleId: items[index + 1]!.id,
+                        mode: 'WALK',
+                      }
+                    }
+                    saved={Boolean(
+                      props.snapshot.travelLegs?.some(
+                        (leg) =>
+                          leg.fromScheduleId === item.id &&
+                          leg.toScheduleId === items[index + 1]!.id,
+                      ),
+                    )}
+                    disabled={props.disabled && props.canCreate}
+                    onSelect={
+                      props.canCreate
+                        ? (mode) =>
+                            props.onRoute({
+                              dayId: props.day.id,
+                              fromScheduleId: item.id,
+                              toScheduleId: items[index + 1]!.id,
+                              mode,
+                            })
+                        : undefined
+                    }
+                  />
+                )}
               {scheduleFlight(item) && index === items.length - 1 && (
                 <View style={{ gap: 6, paddingVertical: 12 }}>
                   <Text style={s.sectionTitle}>다음 일정</Text>

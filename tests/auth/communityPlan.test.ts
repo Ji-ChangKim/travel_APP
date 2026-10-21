@@ -3,7 +3,10 @@ import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import type { WorkspaceSnapshot } from '@wherego/domain';
-import { communityFeedCard } from '../../apps/mobile/src/features/workspace/communityFeedCard';
+import {
+  communityFeedCard,
+  communityFeedPeriod,
+} from '../../apps/mobile/src/features/workspace/communityFeedCard';
 import {
   communityPostSchema,
   newTrip,
@@ -426,5 +429,18 @@ test('Google 장소 ID는 선택한 계획 장소에만 공개하고 비공개 �
   assert.equal(
     communityPostSchema.parse(post).snapshot.itinerary[0]!.googlePlaceId,
     'selected-place',
+  );
+});
+
+test('공개 카드의 박·일은 전체 달력 기간으로 계산하고 같은 날·윤년·연도 경계를 보존한다', () => {
+  // 공개 선택한 장소 수나 기기 시간대로 여행 기간을 바꾸지 않는다.
+  assert.deepEqual(
+    [
+      { startDate: '2026-12-10', endDate: '2026-12-13' },
+      { startDate: '2026-12-10', endDate: '2026-12-10' },
+      { startDate: '2028-02-28', endDate: '2028-03-01' },
+      { startDate: '2026-12-31', endDate: '2027-01-02' },
+    ].map(communityFeedPeriod),
+    ['3박 4일', '당일 여행', '2박 3일', '2박 3일'],
   );
 });

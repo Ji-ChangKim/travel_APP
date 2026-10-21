@@ -47,6 +47,11 @@ export default function StartupLoading({
         </Animated.View>
         <Animated.View
           testID="startup-copy"
+          aria-hidden={motion.phase !== 'ready'}
+          accessibilityElementsHidden={motion.phase !== 'ready'}
+          importantForAccessibility={
+            motion.phase === 'ready' ? 'auto' : 'no-hide-descendants'
+          }
           style={{
             width: '100%',
             alignItems: 'center',

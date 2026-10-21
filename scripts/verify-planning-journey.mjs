@@ -43,3 +43,5 @@ await run(['scripts/prepare-schedule-preview.mjs'], {
   TRIPPRINT_PREVIEW_PORT: '8852',
 });
 await run(['--test', 'tests/planning/journey.test.mjs']);
+await run(['--test', 'tests/planning/triple-flow.test.mjs']);
+await run(['--test', 'tests/planning/multicity-flow.test.mjs']);

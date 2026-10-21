@@ -11,6 +11,7 @@ import type { ImperativeRouter } from 'expo-router';
 import type { Dispatch, SetStateAction } from 'react';
 import { View } from 'react-native';
 import PublishReadiness from './PublishReadiness';
+import PublishedPlanActions from './PublishedPlanActions';
 import ReceiptDetails from './ReceiptDetails';
 import ScheduleCoursePicker from './ScheduleCoursePicker';
 import ServerPhoto from './ServerPhoto';
@@ -138,6 +139,12 @@ export function renderWorkspaceSharing({
                   params: { postId: snapshot.postId! },
                 });
               }}
+            />
+            <PublishedPlanActions
+              key={snapshot.postId}
+              title={snapshot.trip.title}
+              postId={snapshot.postId}
+              disabled={busy || scanning || hasPending}
             />
           </>
         )}
@@ -734,6 +741,8 @@ export function renderWorkspaceItinerary({
               }}
               disabled={!writable || busy || scanning || hasPending}
               onReorder={(ids) => actions.reorderSchedules(day.id, ids)}
+              onRecommend={(item) => actions.chooseRecommendation(day.id, item)}
+              onRoute={actions.saveTravelLeg}
               onExpense={(item) => {
                 // 선택 장소에 실제 지출을 연결한다.
                 return openDraft('expense', item);
@@ -747,6 +756,7 @@ export function renderWorkspaceItinerary({
                 return photo('photo', false, item.id);
               }}
               onEdit={(item) => actions.editSchedule(item)}
+              onCopy={(item) => actions.copySchedule(item)}
               onDelete={(item) => actions.deleteSchedule(item)}
             />
           ))}

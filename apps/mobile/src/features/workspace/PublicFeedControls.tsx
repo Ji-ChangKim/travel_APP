@@ -21,7 +21,7 @@ const kinds = [
 const periods = [
   ['all', '기간 전체'],
   ['short', '1~3일'],
-  ['4', '3~5일'],
+  ['4', '4일'],
   ['long', '5일 이상'],
 ] as const;
 
@@ -40,15 +40,15 @@ export default function PublicFeedControls({
 }: CommunityFeedViewProps) {
   // 선택 시트의 표시만 로컬 상태로 관리한다.
   const [opened, setOpened] = useState(false);
-  // 시안 기준 4개 필터 칩의 라벨을 계산한다.
+  // 시안의 예시 월·동행값 대신 서버가 지원하는 조건과 전체 설정을 표시한다.
   const chipItems = [
     {
       label: filters.q ? filters.q : '여행지 전체',
       selected: true,
-      hint: '여행지 조건 선택',
+      hint: `${filters.q || '여행지 전체'} 조건 선택`,
     },
     {
-      label: periods.find(([key]) => key === filters.days)?.[1] || '3~5일',
+      label: periods.find(([key]) => key === filters.days)?.[1] || '기간 전체',
       selected: false,
       hint: '기간 조건 선택',
     },
@@ -58,14 +58,14 @@ export default function PublicFeedControls({
           ? '여행계획'
           : filters.kind === 'record'
             ? '여행기록'
-            : '친구와',
+            : '유형 전체',
       selected: false,
-      hint: '동행 및 유형 선택',
+      hint: '공개 유형 선택',
     },
     {
-      label: '10월',
+      label: '전체 조건',
       selected: false,
-      hint: '여행 시기 선택',
+      hint: '전체 조건 보기',
     },
   ];
 

@@ -1,0 +1,103 @@
+import { StyleSheet } from 'react-native';
+import { homeColors as colors } from './homeTheme';
+
+// 공개 카드의 본문은 사진 밖에 두어 긴 제목과 큰 글꼴도 읽을 수 있게 한다.
+export const homeExploreStyles = StyleSheet.create({
+  section: { gap: 12 },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  title: {
+    flexShrink: 1,
+    fontSize: 18,
+    lineHeight: 26,
+    fontWeight: '700',
+    color: colors.ink,
+  },
+  more: {
+    minHeight: 48,
+    paddingLeft: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  meta: { fontSize: 14, lineHeight: 22, color: colors.muted },
+  notice: {
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: colors.surface,
+    gap: 12,
+  },
+  chips: { gap: 8, paddingBottom: 4 },
+  chip: {
+    minHeight: 48,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 24,
+    backgroundColor: colors.surface,
+    justifyContent: 'center',
+  },
+  selectedChip: { backgroundColor: colors.selectedChip },
+  chipText: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: colors.muted,
+    fontWeight: '600',
+  },
+  selectedChipText: { color: colors.surface },
+  card: {
+    borderRadius: 12,
+    backgroundColor: colors.surface,
+    overflow: 'hidden',
+  },
+  cover: { minHeight: 144, overflow: 'hidden', backgroundColor: colors.soft },
+  placeholder: {
+    minHeight: 144,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.selected,
+  },
+  cardCopy: { padding: 12, gap: 4 },
+  location: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: colors.accent,
+    fontWeight: '600',
+  },
+  cardTitle: {
+    fontSize: 18,
+    lineHeight: 26,
+    color: colors.ink,
+    fontWeight: '700',
+  },
+  footer: {
+    paddingHorizontal: 12,
+    paddingBottom: 12,
+    gap: 8,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  author: { flexShrink: 1 },
+  open: {
+    minHeight: 48,
+    borderRadius: 8,
+    backgroundColor: colors.soft,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  openText: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: colors.ink,
+    fontWeight: '600',
+    flexShrink: 1,
+  },
+});

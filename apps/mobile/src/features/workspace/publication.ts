@@ -80,3 +80,14 @@ export function togglePublication(value: string, id: string): string {
       : [...publicationIds(value), id]
   ).join(',');
 }
+
+// 선택한 DAY의 일정만 한 번에 선택하거나 해제한다.
+export function togglePublicationDay(value: string, ids: string[]): string {
+  // 다른 DAY의 선택과 오래된 선택은 보존해 기존 공개 검증을 우회하지 않는다.
+  const selected = new Set(publicationIds(value));
+  return (
+    ids.length && ids.every((id) => selected.has(id))
+      ? [...selected].filter((id) => !ids.includes(id))
+      : [...new Set([...selected, ...ids])]
+  ).join(',');
+}

@@ -24,6 +24,7 @@ import { startupManifest } from './startup';
 import { appConfig } from './appConfig';
 import { lookupFlights } from './flights';
 import { previewPlanPhoto, publicPlanPhoto } from './placePhotos';
+import { registerPlanningRoutes } from './planning';
 
 type ApiContext = Context<ApiEnvironment>;
 
@@ -31,6 +32,24 @@ type ApiContext = Context<ApiEnvironment>;
 function initializeRequest(c: ApiContext, next: Next): Promise<void> {
   // 외부 입력과 독립적인 난수 추적 ID를 만든다.
   return Promise.resolve(c.set('requestId', crypto.randomUUID())).then(next);
+}
+
+// 모든 API 응답에 OWASP ASVS 권고 표준 보안 헤더를 설정한다.
+function applySecurityHeaders(c: ApiContext, next: Next): Promise<void> {
+  // 인증 및 사용자 데이터 응답이 외부 캐시에 저장되지 않도록 방지한다.
+  c.header('Cache-Control', 'no-store');
+  // 브라우저의 MIME 타입 스니핑 공격을 차단한다.
+  c.header('X-Content-Type-Options', 'nosniff');
+  // 다른 사이트에서의 프레임 삽입(클릭재킹) 공격을 차단한다.
+  c.header('X-Frame-Options', 'DENY');
+  // 교차 출처 요청 시 민감한 URL 경로 정보가 Referer에 노출되지 않도록 제한한다.
+  c.header('Referrer-Policy', 'strict-origin-when-cross-origin');
+  // 레거시 XSS 필터의 의도치 않은 취약점 악용을 방지하기 위해 비활성화한다.
+  c.header('X-XSS-Protection', '0');
+  // API 엔드포인트에서 불필요한 브라우저 디바이스 권한 접근을 차단한다.
+  c.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  // 다음 미들웨어 또는 라우트 핸들러를 실행한다.
+  return next();
 }
 
 // 검증된 세션 하나를 요청 문맥에 기록한다.
@@ -272,88 +291,92 @@ function notReady(): never {
 // 인증·입력 제한·오류 처리·M1 라우트를 결합한다.
 export function createApp(fetcher: typeof fetch = fetch): Hono<ApiEnvironment> {
   // 요청별 상태는 문맥에만 저장하고 모듈 전역 세션을 두지 않는다.
-  return registerDiscoveryRoutes(
-    registerSocialRoutes(
-      registerProfileRoutes(
-        registerMediaRoutes(
-          registerWorkspaceRoutes(
-            new Hono<ApiEnvironment>()
-              .use('*', initializeRequest)
-              .use(
-                '*',
-                cors({
-                  origin: allowedOrigin,
-                  allowHeaders: [
-                    'Authorization',
-                    'Content-Type',
-                    'Idempotency-Key',
-                    'If-Match',
-                  ],
-                  allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-                  exposeHeaders: ['set-auth-token'],
-                }),
-              )
-              .use('*', async (c, next) => {
-                // 인증 응답이 외부 공용 캐시에 저장되지 않도록 한다.
-                return Promise.resolve(
-                  c.header('Cache-Control', 'no-store'),
-                ).then(next);
-              })
-              .use(
-                '/api/*',
-                bodyLimit({
-                  maxSize: 16384,
-                  onError: () => {
-                    // 과도한 요청은 JSON 파싱 전에 거부한다.
-                    return rejectRequest('PAYLOAD_TOO_LARGE');
-                  },
-                }),
-              )
-              .use('/api/v1/*', sessionMiddleware(fetcher))
-              .on(['GET', 'POST'], '/api/auth/*', (c) => {
-                // 인증 공급자가 D1 세션과 비밀번호 해시를 직접 관리한다.
-                return cloudAuth(c.env, c.req.query('state')).handler(
-                  c.req.raw,
-                );
-              })
-              .get('/health', health)
-              .get('/public/startup', startupManifest)
-              .get('/public/app-config', appConfig)
-              .get(
-                '/public/community/:postId/places/:scheduleId/photo',
-                publicPlanPhoto.bind(null, fetcher),
-              )
-              .get('/api/v1/me', getMe.bind(null, fetcher))
-              .get('/api/v1/flights/lookup', lookupFlights.bind(null, fetcher))
-              .get('/api/v1/places/search', searchPlaces.bind(null, fetcher))
-              .get('/api/v1/places/import', importMapsShare.bind(null, fetcher))
-              .get(
-                '/api/v1/places/:placeId',
-                getGooglePlace.bind(null, fetcher),
-              )
-              .get('/api/v1/trips', listTrips.bind(null, fetcher))
-              .get(
-                '/api/v1/trips/:tripId/places/:scheduleId/photo',
-                previewPlanPhoto.bind(null, fetcher),
-              )
-              .post('/api/v1/trips', createTrip.bind(null, fetcher))
-              .get('/api/v1/trips/:tripId', getTrip.bind(null, fetcher))
-              .post(
-                '/api/v1/trips/:tripId/checklists',
-                addChecklist.bind(null, fetcher),
-              )
-              .patch(
-                '/api/v1/checklists/:itemId',
-                setChecklist.bind(null, fetcher),
-              )
-              .all('/api/places/search', notReady)
-              .all('/api/share/link', notReady)
-              .all('/api/receipt/ocr', notReady)
-              .onError(renderError),
-            fetcher,
+  return registerPlanningRoutes(
+    registerDiscoveryRoutes(
+      registerSocialRoutes(
+        registerProfileRoutes(
+          registerMediaRoutes(
+            registerWorkspaceRoutes(
+              new Hono<ApiEnvironment>()
+                .use('*', initializeRequest)
+                .use(
+                  '*',
+                  cors({
+                    origin: allowedOrigin,
+                    allowHeaders: [
+                      'Authorization',
+                      'Content-Type',
+                      'Idempotency-Key',
+                      'If-Match',
+                    ],
+                    allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+                    exposeHeaders: ['set-auth-token'],
+                  }),
+                )
+                .use('*', applySecurityHeaders)
+                .use(
+                  '/api/*',
+                  bodyLimit({
+                    maxSize: 16384,
+                    onError: () => {
+                      // 과도한 요청은 JSON 파싱 전에 거부한다.
+                      return rejectRequest('PAYLOAD_TOO_LARGE');
+                    },
+                  }),
+                )
+                .use('/api/v1/*', sessionMiddleware(fetcher))
+                .on(['GET', 'POST'], '/api/auth/*', (c) => {
+                  // 인증 공급자가 D1 세션과 비밀번호 해시를 직접 관리한다.
+                  return cloudAuth(c.env, c.req.query('state')).handler(
+                    c.req.raw,
+                  );
+                })
+                .get('/health', health)
+                .get('/public/startup', startupManifest)
+                .get('/public/app-config', appConfig)
+                .get(
+                  '/public/community/:postId/places/:scheduleId/photo',
+                  publicPlanPhoto.bind(null, fetcher),
+                )
+                .get('/api/v1/me', getMe.bind(null, fetcher))
+                .get(
+                  '/api/v1/flights/lookup',
+                  lookupFlights.bind(null, fetcher),
+                )
+                .get('/api/v1/places/search', searchPlaces.bind(null, fetcher))
+                .get(
+                  '/api/v1/places/import',
+                  importMapsShare.bind(null, fetcher),
+                )
+                .get(
+                  '/api/v1/places/:placeId',
+                  getGooglePlace.bind(null, fetcher),
+                )
+                .get('/api/v1/trips', listTrips.bind(null, fetcher))
+                .get(
+                  '/api/v1/trips/:tripId/places/:scheduleId/photo',
+                  previewPlanPhoto.bind(null, fetcher),
+                )
+                .post('/api/v1/trips', createTrip.bind(null, fetcher))
+                .get('/api/v1/trips/:tripId', getTrip.bind(null, fetcher))
+                .post(
+                  '/api/v1/trips/:tripId/checklists',
+                  addChecklist.bind(null, fetcher),
+                )
+                .patch(
+                  '/api/v1/checklists/:itemId',
+                  setChecklist.bind(null, fetcher),
+                )
+                .all('/api/places/search', notReady)
+                .all('/api/share/link', notReady)
+                .all('/api/receipt/ocr', notReady)
+                .onError(renderError),
+              fetcher,
+            ),
           ),
         ),
       ),
+      fetcher,
     ),
     fetcher,
   );

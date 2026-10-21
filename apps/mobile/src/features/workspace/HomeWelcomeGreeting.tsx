@@ -1,5 +1,5 @@
 import Text from '@/components/AppText';
-import { colors } from '@/constants/theme';
+import { homeColors as colors } from './homeTheme';
 import { StyleSheet, View } from 'react-native';
 
 // 환영 섹션에 전달되는 속성을 정의한다.
@@ -9,18 +9,13 @@ interface Props {
 
 // 장식 배지 없이 사용자에게 한 줄 환영 제목을 표시한다.
 export default function HomeWelcomeGreeting({ nickname }: Props) {
-  // 긴 닉네임도 제목을 두 줄로 밀어내지 않도록 말줄임 처리한다.
+  // 닉네임과 큰 글꼴은 필요한 만큼 줄을 바꾸어 표시한다.
   return (
     <View style={styles.container}>
-      <Text
-        accessibilityRole="header"
-        numberOfLines={1}
-        ellipsizeMode="tail"
-        style={styles.headline}
-      >
-        환영해요, {resolveDisplayName(nickname)}님! 👋
+      <Text accessibilityRole="header" style={styles.headline}>
+        반가워요, {resolveDisplayName(nickname)}님! 👋
       </Text>
-      <Text style={styles.subhead}>설레는 첫 여정을 함께 건너볼까요?</Text>
+      <Text style={styles.subhead}>당신만의 여행 발자국을 남겨볼까요?</Text>
     </View>
   );
 }
@@ -33,15 +28,14 @@ function resolveDisplayName(nickname?: string | null): string {
 
 const styles = StyleSheet.create({
   container: {
-    gap: 8,
+    gap: 4,
     paddingTop: 4,
   },
   headline: {
-    fontSize: 24,
-    lineHeight: 32,
-    fontWeight: '800',
-    color: colors.text,
-    letterSpacing: -0.6,
+    fontSize: 18,
+    lineHeight: 26,
+    fontWeight: '700',
+    color: colors.ink,
   },
   subhead: {
     fontSize: 14,

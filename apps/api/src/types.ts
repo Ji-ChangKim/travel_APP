@@ -11,6 +11,7 @@ export interface ApiEnvironment {
   Bindings: Omit<Env, 'FLIGHT_LOOKUP_LIMITER' | 'PLACES_PHOTO_LIMITER'> & {
     FLIGHT_LOOKUP_LIMITER: RateLimit;
     GOOGLE_PLACES_API_KEY?: string;
+    GOOGLE_ROUTES_API_KEY?: string;
     PLACES_PHOTO_LIMITER: RateLimit;
     AERODATABOX_RAPIDAPI_KEY?: string;
     KAC_FLIGHT_SERVICE_KEY?: string;

@@ -1,13 +1,14 @@
+import { tripListQueryOptions } from '../workspace/tripQueries';
 import {
   connectProfileSaveScope,
   type ProfileSaveScope,
 } from '@/features/auth/profileSave';
 import { useScheduleExitGuard } from '@/features/workspace/scheduleExitGuard';
-import { serverOptions } from '@/features/workspace/service';
+
 import { useTripDateRefresh } from '@/features/workspace/useTripDateRefresh';
 import { useTripStore } from '@/stores/useTripStore';
 import { useQuery } from '@tanstack/react-query';
-import { foundationQueryKey, listServerTrips } from '@wherego/api-client';
+
 import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { useProfileEditorActions } from './profileEditorActions';
@@ -23,13 +24,8 @@ export function useMyAccountController() {
   // 활동 통계도 내 여행과 동일한 계정별 서버 원본을 조회한다.
   const userId = currentUser?.id || '';
   const serverTrips = useQuery({
-    queryKey: foundationQueryKey(userId || '', 'trips'),
+    ...tripListQueryOptions(userId || ''),
     enabled: Boolean(userId),
-    queryFn: () => {
-      // 게스트의 기기 초안을 계정의 여행 통계에 합산하지 않는다.
-      return serverOptions(userId!).then(listServerTrips);
-    },
-    retry: false,
   });
 
   // 프로필 편집 모달 및 폼 상태를 관리한다.

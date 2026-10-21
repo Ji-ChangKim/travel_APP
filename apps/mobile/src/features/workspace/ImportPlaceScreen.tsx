@@ -1,3 +1,4 @@
+import { tripListQueryOptions } from './tripQueries';
 import Text from '@/components/AppText';
 import ScreenHeader from '@/components/ScreenHeader';
 import { travelDateRange } from './travelDateRange';
@@ -6,9 +7,9 @@ import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
-import { foundationQueryKey, listServerTrips } from '@wherego/api-client';
+
 import { useTripStore } from '@/stores/useTripStore';
-import { serverOptions } from './service';
+
 import { Action, Field } from './ui';
 import { styles } from './workspaceStyles';
 
@@ -90,16 +91,8 @@ function useImportRestore(set: Set): void {
 function useImportTrips(userId: string) {
   // 저장된 여행의 읽기 권한은 API 서버가 검사한다.
   return useQuery({
-    queryKey: foundationQueryKey(userId, 'trips'),
+    ...tripListQueryOptions(userId),
     enabled: Boolean(userId),
-    retry: false,
-    queryFn: ({ signal }) => {
-      // 여행에 없는 임시 목업을 추가하지 않는다.
-      return serverOptions(userId).then((options) => {
-        // 가져오기 화면의 마지막 구독이 끝나면 목록 조회를 중단한다.
-        return listServerTrips(options, signal);
-      });
-    },
   });
 }
 

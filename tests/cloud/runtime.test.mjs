@@ -55,6 +55,274 @@ const png = Buffer.from(
   'base64',
 );
 
+test('공개 일정 담기는 D1에 본인 여행으로 원자 저장되며 재시도·편집·철회가 원본을 바꾸지 않는다', async (t) => {
+  // 공개 검수 글은 이 검사 전용 D1에만 만들며 외부 서버는 호출하지 않는다.
+  const author = await accountResponse(
+    await request(
+      '/api/auth/sign-up/email',
+      'POST',
+      {
+        name: '담기 원작자',
+        email: `${randomUUID()}@example.test`,
+        password: 'import-test-strong-password!',
+      },
+      undefined,
+      { 'CF-Connecting-IP': '203.0.113.221' },
+    ),
+  );
+  const reader = await accountResponse(
+    await request(
+      '/api/auth/sign-up/email',
+      'POST',
+      {
+        name: '담기 여행자',
+        email: `${randomUUID()}@example.test`,
+        password: 'import-test-strong-password!',
+      },
+      undefined,
+      { 'CF-Connecting-IP': '203.0.113.222' },
+    ),
+  );
+  const original = (
+    await json(
+      await request(
+        '/api/v1/trips',
+        'POST',
+        {
+          title: '원본 개인 여행',
+          country: '일본',
+          city: '오사카',
+          startDate: '2025-12-30',
+          endDate: '2026-01-02',
+          timezone: 'Asia/Tokyo',
+        },
+        author,
+        { 'Idempotency-Key': randomUUID() },
+      ),
+      201,
+    )
+  ).data.tripId;
+  const db = await mf.getD1Database('DB');
+  const sourceBefore = (
+    await json(
+      await request(
+        `/api/v1/trips/${original}/workspace`,
+        'GET',
+        undefined,
+        author,
+      ),
+    )
+  ).data;
+  const postId = randomUUID();
+  t.after(() => {
+    // 실패한 검사에서도 이 공개 행이 다른 목록 검사에 섞이지 않게 한다.
+    return db.prepare('DELETE FROM posts WHERE id=?').bind(postId).run();
+  });
+  const post = {
+    id: postId,
+    authorId: author.id,
+    author: '담기 원작자',
+    title: '공개 원문',
+    kind: 'plan',
+    body: '선택 공개',
+    publishedAt: '2026-10-20T00:00:00Z',
+    photoPaths: [],
+    snapshot: {
+      country: '일본',
+      city: '오사카',
+      startDate: '2025-12-30',
+      endDate: '2026-01-02',
+      days: [
+        {
+          dayNumber: 3,
+          date: '2026-01-01',
+          planTitle: 'DAY 3 소개',
+          planConcept: '공개 소개',
+        },
+      ],
+      itinerary: [
+        {
+          id: randomUUID(),
+          dayNumber: 3,
+          sortOrder: 1,
+          title: '담을 장소',
+          date: '2026-01-01',
+          timeSlot: '12:30',
+          type: 'PLACE',
+          address: '공개 주소',
+          planContent: { description: '공개 설명\n추천 내용' },
+        },
+      ],
+      costs: { JPY: '500' },
+    },
+  };
+  await db
+    .prepare(
+      'INSERT INTO posts(id,trip_id,author_id,published_at,snapshot) VALUES(?,?,?,?,?)',
+    )
+    .bind(postId, original, author.id, Date.now(), JSON.stringify(post))
+    .run();
+  const route = `/api/v1/community/${postId}/import`;
+  const input = {
+    startDate: '2027-02-27',
+    timezone: 'Asia/Tokyo',
+    defaultCurrency: 'JPY',
+  };
+  const key = randomUUID();
+  const headers = { 'Idempotency-Key': key };
+  assert.equal(
+    (await request(route, 'POST', input, undefined, headers)).status,
+    401,
+  );
+  assert.equal(
+    (
+      await request(
+        route,
+        'POST',
+        { ...input, ownerId: author.id },
+        reader,
+        headers,
+      )
+    ).status,
+    422,
+  );
+  assert.equal(
+    (
+      await request(
+        route,
+        'POST',
+        { ...input, startDate: '2027-02-30' },
+        reader,
+        headers,
+      )
+    ).status,
+    422,
+  );
+  await db
+    .prepare('INSERT INTO blocks(actor_id,blocked_id) VALUES(?,?)')
+    .bind(reader.id, author.id)
+    .run();
+  assert.equal(
+    (await request(route, 'POST', input, reader, headers)).status,
+    404,
+  );
+  await db
+    .prepare('DELETE FROM blocks WHERE actor_id=? AND blocked_id=?')
+    .bind(reader.id, author.id)
+    .run();
+  const [saved, retry] = await Promise.all([
+    request(route, 'POST', input, reader, headers).then(json),
+    request(route, 'POST', input, reader, headers).then(json),
+  ]);
+  assert.equal(saved.data.tripId, retry.data.tripId);
+  const copyId = saved.data.tripId;
+  const copied = (
+    await json(
+      await request(
+        `/api/v1/trips/${copyId}/workspace`,
+        'GET',
+        undefined,
+        reader,
+      ),
+    )
+  ).data;
+  assert.equal(copied.trip.ownerId, reader.id);
+  assert.equal(copied.myRole, 'owner');
+  assert.equal(copied.trip.endDate, '2027-03-02');
+  assert.equal(copied.days[2].planTitle, 'DAY 3 소개');
+  assert.equal(copied.itinerary[0].dayId, copied.days[2].id);
+  assert.notEqual(copied.itinerary[0].id, post.snapshot.itinerary[0].id);
+  assert.equal(copied.postId, null);
+  assert.deepEqual(
+    [copied.expenses, copied.media, copied.receipts, copied.invites],
+    [[], [], [], []],
+  );
+  assert.equal(copied.members.length, 1);
+  assert.equal(
+    (
+      await request(
+        `/api/v1/trips/${copyId}/workspace`,
+        'GET',
+        undefined,
+        author,
+      )
+    ).status,
+    404,
+  );
+  const listed = (
+    await json(await request('/api/v1/trips', 'GET', undefined, reader))
+  ).data;
+  assert.equal(listed.length, 1);
+  assert.equal(listed[0].id, copyId);
+  assert.equal(
+    (
+      await request(
+        route,
+        'POST',
+        { ...input, startDate: '2028-01-01' },
+        reader,
+        headers,
+      )
+    ).status,
+    409,
+  );
+  const edit = await json(
+    await request(
+      `/api/v1/trips/${copyId}/commands`,
+      'POST',
+      {
+        operation: 'schedule.save',
+        input: { ...copied.itinerary[0], memo: '', title: '내가 편집한 장소' },
+      },
+      reader,
+      { 'Idempotency-Key': randomUUID(), 'If-Match': `"trip:${copyId}:1"` },
+    ),
+  );
+  assert.equal(edit.data.tripVersion, 2);
+  assert.deepEqual(
+    (await json(await request(`/public/community/${postId}`))).data,
+    post,
+  );
+  assert.deepEqual(
+    (
+      await json(
+        await request(
+          `/api/v1/trips/${original}/workspace`,
+          'GET',
+          undefined,
+          author,
+        ),
+      )
+    ).data,
+    sourceBefore,
+  );
+  await db.prepare('DELETE FROM posts WHERE id=?').bind(postId).run();
+  assert.equal(
+    (await json(await request(route, 'POST', input, reader, headers))).data
+      .tripId,
+    copyId,
+  );
+  assert.equal(
+    (
+      await request(route, 'POST', input, reader, {
+        'Idempotency-Key': randomUUID(),
+      })
+    ).status,
+    404,
+  );
+  const retained = (
+    await json(
+      await request(
+        `/api/v1/trips/${copyId}/workspace`,
+        'GET',
+        undefined,
+        reader,
+      ),
+    )
+  ).data;
+  assert.equal(retained.itinerary[0].title, '내가 편집한 장소');
+});
+
 test('여행계획은 DAY·장소 원문으로 D1 저장하며 단건 공개 조회와 철회가 일치한다', async () => {
   // 별도 회원·여행에서 실제 Worker·D1 명령을 거치며 외부 서버는 호출하지 않는다.
   const member = await accountResponse(

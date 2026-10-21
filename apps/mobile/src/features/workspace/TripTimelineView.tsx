@@ -220,6 +220,14 @@ export function renderTimelineManagement({
           }}
         />
         <ScheduleButton
+          label="일정 복사"
+          disabled={props.disabled}
+          onPress={() => {
+            // 기존 사진·실제 지출을 옮기지 않는 새 작성 초안을 연다.
+            return props.onCopy(item);
+          }}
+        />
+        <ScheduleButton
           label="일정 삭제"
           disabled={props.disabled}
           onPress={() => {

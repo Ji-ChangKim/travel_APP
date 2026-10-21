@@ -1,9 +1,9 @@
+import { workspaceQueryOptions } from './tripQueries';
 import Text from '@/components/AppText';
 import DesignButton from '@/components/DesignButton';
 import { View } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
-import { foundationQueryKey, getWorkspace } from '@wherego/api-client';
-import { serverOptions } from './service';
+
 import { nextTripSchedule } from './homeBriefing';
 import { homeStyles as s } from './homeStyles';
 
@@ -17,19 +17,8 @@ export default function HomeNextSchedule({
 }) {
   // 계정과 여행별 캐시로 늦은 응답을 다른 여행에 표시하지 않는다.
   const query = useQuery({
-    queryKey: foundationQueryKey(userId, 'workspace', tripId),
+    ...workspaceQueryOptions(userId, tripId),
     enabled: Boolean(userId && tripId),
-    retry: false,
-    queryFn: ({ signal }) => {
-      // 기존 권한 검증이 있는 조회 경로만 사용한다.
-      return serverOptions(userId).then((options) => {
-        /* 선택한 여행을 읽는다. */ return getWorkspace(
-          options,
-          tripId,
-          signal,
-        );
-      });
-    },
   });
   const next = query.data ? nextTripSchedule(query.data) : undefined;
   return (

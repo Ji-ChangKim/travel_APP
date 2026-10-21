@@ -44,6 +44,8 @@ const controllers = new Set([
 ]);
 // 요청 행동은 기기·통신 기능을 사용할 수 있지만 화면과 스타일을 소유하지 않는다.
 const workflows = new Set([
+  'tripQueries.ts',
+  'useCommunityImport.ts',
   'workspaceSaveSession.ts',
   'workspaceCommands.ts',
   'workspaceFormActions.ts',
@@ -52,8 +54,14 @@ const workflows = new Set([
   'recordPersistence.ts',
   'profileEditorActions.ts',
   'profileLogoutActions.ts',
+  'publicPlanShare.ts',
+  'usePublishedPlanShare.ts',
 ]);
 const pureModels = new Set([
+  'sessionTokenStorage.ts',
+  'formCommands.ts',
+  'workspaceModelCore.ts',
+  'workspaceSchedules.ts',
   'userFacingError.ts',
   'workspaceFailure.ts',
   'workspaceDrafts.ts',
@@ -63,6 +71,8 @@ const pureModels = new Set([
   'destinationCatalog.ts',
   'ledgerActionAppearance.ts',
   'workspaceScreenActions.ts',
+  'scheduleCopy.ts',
+  'publicPlanLink.ts',
   'recordDetails.ts',
 ]);
 const styles = new Set([

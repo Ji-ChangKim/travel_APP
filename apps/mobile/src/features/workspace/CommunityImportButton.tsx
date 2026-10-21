@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, type ReactNode } from 'react';
 import { ScrollView, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTripStore } from '@/stores/useTripStore';
@@ -19,9 +19,11 @@ import {
 export default function CommunityImportButton({
   postId,
   compact = false,
+  renderTrigger,
 }: {
   postId: string;
   compact?: boolean;
+  renderTrigger?: (open: () => void, saved: boolean) => ReactNode;
 }) {
   // 계정이 바뀌면 이전 계정의 저장 키와 완료 표시를 재사용하지 않는다.
   const userId = useTripStore((state) => {
@@ -34,6 +36,7 @@ export default function CommunityImportButton({
       postId={postId}
       userId={userId}
       compact={compact}
+      renderTrigger={renderTrigger}
     />
   );
 }
@@ -43,17 +46,21 @@ function ImportContent({
   postId,
   userId,
   compact = false,
+  renderTrigger,
 }: {
   postId: string;
   userId: string;
   compact?: boolean;
+  renderTrigger?: (open: () => void, saved: boolean) => ReactNode;
 }) {
   // 날짜 입력에도 저장 중 잠금과 접근성 규격을 공통 적용한다.
   const model = useCommunityImport(postId, userId);
   const scroll = useRef<ScrollView>(null);
   return (
     <>
-      {compact ? (
+      {renderTrigger ? (
+        renderTrigger(model.open, Boolean(model.savedTrip))
+      ) : compact ? (
         <PublicFeedButton
           label={model.savedTrip ? '담은 일정 열기' : '일정 담기'}
           onPress={model.open}
