@@ -36,6 +36,9 @@ jobs:
       - name: Chrome 설치
         run: npx playwright install --with-deps chrome
 
+      - name: V11 여행계획 등록 및 실제 D1 저장 검증
+        run: npm run test:planning:db
+
       - name: 앱 핵심 화면 흐름 검증
         run: npm run test:workspace:web
 

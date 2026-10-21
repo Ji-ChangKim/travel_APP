@@ -36,6 +36,7 @@
     "release:artifacts": "node scripts/release-artifacts.mjs",
     "release:prepare": "node --env-file-if-exists=.env.release scripts/prepare-release.mjs",
     "test:workspace:web": "node scripts/verify-workspace-web.mjs",
+    "test:planning:db": "node scripts/verify-planning-journey.mjs",
     "test:schedule:web": "node scripts/prepare-schedule-preview.mjs && playwright test --config playwright.schedule.config.ts",
     "preview:trail": "node scripts/preview-trail.mjs",
     "lint": "eslint . --max-warnings=0",

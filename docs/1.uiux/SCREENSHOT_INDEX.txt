@@ -142,3 +142,9 @@ MY / 320 / 글자 200%
 헤더·접근성·GNB·복귀21/21 통과. 관련 동작은 최초19개와 복귀 기대값 수정 후1개 재검증 통과.
 전체 검사와 자동 차단 테스트8/8·탐색 정책4/4 통과. 로그는 outputs/header-gnb-lock-20261021/에 보관한다.
 실제 캡처를 열어 정렬·줄바꿈·버튼·브랜드 구분선을 대조했다. Android 빌드·기기 검수·외부 배포는 실행하지 않았다.
+
+[V11 여행계획 등록 / 2026-10-21]
+참조 규격: docs/design/DESIGN.md, design-tokens.json, SCREEN_HEADER_SPEC.md, ITINERARY_SCHEDULE_SCREEN_SPEC.md.
+실제 독립 후보의 앱·Worker·D1 검수 캡처: outputs/planning-v11/final/01-dates-destination-390.png,02-day-edit-reorder-390.png,03-restored-320-large.png,04-day-320-large.png.
+날짜→국가·도시→선택 제목 순서와 DAY별 등록·편집·정렬·삭제·재로그인 복원을 대조했다. 320·200% 제목52px, 하단 추가 버튼70px·화면 안 배치·실제 터치 대상 확인. Android 기기 캡처는 아니다.
+검수 기록: docs/qa/V11_TRAVEL_PLAN_REGISTRATION.txt.

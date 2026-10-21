@@ -103,8 +103,8 @@ export function renderTripPlanning({
           >
             <Text style={styles.subtitle}>
               {step === 'basics'
-                ? '1 / 2 · 여행지와 날짜'
-                : '2 / 2 · 내용 확인'}
+                ? '1 / 2 · 날짜와 여행지'
+                : '2 / 2 · 항공권과 내용 확인'}
             </Text>
             <View
               style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}
@@ -120,8 +120,8 @@ export function renderTripPlanning({
                 {step === 'basics'
                   ? recording
                     ? '어디를, 언제 다녀오셨나요?'
-                    : '어디로, 언제 떠날까요?'
-                  : '항공편을 더하거나 나중에 입력해도 괜찮아요.'}
+                    : '여행 날짜와 방문할 나라·도시를 선택해 주세요.'
+                  : '구매한 항공권의 편명과 출발·도착 정보를 입력해 주세요.'}
               </Text>
               {step === 'basics' && (
                 <Image

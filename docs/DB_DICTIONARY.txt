@@ -2456,3 +2456,10 @@ DB: Cloudflare D1 (환경별 DB 바인딩). 물리 테이블·컬럼 추가 없�
 객체 WorkspaceSnapshot 담기 결과: trip·days·itinerary·members 새 UUID, myRole owner, trip.status PLANNED, postId null, 개인 미디어·영수증·비용·초대·체크리스트 빈 배열. 일정 memo null. DAY 소개·공개 planContent·주소·시각·유형·googlePlaceId만 허용 목록으로 복사. 날짜 간격 유지, 기간1~90일, 범위 밖 일정과 빈 일정은 거부.
 객체 GuestWorkspace: 기존 version1 문서의 trips 배열과 requests 기록으로 같은 담기 결과를 기기에만 저장. 원격 인증·DB 저장으로 오인하지 않으며 계정 전환과 큐 잠금은 기존 규칙 유지.
 API POST /api/v1/community/:postId/import: UUID 공개 ID·Idempotency-Key 필수. 성공 data.tripId UUID·tripVersion 양수·trip 객체. 401 인증,404 철회/차단/없음,409 키 재사용,422 입력/기간,503 D1 미설정. 레거시 Supabase 저장소에는 새 RPC가 없으므로 명시적으로 미지원 처리.
+
+[2026-10-21 V11 여행계획 등록 저장 계약]
+DB: Cloudflare D1 wherego-staging. 기존 user/profiles/trips/trip_members/mutation_requests를 사용하며 신규 테이블·열·스키마 마이그레이션은 없다.
+trips.snapshot TEXT NOT NULL CHECK(json_valid(snapshot)): 여행지·기간·시간대와 days/id/dayNumber/tripDate, itinerary/id/dayId/title/type/timeSlot/sortOrder/flight/planContent를 기존 WorkspaceSnapshot 타입으로 보관한다. trips.version INTEGER 양수와 snapshot.trip.version은 같은 CAS 저장 버전이다.
+생성 입력 flights[]의 date/role/time은 생성용 계약이며 항공편마다 실제 출발일의 DAY UUID에 TRANSPORT 일정과 flight 상세로 저장한다. 생성용 배열을 여행 원본에 중복 보관하지 않는다.
+DAY별 추가·수정은 schedule.save, 순서는 schedule.reorder, 삭제는 schedule.delete를 사용한다. 편집은 기존 일정 UUID·DAY UUID를 유지하고 정렬은 같은 DAY의 모든 일정 ID를 중복 없이 전달한다. 다른 DAY의 항공권을 이동·삭제하지 않는다.
+회원은 인증·멤버십 확인 뒤 D1에 저장하며 게스트는 기존 기기 저장 범위를 유지한다. HTTP 성공만으로 검수를 마치지 않고 새 세션 조회와 로컬 D1 행을 대조한다. 실제 staging 검수 결과와 관리자 SQL 조회 권한의 한계는 docs/qa/V11_TRAVEL_PLAN_REGISTRATION.txt에 구분한다.

@@ -1,7 +1,7 @@
 {
   "version": "0.1.0",
-  "versionCode": 10,
-  "release": "internal-0.1.0-v10-travel-community-20261021",
+  "versionCode": 11,
+  "release": "internal-0.1.0-v11-trip-planning-20261021",
   "environment": "staging",
   "releaseDate": "2026-10-21",
   "webOrigin": "https://tripprint-staging.pages.dev",
