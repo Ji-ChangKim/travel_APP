@@ -30,5 +30,5 @@ await run([
   '--config',
   'playwright.header.config.ts',
   '--grep',
-  '헤더 규격|WCAG AA',
+  '헤더 규격|WCAG AA|GNB 통합|헤더 복귀',
 ]);

@@ -11,12 +11,6 @@ export const styles = StyleSheet.create({
     width: '100%',
     alignSelf: 'center',
   },
-  header: {
-    fontSize: typography.headlineLarge.size,
-    lineHeight: typography.headlineLarge.lineHeight,
-    fontWeight: '700',
-    color: colors.text,
-  },
   subtitle: { fontSize: 14, lineHeight: 22, color: colors.muted },
   card: {
     padding: 16,

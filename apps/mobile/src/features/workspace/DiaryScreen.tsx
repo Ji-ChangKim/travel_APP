@@ -1,13 +1,15 @@
+import { returnToScreen } from '@/components/navigationModel';
+import { workspaceQueryOptions } from './tripQueries';
 import { ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
-import { foundationQueryKey, getWorkspace } from '@wherego/api-client';
+
 import { foundationUuidSchema } from '@wherego/validation';
 import Text from '@/components/AppText';
 import HaruState from '@/components/HaruState';
 import { useTripStore } from '@/stores/useTripStore';
 import { useAuthReady } from '@/features/auth/AuthBridge';
-import { serverOptions } from './service';
+
 import { tripPhase } from './tripLifecycle';
 import { useTripDateRefresh } from './useTripDateRefresh';
 import { authReturn } from '../auth/authReturn';
@@ -39,23 +41,16 @@ function DiaryContent({ id, userId }: { id: string; userId: string }) {
   });
   const valid = foundationUuidSchema.safeParse(id).success;
   const query = useQuery({
-    queryKey: foundationQueryKey(userId, 'workspace', id),
+    ...workspaceQueryOptions(userId, id),
     enabled: ready && valid && Boolean(userId),
-    retry: false,
-    queryFn: ({ signal }) => {
-      // 서버가 멤버십과 현재 역할을 확인한다.
-      return serverOptions(userId).then((options) =>
-        getWorkspace(options, id, signal),
-      );
-    },
   });
   const snapshot = query.isError ? undefined : query.data;
   return (
     <LedgerScreen
       title={snapshot?.trip.title || '여행기록'}
       onBack={() => {
-        // 원래 발자국 목록으로 돌아간다.
-        return router.replace('/(tabs)/footprints');
+        // 개인 기록 상세는 공개 피드가 아닌 나의 보관함으로 돌아간다.
+        return returnToScreen(router, '/my-footprints');
       }}
     >
       <ScrollView contentContainerStyle={[s.content, wide && s.wideContent]}>
@@ -80,7 +75,7 @@ function DiaryContent({ id, userId }: { id: string; userId: string }) {
         )}
         {!valid && (
           <Text>
-            여행을 찾을 수 없어요. 발자국 목록에서 다시 선택해 주세요.
+            여행을 찾을 수 없어요. 나의 여행 기록에서 다시 선택해 주세요.
           </Text>
         )}
         {query.isError && (

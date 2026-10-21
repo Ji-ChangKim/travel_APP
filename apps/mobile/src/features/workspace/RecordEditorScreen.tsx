@@ -1,13 +1,11 @@
+import { returnToScreen } from '@/components/navigationModel';
+import { workspaceQueryOptions } from './tripQueries';
 import Text from '@/components/AppText';
 import HaruState from '@/components/HaruState';
 import { useAuthReady } from '@/features/auth/AuthBridge';
 import { useTripStore } from '@/stores/useTripStore';
 import { useQuery } from '@tanstack/react-query';
-import {
-  FoundationClientError,
-  foundationQueryKey,
-  getWorkspace,
-} from '@wherego/api-client';
+import { FoundationClientError } from '@wherego/api-client';
 import {
   foundationUuidSchema,
   type WorkspaceCommand,
@@ -23,7 +21,6 @@ import { useRecordEditorController } from './useRecordEditorController';
 import { authReturn } from '../auth/authReturn';
 import TripAccessFeedback from './TripAccessFeedback';
 import { requestScheduleExit } from './scheduleExitGuard';
-import { serverOptions } from './service';
 
 // 실제 여행/일정 원본을 읽은 뒤 기록 편집기를 연다.
 export default function RecordEditorScreen() {
@@ -68,16 +65,9 @@ function RecordPage({
   const router = useRouter();
   const valid = foundationUuidSchema.safeParse(id).success;
   const query = useQuery({
-    queryKey: foundationQueryKey(userId, 'workspace', id),
+    ...workspaceQueryOptions(userId, id),
     enabled:
       ready && Boolean(userId) && foundationUuidSchema.safeParse(id).success,
-    retry: false,
-    queryFn: ({ signal }) => {
-      // 서버 멤버십과 실제 일정 소속을 검사한다.
-      return serverOptions(userId).then((options) =>
-        getWorkspace(options, id, signal),
-      );
-    },
   });
   const denied =
     accessError ||
@@ -94,7 +84,9 @@ function RecordPage({
       title="여행기록 추가"
       onBack={() => {
         // 변경이 있으면 기존 공통 이탈 확인을 거친다.
-        return requestScheduleExit(() => router.replace(`/diary/${id}`));
+        return requestScheduleExit(() =>
+          returnToScreen(router, `/diary/${id}`),
+        );
       }}
     >
       {!ready || (valid && userId && query.isPending) ? (

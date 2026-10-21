@@ -1,8 +1,10 @@
+import ScreenHeader from '@/components/ScreenHeader';
+import { returnToScreen } from '@/components/navigationModel';
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
 import { Image, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import GoogleLogin from '@/features/auth/GoogleLogin';
@@ -138,6 +140,7 @@ export default function LoginScreen() {
     tripId?: string;
     reauth?: string;
   }>();
+  const router = useRouter();
   const controller = useLoginController(next, destination, tripId);
   const signedInMember = Boolean(
     controller.currentUser &&
@@ -148,6 +151,19 @@ export default function LoginScreen() {
   return (
     <SafeAreaView style={styles.screen}>
       <StatusBar style="dark" />
+      {!controller.emailOpen && (
+        <ScreenHeader
+          title="로그인"
+          inlineTitle
+          disabled={controller.busy}
+          onBack={() => {
+            // 인증 요청 중에는 복귀를 잠그고 완료 전 화면 전환을 막는다.
+            return controller.busy
+              ? undefined
+              : returnToScreen(router, '/(tabs)');
+          }}
+        />
+      )}
       <ScrollView
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"

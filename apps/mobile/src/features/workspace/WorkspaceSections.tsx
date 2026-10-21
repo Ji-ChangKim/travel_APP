@@ -1,3 +1,4 @@
+import { returnToScreen } from '@/components/navigationModel';
 import Text from '@/components/AppText';
 import DesignButton from '@/components/DesignButton';
 import ScreenHeader from '@/components/ScreenHeader';
@@ -832,7 +833,7 @@ export function renderWorkspaceSummary({
   return (
     <View style={hub.tripHeader}>
       <View style={hub.titleRow}>
-        <ScreenTitle style={{ flex: 1 }}>{snapshot.trip.title}</ScreenTitle>
+        <ScreenTitle grow>{snapshot.trip.title}</ScreenTitle>
       </View>
       <Text style={hub.status}>
         {tripPresentation(snapshot.trip).label} ·{' '}
@@ -896,34 +897,27 @@ export function renderWorkspaceHeader({
         onBack={() => {
           /* 작성 중인 내용과 대기 요청을 확인한 뒤 목록으로 돌아간다. */ return requestScheduleExit(
             () => {
-              /* 기존 목록 경로를 연다. */ return router.replace('/plans');
+              /* 기존 목록 경로를 연다. */ return returnToScreen(
+                router,
+                '/plans',
+              );
             },
           );
         }}
-        right={
-          snapshot && !workspace.isError ? (
-            <DesignButton
-              label=""
-              accessibilityLabel="여행 더보기"
-              expanded={showTripMore}
-              variant="quiet"
-              size="icon"
-              onPress={() => {
-                // 부가 기능과 소유자 설정을 같은 메뉴에서 연다.
-                return setShowTripMore(true);
-              }}
-              icon={(color) => {
-                // 상단 메뉴는 항상 같은 점 세 개 아이콘으로 표시한다.
-                return (
-                  <Ionicons
-                    name="ellipsis-horizontal"
-                    size={24}
-                    color={color}
-                  />
-                );
-              }}
-            />
-          ) : undefined
+        actions={
+          snapshot && !workspace.isError
+            ? [
+                {
+                  icon: 'more',
+                  label: '여행 더보기',
+                  expanded: showTripMore,
+                  onPress: () => {
+                    // 여행에 관련된 보조 행동만 메뉴로 연다.
+                    return setShowTripMore(true);
+                  },
+                },
+              ]
+            : undefined
         }
       />
     )

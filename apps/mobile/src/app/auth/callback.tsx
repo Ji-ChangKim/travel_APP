@@ -1,3 +1,4 @@
+import ScreenHeader from '@/components/ScreenHeader';
 import { userFacingMessage } from '@/services/userFacingError';
 import { useEffect, useState } from 'react';
 import { Platform, ScrollView } from 'react-native';
@@ -91,6 +92,7 @@ export default function AuthCallbackScreen() {
   // 성공 대기와 인증 실패 복귀 동작을 구분한다.
   return (
     <SafeAreaView style={styles.screen}>
+      <ScreenHeader title="로그인 확인" />
       <ScrollView
         contentContainerStyle={[
           styles.content,

@@ -1,3 +1,5 @@
+import ScreenHeader from '@/components/ScreenHeader';
+import { returnToScreen } from '@/components/navigationModel';
 import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -16,6 +18,14 @@ function NotFoundContent({ router }: { router: ReturnType<typeof useRouter> }) {
   // 하루의 길 찾기 안내와 안전한 복귀 버튼을 보여준다.
   return (
     <SafeAreaView style={styles.screen}>
+      <ScreenHeader
+        title="페이지를 찾을 수 없어요"
+        inlineTitle
+        onBack={() => {
+          // 잘못된 주소는 이전 화면이나 홈으로 안전하게 돌아간다.
+          return returnToScreen(router, '/(tabs)');
+        }}
+      />
       <ScrollView
         contentContainerStyle={[
           styles.content,

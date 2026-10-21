@@ -18,9 +18,13 @@ import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 export default function CommunityPhoto({
   path,
   userId = 'public',
+  coverHeight,
+  edgeToEdge = false,
 }: {
   path: string;
   userId?: string;
+  coverHeight?: number;
+  edgeToEdge?: boolean;
 }) {
   // 목록과 단건 읽기 모두 원본 대신 같은 공개 서명 경로를 사용한다.
   const focused = useIsFocused();
@@ -43,7 +47,13 @@ export default function CommunityPhoto({
     <Image
       source={{ uri: query.data }}
       resizeMethod="resize"
-      style={s.photo}
+      style={[
+        s.photo,
+        edgeToEdge && { borderRadius: 0 },
+        coverHeight
+          ? { height: coverHeight, aspectRatio: undefined }
+          : undefined,
+      ]}
       accessibilityLabel="작성자가 공개한 여행 사진"
       onError={() => {
         // 실패한 이미지 주소를 정상 사진처럼 계속 노출하지 않는다.
@@ -51,7 +61,13 @@ export default function CommunityPhoto({
       }}
     />
   ) : (
-    <View style={s.photoStatus}>
+    <View
+      style={[
+        s.photoStatus,
+        coverHeight ? { minHeight: coverHeight } : undefined,
+        edgeToEdge && { borderRadius: 0 },
+      ]}
+    >
       <Text style={s.meta}>
         {query.isError || failedUrl
           ? '사진을 불러오지 못했어요.'

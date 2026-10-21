@@ -1,3 +1,4 @@
+import ScreenHeader from '@/components/ScreenHeader';
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
 import Modal from '@/components/AppModal';
@@ -8,7 +9,7 @@ import { styles } from './workspaceStyles';
 
 import { useTripStore } from '@/stores/useTripStore';
 import { ledgerStyles as l, ledgerColors as c } from './ledgerTheme';
-import { LedgerAction as Action, LedgerBrand, useLedgerWide } from './LedgerUI';
+import { LedgerAction as Action, useLedgerWide } from './LedgerUI';
 
 // 시스템 카메라를 열기 전에 촬영 방법과 사진 처리 선택을 안내한다.
 export default function ReceiptCapture({
@@ -32,17 +33,27 @@ export default function ReceiptCapture({
     return state.currentUser?.authProvider === 'guest';
   });
   const wide = useLedgerWide();
+  function closeCapture(): void {
+    // 사진 선택을 처리하는 중에는 모든 닫기 경로를 같은 규칙으로 잠근다.
+    return busy ? undefined : onClose();
+  }
   // 실제 카메라는 기기의 촬영 화면을 사용하며 이 화면에서는 결과를 만들지 않는다.
   return (
     <Modal
       accessibilityLabel="영수증 사진 선택"
       visible={visible}
       animationType="slide"
-      onRequestClose={onClose}
+      onRequestClose={closeCapture}
     >
       <SafeAreaView style={[styles.modal, { backgroundColor: c.canvas }]}>
+        <ScreenHeader
+          title="영수증 촬영"
+          inlineTitle
+          onBack={closeCapture}
+          backLabel="영수증 사진 선택 닫기"
+          disabled={busy}
+        />
         <ScrollView contentContainerStyle={[l.content, wide && l.wideContent]}>
-          <LedgerBrand />
           <Text style={styles.label}>사진 촬영 → 정보 확인 → 일정 등록</Text>
           <Text style={l.title}>영수증 한 장으로 지출 기록</Text>
           <Text style={styles.subtitle}>
@@ -106,7 +117,7 @@ export default function ReceiptCapture({
             label="나중에 할게요"
             variant="quiet"
             disabled={busy}
-            onPress={onClose}
+            onPress={closeCapture}
           />
         </ScrollView>
       </SafeAreaView>

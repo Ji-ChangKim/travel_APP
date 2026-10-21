@@ -10,10 +10,60 @@ import {
   workspaceTripSchema,
   workspaceCommandSchema,
   communityFeedSearch,
+  communityImportSchema,
+  type CommunityImportInput,
   type CommunityFeedFilters,
   type WorkspaceCommand,
 } from '@wherego/validation';
-import { requestFoundation, type FoundationClientOptions } from './foundation';
+import {
+  requestFoundation,
+  requestSignal,
+  FoundationClientError,
+  type FoundationClientOptions,
+} from './foundation';
+
+// 공개 일정 담기를 하나의 멱등 저장 요청으로 전송한다.
+export function importCommunityPlan(
+  options: FoundationClientOptions,
+  postId: string,
+  input: CommunityImportInput,
+  key: string,
+): Promise<string> {
+  // 클라이언트가 만든 일정 사본 대신 공개 ID와 선택 출발일만 전송한다.
+  return requestFoundation(
+    options,
+    `/community/${encodeURIComponent(postId)}/import`,
+    {
+      method: 'POST',
+      headers: { 'Idempotency-Key': key },
+      body: JSON.stringify(communityImportSchema.parse(input)),
+    },
+  ).then((response) => {
+    // 저장을 확정한 실제 여행 ID만 편집 화면으로 연결한다.
+    return z.object({ tripId: z.string().uuid() }).parse(response.data).tripId;
+  });
+}
+
+// 로그인 여부와 무관하게 공개된 원본 한 건을 조회한다.
+export function getPublicCommunityPost(
+  baseUrl: string,
+  postId: string,
+  signal?: AbortSignal,
+): Promise<CommunityPost> {
+  // 비공개 인증 토큰을 공개 조회에 포함하지 않는다.
+  return fetch(
+    `${baseUrl.replace(/\/$/, '')}/public/community/${encodeURIComponent(postId)}`,
+    { signal: requestSignal(signal) },
+  ).then((response) => {
+    // 공개 중단과 통신 실패를 빈 일정으로 바꾸지 않는다.
+    return response.ok
+      ? response.json().then((payload: unknown) => {
+          // 실제 공개 계약을 통과한 내용만 전달한다.
+          return z.object({ data: communityPostSchema }).parse(payload).data;
+        })
+      : Promise.reject(new FoundationClientError(response.status, null));
+  });
+}
 
 // 앱과 웹의 원본 여행 목록을 조회한다.
 export function listServerTrips(

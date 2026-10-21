@@ -215,12 +215,6 @@ const s = StyleSheet.create({
     gap: 16,
     backgroundColor: colors.background,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  close: { padding: 10, minWidth: 48, minHeight: 48 },
   list: { paddingBottom: 24, gap: 8 },
   option: {
     flexDirection: 'row',

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 3,
-  "revision": "3.0.3",
-  "date": "2026-10-19",
+  "revision": "3.0.4",
+  "date": "2026-10-21",
   "status": "app-integrated",
   "unit": "logical-pixel",
   "sourceScreens": {
@@ -438,7 +438,35 @@
     "headerTouchTarget": 48,
     "headerMaxWidth": 640,
     "headerIconSize": 24,
-    "screenTitleStyle": "headlineLarge"
+    "screenTitleStyle": "headlineLarge",
+    "headerPaddingVertical": 6,
+    "headerActionGap": 8,
+    "brandTitleSize": 24,
+    "brandTitleLineHeight": 34,
+    "brandFeed": {
+      "background": "#F8F9FF",
+      "border": "rgba(198, 198, 205, 0.3)"
+    },
+    "gnb": {
+      "background": "#FFFFFF",
+      "border": "#E2E8F0",
+      "foreground": "#45464D",
+      "selectedForeground": "#B3261E",
+      "selectedBackground": "#FFDAD2",
+      "pressedBackground": "#F5F1EC",
+      "actionBackground": "#B3261E",
+      "actionPressedBackground": "#A43E31",
+      "actionForeground": "#FFFFFF",
+      "actionLabel": "#334155",
+      "minimumHeight": 64,
+      "chipWidth": 48,
+      "chipHeight": 28,
+      "chipRadius": 14,
+      "iconSize": 22,
+      "actionSize": 56,
+      "actionIconSize": 28,
+      "actionOffset": -14
+    }
   },
   "format": {
     "dateRangeSeparator": " – "

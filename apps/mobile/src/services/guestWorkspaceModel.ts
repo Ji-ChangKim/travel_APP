@@ -1,5 +1,9 @@
 import { z } from 'zod';
-import type { Profile, WorkspaceSnapshot } from '@wherego/domain';
+import type {
+  Profile,
+  WorkspaceSnapshot,
+  CommunityPost,
+} from '@wherego/domain';
 import {
   newTrip,
   transform,
@@ -9,6 +13,8 @@ import {
   checklistAddSchema,
   checklistStateSchema,
   foundationUuidSchema,
+  communityImportSchema,
+  importCommunityTrip,
   type WorkspaceId,
   type Change,
 } from '@wherego/validation';
@@ -62,6 +68,7 @@ export function guestWorkspaceRequest(
   body: unknown,
   headers: Headers,
   identify: WorkspaceId,
+  source?: CommunityPost,
 ): GuestResult {
   // 로컬 프로필은 원격 API 인증을 대신하지 않는다.
   return document.ownerId !== user.id || user.authProvider !== 'guest'
@@ -76,6 +83,7 @@ export function guestWorkspaceRequest(
           body,
           headers,
           identify,
+          source,
         );
 }
 
@@ -146,6 +154,7 @@ function mutateGuestWorkspace(
   body: unknown,
   headers: Headers,
   identify: WorkspaceId,
+  source?: CommunityPost,
 ): GuestResult {
   // 키·본문·버전이 같은 재시도만 기존 성공 결과를 돌려준다.
   return replayGuestMutation(
@@ -154,9 +163,22 @@ function mutateGuestWorkspace(
     JSON.stringify({ path, method, body, version: headers.get('If-Match') }),
     () => {
       // 생성과 기존 여행 변경은 각각 한 책임으로 처리한다.
-      return path === '/trips' && method === 'POST'
-        ? createGuestTrip(document, user, body, identify)
-        : changeGuestTrip(document, path, method, body, headers, identify);
+      return /^\/community\/[^/]+\/import$/.test(path) && method === 'POST'
+        ? source && source.id === path.split('/')[2]
+          ? insertGuestTrip(
+              document,
+              importCommunityTrip(
+                source,
+                communityImportSchema.parse(body),
+                user.id,
+                user.nickname,
+                identify,
+              ),
+            )
+          : fail(404, 'RESOURCE_NOT_FOUND')
+        : path === '/trips' && method === 'POST'
+          ? createGuestTrip(document, user, body, identify)
+          : changeGuestTrip(document, path, method, body, headers, identify);
     },
   );
 }
@@ -231,7 +253,11 @@ function insertGuestTrip(
       ...document,
       trips: [...document.trips, workspaceSnapshotSchema.parse(snapshot)],
     },
-    data: { trip: snapshot.trip },
+    data: {
+      trip: snapshot.trip,
+      tripId: snapshot.trip.id,
+      tripVersion: snapshot.trip.version,
+    },
     write: true,
   };
 }

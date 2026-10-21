@@ -97,7 +97,7 @@ export function renderAccountContent({
   return (
     <SafeAreaView style={styles.screen}>
       <ModalBackground>
-        <ScreenHeader title="마이페이지" />
+        <ScreenHeader title="MY" />
         <ScrollView contentContainerStyle={styles.scrollContent}>
           {profileNotice ? (
             <Text accessibilityRole="alert" style={{ color: colors.text }}>

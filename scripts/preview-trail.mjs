@@ -32,7 +32,10 @@ function requestedFile(url) {
 // 웹 빌드 폴더 밖의 요청을 거부한다.
 function safeCandidate(candidate) {
   // 상위 경로로 벗어난 파일은 제공하지 않는다.
-  return candidate.startsWith(root) ? existingFile(candidate) : null;
+  return path.relative(root, candidate).startsWith('..') ||
+    path.isAbsolute(path.relative(root, candidate))
+    ? null
+    : existingFile(candidate);
 }
 
 // 확장자 없는 Expo 라우트는 HTML로 읽는다.
@@ -42,33 +45,59 @@ function existingFile(candidate) {
     ? candidate
     : fs.existsSync(`${candidate}.html`)
       ? `${candidate}.html`
-      : /[\\/](?:trips|diary)[\\/][0-9a-f-]{36}$/.test(candidate)
-        ? path.join(path.dirname(candidate), '[id].html')
-        : /[\\/]community[\\/][0-9a-f-]{36}$/.test(candidate)
-          ? path.join(path.dirname(candidate), '[postId].html')
-          : null;
+      : templateFile(candidate);
+}
+
+// 앱의 최상위 상세 주소만 존재하는 Expo 템플릿에 연결한다.
+function templateFile(candidate) {
+  // /public/community 같은 API 주소를 앱 화면으로 오인하지 않는다.
+  const route = path.relative(root, candidate).replaceAll('\\', '/');
+  const file = /^(?:trips|diary|record)\/[0-9a-f-]{36}$/.test(route)
+    ? path.join(path.dirname(candidate), '[id].html')
+    : /^community\/[0-9a-f-]{36}$/.test(route)
+      ? path.join(path.dirname(candidate), '[postId].html')
+      : '';
+  return file && fs.existsSync(file) && fs.statSync(file).isFile()
+    ? file
+    : null;
 }
 
 // 정적 응답 또는 찾을 수 없음 상태를 반환한다.
 function respond(response, file) {
   // 원본 저장소·환경 파일은 노출하지 않는다.
   return file
-    ? fs.createReadStream(file).pipe(
-        response.writeHead(200, {
-          'Content-Type':
-            mime[path.extname(file)] ?? 'application/octet-stream',
-        }),
-      )
-    : fs
-        .createReadStream(
+    ? streamFile(response, file, 200)
+    : fs.existsSync(path.join(root, '404.html')) ||
+        fs.existsSync(path.join(root, '+not-found.html'))
+      ? streamFile(
+          response,
           path.join(
             root,
             fs.existsSync(path.join(root, '404.html'))
               ? '404.html'
               : '+not-found.html',
           ),
+          404,
         )
-        .pipe(response.writeHead(404, { 'Content-Type': mime['.html'] }));
+      : response.writeHead(404).end('Not found');
+}
+
+// 조회 뒤 파일이 없어져도 서버 전체를 종료하지 않고 해당 응답만 끝낸다.
+function streamFile(response, file, status) {
+  // 파일 원문이나 내부 경로를 오류 응답에 포함하지 않는다.
+  return fs
+    .createReadStream(file)
+    .once('error', () => {
+      // 이미 본문을 보냈다면 연결만 닫고, 아니면 찾을 수 없음으로 끝낸다.
+      return response.headersSent
+        ? response.destroy()
+        : response.writeHead(404).end('Not found');
+    })
+    .pipe(
+      response.writeHead(status, {
+        'Content-Type': mime[path.extname(file)] ?? 'application/octet-stream',
+      }),
+    );
 }
 
 // 잘못된 URL 인코딩은 요청 오류로 처리한다.

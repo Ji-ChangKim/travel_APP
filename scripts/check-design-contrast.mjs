@@ -136,6 +136,18 @@ checks.push(
   pair('ledger.private', ledger.privateText, ledger.private, 4.5),
 );
 
+// 헤더와 GNB의 기본·선택·눌림 상태도 실제 적용 토큰으로 검사한다.
+const gnb = tokens.navigation.gnb;
+for (const [name, foreground, background] of [
+  ['normal', gnb.foreground, gnb.background],
+  ['pressed', gnb.foreground, gnb.pressedBackground],
+  ['selected', gnb.selectedForeground, gnb.selectedBackground],
+  ['action', gnb.actionForeground, gnb.actionBackground],
+  ['actionPressed', gnb.actionForeground, gnb.actionPressedBackground],
+  ['actionLabel', gnb.actionLabel, gnb.background],
+])
+  checks.push(pair(`navigation.${name}`, foreground, background, 4.5));
+
 const failures = checks.filter((item) => {
   // 실패한 조합만 차단 결과에 남긴다.
   return !item.passes;

@@ -1,8 +1,7 @@
 import { View, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import type { ReactNode } from 'react';
 import ScreenTitle from './ScreenTitle';
-import DesignButton from './DesignButton';
+import HeaderAction from './HeaderAction';
+import HeaderActions, { type HeaderActionItem } from './HeaderActions';
 import { designTokens } from '@/constants/theme';
 
 // 뒤로가기·제목·우측 행동을 화면마다 같은 순서와 규격으로 표시한다.
@@ -11,7 +10,7 @@ export default function ScreenHeader({
   backLabel,
   onBack,
   disabled = false,
-  right,
+  actions,
   inset = true,
   inlineTitle = false,
 }: {
@@ -19,7 +18,7 @@ export default function ScreenHeader({
   backLabel?: string;
   onBack?: () => void;
   disabled?: boolean;
-  right?: ReactNode;
+  actions?: readonly HeaderActionItem[];
   inset?: boolean;
   inlineTitle?: boolean;
 }) {
@@ -28,26 +27,23 @@ export default function ScreenHeader({
     <View testID="screen-header" style={[s.header, inset && s.inset]}>
       <View testID="screen-header-row" style={s.row}>
         {onBack ? (
-          <DesignButton
-            label=""
-            accessibilityLabel={backLabel || '이전 화면으로 돌아가기'}
-            size="icon"
-            variant="quiet"
+          <HeaderAction
+            icon="back"
+            label={backLabel || '이전 화면으로 돌아가기'}
             disabled={disabled}
             onPress={onBack}
-            icon={(color) => {
-              /* 모든 뒤로가기는 같은 화살표와 상태색을 사용한다. */ return (
-                <Ionicons name="arrow-back" size={24} color={color} />
-              );
-            }}
           />
         ) : title ? (
-          <ScreenTitle style={s.rootTitle}>{title}</ScreenTitle>
+          <ScreenTitle grow>{title}</ScreenTitle>
         ) : null}
         {onBack && title && inlineTitle ? (
-          <ScreenTitle style={s.rootTitle}>{title}</ScreenTitle>
+          <ScreenTitle grow>{title}</ScreenTitle>
         ) : null}
-        {right ? <View style={s.right}>{right}</View> : null}
+        {actions?.length ? (
+          <View style={s.right}>
+            <HeaderActions actions={actions} disabled={disabled} />
+          </View>
+        ) : null}
       </View>
       {onBack && title && !inlineTitle ? (
         <View style={s.heading}>
@@ -67,12 +63,11 @@ const s = StyleSheet.create({
   inset: { paddingHorizontal: designTokens.layout.screenPaddingMobile },
   row: {
     minHeight: designTokens.navigation.headerMinHeight,
-    paddingVertical: 6,
+    paddingVertical: designTokens.navigation.headerPaddingVertical,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: designTokens.navigation.headerActionGap,
   },
-  rootTitle: { flex: 1 },
   heading: { paddingTop: 8, paddingBottom: 4 },
   right: {
     marginLeft: 'auto',

@@ -1,0 +1,149 @@
+[
+  {
+    "file": "index.tsx",
+    "path": null,
+    "header": "launch",
+    "title": "",
+    "gnb": false
+  },
+  {
+    "file": "(tabs)/index.tsx",
+    "path": "/",
+    "header": "brand",
+    "title": "TripPrint",
+    "gnb": true
+  },
+  {
+    "file": "(tabs)/plans.tsx",
+    "path": "/plans",
+    "header": "root",
+    "title": "내 여행 계획",
+    "gnb": true
+  },
+  {
+    "file": "(tabs)/footprints.tsx",
+    "path": "/footprints",
+    "header": "brand",
+    "title": "TripPrint",
+    "gnb": true
+  },
+  {
+    "file": "(tabs)/community.tsx",
+    "path": "/community",
+    "header": "root",
+    "title": "여행 커뮤니티",
+    "gnb": true
+  },
+  {
+    "file": "(tabs)/my.tsx",
+    "path": "/my",
+    "header": "root",
+    "title": "MY",
+    "gnb": true
+  },
+  {
+    "file": "new-trip.tsx",
+    "path": "/new-trip",
+    "header": "task",
+    "title": "여행 계획 만들기",
+    "gnb": false
+  },
+  {
+    "file": "trips/[id].tsx",
+    "path": "/trips/:id",
+    "header": "personal",
+    "title": "",
+    "gnb": false
+  },
+  {
+    "file": "community/[postId].tsx",
+    "path": "/community/:postId",
+    "header": "inline",
+    "title": "공유된 여행",
+    "gnb": false
+  },
+  {
+    "file": "diary/[id].tsx",
+    "path": "/diary/:id",
+    "header": "inline",
+    "title": "여행기록",
+    "gnb": false
+  },
+  {
+    "file": "record/[id].tsx",
+    "path": "/record/:id",
+    "header": "inline",
+    "title": "여행기록 추가",
+    "gnb": false
+  },
+  {
+    "file": "my-footprints.tsx",
+    "path": "/my-footprints",
+    "header": "inline",
+    "title": "나의 발자국",
+    "gnb": false
+  },
+  {
+    "file": "destinations/[key].tsx",
+    "path": "/destinations/:key",
+    "header": "task",
+    "title": "여행지 안내",
+    "gnb": false
+  },
+  {
+    "file": "account.tsx",
+    "path": "/account",
+    "header": "task",
+    "title": "계정 관리",
+    "gnb": false
+  },
+  {
+    "file": "invite.tsx",
+    "path": "/invite",
+    "header": "task",
+    "title": "여행 초대",
+    "gnb": false
+  },
+  {
+    "file": "import-place.tsx",
+    "path": "/import-place",
+    "header": "task",
+    "title": "저장한 장소를 여행으로",
+    "gnb": false
+  },
+  {
+    "file": "local-records.tsx",
+    "path": "/local-records",
+    "header": "task",
+    "title": "나의 발자취",
+    "gnb": false
+  },
+  {
+    "file": "login.tsx",
+    "path": "/login",
+    "header": "inline",
+    "title": "로그인",
+    "gnb": false
+  },
+  {
+    "file": "profile-setup.tsx",
+    "path": "/profile-setup",
+    "header": "task",
+    "title": "회원가입",
+    "gnb": false
+  },
+  {
+    "file": "auth/callback.tsx",
+    "path": "/auth/callback",
+    "header": "root",
+    "title": "로그인 확인",
+    "gnb": false
+  },
+  {
+    "file": "+not-found.tsx",
+    "path": null,
+    "header": "inline",
+    "title": "페이지를 찾을 수 없어요",
+    "gnb": false
+  }
+]

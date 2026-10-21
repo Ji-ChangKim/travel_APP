@@ -1,2 +1,2 @@
-// 발자취 계획과 영수증 기록 작업 공간을 탭에 연결한다.
-export { default } from '@/features/workspace/FootprintsScreen';
+// 공개 일정 목록을 발자국 탭에 연결하고 개인 기록은 /my-footprints에 유지한다.
+export { default } from '@/features/workspace/PublicFootprintsScreen';

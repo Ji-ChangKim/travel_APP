@@ -1,17 +1,15 @@
+import { returnToScreen } from '@/components/navigationModel';
+import { tripListQueryOptions, workspaceQueryOptions } from './tripQueries';
 import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useQuery, type UseQueryResult } from '@tanstack/react-query';
-import {
-  foundationQueryKey,
-  getWorkspace,
-  listServerTrips,
-} from '@wherego/api-client';
+
 import type { PersistedTrip } from '@wherego/domain';
 import Text from '@/components/AppText';
 import HaruState from '@/components/HaruState';
 import { useTripStore } from '@/stores/useTripStore';
-import { serverOptions } from './service';
+
 import { Field } from './ui';
 import ServerPhoto from './ServerPhoto';
 
@@ -37,16 +35,8 @@ export default function FootprintsScreen() {
   });
   const userId = user?.id || '';
   const query = useQuery({
-    queryKey: foundationQueryKey(userId, 'trips'),
+    ...tripListQueryOptions(userId),
     enabled: Boolean(userId),
-    retry: false,
-    queryFn: ({ signal }) => {
-      // 시안의 여행 배열 대신 실제 기존 원본을 읽는다.
-      return serverOptions(userId).then((options) => {
-        // 마지막 화면 구독이 끝나면 목록 조회도 중단한다.
-        return listServerTrips(options, signal);
-      });
-    },
   });
   return (
     <ArchiveContent
@@ -96,7 +86,13 @@ function ArchiveContent({
     );
   });
   return (
-    <LedgerScreen>
+    <LedgerScreen
+      title="나의 발자국"
+      onBack={() => {
+        // 개인 보관함을 연 출발 화면으로 돌아간다.
+        return returnToScreen(router, '/(tabs)/my');
+      }}
+    >
       <ScrollView contentContainerStyle={[s.content, wide && s.wideContent]}>
         <View style={s.tinted}>
           <Text style={s.eyebrow}>JOURNAL ARCHIVE</Text>
@@ -135,7 +131,7 @@ function ArchiveContent({
           onPress={() => {
             // 실제 생성 또는 목적 복귀가 있는 로그인으로 연결한다.
             return router.push(
-              userId ? '/new-trip?mode=record' : '/login?next=footprints',
+              userId ? '/new-trip?mode=record' : '/login?next=my-footprints',
             );
           }}
         />
@@ -155,7 +151,7 @@ function ArchiveContent({
         {query.isError && (
           <TripAccessFeedback
             error={query.error}
-            target={{ next: 'footprints' }}
+            target={{ next: 'my-footprints' }}
             busy={query.isFetching}
             onRetry={() => {
               // 현재 계정의 실패한 목록만 다시 요청한다.
@@ -261,16 +257,7 @@ function ArchiveCard({
   userId: string;
 }) {
   // 다이어리와 조회 키를 공유한다.
-  const query = useQuery({
-    queryKey: foundationQueryKey(userId, 'workspace', trip.id),
-    retry: false,
-    queryFn: ({ signal }) => {
-      // 현재 멤버십으로 해당 원본만 읽는다.
-      return serverOptions(userId).then((options) =>
-        getWorkspace(options, trip.id, signal),
-      );
-    },
-  });
+  const query = useQuery({ ...workspaceQueryOptions(userId, trip.id) });
   const router = useRouter();
   const snapshot = query.isError ? undefined : query.data;
   const detail = snapshot ? archiveDetails(snapshot) : undefined;

@@ -1,6 +1,11 @@
 import { UserFacingError } from './userFacingError';
 import * as Crypto from 'expo-crypto';
 import type { FoundationClientOptions } from '@wherego/api-client';
+import {
+  getPublicCommunityPost,
+  FoundationClientError,
+} from '@wherego/api-client';
+import type { CommunityPost } from '@wherego/domain';
 import { WorkspaceModelError } from '@wherego/validation';
 import { useTripStore } from '@/stores/useTripStore';
 import { guestRemoteHeaders } from './guestRemoteHeaders';
@@ -43,20 +48,50 @@ function guestFetch(
   remote: () => Promise<FoundationClientOptions>,
 ): Promise<Response> {
   // 허용한 외부 기능만 원격 인증을 사용하며 다른 경로는 기기에서 거부한다.
-  return /^\/(flights\/lookup(?:$|\?)|places(?:\/|\?)|profile(?:$|\?)|community(?:$|\?)|reports$|blocks$)/.test(
-    new URL(url).pathname.replace('/api/v1', ''),
-  )
-    ? remote().then((options) => {
-        // 기기 인증 상태를 원격 서버가 검증한 세션으로 대체하지 않는다.
-        return fetch(url, {
-          ...init,
-          headers: guestRemoteHeaders(init?.headers, options.accessToken),
-        });
+  return /^\/api\/v1\/community\/[^/]+\/import$/.test(new URL(url).pathname)
+    ? serializeGuest(userId, () => {
+        // 공개 원본만 네트워크로 읽고 담은 여행은 기기에만 보관한다.
+        return importGuestFetch(userId, url, init);
       })
-    : serializeGuest(userId, () => {
-        // 같은 기기의 연속 저장도 이전 저장 완료 후 읽는다.
-        return handleGuestFetch(userId, url, init);
-      });
+    : /^\/(flights\/lookup(?:$|\?)|places(?:\/|\?)|profile(?:$|\?)|community(?:$|\?)|reports$|blocks$)/.test(
+          new URL(url).pathname.replace('/api/v1', ''),
+        )
+      ? remote().then((options) => {
+          // 기기 인증 상태를 원격 서버가 검증한 세션으로 대체하지 않는다.
+          return fetch(url, {
+            ...init,
+            headers: guestRemoteHeaders(init?.headers, options.accessToken),
+          });
+        })
+      : serializeGuest(userId, () => {
+          // 같은 기기의 연속 저장도 이전 저장 완료 후 읽는다.
+          return handleGuestFetch(userId, url, init);
+        });
+}
+
+// 기존 로컬 요청 기록이 있으면 원본을 다시 받지 않고 저장 결과를 복원한다.
+function importGuestFetch(
+  userId: string,
+  url: string,
+  init?: RequestInit,
+): Promise<Response> {
+  // 회원 계정으로 전환한 이전 화면의 요청은 확정 단계에서 다시 거부한다.
+  return readGuestWorkspace(userId)
+    .then((document) => {
+      // 입력과 키의 동일성은 공통 기기 모델이 확인한다.
+      return document.requests[
+        new Headers(init?.headers).get('Idempotency-Key') || ''
+      ]
+        ? checkedGuestFetch(userId, document, url, init)
+        : getPublicCommunityPost(
+            new URL(url).origin,
+            new URL(url).pathname.split('/')[4] || '',
+          ).then((source) => {
+            // 서버에 올라온 공개 일정만 기기 저장 후보로 전달한다.
+            return checkedGuestFetch(userId, document, url, init, source);
+          });
+    })
+    .catch(rejectedGuestResponse);
 }
 
 // 한 게스트 문서의 동시에 들어온 저장을 순서대로 실행한다.
@@ -119,6 +154,7 @@ function checkedGuestFetch(
   document: GuestWorkspace,
   url: string,
   init?: RequestInit,
+  source?: CommunityPost,
 ): Promise<Response> {
   // 계정 변경 후 시작한 이전 화면의 저장은 거부한다.
   return useTripStore.getState().currentUser?.id !== userId
@@ -133,6 +169,7 @@ function checkedGuestFetch(
           init?.body ? JSON.parse(String(init.body)) : undefined,
           new Headers(init?.headers),
           Crypto.randomUUID,
+          source,
         ),
       );
 }
@@ -173,24 +210,39 @@ function localMediaResult(data: unknown): unknown {
 // 로컬 변경 거부를 공통 오류 응답으로 변환한다.
 function rejectedGuestResponse(error: unknown): Response {
   // 저장소 오류는 한국어 복구 안내로 전달하고 내부 경로를 숨긴다.
-  return error instanceof GuestWorkspaceError ||
-    error instanceof WorkspaceModelError
+  return error instanceof FoundationClientError
     ? Response.json(
-        { error: { code: error.code } },
         {
-          status:
-            error instanceof GuestWorkspaceError
-              ? error.status
-              : error.code === 'ROLE_FORBIDDEN'
-                ? 403
-                : error.code === 'TRIP_ARCHIVED'
-                  ? 409
-                  : 422,
+          error: {
+            code:
+              error.status === 404
+                ? 'RESOURCE_NOT_FOUND'
+                : 'BACKEND_UNAVAILABLE',
+          },
         },
+        { status: error.status },
       )
-    : error instanceof Error && error.name === 'ZodError'
-      ? Response.json({ error: { code: 'VALIDATION_FAILED' } }, { status: 422 })
-      : failStorage();
+    : error instanceof GuestWorkspaceError ||
+        error instanceof WorkspaceModelError
+      ? Response.json(
+          { error: { code: error.code } },
+          {
+            status:
+              error instanceof GuestWorkspaceError
+                ? error.status
+                : error.code === 'ROLE_FORBIDDEN'
+                  ? 403
+                  : error.code === 'TRIP_ARCHIVED'
+                    ? 409
+                    : 422,
+          },
+        )
+      : error instanceof Error && error.name === 'ZodError'
+        ? Response.json(
+            { error: { code: 'VALIDATION_FAILED' } },
+            { status: 422 },
+          )
+        : failStorage();
 }
 
 // 실제 기기 쓰기 실패를 사용자 재시도 안내로 전달한다.

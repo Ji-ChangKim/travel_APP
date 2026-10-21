@@ -3,8 +3,7 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Modal from './AppModal';
 import ScreenTitle from './ScreenTitle';
-import DesignButton from './DesignButton';
-import { Ionicons } from '@expo/vector-icons';
+import HeaderAction from './HeaderAction';
 import { colors } from '@/constants/theme';
 
 // 선택 목록은 하단 시트로, 한 번의 결정은 중앙 확인으로 표시한다.
@@ -68,18 +67,12 @@ export default function ActionSheet({
             contentContainerStyle={s.content}
           >
             <View style={s.titleRow}>
-              <ScreenTitle style={{ flex: 1 }}>{title}</ScreenTitle>
-              <DesignButton
-                label=""
-                accessibilityLabel="닫기"
-                size="icon"
-                variant="quiet"
+              <ScreenTitle grow>{title}</ScreenTitle>
+              <HeaderAction
+                icon="close"
+                label="닫기"
                 disabled={dismissDisabled}
                 onPress={closeSheet}
-                icon={(color) => {
-                  // 안전한 닫기를 첫 조작 대상으로 두고 제목과 겹치지 않게 한다.
-                  return <Ionicons name="close" size={24} color={color} />;
-                }}
               />
             </View>
             {children}

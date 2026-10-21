@@ -109,15 +109,13 @@ export function renderFlightEditor({
           });
         }}
         disabled={props.locked}
-        right={
-          <Action
-            label="완료"
-            size="header"
-            variant="quiet"
-            disabled={props.locked || (manual ? Boolean(issue) : !selected)}
-            onPress={finish}
-          />
-        }
+        actions={[
+          {
+            label: '완료',
+            disabled: props.locked || (manual ? Boolean(issue) : !selected),
+            onPress: finish,
+          },
+        ]}
       />
       <ScrollView
         contentContainerStyle={[

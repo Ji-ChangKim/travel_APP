@@ -16,7 +16,7 @@ import { homeDestinations } from './homeDestinations';
 import HomeGuide from './HomeGuide';
 import HomeTools from './HomeTools';
 import { useTripDateRefresh } from './useTripDateRefresh';
-import HomeHeader from './HomeHeader';
+import HomeHeader from '@/components/HomeHeader';
 
 interface HomeProps {
   userId: string;

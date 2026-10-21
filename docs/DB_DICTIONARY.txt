@@ -2426,3 +2426,33 @@ DB/테이블: 기존 Cloudflare D1 uploads·trips·posts 및 비공개 R2 MEDIA.
   압축 픽셀과 색상 정보는 유지하고 EXIF 방향은 1~8 범위의 태그 하나만 재작성한다.
   공개된 기존 파일에도 읽기 시점에 같은 보호를 적용하며 비공개 원본·파일 경로·미디어 ID·등록 데이터는 변경하지 않는다.
   변환은 완전한 이미지 디코더·악성 파일 검사·사진 픽셀에 보이는 개인정보 삭제를 대신하지 않는다.
+
+[헤더·GNB 필수 연결 객체 / 2026-10-21]
+이번 선택 커밋의 클라이언트·기기 연결 계약이다. 서버 구현·물리 DB·데이터 등록 변경은 포함하지 않는다.
+[2026-10-20 발자국 HTML 목록 요약 보완]
+DB/테이블: 기존 Cloudflare D1 posts.snapshot. 컬럼·인덱스·서버 DTO 변경 없음, DB 데이터 갱신 없음.
+객체/타입: communityFeedCard(post:CommunityPost)의 비영속 목록 요약에 startDate:string(YYYY-MM-DD), endDate:string(YYYY-MM-DD)를 추가한다.
+제약: 서버에서 검증한 공개 snapshot의 전체 여행 날짜를 복사한다. 부분 공개한 DAY 수로 박·일을 계산하지 않는다.
+  communityFeedPeriod({startDate,endDate}):string은 UTC 달력 날짜 차이에 시작일을 포함해 당일 또는 N박 M일을 표시한다.
+  CommunityFeedViewProps는 useDiscoveryController, CommunityFeedPostProps는 같은 실제 요약·행동 계약에서 파생한다.
+  동행 유형·개인 아바타·저장 수·알림 수를 새 필드나 가짜 값으로 추가하지 않는다.
+표시: 공개 유형·여행 기간·시작 연월을 실제 값으로 표시한다. 월·동행 필터는 현행 조회 계약에 없어 구현한 것처럼 노출하지 않는다.
+
+[2026-10-20 내 여행 목록 비영속 표시 모델]
+DB명/테이블: 기존 D1 trips·posts 및 개인 workspace JSON 원본. 신규 테이블·컬럼·저장 명령·API DTO 변경 없음.
+객체: MyTripsSelection (화면 메모리 전용). filter:ALL|IN_PROGRESS|UPCOMING|COMPLETED, search:string, sort:recent|departure, searching:boolean. 계정 변경 시 초기화하며 DB에 저장하지 않는다.
+객체: myTripTiming(PersistedTrip, now): 공통 tripPresentation에 total:number·day:number·progress:number(0~1)·badge:string·countdown:string|null과 화면 행동 문구를 더한다. 날짜 미정에는 total=0·countdown=null이며 여행 현지 날짜를 쓴다.
+객체: myTripFacts(WorkspaceSnapshot, now): photo:WorkspaceMedia|undefined(일반 photo만), photoCount/placeCount/receiptCount/checklistTotal/checklistDone:number, flight:FlightDetails|undefined, stay/next:WorkspaceSchedule|undefined, published:boolean(postId 존재). 조회 실패·로딩에는 이 객체를 표시하지 않는다.
+조회: 개인 trips와 상세의 기존 계정별 foundationQueryKey를 공유하며 카드 주변만 권한 조회한다. 영수증을 표지로 선택하지 않고 사진이 없으면 가상 관광 사진을 만들지 않는다. 공개 추천은 기존 loadCommunity 응답만 읽는다.
+제약: 정렬은 현재 DTO에 없는 생성 시각을 추정하지 않고 실제 startDate로 수행한다. 준비 중·예정을 UPCOMING으로 묶고 보관 여행은 ALL에서 보존한다. 빈 배열·오류·권한 없음은 서로 구분한다.
+
+[2026-10-20 공개 일정 담기 계약]
+DB: Cloudflare D1 (환경별 DB 바인딩). 물리 테이블·컬럼 추가 없음.
+테이블 trips: id UUID PK, owner_id UUID(인증된 담은 계정), version INTEGER=1, snapshot JSON(WorkspaceSnapshot), last_key TEXT(계정:요청 UUID). 공개 원본과 다른 새 ID이며 owner 권한으로 기존 commands 편집 가능.
+테이블 trip_members: trip_id UUID, user_id UUID, role='owner'. 담은 계정 한 명만 삽입. 원본 동행자·권한 복사 금지.
+테이블 mutation_requests: actor_id UUID + request_key UUID 복합 유일성, input_hash SHA-256, result JSON(tripId·tripVersion·trip), created_at epoch ms. 생성·멤버·요청 결과 원자 확정 및 응답 유실 재생. 다른 입력으로 키 재사용409.
+읽기 테이블 posts: id UUID PK, author_id UUID, snapshot JSON. 현재 공개 행만 원본으로 사용하며 저장 시 같은 snapshot 바이트를 재확인. blocks(actor_id,blocked_id) 차단이면 담기 거부.
+객체 CommunityImportInput: startDate string YYYY-MM-DD 실제 달력 필수; title 선택 trim 최대50자; timezone 필수 IANA 지원 시간대 최대100자; defaultCurrency KRW|JPY|USD 기본KRW. strict 객체로 ownerId·일정 본문 등 임의 속성 거부.
+객체 WorkspaceSnapshot 담기 결과: trip·days·itinerary·members 새 UUID, myRole owner, trip.status PLANNED, postId null, 개인 미디어·영수증·비용·초대·체크리스트 빈 배열. 일정 memo null. DAY 소개·공개 planContent·주소·시각·유형·googlePlaceId만 허용 목록으로 복사. 날짜 간격 유지, 기간1~90일, 범위 밖 일정과 빈 일정은 거부.
+객체 GuestWorkspace: 기존 version1 문서의 trips 배열과 requests 기록으로 같은 담기 결과를 기기에만 저장. 원격 인증·DB 저장으로 오인하지 않으며 계정 전환과 큐 잠금은 기존 규칙 유지.
+API POST /api/v1/community/:postId/import: UUID 공개 ID·Idempotency-Key 필수. 성공 data.tripId UUID·tripVersion 양수·trip 객체. 401 인증,404 철회/차단/없음,409 키 재사용,422 입력/기간,503 D1 미설정. 레거시 Supabase 저장소에는 새 RPC가 없으므로 명시적으로 미지원 처리.

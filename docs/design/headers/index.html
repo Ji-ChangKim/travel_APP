@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TripPrint · 헤더 상황별 시각 규격</title>
+    <link rel="stylesheet" href="./headers.css" />
+  </head>
+  <body>
+    <header class="document-header">
+      <p class="eyebrow">TRIPPRINT / HEADER SPEC / 2026.10.21</p>
+      <h1>상황에 맞는 헤더, 같은 읽기 규칙</h1>
+      <p>
+        기존 디자인을 기준으로 정리한 정적 시각 규격판입니다. 예시 제목은 배치
+        확인용이며 실제 여행·저장·공유 데이터가 아닙니다.
+      </p>
+      <p>
+        <a href="../SCREEN_HEADER_SPEC.md">상황·폰트 규격 문서</a> ·
+        <a href="../RESOURCE_INDEX.md">리소스 경로</a>
+      </p>
+    </header>
+
+    <input class="toggle" id="w320" type="radio" name="width" />
+    <label class="control" for="w320">320</label>
+    <input class="toggle" id="w390" type="radio" name="width" checked />
+    <label class="control" for="w390">390</label>
+    <input class="toggle" id="w430" type="radio" name="width" />
+    <label class="control" for="w430">430</label>
+    <input class="toggle" id="large" type="checkbox" />
+    <label class="control" for="large">글자 200% 비교</label>
+
+    <main class="stage">
+      <section class="specimen">
+        <div class="caption">
+          <h2>H01 · 브랜드형</h2>
+          <span>홈 · 발자국</span>
+        </div>
+        <div class="phone modern">
+          <div class="bar brand-bar">
+            <div class="brand">
+              <span class="symbol-frame"
+                ><img
+                  src="../../../apps/mobile/assets/brand/tripprint-v1/TripPrint_symbol-coral-clean_1024x1024.png"
+                  alt="" /></span
+              ><span class="wordmark">Trip<span>Print</span></span>
+            </div>
+            <span class="icon-button account" aria-label="내 계정 보기"
+              ><i class="ion" aria-hidden="true">&#xf4ac;</i></span
+            >
+          </div>
+          <div class="content">
+            <p class="helper">공식 브랜드 유지</p>
+            <p class="body">
+              로그인 전에는 오른쪽에 ‘로그인’을 표시합니다. 브랜드를 누르는 숨은
+              이동은 두지 않습니다.
+            </p>
+          </div>
+        </div>
+        <p class="annotation">
+          최소 56 · 좌우 20 · 로고 24 · 계정 아이콘 22 / 터치 48. 로고는 일반
+          제목과 다른 유형입니다.
+        </p>
+      </section>
+
+      <section class="specimen">
+        <div class="caption">
+          <h2>H02 · 최상위 목록형</h2>
+          <span>내 여행 · MY</span>
+        </div>
+        <div class="phone modern">
+          <div class="bar">
+            <h3 class="screen-title">내 여행 계획</h3>
+            <span class="icon-button" aria-label="여행 검색 열기"
+              ><i class="ion" aria-hidden="true">&#xf563;</i></span
+            ><span class="icon-button profile" aria-label="내 계정 보기"
+              ><i class="ion" aria-hidden="true">&#xf4aa;</i></span
+            >
+          </div>
+          <div class="content">
+            <p class="body">
+              뒤로가기 없이 현재 영역을 설명합니다. 로딩·빈 목록·오류에서도
+              제목과 행동의 자리는 유지합니다.
+            </p>
+          </div>
+          <div class="gnb" aria-label="하단 메뉴 배치 예시">
+            <span class="nav"
+              ><span class="chip"
+                ><i class="ion" aria-hidden="true">&#xf383;</i></span
+              ><span>홈</span></span
+            >
+            <span class="nav selected"
+              ><span class="chip"
+                ><i class="ion" aria-hidden="true">&#xf1b1;</i></span
+              ><span>내 여행</span></span
+            >
+            <span class="nav create"
+              ><span class="circle"
+                ><i class="ion" aria-hidden="true">&#xf103;</i></span
+              ><span>여행 만들기</span></span
+            >
+            <span class="nav"
+              ><span class="chip"
+                ><i class="ion" aria-hidden="true">&#xf284;</i></span
+              ><span>발자국</span></span
+            >
+            <span class="nav"
+              ><span class="chip"
+                ><i class="ion" aria-hidden="true">&#xf4ac;</i></span
+              ><span>MY</span></span
+            >
+          </div>
+        </div>
+        <p class="annotation">
+          제목 26/36·700. 검색 24·계정 30은 현재 화면 예외입니다. GNB는 규격
+          비교용으로 내 여행 선택을 표시했습니다.
+        </p>
+      </section>
+
+      <section class="specimen">
+        <div class="caption">
+          <h2>H03 · 작업·작성형</h2>
+          <span>여행 만들기 · 일정 · 항공권</span>
+        </div>
+        <div class="phone">
+          <div class="bar">
+            <span class="icon-button" aria-label="이전 단계로"
+              ><i class="ion" aria-hidden="true">&#xf127;</i></span
+            >
+          </div>
+          <h3 class="screen-title below">항공권 입력</h3>
+          <div class="content">
+            <p class="helper">작업명 · 26/36</p>
+            <p class="body">
+              이전 단계로 돌아갑니다. 변경이 있으면 작성 보호를 적용하고, 저장
+              실패 시 입력을 보존합니다.
+            </p>
+          </div>
+        </div>
+        <p class="annotation">
+          이동 바 아래 8 · 제목 아래 4 · 본문 간격 20. 전체 화면 작성에는 GNB가
+          없습니다.
+        </p>
+      </section>
+
+      <section class="specimen">
+        <div class="caption">
+          <h2>H04 · 개인 여행 상세형</h2>
+          <span>일정 · 지도 · 비용</span>
+        </div>
+        <div class="phone">
+          <div class="bar">
+            <span class="icon-button" aria-label="내 여행 목록"
+              ><i class="ion" aria-hidden="true">&#xf127;</i></span
+            ><span class="spacer"></span
+            ><span class="icon-button" aria-label="여행 더보기"
+              ><i class="ion" aria-hidden="true">&#xf2ce;</i></span
+            >
+          </div>
+          <div class="content">
+            <h3 class="screen-title">오사카 3박 4일 여행 계획</h3>
+            <p class="helper">실제 저장된 여행명 자리 · 예시 문구</p>
+            <p class="body">
+              현재 승인된 개인 상세는 이동 바 아래 첫 제목을 사용합니다. 본문에
+              제목을 다시 반복하지 않습니다.
+            </p>
+          </div>
+        </div>
+        <p class="annotation">
+          뒤로가기와 더보기 24 / 터치 48. 공개 상세와 배치를 통일하는 변경은
+          아직 적용하지 않았습니다.
+        </p>
+      </section>
+
+      <section class="specimen">
+        <div class="caption">
+          <h2>H05 · 대상명 한 줄 헤더형</h2>
+          <span>공개 여행 · 장소 설명</span>
+        </div>
+        <div class="phone modern">
+          <div class="bar">
+            <span class="icon-button" aria-label="장소 목록으로"
+              ><i class="ion" aria-hidden="true">&#xf127;</i></span
+            >
+            <h3 class="screen-title">도톤보리의 저녁과 골목 산책</h3>
+          </div>
+          <div class="content">
+            <p class="helper">전체 대상명 · 줄바꿈 허용</p>
+            <p class="body">
+              DAY를 바꾸어도 여행 제목은 유지합니다. 장소 설명을 열었을 때는
+              해당 장소명으로 바뀝니다.
+            </p>
+          </div>
+        </div>
+        <p class="annotation">
+          제목 26/36. 장소 상세 오른쪽 진입 200ms · 오른쪽 복귀 150ms. 동작
+          줄이기는 즉시 전환합니다.
+        </p>
+      </section>
+
+      <section class="specimen">
+        <div class="caption">
+          <h2>H06 · 선택 시트형</h2>
+          <span>여행 더보기 · 출처 · 조건 선택</span>
+        </div>
+        <div class="phone scrim">
+          <div class="sheet">
+            <div class="handle" aria-hidden="true"></div>
+            <div class="bar">
+              <h3 class="screen-title">여행 더보기</h3>
+              <span class="icon-button" aria-label="닫기"
+                ><i class="ion" aria-hidden="true">&#xf24a;</i></span
+              >
+            </div>
+            <div class="content">
+              <p class="body">
+                목록은 시트 안에서 스크롤합니다. 닫기는 취소이며 저장·삭제를
+                실행하지 않습니다.
+              </p>
+            </div>
+          </div>
+        </div>
+        <p class="annotation">
+          제목 26/36 · 닫기 24 / 터치 48 · 모서리 24. 열기 200ms · 닫기 150ms ·
+          배경 150ms.
+        </p>
+      </section>
+
+      <section class="specimen">
+        <div class="caption">
+          <h2>H07 · 확인 팝업형</h2>
+          <span>미저장 이탈 · 삭제 확정</span>
+        </div>
+        <div class="phone scrim confirm-stage">
+          <div class="confirm">
+            <h3 class="screen-title">작성 중인 내용을 버릴까요?</h3>
+            <p class="body">저장하지 않은 변경이 있어요.</p>
+            <span class="sample-action secondary">계속 작성</span
+            ><span class="sample-action danger">내용 버리고 이동</span>
+          </div>
+        </div>
+        <p class="annotation">
+          제목 26/36 · 본문 16/26 · 중앙 최대 350. 안전한 취소로 초점 이동 ·
+          배경 읽기와 조작 차단.
+        </p>
+      </section>
+
+      <section class="specimen">
+        <div class="caption">
+          <h2>H08 · 로딩·오류형</h2>
+          <span>공개 여행 직접 링크</span>
+        </div>
+        <div class="phone modern">
+          <div class="bar">
+            <span class="icon-button" aria-label="공개 목록으로"
+              ><i class="ion" aria-hidden="true">&#xf127;</i></span
+            >
+            <h3 class="screen-title">공유된 여행</h3>
+          </div>
+          <div class="content">
+            <p class="body">여행을 열 수 없어요.</p>
+            <p class="helper">
+              주소를 확인하거나 목록에서 다른 여행을 살펴보세요.
+            </p>
+            <span class="sample-action secondary">다시 불러오기</span>
+          </div>
+        </div>
+        <p class="annotation">
+          존재하지 않는 여행명을 만들지 않습니다. 로딩 중 일반 화면명에서 조회
+          성공 후 실제 제목으로 바뀝니다.
+        </p>
+      </section>
+    </main>
+
+    <section class="type-guide">
+      <h2>같은 역할에는 같은 글자 규격</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>역할</th>
+            <th>크기 / 행간</th>
+            <th>굵기</th>
+            <th>색·범위</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>화면·시트·확인 제목</td>
+            <td>26 / 36</td>
+            <td>700</td>
+            <td>#203247 / 공통 ScreenTitle</td>
+          </tr>
+          <tr>
+            <td>브랜드 워드마크</td>
+            <td>24 / 34</td>
+            <td>700</td>
+            <td>Poppins·공식 브랜드 색</td>
+          </tr>
+          <tr>
+            <td>섹션 제목</td>
+            <td>22 / 30</td>
+            <td>700</td>
+            <td>본문의 구역, 헤더 아님</td>
+          </tr>
+          <tr>
+            <td>카드 제목</td>
+            <td>18 / 26</td>
+            <td>600</td>
+            <td>본문 카드, 헤더 아님</td>
+          </tr>
+          <tr>
+            <td>본문</td>
+            <td>16 / 26</td>
+            <td>400</td>
+            <td>공통 읽기</td>
+          </tr>
+          <tr>
+            <td>버튼·헤더 행동</td>
+            <td>16 / 24</td>
+            <td>600</td>
+            <td>실행할 동사</td>
+          </tr>
+          <tr>
+            <td>보조 정보</td>
+            <td>14 / 22</td>
+            <td>400</td>
+            <td>날짜·주소·오류 안내</td>
+          </tr>
+          <tr>
+            <td>GNB</td>
+            <td>13 / 20</td>
+            <td>600 기준</td>
+            <td>탐색 라벨 전용 예외</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        본문 24/32 등 화면 전용 Stitch 규격을 공통 헤더에 자동 적용하지
+        않습니다. 200% 비교는 글자 크기·줄바꿈 점검용이며 OS 글자 확대·TalkBack
+        검수를 대신하지 않습니다.
+      </p>
+    </section>
+  </body>
+</html>

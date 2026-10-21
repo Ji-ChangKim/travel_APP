@@ -5,6 +5,7 @@ export function isPublicBrowsePath(path: string): boolean {
     path === '/' ||
     path === '/account' ||
     path === '/community' ||
+    path === '/footprints' ||
     /^\/community\/[0-9a-f-]{36}$/i.test(path) ||
     /^\/destinations\/[^/]+$/.test(path)
   );

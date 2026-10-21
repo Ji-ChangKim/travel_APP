@@ -127,3 +127,18 @@ MY / 320 / 글자 200%
 
 이전 웹 캡처와 오래된 로그인 캡처 154장은 현행 화면의 기준으로 사용하지 않고 삭제했다.
 삭제 내역: IMAGE_CLEANUP_LOG.txt
+
+[2026-10-21 헤더·GNB 규격 고정 보완]
+기준 문서: docs/design/SCREEN_HEADER_SPEC.md, design-tokens.json, headers/index.html의 H01~H08
+검증 보고서: docs/qa/HEADER_GNB_LOCK_20261021.md
+격리 응답 / MY 인증 대기 / 320·200%: outputs/header-standard/my-auth-pending-320-200.png
+격리 응답 / MY 인증 오류 / 320·200%: outputs/header-standard/my-auth-error-320-200.png
+격리 응답 / 인증 재시도 복구 / 320·200%: outputs/header-standard/my-auth-restored-320-200.png
+격리 응답 / 작성 진입 인증 오류 / 320·200%: outputs/header-standard/task-auth-error-320-200.png
+격리 응답 / 공통 브랜드·구분선 / 390: outputs/header-standard/footprints-public-390-100.png
+격리 응답 / 내 여행·검색·계정 / 320·200%: outputs/header-standard/plans-320-200.png
+격리 응답 / 항공권 입력·완료 잠금 / 320·200%: outputs/header-standard/ticket-320-200.png
+격리 응답 / 홈 브랜드 큰 글자 / 320·200%: outputs/header-standard/home-320-200.png
+헤더·접근성·GNB·복귀21/21 통과. 관련 동작은 최초19개와 복귀 기대값 수정 후1개 재검증 통과.
+전체 검사와 자동 차단 테스트8/8·탐색 정책4/4 통과. 로그는 outputs/header-gnb-lock-20261021/에 보관한다.
+실제 캡처를 열어 정렬·줄바꿈·버튼·브랜드 구분선을 대조했다. Android 빌드·기기 검수·외부 배포는 실행하지 않았다.

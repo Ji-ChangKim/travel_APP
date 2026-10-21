@@ -86,16 +86,8 @@ export function renderTripPlanning({
           }
           onBack={back}
           disabled={props.locked}
-          right={
-            step === 'basics' ? (
-              <Action
-                label="다음"
-                size="header"
-                variant="quiet"
-                disabled={props.locked}
-                onPress={next}
-              />
-            ) : undefined
+          actions={
+            step === 'basics' ? [{ label: '다음', onPress: next }] : undefined
           }
         />
         <ScrollView

@@ -182,3 +182,18 @@ test('G11 계정 관리 공개 안내는 로그인 후 같은 안전한 내부 �
   assert.equal(authReturnPath(returnFromPath('/account')), '/account');
   assert.deepEqual(authReturn('https://evil.test/account'), {});
 });
+
+test('공개 발자국과 개인 여행 보관함의 접근·로그인 복귀를 분리한다', () => {
+  // 공개 추천을 보려고 로그인시키거나 개인 보관함을 익명에게 공개하지 않는다.
+  assert.equal(isPublicBrowsePath('/footprints'), true);
+  assert.equal(isPublicBrowsePath('/my-footprints'), false);
+  assert.equal(isPublicBrowsePath('/footprints/private'), false);
+  assert.equal(
+    authReturnPath(returnFromPath('/my-footprints')),
+    '/my-footprints',
+  );
+  assert.equal(
+    authReturnPath(returnFromPath('/footprints')),
+    '/(tabs)/footprints',
+  );
+});

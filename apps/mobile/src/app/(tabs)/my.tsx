@@ -3,6 +3,9 @@ import { renderAccountContent } from '../../features/profile/MyAccountView';
 import { useMyAccountController } from '../../features/profile/useMyAccountController';
 
 import TripPrintLoading from '@/components/TripPrintLoading';
+import ScreenHeader from '@/components/ScreenHeader';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { styles } from '@/features/profile/myAccountStyles';
 import { useAuthReady } from '@/features/auth/AuthBridge';
 import { useTripStore } from '@/stores/useTripStore';
 
@@ -15,7 +18,10 @@ export default function MyScreen() {
   }) ? (
     <MyAccount />
   ) : (
-    <TripPrintLoading message="계정을 확인하고 있어요" />
+    <SafeAreaView edges={['top', 'left', 'right']} style={styles.screen}>
+      <ScreenHeader title="MY" />
+      <TripPrintLoading message="계정을 확인하고 있어요" />
+    </SafeAreaView>
   );
 }
 

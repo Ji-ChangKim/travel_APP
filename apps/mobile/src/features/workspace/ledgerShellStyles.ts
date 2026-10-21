@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { ledgerColors as c, ledgerLayout, ledgerControl } from './ledgerTheme';
+import { ledgerControl } from './ledgerTheme';
 
 // 셸의 배치 규격만 정의하고 사용자 동작과 서버 상태는 다루지 않는다.
 export const ledgerShellStyles = StyleSheet.create({
@@ -20,19 +20,5 @@ export const ledgerShellStyles = StyleSheet.create({
     fontWeight: '600',
     flexShrink: 1,
     textAlign: 'center',
-  },
-  sidebar: {
-    width: ledgerLayout.sidebar,
-    backgroundColor: c.soft,
-    padding: 20,
-    gap: 16,
-  },
-  brandBar: {
-    minHeight: 64,
-    paddingHorizontal: 20,
-    paddingVertical: 6,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
   },
 });

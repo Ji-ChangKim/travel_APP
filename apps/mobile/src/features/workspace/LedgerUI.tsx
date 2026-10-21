@@ -4,14 +4,12 @@ import {
   ledgerActionForeground,
 } from './ledgerActionAppearance';
 import { useState, type ReactNode } from 'react';
-import { Image, Pressable, View, useWindowDimensions } from 'react-native';
+import { Pressable, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter, usePathname, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Text from '@/components/AppText';
 import ScreenHeader from '@/components/ScreenHeader';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
-import { requestScheduleExit } from './scheduleExitGuard';
 import { useFormScope } from './InputFeedback';
 import {
   ledgerColors as c,
@@ -121,115 +119,27 @@ export function LedgerAction({
   );
 }
 
-const destinations: {
-  label: string;
-  path: Href;
-  match: string;
-  icon: keyof typeof Ionicons.glyphMap;
-}[] = [
-  { label: '홈', path: '/(tabs)', match: '/', icon: 'home-outline' },
-  {
-    label: '내 여행',
-    path: '/plans',
-    match: '/plans',
-    icon: 'calendar-outline',
-  },
-  {
-    label: '발자국',
-    path: '/(tabs)/footprints',
-    match: '/footprints',
-    icon: 'footsteps-outline',
-  },
-  {
-    label: '발견',
-    path: '/(tabs)/community',
-    match: '/community',
-    icon: 'compass-outline',
-  },
-  { label: 'MY', path: '/(tabs)/my', match: '/my', icon: 'person-outline' },
-];
-
-// 시안의 로고 자리에는 앱에 포함된 원본 로고만 사용한다.
-export function LedgerBrand() {
-  // 외부 예시 로고나 가짜 사용자 사진은 가져오지 않는다.
-  return (
-    <Image
-      source={require('../../../assets/brand/tripprint-v1/TripPrint_logo-horizontal_1024x320.png')}
-      resizeMode="contain"
-      accessibilityLabel="TripPrint 트립프린트"
-      style={{ width: 132, height: 42 }}
-    />
-  );
-}
-
 // 모바일과 태블릿은 같은 실제 화면 내용을 다른 배치로 표시한다.
 export function LedgerScreen({
   children,
   title,
   onBack,
-  action,
 }: {
   children: ReactNode;
   title?: string;
   onBack?: () => void;
-  action?: ReactNode;
 }) {
-  // 기기 회전과 글자 확대 시에도 저장 상태를 복제하지 않는다.
-  const wide = useLedgerWide();
-  const router = useRouter();
-  const path = usePathname();
+  // 상세·작성 화면은 중복 로고나 탐색 메뉴 없이 제목에 집중한다.
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={s.screen}>
-      <View style={{ flex: 1, flexDirection: 'row' }}>
-        {wide && (
-          <View style={local.sidebar}>
-            <LedgerBrand />
-            {destinations.map((item) => {
-              // 사이드바는 실제 기존 목적지와 이탈 보호를 사용한다.
-              return (
-                <LedgerAction
-                  key={item.label}
-                  label={item.label}
-                  selected={
-                    path === item.match ||
-                    (item.match === '/footprints' && path.startsWith('/diary/'))
-                  }
-                  onPress={() => {
-                    // 편집 초안을 버리지 않고 기존 보호 절차를 거친다.
-                    return requestScheduleExit(() => router.replace(item.path));
-                  }}
-                />
-              );
-            })}
-          </View>
-        )}
-        <View style={{ flex: 1, minWidth: 0 }}>
-          <View style={local.brandBar}>
-            {!wide ? (
-              <LedgerBrand />
-            ) : (
-              <Text style={s.meta}>여행의 순간을 기록해요</Text>
-            )}
-            <LedgerAction
-              label="MY"
-              quiet
-              onPress={() => {
-                // 실제 계정 화면으로 이동한다.
-                return requestScheduleExit(() => router.push('/(tabs)/my'));
-              }}
-            />
-          </View>
-          {title && (
-            <ScreenHeader
-              title={title}
-              inlineTitle={Boolean(onBack)}
-              onBack={onBack}
-              right={action}
-            />
-          )}
-          {children}
-        </View>
-      </View>
+      {title && (
+        <ScreenHeader
+          title={title}
+          inlineTitle={Boolean(onBack)}
+          onBack={onBack}
+        />
+      )}
+      {children}
     </SafeAreaView>
   );
 }

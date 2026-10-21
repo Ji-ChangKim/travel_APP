@@ -48,7 +48,7 @@ function ExploreContent({
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="공개 일정 더 둘러보기"
-          style={s.login}
+          style={s.exploreLink}
           onPress={() => {
             // 공개 여행을 더 보고 싶을 때 전체 목록을 연다.
             return router.push('/(tabs)/community');

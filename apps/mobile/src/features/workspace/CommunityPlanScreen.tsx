@@ -1,3 +1,4 @@
+import { returnToScreen } from '@/components/navigationModel';
 import { ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
@@ -55,7 +56,7 @@ function PublicPlanContent() {
       title={post?.title || '공유된 여행'}
       onBack={() => {
         // 직접 링크로 들어와도 공개 계획 목록으로 돌아간다.
-        return router.replace('/(tabs)/community');
+        return returnToScreen(router, '/(tabs)/footprints');
       }}
     >
       <ScrollView contentContainerStyle={ledgerStyles.content}>
@@ -68,7 +69,7 @@ function PublicPlanContent() {
             title="공유된 여행을 열 수 없어요"
             description={
               query.error?.message ||
-              '주소를 다시 확인하거나 발견에서 다른 여행을 살펴보세요.'
+              '주소를 다시 확인하거나 발자국에서 다른 여행을 살펴보세요.'
             }
           >
             {validId && (
@@ -99,7 +100,7 @@ async function readPlan(response: Response) {
   if (!response.ok)
     throw new Error(
       response.status === 404
-        ? '공개가 중단됐거나 찾을 수 없는 여행이에요. 발견에서 다른 여행을 살펴보세요.'
+        ? '공개가 중단됐거나 찾을 수 없는 여행이에요. 발자국에서 다른 여행을 살펴보세요.'
         : '여행을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.',
     );
   const data: unknown = await response.json();

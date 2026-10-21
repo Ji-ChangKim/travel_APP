@@ -1,3 +1,4 @@
+import { returnToScreen } from '@/components/navigationModel';
 import { UserFacingError, userFacingMessage } from '@/services/userFacingError';
 import Text from '@/components/AppText';
 import ScreenHeader from '@/components/ScreenHeader';
@@ -142,10 +143,10 @@ function Workspace({ model }: { model: Model }) {
       <Hydration scope={model.scope} />
       <ScreenHeader
         title="나의 발자취"
-        backLabel="마이페이지로 돌아가기"
+        backLabel="MY로 돌아가기"
         onBack={() => {
           // 기기에 저장한 기록을 유지한 채 마이페이지로 돌아간다.
-          return router.replace('/my');
+          return returnToScreen(router, '/(tabs)/my');
         }}
       />
       <ScrollView

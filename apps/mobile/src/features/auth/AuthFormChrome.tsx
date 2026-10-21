@@ -3,7 +3,6 @@ import ScreenHeader from '@/components/ScreenHeader';
 import { colors } from '@/constants/theme';
 import { Image, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import DesignButton from '@/components/DesignButton';
 import { loginStyles as styles, loginTheme } from './loginStyles';
 
 // 인증 입력 화면의 제목과 뒤로가기·닫기 버튼을 표시한다.
@@ -25,21 +24,10 @@ export function AuthNavigation({
       backLabel="로그인 화면으로 돌아가기"
       onBack={onBack}
       disabled={disabled}
-      right={
-        onClose ? (
-          <DesignButton
-            label=""
-            accessibilityLabel="이메일 인증 닫기"
-            variant="quiet"
-            size="icon"
-            disabled={disabled}
-            onPress={onClose}
-            icon={(color) => {
-              // 인증 닫기도 같은 아이콘과 터치 규격을 사용한다.
-              return <Ionicons name="close" size={24} color={color} />;
-            }}
-          />
-        ) : undefined
+      actions={
+        onClose
+          ? [{ icon: 'close', label: '이메일 인증 닫기', onPress: onClose }]
+          : undefined
       }
     />
   );

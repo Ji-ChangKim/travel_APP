@@ -9,6 +9,7 @@ export type AuthReturn = {
     | 'diary'
     | 'record'
     | 'footprints'
+    | 'my-footprints'
     | 'new-trip'
     | 'community'
     | 'account'
@@ -29,22 +30,25 @@ export function authReturn(
     ? z.string().uuid().safeParse(tripId).success
       ? { next, tripId: tripId as string }
       : { next: 'plans' }
-    : next === 'new-trip'
-      ? {
-          next,
-          destination:
-            homeDestination(
-              typeof destination === 'string' ? destination : undefined,
-            )?.key || '',
-        }
-      : next === 'plans' ||
-          next === 'account' ||
-          next === 'community' ||
-          next === 'invite' ||
-          next === 'import-place' ||
-          next === 'footprints'
-        ? { next }
-        : {};
+    : next === 'community' && z.string().uuid().safeParse(tripId).success
+      ? { next, tripId: tripId as string }
+      : next === 'new-trip'
+        ? {
+            next,
+            destination:
+              homeDestination(
+                typeof destination === 'string' ? destination : undefined,
+              )?.key || '',
+          }
+        : next === 'plans' ||
+            next === 'account' ||
+            next === 'community' ||
+            next === 'invite' ||
+            next === 'import-place' ||
+            next === 'my-footprints' ||
+            next === 'footprints'
+          ? { next }
+          : {};
 }
 
 // 현재 화면에서 인증을 거쳐 다시 열 수 있는 목적지만 만든다.
@@ -97,18 +101,22 @@ function verifiedReturnPath(params: AuthReturn) {
               params: { destination: params.destination || '' },
             }
           : params.next === 'community'
-            ? ('/(tabs)/community' as const)
+            ? params.tripId
+              ? (`/community/${params.tripId}` as const)
+              : ('/(tabs)/community' as const)
             : params.next === 'account'
               ? ('/account' as const)
-              : params.next === 'footprints'
-                ? ('/(tabs)/footprints' as const)
-                : params.next === 'plans'
-                  ? ('/plans' as const)
-                  : params.next === 'invite'
-                    ? ('/invite' as const)
-                    : params.next === 'import-place'
-                      ? ('/import-place' as const)
-                      : ('/(tabs)' as const);
+              : params.next === 'my-footprints'
+                ? ('/my-footprints' as const)
+                : params.next === 'footprints'
+                  ? ('/(tabs)/footprints' as const)
+                  : params.next === 'plans'
+                    ? ('/plans' as const)
+                    : params.next === 'invite'
+                      ? ('/invite' as const)
+                      : params.next === 'import-place'
+                        ? ('/import-place' as const)
+                        : ('/(tabs)' as const);
 }
 
 // 로그인 만료와 접근 불가를 통신 장애와 구분한다.

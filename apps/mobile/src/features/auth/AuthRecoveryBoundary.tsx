@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import HaruState from '@/components/HaruState';
 import DesignButton from '@/components/DesignButton';
 import AppModal from '@/components/AppModal';
+import RecoveryHeader from '@/components/RecoveryHeader';
 import { styles } from '../workspace/workspaceStyles';
 
 import {
@@ -68,7 +69,8 @@ export default function AuthRecoveryBoundary({
         accessibilityLabel="로그인 정보 다시 확인"
         onRequestClose={browse}
       >
-        <SafeAreaView style={styles.screen}>
+        <SafeAreaView testID="auth-recovery-screen" style={styles.screen}>
+          <RecoveryHeader path={path} onBack={browse} />
           <ScrollView contentContainerStyle={styles.content}>
             <HaruState
               kind="error"
