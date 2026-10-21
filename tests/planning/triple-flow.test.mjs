@@ -229,6 +229,15 @@ test(
     await expect(publicPage.getByTestId('screen-title').first()).toHaveText(
       '여행 생성·편집·공유 검증',
     );
+    // 새 브라우저의 대체 글꼴과 로딩 후 글꼴을 선택 전후 크기로 비교하지 않는다.
+    assert.ok(
+      await publicPage.evaluate(async () => {
+        // 실제 DAY 글꼴을 준비한 뒤 같은 글꼴의 선택 상태만 비교한다.
+        const fonts = await document.fonts.load('14px TripPrintSemibold');
+        await document.fonts.ready;
+        return fonts.length > 0;
+      }),
+    );
     const dayWidth = (
       await publicPage
         .getByRole('tab', { name: 'DAY 1', exact: true })
