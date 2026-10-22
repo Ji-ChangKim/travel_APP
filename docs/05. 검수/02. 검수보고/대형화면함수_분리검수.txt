@@ -1,0 +1,71 @@
+TripPrint 큰 화면 역할 분리·회원 저장 검수
+기준일:2026-10-19 / 기존 UI·UX 유지 / Android 빌드 없음
+
+1. 작업 범위
+프로필·발견·항공권·기록 상세/편집·일정 작성·위치 선택·여행 생성·타임라인·영수증 확인·공개 선택·여행 상세·시작 점검의 큰 화면 함수를 역할별로 나눴다.
+DB 구조·API 입력·인증 운영값·공개 사본·기존 여행 ID·DAY ID·동행 권한은 바꾸지 않는다. 회원 검수에는 기존 전용 QA 계정과 이번 검수 여행만 사용한다.
+
+2. 역할과 파일
+표현:*View.tsx, WorkspaceSections.tsx, WorkspaceDialogs.tsx. 영역별 입력·상태·행동을 같은 배치로 표시한다.
+상태:useMyAccountController/useDiscoveryController/useFlightTicketController/useScheduleLocationController/useRecordEditorController와 기존 useWorkspaceController.
+요청 수명:workspaceSaveSession/Commands/FormActions/MediaActions/ChecklistActions, recordPersistence, profileEditorActions/LogoutActions. 렌더 수명에 묶인 행동 훅으로 구성한다.
+시작:useStartupController와 useStartupLifecycle. 공통 데이터 캐시·스토어 복귀·최종 목적지 이동의 순서와 구독 해제를 유지한다.
+명령:workspaceScreenActions. 화면에 있던20개 이벤트의 명령 본문·초안 생성·금액 정리·삭제 후 파일 정리를 기능 계층으로 옮겼다.
+기록 투영:recordDetails. 해당 일정의 일반 사진과 지출을 같은 원본에서 계산한다.
+스타일:myAccountStyles.ts와 tripTimelineStyles.ts. 기존 값을 그대로 옮겼다. 기존 공통/Ledger 토큰은 유지한다.
+기록의 저장·삭제는 여전히 기존 명령과 잠금·버전·요청 키로 실행한다. 파일로 나눴다는 이유로 새 저장 경로나 자동 저장을 추가하지 않았다.
+
+3. 분리하면서 보완한 계약
+일정/추천 코스 초안은 클릭할 때 한 번 생성해 같은 UUID와 DAY를 사용한다. 렌더링과 미리보기 선택 자체는 저장이 아니다.
+편집 화면의 충돌 복구 버튼은 error.includes('동행') 대신 실제 충돌 상태를 받는다. 화면 표시 값은 state로 관리하고 요청 잠금·재시도 참조와 구분한다.
+이미 확정된 사진 등록 삭제 이후에만 기존 후속 콜백으로 원본 파일을 정리한다. 저장 후 재조회 실패와 저장 실패를 구분하는 기존 경계를 유지한다.
+사용자·여행·계정 정보는 모듈 전역에 캐시하지 않는다. 기존 계정/화면 종료 후 늦은 결과 보호와 조회 취소 정책을 유지한다.
+
+4. UI 기준과 비교
+디자인시스템.md, design-tokens.json, 헤더GNB_규격.md, ledger-tokens.json, STITCH_CURRENT_INTEGRATION.txt를 읽고 대조했다.
+코드의 화면 태그·문구·고정 라벨·스타일 표현1452개는 분리 전후 차이0건이다. 이것만으로 실제 화면 인수를 완료했다고 판단하지 않는다.
+실제 회원 화면의 분리 전 MY·프로필 캡처를 보존했다. 최신 웹의 캡처·저장·재조회·공개 확인 결과는 아래에 확정한다.
+
+5. 검증 결과
+코드: npm run check 통과. TypeScript·ESLint·Prettier, 대비 검사 69/69, 코드 경계 검사 354개 파일·위반 0건.
+테스트: 인증·기능 233/233, 릴리스 계약 56/56 통과. 실제 명령 실행 시점의 초안 ID 생성, 금액 정밀도, 삭제 확정 뒤 파일 정리와 경계 위반 검출을 추가 검증했다.
+정적 감사: 명시적 any 0건. 200줄 초과 함수는 18개에서 3개로 줄었다. 남은 것은 상태·요청을 조합하는 useWorkspaceController(320줄), useTripStore(342줄), 도메인 변경을 적용하는 workspaceModel(255줄)이다. 200줄 초과 JSX 화면 함수는 없다. 이 수치를 결함이 전혀 없다는 보증으로 해석하지 않는다.
+웹: staging Pages 배포 c49aa281 완료. 실제 배포 JS 두 파일의 SHA-256이 검수 후보와 같다. 컴파일 기준 51개 코드·검사 파일도 최종 검수까지 변경되지 않았다.
+주소: https://tripprint-staging.pages.dev
+API: 기존 tripprint-api-staging을 사용했다. 이번 작업에서 서버 코드·DB 구조·비밀 키는 배포하거나 변경하지 않았다.
+
+회원 실검수: 기존 이메일 검수 회원으로 화면을 조작하고, 별도 로그인 세션으로 서버 원본을 재조회했다. 인증 값과 서명된 파일 URL은 보고서·증거 파일에 남기지 않았다.
+- 프로필의 짧은 닉네임 저장 차단, 소개·여행 스타일 저장·재조회, 검수 후 기존 프로필 복구를 확인했다.
+- 오사카 2026-10-01~04 여행을 생성했다. 항공권 KE721 / ICN→KIX / 09:00→11:00을 수동 등록했고, DAY 4개와 완료 상태를 확인했다. 항공편 공급자 조회 성공을 검증한 것은 아니다.
+- DAY 1 소개를 저장하고 실제 Google 장소 검색에서 花丸軒 法善寺店을 선택했다. 장소 ID, 30분 체류, 계획 설명, 개인 메모를 저장했다. 기존 정책대로 Google 주소·좌표는 자동 저장하지 않는다.
+- 일반 사진 1장을 실제 업로드하고 파일을 다시 내려받았다. 검수 자료는 앱 소유 로고 이미지이며 실제 여행 사진으로 취급하지 않는다.
+- 기록 수정 중 이탈 확인, 계속 작성 시 입력 유지, 저장 후 원본 재조회가 정상이다.
+- 합성 검수 영수증을 앨범에서 올려 실제 업로드·OCR·확정을 실행했다. QA CAFE / JPY 1200 / 품목 800+400을 기존 장소에 연결했다. 일정 2개(항공권 1, 장소 1)를 유지하며 영수증 1건·지출 1건·영수증 사진 1장만 저장됐다. 실제 구매나 기기 카메라 촬영 검증은 아니다.
+- 생성·DAY 저장·장소 저장·기록 저장·영수증 확정·공개에서 연속 클릭 후 중복 등록이 없었다. 서버 버전은 기록 저장 후 5, 영수증 확정 후 7, 공개 후 8이다.
+- 장소 1개·일반 사진 1장·통화별 실제 지출 합계를 선택해 여행계획으로 공개했다. DAY 제목/소개·장소 설명·공유 소개가 공개 사본과 같다. 개인 메모·항공권·영수증 ID/원본/상호/품목은 공개 사본에서 제외됐다. 익명 회원 원본 조회는 401이다.
+- 공개 전 미리보기와 공개 화면의 Google 장소 ID·사진 원본 링크·저작자가 같고, 실제 이미지 89,664바이트를 내려받았다. 브라우저에서도 Google 사진과 일반 사진이 표시됐다.
+
+검수 여행 ID: c8784489-2edd-43a9-81f3-b9576adcb255
+공개 ID: 4b3b3803-d828-49a3-9f37-069f9930c68b
+공개 링크: https://tripprint-staging.pages.dev/community/4b3b3803-d828-49a3-9f37-069f9930c68b
+검수 여행은 QA 제목으로 staging에 남겼다. 기존 사용자 오사카 여행과 공개 사본은 수정하지 않았다.
+
+실제 화면: MY 1280×720, 프로필 390×844의 분리 전후 캡처는 바이트까지 같다. 나머지 두 쌍은 크기 전환 중 프레임이 포함돼 동일 화면 비교에서 제외했다. 전 화면 픽셀 일치를 주장하지 않는다.
+공개 화면 390×844·320×740에서 긴 제목의 줄바꿈, 실제 사진, 설명·팁 상세 이동을 확인했다. 320 폭에서 문서 가로 폭은 320이며 표시된 버튼은 최소 48 높이다.
+최종 웹 후보에만 루트 글꼴 32px(기본 16px의 200%)을 적용한 읽기 전용 로컬 검수에서도 320 폭을 유지했다. 제목은 26→52px, DAY 제목은 20→40px로 커졌고 상세 화면을 열 수 있었다. 매우 긴 제목은 세로 공간을 많이 차지한다. 이번 분리는 기존 디자인을 유지하는 범위라 제목 규격을 임의로 줄이지 않았다. 이 검수 서버는 종료했다.
+빈 비용 상태, 프로필 오류 상태, 기록 이탈 확인, 영수증 확인, 공개 확인 팝업도 실제 화면으로 확인했다.
+
+남은 검증 한계: DB 직접 SELECT는 Cloudflare 인증 오류 10000으로 실행되지 않았다. DB 관리자 조회 완료로 보고하지 않는다. 실제 저장은 별도 세션의 서버 원본·목록·공개 조회와 파일 다운로드로 확인했다. Google OAuth, OS 카메라·위치 권한, TalkBack, Android 실기기 메모리 검수는 이번 결과에 포함하지 않는다. Android 빌드·APK·AAB는 만들지 않았고 Git 커밋·푸시도 하지 않았다.
+
+6. 변경·증거
+outputs/screen-split-20261019/before-manifest.json 및 before/에 시작 시점 원본을 보존한다.
+changed-source-files.json:이번에 수정·추가한 앱 코드 목록.
+source-audit.json:코드 경계·큰 함수·catch·명시적 any 지표. 함수 길이만으로 결함이라고 판단하지 않는다.
+ui-source-parity.json:분리 전후 표시 문구·태그·스타일 표현 비교.
+검수 스크립트·결과는 outputs/screen-split-20261019/에, 독립 테스트는 tests/에 둔다. 제품의 기본 데이터에 예제 여행·가짜 회원·고정 성공 응답을 넣지 않았다. staging 검수 여행은 위에 명시한 실검수 자료다.
+check-delivery.log, auth-delivery.log, release-delivery.log: 최종 검사 결과.
+web-export.log, pages-deploy.log, deployed-web-match.json, final-source-stability.json: 웹 반영과 소스 일치.
+profile-readback.json, private-readback.json, receipt-readback.json, final-readback.json, restore-profile-readback.json: 서로 다른 로그인으로 확인한 서버 원본과 공개 결과.
+public-320-layout.json, public-320-large-font-layout.json, visual-comparison-notes.json: 실제 크기·글꼴·터치 영역 및 캡처 비교 범위.
+share-preview.png, public-result.png, public-place-result.png, public-320.png, receipt-review.png, cost-summary.png, record-exit-protection.png: 실제 화면 증거.
+d1-readback.json: 별도 DB 조회의 인증 실패 기록. 성공 자료와 구분한다.

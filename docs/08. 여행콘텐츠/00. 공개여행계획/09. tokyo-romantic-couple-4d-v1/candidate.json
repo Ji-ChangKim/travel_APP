@@ -1,0 +1,215 @@
+{
+  "tripCreate": {
+    "title": "[도쿄] 롯폰기 야경 & 오모테산도 긴자 로맨틱 3박 4일",
+    "country": "일본",
+    "city": "도쿄",
+    "startDate": "2026-11-12",
+    "endDate": "2026-11-15",
+    "timezone": "Asia/Tokyo",
+    "defaultCurrency": "JPY",
+    "coverColor": "#1D3557"
+  },
+  "planKey": "tokyo-romantic-couple-4d-v1",
+  "publicBody": "30년차 일본 전문 투어플래너 HURU가 엄선한 커플 추천 코스. 번잡한 인파를 피해 도쿄타워가 한눈에 내려다보이는 스카이라운지, 롯폰기 미술관 산책, 오모테산도 감성 카페와 긴자 정통 스시 다이닝을 연인의 보폭에 맞추어 완벽하게 설계했습니다.",
+  "days": [
+    {
+      "dayNumber": 1,
+      "planTitle": "도쿄의 세련된 첫인상, 롯폰기와 도쿄타워",
+      "planConcept": "공항 도착 후 롯폰기 미드타운 숲 카페에서 여유를 찾고, 현대미술 관람 후 도쿄타워 뷰 다이닝으로 로맨틱한 첫날밤을 완성합니다.",
+      "schedules": [
+        {
+          "title": "블루보틀 롯폰기 카페",
+          "type": "PLACE",
+          "timeSlot": "11:00",
+          "sortOrder": 1,
+          "address": "도쿄도 미나토구 롯폰기 7-7-7",
+          "description": "미드타운 뒤편 조용한 숲을 마주한 스페셜티 커피 매장. 시그니처 블렌드 드립 커피와 갓 구운 와플을 즐기며 비행 피로를 풀고 둘만의 여행을 시작합니다.",
+          "costAmount": "1100"
+        },
+        {
+          "title": "모리 미술관 & 롯폰기 힐즈 전망대",
+          "type": "PLACE",
+          "timeSlot": "12:30",
+          "sortOrder": 2,
+          "address": "도쿄도 미나토구 롯폰기 6-10-1 롯폰기 힐즈 모리타워 53F",
+          "description": "세계적인 현대 미술 기획전 관람 후 52층 전망대에서 도쿄 도심의 웅장한 스카이라인을 조망합니다.",
+          "costAmount": "2200"
+        },
+        {
+          "title": "츠루톤탄 롯폰기점",
+          "type": "PLACE",
+          "timeSlot": "14:30",
+          "sortOrder": 3,
+          "address": "도쿄도 미나토구 롯폰기 3-14-12",
+          "description": "세숫대야 크기의 거대한 그릇에 정갈하게 담겨 나오는 명란 크림 우동과 특선 붓카케 우동. 쫄깃한 수제 면발과 크리미한 국물이 일품인 로맨틱 점심 식사.",
+          "costAmount": "2100"
+        },
+        {
+          "title": "미드타운 가든 & 21_21 디자인 사이트",
+          "type": "PLACE",
+          "timeSlot": "16:30",
+          "sortOrder": 4,
+          "address": "도쿄도 미나토구 아카사카 9-7-6",
+          "description": "안도 타다오가 설계한 건축물과 푸른 잔디 정원을 천천히 거닐며 도심 속 자연을 만끽합니다.",
+          "costAmount": "1200"
+        },
+        {
+          "title": "더 도쿄 에디션 토라노몬 The Blue Room",
+          "type": "PLACE",
+          "timeSlot": "19:00",
+          "sortOrder": 5,
+          "address": "도쿄도 미나토구 토라노몬 4-1-1 31F",
+          "description": "창밖으로 붉게 빛나는 도쿄타워를 정면으로 마주하는 프렌치 파인다이닝 디너. 시즈널 코스와 로제 와인 페어링으로 기념일 같은 저녁을 선사합니다.",
+          "costAmount": "14000"
+        }
+      ]
+    },
+    {
+      "dayNumber": 2,
+      "planTitle": "트렌디한 골목길 감성, 메구로 & 다이칸야마 & 시부야",
+      "planConcept": "강변 베이커리 조식으로 시작해 세계적인 로스터리와 츠타야 서점을 걷고, 시부야 스카이 일몰과 와규 만찬을 즐깁니다.",
+      "schedules": [
+        {
+          "title": "사와무라 베이커리 히로오",
+          "type": "PLACE",
+          "timeSlot": "09:00",
+          "sortOrder": 1,
+          "address": "도쿄도 미나토구 미나미아자부 5-1-6",
+          "description": "매일 아침 갓 구워낸 바게트와 부드러운 프렌치 토스트 플레이트로 현지인들에게 사랑받는 유럽풍 브런치.",
+          "costAmount": "1600"
+        },
+        {
+          "title": "스타벅스 리저브 로스터리 도쿄 & 츠타야 T-SITE",
+          "type": "PLACE",
+          "timeSlot": "10:30",
+          "sortOrder": 2,
+          "address": "도쿄도 메구로구 아오바다이 2-19-23",
+          "description": "나카메구로 강변의 웅장한 4층짜리 리저브 로스터리에서 특별한 커피 테이스팅 후 다이칸야마 건축 서점 산책.",
+          "costAmount": "1800"
+        },
+        {
+          "title": "IVY PLACE 다이칸야마",
+          "type": "PLACE",
+          "timeSlot": "13:00",
+          "sortOrder": 3,
+          "address": "도쿄도 시부야구 사루가쿠초 16-15",
+          "description": "울창한 숲에 둘러싸인 테라스에서 즐기는 클래식 버터밀크 팬케이크와 시즈널 생면 파스타 데이트.",
+          "costAmount": "2600"
+        },
+        {
+          "title": "시부야 스카이 SHIBUYA SKY",
+          "type": "PLACE",
+          "timeSlot": "17:00",
+          "sortOrder": 4,
+          "address": "도쿄도 시부야구 시부야 2-24-12 시부야 스크램블 스퀘어 47F",
+          "description": "해발 229m 루프탑에서 즐기는 360도 파노라마 일몰. 후지산 실루엣과 황금빛 도쿄 야경을 감상합니다.",
+          "costAmount": "2500"
+        },
+        {
+          "title": "니쿠아자부 에비스 본점",
+          "type": "PLACE",
+          "timeSlot": "19:30",
+          "sortOrder": 5,
+          "address": "도쿄도 시부야구 에비스미나미 1-8-10",
+          "description": "1++ 등급 와규 특선 모둠을 부위별 어울리는 소스와 함께 구워주는 프라이빗 와규 야키니쿠 디너.",
+          "costAmount": "8500"
+        }
+      ]
+    },
+    {
+      "dayNumber": 3,
+      "planTitle": "클래식 럭셔리와 문화, 긴자 & 마루노우치",
+      "planConcept": "70년 전통 킷사텐의 모닝커피, 긴자 미슐랭 에도마에 스시 오마카세와 고쿄 정원의 차분한 럭셔리 데이트.",
+      "schedules": [
+        {
+          "title": "카페 드 랑브르 긴자",
+          "type": "PLACE",
+          "timeSlot": "09:30",
+          "sortOrder": 1,
+          "address": "도쿄도 주오구 긴자 8-10-15",
+          "description": "1948년 창업 이래 장인의 숙성 원두 핸드드립 커피와 도톰한 버터 토스트로 도쿄 킷사텐의 정취를 경험합니다.",
+          "costAmount": "1200"
+        },
+        {
+          "title": "긴자 식스 루프탑 가든 & 명품거리",
+          "type": "PLACE",
+          "timeSlot": "11:00",
+          "sortOrder": 2,
+          "address": "도쿄도 주오구 긴자 6-10-1",
+          "description": "긴자 중심의 공중정원 산책과 현대 예술품 전시를 감상하며 우아한 오전 쇼핑을 즐깁니다.",
+          "costAmount": "0"
+        },
+        {
+          "title": "긴자 스시 긴조",
+          "type": "PLACE",
+          "timeSlot": "13:00",
+          "sortOrder": 3,
+          "address": "도쿄도 주오구 긴자 5-9-1",
+          "description": "도요스 시장 직송의 극상 참치와 성게알을 런치 오마카세 12피스로 품격 있게 맛보는 정통 에도마에 스시.",
+          "costAmount": "6800"
+        },
+        {
+          "title": "황거 고쿄 히가시교엔 정원",
+          "type": "PLACE",
+          "timeSlot": "15:30",
+          "sortOrder": 4,
+          "address": "도쿄도 지요다구 지요다 1-1",
+          "description": "옛 에도성 천수각 터와 고즈넉한 연못 정원을 연인과 도란도란 이야기하며 산책합니다.",
+          "costAmount": "0"
+        },
+        {
+          "title": "메종 바사 마루노우치",
+          "type": "PLACE",
+          "timeSlot": "19:00",
+          "sortOrder": 5,
+          "address": "도쿄도 지요다구 마루노우치 2-4-1 마루빌딩 35F",
+          "description": "붉은 벽돌의 도쿄역사가 우아하게 조명받는 야경을 마주하며 즐기는 비프 안심 스테이크와 프랑스 와인 디너.",
+          "costAmount": "9500"
+        }
+      ]
+    },
+    {
+      "dayNumber": 4,
+      "planTitle": "도심 숲 힐링과 오모테산도 쇼핑, 귀국",
+      "planConcept": "신주쿠교엔의 푸른 숲에서 스냅사진을 남기고, 프리미엄 흑돼지 돈카츠와 감성 쇼핑 후 공항으로 향합니다.",
+      "schedules": [
+        {
+          "title": "긴자 센비키야 과일 샌드위치",
+          "type": "PLACE",
+          "timeSlot": "09:00",
+          "sortOrder": 1,
+          "address": "도쿄도 주오구 긴자 5-5-1",
+          "description": "100년 전통 과일 명가의 딸기와 머스크멜론이 듬뿍 들어간 프리미엄 후르츠 산도와 홍차 조식.",
+          "costAmount": "1800"
+        },
+        {
+          "title": "신주쿠교엔 국민공원",
+          "type": "PLACE",
+          "timeSlot": "10:30",
+          "sortOrder": 2,
+          "address": "도쿄도 신주쿠구 나이토마치 11",
+          "description": "영화의 배경이 된 드넓은 영국식 잔디정원과 프랑스 정형정원을 걷는 상쾌한 아침 산책.",
+          "costAmount": "500"
+        },
+        {
+          "title": "마이센 아오야마 본점",
+          "type": "PLACE",
+          "timeSlot": "12:30",
+          "sortOrder": 3,
+          "address": "도쿄도 시부야구 진구마에 4-8-5",
+          "description": "옛 목욕탕 건물을 개조한 운치 있는 홀에서 젓가락으로 잘릴 만큼 부드러운 흑돼지(쿠로부타) 히레카츠 만찬.",
+          "costAmount": "3300"
+        },
+        {
+          "title": "캣스트리트 감성 숍 투어 & 공항 이동",
+          "type": "TRANSPORT",
+          "timeSlot": "14:30",
+          "sortOrder": 4,
+          "address": "도쿄도 시부야구 진구마에 5-10",
+          "description": "오모테산도 힐즈와 캣스트리트의 개성 넘치는 편집숍을 둘러본 뒤 하네다/나리타 공항으로 이동합니다.",
+          "costAmount": "1500"
+        }
+      ]
+    }
+  ]
+}

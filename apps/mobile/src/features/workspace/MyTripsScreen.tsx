@@ -23,6 +23,7 @@ import {
 } from './MyTripsControls';
 import { selectMyTrips } from './myTripsModel';
 import { myTripsStyles as s, myTripsColors as c } from './myTripsStyles';
+import { onGnbScroll } from '@/components/navigationScroll';
 
 // 새 내 여행 화면을 전용 모듈에 두어 병행 수정하는 이전 화면과 분리한다.
 export default function MyTripsScreen() {
@@ -86,6 +87,8 @@ function MyTripsContent({ userId, local }: { userId: string; local: boolean }) {
         contentContainerStyle={s.content}
         style={{ flex: 1 }}
         keyboardShouldPersistTaps="handled"
+        onScroll={onGnbScroll}
+        scrollEventThrottle={16}
         initialNumToRender={4}
         maxToRenderPerBatch={4}
         windowSize={5}
@@ -169,7 +172,7 @@ function MyTripsContent({ userId, local }: { userId: string; local: boolean }) {
             {loaded && trips.length > 0 && (
               <View style={s.banner}>
                 <View style={s.heading}>
-                  <Text style={s.strongCaption}>Ready to wander?</Text>
+                  <Text style={s.strongCaption}>다음 여행 준비</Text>
                   <Text style={s.title}>새로운 여행을 계획 중인가요?</Text>
                 </View>
                 <MyTripsButton
@@ -187,7 +190,7 @@ function MyTripsContent({ userId, local }: { userId: string; local: boolean }) {
             )}
             {loaded && (
               <View style={s.footer}>
-                <Text style={s.caption}>TRIPPRINT ARCHIVE JOURNAL</Text>
+                <Text style={s.caption}>나의 여행을 한곳에</Text>
                 <Text style={[s.body, s.centered]}>
                   여행을 계획하고 소중한 순간을 기록해요.
                 </Text>

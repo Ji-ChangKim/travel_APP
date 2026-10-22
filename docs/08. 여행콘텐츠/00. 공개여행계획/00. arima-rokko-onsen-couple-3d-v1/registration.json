@@ -1,0 +1,12 @@
+{
+  "base": "https://tripprint-api-staging.gametps.workers.dev",
+  "planKey": "arima-rokko-onsen-couple-3d-v1",
+  "tripId": "59e0d77b-f13a-47f7-a6d5-f80194213db0",
+  "postId": "acf634a1-df3a-4f46-a7bd-48e60cf9e7d7",
+  "author": "가이드 하루",
+  "days": 3,
+  "schedules": 13,
+  "cover": "59e0d77b-f13a-47f7-a6d5-f80194213db0/ee35c651-78fa-40f4-ba53-50e1935fb6a5.jpg",
+  "verifiedAt": "2026-10-21T11:31:24.892Z",
+  "publicUrl": "https://tripprint-staging.pages.dev/community/acf634a1-df3a-4f46-a7bd-48e60cf9e7d7"
+}

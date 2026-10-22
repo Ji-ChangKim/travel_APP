@@ -4,6 +4,14 @@ import { StyleSheet } from 'react-native';
 // 마이페이지 화면 스타일 규격
 export const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
+  // 계정 관리와 로그아웃은 서로 다른 행동으로 읽히도록 간격을 둔다.
+  accountActions: { gap: 8 },
+  inputHint: {
+    fontSize: 14,
+    lineHeight: 22,
+    fontWeight: '400',
+    color: colors.muted,
+  },
   scrollContent: {
     width: '100%',
     maxWidth: 640,

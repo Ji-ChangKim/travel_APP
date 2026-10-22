@@ -1,0 +1,206 @@
+{
+  "tripCreate": {
+    "title": "[오사카+나라·고베] 나라 사슴공원 생태 교감과 고베 하버랜드 야경 3박 4일",
+    "country": "일본",
+    "city": "고베",
+    "startDate": "2026-12-17",
+    "endDate": "2026-12-20",
+    "timezone": "Asia/Tokyo",
+    "defaultCurrency": "JPY",
+    "coverColor": "#2B2D42"
+  },
+  "planKey": "osaka-nara-kobe-family-4d-v1",
+  "publicBody": "아이들이 환호하는 나라 사슴공원 교감과 어르신들이 감탄하시는 정통 고베규 철판 스테이크! 전철 환승을 최소화하고 넉넉한 식사 공간으로 완성한 3세대 대가족 맞춤 여행.",
+  "days": [
+    {
+      "dayNumber": 1,
+      "planTitle": "오사카 도착과 편안한 솥밥 만찬",
+      "planConcept": "공항 도착 후 난바 역전 카페 조식, 도미 가마솥 밥과 난바 야사카 신사 거대 사자상에서 가족 건강을 기원합니다.",
+      "schedules": [
+        {
+          "title": "도토루 커피 난바역 모닝",
+          "type": "PLACE",
+          "timeSlot": "10:00",
+          "sortOrder": 1,
+          "address": "오사카부 오사카시 주오구 난바 5-1-60",
+          "description": "부담 없는 햄에그 샌드위치와 따뜻한 블렌드 커피로 빠르게 에너지를 보충합니다.",
+          "costAmount": "550"
+        },
+        {
+          "title": "간코 난바 본점 도미 솥밥 정식",
+          "type": "PLACE",
+          "timeSlot": "12:30",
+          "sortOrder": 2,
+          "address": "오사카부 오사카시 주오구 난바 1-2-2",
+          "description": "즉석에서 불을 피워 지어주는 고슬고슬한 도미 솥밥과 바삭한 모둠 튀김으로 남녀노소 만족스러운 점심.",
+          "costAmount": "2100"
+        },
+        {
+          "title": "난바 야사카 신사 거대 사자상",
+          "type": "PLACE",
+          "timeSlot": "14:30",
+          "sortOrder": 3,
+          "address": "오사카부 오사카시 나니와구 모토마치 2-9-19",
+          "description": "액운을 삼키고 승리를 부른다는 거대한 사자 머리 조형물 앞에서 활짝 웃는 가족 기념사진 촬영.",
+          "costAmount": "0"
+        },
+        {
+          "title": "도톤보리 나베조 스키야키 뷔페",
+          "type": "PLACE",
+          "timeSlot": "18:00",
+          "sortOrder": 4,
+          "address": "오사카부 오사카시 주오구 도톤보리 1-8-26 5F",
+          "description": "신선한 야채 바와 엄선된 소고기·돼지고기를 무제한으로 끓여 먹는 정갈한 패밀리 스키야키.",
+          "costAmount": "3800"
+        }
+      ]
+    },
+    {
+      "dayNumber": 2,
+      "planTitle": "사슴들의 천국, 나라 평화로운 생태 투어",
+      "planConcept": "킨테츠 특급열차로 나라에 도착해 사슴 센베이 주기 체험과 50년 전통 나라 솥밥, 세계 최대 목조 대불전을 관람합니다.",
+      "schedules": [
+        {
+          "title": "비 드 프랑스 난바역 베이커리",
+          "type": "PLACE",
+          "timeSlot": "08:30",
+          "sortOrder": 1,
+          "address": "오사카부 오사카시 주오구 난바역 구내",
+          "description": "단팥 크림빵과 따뜻한 카페라떼로 열차 탑승 전 가볍게 아침을 챙깁니다.",
+          "costAmount": "600"
+        },
+        {
+          "title": "나라 공원 사슴 센베이 교감 체험",
+          "type": "PLACE",
+          "timeSlot": "10:00",
+          "sortOrder": 2,
+          "address": "나라현 나라시 노보리오오지초 40-118",
+          "description": "공손하게 고개를 숙이면 인사하는 귀여운 사슴들에게 센베이 과자를 건네며 아이들과 잊지 못할 교감.",
+          "costAmount": "500"
+        },
+        {
+          "title": "시즈카 나라공원점 7종 보물 솥밥",
+          "type": "PLACE",
+          "timeSlot": "12:00",
+          "sortOrder": 3,
+          "address": "나라현 나라시 노보리오오지초 59-11",
+          "description": "새우, 장어, 게살, 닭고기가 듬뿍 들어간 50년 전통 솥밥. 바닥의 고소한 누룽지가 일품.",
+          "costAmount": "2400"
+        },
+        {
+          "title": "도다이지(동대사) 대불전 관람",
+          "type": "PLACE",
+          "timeSlot": "14:00",
+          "sortOrder": 4,
+          "address": "나라현 나라시 조시초 406-1",
+          "description": "세계 최대의 목조 건축물 안에서 15m 높이의 거대한 청동 대불을 마주하며 감탄하는 시간.",
+          "costAmount": "600"
+        },
+        {
+          "title": "모쿠모쿠 난바 파크스점 친환경 자연식 뷔페",
+          "type": "PLACE",
+          "timeSlot": "18:30",
+          "sortOrder": 5,
+          "address": "오사카부 오사카시 나니와구 난바나카 2-10-70 난바 파크스 6F",
+          "description": "직영 농장에서 재배한 무농약 채소 요리와 수제 소시지로 부모님 입맛을 사로잡는 건강한 저녁.",
+          "costAmount": "2900"
+        }
+      ]
+    },
+    {
+      "dayNumber": 3,
+      "planTitle": "낭만의 항구도시, 고베 이국적 투어와 고베규",
+      "planConcept": "서양식 기타노이진칸 고택, 눈앞에서 구워주는 정통 고베규 스테이크와 하버랜드 오션뷰 야경.",
+      "schedules": [
+        {
+          "title": "오니기리야 난바역 삼각김밥",
+          "type": "PLACE",
+          "timeSlot": "08:30",
+          "sortOrder": 1,
+          "address": "난바역 한신선 개찰구 인근",
+          "description": "따뜻한 소고기 장조림 삼각김밥과 미소된장국으로 든든한 출발.",
+          "costAmount": "500"
+        },
+        {
+          "title": "기타노이진칸 스타벅스 & 양옥거리",
+          "type": "PLACE",
+          "timeSlot": "10:00",
+          "sortOrder": 2,
+          "address": "효고현 고베시 주오구 기타노초 3-1-31",
+          "description": "100년 넘은 문화재 서양 목조 저택에서 즐기는 이색적인 커피 타임과 이국적 거리 산책.",
+          "costAmount": "800"
+        },
+        {
+          "title": "스테이크랜드 고베관 고베규 철판 스테이크",
+          "type": "PLACE",
+          "timeSlot": "12:30",
+          "sortOrder": 3,
+          "address": "효고현 고베시 주오구 기타나가사도리 1-9-17 4F",
+          "description": "셰프가 화려한 불쇼와 함께 눈앞에서 미디엄으로 구워주는 극상의 마블링 고베규 런치 코스.",
+          "costAmount": "5800"
+        },
+        {
+          "title": "고베 하버랜드 모자이크 & 호빵맨 박물관",
+          "type": "PLACE",
+          "timeSlot": "15:00",
+          "sortOrder": 4,
+          "address": "효고현 고베시 주오구 히가시카와사키초 1-7-2",
+          "description": "바닷바람을 맞으며 산책하고 아이들이 좋아하는 호빵맨 베이커리 빵 시식.",
+          "costAmount": "1200"
+        },
+        {
+          "title": "피셔맨즈 마켓 고베 모자이크 오션뷰 디너",
+          "type": "PLACE",
+          "timeSlot": "18:30",
+          "sortOrder": 5,
+          "address": "효고현 고베시 주오구 히가시카와사키초 1-6-1 2F",
+          "description": "고베 포트타워의 붉은 불빛과 바다 위 크루즈 야경을 마주하며 즐기는 해산물 파스타와 화덕 피자 뷔페.",
+          "costAmount": "3200"
+        }
+      ]
+    },
+    {
+      "dayNumber": 4,
+      "planTitle": "오사카 텐노지 힐링 파크와 귀국",
+      "planConcept": "덴시바 잔디공원 브런치와 하루카스 300 전망대에서 오사카 전경을 보고 공항으로 향합니다.",
+      "schedules": [
+        {
+          "title": "스푼빌 텐노지 잔디공원 브런치",
+          "type": "PLACE",
+          "timeSlot": "09:00",
+          "sortOrder": 1,
+          "address": "오사카부 오사카시 텐노지구 차우스야마초 5-55",
+          "description": "넓은 천연 잔디밭을 바라보며 아보카도 토스트 플레이트와 신선한 오렌지 주스를 마십니다.",
+          "costAmount": "1200"
+        },
+        {
+          "title": "아베노 하루카스 300 전망대",
+          "type": "PLACE",
+          "timeSlot": "10:30",
+          "sortOrder": 2,
+          "address": "오사카부 오사카시 아베노구 아베노스지 1-1-43 60F",
+          "description": "일본 최고층 빌딩 60층 통유리 전망대에서 오사카 평야와 교토, 롯코산까지 조망합니다.",
+          "costAmount": "1500"
+        },
+        {
+          "title": "야에카츠 텐노지 쿠시카츠 정식",
+          "type": "PLACE",
+          "timeSlot": "12:30",
+          "sortOrder": 3,
+          "address": "오사카부 오사카시 나니와구 에비스히가시 3-4-13",
+          "description": "튀김옷이 얇고 부드러워 부담 없는 50년 노포의 소고기 쿠시카츠와 소힘줄 도테야키 점심.",
+          "costAmount": "1800"
+        },
+        {
+          "title": "텐노지역 특급 하루카 탑승 및 공항 귀국",
+          "type": "TRANSPORT",
+          "timeSlot": "14:30",
+          "sortOrder": 4,
+          "address": "오사카부 센난군 다지리초 센슈쿠코나카 1",
+          "description": "텐노지역에서 하루카 특급열차로 간사이 공항까지 30분 만에 도착해 출국합니다.",
+          "costAmount": "1800"
+        }
+      ]
+    }
+  ]
+}

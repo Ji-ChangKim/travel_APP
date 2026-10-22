@@ -1,43 +1,30 @@
-# TripPrint 현행 문서
+# TripPrint 문서 안내
 
-기준일: 2026-10-16. 같은 주제의 현행 파일만 갱신합니다. 현재 작업은 Google Play 내부 테스트용 빌드 생성 전까지이며 최종 기기 테스트는 새 설치본에서 진행합니다.
+정리 기준일: 2026-10-22. 이 문서는 문서 위치를 안내합니다. 앱·서버의 구현 완료나 내부 테스트 통과를 뜻하지 않습니다.
 
-## 먼저 읽을 문서
+## 문서 찾기
 
-- [현재 개발·검수 상태](CURRENT_STATUS.txt)
-- [화면 피드백과 날짜·상태·동선 계약](SCREEN_REVIEW.txt)
-- [현재 상세 화면·CTA·빈 일정 개편](HARU_WORKSPACE_REFACTOR_20261016.txt)
-- [최신 화면별 상세기능정의서 v3 원본](<2. planning/TripPrint_화면별_상세기능정의서_v3_20261014.docx>)
-- [고객 여행 기록 완주 점검·개선 요청](qa/CUSTOMER_JOURNEY_REVIEW.txt)
-- [실제 서버 등록·저장·재로그인 검증](qa/STAGING_CUSTOMER_JOURNEY.txt)
-- [오사카 여행계획 등록·공유 검증](qa/COMMUNITY_PLAN_PUBLISH.txt)
-- [Google 장소 썸네일·무료 한도 검증](qa/GOOGLE_PLACE_PHOTOS.txt)
-- [빌드 직전 인계](PLAY_INTERNAL_PREBUILD.txt)
-- [Play 내부 테스트 기기 검수표](qa/DEVICE_ACCEPTANCE.txt)
-- [문서 정리 결과](DOCUMENT_CLEANUP.txt)
+| 폴더                                         | 용도                                               |
+| -------------------------------------------- | -------------------------------------------------- |
+| [00. 문서안내](<00. 문서안내/README.md>)     | 폴더·파일명 규칙, 이동 목록, 정리 결과             |
+| [01. 서비스기획](<01. 서비스기획/README.md>) | 서비스 정의, 기능, 사용자 흐름, 검토 중인 제안     |
+| [02. 디자인](<02. 디자인/README.md>)         | 현행 디자인 시스템, 헤더·GNB, 화면 규격, 참조 원본 |
+| [03. 개발](<03. 개발/README.md>)             | 데이터 흐름, API 계약, DB·객체 사전, 개발 환경     |
+| [04. 운영](<04. 운영/README.md>)             | 서비스 설정, 배포, 보안 정책                       |
+| [05. 검수](<05. 검수/README.md>)             | 인수 기준과 실제 검수 보고                         |
+| [06. 출시](<06. 출시/README.md>)             | 현재 출시 대상과 빌드 인계                         |
+| [07. 브랜드](<07. 브랜드/README.md>)         | 브랜드 자산 안내와 참조 이미지                     |
+| [08. 여행콘텐츠](<08. 여행콘텐츠/README.md>) | 실제 공개 여행계획의 원본 데이터와 작성 양식       |
+| [99. 아카이브](<99. 아카이브/README.md>)     | 이전 기준·출시·검수 기록, 삭제 검토 대상           |
 
-사용자 확정 사항과 화면 보완 계약을 먼저 적용합니다. 원본 기능정의서의 보완 전 요구를 현재 구현 완료 여부로 해석하지 않습니다. 과거 검수 캡처는 촬영 당시 참고 자료입니다.
+`98. keys`는 비공개 로컬 설정 영역입니다. 문서 색인·백업·Git·빌드 업로드에 포함하지 않습니다.
 
-## 계약과 운영
+## 먼저 읽을 현행 기준
 
-- [DB·도메인 객체 사전](DB_DICTIONARY.txt)
-- [API 계약](planning/API_CONTRACT.md), [현재 앱 서버 계약](planning/APP_SERVER_API.md)
-- [개발 환경](DEVELOPMENT_SETUP.md), [배포 절차](DEPLOYMENT.md)
-- [GitHub Android 빌드](ANDROID_GITHUB_BUILD.md), [Google Play 내부 테스트](GOOGLE_PLAY_INTERNAL_TEST.md)
-- [인증·온보딩](AUTH_ONBOARDING.md), [소셜 인증 설정](SOCIAL_AUTH_SETUP.md)
-- [서비스 연결](APP_SERVICES_SETUP.md), [지도 설정](GOOGLE_MAPS_SETUP.md)
-- [오류 코드](ERROR_CODE_SPEC.md), [권한 안내](APP_PERMISSIONS_20261013.txt)
+- [디자인 시스템](<02. 디자인/00. 공통규격/디자인시스템.md>), [디자인 토큰](<02. 디자인/00. 공통규격/design-tokens.json>), [헤더·GNB 규격](<02. 디자인/00. 공통규격/헤더GNB_규격.md>)
+- [홈·온보딩](<02. 디자인/01. 화면설계/홈온보딩_화면규격.md>), [여행 일정](<02. 디자인/01. 화면설계/여행일정_화면규격.md>), [헤더 시안](<02. 디자인/01. 화면설계/00. 헤더시안/index.html>)
+- [앱·서버 API 계약](<03. 개발/01. API계약/앱서버_API계약.md>), [DB·객체 사전](<03. 개발/02. 데이터정의/DB_객체사전.txt>), [v11 데이터 흐름](<03. 개발/00. 구조설계/v11_데이터흐름.md>)
+- [v11 빌드 전 점검](<05. 검수/02. 검수보고/2026-10-21_v11_빌드전점검.md>), [전체 UI 검수](<05. 검수/02. 검수보고/2026-10-21_전체UI_폴리싱검수.md>)
+- [문서 관리 규칙](<00. 문서안내/문서_관리규칙.md>), [문서 이동 목록](<00. 문서안내/문서_이동목록.csv>)
 
-## 기획과 디자인
-
-- [기획 문서 안내](planning/README.md), [제품 PRD](0.PRD/TripPrint_신사업계획서_및_PRD.md)
-- [전략 기획](전략기획서/README.md)
-- [현재 디자인 시스템](design/DESIGN.md), [앱에서 참조하는 디자인 토큰](design/design-tokens.json)
-- [화면 헤더 규격과 큰 글자 검수](design/SCREEN_HEADER_SPEC.md)
-- [홈·온보딩 보완 명세](1.uiux/HOME_ONBOARDING_SCREEN_SPEC.md), [일정 명세](1.uiux/ITINERARY_SCHEDULE_SCREEN_SPEC.md)
-- [기준 캡처 목록](1.uiux/SCREENSHOT_INDEX.txt), [캡처 메타데이터](1.uiux/SCREENSHOT_MANIFEST.json)
-- [사진·자료 출처](RESOURCE_CREDITS.txt)
-
-앱이 직접 읽는 디자인 JSON, 기능정의서 원본, 출처·이용 조건, 서로 다른 화면 상태의 기준 이미지는 유지합니다. 바이트가 같은 이미지 사본은 한 파일로 통합하며 캡처 목록에서 같은 파일을 참조합니다. 보안 키 폴더는 일반 문서 목록과 정리 대상에 포함하지 않습니다.
-
-2026-10-16 헤더 개편으로 오래된 웹 캡처 154장은 현재 검수 캡처로 교체했습니다. 현재 이미지와 보존한 Android 참고 자료는 캡처 목록에서 구분하며, [이미지 삭제 내역](1.uiux/IMAGE_CLEANUP_LOG.txt)을 함께 남깁니다.
+검토안은 승인된 요구사항으로 해석하지 않습니다. 아카이브의 과거 글자 크기·터치 영역·메뉴 정책을 현재 앱에 적용하지 않습니다. 실제 검수 결과는 해당 보고서의 날짜·코드·환경·미실행 항목을 함께 확인합니다.

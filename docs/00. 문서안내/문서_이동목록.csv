@@ -1,0 +1,326 @@
+﻿이전경로,현재경로,분류
+docs/0.PRD/TripPrint_신사업계획서_및_PRD.md,docs/99. 아카이브/00. 이전기획/00. 초기PRD/TripPrint_신사업계획서_및_PRD.md,아카이브
+docs/1.uiux/HOME_ONBOARDING_SCREEN_SPEC.md,docs/02. 디자인/01. 화면설계/홈온보딩_화면규격.md,현행·참조자료
+docs/1.uiux/IMAGE_CLEANUP_LOG.txt,docs/99. 아카이브/01. 이전디자인/2026-10-16_이미지정리_이력.txt,아카이브
+docs/1.uiux/ITINERARY_SCHEDULE_SCREEN_SPEC.md,docs/02. 디자인/01. 화면설계/여행일정_화면규격.md,현행·참조자료
+docs/1.uiux/SCREENSHOT_INDEX.txt,docs/99. 아카이브/01. 이전디자인/2026-10-16_이전캡처_목록.txt,아카이브
+docs/1.uiux/SCREENSHOT_MANIFEST.json,docs/99. 아카이브/01. 이전디자인/2026-10-16_이전캡처_manifest.json,아카이브
+docs/1.uiux/ui_design_system.md,docs/99. 아카이브/01. 이전디자인/이전_디자인시스템.md,아카이브
+docs/2. planning/TripPrint_IA_정보구조도.md,docs/01. 서비스기획/03. 검토안/TripPrint_IA_정보구조도.md,현행·참조자료
+docs/2. planning/TripPrint_PRD_노션용.md,docs/01. 서비스기획/03. 검토안/TripPrint_PRD_노션용.md,현행·참조자료
+docs/2. planning/TripPrint_통합_PRD_및_시스템기획서.md,docs/01. 서비스기획/03. 검토안/TripPrint_통합_PRD_및_시스템기획서.md,현행·참조자료
+docs/2. planning/TripPrint_화면별_상세기능정의서_v3_20261014.docx,docs/99. 아카이브/00. 이전기획/01. 기능정의원본/TripPrint_화면별_상세기능정의서_v3_20261014.docx,아카이브
+docs/ANDROID_GITHUB_BUILD.md,docs/04. 운영/01. 배포절차/Android_GitHub빌드절차.md,현행·참조자료
+docs/APP_PERMISSIONS_20261013.txt,docs/04. 운영/02. 보안정책/앱_권한정책.txt,현행·참조자료
+docs/APP_SERVICES_SETUP.md,docs/04. 운영/00. 서비스설정/서비스_연결설정.md,현행·참조자료
+docs/AUTH_ONBOARDING.md,docs/01. 서비스기획/01. 기능정의/인증온보딩_기능정의.md,현행·참조자료
+docs/CURRENT_STATUS.txt,docs/00. 문서안내/개발검수_현재상태.txt,현행·참조자료
+docs/DB_DICTIONARY.txt,docs/03. 개발/02. 데이터정의/DB_객체사전.txt,현행·참조자료
+docs/DEPLOYMENT.md,docs/04. 운영/01. 배포절차/서버웹_배포절차.md,현행·참조자료
+docs/DEVELOPMENT_SETUP.md,docs/03. 개발/03. 개발환경/개발환경_설정.md,현행·참조자료
+docs/DOCUMENT_CLEANUP.txt,docs/99. 아카이브/02. 이전검수/2026-10-16_문서정리_이전결과.txt,아카이브
+docs/ERROR_CODE_SPEC.md,docs/03. 개발/01. API계약/오류코드_계약.md,현행·참조자료
+docs/GOOGLE_MAPS_SETUP.md,docs/04. 운영/00. 서비스설정/Google지도_연결설정.md,현행·참조자료
+docs/GOOGLE_PLAY_INTERNAL_TEST.md,docs/04. 운영/01. 배포절차/GooglePlay_내부테스트절차.md,현행·참조자료
+docs/HARU_HEADER_STANDARD_20261016.txt,docs/99. 아카이브/99. 삭제필요/2026-10-16_헤더규격_폐기검토.txt,삭제검토·보존
+docs/HARU_HIERARCHY_REFINEMENT_20261016.txt,docs/99. 아카이브/99. 삭제필요/2026-10-16_화면위계_폐기검토.txt,삭제검토·보존
+docs/HARU_WCAG_AA_BASELINE_20261016.txt,docs/99. 아카이브/02. 이전검수/2026-10-16_접근성_이전검수.txt,아카이브
+docs/HARU_WORKSPACE_REFACTOR_20261016.txt,docs/99. 아카이브/02. 이전검수/2026-10-16_여행화면_이전개편.txt,아카이브
+docs/PLAY_INTERNAL_PREBUILD.txt,docs/06. 출시/00. v11/내부테스트_빌드전인계.txt,현행·참조자료
+docs/README.md,docs/README.md,현행·참조자료
+docs/RESOURCE_CREDITS.txt,docs/02. 디자인/02. 리소스/리소스_출처.txt,현행·참조자료
+docs/SCREEN_REVIEW.txt,docs/99. 아카이브/02. 이전검수/2026-10-16_화면피드백_검토.txt,아카이브
+docs/SOCIAL_AUTH_SETUP.md,docs/04. 운영/00. 서비스설정/소셜로그인_연결설정.md,현행·참조자료
+docs/branding/TRIPPRINT_ASSETS_V1.md,docs/07. 브랜드/브랜드_자산안내.md,현행·참조자료
+docs/branding/TRIPPRINT_BRAND_REVIEW_20261006.md,docs/99. 아카이브/04. 이전브랜드/2026-10-06_브랜드_검토보고.md,아카이브
+docs/branding/TRIPPRINT_UPDATE_20261006.md,docs/99. 아카이브/04. 이전브랜드/2026-10-06_브랜드_변경기록.md,아카이브
+docs/branding/references/TripPrint_login-preview_390x844.png,docs/07. 브랜드/00. 참조이미지/TripPrint_login-preview_390x844.png,현행·참조자료
+docs/branding/references/current-login.png,docs/07. 브랜드/00. 참조이미지/current-login.png,현행·참조자료
+docs/branding/references/tripprint-concept.png,docs/07. 브랜드/00. 참조이미지/tripprint-concept.png,현행·참조자료
+docs/content/public-plans/arima-rokko-onsen-couple-3d-v1/candidate.json,docs/08. 여행콘텐츠/00. 공개여행계획/00. arima-rokko-onsen-couple-3d-v1/candidate.json,현행·참조자료
+docs/content/public-plans/arima-rokko-onsen-couple-3d-v1/cover.jpg,docs/08. 여행콘텐츠/00. 공개여행계획/00. arima-rokko-onsen-couple-3d-v1/cover.jpg,현행·참조자료
+docs/content/public-plans/arima-rokko-onsen-couple-3d-v1/registration.json,docs/08. 여행콘텐츠/00. 공개여행계획/00. arima-rokko-onsen-couple-3d-v1/registration.json,현행·참조자료
+docs/content/public-plans/huru-10-plans-registration-summary.json,docs/08. 여행콘텐츠/00. 공개여행계획/huru-10-plans-registration-summary.json,현행·참조자료
+docs/content/public-plans/huru-japan-10-curated-plans.md,docs/08. 여행콘텐츠/00. 공개여행계획/huru-japan-10-curated-plans.md,현행·참조자료
+docs/content/public-plans/koyasan-uji-culture-friends-4d-v1/candidate.json,docs/08. 여행콘텐츠/00. 공개여행계획/01. koyasan-uji-culture-friends-4d-v1/candidate.json,현행·참조자료
+docs/content/public-plans/koyasan-uji-culture-friends-4d-v1/cover.jpg,docs/08. 여행콘텐츠/00. 공개여행계획/01. koyasan-uji-culture-friends-4d-v1/cover.jpg,현행·참조자료
+docs/content/public-plans/koyasan-uji-culture-friends-4d-v1/registration.json,docs/08. 여행콘텐츠/00. 공개여행계획/01. koyasan-uji-culture-friends-4d-v1/registration.json,현행·참조자료
+docs/content/public-plans/kyushu-onsen-yatai-4d-v1/README.md,docs/08. 여행콘텐츠/00. 공개여행계획/02. kyushu-onsen-yatai-4d-v1/README.md,현행·참조자료
+docs/content/public-plans/kyushu-onsen-yatai-4d-v1/candidate.json,docs/08. 여행콘텐츠/00. 공개여행계획/02. kyushu-onsen-yatai-4d-v1/candidate.json,현행·참조자료
+docs/content/public-plans/kyushu-onsen-yatai-4d-v1/corrections.json,docs/08. 여행콘텐츠/00. 공개여행계획/02. kyushu-onsen-yatai-4d-v1/corrections.json,현행·참조자료
+docs/content/public-plans/kyushu-onsen-yatai-4d-v1/cover.png,docs/08. 여행콘텐츠/00. 공개여행계획/02. kyushu-onsen-yatai-4d-v1/cover.png,현행·참조자료
+docs/content/public-plans/kyushu-onsen-yatai-4d-v1/days.csv,docs/08. 여행콘텐츠/00. 공개여행계획/02. kyushu-onsen-yatai-4d-v1/days.csv,현행·참조자료
+docs/content/public-plans/kyushu-onsen-yatai-4d-v1/original.txt,docs/08. 여행콘텐츠/00. 공개여행계획/02. kyushu-onsen-yatai-4d-v1/original.txt,현행·참조자료
+docs/content/public-plans/kyushu-onsen-yatai-4d-v1/photos.csv,docs/08. 여행콘텐츠/00. 공개여행계획/02. kyushu-onsen-yatai-4d-v1/photos.csv,현행·참조자료
+docs/content/public-plans/kyushu-onsen-yatai-4d-v1/plan.json,docs/08. 여행콘텐츠/00. 공개여행계획/02. kyushu-onsen-yatai-4d-v1/plan.json,현행·참조자료
+docs/content/public-plans/kyushu-onsen-yatai-4d-v1/publisher.json,docs/08. 여행콘텐츠/00. 공개여행계획/02. kyushu-onsen-yatai-4d-v1/publisher.json,현행·참조자료
+docs/content/public-plans/kyushu-onsen-yatai-4d-v1/registration.json,docs/08. 여행콘텐츠/00. 공개여행계획/02. kyushu-onsen-yatai-4d-v1/registration.json,현행·참조자료
+docs/content/public-plans/kyushu-onsen-yatai-4d-v1/schedules.csv,docs/08. 여행콘텐츠/00. 공개여행계획/02. kyushu-onsen-yatai-4d-v1/schedules.csv,현행·참조자료
+docs/content/public-plans/kyushu-onsen-yatai-4d-v1/sources.csv,docs/08. 여행콘텐츠/00. 공개여행계획/02. kyushu-onsen-yatai-4d-v1/sources.csv,현행·참조자료
+docs/content/public-plans/kyushu-onsen-yatai-4d-v1/trips.csv,docs/08. 여행콘텐츠/00. 공개여행계획/02. kyushu-onsen-yatai-4d-v1/trips.csv,현행·참조자료
+docs/content/public-plans/kyushu-onsen-yatai-4d-v1/validation.json,docs/08. 여행콘텐츠/00. 공개여행계획/02. kyushu-onsen-yatai-4d-v1/validation.json,현행·참조자료
+docs/content/public-plans/osaka-foodie-friends-4d-v1/candidate.json,docs/08. 여행콘텐츠/00. 공개여행계획/03. osaka-foodie-friends-4d-v1/candidate.json,현행·참조자료
+docs/content/public-plans/osaka-foodie-friends-4d-v1/cover.jpg,docs/08. 여행콘텐츠/00. 공개여행계획/03. osaka-foodie-friends-4d-v1/cover.jpg,현행·참조자료
+docs/content/public-plans/osaka-foodie-friends-4d-v1/registration.json,docs/08. 여행콘텐츠/00. 공개여행계획/03. osaka-foodie-friends-4d-v1/registration.json,현행·참조자료
+docs/content/public-plans/osaka-kyoto-kimono-couple-4d-v1/candidate.json,docs/08. 여행콘텐츠/00. 공개여행계획/04. osaka-kyoto-kimono-couple-4d-v1/candidate.json,현행·참조자료
+docs/content/public-plans/osaka-kyoto-kimono-couple-4d-v1/cover.jpg,docs/08. 여행콘텐츠/00. 공개여행계획/04. osaka-kyoto-kimono-couple-4d-v1/cover.jpg,현행·참조자료
+docs/content/public-plans/osaka-kyoto-kimono-couple-4d-v1/registration.json,docs/08. 여행콘텐츠/00. 공개여행계획/04. osaka-kyoto-kimono-couple-4d-v1/registration.json,현행·참조자료
+docs/content/public-plans/osaka-nara-kobe-family-4d-v1/candidate.json,docs/08. 여행콘텐츠/00. 공개여행계획/05. osaka-nara-kobe-family-4d-v1/candidate.json,현행·참조자료
+docs/content/public-plans/osaka-nara-kobe-family-4d-v1/cover.jpg,docs/08. 여행콘텐츠/00. 공개여행계획/05. osaka-nara-kobe-family-4d-v1/cover.jpg,현행·참조자료
+docs/content/public-plans/osaka-nara-kobe-family-4d-v1/registration.json,docs/08. 여행콘텐츠/00. 공개여행계획/05. osaka-nara-kobe-family-4d-v1/registration.json,현행·참조자료
+docs/content/public-plans/osaka-usj-family-4d-v1/candidate.json,docs/08. 여행콘텐츠/00. 공개여행계획/06. osaka-usj-family-4d-v1/candidate.json,현행·참조자료
+docs/content/public-plans/osaka-usj-family-4d-v1/cover.jpg,docs/08. 여행콘텐츠/00. 공개여행계획/06. osaka-usj-family-4d-v1/cover.jpg,현행·참조자료
+docs/content/public-plans/osaka-usj-family-4d-v1/registration.json,docs/08. 여행콘텐츠/00. 공개여행계획/06. osaka-usj-family-4d-v1/registration.json,현행·참조자료
+docs/content/public-plans/sapporo-otaru-canal-couple-4d-v1/candidate.json,docs/08. 여행콘텐츠/00. 공개여행계획/07. sapporo-otaru-canal-couple-4d-v1/candidate.json,현행·참조자료
+docs/content/public-plans/sapporo-otaru-canal-couple-4d-v1/cover.jpg,docs/08. 여행콘텐츠/00. 공개여행계획/07. sapporo-otaru-canal-couple-4d-v1/cover.jpg,현행·참조자료
+docs/content/public-plans/sapporo-otaru-canal-couple-4d-v1/registration.json,docs/08. 여행콘텐츠/00. 공개여행계획/07. sapporo-otaru-canal-couple-4d-v1/registration.json,현행·참조자료
+docs/content/public-plans/sapporo-snow-family-4d-v1/candidate.json,docs/08. 여행콘텐츠/00. 공개여행계획/08. sapporo-snow-family-4d-v1/candidate.json,현행·참조자료
+docs/content/public-plans/sapporo-snow-family-4d-v1/cover.jpg,docs/08. 여행콘텐츠/00. 공개여행계획/08. sapporo-snow-family-4d-v1/cover.jpg,현행·참조자료
+docs/content/public-plans/sapporo-snow-family-4d-v1/registration.json,docs/08. 여행콘텐츠/00. 공개여행계획/08. sapporo-snow-family-4d-v1/registration.json,현행·참조자료
+docs/content/public-plans/tokyo-romantic-couple-4d-v1/candidate.json,docs/08. 여행콘텐츠/00. 공개여행계획/09. tokyo-romantic-couple-4d-v1/candidate.json,현행·참조자료
+docs/content/public-plans/tokyo-romantic-couple-4d-v1/cover.jpg,docs/08. 여행콘텐츠/00. 공개여행계획/09. tokyo-romantic-couple-4d-v1/cover.jpg,현행·참조자료
+docs/content/public-plans/tokyo-romantic-couple-4d-v1/registration.json,docs/08. 여행콘텐츠/00. 공개여행계획/09. tokyo-romantic-couple-4d-v1/registration.json,현행·참조자료
+docs/content/public-plans/tokyo-subculture-friends-4d-v1/candidate.json,docs/08. 여행콘텐츠/00. 공개여행계획/10. tokyo-subculture-friends-4d-v1/candidate.json,현행·참조자료
+docs/content/public-plans/tokyo-subculture-friends-4d-v1/cover.jpg,docs/08. 여행콘텐츠/00. 공개여행계획/10. tokyo-subculture-friends-4d-v1/cover.jpg,현행·참조자료
+docs/content/public-plans/tokyo-subculture-friends-4d-v1/registration.json,docs/08. 여행콘텐츠/00. 공개여행계획/10. tokyo-subculture-friends-4d-v1/registration.json,현행·참조자료
+docs/design/APP_REDESIGN_REVIEW.txt,docs/99. 아카이브/01. 이전디자인/03. 검토기록/앱개편_검토안.txt,아카이브
+docs/design/COMMUNITY_PLAN_SCREEN_SPEC.md,docs/02. 디자인/01. 화면설계/공개여행계획_화면규격.md,현행·참조자료
+docs/design/DESIGN.md,docs/02. 디자인/00. 공통규격/디자인시스템.md,현행·참조자료
+docs/design/DESIGN_GUIDE.txt,docs/02. 디자인/00. 공통규격/디자인_적용가이드.txt,현행·참조자료
+docs/design/FOOTPRINTS_PUBLIC_FEED_SPEC.md,docs/02. 디자인/01. 화면설계/발자국목록_화면규격.md,현행·참조자료
+docs/design/MY_TRIPS_SPEC.md,docs/02. 디자인/01. 화면설계/내여행_화면규격.md,현행·참조자료
+docs/design/PAGE_DESIGN_QA.txt,docs/99. 아카이브/01. 이전디자인/03. 검토기록/2026-10-19_전체페이지_디자인검수.txt,아카이브
+docs/design/PAGE_DESIGN_SYSTEM.txt,docs/02. 디자인/00. 공통규격/전체페이지_디자인규격.txt,현행·참조자료
+docs/design/PAGE_FUNCTION_SPEC.txt,docs/02. 디자인/00. 공통규격/페이지별_기능정의.txt,현행·참조자료
+docs/design/PAGE_UI_LEAD_REVIEW.txt,docs/99. 아카이브/01. 이전디자인/03. 검토기록/2026-10-19_전체페이지_UI검토.txt,아카이브
+docs/design/POPUP_SPEC.txt,docs/02. 디자인/00. 공통규격/팝업_규격.txt,현행·참조자료
+docs/design/REDESIGN_TECH_API_BUILD.txt,docs/02. 디자인/00. 공통규격/앱개편_기술검토.txt,현행·참조자료
+docs/design/RESOURCE_INDEX.md,docs/02. 디자인/02. 리소스/리소스_저장경로.md,현행·참조자료
+docs/design/RESOURCE_NAMING.md,docs/02. 디자인/02. 리소스/리소스_이름규칙.md,현행·참조자료
+docs/design/SCHEDULE_PRODUCT_REVIEW.md,docs/02. 디자인/00. 공통규격/일정화면_기획검토.md,현행·참조자료
+docs/design/SCHEDULE_RELEASE.md,docs/99. 아카이브/03. 이전출시/00. v05/2026-10-14_v05_출시준비.md,아카이브
+docs/design/SCREEN_HEADER_SPEC.md,docs/02. 디자인/00. 공통규격/헤더GNB_규격.md,현행·참조자료
+docs/design/STITCH_CURRENT_INTEGRATION.txt,docs/02. 디자인/00. 공통규격/Stitch시안_적용범위.txt,현행·참조자료
+docs/design/STITCH_CURRENT_SOURCE.json,docs/02. 디자인/00. 공통규격/STITCH_CURRENT_SOURCE.json,현행·참조자료
+docs/design/UI_LEAD_REVIEW.txt,docs/99. 아카이브/01. 이전디자인/03. 검토기록/2026-10-19_개편안_UI검토.txt,아카이브
+docs/design/design-tokens.json,docs/02. 디자인/00. 공통규격/design-tokens.json,현행·참조자료
+docs/design/haru-v3/STYLE_GUIDE.txt,docs/99. 아카이브/01. 이전디자인/02. 이전UI키트/STYLE_GUIDE.txt,아카이브
+docs/design/haru-v3/design-tokens.json,docs/99. 아카이브/01. 이전디자인/02. 이전UI키트/design-tokens.json,아카이브
+docs/design/headers/headers.css,docs/02. 디자인/01. 화면설계/00. 헤더시안/headers.css,현행·참조자료
+docs/design/headers/index.html,docs/02. 디자인/01. 화면설계/00. 헤더시안/index.html,현행·참조자료
+docs/design/headers/serve.mjs,docs/02. 디자인/01. 화면설계/00. 헤더시안/serve.mjs,현행·참조자료
+docs/design/icon-catalog-1280x900.png,docs/02. 디자인/02. 리소스/icon-catalog-1280x900.png,현행·참조자료
+docs/design/icon-catalog-390x844.png,docs/02. 디자인/02. 리소스/icon-catalog-390x844.png,현행·참조자료
+docs/design/icon-catalog.html,docs/02. 디자인/02. 리소스/icon-catalog.html,현행·참조자료
+docs/design/ledger-tokens.json,docs/02. 디자인/00. 공통규격/ledger-tokens.json,현행·참조자료
+docs/design/pages/000_디자인시스템.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/000_디자인시스템.html,현행·참조자료
+docs/design/pages/100_홈.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/100_홈.html,현행·참조자료
+docs/design/pages/110_여행만들기.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/110_여행만들기.html,현행·참조자료
+docs/design/pages/111_나라선택.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/111_나라선택.html,현행·참조자료
+docs/design/pages/112_도시선택.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/112_도시선택.html,현행·참조자료
+docs/design/pages/113_여행기간선택.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/113_여행기간선택.html,현행·참조자료
+docs/design/pages/114_여행시작확인.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/114_여행시작확인.html,현행·참조자료
+docs/design/pages/200_내여행.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/200_내여행.html,현행·참조자료
+docs/design/pages/210_여행상세_일정.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/210_여행상세_일정.html,현행·참조자료
+docs/design/pages/211_여행상세_지도.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/211_여행상세_지도.html,현행·참조자료
+docs/design/pages/212_여행상세_비용.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/212_여행상세_비용.html,현행·참조자료
+docs/design/pages/213_사진과영수증.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/213_사진과영수증.html,현행·참조자료
+docs/design/pages/214_준비물.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/214_준비물.html,현행·참조자료
+docs/design/pages/215_동행관리.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/215_동행관리.html,현행·참조자료
+docs/design/pages/216_여행정보수정.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/216_여행정보수정.html,현행·참조자료
+docs/design/pages/217_여행기간변경.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/217_여행기간변경.html,현행·참조자료
+docs/design/pages/220_장소검색.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/220_장소검색.html,현행·참조자료
+docs/design/pages/221_내일정_장소설명과팁.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/221_내일정_장소설명과팁.html,현행·참조자료
+docs/design/pages/222_검색후보_장소확인.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/222_검색후보_장소확인.html,현행·참조자료
+docs/design/pages/223_일정작성.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/223_일정작성.html,현행·참조자료
+docs/design/pages/224_이날소개작성.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/224_이날소개작성.html,현행·참조자료
+docs/design/pages/225_일정위치선택.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/225_일정위치선택.html,현행·참조자료
+docs/design/pages/226_일정순서편집.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/226_일정순서편집.html,현행·참조자료
+docs/design/pages/227_구글지도장소가져오기.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/227_구글지도장소가져오기.html,현행·참조자료
+docs/design/pages/230_항공과예약.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/230_항공과예약.html,현행·참조자료
+docs/design/pages/231_항공편조회.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/231_항공편조회.html,현행·참조자료
+docs/design/pages/232_항공권직접입력.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/232_항공권직접입력.html,현행·참조자료
+docs/design/pages/233_숙소일정입력.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/233_숙소일정입력.html,현행·참조자료
+docs/design/pages/234_지출직접입력.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/234_지출직접입력.html,현행·참조자료
+docs/design/pages/235_지출상세.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/235_지출상세.html,현행·참조자료
+docs/design/pages/236_영수증등록.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/236_영수증등록.html,현행·참조자료
+docs/design/pages/237_영수증확인.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/237_영수증확인.html,현행·참조자료
+docs/design/pages/238_영수증원본보기.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/238_영수증원본보기.html,현행·참조자료
+docs/design/pages/239_여행사진상세.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/239_여행사진상세.html,현행·참조자료
+docs/design/pages/240_초대참여.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/240_초대참여.html,현행·참조자료
+docs/design/pages/300_발견.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/300_발견.html,현행·참조자료
+docs/design/pages/310_공개여행계획.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/310_공개여행계획.html,현행·참조자료
+docs/design/pages/311_공개장소_설명과팁.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/311_공개장소_설명과팁.html,현행·참조자료
+docs/design/pages/312_공개여행기록.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/312_공개여행기록.html,현행·참조자료
+docs/design/pages/313_도시가이드.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/313_도시가이드.html,현행·참조자료
+docs/design/pages/314_가이드장소확인.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/314_가이드장소확인.html,현행·참조자료
+docs/design/pages/400_발자국.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/400_발자국.html,현행·참조자료
+docs/design/pages/410_여행기록상세.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/410_여행기록상세.html,현행·참조자료
+docs/design/pages/411_여행기록추가.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/411_여행기록추가.html,현행·참조자료
+docs/design/pages/420_공개항목선택.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/420_공개항목선택.html,현행·참조자료
+docs/design/pages/421_선택공개미리보기.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/421_선택공개미리보기.html,현행·참조자료
+docs/design/pages/422_공개완료.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/422_공개완료.html,현행·참조자료
+docs/design/pages/500_MY.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/500_MY.html,현행·참조자료
+docs/design/pages/510_프로필편집.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/510_프로필편집.html,현행·참조자료
+docs/design/pages/511_여행스타일선택.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/511_여행스타일선택.html,현행·참조자료
+docs/design/pages/512_알림설정.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/512_알림설정.html,현행·참조자료
+docs/design/pages/513_계정설정.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/513_계정설정.html,현행·참조자료
+docs/design/pages/514_공개한여행관리.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/514_공개한여행관리.html,현행·참조자료
+docs/design/pages/515_이기기의이전기록.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/515_이기기의이전기록.html,현행·참조자료
+docs/design/pages/600_앱시작.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/600_앱시작.html,현행·참조자료
+docs/design/pages/610_로그인.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/610_로그인.html,현행·참조자료
+docs/design/pages/611_이메일로그인.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/611_이메일로그인.html,현행·참조자료
+docs/design/pages/612_이메일가입.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/612_이메일가입.html,현행·참조자료
+docs/design/pages/613_프로필설정.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/613_프로필설정.html,현행·참조자료
+docs/design/pages/614_인증후원래화면복귀.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/614_인증후원래화면복귀.html,현행·참조자료
+docs/design/pages/615_시작연결점검.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/615_시작연결점검.html,현행·참조자료
+docs/design/pages/616_필수업데이트.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/616_필수업데이트.html,현행·참조자료
+docs/design/pages/701_예외_첫여행.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/701_예외_첫여행.html,현행·참조자료
+docs/design/pages/702_예외_일정없음.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/702_예외_일정없음.html,현행·참조자료
+docs/design/pages/703_예외_검색결과없음.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/703_예외_검색결과없음.html,현행·참조자료
+docs/design/pages/704_예외_완료여행없음.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/704_예외_완료여행없음.html,현행·참조자료
+docs/design/pages/705_예외_오프라인.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/705_예외_오프라인.html,현행·참조자료
+docs/design/pages/706_예외_불러오기실패.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/706_예외_불러오기실패.html,현행·참조자료
+docs/design/pages/707_예외_저장실패.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/707_예외_저장실패.html,현행·참조자료
+docs/design/pages/708_예외_동시편집충돌.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/708_예외_동시편집충돌.html,현행·참조자료
+docs/design/pages/709_예외_위치권한거부.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/709_예외_위치권한거부.html,현행·참조자료
+docs/design/pages/710_예외_위치정확도낮음.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/710_예외_위치정확도낮음.html,현행·참조자료
+docs/design/pages/711_예외_위치서비스꺼짐.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/711_예외_위치서비스꺼짐.html,현행·참조자료
+docs/design/pages/712_예외_카메라권한거부.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/712_예외_카메라권한거부.html,현행·참조자료
+docs/design/pages/713_예외_영수증인식실패.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/713_예외_영수증인식실패.html,현행·참조자료
+docs/design/pages/714_예외_미지원통화.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/714_예외_미지원통화.html,현행·참조자료
+docs/design/pages/715_예외_영수증합계차이.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/715_예외_영수증합계차이.html,현행·참조자료
+docs/design/pages/716_예외_사진실패.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/716_예외_사진실패.html,현행·참조자료
+docs/design/pages/717_예외_공개철회.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/717_예외_공개철회.html,현행·참조자료
+docs/design/pages/718_예외_편집권한없음.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/718_예외_편집권한없음.html,현행·참조자료
+docs/design/pages/719_예외_초대만료.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/719_예외_초대만료.html,현행·참조자료
+docs/design/pages/720_예외_로그인만료.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/720_예외_로그인만료.html,현행·참조자료
+docs/design/pages/721_예외_지출없음.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/721_예외_지출없음.html,현행·참조자료
+docs/design/pages/722_예외_로그인필요.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/722_예외_로그인필요.html,현행·참조자료
+docs/design/pages/723_예외_지도불러오기실패.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/723_예외_지도불러오기실패.html,현행·참조자료
+docs/design/pages/724_예외_항공편조회없음.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/724_예외_항공편조회없음.html,현행·참조자료
+docs/design/pages/801_팝업_여행더보기.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/801_팝업_여행더보기.html,현행·참조자료
+docs/design/pages/802_팝업_작성중이탈.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/802_팝업_작성중이탈.html,현행·참조자료
+docs/design/pages/803_팝업_일정삭제.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/803_팝업_일정삭제.html,현행·참조자료
+docs/design/pages/804_팝업_기간축소영향.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/804_팝업_기간축소영향.html,현행·참조자료
+docs/design/pages/805_팝업_공개확정.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/805_팝업_공개확정.html,현행·참조자료
+docs/design/pages/806_팝업_공개철회.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/806_팝업_공개철회.html,현행·참조자료
+docs/design/pages/807_팝업_로그아웃.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/807_팝업_로그아웃.html,현행·참조자료
+docs/design/pages/808_팝업_회원탈퇴.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/808_팝업_회원탈퇴.html,현행·참조자료
+docs/design/pages/809_팝업_동행권한변경.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/809_팝업_동행권한변경.html,현행·참조자료
+docs/design/pages/810_팝업_동행참여해제.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/810_팝업_동행참여해제.html,현행·참조자료
+docs/design/pages/811_팝업_초대링크만들기.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/811_팝업_초대링크만들기.html,현행·참조자료
+docs/design/pages/812_팝업_도시가이드출처.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/812_팝업_도시가이드출처.html,현행·참조자료
+docs/design/pages/813_팝업_장소사진정보.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/813_팝업_장소사진정보.html,현행·참조자료
+docs/design/pages/814_팝업_통화선택.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/814_팝업_통화선택.html,현행·참조자료
+docs/design/pages/815_팝업_달력선택.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/815_팝업_달력선택.html,현행·참조자료
+docs/design/pages/816_팝업_일정시간선택.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/816_팝업_일정시간선택.html,현행·참조자료
+docs/design/pages/817_팝업_사진등록방법.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/817_팝업_사진등록방법.html,현행·참조자료
+docs/design/pages/818_팝업_공개내용신고.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/818_팝업_공개내용신고.html,현행·참조자료
+docs/design/pages/819_팝업_작성자차단.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/819_팝업_작성자차단.html,현행·참조자료
+docs/design/pages/820_팝업_위치설정복귀.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/820_팝업_위치설정복귀.html,현행·참조자료
+docs/design/pages/ALL_PAGES.html,docs/02. 디자인/01. 화면설계/01. 페이지시안/ALL_PAGES.html,현행·참조자료
+docs/design/pages/PAGE_INDEX.txt,docs/02. 디자인/01. 화면설계/01. 페이지시안/페이지_목록.txt,현행·참조자료
+docs/design/pages/PAGE_MANIFEST.json,docs/02. 디자인/01. 화면설계/01. 페이지시안/PAGE_MANIFEST.json,현행·참조자료
+docs/design/review/brand-data.mjs,docs/02. 디자인/01. 화면설계/02. 시안렌더러/brand-data.mjs,현행·참조자료
+docs/design/review/catalog.mjs,docs/02. 디자인/01. 화면설계/02. 시안렌더러/catalog.mjs,현행·참조자료
+docs/design/review/components.mjs,docs/02. 디자인/01. 화면설계/02. 시안렌더러/components.mjs,현행·참조자료
+docs/design/review/design-system.mjs,docs/02. 디자인/01. 화면설계/02. 시안렌더러/design-system.mjs,현행·참조자료
+docs/design/review/index.html,docs/02. 디자인/01. 화면설계/02. 시안렌더러/index.html,현행·참조자료
+docs/design/review/model.mjs,docs/02. 디자인/01. 화면설계/02. 시안렌더러/model.mjs,현행·참조자료
+docs/design/review/plan-source.mjs,docs/02. 디자인/01. 화면설계/02. 시안렌더러/plan-source.mjs,현행·참조자료
+docs/design/review/prepare-pages.mjs,docs/02. 디자인/01. 화면설계/02. 시안렌더러/prepare-pages.mjs,현행·참조자료
+docs/design/review/review.css,docs/02. 디자인/01. 화면설계/02. 시안렌더러/review.css,현행·참조자료
+docs/design/review/review.js,docs/02. 디자인/01. 화면설계/02. 시안렌더러/review.js,현행·참조자료
+docs/design/review/screens.mjs,docs/02. 디자인/01. 화면설계/02. 시안렌더러/screens.mjs,현행·참조자료
+docs/design/review/serve.mjs,docs/02. 디자인/01. 화면설계/02. 시안렌더러/serve.mjs,현행·참조자료
+docs/design/review/states.mjs,docs/02. 디자인/01. 화면설계/02. 시안렌더러/states.mjs,현행·참조자료
+docs/design/sources/footprints-20261020/README.txt,docs/02. 디자인/03. 참조시안/00. 제공원본/00. 발자국_2026-10-20/README.txt,현행·참조자료
+docs/design/sources/footprints-20261020/footprints_reference.html,docs/02. 디자인/03. 참조시안/00. 제공원본/00. 발자국_2026-10-20/footprints_reference.html,현행·참조자료
+docs/design/sources/home-20261020/100_home_create_background_reference.html,docs/02. 디자인/03. 참조시안/00. 제공원본/01. 홈_2026-10-20/100_home_create_background_reference.html,현행·참조자료
+docs/design/sources/home-20261020/100_home_empty_reference.html,docs/02. 디자인/03. 참조시안/00. 제공원본/01. 홈_2026-10-20/100_home_empty_reference.html,현행·참조자료
+docs/design/sources/my-trips-20261020/README.txt,docs/02. 디자인/03. 참조시안/00. 제공원본/02. 내여행_2026-10-20/README.txt,현행·참조자료
+docs/design/sources/my-trips-20261020/my_trips_empty_reference.html,docs/02. 디자인/03. 참조시안/00. 제공원본/02. 내여행_2026-10-20/my_trips_empty_reference.html,현행·참조자료
+docs/design/sources/my-trips-20261020/my_trips_populated_reference.html,docs/02. 디자인/03. 참조시안/00. 제공원본/02. 내여행_2026-10-20/my_trips_populated_reference.html,현행·참조자료
+docs/design/sources/stitch-icon-library.html,docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html,현행·참조자료
+docs/design/sources/stitch-icon-library.png,docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.png,현행·참조자료
+docs/design/sources/stitch-sources.json,docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-sources.json,현행·참조자료
+docs/design/sources/stitch-ui-toolkit.html,docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-ui-toolkit.html,현행·참조자료
+docs/design/sources/stitch-ui-toolkit.png,docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-ui-toolkit.png,현행·참조자료
+docs/guides/PUBLIC_PLAN_DATA_GUIDE.md,docs/08. 여행콘텐츠/01. 작성가이드/공개여행계획_작성가이드.md,현행·참조자료
+docs/guides/templates/public-plan/days.csv,docs/08. 여행콘텐츠/01. 작성가이드/00. 양식/00. 공개여행계획/days.csv,현행·참조자료
+docs/guides/templates/public-plan/example.commands.json,docs/08. 여행콘텐츠/01. 작성가이드/00. 양식/00. 공개여행계획/example.commands.json,현행·참조자료
+docs/guides/templates/public-plan/photos.csv,docs/08. 여행콘텐츠/01. 작성가이드/00. 양식/00. 공개여행계획/photos.csv,현행·참조자료
+docs/guides/templates/public-plan/schedules.csv,docs/08. 여행콘텐츠/01. 작성가이드/00. 양식/00. 공개여행계획/schedules.csv,현행·참조자료
+docs/guides/templates/public-plan/sources.csv,docs/08. 여행콘텐츠/01. 작성가이드/00. 양식/00. 공개여행계획/sources.csv,현행·참조자료
+docs/guides/templates/public-plan/trips.csv,docs/08. 여행콘텐츠/01. 작성가이드/00. 양식/00. 공개여행계획/trips.csv,현행·참조자료
+docs/planning/API_CONTRACT.md,docs/03. 개발/01. API계약/API_기본계약.md,현행·참조자료
+docs/planning/APP_SERVER_API.md,docs/03. 개발/01. API계약/앱서버_API계약.md,현행·참조자료
+docs/planning/DATA_STORAGE_SPEC.md,docs/03. 개발/02. 데이터정의/데이터_저장규칙.md,현행·참조자료
+docs/planning/FLIGHT_LOOKUP_SPEC.md,docs/03. 개발/01. API계약/항공편조회_기능정의.md,현행·참조자료
+docs/planning/KAC_FLIGHT_API_REVIEW.md,docs/03. 개발/01. API계약/항공편_API검토.md,현행·참조자료
+docs/planning/KAC_FLIGHT_LIVE_ANALYSIS.md,docs/03. 개발/01. API계약/항공편_실제데이터분석.md,현행·참조자료
+docs/planning/PLANNING_PROCESS.md,docs/01. 서비스기획/01. 기능정의/기획_진행절차.md,현행·참조자료
+docs/planning/POLICY_DECISIONS.md,docs/01. 서비스기획/01. 기능정의/서비스정책_결정사항.md,현행·참조자료
+docs/planning/QA_ACCEPTANCE.md,docs/05. 검수/00. 검수기준/기능_인수기준.md,현행·참조자료
+docs/planning/README.md,docs/01. 서비스기획/01. 기능정의/README.md,현행·참조자료
+docs/planning/TRAIL_CONTENT_SPEC.md,docs/01. 서비스기획/01. 기능정의/여행기록_기능정의.md,현행·참조자료
+docs/planning/TRIPLE_PLANNING_REFERENCE.md,docs/01. 서비스기획/01. 기능정의/트리플_여행계획참조.md,현행·참조자료
+docs/planning/TRIP_CREATION_FLOW_20261015.md,docs/01. 서비스기획/02. 사용자흐름/여행생성_사용자흐름.md,현행·참조자료
+docs/planning/TRIP_PRESENTATION_NAVIGATION_20261016.md,docs/01. 서비스기획/02. 사용자흐름/여행화면_탐색규칙.md,현행·참조자료
+docs/planning/V11_DATA_FLOW.md,docs/03. 개발/00. 구조설계/v11_데이터흐름.md,현행·참조자료
+docs/planning/data-flow/index.html,docs/03. 개발/00. 구조설계/00. 데이터흐름/index.html,현행·참조자료
+docs/qa/COMMUNITY_IMPORT_20261020.md,docs/05. 검수/02. 검수보고/2026-10-20_공개일정담기_검수.md,현행·참조자료
+docs/qa/COMMUNITY_PLAN_CONTRACT_20261016.txt,docs/05. 검수/02. 검수보고/2026-10-16_공개여행계획_계약검수.txt,현행·참조자료
+docs/qa/COMMUNITY_PLAN_PUBLISH.txt,docs/05. 검수/02. 검수보고/오사카여행계획_공개검수.txt,현행·참조자료
+docs/qa/CTO_CODE_REVIEW.txt,docs/05. 검수/02. 검수보고/CTO_코드검토.txt,현행·참조자료
+docs/qa/CTO_REFACTOR_20261021.txt,docs/05. 검수/02. 검수보고/2026-10-21_CTO_역할분리검수.txt,현행·참조자료
+docs/qa/CUSTOMER_JOURNEY_IMPLEMENTATION.txt,docs/05. 검수/02. 검수보고/고객여정_개선결과.txt,현행·참조자료
+docs/qa/CUSTOMER_JOURNEY_REVIEW.txt,docs/05. 검수/02. 검수보고/고객여정_검토.txt,현행·참조자료
+docs/qa/DEVICE_ACCEPTANCE.txt,docs/05. 검수/00. 검수기준/실기기_인수기준.txt,현행·참조자료
+docs/qa/FINAL_RELEASE_REVIEW_20261016.md,docs/99. 아카이브/02. 이전검수/2026-10-16_출시전_검수보고.md,아카이브
+docs/qa/FOOTPRINTS_HTML_UPDATE_20261020.md,docs/05. 검수/02. 검수보고/2026-10-20_발자국목록_시안적용검수.md,현행·참조자료
+docs/qa/FOOTPRINTS_NAVIGATION_FIX_20261020.md,docs/05. 검수/02. 검수보고/2026-10-20_발자국_이동검수.md,현행·참조자료
+docs/qa/FOOTPRINTS_THREE_WAY_COMPARISON_20261020.md,docs/05. 검수/02. 검수보고/2026-10-20_발자국_시안대조.md,현행·참조자료
+docs/qa/GIT_INTEGRATION_20261016.md,docs/99. 아카이브/02. 이전검수/2026-10-16_Git_통합결과.md,아카이브
+docs/qa/GIT_RELEASE_READINESS_20261016.md,docs/99. 아카이브/02. 이전검수/2026-10-16_Git_출시준비점검.md,아카이브
+docs/qa/GOOGLE_PLACE_PHOTOS.txt,docs/05. 검수/02. 검수보고/Google장소사진_연결검수.txt,현행·참조자료
+docs/qa/HEADER_GNB_APPLICATION_20261021.md,docs/05. 검수/02. 검수보고/2026-10-21_헤더GNB_적용검수.md,현행·참조자료
+docs/qa/HEADER_GNB_CODE_AUDIT_20261021.md,docs/05. 검수/02. 검수보고/2026-10-21_헤더GNB_코드전수검사.md,현행·참조자료
+docs/qa/HEADER_GNB_INTERNAL_TEST_20261021.md,docs/05. 검수/02. 검수보고/2026-10-21_헤더GNB_내부테스트안내.md,현행·참조자료
+docs/qa/HEADER_GNB_LOCK_20261021.md,docs/05. 검수/02. 검수보고/2026-10-21_헤더GNB_규격보호검수.md,현행·참조자료
+docs/qa/HOME_HERO_UPDATE_20261020.md,docs/05. 검수/02. 검수보고/2026-10-20_홈여행시작카드_적용검수.md,현행·참조자료
+docs/qa/HOME_HTML_REVIEW_20261020.md,docs/05. 검수/02. 검수보고/2026-10-20_홈화면_시안대조.md,현행·참조자료
+docs/qa/KYUSHU_PUBLIC_PLAN_20261020.md,docs/05. 검수/02. 검수보고/2026-10-20_규슈여행계획_공개검수.md,현행·참조자료
+docs/qa/LARGE_SCREEN_REFACTOR.txt,docs/05. 검수/02. 검수보고/대형화면함수_분리검수.txt,현행·참조자료
+docs/qa/MULTICITY_PLANNING_20261021.md,docs/05. 검수/02. 검수보고/2026-10-21_다도시추천이동시간_검수.md,현행·참조자료
+docs/qa/MY_TRIPS_HTML_UPDATE_20261020.md,docs/05. 검수/02. 검수보고/2026-10-20_내여행목록_시안적용검수.md,현행·참조자료
+docs/qa/OCR_FLIGHT_REPAIR_20261016.md,docs/05. 검수/02. 검수보고/2026-10-16_항공권OCR_수정검수.md,현행·참조자료
+docs/qa/P0_STITCH_ACCEPTANCE.txt,docs/05. 검수/02. 검수보고/Stitch_P0인수검수.txt,현행·참조자료
+docs/qa/POST_DEPLOY_RELEASE_GATES_20261016.txt,docs/99. 아카이브/02. 이전검수/2026-10-16_배포후_출시조건.txt,아카이브
+docs/qa/PREBUILD_V11_20261021.md,docs/05. 검수/02. 검수보고/2026-10-21_v11_빌드전점검.md,현행·참조자료
+docs/qa/PREBUILD_V9_20261021.md,docs/99. 아카이브/02. 이전검수/2026-10-21_v09_빌드전점검.md,아카이브
+docs/qa/PREVIEW_PHOTO_LOADING.txt,docs/05. 검수/02. 검수보고/공개미리보기_사진로딩검수.txt,현행·참조자료
+docs/qa/PUBLIC_FEED_CLEANUP_20261020.md,docs/05. 검수/02. 검수보고/2026-10-20_공개목록_정리검수.md,현행·참조자료
+docs/qa/REDESIGN_IMPLEMENTATION.txt,docs/05. 검수/02. 검수보고/디자인개편_적용검수.txt,현행·참조자료
+docs/qa/RESOURCE_CLEANUP.txt,docs/05. 검수/02. 검수보고/리소스코드_정리검수.txt,현행·참조자료
+docs/qa/SECURITY_P0_FOLLOWUP.txt,docs/05. 검수/02. 검수보고/보안_P0후속검수.txt,현행·참조자료
+docs/qa/SECURITY_P0_REVIEW.txt,docs/05. 검수/02. 검수보고/보안_P0검수.txt,현행·참조자료
+docs/qa/SECURITY_RELEASE_GATE.txt,docs/05. 검수/02. 검수보고/보안_출시조건.txt,현행·참조자료
+docs/qa/STAGING_CUSTOMER_JOURNEY.txt,docs/05. 검수/02. 검수보고/staging_고객여정검수.txt,현행·참조자료
+docs/qa/STAGING_FOOTPRINTS_DEPLOY_20261020.md,docs/05. 검수/02. 검수보고/2026-10-20_staging_발자국배포검수.md,현행·참조자료
+docs/qa/STAGING_QA_ACCESS.txt,docs/05. 검수/02. 검수보고/staging_검수접근안내.txt,현행·참조자료
+docs/qa/STITCH_UI_IMPLEMENTATION.txt,docs/05. 검수/02. 검수보고/Stitch_UI적용검수.txt,현행·참조자료
+docs/qa/TRIPLE_PLANNING_20261021.md,docs/05. 검수/02. 검수보고/2026-10-21_트리플참조_여행계획검수.md,현행·참조자료
+docs/qa/TripPrint_Final_QA_TC_20261006.json,docs/99. 아카이브/02. 이전검수/TripPrint_Final_QA_TC_20261006.json,아카이브
+docs/qa/UI_SCREEN_POLISH_20261021.md,docs/05. 검수/02. 검수보고/2026-10-21_전체UI_폴리싱검수.md,현행·참조자료
+docs/qa/V11_MVP_REVIEW_20261021.md,docs/05. 검수/02. 검수보고/2026-10-21_v11_MVP검수.md,현행·참조자료
+docs/qa/V11_TRAVEL_PLAN_REGISTRATION.txt,docs/05. 검수/02. 검수보고/v11_여행계획등록검수.txt,현행·참조자료
+docs/releases/TripPrint_261021_Ver09.md,docs/99. 아카이브/03. 이전출시/01. v09/2026-10-21_v09_출시안내.md,아카이브
+docs/releases/TripPrint_261021_Ver11.md,docs/06. 출시/00. v11/v11_출시안내.md,현행·참조자료
+docs/전략기획서/01_사업기획서_제안서.md,docs/01. 서비스기획/00. 서비스정의/01_사업기획서_제안서.md,현행·참조자료
+docs/전략기획서/02_시장_경쟁분석_보고서.md,docs/01. 서비스기획/00. 서비스정의/02_시장_경쟁분석_보고서.md,현행·참조자료
+docs/전략기획서/03_타깃_사용자_정의서.md,docs/01. 서비스기획/00. 서비스정의/03_타깃_사용자_정의서.md,현행·참조자료
+docs/전략기획서/04_BM_및_KPI_정의서.md,docs/01. 서비스기획/00. 서비스정의/04_BM_및_KPI_정의서.md,현행·참조자료
+docs/전략기획서/05_PO_상용화_및_출시전략_20261014.txt,docs/01. 서비스기획/00. 서비스정의/05_PO_상용화_및_출시전략_20261014.txt,현행·참조자료
+docs/전략기획서/README.md,docs/01. 서비스기획/00. 서비스정의/README.md,현행·참조자료

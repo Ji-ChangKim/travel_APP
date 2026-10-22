@@ -1,0 +1,12 @@
+{
+  "base": "https://tripprint-api-staging.gametps.workers.dev",
+  "planKey": "sapporo-otaru-canal-couple-4d-v1",
+  "tripId": "2b0eab14-7d08-419a-9c47-75982f807ae2",
+  "postId": "b16bbfd7-700d-4e6b-a565-ba1f4021d786",
+  "author": "가이드 하루",
+  "days": 4,
+  "schedules": 19,
+  "cover": "2b0eab14-7d08-419a-9c47-75982f807ae2/cdad0d26-fb71-4949-8789-95a5324bf36e.jpg",
+  "verifiedAt": "2026-10-21T11:33:51.463Z",
+  "publicUrl": "https://tripprint-staging.pages.dev/community/b16bbfd7-700d-4e6b-a565-ba1f4021d786"
+}

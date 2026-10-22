@@ -1,0 +1,12 @@
+{
+  "base": "https://tripprint-api-staging.gametps.workers.dev",
+  "planKey": "osaka-nara-kobe-family-4d-v1",
+  "tripId": "78884e60-a21b-434e-bcc6-0408a415df6a",
+  "postId": "e4694172-fac4-4f8f-b8a1-da76eb35d831",
+  "author": "가이드 하루",
+  "days": 4,
+  "schedules": 18,
+  "cover": "78884e60-a21b-434e-bcc6-0408a415df6a/92bc2545-a49e-40e4-8721-f7a3fde61d84.jpg",
+  "verifiedAt": "2026-10-21T11:30:47.507Z",
+  "publicUrl": "https://tripprint-staging.pages.dev/community/e4694172-fac4-4f8f-b8a1-da76eb35d831"
+}

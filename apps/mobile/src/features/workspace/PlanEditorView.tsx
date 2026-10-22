@@ -272,7 +272,17 @@ export function renderPlanEditor({
                     {['PLANNED', 'COMPLETED'].map((status) => (
                       <Action
                         key={status}
-                        label={`${(status === 'COMPLETED' ? form.values.status === status : form.values.status !== 'COMPLETED') ? '✓ ' : ''}${{ PLANNED: '기록 정리 중', COMPLETED: '기록 정리 완료' }[status]}`}
+                        label={
+                          status === 'COMPLETED'
+                            ? '기록 정리 완료'
+                            : '기록 정리 중'
+                        }
+                        selected={
+                          status === 'COMPLETED'
+                            ? form.values.status === status
+                            : form.values.status !== 'COMPLETED'
+                        }
+                        selectionStyle="fill"
                         onPress={() => {
                           // 종료 여부는 소유자가 명시적으로 확인한다.
                           onChange('status', status);

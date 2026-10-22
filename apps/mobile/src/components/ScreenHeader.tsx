@@ -12,7 +12,7 @@ export default function ScreenHeader({
   disabled = false,
   actions,
   inset = true,
-  inlineTitle = false,
+  inlineTitle = true,
 }: {
   title?: string;
   backLabel?: string;

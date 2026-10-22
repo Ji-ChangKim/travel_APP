@@ -1,0 +1,215 @@
+{
+  "tripCreate": {
+    "title": "[오사카] 난바 도톤보리 24시간 먹방 노포와 우라난바 미식 기행 3박 4일",
+    "country": "일본",
+    "city": "오사카",
+    "startDate": "2026-11-26",
+    "endDate": "2026-11-29",
+    "timezone": "Asia/Tokyo",
+    "defaultCurrency": "JPY",
+    "coverColor": "#E63946"
+  },
+  "planKey": "osaka-foodie-friends-4d-v1",
+  "publicBody": "쿠이다오레(먹다가 망하는) 오사카의 진수! 기존 DB 수록 하나마루켄 행복라멘, 70년 미슐랭 아지노야 오코노미야키, 규카츠 모토무라와 넷플릭스 참치 불쇼 노포 이자카야 토요까지 망라한 전설의 미식 기행.",
+  "days": [
+    {
+      "dayNumber": 1,
+      "planTitle": "미나미의 심장, 도톤보리와 우라난바의 밤",
+      "planConcept": "공항 도착 즉시 연골 갈비 라멘으로 속을 채우고 글리코상 인증샷, 70년 철판 오코노미야키와 우라난바 야타이를 달립니다.",
+      "schedules": [
+        {
+          "title": "하나마루켄 난바점",
+          "type": "PLACE",
+          "timeSlot": "11:00",
+          "sortOrder": 1,
+          "address": "오사카부 오사카시 주오구 난바센니치마에 8-7",
+          "description": "24시간 고아낸 진한 돈코츠 육수에 부드러운 돼지 연골 갈비가 통째로 올라간 행복 라멘과 수제 교자 세트.",
+          "costAmount": "1250"
+        },
+        {
+          "title": "릴로 커피 로스터즈 & 앗치치혼포 타코야키",
+          "type": "PLACE",
+          "timeSlot": "13:00",
+          "sortOrder": 2,
+          "address": "오사카부 오사카시 주오구 신사이바시스지 1-10-28",
+          "description": "평점 4.8점의 스페셜티 드립 커피로 입가심한 후 바로 옆 도톤보리 강변에서 파 듬뿍 타코야키 8알을 맛봅니다.",
+          "costAmount": "1300"
+        },
+        {
+          "title": "도톤보리 글리코상 & 신사이바시스지 쇼핑",
+          "type": "PLACE",
+          "timeSlot": "14:30",
+          "sortOrder": 3,
+          "address": "오사카부 오사카시 주오구 도톤보리 1-10-3",
+          "description": "에비스바시 위에서 시그니처 러너 포즈로 단체 사진을 남기고 상점가 잡화 쇼핑.",
+          "costAmount": "0"
+        },
+        {
+          "title": "아지노야 본점 오코노미야키",
+          "type": "PLACE",
+          "timeSlot": "18:00",
+          "sortOrder": 4,
+          "address": "오사카부 오사카시 주오구 난바 1-3-9",
+          "description": "밀가루를 최소화하고 신선한 양배추와 해산물, 소고기를 듬뿍 넣어 눈앞의 철판에서 장인이 구워주는 70년 미슐랭 오코노미야키.",
+          "costAmount": "2600"
+        },
+        {
+          "title": "토라메 요코초 쿠시카츠 & 메가 하이볼",
+          "type": "PLACE",
+          "timeSlot": "20:30",
+          "sortOrder": 5,
+          "address": "오사카부 오사카시 주오구 센니치마에 2-3-15",
+          "description": "붉은 토리이가 세워진 실내 야타이 골목에서 바삭한 모둠 쿠시카츠와 메가 하이볼로 친구들과 첫날밤 파티.",
+          "costAmount": "3500"
+        }
+      ]
+    },
+    {
+      "dayNumber": 2,
+      "planTitle": "키타(우메다)의 세련미와 넷플릭스 심야 이자카야",
+      "planConcept": "우메다 지하상가 모닝커피, 개인 화로 규카츠와 우메다 공중정원, 그리고 넷플릭스 불쇼 노포 참치구이를 체험합니다.",
+      "schedules": [
+        {
+          "title": "킷사 야시로 모닝 토스트",
+          "type": "PLACE",
+          "timeSlot": "09:00",
+          "sortOrder": 1,
+          "address": "오사카부 오사카시 기타구 도요사키 1-3-1",
+          "description": "오사카 상인들의 아침을 책임지는 구수한 버터 두툼 토스트와 사이폰 드립 커피 세트.",
+          "costAmount": "650"
+        },
+        {
+          "title": "오사카 성 천수각 & 고자부네 유람선",
+          "type": "PLACE",
+          "timeSlot": "10:30",
+          "sortOrder": 2,
+          "address": "오사카부 오사카시 주오구 오사카조 1-1",
+          "description": "금빛 천수각 관람 후 해자를 따라 황금빛 고자부네 놀잇배를 타고 성곽 돌벽을 올려다봅니다.",
+          "costAmount": "2100"
+        },
+        {
+          "title": "규카츠 모토무라 난바점",
+          "type": "PLACE",
+          "timeSlot": "13:00",
+          "sortOrder": 3,
+          "address": "오사카부 오사카시 주오구 난바 3-3-1",
+          "description": "미디엄 레어로 바삭하게 튀겨낸 소고기를 미니 개인 화로에 취향껏 구워 생와사비와 특제 간장에 찍어 먹는 규카츠 정식.",
+          "costAmount": "2800"
+        },
+        {
+          "title": "우메다 스카이빌딩 공중정원 전망대",
+          "type": "PLACE",
+          "timeSlot": "16:00",
+          "sortOrder": 4,
+          "address": "오사카부 오사카시 기타구 오야마초 1-1-88",
+          "description": "지상 173m 연결 브릿지와 루프탑에서 오사카만과 도심 전경을 시원하게 내려다봅니다.",
+          "costAmount": "1500"
+        },
+        {
+          "title": "이자카야 토요 (넷플릭스 길 위의 셰프들)",
+          "type": "PLACE",
+          "timeSlot": "18:30",
+          "sortOrder": 5,
+          "address": "오사카부 오사카시 미야코지마구 히가시노다초 3-2-26",
+          "description": "토치 불쇼로 직화 구이한 참치 뺨살과 우니·이쿠라 참치 모둠, 얼음 바스켓에서 꺼내 마시는 캔맥주의 압도적 로컬 감성.",
+          "costAmount": "4200"
+        }
+      ]
+    },
+    {
+      "dayNumber": 3,
+      "planTitle": "레트로 오사카의 끝판왕, 신세카이 & 츠텐카쿠",
+      "planConcept": "구로몬 시장 카이센동, 츠텐카쿠 타워 슬라이더 스릴과 원조 쿠시카츠, 우라난바 곱창 숯불구이 만찬.",
+      "schedules": [
+        {
+          "title": "구로몬 산페이 신선 카이센동",
+          "type": "PLACE",
+          "timeSlot": "09:00",
+          "sortOrder": 1,
+          "address": "오사카부 오사카시 주오구 니혼바시 1-22-25",
+          "description": "오사카의 부엌 구로몬 시장에서 참치 대뱃살(오도로)과 연어알을 즉석에서 골라 올려 먹는 럭셔리 조식.",
+          "costAmount": "2800"
+        },
+        {
+          "title": "츠텐카쿠 타워 슬라이더 & 신세카이",
+          "type": "PLACE",
+          "timeSlot": "10:30",
+          "sortOrder": 2,
+          "address": "오사카부 오사카시 나니와구 에비스히가시 1-18-6",
+          "description": "60미터 높이에서 원통을 타고 질주하는 짜릿한 타워 슬라이더 체험과 쇼와 복고풍 거리 산책.",
+          "costAmount": "2000"
+        },
+        {
+          "title": "쿠시카츠 다루마 신세카이 총본점",
+          "type": "PLACE",
+          "timeSlot": "13:00",
+          "sortOrder": 3,
+          "address": "오사카부 오사카시 나니와구 에비스히가시 2-3-9",
+          "description": "소스 두 번 찍기 금지! 바삭한 특제 튀김옷과 비법 간장 소스에 찍어 먹는 12종 꼬치튀김 총알세트.",
+          "costAmount": "1900"
+        },
+        {
+          "title": "아메리카무라 & 만다라케 그랜드카오스",
+          "type": "PLACE",
+          "timeSlot": "15:30",
+          "sortOrder": 4,
+          "address": "오사카부 오사카시 주오구 니시신사이바시 2-9-22",
+          "description": "오사카 유스 컬처의 중심지에서 빈티지 의류 쇼핑과 서브컬처 아이템 탐방.",
+          "costAmount": "1500"
+        },
+        {
+          "title": "야키니쿠 호르몬 타카라 우라난바",
+          "type": "PLACE",
+          "timeSlot": "18:30",
+          "sortOrder": 5,
+          "address": "오사카부 오사카시 주오구 난바센니치마에 14-8",
+          "description": "연기가 피어오르는 카운터에서 사장님이 썰어주는 최상급 대창, 우설 소금구이, 안창살과 레몬사와.",
+          "costAmount": "4500"
+        }
+      ]
+    },
+    {
+      "dayNumber": 4,
+      "planTitle": "로컬 시장의 온기와 마지막 라멘 한 그릇",
+      "planConcept": "90년 전통 카페 핫케이크, 도구야스지 주방 쇼핑 후 닭육수 라멘의 명가에서 마무리하고 귀국합니다.",
+      "schedules": [
+        {
+          "title": "마루후쿠 커피점 센니치마에 본점",
+          "type": "PLACE",
+          "timeSlot": "09:00",
+          "sortOrder": 1,
+          "address": "오사카부 오사카시 주오구 센니치마에 1-9-1",
+          "description": "1934년 창업. 두툼한 구리판 수제 핫케이크와 농후한 클래식 드립 커피 조식.",
+          "costAmount": "1100"
+        },
+        {
+          "title": "센니치마에 도구야스지 주방거리",
+          "type": "PLACE",
+          "timeSlot": "10:30",
+          "sortOrder": 2,
+          "address": "오사카부 오사카시 주오구 난바센니치마에 14-5",
+          "description": "타코야키 전용 팬, 전문가용 일식 칼, 아기자기한 사케 잔을 구경하고 알뜰 기념품 구매.",
+          "costAmount": "2000"
+        },
+        {
+          "title": "카도야 쇼쿠도 본점 중화소바",
+          "type": "PLACE",
+          "timeSlot": "12:30",
+          "sortOrder": 3,
+          "address": "오사카부 오사카시 니시구 신마치 4-16-13",
+          "description": "사쓰마 토종닭으로 우려낸 황금빛 맑은 육수와 자가제면의 깊은 풍미를 자랑하는 오사카 닭육수 라멘의 자존심.",
+          "costAmount": "1600"
+        },
+        {
+          "title": "난카이 난바역 라피트 공항 이동",
+          "type": "TRANSPORT",
+          "timeSlot": "14:30",
+          "sortOrder": 4,
+          "address": "오사카부 오사카시 주오구 난바 5-1-60",
+          "description": "특급 라피트를 타고 간사이 국제공항으로 35분 만에 쾌적하게 직행합니다.",
+          "costAmount": "1490"
+        }
+      ]
+    }
+  ]
+}

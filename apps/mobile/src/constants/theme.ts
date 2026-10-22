@@ -1,4 +1,4 @@
-import tokens from '../../../../docs/design/design-tokens.json';
+import tokens from '../../../../docs/02. 디자인/00. 공통규격/design-tokens.json';
 
 // 앱과 일정 화면은 승인한 하루 UI Kit v3 토큰을 공유한다.
 export const designTokens = tokens;

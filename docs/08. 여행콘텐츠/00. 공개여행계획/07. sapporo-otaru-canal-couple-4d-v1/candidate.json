@@ -1,0 +1,215 @@
+{
+  "tripCreate": {
+    "title": "[삿포로+오타루] 오타루 운하 설경과 카이센동 르타오 디저트 로맨스 3박 4일",
+    "country": "일본",
+    "city": "오타루",
+    "startDate": "2027-01-21",
+    "endDate": "2027-01-24",
+    "timezone": "Asia/Tokyo",
+    "defaultCurrency": "JPY",
+    "coverColor": "#1B263B"
+  },
+  "planKey": "sapporo-otaru-canal-couple-4d-v1",
+  "publicBody": "영화 러브레터의 낭만이 살아 숨 쉬는 오타루 운하의 가스등 눈빛 산책, 오르골당의 오르골 멜로디, 삼각시장 활어 덮밥과 르타오 본점 더블프로마쥬 치즈케이크까지 연인들의 로맨틱 겨울 동화.",
+  "days": [
+    {
+      "dayNumber": 1,
+      "planTitle": "모이와야마 다이아몬드 야경과 스스키노 파인다이닝",
+      "planConcept": "공항 도착 후 스프카레 런치, 일본 신 3대 야경 정상에서 사랑의 종을 울리고 와규 디너를 즐깁니다.",
+      "schedules": [
+        {
+          "title": "미소키친 공항점 따뜻한 연어구이 조식",
+          "type": "PLACE",
+          "timeSlot": "10:00",
+          "sortOrder": 1,
+          "address": "신치토세 공항 국내선 3F",
+          "description": "눈 덮인 활주로를 바라보며 담백한 연어구이 정식과 따뜻한 미소된장국으로 시작합니다.",
+          "costAmount": "1100"
+        },
+        {
+          "title": "스아게플러스 본점 닭꼬치 스프카레",
+          "type": "PLACE",
+          "timeSlot": "12:30",
+          "sortOrder": 2,
+          "address": "홋카이도 삿포로시 주오구 미나미4조니시 5",
+          "description": "바삭하게 튀겨낸 닭꼬치와 신선한 채소를 진한 육수에 적셔 먹는 인기 스프카레 점심.",
+          "costAmount": "1380"
+        },
+        {
+          "title": "모이와야마 로프웨이 다이아몬드 야경",
+          "type": "PLACE",
+          "timeSlot": "16:30",
+          "sortOrder": 3,
+          "address": "홋카이도 삿포로시 주오구 후시미 5-3-7",
+          "description": "케이블카를 타고 해발 531m 정상에 올라 눈 덮인 삿포로 시내의 보석 같은 야경을 보고 행복의 종 울리기.",
+          "costAmount": "2100"
+        },
+        {
+          "title": "스스키노 와규 이시자키 프라이빗 디너",
+          "type": "PLACE",
+          "timeSlot": "19:00",
+          "sortOrder": 4,
+          "address": "홋카이도 삿포로시 주오구 미나미4조니시 3",
+          "description": "극진한 환대와 함께 입안에서 사르르 녹아내리는 시라오이산 흑모와규 코스와 홋카이도 화이트 와인.",
+          "costAmount": "12000"
+        },
+        {
+          "title": "파르페테리아 파루 심야 시메파르페",
+          "type": "PLACE",
+          "timeSlot": "21:30",
+          "sortOrder": 5,
+          "address": "홋카이도 삿포로시 주오구 미나미4조니시 2",
+          "description": "술자리 후 파르페로 달콤하게 마무리하는 삿포로 밤 문화. 계절 생딸기와 피스타치오 젤라또 파르페.",
+          "costAmount": "1800"
+        }
+      ]
+    },
+    {
+      "dayNumber": 2,
+      "planTitle": "영화 러브레터의 무대, 낭만의 오타루",
+      "planConcept": "니조시장 우니 카이센동으로 아침을 열고 바다 열차를 타고 오타루로 이동해 스시와 오르골당, 운하 설경을 누립니다.",
+      "schedules": [
+        {
+          "title": "니조시장 오히소 우니 카이센동",
+          "type": "PLACE",
+          "timeSlot": "08:30",
+          "sortOrder": 1,
+          "address": "홋카이도 삿포로시 주오구 미나미3조히가시 2",
+          "description": "혀끝에 닿는 순간 녹아내리는 최고급 에조 바훈우니(성게알)와 연어알 3색 해산물 덮밥 조식.",
+          "costAmount": "3800"
+        },
+        {
+          "title": "JR 쾌속 하코다테 본선 바다 열차",
+          "type": "TRANSPORT",
+          "timeSlot": "10:00",
+          "sortOrder": 2,
+          "address": "삿포로역 - 오타루역 구간",
+          "description": "오른쪽 차창 밖으로 파도가 부서지는 겨울 바다를 바라보며 35분 만에 오타루에 도착합니다.",
+          "costAmount": "750"
+        },
+        {
+          "title": "오타루 마사즈시 본점 80년 스시 명가",
+          "type": "PLACE",
+          "timeSlot": "12:00",
+          "sortOrder": 3,
+          "address": "홋카이도 오타루시 하나조노 1-1-1",
+          "description": "만화 미스터 초밥왕의 고향. 갓 잡은 신선한 오징어 국수와 사계절 특선 니기리 12피스 런치 코스.",
+          "costAmount": "6000"
+        },
+        {
+          "title": "오타루 오르골당 & 르타오 본점 디저트",
+          "type": "PLACE",
+          "timeSlot": "14:30",
+          "sortOrder": 4,
+          "address": "홋카이도 오타루시 스미요시초 4-1",
+          "description": "15,000점 오르골 속에서 둘만의 멜로디를 고르고, 르타오 본점 전망대에서 더블프로마쥬 치즈케이크 시식.",
+          "costAmount": "2200"
+        },
+        {
+          "title": "오타루 운하 눈빛 산책 & 오타루 창고 No.1 맥주 디너",
+          "type": "PLACE",
+          "timeSlot": "18:00",
+          "sortOrder": 5,
+          "address": "홋카이도 오타루시 미나토마치 5-4",
+          "description": "눈 내리는 운하를 따라 켜진 가스등 아래를 걷고 100년 된 붉은 벽돌 창고에서 수제 필스너 맥주와 족발 구이.",
+          "costAmount": "3500"
+        }
+      ]
+    },
+    {
+      "dayNumber": 3,
+      "planTitle": "삼각시장의 활기와 삿포로 복귀",
+      "planConcept": "오타루 삼각시장 활어 덮밥, 텐구야마 설원 로프웨이 후 삿포로로 복귀해 새우 라멘과 사케 페어링.",
+      "schedules": [
+        {
+          "title": "오타루 삼각시장 다키나미 식당",
+          "type": "PLACE",
+          "timeSlot": "08:30",
+          "sortOrder": 1,
+          "address": "홋카이도 오타루시 이나호 3-10-16",
+          "description": "활기찬 시장 골목에서 직접 고르는 4종 해산물 덮밥(도화새우, 가리비, 게살, 연어) 조식.",
+          "costAmount": "3000"
+        },
+        {
+          "title": "텐구야마 로프웨이 설원 전망대",
+          "type": "PLACE",
+          "timeSlot": "10:30",
+          "sortOrder": 2,
+          "address": "홋카이도 오타루시 텐구야마 2-호",
+          "description": "영화 러브레터 오겡끼데스까 촬영지 설원에서 오타루 시내와 항구를 굽어보는 설경 전망.",
+          "costAmount": "1400"
+        },
+        {
+          "title": "라멘 에비소바 이치겐 총본점",
+          "type": "PLACE",
+          "timeSlot": "13:30",
+          "sortOrder": 3,
+          "address": "홋카이도 삿포로시 주오구 미나미7조니시 9-1024-10",
+          "description": "달콤한 단새우 머리를 통째로 우려낸 고소하고 진한 육수의 새우 된장 라멘.",
+          "costAmount": "950"
+        },
+        {
+          "title": "마루야마 공원 & 홋카이도 신궁 설경",
+          "type": "PLACE",
+          "timeSlot": "15:30",
+          "sortOrder": 4,
+          "address": "홋카이도 삿포로시 주오구 미야가오카 474",
+          "description": "눈 덮인 거대한 전나무 숲 사이를 걸으며 홋카이도 총진수 신궁에서 소원을 비는 산책.",
+          "costAmount": "0"
+        },
+        {
+          "title": "스스키노 롯카쿠 사케 페어링 디너",
+          "type": "PLACE",
+          "timeSlot": "18:30",
+          "sortOrder": 5,
+          "address": "홋카이도 삿포로시 주오구 미나미5조니시 3",
+          "description": "홋카이도 제철 모둠 사시미와 은대구 숯불구이에 삿포로 준마이 다이긴죠 사케를 기울이는 아늑한 마지막 밤.",
+          "costAmount": "6500"
+        }
+      ]
+    },
+    {
+      "dayNumber": 4,
+      "planTitle": "로맨틱 트립의 달콤한 마무리, 귀국",
+      "planConcept": "커스텀 목장 라떼 조식, 삿포로역 쇼핑 후 공항 라멘 도장에서 아사히카와 쇼유라멘으로 마무리합니다.",
+      "schedules": [
+        {
+          "title": "바리스타트 커피 목장 커스텀 라떼",
+          "type": "PLACE",
+          "timeSlot": "09:00",
+          "sortOrder": 1,
+          "address": "홋카이도 삿포로시 주오구 미나미1조니시 4-8",
+          "description": "비에이, 하코다테 등 홋카이도 3대 목장 원유를 선택해 즐기는 극상의 벨벳 라떼와 크루아상.",
+          "costAmount": "900"
+        },
+        {
+          "title": "삿포로역 스텔라플레이스 선물 쇼핑",
+          "type": "PLACE",
+          "timeSlot": "10:30",
+          "sortOrder": 2,
+          "address": "홋카이도 삿포로시 주오구 기타5조니시 2",
+          "description": "시로이코이비토 쿠키, 로이스 생초콜릿, 홋카이도 옥수수 과자 쇼핑.",
+          "costAmount": "3000"
+        },
+        {
+          "title": "신치토세 공항 라멘 도장 바이코켄",
+          "type": "PLACE",
+          "timeSlot": "12:30",
+          "sortOrder": 3,
+          "address": "신치토세 공항 국내선 3F 홋카이도 라멘 도장",
+          "description": "홋카이도 명가 10곳이 모인 라멘 도장에서 즐기는 아사히카와 정통 간장(쇼유) 라멘과 수제 교자.",
+          "costAmount": "1150"
+        },
+        {
+          "title": "신치토세 국제선 출국 및 귀국",
+          "type": "TRANSPORT",
+          "timeSlot": "14:30",
+          "sortOrder": 4,
+          "address": "홋카이도 치토세시 신치토세 공항",
+          "description": "삿포로 클래식 한정 캔맥주를 기념으로 챙긴 뒤 아쉬운 마음을 뒤로하고 귀국 비행기에 오릅니다.",
+          "costAmount": "0"
+        }
+      ]
+    }
+  ]
+}

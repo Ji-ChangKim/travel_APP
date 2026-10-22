@@ -20,7 +20,7 @@
       "group": "navigation",
       "file": "icon-home-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(0) svg:index(0)",
         "label": "Copy SVG Outline Filled 홈 (Home) 앱 첫 화면 및 맞춤형 여행 피드 tp-icon-home 24px"
       },
@@ -36,7 +36,7 @@
       "group": "navigation",
       "file": "icon-home-filled.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(0) svg:index(1)",
         "label": "Copy SVG Outline Filled 홈 (Home) 앱 첫 화면 및 맞춤형 여행 피드 tp-icon-home 24px"
       },
@@ -52,7 +52,7 @@
       "group": "navigation",
       "file": "icon-compass-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(1) svg:index(0)",
         "label": "Copy SVG Outline Duotone 지도 & 탐색 (Explore) 둘러보기, 나침반 및 실시간 지도 tp-icon-compass 24px"
       },
@@ -68,7 +68,7 @@
       "group": "navigation",
       "file": "icon-compass-duotone.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(1) svg:index(1)",
         "label": "Copy SVG Outline Duotone 지도 & 탐색 (Explore) 둘러보기, 나침반 및 실시간 지도 tp-icon-compass 24px"
       },
@@ -84,7 +84,7 @@
       "group": "navigation",
       "file": "icon-plus-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(2) svg:index(0)",
         "label": "Copy SVG Center FAB 여행 기록 FAB (Create) 새 일정 추가 및 모바일 플로팅 버튼 tp-icon-fab-plus 24/48px"
       },
@@ -100,7 +100,7 @@
       "group": "navigation",
       "file": "icon-journal-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(3) svg:index(0)",
         "label": "Copy SVG Outline Filled 여행 기록장 (Journal) 나의 타임라인 및 저널 북 tp-icon-journal 24px"
       },
@@ -116,7 +116,7 @@
       "group": "navigation",
       "file": "icon-journal-filled.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(3) svg:index(1)",
         "label": "Copy SVG Outline Filled 여행 기록장 (Journal) 나의 타임라인 및 저널 북 tp-icon-journal 24px"
       },
@@ -132,7 +132,7 @@
       "group": "navigation",
       "file": "icon-user-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(4) svg:index(0)",
         "label": "Copy SVG Outline Filled 마이페이지 (Profile) 회원 정보, 배지 및 환경설정 tp-icon-user 24px"
       },
@@ -148,7 +148,7 @@
       "group": "navigation",
       "file": "icon-user-filled.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(4) svg:index(1)",
         "label": "Copy SVG Outline Filled 마이페이지 (Profile) 회원 정보, 배지 및 환경설정 tp-icon-user 24px"
       },
@@ -164,7 +164,7 @@
       "group": "category",
       "file": "icon-restaurant-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(5) svg:index(0)",
         "label": "식당 / 맛집 Dining / Restaurant #dining #restaurant"
       },
@@ -180,7 +180,7 @@
       "group": "category",
       "file": "icon-cafe-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(6) svg:index(0)",
         "label": "카페 / 베이커리 Cafe & Bakery #cafe #dessert"
       },
@@ -196,7 +196,7 @@
       "group": "category",
       "file": "icon-bar-duotone.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(7) svg:index(0)",
         "label": "펍 / 바 / 이자카야 Pub, Bar & Izakaya #pub #bar #izakaya"
       },
@@ -212,7 +212,7 @@
       "group": "category",
       "file": "icon-grocery-duotone.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(8) svg:index(0)",
         "label": "마트 / 편의점 Mart & Convenience #mart #grocery #cvs"
       },
@@ -228,7 +228,7 @@
       "group": "category",
       "file": "icon-flight-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(9) svg:index(0)",
         "label": "항공편 / 공항 Flight & Airport #flight #airport"
       },
@@ -249,7 +249,7 @@
       "group": "category",
       "file": "icon-metro-duotone.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(10) svg:index(0)",
         "label": "지하철 / 전철역 Metro & Train #metro #station"
       },
@@ -265,7 +265,7 @@
       "group": "category",
       "file": "icon-bus-duotone.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(11) svg:index(0)",
         "label": "버스 / 정류장 Bus & Bus Stop #bus #transit"
       },
@@ -281,7 +281,7 @@
       "group": "category",
       "file": "icon-taxi-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(12) svg:index(0)",
         "label": "택시 / 렌터카 / 페리 Taxi & Car Rental #taxi #rental"
       },
@@ -302,7 +302,7 @@
       "group": "category",
       "file": "icon-hotel-duotone.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(13) svg:index(0)",
         "label": "호텔 / 리조트 Hotel & Resort #hotel"
       },
@@ -318,7 +318,7 @@
       "group": "category",
       "file": "icon-guesthouse-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(14) svg:index(0)",
         "label": "호스텔 / 료칸 / 게하 Guesthouse & Ryokan #guesthouse #ryokan"
       },
@@ -334,7 +334,7 @@
       "group": "category",
       "file": "icon-landmark-duotone.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(15) svg:index(0)",
         "label": "관광명소 / 랜드마크 Sightseeing & Landmark #landmark #sight"
       },
@@ -350,7 +350,7 @@
       "group": "category",
       "file": "icon-museum-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(16) svg:index(0)",
         "label": "박물관 / 미술관 / 문화재 Culture & Museum #museum #culture"
       },
@@ -366,7 +366,7 @@
       "group": "category",
       "file": "icon-shopping-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(17) svg:index(0)",
         "label": "쇼핑 / 백화점 / 플리마켓 Shopping & Mall #shopping #market"
       },
@@ -382,7 +382,7 @@
       "group": "category",
       "file": "icon-activity-duotone.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(18) svg:index(0)",
         "label": "액티비티 / 테마파크 Activity & Theme Park #activity #park"
       },
@@ -398,7 +398,7 @@
       "group": "action",
       "file": "icon-receipt-scan-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(19) svg:index(0)",
         "label": "영수증 스캔 (OCR) tp-scan-receipt"
       },
@@ -414,7 +414,7 @@
       "group": "action",
       "file": "icon-share-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(20) svg:index(0)",
         "label": "동행자 공유 tp-action-share"
       },
@@ -430,7 +430,7 @@
       "group": "action",
       "file": "icon-filter-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(21) svg:index(0)",
         "label": "조건 필터 tp-action-filter"
       },
@@ -446,7 +446,7 @@
       "group": "action",
       "file": "icon-checklist-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(22) svg:index(0)",
         "label": "체크리스트 tp-action-checklist"
       },
@@ -462,7 +462,7 @@
       "group": "action",
       "file": "icon-search-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(23) svg:index(0)",
         "label": "장소/경로 검색 tp-action-search"
       },
@@ -478,7 +478,7 @@
       "group": "action",
       "file": "icon-lock-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(24) svg:index(0)",
         "label": "비공개 잠금 tp-action-lock"
       },
@@ -494,7 +494,7 @@
       "group": "utility",
       "file": "icon-bookmark-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(25) svg:index(0)",
         "label": "bookmark"
       },
@@ -510,7 +510,7 @@
       "group": "utility",
       "file": "icon-calendar-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(26) svg:index(0)",
         "label": "calendar"
       },
@@ -526,7 +526,7 @@
       "group": "utility",
       "file": "icon-clock-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(27) svg:index(0)",
         "label": "clock"
       },
@@ -542,7 +542,7 @@
       "group": "utility",
       "file": "icon-sun-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(28) svg:index(0)",
         "label": "sun-weather"
       },
@@ -558,7 +558,7 @@
       "group": "utility",
       "file": "icon-rain-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(29) svg:index(0)",
         "label": "cloud-rain"
       },
@@ -579,7 +579,7 @@
       "group": "utility",
       "file": "icon-navigation-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(30) svg:index(0)",
         "label": "navigation"
       },
@@ -595,7 +595,7 @@
       "group": "utility",
       "file": "icon-tag-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(31) svg:index(0)",
         "label": "tag-label"
       },
@@ -616,7 +616,7 @@
       "group": "utility",
       "file": "icon-heart-filled.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(32) svg:index(0)",
         "label": "heart-active"
       },
@@ -637,7 +637,7 @@
       "group": "utility",
       "file": "icon-ticket-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(33) svg:index(0)",
         "label": "ticket-pass"
       },
@@ -653,7 +653,7 @@
       "group": "utility",
       "file": "icon-luggage-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(34) svg:index(0)",
         "label": "luggage"
       },
@@ -669,7 +669,7 @@
       "group": "utility",
       "file": "icon-route-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(35) svg:index(0)",
         "label": "route-path"
       },
@@ -685,7 +685,7 @@
       "group": "utility",
       "file": "icon-bell-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(36) svg:index(0)",
         "label": "bell-notice"
       },
@@ -706,7 +706,7 @@
       "group": "utility",
       "file": "icon-sliders-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(37) svg:index(0)",
         "label": "sliders"
       },
@@ -722,7 +722,7 @@
       "group": "utility",
       "file": "icon-refresh-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(38) svg:index(0)",
         "label": "refresh-sync"
       },
@@ -743,7 +743,7 @@
       "group": "utility",
       "file": "icon-map-pin-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(39) svg:index(0)",
         "label": "map-pin"
       },
@@ -764,7 +764,7 @@
       "group": "utility",
       "file": "icon-star-filled.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": ".icon-card,.icon-item:index(40) svg:index(0)",
         "label": "star-rating"
       },
@@ -785,7 +785,7 @@
       "group": "status",
       "file": "icon-success-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": "#status-icons svg:index(0)",
         "label": "성공 / 완료 (Success) #186779 일정 체크 완료, 결제 및 저장 성공 안내 피드백"
       },
@@ -806,7 +806,7 @@
       "group": "status",
       "file": "icon-warning-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": "#status-icons svg:index(1)",
         "label": "주의 / 확인요망 (Warning) #ffc857 환승 시간 부족, 기상 악화 및 경로 중복 경고"
       },
@@ -827,7 +827,7 @@
       "group": "status",
       "file": "icon-error-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": "#status-icons svg:index(2)",
         "label": "오류 / 취소 (Destructive) #ff6b57 연결 실패, 일정 삭제 및 필수 항목 누락 경보"
       },
@@ -843,7 +843,7 @@
       "group": "status",
       "file": "icon-info-outline.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": "#status-icons svg:index(3)",
         "label": "안내 / 팁 (Info) #8fd3e8 로컬 여행 팁, 시차 알림 및 실시간 가이드 힌트"
       },
@@ -859,7 +859,7 @@
       "group": "utility",
       "file": "icon-map-pin-duotone.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": "#principles duotone:index(0)",
         "label": ""
       },
@@ -875,7 +875,7 @@
       "group": "utility",
       "file": "icon-camera-duotone.svg",
       "source": {
-        "file": "docs/design/sources/stitch-icon-library.html",
+        "file": "docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html",
         "locator": "#principles duotone:index(1)",
         "label": ""
       },

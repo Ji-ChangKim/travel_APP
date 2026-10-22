@@ -92,8 +92,9 @@ export default function DestinationPicker({
         {kind === 'country' && !query.trim() ? (
           <>
             <ScrollView
+              testID="country-continent-filter"
               horizontal
-              style={{ flexGrow: 0 }}
+              style={s.filters}
               contentContainerStyle={{ gap: 8 }}
             >
               {continents.map((name) => (
@@ -102,6 +103,7 @@ export default function DestinationPicker({
                   label={name}
                   size="chip"
                   selected={continent === name}
+                  selectionStyle="fill"
                   onPress={() => {
                     // 대륙을 바꾸면 이전 지역 필터를 해제한다.
                     return void (setContinent(name), setRegion(''));
@@ -110,13 +112,16 @@ export default function DestinationPicker({
               ))}
             </ScrollView>
             <ScrollView
+              testID="country-region-filter"
               horizontal
-              style={{ flexGrow: 0 }}
+              style={s.filters}
               contentContainerStyle={{ gap: 8 }}
             >
               <Action
                 label="전체 지역"
+                size="chip"
                 selected={!region}
+                selectionStyle="fill"
                 onPress={() => {
                   // 선택 대륙 전체의 나라를 표시한다.
                   return setRegion('');
@@ -128,6 +133,7 @@ export default function DestinationPicker({
                   label={name}
                   size="chip"
                   selected={region === name}
+                  selectionStyle="fill"
                   onPress={() => {
                     // 지역 필터만 변경한다.
                     return setRegion(name);
@@ -147,6 +153,7 @@ export default function DestinationPicker({
           />
         ) : null}
         <ScrollView
+          style={s.results}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={s.list}
         >
@@ -216,6 +223,9 @@ const s = StyleSheet.create({
     backgroundColor: colors.background,
   },
   list: { paddingBottom: 24, gap: 8 },
+  // 목록이 길어져도 두 필터 행의 터치 영역과 글자를 줄이지 않는다.
+  filters: { flexGrow: 0, flexShrink: 0 },
+  results: { flex: 1, minHeight: 0 },
   option: {
     flexDirection: 'row',
     justifyContent: 'space-between',

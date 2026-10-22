@@ -230,7 +230,7 @@ function MyTripCover({
           <Rect width="100%" height="100%" fill={`url(#cover-${trip.id})`} />
         </Svg>
       )}
-      <View style={s.coverTop}>
+      <View style={s.coverTop} testID="my-trip-cover-status">
         <View style={s.row}>
           <View style={s.badge}>
             <Text
@@ -262,6 +262,7 @@ function MyTripCover({
         )}
       </View>
       <View
+        testID="my-trip-cover-summary"
         style={[
           s.coverBottom,
           facts?.photo ? s.coverBottomWithPhoto : undefined,

@@ -246,7 +246,8 @@ function ImportView({ controller }: { controller: Controller }) {
                     {travelDateRange(trip.startDate, trip.endDate)}
                   </Text>
                   <Action
-                    label={`이 여행에 추가: ${trip.title}`}
+                    label="이 여행에 장소 추가"
+                    accessibilityLabel={`이 여행에 추가: ${trip.title}`}
                     disabled={controller.state.busy}
                     onPress={() => {
                       // 일정 편집 폼에서 날짜와 장소를 확인한다.

@@ -4,11 +4,17 @@ import path from 'node:path';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const tokens = JSON.parse(
-  readFileSync(path.join(root, 'docs/design/design-tokens.json'), 'utf8'),
+  readFileSync(
+    path.join(root, 'docs/02. 디자인/00. 공통규격/design-tokens.json'),
+    'utf8',
+  ),
 );
 const c = tokens.color;
 const ledger = JSON.parse(
-  readFileSync(path.join(root, 'docs/design/ledger-tokens.json'), 'utf8'),
+  readFileSync(
+    path.join(root, 'docs/02. 디자인/00. 공통규격/ledger-tokens.json'),
+    'utf8',
+  ),
 ).color;
 
 // sRGB 원색을 선형 상대 휘도로 변환하며 계산 중 반올림하지 않는다.

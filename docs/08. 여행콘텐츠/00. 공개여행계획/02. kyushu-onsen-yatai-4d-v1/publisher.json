@@ -1,0 +1,9 @@
+{
+  "publisherNumber": 1,
+  "userId": "64ee1a3b-504f-46cb-b762-24c3e9fb4ebf",
+  "nickname": "가이드 하루",
+  "base": "https://tripprint-api-staging.gametps.workers.dev",
+  "createdAt": "2026-10-20T09:26:15.898Z",
+  "credentialLocation": "Git 제외 로컬 파일",
+  "emailDelivery": "내부 게시 계정으로 이메일 수신·복구 주소는 설정하지 않음"
+}

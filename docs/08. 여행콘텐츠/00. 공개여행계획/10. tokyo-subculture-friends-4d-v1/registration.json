@@ -1,0 +1,12 @@
+{
+  "base": "https://tripprint-api-staging.gametps.workers.dev",
+  "planKey": "tokyo-subculture-friends-4d-v1",
+  "tripId": "a87fe855-8dd5-49d5-96a2-c42203506606",
+  "postId": "939d91d3-0c52-4543-adf5-086bafb498cd",
+  "author": "가이드 하루",
+  "days": 4,
+  "schedules": 19,
+  "cover": "a87fe855-8dd5-49d5-96a2-c42203506606/20d5f2f9-a32c-460b-8c2d-76e287603a0d.jpg",
+  "verifiedAt": "2026-10-21T11:27:33.935Z",
+  "publicUrl": "https://tripprint-staging.pages.dev/community/939d91d3-0c52-4543-adf5-086bafb498cd"
+}

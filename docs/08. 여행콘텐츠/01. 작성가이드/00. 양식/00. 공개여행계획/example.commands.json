@@ -1,0 +1,106 @@
+{
+  "exampleOnly": true,
+  "note": "형식 확인용 가상 예시입니다. 실제 추천 장소가 아니며 DB 저장·공개 게시하면 안 됩니다. 전체 파일은 단일 API 요청 본문이 아닙니다.",
+  "exampleIds": {
+    "ownerId": "00000000-0000-4000-8000-000000001001",
+    "tripId": "00000000-0000-4000-8000-000000002001",
+    "day1Id": "00000000-0000-4000-8000-000000003001",
+    "day2Id": "00000000-0000-4000-8000-000000003002",
+    "memberId": "00000000-0000-4000-8000-000000004001"
+  },
+  "tripCreate": {
+    "title": "[형식 예시·게시 금지] 오사카 2일 여행",
+    "country": "일본",
+    "city": "오사카",
+    "startDate": "2026-11-10",
+    "endDate": "2026-11-11",
+    "timezone": "Asia/Tokyo",
+    "defaultCurrency": "JPY"
+  },
+  "dayPlans": [
+    {
+      "operation": "day.plan",
+      "input": {
+        "dayId": "00000000-0000-4000-8000-000000003001",
+        "planTitle": "형식 예시 DAY 1",
+        "planConcept": "이 값은 DAY별 컨셉 입력 위치를 보여주는 예시입니다."
+      }
+    },
+    {
+      "operation": "day.plan",
+      "input": {
+        "dayId": "00000000-0000-4000-8000-000000003002",
+        "planTitle": "형식 예시 DAY 2",
+        "planConcept": "기본 코스와 우천 대체 코스의 입력 관계를 보여줍니다."
+      }
+    }
+  ],
+  "schedules": [
+    {
+      "operation": "schedule.save",
+      "input": {
+        "id": "00000000-0000-4000-8000-000000005001",
+        "dayId": "00000000-0000-4000-8000-000000003001",
+        "title": "형식 예시 장소 A",
+        "type": "PLACE",
+        "timeSlot": "09:30",
+        "sortOrder": 1,
+        "memo": "내부 검수 메모_공개 제외",
+        "address": "",
+        "durationMinutes": 60,
+        "planContent": {
+          "description": "[형식 예시] 어떤 곳인지 설명합니다.\n방문 이유와 이용 팁을 적고 운영 조건의 출처·확인일을 관리합니다. 실제 장소 정보는 아닙니다."
+        }
+      }
+    },
+    {
+      "operation": "schedule.save",
+      "input": {
+        "id": "00000000-0000-4000-8000-000000005002",
+        "dayId": "00000000-0000-4000-8000-000000003002",
+        "title": "형식 예시 장소 B",
+        "type": "PLACE",
+        "timeSlot": "10:00",
+        "sortOrder": 1,
+        "planContent": {
+          "description": "[형식 예시] 맑은 날 선택할 기본 코스의 설명 위치입니다. 실제 여행 추천이 아닙니다.",
+          "choiceGroup": "day2-weather",
+          "choiceLabel": "맑은 날 선택",
+          "choiceKind": "choice"
+        }
+      }
+    },
+    {
+      "operation": "schedule.save",
+      "input": {
+        "id": "00000000-0000-4000-8000-000000005003",
+        "dayId": "00000000-0000-4000-8000-000000003002",
+        "title": "형식 예시 장소 C",
+        "type": "PLACE",
+        "timeSlot": "10:00",
+        "sortOrder": 2,
+        "planContent": {
+          "description": "[형식 예시] 비가 올 때 바꿔 선택할 대체 코스입니다. B와 C를 모두 방문하는 뜻이 아닙니다.",
+          "choiceGroup": "day2-weather",
+          "choiceLabel": "비 오는 날 대체",
+          "choiceKind": "backup"
+        }
+      }
+    }
+  ],
+  "publish": {
+    "operation": "community.publish",
+    "input": {
+      "title": "[형식 예시·게시 금지] 오사카 2일 여행",
+      "body": "입력·공개 구조 확인용 가상 자료입니다. 실제 추천 일정이 아니며 게시하면 안 됩니다.",
+      "kind": "plan",
+      "scheduleIds": [
+        "00000000-0000-4000-8000-000000005001",
+        "00000000-0000-4000-8000-000000005002",
+        "00000000-0000-4000-8000-000000005003"
+      ],
+      "photoIds": [],
+      "includeCosts": false
+    }
+  }
+}

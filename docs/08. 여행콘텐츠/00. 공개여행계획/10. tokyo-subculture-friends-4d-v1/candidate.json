@@ -1,0 +1,215 @@
+{
+  "tripCreate": {
+    "title": "[도쿄] 신주쿠 요코초 & 시모키타자와 아키하바라 힙스터 3박 4일",
+    "country": "일본",
+    "city": "도쿄",
+    "startDate": "2026-11-19",
+    "endDate": "2026-11-22",
+    "timezone": "Asia/Tokyo",
+    "defaultCurrency": "JPY",
+    "coverColor": "#D90429"
+  },
+  "planKey": "tokyo-subculture-friends-4d-v1",
+  "publicBody": "신주쿠 오모이데요코초의 숯불 연기와 시원한 하이볼, 아키하바라 한정판 굿즈 쇼핑, 시모키타자와 빈티지 레코드 숍까지 친구들과 함께 즐기는 24시간 에너지 가득한 도쿄 힙스터 투어!",
+  "days": [
+    {
+      "dayNumber": 1,
+      "planTitle": "신주쿠 뒷골목의 에너지, 네온사인과 하이볼",
+      "planConcept": "가성비 소바와 진한 츠케멘으로 배를 채우고 도쿄도청 야경 관람 후 오모이데요코초 꼬치구이 파티를 시작합니다.",
+      "schedules": [
+        {
+          "title": "카노야 신주쿠남쪽출구점",
+          "type": "PLACE",
+          "timeSlot": "10:00",
+          "sortOrder": 1,
+          "address": "도쿄도 신주쿠구 신주쿠 3-36-2",
+          "description": "바삭한 야채튀김 카키아게가 올라간 스탠딩 소바. 현지 직장인들이 애용하는 깊고 진한 국물의 든든한 조식.",
+          "costAmount": "550"
+        },
+        {
+          "title": "신주쿠 가부키초 타워 & 오락실 투어",
+          "type": "PLACE",
+          "timeSlot": "11:30",
+          "sortOrder": 2,
+          "address": "도쿄도 신주쿠구 가부키초 1-29-1",
+          "description": "도쿄 최대급 신개념 엔터테인먼트 복합단지에서 가챠 머신과 레트로 게임 대결.",
+          "costAmount": "1500"
+        },
+        {
+          "title": "츠케멘 타츠노야 신주쿠점",
+          "type": "PLACE",
+          "timeSlot": "13:30",
+          "sortOrder": 3,
+          "address": "도쿄도 신주쿠구 니시신주쿠 7-4-5",
+          "description": "바삭하게 튀겨낸 곱창(모츠) 토핑이 진한 돈코츠 쯔유에 들어간 별미 츠케멘. 친구들과 감탄하며 먹는 인생 면 요리.",
+          "costAmount": "1200"
+        },
+        {
+          "title": "도쿄도청 무료 전망대 야경",
+          "type": "PLACE",
+          "timeSlot": "17:30",
+          "sortOrder": 4,
+          "address": "도쿄도 신주쿠구 니시신주쿠 2-8-1 45F",
+          "description": "지상 202m 남쪽 전망대에서 도쿄 전역으로 뻗어나가는 네온사인 불빛과 도로를 무료로 감상.",
+          "costAmount": "0"
+        },
+        {
+          "title": "신주쿠 오모이데요코초 카부토",
+          "type": "PLACE",
+          "timeSlot": "19:30",
+          "sortOrder": 5,
+          "address": "도쿄도 신주쿠구 니시신주쿠 1-2-11",
+          "description": "연기가 자욱한 좁은 목조 골목에서 숯불에 구워내는 장어·닭꼬치와 얼음장처럼 차가운 하이볼 건배.",
+          "costAmount": "3800"
+        }
+      ]
+    },
+    {
+      "dayNumber": 2,
+      "planTitle": "덕질과 레트로의 성지, 아키하바라 & 칸다",
+      "planConcept": "라디오회관과 만다라케에서 한정판 피규어와 레트로 게임을 정복하고 야키니쿠 무제한 파티를 벌입니다.",
+      "schedules": [
+        {
+          "title": "코히 칸 칸다점 샌드위치",
+          "type": "PLACE",
+          "timeSlot": "09:00",
+          "sortOrder": 1,
+          "address": "도쿄도 지요다구 가지초 2-1-2",
+          "description": "숯불 로스팅 모닝커피와 따뜻한 햄에그 핫샌드위치로 에너지를 충전하는 킷사텐 조식.",
+          "costAmount": "850"
+        },
+        {
+          "title": "아키하바라 라디오회관 & 만다라케",
+          "type": "PLACE",
+          "timeSlot": "10:30",
+          "sortOrder": 2,
+          "address": "도쿄도 지요다구 소토칸다 1-15-16",
+          "description": "10개 층에 걸쳐 애니메이션 굿즈, 레어 피규어, 전자부품이 가득한 전 세계 서브컬처의 심장부.",
+          "costAmount": "3000"
+        },
+        {
+          "title": "아키하바라 돈카츠 마루고",
+          "type": "PLACE",
+          "timeSlot": "13:00",
+          "sortOrder": 3,
+          "address": "도쿄도 지요다구 소토칸다 1-8-14",
+          "description": "미슐랭 빕구르망에 빛나는 아키하바라 최고봉 돈카츠. 두툼한 육즙 로스카츠의 바삭한 매력.",
+          "costAmount": "2400"
+        },
+        {
+          "title": "요도바시 아키바 하비 플로어",
+          "type": "PLACE",
+          "timeSlot": "15:00",
+          "sortOrder": 4,
+          "address": "도쿄도 지요다구 간다하나오카초 1-1",
+          "description": "건프라, 카메라, 최신 전자기기를 직접 만져보고 면세 혜택을 챙기는 쇼핑.",
+          "costAmount": "2000"
+        },
+        {
+          "title": "야키니쿠 풍풍정 아키하바라점",
+          "type": "PLACE",
+          "timeSlot": "18:30",
+          "sortOrder": 5,
+          "address": "도쿄도 지요다구 간다사쿠마초 1-16",
+          "description": "국산 소고기 갈비, 등심, 대창 무제한 120분 코스와 주류 무제한(노미호다이)으로 배 터지는 저녁.",
+          "costAmount": "5500"
+        }
+      ]
+    },
+    {
+      "dayNumber": 3,
+      "planTitle": "스트리트 힙 감성, 시모키타자와 & 하라주쿠 & 시부야",
+      "planConcept": "빈티지 레코드와 옷가게를 뒤지고 매운 스프카레로 점심 후 시부야 명물 철판 몬자야키를 긁어먹습니다.",
+      "schedules": [
+        {
+          "title": "시부야 오니기리 본고",
+          "type": "PLACE",
+          "timeSlot": "09:00",
+          "sortOrder": 1,
+          "address": "도쿄도 시부야구 도겐자카 1-2-3",
+          "description": "밥알 사이 공기층이 살아있는 주먹밥 장인의 명란마요 오니기리와 바지락 미소시루 조식.",
+          "costAmount": "900"
+        },
+        {
+          "title": "시모키타자와 빈티지 거리 헌팅",
+          "type": "PLACE",
+          "timeSlot": "10:30",
+          "sortOrder": 2,
+          "address": "도쿄도 세타가야구 기타자와 2-25",
+          "description": "미국 빈티지 의류, 레트로 바이닐 레코드, 독특한 인테리어 소품을 발굴하는 힙스터 골목 산책.",
+          "costAmount": "3500"
+        },
+        {
+          "title": "시모키타자와 매직 스파이스 스프카레",
+          "type": "PLACE",
+          "timeSlot": "13:00",
+          "sortOrder": 3,
+          "address": "도쿄도 세타가야구 기타자와 1-40-15",
+          "description": "매운맛 조절이 가능한 칼칼한 치킨 야채 스프카레로 빈티지 쇼핑 후 속을 시원하게 풀어줍니다.",
+          "costAmount": "1450"
+        },
+        {
+          "title": "하라주쿠 캣스트리트 슈프림 & 스투시",
+          "type": "PLACE",
+          "timeSlot": "15:30",
+          "sortOrder": 4,
+          "address": "도쿄도 시부야구 진구마에 4-28-2",
+          "description": "도쿄 스트리트 패션의 성지에서 브랜드 신상 아이템을 찾고 요요기 공원에서 잠시 휴식.",
+          "costAmount": "2000"
+        },
+        {
+          "title": "츠키시마 몬자 모헤지 시부야점",
+          "type": "PLACE",
+          "timeSlot": "18:30",
+          "sortOrder": 5,
+          "address": "도쿄도 시부야구 시부야 2-24-12 12F",
+          "description": "명란 모찌 치즈 몬자야키를 미니 주걱으로 직접 철판에 눌러 긁어먹으며 생맥주를 곁들이는 소울푸드 디너.",
+          "costAmount": "2600"
+        }
+      ]
+    },
+    {
+      "dayNumber": 4,
+      "planTitle": "츠키지 수산시장 먹방과 아사쿠사 센소지",
+      "planConcept": "새벽 수산시장의 해산물 꼬치로 아침을 열고, 아사쿠사 100년 텐동으로 완벽한 마무리를 합니다.",
+      "schedules": [
+        {
+          "title": "츠키지 장외시장 길거리 해산물 투어",
+          "type": "PLACE",
+          "timeSlot": "08:30",
+          "sortOrder": 1,
+          "address": "도쿄도 주오구 츠키지 4-16-2",
+          "description": "달콤한 일본식 계란말이 꼬치와 갓 구운 가리비 버터구이, 신선한 참치 뱃살 초밥을 노점에서 맛보는 활기찬 아침.",
+          "costAmount": "2500"
+        },
+        {
+          "title": "아사쿠사 센소지 참배 & 나카미세도리",
+          "type": "PLACE",
+          "timeSlot": "10:30",
+          "sortOrder": 2,
+          "address": "도쿄도 다이토구 아사쿠사 2-3-1",
+          "description": "도쿄 최고(最古) 사찰의 가미나리몬 앞에서 단체 기념사진을 찍고 갓 구운 멜론빵과 당고 시식.",
+          "costAmount": "800"
+        },
+        {
+          "title": "아사쿠사 다이코쿠야 텐푸라",
+          "type": "PLACE",
+          "timeSlot": "12:30",
+          "sortOrder": 3,
+          "address": "도쿄도 다이토구 아사쿠사 1-38-10",
+          "description": "1887년 창업한 노포. 큼직한 참새우 4마리가 특제 참기름 간장 소스에 푹 적셔 나오는 정통 에도식 텐동.",
+          "costAmount": "2200"
+        },
+        {
+          "title": "우에노 아메요코 시장 쇼핑 후 공항 이동",
+          "type": "TRANSPORT",
+          "timeSlot": "14:30",
+          "sortOrder": 4,
+          "address": "도쿄도 다이토구 우에노 4-9-14",
+          "description": "면세 간식과 화장품 쇼핑 후 게이세이 우에노역에서 스카이라이너를 타고 나리타/하네다로 이동합니다.",
+          "costAmount": "2570"
+        }
+      ]
+    }
+  ]
+}

@@ -17,6 +17,7 @@ import HomeGuide from './HomeGuide';
 import HomeTools from './HomeTools';
 import { useTripDateRefresh } from './useTripDateRefresh';
 import HomeHeader from '@/components/HomeHeader';
+import { onGnbScroll } from '@/components/navigationScroll';
 
 interface HomeProps {
   userId: string;
@@ -113,7 +114,11 @@ function HomeView({
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={s.screen}>
       <HomeHeader signedIn={Boolean(userId)} ready={ready} />
-      <ScrollView contentContainerStyle={s.content}>
+      <ScrollView
+        contentContainerStyle={s.content}
+        onScroll={onGnbScroll}
+        scrollEventThrottle={16}
+      >
         {!ready || loading ? (
           <HaruState kind="loading" title="내 여행 불러오는 중…" compact />
         ) : error ? (

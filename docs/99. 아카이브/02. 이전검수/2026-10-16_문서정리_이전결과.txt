@@ -1,0 +1,160 @@
+TripPrint 문서 정리 결과
+정리일: 2026-10-16
+사용자 요청: 불필요한 문서·구버전·중복 사본 삭제, 같은 주제의 현행본만 유지.
+
+1. 처리 기준
+
+과거 구현/검수 보고와 초기 MVP 범위를 개발검수_현재상태.txt·2026-10-16_화면피드백_검토.txt·PLAY_INTERNAL_PREBUILD.txt에 통합했다.
+수정되는 Markdown이 있는 Word 사본은 제거했다. 원본 기능정의서 v3는 독립 입력 자료로 보존한다.
+바이트가 같은 PNG12개만 통합하고, 용도가 다른 캡처·디자인 원본·앱 참조 JSON·DB/API 계약·필수 이용 조건은 유지한다.
+R14는 빌드 후 내부 테스트에서 실행하며 USB 연결을 현재 완료 조건에 두지 않는다.
+문서의 내부 링크·본문 경로·캡처 메타데이터는 아래 대체 경로로 연결한다.
+보안 키 폴더는 읽기·복구본·삭제 대상에서 제외했다.
+
+2. 복구와 삭제 결과
+
+정리 전 복구본: outputs/docs-cleanup-20261016/docs-before-cleanup.zip
+ZIP 무결성과 삭제 대상의 SHA-256을 대조했다. 복구본은 docs 밖에 두고 EAS 업로드에서도 제외한다.
+삭제 대상99개. 파일마다 해결한 절대 경로가 docs 안에 있는지 확인한 뒤 삭제했다.
+정리 전 일반 문서·자료317개에서99개를 삭제하고 현행 통합/인계/피드백 자료를 별도 생성했다. 보안 키 폴더는 개수 비교와 복구본에서 제외한다.
+최종 일반 문서·자료232개(보안 키 폴더 제외). 병행 작업이 추가한 최신 정합성·워크스페이스 개편 문서는 현재 계약 자료로 유지했다.
+최종 검사: 끊어진 상대 Markdown 링크0개, 캡처172개 항목의 파일·SHA-256 일치, 디자인 원본·기능정의서 원본 바이트 보존.
+검증 로그: outputs/docs-cleanup-20261016/verification.log. 재검사: outputs/verify-screen-review-docs.py.
+
+3. 전체 삭제·대체 목록
+ANDROID_INTERNAL_PREP_20261013.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+ANDROID_LOCAL_RELEASE_20261012.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+ANDROID_STUDIO_LINK_CHECK_20261012.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+ANDROID_VERSION_CODE_20261013.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+ANDROID_WINDOWS_ASCII_FIX_20261012.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+BASIC_TRIP_MAP_20261013.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+BUILD_FEEDBACK_FIXES_20261014.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+CLOUDFLARE_MVP_DEPLOYMENT_20261006.md → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+DESIGN_SYSTEM_V2_IMPLEMENTATION_20261015.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+DESTINATION_DISCOVERY_API_20261012.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+DUMMY_DATA_REMOVAL_20261006.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+FINAL_AUDIT_20261013.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+FINAL_QA_BUILD_HANDOFF_20261006.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+FLIGHT_STITCH_UI_20261014.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+FLIGHT_V4_RELEASE_PREP_20261014.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+GIT_UPDATE_20261012.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+GRADLE_FIX_20261004.md → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+GUEST_LOCAL_ACCOUNTS_20261012.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+HARU_MASCOT_IMPLEMENTATION_20261006.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+HARU_UI_KIT_V3_DETAIL_20261015.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+HARU_UI_KIT_V3_EXPANSION_20261015.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+HARU_UI_KIT_V3_IMPLEMENTATION_20261015.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+HOME_FLOW_FIX_20261006.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+HOME_HEADER_COPY_20261013.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+HOME_TRIP_HUB_REVIEW_20261006.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+INTERNAL_CORE_STABILITY_20261012.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+MVP_1_RELEASE_PERFORMANCE_20261012.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+MVP_IMPLEMENTATION_20261006.md → 개발검수_현재상태.txt / 구버전 MVP 범위·출시 현황은 최신 인계 문서로 대체
+MY_TRAVEL_PLANS_20261013.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+PLAY_INTERNAL_READINESS_20261012.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+PREBUILD_FINAL_CHECK_20261012.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+PROFILE_CLEANUP_20261006.md → 개발검수_현재상태.txt / 구버전 MVP 범위·출시 현황은 최신 인계 문서로 대체
+R04_PROFILE_CONTRACT_20261015.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+R05_INPUT_VALIDATION_20261015.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+R06_AUTH_RETURN_20261015.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+R07_TRIP_DETAILS_20261015.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+R08_STARTUP_POLICY_20261015.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+R09_CURRENT_LOCATION_20261015.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+R10_RECEIPT_PUBLICATION_20261015.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+R11_CITY_SOURCES_20261015.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+R12_TRANSITION_ACCESSIBILITY_20261015.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+R13_BI_LOADING_20261015.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+RECEIPT_CONFIRM_FLOW_20261006.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+RECEIPT_SCAN_FLOW_20261006.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+SERVICE_FLOW_FIX_20261006.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+STITCH_SCHEDULE_GAP_ANALYSIS_20261014.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+STITCH_UI_REVIEW_20261013.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+TC_REVISION_V2_20261006.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+TEST_FEEDBACK_20261003.md → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+USER_FACING_COPY_20261006.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+V3_P0_IMPLEMENTATION_20261014.txt → 개발검수_현재상태.txt / 구현 이력·과거 점검 보고를 현행 상태 문서로 통합
+BUILD_CHECKLIST.md → 개발검수_현재상태.txt / 구버전 MVP 범위·출시 현황은 최신 인계 문서로 대체
+MVP_ANDROID_BUILD.md → 개발검수_현재상태.txt / 구버전 MVP 범위·출시 현황은 최신 인계 문서로 대체
+LOGIN_PAGE_PLAN.txt → 개발검수_현재상태.txt / 구버전 MVP 범위·출시 현황은 최신 인계 문서로 대체
+PROJECT_PROGRESS_REPORT.md → 개발검수_현재상태.txt / 구버전 MVP 범위·출시 현황은 최신 인계 문서로 대체
+TEST_1_RELEASE.md → 개발검수_현재상태.txt / 구버전 MVP 범위·출시 현황은 최신 인계 문서로 대체
+0.PRD/TripPrint_신사업계획서_및_PRD.docx → 0.PRD/TripPrint_신사업계획서_및_PRD.md / 동일 문서의 Word 사본 제거, 수정되는 Markdown을 기준으로 유지
+0.PRD/WHEREGO_TripPrint_신사업계획서_및_PRD.docx → 0.PRD/TripPrint_신사업계획서_및_PRD.md / 동일 문서의 Word 사본 제거, 수정되는 Markdown을 기준으로 유지
+planning/API_CONTRACT.docx → planning/API_CONTRACT.md / 동일 문서의 Word 사본 제거, 수정되는 Markdown을 기준으로 유지
+planning/APP_COMPLETION_SCOPE.docx → 2. planning/TripPrint_화면별_상세기능정의서_v3_20261014.docx / 동일 문서의 Word 사본 제거, 수정되는 Markdown을 기준으로 유지
+planning/DATA_STORAGE_SPEC.docx → planning/DATA_STORAGE_SPEC.md / 동일 문서의 Word 사본 제거, 수정되는 Markdown을 기준으로 유지
+planning/FEATURE_SPEC.docx → 2. planning/TripPrint_화면별_상세기능정의서_v3_20261014.docx / 동일 문서의 Word 사본 제거, 수정되는 Markdown을 기준으로 유지
+planning/MVP_SCREEN_DB_API_SPEC.docx → planning/API_CONTRACT.md / 동일 문서의 Word 사본 제거, 수정되는 Markdown을 기준으로 유지
+planning/POLICY_DECISIONS.docx → planning/POLICY_DECISIONS.md / 동일 문서의 Word 사본 제거, 수정되는 Markdown을 기준으로 유지
+planning/UX_SCREEN_SPEC.docx → 2. planning/TripPrint_화면별_상세기능정의서_v3_20261014.docx / 동일 문서의 Word 사본 제거, 수정되는 Markdown을 기준으로 유지
+전략기획서/01_사업기획서_제안서.docx → 전략기획서/01_사업기획서_제안서.md / 동일 문서의 Word 사본 제거, 수정되는 Markdown을 기준으로 유지
+전략기획서/02_시장_경쟁분석_보고서.docx → 전략기획서/02_시장_경쟁분석_보고서.md / 동일 문서의 Word 사본 제거, 수정되는 Markdown을 기준으로 유지
+전략기획서/03_타깃_사용자_정의서.docx → 전략기획서/03_타깃_사용자_정의서.md / 동일 문서의 Word 사본 제거, 수정되는 Markdown을 기준으로 유지
+전략기획서/04_BM_및_KPI_정의서.docx → 전략기획서/04_BM_및_KPI_정의서.md / 동일 문서의 Word 사본 제거, 수정되는 Markdown을 기준으로 유지
+0.PRD/WHEREGO_TripPrint_신사업계획서_및_PRD.md → 0.PRD/TripPrint_신사업계획서_및_PRD.md / 이전 버전·초기 범위·과거 우선순위는 현행 기준으로 대체
+0.PRD/여행_계획_공유_기록_서비스_통합기획서_v0.3.docx → 0.PRD/TripPrint_신사업계획서_및_PRD.md / 이전 버전·초기 범위·과거 우선순위는 현행 기준으로 대체
+전략기획서/TripPrint_전략기획서_통합제안서.docx → 전략기획서/README.md / 이전 버전·초기 범위·과거 우선순위는 현행 기준으로 대체
+planning/DAILY_MILESTONES.md → 개발검수_현재상태.txt / 이전 버전·초기 범위·과거 우선순위는 현행 기준으로 대체
+planning/M0_M1_EXECUTION.md → 개발검수_현재상태.txt / 이전 버전·초기 범위·과거 우선순위는 현행 기준으로 대체
+planning/MVP_REQUIREMENTS.md → 2. planning/TripPrint_화면별_상세기능정의서_v3_20261014.docx / 이전 버전·초기 범위·과거 우선순위는 현행 기준으로 대체
+planning/MVP_SCREEN_DB_API_SPEC.md → planning/API_CONTRACT.md / 이전 버전·초기 범위·과거 우선순위는 현행 기준으로 대체
+planning/APP_COMPLETION_SCOPE.md → 2. planning/TripPrint_화면별_상세기능정의서_v3_20261014.docx / 이전 버전·초기 범위·과거 우선순위는 현행 기준으로 대체
+planning/FEATURE_SPEC.md → 2. planning/TripPrint_화면별_상세기능정의서_v3_20261014.docx / 이전 버전·초기 범위·과거 우선순위는 현행 기준으로 대체
+planning/UX_SCREEN_SPEC.md → 2. planning/TripPrint_화면별_상세기능정의서_v3_20261014.docx / 이전 버전·초기 범위·과거 우선순위는 현행 기준으로 대체
+2. planning/TripPrint_v3_현행비교_우선순위_20261014.txt → 2026-10-16_화면피드백_검토.txt / 이전 버전·초기 범위·과거 우선순위는 현행 기준으로 대체
+2. planning/TripPrint_v3_착수계획_20261014.txt → 개발검수_현재상태.txt / 이전 버전·초기 범위·과거 우선순위는 현행 기준으로 대체
+1.uiux/17_항공편정보_전체펼침.png → 1.uiux/16_항공편정보보기.png / 바이트가 같은 화면 이미지 중복 제거
+1.uiux/20_구글장소검색_스크롤02.png → 1.uiux/19_일정추가_스크롤02.png / 바이트가 같은 화면 이미지 중복 제거
+1.uiux/20_구글장소검색_스크롤03.png → 1.uiux/19_일정추가_스크롤03.png / 바이트가 같은 화면 이미지 중복 제거
+1.uiux/20_구글장소검색_스크롤04.png → 1.uiux/19_일정추가_스크롤04.png / 바이트가 같은 화면 이미지 중복 제거
+1.uiux/21_구글지도공유링크확인_스크롤04.png → 1.uiux/19_일정추가_스크롤04.png / 바이트가 같은 화면 이미지 중복 제거
+1.uiux/22_일정입력.png → 1.uiux/21_구글지도공유링크확인.png / 바이트가 같은 화면 이미지 중복 제거
+1.uiux/24_일정관리메뉴.png → 1.uiux/23_일정관리_장소등록.png / 바이트가 같은 화면 이미지 중복 제거
+1.uiux/25_일정수정.png → 1.uiux/19_일정추가.png / 바이트가 같은 화면 이미지 중복 제거
+1.uiux/37_영수증사진보관선택.png → 1.uiux/35_영수증인식확인.png / 바이트가 같은 화면 이미지 중복 제거
+1.uiux/40_여행정보상태변경_스크롤02.png → 1.uiux/40_여행정보상태변경.png / 바이트가 같은 화면 이미지 중복 제거
+1.uiux/41_여행기간변경_스크롤02.png → 1.uiux/41_여행기간변경.png / 바이트가 같은 화면 이미지 중복 제거
+1.uiux/67_메인홈_여행도구.png → 1.uiux/06_메인홈.png / 바이트가 같은 화면 이미지 중복 제거
+PLAY_INTERNAL_PREBUILD_20261015.txt → 내부테스트_빌드전인계.txt / 같은 주제의 현행 문서를 고정 파일명으로 통합
+R14_DEVICE_ACCEPTANCE_20261015.txt → qa/DEVICE_ACCEPTANCE.txt / 같은 주제의 현행 문서를 고정 파일명으로 통합
+RESOURCE_CREDITS_20261013.txt → 리소스_출처.txt / 같은 주제의 현행 문서를 고정 파일명으로 통합
+RESOURCE_CREDITS_20261014.txt → 리소스_출처.txt / 같은 주제의 현행 문서를 고정 파일명으로 통합
+1.uiux/SCREENSHOT_MANIFEST_20261014.json → 1.uiux/SCREENSHOT_MANIFEST.json / 같은 주제의 현행 문서를 고정 파일명으로 통합
+1.uiux/SCREENSHOT_INDEX_20261014.txt → 1.uiux/SCREENSHOT_INDEX.txt / 같은 주제의 현행 문서를 고정 파일명으로 통합
+
+4. 현행 참조 갱신·생성 파일
+J:/002. Project_Service/travel_APP/docs/04. 운영/01. 배포절차/Android_GitHub빌드절차.md
+J:/002. Project_Service/travel_APP/docs/04. 운영/00. 서비스설정/서비스_연결설정.md
+J:/002. Project_Service/travel_APP/docs/03. 개발/02. 데이터정의/DB_객체사전.txt
+J:/002. Project_Service/travel_APP/docs/04. 운영/01. 배포절차/서버웹_배포절차.md
+J:/002. Project_Service/travel_APP/docs/03. 개발/03. 개발환경/개발환경_설정.md
+J:/002. Project_Service/travel_APP/docs/03. 개발/01. API계약/오류코드_계약.md
+J:/002. Project_Service/travel_APP/docs/04. 운영/00. 서비스설정/Google지도_연결설정.md
+J:/002. Project_Service/travel_APP/docs/04. 운영/01. 배포절차/GooglePlay_내부테스트절차.md
+J:/002. Project_Service/travel_APP/docs/06. 출시/00. v11/내부테스트_빌드전인계.txt
+J:/002. Project_Service/travel_APP/docs/04. 운영/00. 서비스설정/소셜로그인_연결설정.md
+J:/002. Project_Service/travel_APP/docs/99. 아카이브/00. 이전기획/00. 초기PRD/TripPrint_신사업계획서_및_PRD.md
+J:/002. Project_Service/travel_APP/docs/99. 아카이브/01. 이전디자인/2026-10-16_이전캡처_목록.txt
+J:/002. Project_Service/travel_APP/docs/99. 아카이브/01. 이전디자인/2026-10-16_이전캡처_manifest.json
+J:/002. Project_Service/travel_APP/docs/99. 아카이브/03. 이전출시/00. v05/2026-10-14_v05_출시준비.md
+J:/002. Project_Service/travel_APP/docs/03. 개발/01. API계약/API_기본계약.md
+J:/002. Project_Service/travel_APP/docs/03. 개발/02. 데이터정의/데이터_저장규칙.md
+J:/002. Project_Service/travel_APP/docs/01. 서비스기획/01. 기능정의/기획_진행절차.md
+J:/002. Project_Service/travel_APP/docs/01. 서비스기획/01. 기능정의/서비스정책_결정사항.md
+J:/002. Project_Service/travel_APP/docs/05. 검수/00. 검수기준/기능_인수기준.md
+J:/002. Project_Service/travel_APP/docs/01. 서비스기획/01. 기능정의/여행기록_기능정의.md
+J:/002. Project_Service/travel_APP/docs/05. 검수/00. 검수기준/실기기_인수기준.txt
+J:/002. Project_Service/travel_APP/docs/01. 서비스기획/00. 서비스정의/05_PO_상용화_및_출시전략_20261014.txt
+J:/002. Project_Service/travel_APP/docs/01. 서비스기획/00. 서비스정의/README.md
+J:/002. Project_Service/travel_APP/README.md
+docs/00. 문서안내/개발검수_현재상태.txt: 분산된 개발 이력·보류 운영값·빌드 범위를 현행 상태로 통합.
+docs/99. 아카이브/02. 이전검수/2026-10-16_화면피드백_검토.txt: 사진별 사실·원인·상태/IA/첫 행동 계약·검증과 변경 파일 기록.
+docs/README.md / docs/01. 서비스기획/01. 기능정의/README.md / docs/01. 서비스기획/00. 서비스정의/README.md: 현행 문서 진입점과 원본/현행 계약 구분.
+docs/99. 아카이브/02. 이전검수/2026-10-16_여행화면_이전개편.txt: UI/UX 채팅에서 완료한 최신 세 허브·상단 메뉴·하단 CTA·코스/검색 안내의 현행 개편 문서. 인덱스에 연결했다.
+docs/06. 출시/00. v11/내부테스트_빌드전인계.txt / docs/05. 검수/00. 검수기준/실기기_인수기준.txt: 고정 경로의 인계·실제 테스트 시점.
+docs/02. 디자인/02. 리소스/리소스_출처.txt: 현행8개 Commons 크레딧과 별도 보유 관광청 사진 사용 조건 보존.
+docs/99. 아카이브/01. 이전디자인/2026-10-16_이전캡처_목록.txt / 2026-10-16_이전캡처_manifest.json: 동일 이미지의 단일 파일 참조와 원래 촬영 시각·해시 유지.
+docs/99. 아카이브/01. 이전디자인/01. 비교캡처/home-before.jpg / plans-before.jpg / schedule-before.jpg: 사용자 피드백 입력 원본 바이트 보존.
+docs/02. 디자인/01. 화면설계/홈온보딩_화면규격.md / 여행일정_화면규격.md: 현행 보완 계약 우선순위.
+docs/99. 아카이브/02. 이전검수/2026-10-16_문서정리_이전결과.txt: 삭제99개와 대체·수정·복구·검증 기록.
+playwright.screen-review.config.ts: 독립8804포트의 로컬 웹 회귀 검수 설정. Play 설치 파일을 만들지 않는다.

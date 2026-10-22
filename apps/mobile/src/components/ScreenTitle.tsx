@@ -35,6 +35,7 @@ const s = StyleSheet.create({
     lineHeight: typography.headlineLarge.lineHeight,
     fontWeight: '700',
     textAlign: 'left',
+    paddingVertical: 2,
     ...Platform.select({
       web: { wordBreak: 'keep-all', overflowWrap: 'anywhere' },
       default: {},

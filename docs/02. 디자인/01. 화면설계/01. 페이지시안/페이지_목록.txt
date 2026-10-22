@@ -1,0 +1,128 @@
+TripPrint 전체 페이지 디자인 / 2026-10-19
+기준: 전체페이지_디자인규격.txt·팝업_규격.txt·현행 design-tokens.json
+106개 디자인 화면. 앱 구현·서버 인수·Play 검수 결과와 구분한다.
+번호는 고정 식별자다. 화면별 HTML과 outputs/page-design/captures의 PNG는 같은 Num_페이지명으로 관리한다.
+
+디자인 시스템
+  000_디자인시스템.html | major | 상위 최상위 | 디자인 검토안
+
+홈 · 여행 시작
+  100_홈.html | major | 상위 최상위 | 디자인 검토안
+  110_여행만들기.html | child | 상위 home | 디자인 검토안
+  111_나라선택.html | child | 상위 create | 디자인 검토안
+  112_도시선택.html | child | 상위 create | 디자인 검토안
+  113_여행기간선택.html | child | 상위 create | 디자인 검토안
+  114_여행시작확인.html | child | 상위 create | 디자인 검토안
+
+내 여행 · 원본 관리
+  200_내여행.html | major | 상위 최상위 | 디자인 검토안
+  210_여행상세_일정.html | child | 상위 trips | 디자인 검토안
+  211_여행상세_지도.html | child | 상위 schedule | 디자인 검토안
+  212_여행상세_비용.html | child | 상위 schedule | 디자인 검토안
+  213_사진과영수증.html | child | 상위 schedule | 디자인 검토안
+  214_준비물.html | child | 상위 schedule | 디자인 검토안
+  215_동행관리.html | child | 상위 schedule | 디자인 검토안
+  216_여행정보수정.html | child | 상위 schedule | 디자인 검토안
+  217_여행기간변경.html | child | 상위 schedule | 디자인 검토안
+  220_장소검색.html | child | 상위 schedule | 디자인 검토안
+  221_내일정_장소설명과팁.html | child | 상위 schedule | 디자인 검토안
+  222_검색후보_장소확인.html | child | 상위 search | 디자인 검토안
+  223_일정작성.html | child | 상위 schedule | 디자인 검토안
+  224_이날소개작성.html | child | 상위 schedule | 디자인 검토안
+  225_일정위치선택.html | child | 상위 editor | 디자인 검토안
+  226_일정순서편집.html | child | 상위 schedule | 디자인 검토안
+  227_구글지도장소가져오기.html | child | 상위 schedule | 디자인 검토안
+  230_항공과예약.html | child | 상위 schedule | 디자인 검토안
+  231_항공편조회.html | child | 상위 flight | 디자인 검토안
+  232_항공권직접입력.html | child | 상위 flight | 디자인 검토안
+  233_숙소일정입력.html | child | 상위 flight | 디자인 검토안
+  234_지출직접입력.html | child | 상위 cost | 디자인 검토안
+  235_지출상세.html | child | 상위 cost | 디자인 검토안
+  236_영수증등록.html | child | 상위 media | 디자인 검토안
+  237_영수증확인.html | child | 상위 capture | 디자인 검토안
+  238_영수증원본보기.html | child | 상위 receipt | 디자인 검토안
+  239_여행사진상세.html | child | 상위 media | 디자인 검토안
+  240_초대참여.html | child | 상위 members | 디자인 검토안
+
+발견 · 공개 읽기
+  300_발견.html | major | 상위 최상위 | 디자인 검토안
+  310_공개여행계획.html | child | 상위 discover | 디자인 검토안
+  311_공개장소_설명과팁.html | child | 상위 public | 디자인 검토안
+  312_공개여행기록.html | child | 상위 discover | 디자인 검토안
+  313_도시가이드.html | child | 상위 discover | 디자인 검토안
+  314_가이드장소확인.html | child | 상위 guide | 디자인 검토안
+
+발자국 · 개인 기록
+  400_발자국.html | major | 상위 최상위 | 디자인 검토안
+  410_여행기록상세.html | child | 상위 footprints | 디자인 검토안
+  411_여행기록추가.html | child | 상위 diary | 디자인 검토안
+  420_공개항목선택.html | child | 상위 schedule | 디자인 검토안
+  421_선택공개미리보기.html | child | 상위 share | 디자인 검토안
+  422_공개완료.html | child | 상위 preview | 디자인 검토안
+
+MY · 계정
+  500_MY.html | major | 상위 최상위 | 디자인 검토안
+  510_프로필편집.html | child | 상위 my | 디자인 검토안
+  511_여행스타일선택.html | child | 상위 profile | 디자인 검토안
+  512_알림설정.html | child | 상위 my | 디자인 검토안
+  513_계정설정.html | child | 상위 my | 디자인 검토안
+  514_공개한여행관리.html | child | 상위 my | 디자인 검토안
+  515_이기기의이전기록.html | child | 상위 my | 디자인 검토안
+
+시작 · 인증
+  600_앱시작.html | major | 상위 최상위 | 디자인 검토안
+  610_로그인.html | child | 상위 startup | 디자인 검토안
+  611_이메일로그인.html | child | 상위 login | 디자인 검토안
+  612_이메일가입.html | child | 상위 login | 디자인 검토안
+  613_프로필설정.html | child | 상위 login | 디자인 검토안
+  614_인증후원래화면복귀.html | child | 상위 login | 디자인 검토안
+  615_시작연결점검.html | child | 상위 startup | 디자인 검토안
+  616_필수업데이트.html | child | 상위 startup | 디자인 검토안
+
+예외 화면
+  701_예외_첫여행.html | exception | 상위 home | 디자인 검토안
+  702_예외_일정없음.html | exception | 상위 schedule | 디자인 검토안
+  703_예외_검색결과없음.html | exception | 상위 search | 디자인 검토안
+  704_예외_완료여행없음.html | exception | 상위 footprints | 디자인 검토안
+  705_예외_오프라인.html | exception | 상위 schedule | 디자인 검토안
+  706_예외_불러오기실패.html | exception | 상위 trips | 디자인 검토안
+  707_예외_저장실패.html | exception | 상위 editor | 디자인 검토안
+  708_예외_동시편집충돌.html | exception | 상위 editor | 디자인 검토안
+  709_예외_위치권한거부.html | exception | 상위 location | 디자인 검토안
+  710_예외_위치정확도낮음.html | exception | 상위 location | 디자인 검토안
+  711_예외_위치서비스꺼짐.html | exception | 상위 location | 디자인 검토안
+  712_예외_카메라권한거부.html | exception | 상위 capture | 디자인 검토안
+  713_예외_영수증인식실패.html | exception | 상위 receipt | 디자인 검토안
+  714_예외_미지원통화.html | exception | 상위 receipt | 디자인 검토안
+  715_예외_영수증합계차이.html | exception | 상위 receipt | 디자인 검토안
+  716_예외_사진실패.html | exception | 상위 public | 디자인 검토안
+  717_예외_공개철회.html | exception | 상위 public | 디자인 검토안
+  718_예외_편집권한없음.html | exception | 상위 schedule | 디자인 검토안
+  719_예외_초대만료.html | exception | 상위 invite | 디자인 검토안
+  720_예외_로그인만료.html | exception | 상위 editor | 디자인 검토안
+  721_예외_지출없음.html | exception | 상위 cost | 디자인 검토안
+  722_예외_로그인필요.html | exception | 상위 trips | 디자인 검토안
+  723_예외_지도불러오기실패.html | exception | 상위 map | 디자인 검토안
+  724_예외_항공편조회없음.html | exception | 상위 flightSearch | 디자인 검토안
+
+팝업 · 시트
+  801_팝업_여행더보기.html | popup | 상위 schedule | 디자인 검토안
+  802_팝업_작성중이탈.html | popup | 상위 editor | 디자인 검토안
+  803_팝업_일정삭제.html | popup | 상위 place | 디자인 검토안
+  804_팝업_기간축소영향.html | popup | 상위 changePeriod | 디자인 검토안
+  805_팝업_공개확정.html | popup | 상위 preview | 디자인 검토안
+  806_팝업_공개철회.html | popup | 상위 publications | 디자인 검토안
+  807_팝업_로그아웃.html | popup | 상위 account | 디자인 검토안
+  808_팝업_회원탈퇴.html | popup | 상위 account | 디자인 검토안
+  809_팝업_동행권한변경.html | popup | 상위 members | 디자인 검토안
+  810_팝업_동행참여해제.html | popup | 상위 members | 디자인 검토안
+  811_팝업_초대링크만들기.html | popup | 상위 members | 디자인 검토안
+  812_팝업_도시가이드출처.html | popup | 상위 guide | 디자인 검토안
+  813_팝업_장소사진정보.html | popup | 상위 publicPlace | 디자인 검토안
+  814_팝업_통화선택.html | popup | 상위 expenseEditor | 디자인 검토안
+  815_팝업_달력선택.html | popup | 상위 period | 디자인 검토안
+  816_팝업_일정시간선택.html | popup | 상위 editor | 디자인 검토안
+  817_팝업_사진등록방법.html | popup | 상위 media | 디자인 검토안
+  818_팝업_공개내용신고.html | popup | 상위 public | 디자인 검토안
+  819_팝업_작성자차단.html | popup | 상위 public | 디자인 검토안
+  820_팝업_위치설정복귀.html | popup | 상위 location | 디자인 검토안

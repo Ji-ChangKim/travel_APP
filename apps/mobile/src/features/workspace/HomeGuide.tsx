@@ -33,10 +33,10 @@ export default function HomeGuide() {
         <View style={styles.heading}>
           <Ionicons name="bulb-outline" size={20} color={colors.accent} />
           <Text accessibilityRole="header" style={styles.title}>
-            TripPrint 200% 활용 팁
+            여행 활용 가이드
           </Text>
         </View>
-        <Text style={styles.badge}>초보 가이드</Text>
+        <Text style={styles.badge}>처음이라면</Text>
       </View>
       {tips.map((tip) => {
         // 팁의 제목과 설명을 큰 글꼴에서도 잘리지 않게 함께 표시한다.

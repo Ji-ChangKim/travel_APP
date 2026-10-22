@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "days": 4,
+  "schedules": 23,
+  "commands": 28,
+  "requestSchemas": "passed",
+  "publicProjection": "passed",
+  "maxRequestBytes": 1907,
+  "sourceSha256": "c1f7e9bb17f4211c0f5a01a364fb9928aec4ba51138fbe0683167b43059569a4",
+  "remoteWrites": 0
+}

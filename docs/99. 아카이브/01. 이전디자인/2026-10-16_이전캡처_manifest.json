@@ -1,0 +1,601 @@
+{
+  "capturedOn": "2026-10-16",
+  "sourceRevision": "working-tree-before-header-commit",
+  "scope": "실제 웹 앱 헤더. 기기 네이티브 글자 배율·노치·스크린리더 인증을 대신하지 않음.",
+  "checkedViewports": [320, 390, 430],
+  "checkedTextResizePercent": [100, 200],
+  "checkedScreens": 26,
+  "checkedCaptures": 156,
+  "result": "헤더 6개 조건 + WCAG AA 3개 시나리오 통과",
+  "shots": [
+    {
+      "file": "current/home-390-100.png",
+      "size": [390, 844],
+      "sha256": "c79574d43b7e145601b9d2d5bf74c951a5eb899fe4a64a1fd259e4f05cec1e6e",
+      "name": "홈",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/home-320-200.png",
+      "size": [320, 844],
+      "sha256": "1c7bcd365c4c29612669733d3a136cf0f18e7078d7cbf1e1dab8c62d8bece525",
+      "name": "홈",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/plans-390-100.png",
+      "size": [390, 844],
+      "sha256": "2a50e76be2f36dc219374cace07c7938bb34790e17e086ad390481821dc4e76d",
+      "name": "내 여행",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/plans-320-200.png",
+      "size": [320, 844],
+      "sha256": "7355ffec9d4179a1b41a7e0bc9cd3b163be234c8991b1b771f6c221929703475",
+      "name": "내 여행",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/create-390-100.png",
+      "size": [390, 844],
+      "sha256": "506f6f308c0ce09c488c4c5b82753b5c1efbcbeaa9a0462309bf091b83e3c1c8",
+      "name": "여행 만들기",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/create-320-200.png",
+      "size": [320, 844],
+      "sha256": "341ccb9928909e2b855181f01c1bad29aa01bff5b7d6ead501b43c7099dad8f4",
+      "name": "여행 만들기",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/country-390-100.png",
+      "size": [390, 844],
+      "sha256": "4c24af7e77cfbffefe93ac7f3c4fefcea17bf76d9a536a3fd90cf5a598abcb12",
+      "name": "나라 선택",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/country-320-200.png",
+      "size": [320, 844],
+      "sha256": "de38dcff67275a2cd01cff9154a164e0116c868db9b60da5ca2d59971d6575be",
+      "name": "나라 선택",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/city-390-100.png",
+      "size": [390, 844],
+      "sha256": "9141aad4642c1fc79493ecc24c2f969752a347b1bb7213b1ed714c62558ed8f7",
+      "name": "도시 선택",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/city-320-200.png",
+      "size": [320, 844],
+      "sha256": "054ac44b16b76ccf81acb46f52085680489f5859f23998b6374ac9cb1c31da86",
+      "name": "도시 선택",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/flights-390-100.png",
+      "size": [390, 844],
+      "sha256": "f94a08026cd5fa0da15239e766d3bfc66332611313a5794e81feb43d94585ad8",
+      "name": "항공편 선택",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/flights-320-200.png",
+      "size": [320, 844],
+      "sha256": "3d03ecf88d52110f9e9617f08fe0618904f4387bef7ba4bfda3c8a91ffe7b227",
+      "name": "항공편 선택",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/ticket-390-100.png",
+      "size": [390, 844],
+      "sha256": "1a300242639f7129783100231c8764ac3673f19040d16f4fd3950a31a8b48011",
+      "name": "항공권 입력",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/ticket-320-200.png",
+      "size": [320, 844],
+      "sha256": "c6c19becbc1eff36bd346e295a69524ab404e412c834d09b16b357cd078aee7b",
+      "name": "항공권 입력",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/detail-일정-390-100.png",
+      "size": [390, 844],
+      "sha256": "a9296dcd5fe4dbffd77e84cb13e6ae180db71cb1b2d0c6abcda797ee76eb632d",
+      "name": "여행 상세 · 일정",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/detail-일정-320-200.png",
+      "size": [320, 844],
+      "sha256": "5c2fbac61a7f402e02a96b374180dbd8090de269f2f19004ad698dfb7270f5e5",
+      "name": "여행 상세 · 일정",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/detail-지도-390-100.png",
+      "size": [390, 844],
+      "sha256": "9505aa4028d51016affc53ef5d825e527654ad686e2f19545136c0db1e501373",
+      "name": "여행 상세 · 지도",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/detail-지도-320-200.png",
+      "size": [320, 844],
+      "sha256": "bef045268af249a3769a4751287273eba63bccabca9064254134570edd1fa45b",
+      "name": "여행 상세 · 지도",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/detail-비용-390-100.png",
+      "size": [390, 844],
+      "sha256": "b5e5483be2f85dcc3301d87326eb0f2ef0ba86db69049325c34755dea37767ba",
+      "name": "여행 상세 · 비용",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/detail-비용-320-200.png",
+      "size": [320, 844],
+      "sha256": "7eac9be0c05cad34b0a5717c638d19f852f149d96f0951ec767c7710334f6ad7",
+      "name": "여행 상세 · 비용",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/detail-사진·영수증-390-100.png",
+      "size": [390, 844],
+      "sha256": "29ec0c23d42c1e7b063d947f0994a6bd98651f1b31ad7df664096c87399db182",
+      "name": "여행 상세 · 사진·영수증",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/detail-사진·영수증-320-200.png",
+      "size": [320, 844],
+      "sha256": "2f7bd1f48fa054fc744bbe090692251b5d2de9a399be2497ab23f66288bdcc1c",
+      "name": "여행 상세 · 사진·영수증",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/detail-준비물-390-100.png",
+      "size": [390, 844],
+      "sha256": "bff6840a9282cd0f6696735e27e571de822d0345bbcbc8dd7400821762eb1de7",
+      "name": "여행 상세 · 준비물",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/detail-준비물-320-200.png",
+      "size": [320, 844],
+      "sha256": "4c0265d62156e9f67c8b80dae341556916bf6aa1acaf1bb1002c23a3f56927fe",
+      "name": "여행 상세 · 준비물",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/detail-동행-390-100.png",
+      "size": [390, 844],
+      "sha256": "4a7f6b79520adc3883be3a1724f56aeff0fe1cd8775989078630f0cc697f8a91",
+      "name": "여행 상세 · 동행",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/detail-동행-320-200.png",
+      "size": [320, 844],
+      "sha256": "e19f8b263f38198c270ef79df7ee1f5ba64e29114e2260dd08b6e4a953c053e0",
+      "name": "여행 상세 · 동행",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/schedule-editor-390-100.png",
+      "size": [390, 844],
+      "sha256": "f63f6effe1bd6f4baf22367b75c41cfcbe4247f94f4b487553752d09f410699f",
+      "name": "일정 작성",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/schedule-editor-320-200.png",
+      "size": [320, 844],
+      "sha256": "055f5ffde84edcf984daf5ebebd50c04f4ff88af3e1a8d8479c56a0827ade9d1",
+      "name": "일정 작성",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/metadata-390-100.png",
+      "size": [390, 844],
+      "sha256": "cbd520df94e949e1015f1e27ee1e3d5be3f79fa0915947e2e757e958f545287e",
+      "name": "여행 정보 수정",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/metadata-320-200.png",
+      "size": [320, 844],
+      "sha256": "4813d5edf8ca09a16f8df162ae4f7c8e4e6f08d7246fc88e098f484f8ebb9e53",
+      "name": "여행 정보 수정",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/period-390-100.png",
+      "size": [390, 844],
+      "sha256": "397ab5e24293900da9b35534228a7d5386297b830a54d59cc0deaf26aabd5cd7",
+      "name": "여행 기간 변경",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/period-320-200.png",
+      "size": [320, 844],
+      "sha256": "2560f099873f4029b867c876a8b808699c92fb714dd15d0301da9ce2310839e4",
+      "name": "여행 기간 변경",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/footprints-390-100.png",
+      "size": [390, 844],
+      "sha256": "949d7a750627d35ad774ac60234958196699214b511b50dd7240b9f8597bedf7",
+      "name": "발자국",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/footprints-320-200.png",
+      "size": [320, 844],
+      "sha256": "9a2a3ed968e1745082b6c5ad0f248570b72c97fcb6066b90aeef47e4b43a8730",
+      "name": "발자국",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/community-390-100.png",
+      "size": [390, 844],
+      "sha256": "3bf02f1871ba3cdc96ee9e24e13edd80ab47cabd69c9c0144bf692c584e7193e",
+      "name": "커뮤니티",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/community-320-200.png",
+      "size": [320, 844],
+      "sha256": "5f500c3a963199ed7518afe9d010155c499d437551dbd78bbf8f3df6d7677db0",
+      "name": "커뮤니티",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/my-390-100.png",
+      "size": [390, 844],
+      "sha256": "0af9a23160046a44f8f937c1083c7a0d638f3903308e323af5210732d7fa9bd2",
+      "name": "MY",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/my-320-200.png",
+      "size": [320, 844],
+      "sha256": "4d7e6d734901771b0bcfdf1c5cffb269309393e50384183fda86e7549ded569a",
+      "name": "MY",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/guide-390-100.png",
+      "size": [390, 844],
+      "sha256": "8d05213d1b6c4cb8c918a96b90a2c449b81671ad82149f24914d07291eb30d8c",
+      "name": "도시 가이드",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/guide-320-200.png",
+      "size": [320, 844],
+      "sha256": "0c61f14659f82f74fe8162bbbf56327056f6c0e4d0a1ccc4590196726458b35d",
+      "name": "도시 가이드",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/diary-390-100.png",
+      "size": [390, 844],
+      "sha256": "824c0a2b12fd58218667ab1f07f2e17e31a4b677f7500955a903741bd0390da5",
+      "name": "다이어리",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/diary-320-200.png",
+      "size": [320, 844],
+      "sha256": "c4732375254f979de3ce11900065d0a1b6a76ce434f7af29306dd7fa6427767b",
+      "name": "다이어리",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/invite-390-100.png",
+      "size": [390, 844],
+      "sha256": "4d36c5712809e0fd6d19c3592088cabe8e0ff1a6d89d126f35dabea93015dfc0",
+      "name": "초대",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/invite-320-200.png",
+      "size": [320, 844],
+      "sha256": "68139be216f1a1a141ee34fea68856675f5990422bd73d210c94b77edf638c87",
+      "name": "초대",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/import-390-100.png",
+      "size": [390, 844],
+      "sha256": "772148ced76b418a2bdbff2150ee221b01fea766ee6eb6a8eb606e9d12265573",
+      "name": "장소 가져오기",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/import-320-200.png",
+      "size": [320, 844],
+      "sha256": "c3738d7b7c2b55cdaa54e67b04215cb60d2a5a2734ee1afd5986a8ad0ad91fb5",
+      "name": "장소 가져오기",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/legacy-390-100.png",
+      "size": [390, 844],
+      "sha256": "37c0faa5b212deaea80669f5d7bebcdf0b6c38334231422974ca255119696a9d",
+      "name": "이전 기기 기록",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/legacy-320-200.png",
+      "size": [320, 844],
+      "sha256": "d6d01a27a82f31cb1da176d428170e65d9fbe8b563242e2783c56f323ebf1f1f",
+      "name": "이전 기기 기록",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/profile-390-100.png",
+      "size": [390, 844],
+      "sha256": "832ea95a2f4a3286d0e7f35083b7916a522704a3f905b1ec13e8c7bfcb4f9379",
+      "name": "프로필 편집",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/profile-320-200.png",
+      "size": [320, 844],
+      "sha256": "3b24863f841c17022bb9e14d5fe4cbcb483e1c02f1aea6aca2cf9c5d94eb1fdc",
+      "name": "프로필 편집",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/email-390-100.png",
+      "size": [390, 844],
+      "sha256": "2f81c652b544f782c7595bd5dfaed7334a8b15fe61d339c5678d977af0335bb3",
+      "name": "이메일 인증",
+      "viewport": [390, 844],
+      "textResizePercent": 100,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    },
+    {
+      "file": "current/email-320-200.png",
+      "size": [320, 844],
+      "sha256": "1e5c6db0b3ead854248569ffb591bc7b7aefe73ffa78865b32c18ac77e39e0fb",
+      "name": "이메일 인증",
+      "viewport": [320, 844],
+      "textResizePercent": 200,
+      "source": "실제 앱 웹 번들 · HTTP 검증 응답 · 사용자 조작",
+      "status": "header-regression-passed"
+    }
+  ],
+  "retainedHistoricalNative": [
+    {
+      "file": "../../02. 디자인/01. 화면설계/73_권한안내_Android.png",
+      "size": [1080, 2400],
+      "sha256": "cd38c435fd13809f3033d90063dff80fbbe332917cb304e5a3bc2872d429736d",
+      "capturedAt": "2026-10-14T03:19:09.342Z",
+      "status": "historical-native-reference",
+      "limitation": "2026-10-14 캡처. 현재 헤더 검수 통과 증거가 아니며 지도 타일 정상 로드 증거도 아니다."
+    },
+    {
+      "file": "../../02. 디자인/01. 화면설계/74_알림권한요청_Android.png",
+      "size": [1080, 2400],
+      "sha256": "76d7f33345ce0b9b9825649f2484923170b43d719f5412d146cad7f22ffa8aff",
+      "capturedAt": "2026-10-14T03:19:09.342Z",
+      "status": "historical-native-reference",
+      "limitation": "2026-10-14 캡처. 현재 헤더 검수 통과 증거가 아니며 지도 타일 정상 로드 증거도 아니다."
+    },
+    {
+      "file": "../../02. 디자인/01. 화면설계/75_위치권한요청_Android.png",
+      "size": [1080, 2400],
+      "sha256": "9a76ba2c65d3dfae97d535bf6084ad6d709bf32d468a8e3e056b5bc4b435f302",
+      "capturedAt": "2026-10-14T03:19:09.342Z",
+      "status": "historical-native-reference",
+      "limitation": "2026-10-14 캡처. 현재 헤더 검수 통과 증거가 아니며 지도 타일 정상 로드 증거도 아니다."
+    },
+    {
+      "file": "../../02. 디자인/01. 화면설계/77_여행지도_Android.png",
+      "size": [1080, 2400],
+      "sha256": "312af163dc42eabc7de08085a057a28b70fc82649d116ecd565189db5318f816",
+      "capturedAt": "2026-10-14T03:19:09.342Z",
+      "status": "historical-native-reference",
+      "limitation": "2026-10-14 캡처. 현재 헤더 검수 통과 증거가 아니며 지도 타일 정상 로드 증거도 아니다."
+    },
+    {
+      "file": "../../02. 디자인/01. 화면설계/78_일정지도위치선택_Android.png",
+      "size": [1080, 2400],
+      "sha256": "919693d5105e19190e5fabc87462532a5c78b34740db5587a0fc429cd9bdd4d6",
+      "capturedAt": "2026-10-14T03:19:09.342Z",
+      "status": "historical-native-reference",
+      "limitation": "2026-10-14 캡처. 현재 헤더 검수 통과 증거가 아니며 지도 타일 정상 로드 증거도 아니다."
+    },
+    {
+      "file": "../../02. 디자인/01. 화면설계/79_일정시간선택_Android.png",
+      "size": [1080, 2400],
+      "sha256": "e52abec0a2eb2851adcab3641d8165b087023811675c89ea9d65344c21050f39",
+      "capturedAt": "2026-10-14T03:19:09.342Z",
+      "status": "historical-native-reference",
+      "limitation": "2026-10-14 캡처. 현재 헤더 검수 통과 증거가 아니며 지도 타일 정상 로드 증거도 아니다."
+    }
+  ],
+  "feedbackOriginals": [
+    {
+      "file": "review/home-before.jpg",
+      "sha256": "82e2309ff7b3db8872360dc2c95539c2a40c1bcb30c881912521a17d9e7f338d",
+      "status": "user-feedback-original"
+    },
+    {
+      "file": "review/plans-before.jpg",
+      "sha256": "89fccd14a101d4634a662081de41c67a3e3f8764b23a1fdc2cd5ac98de05c99b",
+      "status": "user-feedback-original"
+    },
+    {
+      "file": "review/schedule-before.jpg",
+      "sha256": "5798a7424d5d53cd95b59615070d7184b9775ab44f25af3ceaa98fe3d48f466a",
+      "status": "user-feedback-original"
+    }
+  ],
+  "imageCount": 61,
+  "removedObsoleteImageCount": 154
+}

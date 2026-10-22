@@ -21,6 +21,7 @@ import { type Dispatch, type SetStateAction } from 'react';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from './myAccountStyles';
+import { onGnbScroll } from '@/components/navigationScroll';
 
 // 여행 스타일 선택 옵션 목록을 정의한다.
 export const TRAVEL_STYLE_OPTIONS = [
@@ -98,7 +99,11 @@ export function renderAccountContent({
     <SafeAreaView style={styles.screen}>
       <ModalBackground>
         <ScreenHeader title="MY" />
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          onScroll={onGnbScroll}
+          scrollEventThrottle={16}
+        >
           {profileNotice ? (
             <Text accessibilityRole="alert" style={{ color: colors.text }}>
               {profileNotice}
@@ -173,25 +178,27 @@ export function renderAccountContent({
             </View>
           </View>
 
-          <Action
-            label="계정 관리"
-            onPress={() => {
-              // 탈퇴는 주 여행 화면 대신 본인 계정 관리 안에서 확인한다.
-              return router.push('/account');
-            }}
-          />
-          {/* 로그아웃 버튼 */}
-          <DesignButton
-            label="로그아웃"
-            variant="danger"
-            disabled={isSavingProfile || logoutBusy}
-            onPress={handleLogout}
-            icon={(color) => {
-              /* 로그아웃은 위험 행동의 대비를 유지한다. */ return (
-                <Ionicons name="log-out-outline" size={18} color={color} />
-              );
-            }}
-          />
+          <View style={styles.accountActions}>
+            <Action
+              label="계정 관리"
+              onPress={() => {
+                // 탈퇴는 주 여행 화면 대신 본인 계정 관리 안에서 확인한다.
+                return router.push('/account');
+              }}
+            />
+            {/* 로그아웃 버튼 */}
+            <DesignButton
+              label="로그아웃"
+              variant="danger"
+              disabled={isSavingProfile || logoutBusy}
+              onPress={handleLogout}
+              icon={(color) => {
+                /* 로그아웃은 위험 행동의 대비를 유지한다. */ return (
+                  <Ionicons name="log-out-outline" size={18} color={color} />
+                );
+              }}
+            />
+          </View>
         </ScrollView>
       </ModalBackground>
       {/* 개인 프로필 수정 모달 */}
@@ -384,7 +391,7 @@ export function renderProfileEditor({
               placeholder="닉네임 입력"
               placeholderTextColor={colors.mutedLight}
             />
-            <Text style={styles.editInputLabel}>{nicknameHint}</Text>
+            <Text style={styles.inputHint}>{nicknameHint}</Text>
             {!validProfileNickname(editNickname, currentUser?.nickname) ? (
               <Text
                 accessibilityRole="alert"

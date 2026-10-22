@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { homeColors as colors } from './homeTheme';
 import HomeHeroBackground from './HomeHeroBackground';
+import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 
 interface Props {
   disabled: boolean;
@@ -19,6 +20,7 @@ export default function HomeEmptyHero({
 }: Props) {
   // 기본 카드 비율을 따르되 글자가 커지면 내용 높이만큼 확장한다.
   const { width } = useWindowDimensions();
+  const { largeText } = useAppAccessibility();
   const [cardWidth, setCardWidth] = useState(0);
   return (
     <View
@@ -45,10 +47,12 @@ export default function HomeEmptyHero({
           style={styles.title}
         >
           다음 여행,
-          <Text aria-hidden style={styles.mark}>
-            {' '}
-            {' ///'}
-          </Text>
+          {!largeText && (
+            <Text aria-hidden style={styles.mark}>
+              {' '}
+              {' ///'}
+            </Text>
+          )}
           {'\n'}어디로 떠나볼까요?
         </Text>
         <Text style={styles.description}>
@@ -102,7 +106,16 @@ const styles = StyleSheet.create({
     shadowRadius: 24,
     elevation: 2,
   },
-  copy: { paddingTop: 4, paddingLeft: 4, gap: 8 },
+  copy: {
+    // 배경 그림의 어두운 부분과 겹쳐도 제목·설명의 읽기 대비를 유지한다.
+    paddingTop: 4,
+    paddingLeft: 4,
+    paddingRight: 8,
+    paddingBottom: 8,
+    gap: 8,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+  },
   title: {
     color: '#142338',
     fontSize: 24,

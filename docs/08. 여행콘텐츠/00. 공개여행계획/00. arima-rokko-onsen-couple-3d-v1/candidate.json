@@ -1,0 +1,154 @@
+{
+  "tripCreate": {
+    "title": "[오사카 근교] 아리마 온천 킨노유 료칸 호캉스와 롯코산 야경 2박 3일",
+    "country": "일본",
+    "city": "고베",
+    "startDate": "2026-12-24",
+    "endDate": "2026-12-26",
+    "timezone": "Asia/Tokyo",
+    "defaultCurrency": "JPY",
+    "coverColor": "#A53860"
+  },
+  "planKey": "arima-rokko-onsen-couple-3d-v1",
+  "publicBody": "1,300년 역사의 일본 3대 고온천 아리마 킨노유(황금빛 온천)와 프라이빗 료칸 가이세키, 롯코산 1,000만 달러 보석 야경이 어우러진 연인들의 궁극의 힐링 호캉스.",
+  "days": [
+    {
+      "dayNumber": 1,
+      "planTitle": "황금빛 온천마을, 아리마 온천 입성과 료칸 가이세키",
+      "planConcept": "우메다에서 직행 고속버스를 타고 아리마에 도착해 수제 메밀국수를 맛보고 프라이빗 노천온천을 즐깁니다.",
+      "schedules": [
+        {
+          "title": "브랑제리 부르디갈라 크루아상 조식",
+          "type": "PLACE",
+          "timeSlot": "09:00",
+          "sortOrder": 1,
+          "address": "오사카부 오사카시 기타구 우메다 2-5-25",
+          "description": "버터 풍미 가득한 프랑스식 크루아상과 진한 카페오레로 여행을 시작합니다.",
+          "costAmount": "800"
+        },
+        {
+          "title": "아리마 온천 직행 고속버스 이동",
+          "type": "TRANSPORT",
+          "timeSlot": "10:00",
+          "sortOrder": 2,
+          "address": "우메다 한큐삼번가 버스터미널",
+          "description": "환승 없이 55분 만에 산골짜기 고즈넉한 온천마을에 도착합니다.",
+          "costAmount": "1400"
+        },
+        {
+          "title": "무라겐 쥬와리 수제 메밀소바",
+          "type": "PLACE",
+          "timeSlot": "12:00",
+          "sortOrder": 3,
+          "address": "효고현 고베시 기타구 아리마초 1019",
+          "description": "맑은 온천수가 흐르는 계곡 고택에서 장인이 100% 순메밀로 뽑아내는 메밀국수와 야채 튀김.",
+          "costAmount": "1850"
+        },
+        {
+          "title": "아리마 킨노유 족욕 & 온천천 산책",
+          "type": "PLACE",
+          "timeSlot": "14:30",
+          "sortOrder": 4,
+          "address": "효고현 고베시 기타구 아리마초 833",
+          "description": "붉은 네네바시 다리 아래 모락모락 김이 피어오르는 황금빛 온천수에 발을 담그고 탄산 센베이 시식.",
+          "costAmount": "0"
+        },
+        {
+          "title": "타케토리테이 마루야마 료칸 흑모와규 가이세키",
+          "type": "PLACE",
+          "timeSlot": "18:30",
+          "sortOrder": 5,
+          "address": "효고현 고베시 기타구 아리마초 1364-1",
+          "description": "전용 객실에서 즐기는 효고현산 흑모와규 샤브샤브와 은어 구이 10코스 만찬 후 별빛 노천욕.",
+          "costAmount": "18000"
+        }
+      ]
+    },
+    {
+      "dayNumber": 2,
+      "planTitle": "롯코산 1,000만 달러 야경과 숲속 힐링",
+      "planConcept": "료칸 정통 조식, 국립공원 케이블카를 타고 롯코산 정상에서 고베항을 굽어보며 징기스칸과 야경을 누립니다.",
+      "schedules": [
+        {
+          "title": "료칸 가마솥 정식 조식",
+          "type": "PLACE",
+          "timeSlot": "08:30",
+          "sortOrder": 1,
+          "address": "료칸 다이닝",
+          "description": "온천수로 끓여낸 순두부와 온천 반숙란, 은대구 유안야키로 속을 편안하게 깨웁니다.",
+          "costAmount": "0"
+        },
+        {
+          "title": "롯코-아리마 로프웨이 케이블카",
+          "type": "TRANSPORT",
+          "timeSlot": "10:30",
+          "sortOrder": 2,
+          "address": "효고현 고베시 기타구 아리마초 로프웨이 승강장",
+          "description": "해발 880m 국립공원 단풍 협곡을 가로지르는 공중 산책.",
+          "costAmount": "1030"
+        },
+        {
+          "title": "롯코 뷰 팰리스 치즈 함박스테이크",
+          "type": "PLACE",
+          "timeSlot": "12:30",
+          "sortOrder": 3,
+          "address": "효고현 고베시 나다구 롯코산초 이치모리 1877-9",
+          "description": "통유리 너머로 바다를 굽어보며 롯코산 목장 수제 치즈 함박스테이크와 비프카레 점심.",
+          "costAmount": "2200"
+        },
+        {
+          "title": "롯코 시다레 자연체감 전망대",
+          "type": "PLACE",
+          "timeSlot": "15:00",
+          "sortOrder": 4,
+          "address": "효고현 고베시 나다구 롯코산초 가든테라스",
+          "description": "나뭇가지를 형상화한 환상적인 조형물 안에서 바람과 햇살을 느끼는 감성 스팟.",
+          "costAmount": "310"
+        },
+        {
+          "title": "롯코산 징기스칸 팰리스 & 텐란다이 야경",
+          "type": "PLACE",
+          "timeSlot": "18:00",
+          "sortOrder": 5,
+          "address": "효고현 고베시 나다구 롯코산초 이치모리",
+          "description": "생양고기 무쇠구이와 로컬 맥주 디너 후 텐란다이 전망대에서 일본 3대 야경 보석 불빛 감상.",
+          "costAmount": "4200"
+        }
+      ]
+    },
+    {
+      "dayNumber": 3,
+      "planTitle": "온천 소금 디저트와 고베항 베이셔틀 귀국",
+      "planConcept": "아리마 천연 소금 롤케이크, 산노미야 돈카츠 노포 후 바다를 건너는 고속선을 타고 간사이 공항 직행.",
+      "schedules": [
+        {
+          "title": "카페 드 보 온천 소금 롤케이크",
+          "type": "PLACE",
+          "timeSlot": "09:30",
+          "sortOrder": 1,
+          "address": "효고현 고베시 기타구 아리마초 835",
+          "description": "킨노유 온천수를 정제한 천연 소금 카라멜 롤케이크와 핸드드립 커피 조식.",
+          "costAmount": "950"
+        },
+        {
+          "title": "산노미야 돈카츠 무사시 본점",
+          "type": "PLACE",
+          "timeSlot": "12:30",
+          "sortOrder": 2,
+          "address": "효고현 고베시 주오구 산노미야초 3-9-3",
+          "description": "80년 전통의 기름기 없이 깔끔하고 담백한 수제 히레카츠 정식.",
+          "costAmount": "1700"
+        },
+        {
+          "title": "고베-간사이 공항 베이셔틀 고속선",
+          "type": "TRANSPORT",
+          "timeSlot": "14:30",
+          "sortOrder": 3,
+          "address": "효고현 고베시 주오구 고베공항 해상터미널",
+          "description": "시원한 바닷바람을 가르며 30분 만에 간사이 국제공항에 직행하여 탑승합니다.",
+          "costAmount": "500"
+        }
+      ]
+    }
+  ]
+}

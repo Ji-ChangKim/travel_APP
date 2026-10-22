@@ -9,6 +9,7 @@ import PublicFeedCard from './PublicFeedCard';
 import PublicFeedControls from './PublicFeedControls';
 import type { CommunityFeedViewProps } from './communityFeedTypes';
 import { publicFeedStyles as s } from './publicFeedStyles';
+import { onGnbScroll } from '@/components/navigationScroll';
 
 // 최신 발자국 시안을 실제 공개 목록·검색·안전 행동에 연결한다.
 export function renderDiscoveryContent(props: CommunityFeedViewProps) {
@@ -40,6 +41,8 @@ export function renderDiscoveryContent(props: CommunityFeedViewProps) {
         style={{ flex: 1 }}
         contentContainerStyle={s.content}
         keyboardShouldPersistTaps="handled"
+        onScroll={onGnbScroll}
+        scrollEventThrottle={16}
         data={posts}
         keyExtractor={(post) => {
           /* 게시물 ID로 카드 수명을 유지한다. */ return post.id;

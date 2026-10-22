@@ -1,0 +1,12 @@
+{
+  "base": "https://tripprint-api-staging.gametps.workers.dev",
+  "planKey": "sapporo-snow-family-4d-v1",
+  "tripId": "36038980-7fa3-41b3-87fe-4a99c1602566",
+  "postId": "089f1b38-c88e-4cd7-8f44-b5a9a13739ee",
+  "author": "가이드 하루",
+  "days": 4,
+  "schedules": 19,
+  "cover": "36038980-7fa3-41b3-87fe-4a99c1602566/7f14eb68-7ce4-4c74-88a9-c6d9ca526270.jpg",
+  "verifiedAt": "2026-10-21T11:33:02.110Z",
+  "publicUrl": "https://tripprint-staging.pages.dev/community/089f1b38-c88e-4cd7-8f44-b5a9a13739ee"
+}

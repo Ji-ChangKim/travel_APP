@@ -1,0 +1,206 @@
+{
+  "tripCreate": {
+    "title": "[오사카 근교] 고야산 삼나무 숲 사찰 템플로드와 우지 녹차 다도 3박 4일",
+    "country": "일본",
+    "city": "와카야마",
+    "startDate": "2026-11-05",
+    "endDate": "2026-11-08",
+    "timezone": "Asia/Tokyo",
+    "defaultCurrency": "JPY",
+    "coverColor": "#588157"
+  },
+  "planKey": "koyasan-uji-culture-friends-4d-v1",
+  "publicBody": "뻔한 여행지에 질린 친구들을 위한 깊이 있는 문화 웰니스 로드트립! 1,200년 영산 고야산의 신비로운 삼나무 숲 야간 투어, 일본 1위 와카야마 돈골라멘, 녹차 수도 우지 차소바와 다도 체험을 망라했습니다.",
+  "days": [
+    {
+      "dayNumber": 1,
+      "planTitle": "해발 800m 영산, 고야산 사찰 템플로드 입성",
+      "planConcept": "산악 케이블카를 타고 신비로운 고야산에 올라 140년 전통 사찰 정진요리를 맛보고 삼나무 숲길을 걷습니다.",
+      "schedules": [
+        {
+          "title": "난카이 소바 난바점 고기우동",
+          "type": "PLACE",
+          "timeSlot": "08:30",
+          "sortOrder": 1,
+          "address": "오사카부 오사카시 주오구 난바 5-1-60",
+          "description": "산으로 올라가기 전 따끈하고 진한 육수의 고기 우동과 유부초밥으로 든든한 출발.",
+          "costAmount": "620"
+        },
+        {
+          "title": "난카이 특급 코우야 & 고야산 케이블카",
+          "type": "TRANSPORT",
+          "timeSlot": "09:30",
+          "sortOrder": 2,
+          "address": "난카이 고야선 열차",
+          "description": "울창한 산악 절경을 뚫고 오르는 레트로 궤도 열차 이동.",
+          "costAmount": "1850"
+        },
+        {
+          "title": "하나비시 140년 전통 사찰 정진요리",
+          "type": "PLACE",
+          "timeSlot": "12:30",
+          "sortOrder": 3,
+          "address": "와카야마현 이토군 고야초 고야산 769",
+          "description": "칡가루와 참깨로 빚어낸 고야산 명물 참깨두부(고마도후)와 제철 버섯 채식 정식.",
+          "costAmount": "3300"
+        },
+        {
+          "title": "단조가란 근본대탑 & 곤고부지 석정",
+          "type": "PLACE",
+          "timeSlot": "14:30",
+          "sortOrder": 4,
+          "address": "와카야마현 이토군 고야초 고야산 152",
+          "description": "주홍빛 웅장한 대탑과 일본 최대 규모의 용 그림 모래 석정 관람.",
+          "costAmount": "1000"
+        },
+        {
+          "title": "오쿠노인 2km 삼나무 숲 야간 투어 & 사찰 만찬",
+          "type": "PLACE",
+          "timeSlot": "18:30",
+          "sortOrder": 5,
+          "address": "와카야마현 이토군 고야초 고야산 550",
+          "description": "수백 년 된 거대한 삼나무 숲과 수만 개 석등 사이를 걷는 신비로운 야간 숲 산책 후 정갈한 사찰 식사.",
+          "costAmount": "3500"
+        }
+      ]
+    },
+    {
+      "dayNumber": 2,
+      "planTitle": "새벽 예불과 일본 1위 와카야마 라멘 투어",
+      "planConcept": "사찰 새벽 명상 후 하산하여 와카야마 성을 관람하고 전설의 간장 돈골라멘 이데쇼텐을 영접합니다.",
+      "schedules": [
+        {
+          "title": "사찰 다이닝 아침 공양",
+          "type": "PLACE",
+          "timeSlot": "07:00",
+          "sortOrder": 1,
+          "address": "고야산 숙방 다이닝",
+          "description": "새벽 예불 후 맛보는 따뜻한 흰쌀죽, 계절 채소 조림과 구운 김의 담백한 맛.",
+          "costAmount": "0"
+        },
+        {
+          "title": "와카야마 성 천수각 & 단풍 정원",
+          "type": "PLACE",
+          "timeSlot": "11:00",
+          "sortOrder": 2,
+          "address": "와카야마현 와카야마시 이치반초 3",
+          "description": "호랑이가 엎드린 형상의 흰 천수각에서 와카야마 시내를 조망하고 니시노마루 정원 산책.",
+          "costAmount": "410"
+        },
+        {
+          "title": "이데 쇼텐 와카야마 중화소바",
+          "type": "PLACE",
+          "timeSlot": "13:00",
+          "sortOrder": 3,
+          "address": "와카야마현 와카야마시 다나카초 4-84",
+          "description": "진한 돼지뼈 육수에 간장을 블렌딩한 감칠맛 폭발 라멘. 고등어 초밥(하야스시)을 곁들이는 로컬 룰!",
+          "costAmount": "1050"
+        },
+        {
+          "title": "기슈혼진 해산물 이자카야",
+          "type": "PLACE",
+          "timeSlot": "18:30",
+          "sortOrder": 4,
+          "address": "와카야마현 와카야마시 도모다초 5-18",
+          "description": "태평양 쿠로시오 난류에서 갓 잡은 참치회와 은어 구이에 지역 크래프트 맥주 한잔.",
+          "costAmount": "3800"
+        }
+      ]
+    },
+    {
+      "dayNumber": 3,
+      "planTitle": "녹차의 수도 우지와 뵤도인 봉황당",
+      "planConcept": "10엔 동전 속 유네스코 세계유산 뵤도인을 관람하고 160년 전통 차소바와 츠루하시 야키니쿠를 즐깁니다.",
+      "schedules": [
+        {
+          "title": "이노다 커피 아라비아의 진주",
+          "type": "PLACE",
+          "timeSlot": "08:30",
+          "sortOrder": 1,
+          "address": "교토역 구내 매장",
+          "description": "교토인들이 가장 사랑하는 깊은 풍미의 시그니처 블렌드 커피와 햄 토스트.",
+          "costAmount": "1150"
+        },
+        {
+          "title": "뵤도인 봉황당 & 우지천 산책",
+          "type": "PLACE",
+          "timeSlot": "10:30",
+          "sortOrder": 2,
+          "address": "교토부 우지시 우지렌게 116",
+          "description": "연못에 거울처럼 비치는 주홍빛 봉황당의 대칭 미학을 감상하고 우지강변 숲길 걷기.",
+          "costAmount": "600"
+        },
+        {
+          "title": "나카무라 토키치 본점 생차 젤리 & 차소바",
+          "type": "PLACE",
+          "timeSlot": "13:00",
+          "sortOrder": 3,
+          "address": "교토부 우지시 우지이치반 10",
+          "description": "최고급 찻잎을 갈아 반죽한 쫄깃한 녹차 메밀국수와 대나무 통에 담겨 나오는 말차 젤리 디저트.",
+          "costAmount": "1850"
+        },
+        {
+          "title": "츠지리 본점 정통 다도 체험",
+          "type": "PLACE",
+          "timeSlot": "15:00",
+          "sortOrder": 4,
+          "address": "교토부 우지시 우지토가와 16-1",
+          "description": "다도 장인에게 직접 말차를 개어 거품을 내는 격불 법을 배우고 쌉싸름한 차를 음미.",
+          "costAmount": "1500"
+        },
+        {
+          "title": "츠루하시 소라 본점 호르몬 야키니쿠",
+          "type": "PLACE",
+          "timeSlot": "18:30",
+          "sortOrder": 5,
+          "address": "오사카부 오사카시 텐노지구 시모아지하라초 1-10",
+          "description": "연기가 자욱한 골목에서 특수부위 곱창 모둠과 갈비에 생맥주잔을 부딪치며 여독을 푸는 저녁.",
+          "costAmount": "3500"
+        }
+      ]
+    },
+    {
+      "dayNumber": 4,
+      "planTitle": "수제 큐브 토스트와 카레 우동, 귀국",
+      "planConcept": "핫플레이스 철판 프렌치 토스트, 우지 말차 과자 쇼핑 후 진한 카레 우동으로 마무리합니다.",
+      "schedules": [
+        {
+          "title": "팡토 에스프레소토 철판 프렌치 토스트",
+          "type": "PLACE",
+          "timeSlot": "09:00",
+          "sortOrder": 1,
+          "address": "오사카부 오사카시 주오구 난바 5-1-60",
+          "description": "큐브 모양의 쫄깃한 식빵을 버터에 구워 꿀을 듬뿍 뿌려 먹는 핫플레이스 브런치.",
+          "costAmount": "1200"
+        },
+        {
+          "title": "우지 녹차 랑그드샤 과자 기념품 쇼핑",
+          "type": "PLACE",
+          "timeSlot": "10:30",
+          "sortOrder": 2,
+          "address": "난바역 타카시마야 백화점 지하 푸드홀",
+          "description": "진한 녹차 풍미의 차노카 과자와 교토 츠지리 티백 세트 알뜰 구매.",
+          "costAmount": "2500"
+        },
+        {
+          "title": "토쿠마사 모리노미야점 소고기 카레 우동",
+          "type": "PLACE",
+          "timeSlot": "12:30",
+          "sortOrder": 3,
+          "address": "오사카부 오사카시 주오구 모리노미야추오 1-16-22",
+          "description": "달콤하면서도 알싸한 일본식 진한 카레 국물에 계란 튀김 밥을 비벼 먹는 명물 카레 우동.",
+          "costAmount": "1100"
+        },
+        {
+          "title": "간사이 국제공항 이동 및 출국",
+          "type": "TRANSPORT",
+          "timeSlot": "14:30",
+          "sortOrder": 4,
+          "address": "오사카부 센난군 다지리초 센슈쿠코나카 1",
+          "description": "열차를 타고 공항에 도착하여 안전하게 귀국 비행기에 탑승합니다.",
+          "costAmount": "1490"
+        }
+      ]
+    }
+  ]
+}

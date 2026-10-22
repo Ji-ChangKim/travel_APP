@@ -95,7 +95,7 @@ function ArchiveContent({
     >
       <ScrollView contentContainerStyle={[s.content, wide && s.wideContent]}>
         <View style={s.tinted}>
-          <Text style={s.eyebrow}>JOURNAL ARCHIVE</Text>
+          <Text style={s.eyebrow}>다녀온 여행 모음</Text>
           <Text accessibilityRole="header" style={s.title}>
             {query.isSuccess
               ? `다녀온 여행의 발자국 ${summary.trips}개`

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <base href="../02. 시안렌더러/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>613_프로필설정 · TripPrint</title>
+    <link rel="stylesheet" href="review.css" />
+  </head>
+  <body data-screen="onboarding">
+    <header class="review-header">
+      <div>
+        <p class="eyebrow">TRIPPRINT / PRODUCT DESIGN REVIEW / 2026.10.19</p>
+        <h1>여행 하나로 이어지는 계획과 기록</h1>
+        <p>큰 페이지 → 작은 페이지 → 예외 화면 → 팝업 · 전체 화면 디자인</p>
+      </div>
+      <a class="review-link" href="report.txt" target="_blank"
+        >역기획·기능 검토서 ↗</a
+      >
+    </header>
+    <p class="review-notice">
+      <strong>디자인 제작본 · 최종 승인 전</strong> · 오사카의 DAY·장소 설명은
+      제공된 원문입니다. 날짜·항공·금액은 예시이며 입력·선택·공개는 브라우저
+      메모리에서만 확인합니다. 실제 저장·촬영·인증·게시 결과가 아닙니다.
+    </p>
+    <main class="review-layout">
+      <aside class="review-sidebar" aria-label="검토할 화면">
+        <p class="eyebrow">01 / CUSTOMER JOURNEY</p>
+        <h2>전체 페이지 목록</h2>
+        <label class="catalog-search"
+          >페이지 찾기<input
+            id="catalog-query"
+            type="search"
+            placeholder="번호 또는 페이지명"
+        /></label>
+        <div id="screen-menu" class="screen-menu"></div>
+        <fieldset class="review-controls">
+          <legend>규격과 예외 상태</legend>
+          <label
+            >화면 폭
+            <select id="review-width">
+              <option value="320">320px</option>
+              <option value="390" selected>390px</option>
+              <option value="430">430px</option>
+            </select>
+          </label>
+          <label
+            >본문 상태
+            <select id="review-state">
+              <option value="normal">기본</option>
+              <option value="empty">빈 상태</option>
+              <option value="error">오류 상태</option>
+            </select>
+          </label>
+          <label class="check-line"
+            ><input id="review-large" type="checkbox" />글자 200%</label
+          >
+          <label class="check-line"
+            ><input id="review-long" type="checkbox" />긴 여행 제목</label
+          >
+          <label class="check-line"
+            ><input id="review-motion" type="checkbox" />동작 줄이기</label
+          >
+          <label class="check-line"
+            ><input id="review-photos" type="checkbox" />실제 Google 사진
+            조회</label
+          >
+        </fieldset>
+      </aside>
+      <section class="review-stage" aria-label="디자인 시안 미리보기">
+        <div class="stage-label">
+          <span id="screen-caption"></span
+          ><span id="screen-size">390 × 844</span>
+        </div>
+        <div id="device" class="device" style="--phone-width: 390px; --zoom: 1">
+          <div id="phone-header" class="phone-header"></div>
+          <div id="phone-scroll" class="phone-scroll" tabindex="-1"></div>
+          <div id="phone-footer"></div>
+          <div id="popup-host"></div>
+        </div>
+        <p
+          id="demo-feedback"
+          class="demo-feedback"
+          role="status"
+          aria-live="polite"
+        >
+          왼쪽에서 화면을 고르거나 시안 안의 버튼을 눌러 이동하세요.
+        </p>
+      </section>
+      <aside class="review-notes" aria-label="설계 근거와 구현 범위">
+        <p class="eyebrow">02 / DESIGN RATIONALE</p>
+        <h2 id="rationale-title"></h2>
+        <p id="rationale"></p>
+        <h3>참고한 서비스 패턴</h3>
+        <div id="references"></div>
+        <h3>작성 → 저장 → 노출</h3>
+        <p id="contract"></p>
+        <div class="scope-note">
+          <strong id="scope"></strong>
+          <p>
+            전체 제작본의 작성·선택 흐름은 로컬 예시입니다. 서버 저장·권한·공개
+            사본과 Play 설치본은 구현 단계에서 별도로 인수합니다.
+          </p>
+        </div>
+        <h3>현재 규격과 대조</h3>
+        <p>제목 26/36 · 섹션 22/30 · 장소명 18/26 · 본문 16/26 · 보조 14/22</p>
+        <p>
+          좌우 20 · 카드 16 · 섹션 간격 24 · 터치 영역 44 이상 · 주요 버튼 52
+          이상
+        </p>
+        <p>
+          네이비·코랄·아이보리, Pretendard와 기존 로고를 유지했습니다. 메뉴
+          이름·헤더 재배치·카드 구조는 검토 대상입니다.
+        </p>
+        <h3>화면과 규격 파일</h3>
+        <a href="../01. 페이지시안/ALL_PAGES.html">전체 페이지 디자인 보드 ↗</a>
+        <a id="page-file" href="#">현재 페이지 파일 ↗</a>
+        <a href="design-system.txt" target="_blank">디자인 시스템 ↗</a>
+        <a href="popup-spec.txt" target="_blank">팝업 규격 ↗</a>
+        <a href="page-index.txt" target="_blank">전체 번호 목록 ↗</a>
+        <a href="ui-review.txt" target="_blank">UI 팀장 재검토 ↗</a>
+        <p id="page-status"></p>
+      </aside>
+    </main>
+    <script type="module" src="review.js"></script>
+  </body>
+</html>

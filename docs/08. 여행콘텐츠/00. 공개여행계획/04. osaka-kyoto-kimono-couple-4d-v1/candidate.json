@@ -1,0 +1,215 @@
+{
+  "tripCreate": {
+    "title": "[오사카+교토] 청수사 기온 기모노 데이트와 아라시야마 료칸 로맨스 3박 4일",
+    "country": "일본",
+    "city": "교토",
+    "startDate": "2026-12-10",
+    "endDate": "2026-12-13",
+    "timezone": "Asia/Tokyo",
+    "defaultCurrency": "JPY",
+    "coverColor": "#6B705C"
+  },
+  "planKey": "osaka-kyoto-kimono-couple-4d-v1",
+  "publicBody": "천년고도 교토의 고즈넉한 정취를 둘만의 호흡으로 누리는 로맨틱 코스. 기모노 스냅, 150년 전통 두부 가이세키, 아라시야마 대나무숲 물안개 아침과 카모강변 촛불 디너를 선사합니다.",
+  "days": [
+    {
+      "dayNumber": 1,
+      "planTitle": "한큐 레트로 전철 타고 교토로, 기온 거리 데이트",
+      "planConcept": "교토 가와라마치 도착 후 실크 기모노를 대여해 고즈넉한 골목 스냅을 촬영하고 정원 두부요리를 맛봅니다.",
+      "schedules": [
+        {
+          "title": "한큐 우메다 타리즈 커피 모닝",
+          "type": "PLACE",
+          "timeSlot": "09:00",
+          "sortOrder": 1,
+          "address": "오사카부 오사카시 기타구 시바타 1-1-2",
+          "description": "교토행 한큐 특급열차 탑승 전 따뜻한 허니 라떼와 모닝 머핀으로 상쾌하게 출발.",
+          "costAmount": "750"
+        },
+        {
+          "title": "기온 거리 기모노 대여 & 야사카 신사",
+          "type": "PLACE",
+          "timeSlot": "10:30",
+          "sortOrder": 2,
+          "address": "교토부 교토시 히가시야마구 기온마치 기타가와 625",
+          "description": "전통 실크 기모노를 입고 붉은 야사카 신사와 하나미코지 목조 골목에서 감성 커플 사진 촬영.",
+          "costAmount": "5500"
+        },
+        {
+          "title": "난젠지 준세이 150년 전통 유도후",
+          "type": "PLACE",
+          "timeSlot": "13:00",
+          "sortOrder": 3,
+          "address": "교토부 교토시 사쿄구 난젠지 쿠사카와초 60",
+          "description": "수백 년 된 일본식 정원을 바라보며 맑은 다시마 육수에 끓여낸 극상의 부드러운 수제 두부 코스.",
+          "costAmount": "4500"
+        },
+        {
+          "title": "은각사 & 철학의 길 산책",
+          "type": "PLACE",
+          "timeSlot": "15:30",
+          "sortOrder": 4,
+          "address": "교토부 교토시 사쿄구 긴카쿠지초 2",
+          "description": "모래 석정과 이끼 정원이 아름다운 은각사에서 수로를 따라 손을 잡고 걷는 호젓한 시간.",
+          "costAmount": "500"
+        },
+        {
+          "title": "기온 이즈모 카모강변 테라스 디너",
+          "type": "PLACE",
+          "timeSlot": "18:30",
+          "sortOrder": 5,
+          "address": "교토부 교토시 히가시야마구 기온마치 미나미가와 570",
+          "description": "카모강 물소리와 붉은 등불 아래서 즐기는 흑모와규 스키야키와 교토산 계절 야채 코스.",
+          "costAmount": "8500"
+        }
+      ]
+    },
+    {
+      "dayNumber": 2,
+      "planTitle": "숲과 강, 아라시야마 힐링 로맨스",
+      "planConcept": "물안개 피어오르는 도게츠교 응커피, 아침 치쿠린 대나무숲과 미슐랭 도미 오차즈케, 료칸 가이세키.",
+      "schedules": [
+        {
+          "title": "% 아라비카 교토 아라시야마 (응커피 본점)",
+          "type": "PLACE",
+          "timeSlot": "08:30",
+          "sortOrder": 1,
+          "address": "교토부 교토시 우쿄구 사가텐류지 스스키노바바초 3-47",
+          "description": "오전 8시 반 오픈 직후 물안개 피어오르는 도게츠교를 바라보며 마시는 시그니처 교토 라떼와 바게트.",
+          "costAmount": "1100"
+        },
+        {
+          "title": "치쿠린 대나무숲 & 텐류지 정원",
+          "type": "PLACE",
+          "timeSlot": "09:30",
+          "sortOrder": 2,
+          "address": "교토부 교토시 우쿄구 사가텐류지 스스키노바바초 68",
+          "description": "인파가 몰리기 전 바람에 사각거리는 대나무 숲길 산책과 소겐치 연못의 비경 감상.",
+          "costAmount": "500"
+        },
+        {
+          "title": "타이쇼 한나리야 도미 오차즈케",
+          "type": "PLACE",
+          "timeSlot": "12:00",
+          "sortOrder": 3,
+          "address": "교토부 교토시 우쿄구 사가텐류지 세토가와초 26-1",
+          "description": "참깨 특제 소스에 버무린 신선한 도미회를 밥에 얹어 먹은 뒤, 따뜻한 우지 녹차를 부어 오차즈케로 마무리.",
+          "costAmount": "3000"
+        },
+        {
+          "title": "사가노 토롯코 로맨틱 열차",
+          "type": "PLACE",
+          "timeSlot": "14:30",
+          "sortOrder": 4,
+          "address": "교토부 교토시 우쿄구 사가쿠루마미치초 4",
+          "description": "창문이 열린 레트로 오픈 열차를 타고 호즈강 계곡 협곡을 따라 달리는 낭만 드라이브.",
+          "costAmount": "880"
+        },
+        {
+          "title": "아라시야마 료칸 쿄 스이란 모던 가이세키",
+          "type": "PLACE",
+          "timeSlot": "18:30",
+          "sortOrder": 5,
+          "address": "교토부 교토시 우쿄구 사가텐류지 스스키노바바초 12",
+          "description": "호즈강변 전통 고택에서 교토 식재료로 빚어낸 9코스 프라이빗 모던 가이세키 만찬.",
+          "costAmount": "16000"
+        }
+      ]
+    },
+    {
+      "dayNumber": 3,
+      "planTitle": "붉은 도리이와 청수사의 일몰, 오사카로 귀환",
+      "planConcept": "유기농 오반자이 조식, 후시미 이나리 붉은 토리이 터널과 청수사 무대에서 바라보는 교토 일몰.",
+      "schedules": [
+        {
+          "title": "미야코 야사이 카모 유기농 오반자이",
+          "type": "PLACE",
+          "timeSlot": "08:30",
+          "sortOrder": 1,
+          "address": "교토부 교토시 시모교구 가라스마도리 부코지사가루 린게이초 398",
+          "description": "당일 아침 교토 농가에서 직송된 신선한 채소와 정갈한 나물, 따뜻한 죽으로 몸을 깨우는 조식 뷔페.",
+          "costAmount": "800"
+        },
+        {
+          "title": "후시미 이나리 대사 천 개의 토리이",
+          "type": "PLACE",
+          "timeSlot": "10:00",
+          "sortOrder": 2,
+          "address": "교토부 교토시 후시미구 후카쿠사 야부노우치초 68",
+          "description": "산자락을 따라 끝없이 이어지는 신비로운 붉은 토리이 터널을 걷는 아침 산책.",
+          "costAmount": "0"
+        },
+        {
+          "title": "소바쇼 소혼케 요시무라 메밀소바",
+          "type": "PLACE",
+          "timeSlot": "13:00",
+          "sortOrder": 3,
+          "address": "교토부 교토시 히가시야마구 기요미즈 2-208-9",
+          "description": "통유리 너머로 교토 시내가 펼쳐지는 전망 속에서 맷돌 자가제면 자루소바와 미니 텐동 세트.",
+          "costAmount": "1900"
+        },
+        {
+          "title": "청수사(기요미즈데라) 본당 & 산넨자카",
+          "type": "PLACE",
+          "timeSlot": "15:00",
+          "sortOrder": 4,
+          "address": "교토부 교토시 히가시야마구 기요미즈 1-294",
+          "description": "못을 쓰지 않고 세운 절벽 위 목조 무대에서 시원한 교토 파노라마와 붉은 노을 감상.",
+          "costAmount": "400"
+        },
+        {
+          "title": "오사카 복귀 후 라운지 32 스카이 디너",
+          "type": "PLACE",
+          "timeSlot": "19:00",
+          "sortOrder": 5,
+          "address": "오사카부 오사카시 기타구 가쿠다초 8-47 한큐 그랜드빌딩 32F",
+          "description": "오사카로 돌아와 도심 네온사인이 끝없이 펼쳐지는 32층 전망에서 안심 스테이크와 스파클링 와인.",
+          "costAmount": "7800"
+        }
+      ]
+    },
+    {
+      "dayNumber": 4,
+      "planTitle": "수변 감성과 100년 오므라이스, 귀국",
+      "planConcept": "나카노시마 강변 테라스 브런치, 일본 최초 오므라이스 원조 시식 후 여유롭게 공항으로 이동합니다.",
+      "schedules": [
+        {
+          "title": "모토 커피 나카노시마 테라스",
+          "type": "PLACE",
+          "timeSlot": "09:30",
+          "sortOrder": 1,
+          "address": "오사카부 오사카시 주오구 기타하마 2-1-1",
+          "description": "강변 야외 테라스에 앉아 붉은 중앙공회당 건물을 바라보며 마시는 수제 핸드드립 커피와 토스트.",
+          "costAmount": "950"
+        },
+        {
+          "title": "나카노시마 장미정원 & 중앙공회당 산책",
+          "type": "PLACE",
+          "timeSlot": "11:00",
+          "sortOrder": 2,
+          "address": "오사카부 오사카시 기타구 나카노시마 1-1",
+          "description": "강줄기 사이에 자리 잡은 유럽풍 건축물과 고요한 공원을 거니는 둘만의 마지막 산책.",
+          "costAmount": "0"
+        },
+        {
+          "title": "홋쿄쿠세이 신사이바시 본점 오므라이스",
+          "type": "PLACE",
+          "timeSlot": "12:30",
+          "sortOrder": 3,
+          "address": "오사카부 오사카시 주오구 니시신사이바시 2-7-27",
+          "description": "1922년 일본 최초로 오므라이스를 탄생시킨 다다미 고택에서 맛보는 폭신하고 부드러운 치킨 오므라이스.",
+          "costAmount": "1300"
+        },
+        {
+          "title": "간사이 국제공항 이동 및 귀국",
+          "type": "TRANSPORT",
+          "timeSlot": "14:30",
+          "sortOrder": 4,
+          "address": "오사카부 센난군 다지리초 센슈쿠코나카 1",
+          "description": "면세점에서 교토 한정 말차 랑그드샤와 로이스 초콜릿을 챙긴 뒤 탑승합니다.",
+          "costAmount": "1490"
+        }
+      ]
+    }
+  ]
+}

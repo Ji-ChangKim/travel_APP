@@ -1,0 +1,12 @@
+{
+  "base": "https://tripprint-api-staging.gametps.workers.dev",
+  "planKey": "osaka-foodie-friends-4d-v1",
+  "tripId": "b0130d0c-0ef8-4d6b-8fd5-910430d611b7",
+  "postId": "000e4c32-d796-45d4-b436-73da378d00ff",
+  "author": "가이드 하루",
+  "days": 4,
+  "schedules": 19,
+  "cover": "b0130d0c-0ef8-4d6b-8fd5-910430d611b7/584d0d0f-5cdb-4dc4-b9e4-b5ee0341f7f4.jpg",
+  "verifiedAt": "2026-10-21T11:28:22.602Z",
+  "publicUrl": "https://tripprint-staging.pages.dev/community/000e4c32-d796-45d4-b436-73da378d00ff"
+}

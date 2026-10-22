@@ -1,0 +1,12 @@
+{
+  "base": "https://tripprint-api-staging.gametps.workers.dev",
+  "planKey": "tokyo-romantic-couple-4d-v1",
+  "tripId": "29d9a2f3-5cc0-451f-b5eb-633fd885292e",
+  "postId": "fdde3b55-ad65-4fd2-9932-760d4e6fcfb9",
+  "author": "가이드 하루",
+  "days": 4,
+  "schedules": 19,
+  "cover": "29d9a2f3-5cc0-451f-b5eb-633fd885292e/796cfe08-0246-4503-8c82-f7ac495040e2.jpg",
+  "verifiedAt": "2026-10-21T11:26:45.068Z",
+  "publicUrl": "https://tripprint-staging.pages.dev/community/fdde3b55-ad65-4fd2-9932-760d4e6fcfb9"
+}

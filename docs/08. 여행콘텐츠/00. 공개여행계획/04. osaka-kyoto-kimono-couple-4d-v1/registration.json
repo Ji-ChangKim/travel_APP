@@ -1,0 +1,12 @@
+{
+  "base": "https://tripprint-api-staging.gametps.workers.dev",
+  "planKey": "osaka-kyoto-kimono-couple-4d-v1",
+  "tripId": "a734170e-9cf2-4018-9463-82f6b1bad55d",
+  "postId": "d23a9a20-2248-4345-be78-c65a98faf976",
+  "author": "가이드 하루",
+  "days": 4,
+  "schedules": 19,
+  "cover": "a734170e-9cf2-4018-9463-82f6b1bad55d/bc055fcd-1a81-4241-8627-963d937eae3d.jpg",
+  "verifiedAt": "2026-10-21T11:30:00.103Z",
+  "publicUrl": "https://tripprint-staging.pages.dev/community/d23a9a20-2248-4345-be78-c65a98faf976"
+}

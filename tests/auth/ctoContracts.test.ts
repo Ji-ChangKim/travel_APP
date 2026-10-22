@@ -23,7 +23,7 @@ import {
   ledgerActionContainer,
   ledgerActionForeground,
 } from '../../apps/mobile/src/features/workspace/ledgerActionAppearance';
-import ledgerTokens from '../../docs/design/ledger-tokens.json';
+import ledgerTokens from '../../docs/02. 디자인/00. 공통규격/ledger-tokens.json';
 
 test('로그인·프로필·기기 기록의 공통 안내도 미확인 예외 원문을 숨긴다', () => {
   // 같은 정책을 쓰는 다른 화면에서 원문 노출이 다시 생기지 않게 한다.

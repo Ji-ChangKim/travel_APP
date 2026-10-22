@@ -1,0 +1,215 @@
+{
+  "tripCreate": {
+    "title": "[삿포로] 오도리 눈꽃 축제 & 조잔케이 계곡 온천 패밀리 힐링 3박 4일",
+    "country": "일본",
+    "city": "삿포로",
+    "startDate": "2027-01-14",
+    "endDate": "2027-01-17",
+    "timezone": "Asia/Tokyo",
+    "defaultCurrency": "JPY",
+    "coverColor": "#3A86FF"
+  },
+  "planKey": "sapporo-snow-family-4d-v1",
+  "publicBody": "동화 속 설국 홋카이도로 떠나는 온 가족 눈꽃 힐링! 오도리 공원의 하얀 눈꽃 파노라마, 조잔케이 계곡 설경 노천온천, 대게 코스와 스프카레, 생양고기 징기스칸까지 청정 미식을 온전히 담았습니다.",
+  "days": [
+    {
+      "dayNumber": 1,
+      "planTitle": "은빛 설국 삿포로 입성과 따뜻한 스프카레",
+      "planConcept": "신치토세 공항 도착 후 홋카이도 원유 디저트로 시작해 시내 TV타워 설경을 보고 3대 원조 스프카레로 몸을 녹입니다.",
+      "schedules": [
+        {
+          "title": "키노토야 신치토세공항점 치즈타르트",
+          "type": "PLACE",
+          "timeSlot": "10:00",
+          "sortOrder": 1,
+          "address": "홋카이도 치토세시 비비 신치토세 공항 국내선 2F",
+          "description": "홋카이도 신선한 원유로 만든 진하고 고소한 소프트아이스크림과 갓 구운 치즈타르트 조식.",
+          "costAmount": "750"
+        },
+        {
+          "title": "오도리 공원 & 삿포로 TV타워 설경",
+          "type": "PLACE",
+          "timeSlot": "11:30",
+          "sortOrder": 2,
+          "address": "홋카이도 삿포로시 주오구 오도리니시 1",
+          "description": "하얀 눈이 소복이 쌓인 공원과 붉은 TV타워를 배경으로 온 가족 눈사람 만들기 스냅 촬영.",
+          "costAmount": "1000"
+        },
+        {
+          "title": "스푸카레 가라쿠 본점",
+          "type": "PLACE",
+          "timeSlot": "13:00",
+          "sortOrder": 3,
+          "address": "홋카이도 삿포로시 주오구 미나미2조니시 2-6-1",
+          "description": "부드러운 닭다리와 홋카이도산 단호박, 브로콜리를 푹 끓여낸 진한 향신료 육수의 원조 스프카레.",
+          "costAmount": "1450"
+        },
+        {
+          "title": "삿포로 맥주 박물관 & 전나무 숲",
+          "type": "PLACE",
+          "timeSlot": "15:30",
+          "sortOrder": 4,
+          "address": "홋카이도 삿포로시 히가시구 기타7조히가시 9-1-1",
+          "description": "붉은 벽돌 양조장에서 어른은 삿포로 클래식 생맥주 시음, 아이는 홋카이도 리본 탄산음료 체험.",
+          "costAmount": "1000"
+        },
+        {
+          "title": "징기스칸 다루마 본점 생양고기 구이",
+          "type": "PLACE",
+          "timeSlot": "18:30",
+          "sortOrder": 5,
+          "address": "홋카이도 삿포로시 주오구 미나미5조니시 4",
+          "description": "투구 무쇠 철판에 잡내 없는 생양고기와 신선한 대파, 양파를 구워 비법 간장에 찍어 먹는 대표 미식.",
+          "costAmount": "3500"
+        }
+      ]
+    },
+    {
+      "dayNumber": 2,
+      "planTitle": "눈 덮인 협곡, 조잔케이 온천 마을 힐링",
+      "planConcept": "삿포로 호텔 조식 뷔페에서 카이센동을 맛보고 조잔케이 계곡 온천으로 이동해 눈꽃 노천욕과 대게 뷔페를 즐깁니다.",
+      "schedules": [
+        {
+          "title": "삿포로 호텔 해산물 조식 뷔페",
+          "type": "PLACE",
+          "timeSlot": "08:00",
+          "sortOrder": 1,
+          "address": "삿포로 시내 호텔 다이닝",
+          "description": "연어, 연어알(이쿠라), 가리비를 마음껏 밥 위에 얹어 먹는 셀프 카이센동 조식.",
+          "costAmount": "2500"
+        },
+        {
+          "title": "갓파라이너 버스로 조잔케이 온천 이동",
+          "type": "TRANSPORT",
+          "timeSlot": "09:30",
+          "sortOrder": 2,
+          "address": "삿포로역 앞 버스터미널",
+          "description": "눈 덮인 자작나무 숲길을 지나 60분 만에 아늑한 온천 계곡 마을에 도착합니다.",
+          "costAmount": "960"
+        },
+        {
+          "title": "조잔케이 베르네이 갤러리 런치",
+          "type": "PLACE",
+          "timeSlot": "12:00",
+          "sortOrder": 3,
+          "address": "홋카이도 삿포로시 미나미구 조잔케이온센니시 4-377",
+          "description": "따뜻한 벽난로 앞에서 즐기는 홋카이도 비프 수제 버거와 갓 구운 따끈한 사과파이.",
+          "costAmount": "1600"
+        },
+        {
+          "title": "후타미 현수교 설경 & 갓파 족욕탕",
+          "type": "PLACE",
+          "timeSlot": "14:30",
+          "sortOrder": 4,
+          "address": "홋카이도 삿포로시 미나미구 조잔케이온센",
+          "description": "얼어붙은 계곡 위 붉은 현수교를 산책하고 김이 모락모락 나는 야외 족욕탕에 발 담그기.",
+          "costAmount": "0"
+        },
+        {
+          "title": "조잔케이 만세이카쿠 홋카이도 대게 뷔페 & 노천온천",
+          "type": "PLACE",
+          "timeSlot": "18:30",
+          "sortOrder": 5,
+          "address": "홋카이도 삿포로시 미나미구 조잔케이온센히가시 3",
+          "description": "살이 꽉 찬 차가운 대게 다리 찜과 따뜻한 스테이크 만찬 후 쏟아지는 눈꽃을 맞으며 즐기는 노천욕.",
+          "costAmount": "16000"
+        }
+      ]
+    },
+    {
+      "dayNumber": 3,
+      "planTitle": "하얀 설원의 과자 테마파크와 정통 게 코스",
+      "planConcept": "시로이코이비토 파크에서 쿠키 만들기, 진한 미소라멘과 카니혼케 게 풀코스 만찬.",
+      "schedules": [
+        {
+          "title": "조잔케이 료칸 뷔페 조식",
+          "type": "PLACE",
+          "timeSlot": "08:30",
+          "sortOrder": 1,
+          "address": "료칸 다이닝",
+          "description": "홋카이도 감자에 버터를 얹어 먹는 고소한 자가바타와 옥수수 수프, 갓 구운 생선구이.",
+          "costAmount": "0"
+        },
+        {
+          "title": "시로이코이비토 파크 과자 테마파크",
+          "type": "PLACE",
+          "timeSlot": "10:30",
+          "sortOrder": 2,
+          "address": "홋카이도 삿포로시 니시구 미야노사와 2조 2-11-36",
+          "description": "유럽풍 성채에서 온 가족이 함께 하트 모양 쿠키를 직접 굽고 오르골 인형극 관람.",
+          "costAmount": "1500"
+        },
+        {
+          "title": "라멘 신겐 진한 된장(미소) 라멘",
+          "type": "PLACE",
+          "timeSlot": "13:00",
+          "sortOrder": 3,
+          "address": "홋카이도 삿포로시 주오구 미나미6조니시 8",
+          "description": "추위를 한 번에 녹여주는 묵직한 미소 국물 라멘과 불향 가득한 차슈 볶음밥.",
+          "costAmount": "1100"
+        },
+        {
+          "title": "다누키코지 상점가 & 메가 돈키호테 쇼핑",
+          "type": "PLACE",
+          "timeSlot": "15:30",
+          "sortOrder": 4,
+          "address": "홋카이도 삿포로시 주오구 미나미3조니시 4-12-1",
+          "description": "지붕이 있는 아케이드 상점가에서 홋카이도 한정 유바리 멜론 젤리와 면세 잡화 구매.",
+          "costAmount": "3000"
+        },
+        {
+          "title": "카니혼케 삿포로역 본점 게 풀코스",
+          "type": "PLACE",
+          "timeSlot": "18:30",
+          "sortOrder": 5,
+          "address": "홋카이도 삿포로시 주오구 기타3조니시 2-1-18",
+          "description": "단독 일본식 룸에서 게 사시미, 게 숯불구이, 게 전골(카니스키)을 온 가족이 여유롭게 즐기는 럭셔리 만찬.",
+          "costAmount": "8500"
+        }
+      ]
+    },
+    {
+      "dayNumber": 4,
+      "planTitle": "홋카이도 대학 캠퍼스 설경과 극상 스시 귀국",
+      "planConcept": "40년 전통 수제 샌드위치 조식, 눈 덮인 포플러 가로수길 산책 후 신선한 네무로 스시로 마무리합니다.",
+      "schedules": [
+        {
+          "title": "산도리아 24시 수제 샌드위치",
+          "type": "PLACE",
+          "timeSlot": "08:30",
+          "sortOrder": 1,
+          "address": "홋카이도 삿포로시 주오구 미나미8조니시 9-758-14",
+          "description": "홋카이도 생딸기 샌드와 에그 샐러드 샌드로 촉촉하게 여는 마지막 날 아침.",
+          "costAmount": "650"
+        },
+        {
+          "title": "홋카이도 대학 포플러 가로수길 설경",
+          "type": "PLACE",
+          "timeSlot": "10:00",
+          "sortOrder": 2,
+          "address": "홋카이도 삿포로시 기타구 기타8조니시 5",
+          "description": "새하얀 눈으로 뒤덮인 유서 깊은 캠퍼스를 걸으며 영화 같은 가족사진을 남깁니다.",
+          "costAmount": "0"
+        },
+        {
+          "title": "네무로 하나마루 스시 JR타워점",
+          "type": "PLACE",
+          "timeSlot": "12:00",
+          "sortOrder": 3,
+          "address": "홋카이도 삿포로시 주오구 기타5조니시 2 스텔라플레이스 6F",
+          "description": "네무로 항 직송 신선한 가리비, 성게알(우니), 활 청어 초밥을 맛보는 홋카이도 최고봉 스시.",
+          "costAmount": "3500"
+        },
+        {
+          "title": "신치토세 공항 에어포트 쾌속선 및 귀국",
+          "type": "TRANSPORT",
+          "timeSlot": "14:30",
+          "sortOrder": 4,
+          "address": "홋카이도 치토세시 신치토세 공항 터미널",
+          "description": "쾌속 열차로 공항으로 직행하여 삿포로 클래식 캔맥주와 감자스낵(자가포쿠루)을 챙겨 탑승합니다.",
+          "costAmount": "1150"
+        }
+      ]
+    }
+  ]
+}

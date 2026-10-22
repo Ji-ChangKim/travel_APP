@@ -1,10 +1,10 @@
 import cityCredits from '../../apps/mobile/assets/destinations/credits.json';
-import designTokens from '../../docs/design/design-tokens.json';
+import designTokens from '../../docs/02. 디자인/00. 공통규격/design-tokens.json';
 import receiptScan from '../fixtures/kagerou-receipt-analysis.json';
 import kacDomestic from '../fixtures/kac-rs901-normalized.json';
 import kacInternational from '../fixtures/kac-ze781a-normalized.json';
 import osakaPlan from '../fixtures/osaka-community-plan.json';
-import kyushuPlan from '../../docs/content/public-plans/kyushu-onsen-yatai-4d-v1/plan.json';
+import kyushuPlan from '../../docs/08. 여행콘텐츠/00. 공개여행계획/02. kyushu-onsen-yatai-4d-v1/plan.json';
 import {
   test,
   expect,
@@ -13331,7 +13331,7 @@ for (const [width, scale] of [
     await page.route('**/kyushu-cover.png', (route) => {
       // DB 업로드 성공으로 가장하지 않고 로컬 원본만 이미지 응답으로 제공한다.
       return route.fulfill({
-        path: 'docs/content/public-plans/kyushu-onsen-yatai-4d-v1/cover.png',
+        path: 'docs/08. 여행콘텐츠/00. 공개여행계획/02. kyushu-onsen-yatai-4d-v1/cover.png',
         contentType: 'image/png',
       });
     });
@@ -13616,7 +13616,7 @@ test('FH-04 로그인 전에도 GNB 다섯 메뉴를 유지하고 개인 화면�
   await page.route('**/kyushu-cover.png', (route) => {
     // 원격 쓰기 없이 기존 첨부 썸네일을 제공한다.
     return route.fulfill({
-      path: 'docs/content/public-plans/kyushu-onsen-yatai-4d-v1/cover.png',
+      path: 'docs/08. 여행콘텐츠/00. 공개여행계획/02. kyushu-onsen-yatai-4d-v1/cover.png',
       contentType: 'image/png',
     });
   });
@@ -13954,3 +13954,181 @@ for (const [width, scale] of [
     await expect(page.getByTestId('screen-title')).toHaveText('여행 커뮤니티');
   });
 }
+
+// 저장한 UI의 잘림·겹침은 실제 브라우저 배치로 재검증한다.
+for (const [width, scale] of [
+  [390, 1],
+  [320, 2],
+] as const) {
+  test(`UI 폴리싱 ${width} ${scale * 100}%: 국가 필터의 높이·선택·취소`, async ({
+    page,
+  }) => {
+    // 긴 국가 목록이 필터의 표시·터치 영역을 줄이거나 원본을 바꾸면 안 된다.
+    const state = await r07Network(page, haruDetailFixture());
+    await page.setViewportSize({ width, height: 844 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await login(page);
+    await page.goto('/new-trip');
+    await page.evaluate((factor) => {
+      // 앱에 상태를 넣지 않고 사용자의 웹 글꼴 확대만 재현한다.
+      document.documentElement.style.fontSize = `${16 * factor}px`;
+    }, scale);
+    await page.getByTestId('trip-country').getByRole('button').click();
+    for (const [id, name] of [
+      ['country-continent-filter', '아시아'],
+      ['country-region-filter', '전체 지역'],
+    ] as const) {
+      // 현재 행의 글자와 버튼이 잘리지 않고 실제 48px 이상을 차지해야 한다.
+      const container = page.getByTestId(id);
+      const control = container.getByRole('button', { name, exact: true });
+      await expect(control).toBeVisible();
+      await expect(control).toHaveAttribute('aria-selected', 'true');
+      const row = await container.boundingBox();
+      const button = await control.boundingBox();
+      expect(button!.height).toBeGreaterThanOrEqual(48);
+      expect(button!.y).toBeGreaterThanOrEqual(row!.y - 1);
+      expect(button!.y + button!.height).toBeLessThanOrEqual(
+        row!.y + row!.height + 1,
+      );
+    }
+    await page.getByRole('button', { name: '유럽', exact: true }).click();
+    await expect(
+      page.getByRole('button', { name: '유럽', exact: true }),
+    ).toHaveAttribute('aria-selected', 'true');
+    await page.screenshot({
+      path: `outputs/ui-polish-20261021/country-${width}-${scale}.png`,
+    });
+    await page.getByRole('button', { name: '선택 닫기', exact: true }).click();
+    expect(state.writes).toHaveLength(0);
+  });
+
+  test(`UI 폴리싱 ${width} ${scale * 100}%: 여행 배지·제목의 겹침 방지`, async ({
+    page,
+  }) => {
+    // 사진 유무와 글자 확대가 달라도 배지가 제목 앞의 별도 영역에 남아야 한다.
+    const snapshot = haruDetailFixture();
+    snapshot.trip.title = '도쿄 골목과 바다를 함께 걷는 긴 이름의 여행';
+    await page.clock.setFixedTime(new Date('2026-10-21T00:00:00Z'));
+    await r07Network(page, snapshot);
+    await page.route('**/api/v1/trips', (route) => {
+      // 목록과 원본 상세가 같은 여행을 사용한다.
+      return route.fulfill({ json: { data: [snapshot.trip] } });
+    });
+    await page.setViewportSize({ width, height: 844 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await login(page);
+    await page.goto('/plans');
+    await page.evaluate((factor) => {
+      // 화면 읽기 크기는 공통 접근성 제공자를 통해 반영한다.
+      document.documentElement.style.fontSize = `${16 * factor}px`;
+    }, scale);
+    const card = page.getByTestId(`my-trip-card-${snapshot.trip.id}`);
+    await expect(
+      card.getByText('등록 장소 2곳', { exact: true }),
+    ).toBeVisible();
+    const badge = card.getByTestId('my-trip-cover-status');
+    const summary = card.getByTestId('my-trip-cover-summary');
+    const title = card.getByRole('heading', {
+      name: snapshot.trip.title,
+      exact: true,
+    });
+    await expect(title).toBeVisible();
+    const [a, b] = await Promise.all([
+      badge.boundingBox(),
+      summary.boundingBox(),
+    ]);
+    expect(a!.y + a!.height).toBeLessThanOrEqual(b!.y + 1);
+    expect(
+      await title.evaluate((node) => node.scrollWidth <= node.clientWidth + 1),
+    ).toBe(true);
+    await page.screenshot({
+      path: `outputs/ui-polish-20261021/trip-cover-${width}-${scale}.png`,
+    });
+  });
+}
+
+test('UI 폴리싱: 계정 행동 간격·프로필 안내·기록 정리 선택과 복귀', async ({
+  page,
+}) => {
+  // 규격 보완은 저장·이탈 확인과 선택의 의미를 바꾸지 않는다.
+  const snapshot = haruDetailFixture();
+  const state = await r07Network(page, snapshot);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await login(page);
+  await page.getByRole('button', { name: 'MY 탭', exact: true }).click();
+  const settings = page.getByRole('button', { name: '계정 관리', exact: true });
+  const logout = page.getByRole('button', { name: '로그아웃', exact: true });
+  await settings.scrollIntoViewIfNeeded();
+  const [a, b] = await Promise.all([
+    settings.boundingBox(),
+    logout.boundingBox(),
+  ]);
+  expect(b!.y - a!.y - a!.height).toBeGreaterThanOrEqual(8);
+  await page.screenshot({
+    path: 'outputs/ui-polish-20261021/my-actions-390.png',
+  });
+  await page.getByRole('button', { name: '프로필 수정', exact: true }).click();
+  await expect(
+    page.getByText(
+      '공백 포함 2~20바이트로 입력해 주세요. 한글은 한 글자당 3바이트예요.',
+      { exact: true },
+    ),
+  ).toHaveCSS('font-weight', '400');
+  await page.screenshot({
+    path: 'outputs/ui-polish-20261021/profile-hint-390.png',
+  });
+  await page.keyboard.press('Escape');
+  await page.goto('/trips/' + trip);
+  await page.getByRole('button', { name: '여행 더보기', exact: true }).click();
+  await page
+    .getByRole('button', { name: '여행 정보 / 기록 정리', exact: true })
+    .click();
+  const selected = page.getByRole('button', {
+    name: '기록 정리 중',
+    exact: true,
+  });
+  await expect(selected).toHaveAttribute('aria-selected', 'true');
+  const size = await selected.boundingBox();
+  await page
+    .getByRole('button', { name: '기록 정리 완료', exact: true })
+    .click();
+  await expect(selected).toHaveAttribute('aria-selected', 'false');
+  expect((await selected.boundingBox())!.width).toBe(size!.width);
+  await page.screenshot({
+    path: 'outputs/ui-polish-20261021/metadata-selection-390.png',
+  });
+  await page.getByRole('button', { name: '닫기', exact: true }).click();
+  await expect(
+    page.getByRole('dialog', { name: '작성 중인 내용을 버릴까요?' }),
+  ).toBeVisible();
+  expect(state.writes).toHaveLength(0);
+});
+
+// 장식 때문에 확대된 제목에 의미 없는 한 줄이 생기지 않게 한다.
+test('UI 폴리싱 홈: 큰 글꼴의 장식 제외와 본문 읽기 바탕', async ({ page }) => {
+  // 빈 여행의 실제 생성 카드만 검사하며 가짜 여행을 렌더링하지 않는다.
+  await network(page);
+  await page.route('**/api/v1/trips', (route) => {
+    // 빈 목록은 실제 조회 성공 응답으로만 표현한다.
+    return route.fulfill({ json: { data: [] } });
+  });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.setViewportSize({ width: 320, height: 844 });
+  await login(page);
+  const hero = page.getByTestId('home-empty-hero');
+  await page.evaluate(() => {
+    // 기기 글자 확대에 해당하는 웹 설정만 변경한다.
+    document.documentElement.style.fontSize = '32px';
+  });
+  await expect(hero.getByText(/\/\/\//)).toHaveCount(0);
+  await expect(
+    hero.getByRole('heading', {
+      name: '다음 여행, 어디로 떠나볼까요?',
+      exact: true,
+    }),
+  ).toHaveCSS('font-size', '48px');
+  await expect(
+    hero.getByText(/하루와 함께 가고 싶은 곳부터/).locator('..'),
+  ).toHaveCSS('background-color', 'rgba(255, 255, 255, 0.9)');
+});

@@ -1,0 +1,66 @@
+TripPrint 필수 보완 실제 앱·서버 검증
+기준일:2026-10-19 / 디자인 토큰3.0.3 / versionCode9·versionName0.1.0
+범위:기능 정의 G01~G14 대조, 필수 누락 수정, 실제 앱 주 경로와 staging 저장·재조회·공유. 106개 시안 전체를 실제 설치본에서 인수했다는 뜻은 아니다. Android AAB/APK 생성·Play 업로드·커밋·푸시는 수행하지 않는다.
+
+1. 판단과 수정 순서
+P0 원문/날짜 보호:후보 묶음만 바꾸면 planContent가 빠지던 폼 오류 수정. 묶음 해제 시 숨은 선택 관계도 제거한다. DAY 소개만 있는 날짜도 기간 축소에서 보호한다. UI 영향과 공통 서버 모델을 일치시키고 남는 DAY ID를 보존한다.
+P0 공개 범위:선택→실제 데이터 미리보기→중앙 범위 확인→저장. 취소·실패 후 폼 유지, 이중 제출 잠금, 계정/역할/버전 재검사. 개인 메모·예약번호·동행·영수증 원본/품목은 공개 사본에서 제외한다. 재공개는 같은 여행의 같은 링크를 갱신한다.
+P1 찾기/읽기:발견의 검색·유형·전체 기간 필터를 실제 D1에서 페이지 분할 전에 적용한다. record도 첫 피드 페이지와 무관한 단건 경로로 연다. 목록은 긴 본문 대신 제목·도시·선택 공개 일정 수와 열기 행동에 집중한다.
+P1 작성/제목/문구:생성의 입력 확인은 실제 값으로 구성하고 항공편 없이 바로 만든다. DAY 소개·장소 설명/팁은 원래 여행에서 작성한다. 공유 폼은 항목 선택을 먼저 두고 선택 소개를 뒤에 둔다. 초기 빈 선택 안내와 개인정보 안내의 반복, 미리보기의 제목 반복을 제거한다. 공개의 전체 여행 기간과 선택 DAY 수를 구분한다. 개인 발자국 헤더는 실제 여행 제목이며 중복 제목/관리 버튼을 제거한다.
+P1 조작/접근성:최소 터치48dp, 주요52. 좁은 달력은 7열을 줄이지 않고 플랫폼 입력을 사용한다. 단일 선택은 채움색, 다중 선택은 사각 체크와 의미 상태다. 중앙 확인과 하단 시트를 구분하며, 확인 취소는 원래 모달 버튼으로 초점을 복귀한다. Escape/시스템 뒤로는 공개 미리보기→선택 단계를 따른다. 인증 복원 중 로그인 필요 화면이 먼저 뜨는 문제를 막는다.
+G11 사용자 확정 정책:90일 유예·유예 중 새 로그인 자동 복구·단독/공동 여행 및 사진/영수증 보존·소유권 이전 없음. 계정 관리 안에서 최근 로그인 확인 후 요청하고 세션을 철회한다. 90일 이후 계정 인증/프로필을 제거하고 여행 참조만 남긴다. 여행에 들어 있는 모든 개인정보를 제거했다고 표시하지 않는다.
+
+2. Google·Microsoft 공식 기준으로 대조
+Google Core app quality:https://developer.android.com/docs/quality-guidelines/core-app-quality
+검토 기준:사용 목적이 분명한 탐색, 예측 가능한 뒤로가기/상태 보존, 작은 화면/큰 글자, 오류 복구, 안정적 시작과 실제 기능. 초기 로그인 안내 깜박임·중복 이동/제목·불필요한 생성 확인·같은 공개 링크의 갱신 범위를 수정했다. 좋은 앱은 다운로드 목표나 시안 수만으로 판정하지 않고 고객이 저장한 결과를 다시 열 수 있어야 한다.
+Google accessibility:https://developer.android.com/guide/topics/ui/accessibility/apps
+검토 기준:48dp 터치, 보통 글자4.5:1/큰 글자3:1 이상, 확대·화면 읽기 의미, 색 이외 선택 정보. 기존 브랜드/글꼴을 임의 교체하지 않고 터치와 상태 의미를 보완했다. 본문12.49:1, 보조5.68:1, 주요 버튼4.66:1, 비활성4.88:1. 토큰46개 조합을 검사한다. 눌림·선택·위험·초점도 같은 토큰 검사를 따른다.
+Microsoft writing:https://learn.microsoft.com/en-us/windows/apps/design/style/writing-style
+검토 기준:실제 결과를 말하는 제목/버튼, 짧고 이해할 수 있는 문구, 다음 행동이 있는 오류. ‘공유할 내용 선택’→‘미리보기’→‘공개 범위 확인’→‘선택한 내용 공개/공개 내용 바꾸기’로 행동과 결과를 맞췄다. 여행 제목은 실제 저장값을 사용한다.
+Microsoft dialogs:https://learn.microsoft.com/en-us/windows/apps/develop/ui/controls/dialogs-and-flyouts/dialogs
+검토 기준:한 번의 결정, 안전한 취소/닫기, 입력 오류는 해당 입력 곁에서 해결. 기간 축소를 확인 버튼으로 강행하지 않으며 영향이 있는 날짜를 폼에서 다시 선택하게 한다. 모달 제목/본문의 중복과 불필요한 확인을 줄였다.
+Microsoft navigation:https://learn.microsoft.com/en-us/windows/apps/design/basics/navigation-basics
+검토 기준:같은 수준의 메뉴 역할 분리, 읽던 맥락으로 복귀. 홈/내 여행/발견/발자국/MY를 일관되게 적용하고 공개 단건의 유형을 실제 데이터로 분기한다. Windows 외형을 Android 앱에 복제한 것이 아니라 탐색 원칙을 적용했다.
+Google Play 계정 삭제:https://support.google.com/googleplay/android-developer/answer/13327111?hl=en
+계정 관리 안의 경로와 외부 웹 경로를 제공해야 하며 계정 관련 데이터 삭제도 요구한다. 현재 사용자 정책의 여행 원문 계속 보존은 별도 공개 고지와 개인정보 삭제 요청 범위의 검토가 필요하다. Google 연결만으로 약관/개인정보처리방침 URL이나 Play 적합성이 확정되는 것은 아니다. 이 사항은 출시 인수 항목이다.
+
+3. 실제 구현과 디자인의 남은 차이
+참조:design/DESIGN.md, design-tokens.json, 헤더GNB_규격.md, 디자인_적용가이드.txt, 페이지별_기능정의.txt, 팝업_규격.txt, 공개여행계획_화면규격.md 및1.uiux의 일정 규격.
+106개 HTML 제작본은 화면 구조/디자인 자료다. 실제 앱은 기존 여행 허브와 폼을 유지해 같은 기능을 연결한다. 일부 독립 제작 페이지는 기존 폼/허브 안의 단계이며 새 경로106개를 만든 것이 아니다. 804는 앱에서 기간 입력 아래 영향 안내로 구현한다. 513 /account·808은 실제 유예/복구 계약으로 연결했다.
+Google 장소 사진은 공개 단건에서 실제 제공자 응답과 출처를 표시한다. 아직 공개하지 않은 선택의 미리보기에서는 공개 전용 사진 API를 다른 기존 공개본으로 우회하지 않는다. 선택 일정 원문과 사용자 사진/비용의 공개 투영은 동일하되 Google 장소 사진의 최종 표시에는 차이가 있다.
+실제 Play 서명의 지도 타일·Google 인증 복귀·카메라/앨범·TalkBack·OS200%글꼴·프로세스 종료 복구는 설치본 인수다. 웹 큰 글꼴 검사와 같은 결과로 합치지 않는다.
+최소 지원 정책 운영값, 확정 약관/개인정보처리방침 URL, 여행 내 개인정보 삭제 요청과 보존 범위, 외부 공급자 운영 결과가 남으면 빌드/출시 인계에서 별도로 표시한다.
+
+4. 검증 증거
+자동:outputs/redesign-implementation/auth-final.log 212/212, cloud-account-final.log 실제 Worker·D1·R2 통합23/23. 후자는 재인증·타인 ID/동의 누락 거부, 세션 철회, 비공개 파일 접근 차단, 새 로그인 복구, 시간 경계 이후 예약 처리, 반복 예약, 단독/공동 여행과 편집자 권한·파일·공개본 보존을 포함한다. 90일 경계는 격리 D1의 시각을 조정해 검사했으며 운영 시계를 바꾸지 않았다.
+staging:staging-result.json/verify-staging.mjs. 정상 신규 회원·생일 없는 온보딩, 여행 생성, DAY/장소 원문 재조회, 비용 같은 키 재시도 중복 없음, 익명 공개의 선택/비공개 분리, 같은 링크 재공개, 실제 서버 필터, DAY 소개만 있는 날짜의 축소422/원본 유지, 철회404/개인 원본 유지9항목 통과. 기존 오사카 fb1c44f7 공개본의 전후 해시 동일.
+실제 화면:community-before.png/community-after.png. 발견 검색 결과→공개 상세→장소 설명/팁 진입, 실제 Google 썸네일 표시 확인. 검수 회원으로 로그인→개인 여행 DAY 소개 편집→저장→새로고침 재조회→공유 선택→미리보기→범위 확인 취소/재확정과 저장 중 전체 잠금 확인.
+DAY 선택:390px에서 네 버튼 모두104.953125×48, 선택 전후 변화0. 화면의 선택 정보와 글자/버튼 색을 함께 확인했다.
+배포/최종 화면·글꼴 결과는 이 문서 아래 후속 검증 기록을 따른다. 비밀번호·토큰·서명 주소는 보고서에 기록하지 않는다.
+
+5. 최종 반영과 후속 검증
+API:a219ebeb-9bcc-4041-b6b0-8744e8feeb3c. migration0007 적용, 매시 예약0 * * * * 등록. 기존17개 바인딩과 인증 변수·비밀 키·D1·R2·조회 제한을 보존했다. deployment-preservation.json에서 기존 바인딩 일치를 대조했다.
+웹:04cd7868.tripprint-staging.pages.dev / 서비스 주소 https://tripprint-staging.pages.dev. 사진 상태별 고정 슬롯까지 포함한 최종 웹 내보내기다. Android 설치 파일은 만들지 않았다.
+최종 npm run check:check-photo-final.log, 종료0. 색 대비46/46·TypeScript·ESLint·Prettier 통과. 관련 자동 검사 auth-dialog-final.log212/212, cloud-account-final.log23/23. 사진 슬롯은 읽기 전용 표시 변경으로 서버 검사를 반복하지 않았다.
+최종 실제 서버 고객 흐름:outputs/customer-journey/live/qa-20261019031848-7fd2db/result.json 19/19. 정상 세션에서 항공 직접 입력, 일정·여행 저장, 합성 영수증 업로드/실제 OCR, 지출 수정/요약, 새 로그인 재조회, 공개 범위/철회까지 확인했다. 과거 날짜 항공 조회200·후보0건은 실편 검색 성공으로 계산하지 않는다. Places 조회200·결과1건이다.
+실제 화면에서 DAY 소개를 수정·저장·새로고침·같은 링크 재공개했다. ui-server-readback.json은 별도 정상 인증 조회와 익명 공개 조회로 원문/선택 범위를 다시 확인한 결과다.
+계정 유예는 최근 인증 거부→일반 재로그인→실제 요청→기존 세션 철회→공개 작성자 ‘탈퇴 멤버’→정상 재로그인 복구까지 확인했다. retirement-live-pending/restored.json과 retirement-public-pending/restored.json에 결과를 남겼다. 소유권/멤버 역할·개인 DAY 원문·공개 링크가 유지됐다. 검사 계정은 복구된 상태다. 90일 실경과는 로컬 격리 Worker 예약 검사로 대체하며 staging 시계/데이터 만료 시각을 조작하지 않았다.
+프로필21바이트 오류는 입력 아래에 표시하고 같은 폼에서 수정·실제 저장했다. 성공은 MY의 ‘프로필을 저장했어요.’로 알린다. 로그아웃 중앙 확인 취소 시 원래 로그아웃 버튼에 초점 복귀, 실제 실행 중 닫기/취소/확정 잠금, 성공 후 로그인 화면과 서버 세션0개를 확인했다. logout-live-final.json의 retirement_count0·owned_trips1로 계정/여행 보존도 확인했다.
+
+6. 실제 화면 대조
+320/390/430px × 웹 글자100/200%의6경우에서 본문 가로 넘침0, 측정 대상 터치48미만0. responsive-results.json과 public-*-font*.jpg 참조. 웹 루트 글자 크기를 적용한 실제 AppText 검사이며 Android OS 글자 확대/TalkBack 합격을 대신하지 않는다.
+430/200의 첫 캡처는 DAY 글자가 그려지기 전 프레임이었다. public-430-font200-stable.jpg에서 흰색 DAY1·밑줄 정상, 글자28/44·opacity1, 버튼109.328125×62를 확인했고 독립 AI UI 검토에서도 해소됐다.
+DAY 네 버튼은 선택 전후104.953125×48. 공개 체크 행은 빈 선택 안내가 사라져도301×48로 동일하다(gutter-final.json). 단일 선택 채움과 다중 선택 체크를 구분했다.
+PlacePhoto의 로딩/없음/실패도88×88 슬롯을 확보한다. 실제 DAY2 새 진입에서 대기7개 모두88×88을 실측했다(photo-slot-final.json). Google 표기는 상태와 독립적으로 같은 위치를 사용하며 오류 문구/재시도는 아래에 둔다. 사진 없음·실패 분기는 코드 규격을 대조했고 최종 실제 캡처는 정상/대기 상태다. 외부 오류를 강제로 주입해 성공한 것처럼 보고하지 않는다.
+최종 캡처:osaka-app-final.jpg는 기존 사용자의 오사카 원문 공개본이고 변경 없이 읽었다. osaka-photo-loading-final.jpg, share-checkbox-final.jpg, exit-dialog-final.jpg, profile-error-final.jpg, profile-saved-final.jpg, logout-dialog-final.jpg, logout-complete-final.jpg는 실제 앱 상태다. 과거 디자인 제작본 캡처와 구분한다.
+전체 레거시 tests/web/workspace.spec.ts 및 헤더 CLI 브라우저 묶음은 이번에 실행하지 않았다. 이전 UI 선택자와 현행 제목/공유 단계가 달라 CI 인계 시 선택자 갱신이 필요하다. 해당 묶음을 통과했다고 보고하지 않는다. 이번 증거는212개 모델/인증 검사,23개 실제 Worker 통합 검사,19개 staging 서버 검사와 위 실제 브라우저 조작이다.
+
+7. 구현 파일 범위
+모델/저장:workspaceModel.ts,communityFeed.ts/index.ts,workspace/forms.ts,schedulePlanInput.ts,tripPeriod.ts,TripPeriodSummary.tsx,publication/workspaceConfirmation.ts와 관련 회귀 검사. DB/API:cloudRpc.ts,workspace.ts,cloudAuth.ts,cloudSession.ts,cloudProfiles.ts,cloudMedia.ts,accountRetirement.ts,index.ts,errors.ts,migration0007,staging cron 및 API client.
+여행/공개:WorkspaceScreen.tsx,PlanEditor.tsx,PublishFlow.tsx,PublishSelection.tsx,PublishReadiness.tsx,CommunityPlanView.tsx,CommunityRecordView.tsx,CommunityPhoto.tsx,PlacePhoto.tsx,CommunityPlanScreen.tsx,CommunityScreen.tsx,DiaryScreen.tsx,TripPlanningFlow.tsx,TripFields.tsx,presentation.ts,formFeedback.ts,tripPresentation.ts,travelPlans.ts,communityService.ts.
+공통/계정:DesignButton.tsx,workspace/ui.tsx,ActionSheet.tsx,AppModal.tsx,modalAccessibility.ts,WorkspaceConfirmDialog.tsx,scheduleExitGuard.tsx,TripCalendar.tsx,GlobalNavigation.tsx,탭layout,my.tsx,account.tsx,인증 복귀/공개 경로·기기 인증 정리. 터치 규격은 DestinationPicker/FlightCard/FlightLookupCandidateCard/scheduleConflicts/TripCompanions/TripMapCanvas.native/TripSectionNavigation/TripTimeline/scheduleTheme에 적용했다.
+문서/검증:DB_객체사전.txt,현행 디자인/토큰/기능/팝업/인계 문서,review 공통 최소 터치/유예 문구 및106개 목록 재생성,auth/redesignContracts.test.ts·authReturn.test.ts·관련 기대값,cloud/runtime.test.mjs. 기존에 수정 중이던 파일과 사용자 원문은 보존했으며 커밋/푸시는 하지 않았다. 상세 실행 로그와 비밀값 없는 결과는 outputs/redesign-implementation에 둔다.
+
+8. 출시 전 남은 차이
+독립 AI UI 후속 검토는 최종 실제 캡처·소스·측정값에서 새로운P0/P1을 발견하지 못했다. DAY 안정 프레임, 사진 정상/대기 슬롯, 체크 행, 이탈/로그아웃, 프로필 오류/저장을 확인했다. 이 검토는 Google 사진 미리보기와 실기기·정책의 미완료를 해소하거나 출시를 승인한 결과가 아니다. 최종 제품 소스309개를 재대조했고 직전 검사 뒤 의도한 PlacePhoto.tsx 외의 변경은 없었다(source-hashes-delivery.json).
+공개 전 미리보기의 Google 장소 사진, Play 서명 지도/Google 로그인 복귀·실기기 카메라/앨범/키보드/시스템 뒤로/TalkBack, 실제 항공 후보 조회, 최소 지원 운영값, 약관/개인정보처리방침 URL과 보존/삭제 정책은 인수 전이다. 특히 여행 원문 계속 보존을 계정 관련 데이터 전체 삭제나 Google Play 정책 승인으로 표현하지 않는다. 조건을 닫기 전 최종 UI/출시 승인 완료로 보고하지 않는다.

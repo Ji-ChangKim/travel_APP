@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import tokens from '../../../../../docs/design/ledger-tokens.json';
+import tokens from '../../../../../docs/02. 디자인/00. 공통규격/ledger-tokens.json';
 
 // 신규 Stitch 화면에만 적용하며 기존 여행 작성 화면의 공통 토큰은 바꾸지 않는다.
 export const ledgerColors = tokens.color;

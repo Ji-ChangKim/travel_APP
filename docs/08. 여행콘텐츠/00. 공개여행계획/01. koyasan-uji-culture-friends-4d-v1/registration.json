@@ -1,0 +1,12 @@
+{
+  "base": "https://tripprint-api-staging.gametps.workers.dev",
+  "planKey": "koyasan-uji-culture-friends-4d-v1",
+  "tripId": "d6680ac5-cf48-4f6b-9f43-bf3fee6ac2b5",
+  "postId": "10eaadec-504f-4d51-89cc-8ec1eefacb88",
+  "author": "가이드 하루",
+  "days": 4,
+  "schedules": 18,
+  "cover": "d6680ac5-cf48-4f6b-9f43-bf3fee6ac2b5/7f4e05d7-759b-4081-bb3e-08a4d733ad8c.jpg",
+  "verifiedAt": "2026-10-21T11:32:12.954Z",
+  "publicUrl": "https://tripprint-staging.pages.dev/community/10eaadec-504f-4d51-89cc-8ec1eefacb88"
+}

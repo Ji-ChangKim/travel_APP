@@ -1,0 +1,11 @@
+{
+  "base": "https://tripprint-api-staging.gametps.workers.dev",
+  "tripId": "930ee12c-fc87-49b5-a5f7-72a626049f70",
+  "postId": "dac90238-8825-4359-93b1-bd43c946f757",
+  "author": "가이드 하루",
+  "days": 4,
+  "schedules": 23,
+  "cover": "930ee12c-fc87-49b5-a5f7-72a626049f70/b640f704-5bf8-4de6-80a9-92734e7a9335.png",
+  "sourceSha256": "c1f7e9bb17f4211c0f5a01a364fb9928aec4ba51138fbe0683167b43059569a4",
+  "verifiedAt": "2026-10-20T09:28:08.240Z"
+}

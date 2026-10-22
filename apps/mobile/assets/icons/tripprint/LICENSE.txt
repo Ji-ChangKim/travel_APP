@@ -2,7 +2,7 @@ TripPrint 디자인 아이콘 — 출처 및 권리 표기
 
 사용자가 지정한 Stitch 프로젝트 All-in-One Travel Planner의
 아이콘 모음(3c4e7db80d9f4dcba7fb58c5f7186c32)에 포함된 인라인 SVG를 추출했다.
-원본: docs/design/sources/stitch-icon-library.html
+원본: docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html
 원본 footer: TripPrint Design System v2.4 · All rights reserved.
 
 원본 HTML에는 개별 SVG의 별도 MIT/Apache 등 라이선스나 제작자 정보가

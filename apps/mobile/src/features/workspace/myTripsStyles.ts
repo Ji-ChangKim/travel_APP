@@ -113,14 +113,14 @@ export const myTripsStyles = StyleSheet.create({
   completedCover: { minHeight: 144 },
   coverImage: { width: '100%', height: '100%', position: 'absolute', inset: 0 },
   coverTop: {
-    position: 'absolute',
-    top: 12,
-    left: 12,
-    right: 12,
+    // 배지를 문서 흐름에 두어 큰 글꼴에서도 제목 위에 겹치지 않는다.
+    paddingTop: 12,
+    paddingHorizontal: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     gap: 8,
+    zIndex: 1,
   },
   badge: {
     flexDirection: 'row',

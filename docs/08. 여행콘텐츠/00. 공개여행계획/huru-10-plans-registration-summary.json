@@ -1,0 +1,122 @@
+[
+  {
+    "base": "https://tripprint-api-staging.gametps.workers.dev",
+    "planKey": "tokyo-romantic-couple-4d-v1",
+    "tripId": "29d9a2f3-5cc0-451f-b5eb-633fd885292e",
+    "postId": "fdde3b55-ad65-4fd2-9932-760d4e6fcfb9",
+    "author": "가이드 하루",
+    "days": 4,
+    "schedules": 19,
+    "cover": "29d9a2f3-5cc0-451f-b5eb-633fd885292e/796cfe08-0246-4503-8c82-f7ac495040e2.jpg",
+    "verifiedAt": "2026-10-21T11:26:45.068Z",
+    "publicUrl": "https://tripprint-staging.pages.dev/community/fdde3b55-ad65-4fd2-9932-760d4e6fcfb9"
+  },
+  {
+    "base": "https://tripprint-api-staging.gametps.workers.dev",
+    "planKey": "tokyo-subculture-friends-4d-v1",
+    "tripId": "a87fe855-8dd5-49d5-96a2-c42203506606",
+    "postId": "939d91d3-0c52-4543-adf5-086bafb498cd",
+    "author": "가이드 하루",
+    "days": 4,
+    "schedules": 19,
+    "cover": "a87fe855-8dd5-49d5-96a2-c42203506606/20d5f2f9-a32c-460b-8c2d-76e287603a0d.jpg",
+    "verifiedAt": "2026-10-21T11:27:33.935Z",
+    "publicUrl": "https://tripprint-staging.pages.dev/community/939d91d3-0c52-4543-adf5-086bafb498cd"
+  },
+  {
+    "base": "https://tripprint-api-staging.gametps.workers.dev",
+    "planKey": "osaka-foodie-friends-4d-v1",
+    "tripId": "b0130d0c-0ef8-4d6b-8fd5-910430d611b7",
+    "postId": "000e4c32-d796-45d4-b436-73da378d00ff",
+    "author": "가이드 하루",
+    "days": 4,
+    "schedules": 19,
+    "cover": "b0130d0c-0ef8-4d6b-8fd5-910430d611b7/584d0d0f-5cdb-4dc4-b9e4-b5ee0341f7f4.jpg",
+    "verifiedAt": "2026-10-21T11:28:22.602Z",
+    "publicUrl": "https://tripprint-staging.pages.dev/community/000e4c32-d796-45d4-b436-73da378d00ff"
+  },
+  {
+    "base": "https://tripprint-api-staging.gametps.workers.dev",
+    "planKey": "osaka-usj-family-4d-v1",
+    "tripId": "51395674-dd30-45d5-ba57-fe20c7ffef0f",
+    "postId": "42548ac9-0e38-45d9-b445-a15cea193db5",
+    "author": "가이드 하루",
+    "days": 4,
+    "schedules": 19,
+    "cover": "51395674-dd30-45d5-ba57-fe20c7ffef0f/a9d1b570-c713-49eb-9e25-097a12c1ef3e.jpg",
+    "verifiedAt": "2026-10-21T11:29:11.303Z",
+    "publicUrl": "https://tripprint-staging.pages.dev/community/42548ac9-0e38-45d9-b445-a15cea193db5"
+  },
+  {
+    "base": "https://tripprint-api-staging.gametps.workers.dev",
+    "planKey": "osaka-kyoto-kimono-couple-4d-v1",
+    "tripId": "a734170e-9cf2-4018-9463-82f6b1bad55d",
+    "postId": "d23a9a20-2248-4345-be78-c65a98faf976",
+    "author": "가이드 하루",
+    "days": 4,
+    "schedules": 19,
+    "cover": "a734170e-9cf2-4018-9463-82f6b1bad55d/bc055fcd-1a81-4241-8627-963d937eae3d.jpg",
+    "verifiedAt": "2026-10-21T11:30:00.103Z",
+    "publicUrl": "https://tripprint-staging.pages.dev/community/d23a9a20-2248-4345-be78-c65a98faf976"
+  },
+  {
+    "base": "https://tripprint-api-staging.gametps.workers.dev",
+    "planKey": "osaka-nara-kobe-family-4d-v1",
+    "tripId": "78884e60-a21b-434e-bcc6-0408a415df6a",
+    "postId": "e4694172-fac4-4f8f-b8a1-da76eb35d831",
+    "author": "가이드 하루",
+    "days": 4,
+    "schedules": 18,
+    "cover": "78884e60-a21b-434e-bcc6-0408a415df6a/92bc2545-a49e-40e4-8721-f7a3fde61d84.jpg",
+    "verifiedAt": "2026-10-21T11:30:47.507Z",
+    "publicUrl": "https://tripprint-staging.pages.dev/community/e4694172-fac4-4f8f-b8a1-da76eb35d831"
+  },
+  {
+    "base": "https://tripprint-api-staging.gametps.workers.dev",
+    "planKey": "arima-rokko-onsen-couple-3d-v1",
+    "tripId": "59e0d77b-f13a-47f7-a6d5-f80194213db0",
+    "postId": "acf634a1-df3a-4f46-a7bd-48e60cf9e7d7",
+    "author": "가이드 하루",
+    "days": 3,
+    "schedules": 13,
+    "cover": "59e0d77b-f13a-47f7-a6d5-f80194213db0/ee35c651-78fa-40f4-ba53-50e1935fb6a5.jpg",
+    "verifiedAt": "2026-10-21T11:31:24.892Z",
+    "publicUrl": "https://tripprint-staging.pages.dev/community/acf634a1-df3a-4f46-a7bd-48e60cf9e7d7"
+  },
+  {
+    "base": "https://tripprint-api-staging.gametps.workers.dev",
+    "planKey": "koyasan-uji-culture-friends-4d-v1",
+    "tripId": "d6680ac5-cf48-4f6b-9f43-bf3fee6ac2b5",
+    "postId": "10eaadec-504f-4d51-89cc-8ec1eefacb88",
+    "author": "가이드 하루",
+    "days": 4,
+    "schedules": 18,
+    "cover": "d6680ac5-cf48-4f6b-9f43-bf3fee6ac2b5/7f4e05d7-759b-4081-bb3e-08a4d733ad8c.jpg",
+    "verifiedAt": "2026-10-21T11:32:12.954Z",
+    "publicUrl": "https://tripprint-staging.pages.dev/community/10eaadec-504f-4d51-89cc-8ec1eefacb88"
+  },
+  {
+    "base": "https://tripprint-api-staging.gametps.workers.dev",
+    "planKey": "sapporo-snow-family-4d-v1",
+    "tripId": "36038980-7fa3-41b3-87fe-4a99c1602566",
+    "postId": "089f1b38-c88e-4cd7-8f44-b5a9a13739ee",
+    "author": "가이드 하루",
+    "days": 4,
+    "schedules": 19,
+    "cover": "36038980-7fa3-41b3-87fe-4a99c1602566/7f14eb68-7ce4-4c74-88a9-c6d9ca526270.jpg",
+    "verifiedAt": "2026-10-21T11:33:02.110Z",
+    "publicUrl": "https://tripprint-staging.pages.dev/community/089f1b38-c88e-4cd7-8f44-b5a9a13739ee"
+  },
+  {
+    "base": "https://tripprint-api-staging.gametps.workers.dev",
+    "planKey": "sapporo-otaru-canal-couple-4d-v1",
+    "tripId": "2b0eab14-7d08-419a-9c47-75982f807ae2",
+    "postId": "b16bbfd7-700d-4e6b-a565-ba1f4021d786",
+    "author": "가이드 하루",
+    "days": 4,
+    "schedules": 19,
+    "cover": "2b0eab14-7d08-419a-9c47-75982f807ae2/cdad0d26-fb71-4949-8789-95a5324bf36e.jpg",
+    "verifiedAt": "2026-10-21T11:33:51.463Z",
+    "publicUrl": "https://tripprint-staging.pages.dev/community/b16bbfd7-700d-4e6b-a565-ba1f4021d786"
+  }
+]

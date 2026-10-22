@@ -1,0 +1,12 @@
+{
+  "base": "https://tripprint-api-staging.gametps.workers.dev",
+  "planKey": "osaka-usj-family-4d-v1",
+  "tripId": "51395674-dd30-45d5-ba57-fe20c7ffef0f",
+  "postId": "42548ac9-0e38-45d9-b445-a15cea193db5",
+  "author": "가이드 하루",
+  "days": 4,
+  "schedules": 19,
+  "cover": "51395674-dd30-45d5-ba57-fe20c7ffef0f/a9d1b570-c713-49eb-9e25-097a12c1ef3e.jpg",
+  "verifiedAt": "2026-10-21T11:29:11.303Z",
+  "publicUrl": "https://tripprint-staging.pages.dev/community/42548ac9-0e38-45d9-b445-a15cea193db5"
+}

@@ -13,11 +13,11 @@
 - 브랜드: TripPrint 로고와 하루, 승인된 디자인 토큰 사용
 - 버전: [ver.text](ver.text)의 versionCode와 versionName을 앱 설정에서 읽음
 
-[최신 P0 검증 기록](docs/qa/P0_STITCH_ACCEPTANCE.txt), [정리·자원 관리 점검](docs/qa/RESOURCE_CLEANUP.txt), [배포 절차](docs/DEPLOYMENT.md)에서 완료 범위와 남은 검증을 확인합니다. 과거 보고의 미배포·미연결 문장을 현재 상태로 해석하지 않습니다.
+[최신 P0 검증 기록](<docs/05. 검수/02. 검수보고/Stitch_P0인수검수.txt>), [정리·자원 관리 점검](<docs/05. 검수/02. 검수보고/리소스코드_정리검수.txt>), [배포 절차](<docs/04. 운영/01. 배포절차/서버웹_배포절차.md>)에서 완료 범위와 남은 검증을 확인합니다. 과거 보고의 미배포·미연결 문장을 현재 상태로 해석하지 않습니다.
 
 [staging 웹](https://tripprint-staging.pages.dev) · [공개 버전 정보](https://tripprint-staging.pages.dev/release.json)
 
-직접 내부 테스트용 AAB를 만들 때는 [빌드 설정·실행 순서](docs/ANDROID_GITHUB_BUILD.md)를 따릅니다. GitHub Actions에서 `main`·`aab`·`submit_play=false`·`draft`를 선택하며, 실제 게스트·Google 로그인 검수는 Play 설치 후 진행합니다. 현재 소스는 versionCode9이고 이미 사용한 번호라면 `ver.text`를 먼저 수정합니다.
+직접 내부 테스트용 AAB를 만들 때는 [빌드 설정·실행 순서](<docs/04. 운영/01. 배포절차/Android_GitHub빌드절차.md>)를 따릅니다. GitHub Actions에서 `main`·`aab`·`submit_play=false`·`draft`를 선택하며, 실제 게스트·Google 로그인 검수는 Play 설치 후 진행합니다. 현재 소스는 versionCode9이고 이미 사용한 번호라면 `ver.text`를 먼저 수정합니다.
 
 ## 개발 환경과 실행
 
@@ -58,14 +58,14 @@ supabase/              이전 백엔드 스키마 참고 자료
 
 `apps/mobile/android`의 생성 소스·서명·최종 APK/AAB와 에뮬레이터 데이터는 중간 빌드 캐시와 구분합니다. 용량만 보고 일괄 삭제하지 않습니다. 테스트의 fixture와 디자인 원본도 제품의 더미 데이터와 구분합니다.
 
-[CTO 코드 검토](docs/qa/CTO_CODE_REVIEW.txt)에서 기능·표현·예외·고정값의 검수 결과를 확인합니다.
+[CTO 코드 검토](<docs/05. 검수/02. 검수보고/CTO_코드검토.txt>)에서 기능·표현·예외·고정값의 검수 결과를 확인합니다.
 
 ## 작업 기준
 
 - [AGENTS.md](AGENTS.md)의 코드·검증·문구 규칙을 따릅니다.
-- UI 변경 전 [DESIGN.md](docs/design/DESIGN.md), [디자인 토큰](docs/design/design-tokens.json), [헤더 규격](docs/design/SCREEN_HEADER_SPEC.md)을 확인합니다.
-- 신규 Stitch 적용 범위는 [원본 대조·연결 기록](docs/design/STITCH_CURRENT_INTEGRATION.txt)을 우선합니다.
-- DB·도메인 변경은 [DB 사전](docs/DB_DICTIONARY.txt)을 함께 수정합니다.
+- UI 변경 전 [DESIGN.md](<docs/02. 디자인/00. 공통규격/디자인시스템.md>), [디자인 토큰](<docs/02. 디자인/00. 공통규격/design-tokens.json>), [헤더 규격](<docs/02. 디자인/00. 공통규격/헤더GNB_규격.md>)을 확인합니다.
+- 신규 Stitch 적용 범위는 [원본 대조·연결 기록](<docs/02. 디자인/00. 공통규격/Stitch시안_적용범위.txt>)을 우선합니다.
+- DB·도메인 변경은 [DB 사전](<docs/03. 개발/02. 데이터정의/DB_객체사전.txt>)을 함께 수정합니다.
 - 환경 변수·서명·계정 자료는 저장소와 화면에 노출하지 않습니다.
 - 실제 저장되지 않은 데이터와 미지원 기능을 사용 가능한 것처럼 표시하지 않습니다.
 - 생성 파일은 `outputs/` 등 정해진 경로에 두며, 소스와 섞지 않습니다.

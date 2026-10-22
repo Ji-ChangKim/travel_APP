@@ -1,5 +1,5 @@
 import type { ViewStyle } from 'react-native';
-import tokens from '../../../../../docs/design/ledger-tokens.json';
+import tokens from '../../../../../docs/02. 디자인/00. 공통규격/ledger-tokens.json';
 
 export interface LedgerActionAppearance {
   emphasized: boolean;

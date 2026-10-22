@@ -6,10 +6,11 @@ import { chromium } from '@playwright/test';
 import { format, resolveConfig } from 'prettier';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const sourceFile = 'docs/design/sources/stitch-icon-library.html';
+const sourceFile =
+  'docs/02. 디자인/03. 참조시안/00. 제공원본/stitch-icon-library.html';
 const destination = 'apps/mobile/assets/icons/tripprint';
 const formatOptions = await resolveConfig(
-  path.join(root, 'docs/design/icon-catalog.html'),
+  path.join(root, 'docs/02. 디자인/02. 리소스/icon-catalog.html'),
 );
 const groupNames = {
   navigation: '탐색',
@@ -191,7 +192,7 @@ function iconCard(entry) {
 function makeCatalog(entries) {
   // 외부 요청 없이 크기·색상·검색·분류를 확인하는 카탈로그를 만든다.
   return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>TripPrint 아이콘 카탈로그</title><style>
-  @font-face{font-family:Pretendard;src:url('../../apps/mobile/assets/brand/tripprint-v1/fonts/PretendardVariable.woff2') format('woff2');font-display:swap}
+  @font-face{font-family:Pretendard;src:url('../../../apps/mobile/assets/brand/tripprint-v1/fonts/PretendardVariable.woff2') format('woff2');font-display:swap}
   :root{--icon-size:24px;--icon-color:#203247;color:#203247;background:#fef8f2;font-family:Pretendard,system-ui,sans-serif}*{box-sizing:border-box}body{margin:0}main{max-width:1280px;margin:auto;padding:32px 24px}h1{font-size:32px;letter-spacing:-.03em;margin:8px 0}p{line-height:1.65}.eyebrow{font-size:13px;color:#c84432;font-weight:700}.swatches{display:flex;gap:12px;flex-wrap:wrap;margin:24px 0}.swatch{background:#fff;border-radius:12px;padding:12px;display:flex;align-items:center;gap:8px}.swatch i{width:24px;height:24px;border-radius:8px;background:var(--swatch)}.controls{display:flex;flex-wrap:wrap;gap:12px;background:#fff;padding:16px;border-radius:16px;position:sticky;top:0;z-index:1;box-shadow:0 4px 20px #2032470d}label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600}input,select{min-height:44px;border:1px solid #dfd9d3;border-radius:8px;padding:10px;color:#203247;background:#f8f3ed;font:inherit}input[type=search]{min-width:240px}input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid #186779;outline-offset:3px}.count{font-size:14px;margin:20px 0}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}.icon-card{display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 12px;background:#fff;border-radius:16px;box-shadow:0 2px 10px #2032470a;min-width:0}.icon{height:64px;display:flex;align-items:center;color:var(--icon-color)}.icon svg{width:var(--icon-size);height:var(--icon-size);overflow:visible}.icon-card span{color:#4a5d73;font-size:12px}.icon-card a{font-size:11px;overflow-wrap:anywhere;text-align:center;color:#186779}.icon-card[hidden]{display:none}.note{padding:16px;background:#e9f7fc;border-radius:12px;font-size:13px;margin-top:28px}@media(max-width:430px){main{padding:20px 16px}h1{font-size:26px}.controls{position:static}.controls label{width:100%}input[type=search]{min-width:0;width:100%}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.icon-card{padding:16px 8px}}
   </style></head><body><main><div class="eyebrow">TRIPPRINT · DESIGN RESOURCE v1.0</div><h1>아이콘 모음</h1><p>스티치 원본에서 추출한 벡터를 이름·크기·색상별로 확인합니다.</p><div class="swatches"><div class="swatch"><i style="--swatch:#ff6b57"></i>Trip Coral #FF6B57</div><div class="swatch"><i style="--swatch:#203247"></i>Journey Navy #203247</div><div class="swatch"><i style="--swatch:#fef8f2"></i>Warm Ivory #FEF8F2</div></div><div class="controls"><label>아이콘 검색<input id="search" type="search" placeholder="장소, camera, flight…"></label><label>분류<select id="group"><option value="">전체</option>${Object.entries(
     groupNames,
@@ -413,7 +414,7 @@ try {
     }),
   );
   await fs.writeFile(
-    path.join(root, 'docs/design/icon-catalog.html'),
+    path.join(root, 'docs/02. 디자인/02. 리소스/icon-catalog.html'),
     await format(makeCatalog(entries), { ...formatOptions, parser: 'html' }),
   );
   await fs.mkdir(path.join(root, 'apps/mobile/src/components/icons'), {

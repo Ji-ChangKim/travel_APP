@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import {
+  Animated,
+  Easing,
+  Platform,
+  Pressable,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { usePathname, useRouter, useSegments } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -7,6 +14,7 @@ import Text from '@/components/AppText';
 import { designTokens, colors } from '@/constants/theme';
 import { useTopModal } from '@/features/accessibility/modalLayers';
 import { requestScheduleExit } from '@/features/workspace/scheduleExitGuard';
+import { navigationScroll } from './navigationScroll';
 import { hasGlobalNavigation } from './navigationPolicy';
 import {
   isNavigationSelected,
@@ -26,20 +34,57 @@ export default function GlobalNavigation() {
   const starting = useSegments().join('/') === '';
   const pending = useRef<string | null>(null);
   const blocked = Boolean(modal && (modal.strict || modal.native));
-  // 새 경로를 받은 뒤에만 다음 이동을 받아 빠른 중복 누름을 막는다.
+
+  const [gnbVisible, setGnbVisible] = useState(true);
+  const [translateY] = useState(() => new Animated.Value(0));
+
+  // 스크롤 이벤트 구독
   useEffect(() => {
-    // 라우트 반영이 끝나면 다음 사용자 이동을 받을 수 있게 한다.
+    return navigationScroll.subscribe(setGnbVisible);
+  }, []);
+
+  // 새 경로를 받은 뒤에만 다음 이동을 받아 빠른 중복 누름을 막고, GNB를 즉시 표시한다.
+  useEffect(() => {
     pending.current = null;
+    navigationScroll.reset();
   }, [path]);
+
+  // 스크롤 방향에 따라 GNB를 아래로 내리거나 위로 올린다.
+  useEffect(() => {
+    Animated.timing(translateY, {
+      toValue: gnbVisible ? 0 : 100,
+      duration: 220,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+  }, [gnbVisible, translateY]);
+
+  // 웹 브라우저 창 스크롤 감지: 아래로 내릴 때 GNB 숨김, 위로 올릴 때 GNB 복귀
+  useEffect(() => {
+    if (Platform.OS !== 'web' || typeof window === 'undefined') return;
+    const onScroll = () => {
+      const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+      navigationScroll.handleScroll(scrollY);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return !starting && hasGlobalNavigation(path) && !(modal && !modal.strict) ? (
-    <View
+    <Animated.View
       testID="global-navigation"
       accessibilityLabel="하단 내비게이션"
       accessibilityElementsHidden={blocked}
       importantForAccessibility={blocked ? 'no-hide-descendants' : 'auto'}
       aria-hidden={blocked}
       pointerEvents={blocked ? 'none' : 'auto'}
-      style={[styles.container, { paddingBottom: Math.max(bottom, 4) }]}
+      style={[
+        styles.container,
+        {
+          paddingBottom: Math.max(bottom, 4),
+          transform: [{ translateY }],
+        },
+      ]}
     >
       {navigationItems.map((item) => (
         <NavigationButton
@@ -60,7 +105,7 @@ export default function GlobalNavigation() {
           }}
         />
       ))}
-    </View>
+    </Animated.View>
   ) : null;
 }
 

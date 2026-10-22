@@ -154,10 +154,9 @@ function Workspace({ model }: { model: Model }) {
         keyboardShouldPersistTaps="handled"
       >
         <View>
-          <Text style={styles.eyebrow}>PLAN → EXPERIENCE → TRACE</Text>
+          <Text style={styles.eyebrow}>계획부터 여행 기록까지</Text>
           <Text style={styles.description}>
-            항공편으로 여행의 기준을 잡고,{'\n'}계획한 장소에 영수증과 경험을
-            남겨보세요.
+            날짜와 장소로 여행을 계획하고, 사진과 영수증으로 경험을 남겨보세요.
           </Text>
         </View>
         <View style={styles.banner}>
@@ -205,10 +204,10 @@ function Workspace({ model }: { model: Model }) {
           <JourneyContent model={model} journey={selectedJourney(model)!} />
         ) : !model.state.loading ? (
           <View style={styles.card}>
-            <Text style={styles.title}>여행의 첫 줄을 작성해 보세요</Text>
+            <Text style={styles.title}>첫 여행 계획을 만들어 보세요</Text>
             <Text style={styles.small}>
-              여행을 만든 뒤 가는 편·오는 편을 등록하고 날짜별 장소 계획을
-              추가합니다. 영수증은 해당 계획에 연결해 기록합니다.
+              여행 날짜와 장소를 정한 뒤 항공편을 추가해 보세요. 영수증도 일정에
+              연결해 보관할 수 있어요.
             </Text>
           </View>
         ) : null}

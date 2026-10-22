@@ -165,7 +165,8 @@ function Attribution({
         <Text style={s.caption}>출처 확인일: {source.checkedAt}</Text>
       )}
       <Action
-        label={`원문 열기 · ${source.title}`}
+        label="원문 보기"
+        accessibilityLabel={`원문 열기 · ${source.title}`}
         disabled={busy}
         onPress={() => {
           // 선택한 자료 한 건의 원문만 연다.
@@ -174,7 +175,8 @@ function Attribution({
       />
       {source.licenseUrl && (
         <Action
-          label={`이용 조건 열기 · ${source.license}`}
+          label="이용 조건 보기"
+          accessibilityLabel={`이용 조건 열기 · ${source.license}`}
           disabled={busy}
           onPress={() => {
             // 해당 자료에 기록된 라이선스 주소만 연다.
