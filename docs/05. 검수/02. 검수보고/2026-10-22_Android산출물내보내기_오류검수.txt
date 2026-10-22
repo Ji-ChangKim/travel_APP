@@ -1,0 +1,63 @@
+Android 산출물 내보내기 오류 검수
+검토일: 2026-10-22
+상태: 기존 AAB 복구 및 코드 품질 검사 통과
+범위: Android Studio의 :app:bundleRelease 후처리 오류
+
+확인 결과
+
+스크린샷의 실패 지점은 scripts/android-export.gradle에서 Node 내보내기 작업을 실행하는 부분이다.
+원본 apps/mobile/android/app/release/app-release.aab와 14:58에 만들어진
+TripPrint_261022_Ver01.aab.partial이 남아 있었고, 두 파일의 SHA-256이 일치했다.
+앱 번들 생성과 서명은 끝났으며, 출력 폴더에서 최종 파일명으로 내보내는 후처리가 실패했다.
+
+기존 Gradle 코드는 Node의 표준 오류를 캡처한 뒤 화면에 보여주지 않았다.
+따라서 원래 IDE 실행의 OS 오류 코드와 잠금을 일으킨 프로세스는 확인할 수 없다.
+복사가 끝난 .partial만 남았다는 점에서 최종 파일명 변경 실패가 유력하다.
+별도 검사에서는 샌드박스의 rename EPERM을 재현했지만 일반 권한에서는 통과했다.
+이 재현을 원래 IDE 실행의 오류 코드나 백신 잠금의 증거로 간주하지 않는다.
+
+수정 내용
+
+- export-android-build.mjs: EPERM·EACCES·EBUSY에 한해 최대 5.1초 동안 재시도한다.
+  다른 오류는 즉시 중단한다. 기존 파일을 덮어쓰지 않으며 실패한 임시 파일을 보존한다.
+- android-export.gradle: Node 종료 코드, 표준 오류, 원본 경로를 실패 메시지에 표시한다.
+  성공하면 실제 내보낸 파일 경로를 표시해 출력 폴더 환경 변수도 반영한다.
+- public/release.json: 기존 ver.text의 12/0.1.0과 릴리스 안내를 맞췄다.
+  ver.text 자체는 변경하지 않았다. 원격 웹에는 배포하지 않았다.
+- check-docs.mjs: 문서 관리 규칙에 따라 비공개 98. keys 내부를 순회하지 않는다.
+  비공개 영역 안의 기존 호환용 junction으로 발생하던 검사 오류를 해소했다.
+  비공개 키 파일 내용과 연결 대상은 수정하지 않았다.
+- 헤더GNB_규격.md: 기존 목록 앞에 누락된 빈 줄 하나를 추가해 서식 검사를 맞췄다.
+  문서의 규격 내용과 화면 구현은 변경하지 않았다.
+
+복구한 기존 산출물
+
+파일: J:/002. Project_Service/travel_APP_bulid/TripPrint_261022_Ver01.aab
+크기: 89,186,594 bytes
+SHA-256: be2ec1b235c0e3e5e1f7574a4df79ddd076d387424cb92a7e78291f508f96d38
+패키지: com.tripprint.app
+실제 매니페스트: versionCode=12, versionName=0.1.0
+
+JDK 21 jarsigner 검증 결과는 jar verified이다.
+자체 서명 인증서·공개 CA 체인 없음·타임스탬프 없음에 대한 경고도 기록했다.
+Play Console의 업로드 인증서 등록 상태나 versionCode 12 사용 여부는 조회하지 않았다.
+
+복구 전 임시 파일, Android Studio 원본, 복구한 AAB의 SHA-256이 모두 같다.
+새 번들을 만들거나 다시 서명하지 않고 .partial의 최종 이름만 복구했다.
+파일명의 Ver01은 당일 산출물 순번이며 Android versionCode 12와 별개다.
+
+AAB에는 BUNDLE-METADATA/com.android.tools.build.obfuscation/proguard.map이 포함되어 있다.
+로컬 apps/mobile/android/app/build/outputs/mapping/release/mapping.txt와 해시가 같다.
+매핑 SHA-256: 13505c63998737748d09f13643c9cfc2c35931f6d4f31a54a89c1531f5969c18
+
+검증
+
+- 릴리스 회귀 검사: 82/82 통과.
+- Gradle 9.3.1: 실제 프로젝트 설정과 Node 종료 코드·표준 출력·표준 오류 조회 검사 통과.
+  Android 앱 생성 작업이 포함되면 중단하는 보호 조건을 적용했다.
+- npm run check: 문서·디자인·구조·이동 경계·TypeScript·ESLint·Prettier 모두 통과.
+- git diff --check: 통과.
+
+검사 로그와 복구 해시는 outputs/android-export-20261022에 보관했다.
+복구한 AAB는 수정 전 이미 생성된 파일이다. 이번 변경을 적용한 전체 서명 빌드는 실행하지 않았다.
+실기기 검사, Play 업로드, 배포, 커밋, 푸시는 실행하지 않았다.

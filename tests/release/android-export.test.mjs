@@ -1,6 +1,111 @@
 import assert from 'node:assert/strict';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { test } from 'node:test';
-import { buildDay, buildName } from '../../scripts/export-android-build.mjs';
+import {
+  buildDay,
+  buildName,
+  finalizeBuildFile,
+} from '../../scripts/export-android-build.mjs';
+
+function withExportFiles(check) {
+  const folder = mkdtempSync(join(tmpdir(), 'tripprint-finalize-'));
+  const target = join(folder, 'build.aab');
+  const partial = target + '.partial';
+  writeFileSync(partial, 'signed bundle fixture');
+  try {
+    check({ target, partial });
+  } finally {
+    rmSync(folder, { recursive: true, force: true });
+  }
+}
+
+for (const code of ['EPERM', 'EACCES', 'EBUSY']) {
+  test(`최종 파일명 변경 중 일시적인 ${code} 오류는 재시도한다`, () => {
+    withExportFiles(({ target, partial }) => {
+      let attempts = 0;
+      const delays = [];
+      const result = finalizeBuildFile(partial, target, {
+        rename: (source, destination) => {
+          assert.equal(source, partial);
+          assert.equal(destination, target);
+          attempts += 1;
+          if (attempts < 3) throw Object.assign(new Error('locked'), { code });
+        },
+        wait: (delay) => delays.push(delay),
+      });
+      assert.equal(result, target);
+      assert.equal(attempts, 3);
+      assert.deepEqual(delays, [100, 200]);
+    });
+  });
+}
+
+test('잠금이 풀리지 않으면 제한된 재시도 후 임시 파일과 원인을 보존한다', () => {
+  withExportFiles(({ target, partial }) => {
+    let attempts = 0;
+    const delays = [];
+    assert.throws(
+      () =>
+        finalizeBuildFile(partial, target, {
+          rename: () => {
+            attempts += 1;
+            throw Object.assign(new Error('locked'), { code: 'EPERM' });
+          },
+          wait: (delay) => delays.push(delay),
+        }),
+      (error) => {
+        assert.equal(error.cause.code, 'EPERM');
+        assert.ok(error.message.includes(partial));
+        assert.ok(error.message.includes(target));
+        return true;
+      },
+    );
+    assert.equal(attempts, 7);
+    assert.equal(
+      delays.reduce((total, delay) => total + delay, 0),
+      5100,
+    );
+    assert.equal(readFileSync(partial, 'utf8'), 'signed bundle fixture');
+  });
+});
+
+test('잠금과 무관한 파일 오류는 재시도하지 않는다', () => {
+  withExportFiles(({ target, partial }) => {
+    assert.throws(
+      () =>
+        finalizeBuildFile(partial, target, {
+          rename: () => {
+            throw Object.assign(new Error('disk error'), { code: 'EIO' });
+          },
+          wait: () => assert.fail('잠금 외 오류를 기다리면 안 됩니다.'),
+        }),
+      (error) => error.cause.code === 'EIO',
+    );
+    assert.equal(readFileSync(partial, 'utf8'), 'signed bundle fixture');
+  });
+});
+
+test('재시도 중 생긴 기존 파일을 덮어쓰지 않는다', () => {
+  withExportFiles(({ target, partial }) => {
+    let attempts = 0;
+    assert.throws(
+      () =>
+        finalizeBuildFile(partial, target, {
+          rename: () => {
+            attempts += 1;
+            throw Object.assign(new Error('locked'), { code: 'EPERM' });
+          },
+          wait: () => writeFileSync(target, 'existing bundle'),
+        }),
+      /덮어쓸/,
+    );
+    assert.equal(attempts, 1);
+    assert.equal(readFileSync(target, 'utf8'), 'existing bundle');
+    assert.equal(readFileSync(partial, 'utf8'), 'signed bundle fixture');
+  });
+});
 
 // 한국 자정에는 UTC 날짜와 달라도 한국 날짜를 사용한다.
 test('Android 산출물 날짜는 한국 시간 기준이다', () => {

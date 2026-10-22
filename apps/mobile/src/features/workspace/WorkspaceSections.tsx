@@ -23,6 +23,10 @@ import {
   TripMemberHeading,
 } from './TripDetailParts';
 import TripMap from './TripMap';
+import TripMapCanvas from './TripMapCanvas';
+import { tripMapStops } from './tripMapModel';
+import { triggerHaptic } from '@/components/haptics';
+import { colors } from '@/constants/theme';
 import TripTimeline, { TripDayStrip } from './TripTimeline';
 import { type PlanForm } from './forms';
 import { memberRoleLabel } from './presentation';
@@ -661,6 +665,8 @@ type RenderWorkspaceItineraryProps = {
   snapshot: WorkspaceSnapshot;
   selectedDay: string;
   setSelectedDay: Dispatch<SetStateAction<string>>;
+  selectedScheduleId?: string;
+  setSelectedScheduleId?: Dispatch<SetStateAction<string>>;
   userId: string;
   writable: boolean;
   setCourseDay: Dispatch<SetStateAction<string>>;
@@ -682,6 +688,8 @@ export function renderWorkspaceItinerary({
   snapshot,
   selectedDay,
   setSelectedDay,
+  selectedScheduleId = '',
+  setSelectedScheduleId,
   userId,
   writable,
   setCourseDay,
@@ -693,10 +701,36 @@ export function renderWorkspaceItinerary({
   actions,
 }: RenderWorkspaceItineraryProps) {
   // 전달받은 값과 행동을 기존 화면 규격으로 표시한다.
+  const currentDayId =
+    selectedDay === 'all'
+      ? snapshot.days[0]?.id || ''
+      : snapshot.days.find((day) => day.id === selectedDay)?.id ||
+        snapshot.days[0]?.id ||
+        '';
+  const currentStops = tripMapStops(snapshot.itinerary, currentDayId);
 
   return (
     activeSection === 'itinerary' && (
       <>
+        {currentStops.length > 0 && (
+          <View
+            style={{
+              marginBottom: 16,
+              borderRadius: 16,
+              overflow: 'hidden',
+              backgroundColor: colors.surface,
+            }}
+          >
+            <TripMapCanvas
+              stops={currentStops}
+              selectedId={selectedScheduleId}
+              onSelect={(id) => {
+                triggerHaptic('selection');
+                setSelectedScheduleId?.(id);
+              }}
+            />
+          </View>
+        )}
         <TripDayStrip
           allowAll
           days={snapshot.days}
@@ -710,7 +744,10 @@ export function renderWorkspaceItinerary({
                 snapshot.days[0]?.id ||
                 ''
           }
-          onSelect={setSelectedDay}
+          onSelect={(dayId) => {
+            triggerHaptic('light');
+            setSelectedDay(dayId);
+          }}
         />
         {snapshot.days
           .filter((day) => {
@@ -732,6 +769,11 @@ export function renderWorkspaceItinerary({
               snapshot={snapshot}
               userId={userId}
               day={day}
+              selectedScheduleId={selectedScheduleId}
+              onSelectSchedule={(id) => {
+                triggerHaptic('selection');
+                setSelectedScheduleId?.(id);
+              }}
               canCreate={writable}
               onPlan={() => actions.editDayPlan(day)}
               onAdd={() => actions.addSchedule(day.id)}

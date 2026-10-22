@@ -1,5 +1,11 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  mkdtempSync,
+  mkdirSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
@@ -53,6 +59,23 @@ test('비공개 파일 내용과 코드 블록·외부 URL은 문서 링크 검�
       '```md\n[예시](missing.md)\n```\n[웹](https://example.com/a)\n[문단](#규칙)',
     '98. keys/00. 비공개/값.md': '[비공개 내용](missing.md)',
   });
+  assert.deepEqual(checkDocumentation(root), {
+    documents: 1,
+    links: 0,
+    problems: [],
+  });
+});
+
+test('비공개 폴더 내부의 기존 호환 경로와 폴더 구조도 검사하지 않는다', (context) => {
+  const root = fixture(context, {
+    'README.md': '# 문서',
+    '98. keys/local-only/값.txt': 'private fixture',
+  });
+  symlinkSync(
+    join(root, 'docs', '98. keys', 'local-only'),
+    join(root, 'docs', '98. keys', 'legacy'),
+    'junction',
+  );
   assert.deepEqual(checkDocumentation(root), {
     documents: 1,
     links: 0,

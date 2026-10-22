@@ -2,7 +2,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// 비공개 폴더에서는 이름 규칙만 확인하고 파일 내용은 읽지 않는다.
+// 비공개 폴더 자체의 이름은 확인하되 내부 구조와 파일은 검사하지 않는다.
 export function checkDocumentation(projectRoot) {
   const docs = resolve(projectRoot, 'docs');
   const problems = [];
@@ -10,6 +10,7 @@ export function checkDocumentation(projectRoot) {
   let links = 0;
 
   function inspect(folder, privateArea = false) {
+    if (privateArea) return;
     const entries = readdirSync(folder, { withFileTypes: true });
     const numbers = new Set();
     for (const entry of entries) {

@@ -13,7 +13,6 @@ import { fileURLToPath } from 'node:url';
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
-// 한국 날짜를 빌드 파일명의 여섯 자리 날짜로 만든다.
 export function buildDay(now = new Date()) {
   return new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Asia/Seoul',
@@ -47,7 +46,6 @@ function nextName(app, day, filenames) {
   );
 }
 
-// 번호가 소진되면 덮어쓰기 대신 명확하게 중단한다.
 function exhausted() {
   throw new Error('오늘의 빌드 번호 Ver00~Ver99를 모두 사용했습니다.');
 }
@@ -65,6 +63,43 @@ function retryLock(path, deadline) {
     if (error.code !== 'EEXIST' || Date.now() >= deadline) throw error;
     Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 50);
     return retryLock(path, deadline);
+  }
+}
+
+function waitForFile(milliseconds) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, milliseconds);
+}
+
+export function finalizeBuildFile(
+  partial,
+  target,
+  { rename = renameSync, wait = waitForFile } = {},
+) {
+  // Windows의 일시적인 파일 잠금만 기다리며, 실패한 원본과 임시 파일은 보존한다.
+  const retryDelays = [100, 200, 400, 800, 1600, 2000];
+  for (let attempt = 0; ; attempt += 1) {
+    if (existsSync(target))
+      throw new Error(
+        `기존 빌드 파일을 덮어쓸 수 없습니다: ${basename(target)}`,
+      );
+    try {
+      rename(partial, target);
+      return target;
+    } catch (error) {
+      if (
+        ['EPERM', 'EACCES', 'EBUSY'].includes(error.code) &&
+        attempt < retryDelays.length
+      ) {
+        wait(retryDelays[attempt]);
+        continue;
+      }
+      throw new Error(
+        `빌드 파일의 최종 이름을 변경하지 못했습니다 (${error.code ?? error.message}). ` +
+          `임시 파일: ${partial}. 저장 대상: ${target}. ` +
+          '폴더 쓰기 권한과 파일 잠금을 확인해 주세요. 임시 파일은 삭제하지 않았습니다.',
+        { cause: error },
+      );
+    }
   }
 }
 
@@ -99,11 +134,9 @@ function exportLocked(source, id, output, app) {
   index[id] = name;
   writeFileSync(indexPath, JSON.stringify(index, null, 2) + '\n');
   copyFileSync(source, target + '.partial');
-  renameSync(target + '.partial', target);
-  return target;
+  return finalizeBuildFile(target + '.partial', target);
 }
 
-// Gradle에서 전달한 산출물 하나를 지정한 폴더로 복사한다.
 if (
   process.argv[1] &&
   resolve(process.argv[1]) === fileURLToPath(import.meta.url)

@@ -15,6 +15,7 @@ import {
   scheduleTheme as theme,
 } from './scheduleTheme';
 import { tripTimelineStyles } from './tripTimelineStyles';
+import { triggerHaptic } from '@/components/haptics';
 
 import type { Props } from './TripTimeline';
 // renderTimelinePlace이 읽는 값과 실행 가능한 행동의 계약이다.
@@ -38,8 +39,34 @@ export function renderTimelinePlace({
 }: RenderTimelinePlaceProps) {
   // 전달받은 값과 행동을 기존 화면 규격으로 표시한다.
 
+  const isSelected = props.selectedScheduleId === item.id;
+  const isArranging = props.arranging[0];
+
   return (
-    <View style={s.placeCard}>
+    <Pressable
+      onPress={() => {
+        props.onSelectSchedule?.(item.id);
+      }}
+      onLongPress={() => {
+        if (!props.disabled && items.length > 1) {
+          triggerHaptic('medium');
+          props.arranging[1](true);
+        }
+      }}
+      style={[
+        s.placeCard,
+        isSelected && {
+          borderColor: '#2563eb',
+          borderWidth: 2,
+          backgroundColor: '#f0f7ff',
+        },
+        isArranging && {
+          borderColor: '#94a3b8',
+          borderWidth: 1.5,
+          borderStyle: 'dashed',
+        },
+      ]}
+    >
       <View style={s.cardTop}>
         <View style={s.badge}>
           <TripIcon
@@ -158,6 +185,7 @@ export function renderTimelinePlace({
             label={item.title + ' 위로 이동'}
             disabled={props.disabled || index === 0}
             onPress={() => {
+              triggerHaptic('medium');
               /* 앞 일정과 순서를 바꾼다. */ return props.onReorder(
                 movedIds(items, index, -1),
               );
@@ -167,6 +195,7 @@ export function renderTimelinePlace({
             label={item.title + ' 아래로 이동'}
             disabled={props.disabled || index === items.length - 1}
             onPress={() => {
+              triggerHaptic('medium');
               /* 뒤 일정과 순서를 바꾼다. */ return props.onReorder(
                 movedIds(items, index, 1),
               );
@@ -174,7 +203,7 @@ export function renderTimelinePlace({
           />
         </View>
       )}
-    </View>
+    </Pressable>
   );
 }
 // renderTimelineManagement이 읽는 값과 실행 가능한 행동의 계약이다.
@@ -262,6 +291,7 @@ export function renderTimelineActions({
           accessibilityRole="button"
           accessibilityLabel={item.title + ' 사진 추가'}
           onPress={() => {
+            triggerHaptic('light');
             /* 앨범 사진을 이 일정에 연결한다. */ return props.onPhoto(item);
           }}
           style={s.inlineAction}
@@ -273,6 +303,7 @@ export function renderTimelineActions({
           accessibilityRole="button"
           accessibilityLabel={item.title + ' 비용 추가'}
           onPress={() => {
+            triggerHaptic('light');
             /* 선택 일정의 비용 폼을 연다. */ return props.onExpense(item);
           }}
           style={s.inlineAction}

@@ -43,6 +43,8 @@ export interface Props {
   onReorder: (ids: string[]) => void;
   onRecommend: (item: RecommendedPlace) => void;
   onRoute: (leg: TravelLeg) => void;
+  selectedScheduleId?: string;
+  onSelectSchedule?: (id: string) => void;
 }
 
 // 다른 여행 작업은 짧은 보조 탭으로 제공한다.

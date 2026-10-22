@@ -86,6 +86,7 @@ export function useWorkspaceController({
           : 'itinerary',
   );
   const [selectedDay, setSelectedDay] = useState('');
+  const [selectedScheduleId, setSelectedScheduleId] = useState('');
   const [courseDay, setCourseDay] = useState('');
   const [showTripMore, setShowTripMore] = useState(false);
   const pending = useRef<null | (() => Promise<unknown>)>(null);
@@ -296,6 +297,8 @@ export function useWorkspaceController({
     setActiveSection,
     selectedDay,
     setSelectedDay,
+    selectedScheduleId,
+    setSelectedScheduleId,
     courseDay,
     setCourseDay,
     showTripMore,

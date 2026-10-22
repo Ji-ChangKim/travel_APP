@@ -1,4 +1,4 @@
 # Android 업로드마다 versionCode를 이전에 사용한 번호보다 크게 올리세요.
 # versionName은 사용자에게 표시되는 앱 버전입니다.
-versionCode=12
+versionCode=13
 versionName=0.1.0

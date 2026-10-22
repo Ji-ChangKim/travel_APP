@@ -15,7 +15,7 @@ const config: ExpoConfig = {
   scheme: 'travelapp',
   orientation: 'portrait',
   userInterfaceStyle: 'light',
-  backgroundColor: '#FFF9F3',
+  backgroundColor: '#F8F9FF',
   icon: './assets/brand/tripprint-v1/TripPrint_app-icon_1024x1024.png',
   ios: {
     supportsTablet: true,
