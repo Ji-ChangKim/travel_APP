@@ -8,7 +8,7 @@ export const homeStyles = StyleSheet.create({
   content: {
     paddingHorizontal: 20,
     paddingTop: 12,
-    paddingBottom: 32,
+    paddingBottom: 96,
     gap: 24,
     maxWidth: 640,
     width: '100%',

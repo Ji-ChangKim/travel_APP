@@ -30,7 +30,7 @@ export const publicFeedStyles = StyleSheet.create({
     alignSelf: 'center',
     paddingHorizontal: 20,
     paddingTop: 16,
-    paddingBottom: 32,
+    paddingBottom: 96,
     gap: 16,
   },
   controls: { gap: 12 },

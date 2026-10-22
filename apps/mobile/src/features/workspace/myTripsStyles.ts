@@ -47,7 +47,7 @@ export const myTripsStyles = StyleSheet.create({
     alignSelf: 'center',
     paddingHorizontal: 20,
     paddingTop: 16,
-    paddingBottom: 32,
+    paddingBottom: 96,
     gap: 16,
   },
   heading: { gap: 4, flexShrink: 1, maxWidth: '100%' },
