@@ -1,6 +1,6 @@
 # 현재 앱 서버 계약
 
-2026-10-03 구현 기준. 제안 API와 구분하며 `apps/api/src/workspace.ts`, 공통 Zod 스키마, SQL을 실제 계약으로 사용한다. [환경 준비](<../../04. 운영/00. 서비스설정/서비스_연결설정.md>), [DB 사전](<../02. 데이터정의/DB_객체사전.txt>)을 함께 확인한다.
+2026-10-03 구현 기준. 제안 API와 구분하며 `apps/api/src/features/trips/workspace.ts`, 공통 Zod 스키마, SQL을 실제 계약으로 사용한다. [환경 준비](<../../04. 운영/00. 서비스설정/서비스_연결설정.md>), [DB 사전](<../02. 데이터정의/DB_객체사전.txt>)을 함께 확인한다.
 
 보호 경로는 `/api/v1`, Supabase `getUser`로 확인한 비익명 JWT를 사용한다. Worker의 공개 키와 현재 사용자 JWT로만 RPC를 호출한다. 응답은 `{data,meta:{requestId,replayed?}}`, 실패는 공개 오류 envelope다. 본문 상한 16KiB, no-store, 실제 웹 origin CORS.
 

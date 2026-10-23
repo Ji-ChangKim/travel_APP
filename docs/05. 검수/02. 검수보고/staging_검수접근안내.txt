@@ -35,7 +35,7 @@ POST /api/auth/sign-out으로 이번 세션을 철회하되, 재로그인 보존
 전체 정리가 필요하면 생성 시 기록한 정확한 QA ID와 소유권을 대조해 별도 관리 작업 범위를 정함. 기존 계정·다른 여행을 이름 접두사나 전체 테이블 조건으로 정리하지 않음. 미정리 QA 계정/여행 ID와 사유를 인수 기록에 남김.
 
 근거
-apps/api/src/cloudAuth.ts, app.ts, workspace.ts, cloudProfiles.ts, cloudRpc.ts.
+apps/api/src/features/auth/cloudAuth.ts, app.ts, workspace.ts, cloudProfiles.ts, cloudRpc.ts.
 apps/mobile/src/services/cloudAuth.ts, packages/validation/src/workspace.ts, workspaceModel.ts.
 공식 인증 계약: https://better-auth.com/docs/authentication/email-password
 공식 Bearer 계약: https://better-auth.com/docs/plugins/bearer

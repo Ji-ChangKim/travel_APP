@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import {
   getReleaseIssues,
   workerConfig,
-} from '../../scripts/release-config.mjs';
+} from '../../scripts/release/release-config.mjs';
 
 const valid = {
   RELEASE_ENV: 'staging',

@@ -1,7 +1,13 @@
 import Text from '@/components/AppText';
 import ScreenHeader from '@/components/ScreenHeader';
 import type { WorkspaceSnapshot } from '@wherego/domain';
-import { type JSX, type RefObject } from 'react';
+import { type RefObject } from 'react';
+import type { LedgerAction } from './LedgerUI';
+import {
+  ScheduleOptions,
+  ExpenseOptions,
+  MetadataOptions,
+} from './PlanEditorOptions';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ScheduleFlightFields from './FlightEntryFields';
@@ -11,7 +17,7 @@ import ReceiptConfirmation from './ReceiptConfirmation';
 import ReceiptReview from './ReceiptReview';
 import ScheduleLocation from './ScheduleLocation';
 import ServerPhoto from './ServerPhoto';
-import { DateField, DestinationFields } from './TravelInputs';
+import { DateField } from './TravelInputs';
 import TripPeriodSummary from './TripPeriodSummary';
 import type { PlanForm } from './forms';
 import { ledgerStyles as l, ledgerColors } from './ledgerTheme';
@@ -61,57 +67,7 @@ type RenderPlanEditorProps = {
   periodImpact: TripPeriodImpact | null;
   error: string;
   conflicted: boolean;
-  SaveAction:
-    | (({
-        label,
-        accessibilityLabel,
-        onPress,
-        primary,
-        quiet,
-        selected,
-        checked,
-        disabled,
-        loading,
-        variant,
-        allowWhileLocked,
-      }: {
-        label: string;
-        accessibilityLabel?: string;
-        onPress: () => void;
-        primary?: boolean;
-        quiet?: boolean;
-        selected?: boolean;
-        checked?: boolean;
-        disabled?: boolean;
-        loading?: boolean;
-        variant?: 'primary' | 'secondary' | 'quiet' | 'danger' | 'destructive';
-        allowWhileLocked?: boolean;
-      }) => JSX.Element)
-    | (({
-        label,
-        accessibilityLabel,
-        onPress,
-        disabled,
-        variant,
-        selected,
-        selectionStyle,
-        checked,
-        allowWhileLocked,
-        loading,
-        size,
-      }: {
-        label: string;
-        accessibilityLabel?: string;
-        onPress: () => void;
-        disabled?: boolean;
-        variant?: 'primary' | 'secondary' | 'danger' | 'destructive' | 'quiet';
-        selected?: boolean;
-        selectionStyle?: 'check' | 'fill';
-        checked?: boolean;
-        allowWhileLocked?: boolean;
-        loading?: boolean;
-        size?: 'default' | 'chip' | 'icon' | 'day' | 'header';
-      }) => JSX.Element);
+  SaveAction: typeof Action | typeof LedgerAction;
   onSave: () => void;
   onReload: () => void;
 };
@@ -197,101 +153,16 @@ export function renderPlanEditor({
                 onReceipt,
               })}
               {renderPlanFields({ form, onChange })}
-              {form.kind === 'schedule' && (
-                <View style={styles.card}>
-                  <Text style={styles.title}>여행 날짜 선택</Text>
-                  {snapshot?.days.map((day) => (
-                    <Action
-                      key={day.id}
-                      label={`DAY ${day.dayNumber} · ${day.tripDate}`}
-                      selected={form.values.dayId === day.id}
-                      selectionStyle="fill"
-                      disabled={busy}
-                      onPress={() => {
-                        // 수동 날짜 선택에서 기존 일정 연결은 해제한다.
-                        onChange('dayId', day.id);
-                      }}
-                    />
-                  ))}
-                </View>
-              )}
-              {form.kind === 'schedule' && (
-                <View style={styles.row}>
-                  {[
-                    'PLACE',
-                    'TRANSPORT',
-                    'STAY',
-                    'RESERVATION',
-                    'TODO',
-                    'MEMO',
-                  ].map((type) => (
-                    <Action
-                      key={type}
-                      label={`${form.values.type === type ? '✓ ' : ''}${{ PLACE: '장소', TRANSPORT: '이동', STAY: '숙소', RESERVATION: '예약', TODO: '할 일', MEMO: '메모' }[type]}`}
-                      disabled={busy}
-                      onPress={() => {
-                        // 일정 유형을 하나 선택한다.
-                        onChange('type', type);
-                      }}
-                    />
-                  ))}
-                </View>
-              )}
+              <ScheduleOptions
+                form={form}
+                onChange={onChange}
+                busy={busy}
+                snapshot={snapshot}
+              />
               {renderExpenseCurrency({ form, busy, onChange })}
               {renderExpenseLink({ form, busy, onChange, snapshot })}
-              {form.kind === 'expense' && (
-                <View style={styles.row}>
-                  <Action
-                    label="실제 지출"
-                    selected={form.values.isActual === 'true'}
-                    onPress={() => {
-                      // 실제 지출로 명시한다.
-                      onChange('isActual', 'true');
-                    }}
-                  />
-                  <Action
-                    label="예상 비용"
-                    selected={form.values.isActual === 'false'}
-                    onPress={() => {
-                      // 예상 비용과 실제 지출은 합계를 분리한다.
-                      onChange('isActual', 'false');
-                    }}
-                  />
-                </View>
-              )}
-              {form.kind === 'metadata' && (
-                <DestinationFields values={form.values} onChange={onChange} />
-              )}
-              {form.kind === 'metadata' && (
-                <View>
-                  <Text>
-                    여행 단계는 날짜에 맞춰 바뀌어요. 공개할 기록의 정리 여부를
-                    선택해 주세요.
-                  </Text>
-                  <View style={styles.row}>
-                    {['PLANNED', 'COMPLETED'].map((status) => (
-                      <Action
-                        key={status}
-                        label={
-                          status === 'COMPLETED'
-                            ? '기록 정리 완료'
-                            : '기록 정리 중'
-                        }
-                        selected={
-                          status === 'COMPLETED'
-                            ? form.values.status === status
-                            : form.values.status !== 'COMPLETED'
-                        }
-                        selectionStyle="fill"
-                        onPress={() => {
-                          // 종료 여부는 소유자가 명시적으로 확인한다.
-                          onChange('status', status);
-                        }}
-                      />
-                    ))}
-                  </View>
-                </View>
-              )}
+              <ExpenseOptions form={form} onChange={onChange} />
+              <MetadataOptions form={form} onChange={onChange} />
               {form.kind === 'receipt' &&
                 ['ready', 'manual'].includes(
                   form.values.receiptStatus || '',
@@ -348,57 +219,7 @@ function renderPlanSaveActions({
   conflicted,
   onReload,
 }: {
-  SaveAction:
-    | (({
-        label,
-        accessibilityLabel,
-        onPress,
-        primary,
-        quiet,
-        selected,
-        checked,
-        disabled,
-        loading,
-        variant,
-        allowWhileLocked,
-      }: {
-        label: string;
-        accessibilityLabel?: string;
-        onPress: () => void;
-        primary?: boolean;
-        quiet?: boolean;
-        selected?: boolean;
-        checked?: boolean;
-        disabled?: boolean;
-        loading?: boolean;
-        variant?: 'primary' | 'secondary' | 'quiet' | 'danger' | 'destructive';
-        allowWhileLocked?: boolean;
-      }) => JSX.Element)
-    | (({
-        label,
-        accessibilityLabel,
-        onPress,
-        disabled,
-        variant,
-        selected,
-        selectionStyle,
-        checked,
-        allowWhileLocked,
-        loading,
-        size,
-      }: {
-        label: string;
-        accessibilityLabel?: string;
-        onPress: () => void;
-        disabled?: boolean;
-        variant?: 'primary' | 'secondary' | 'danger' | 'destructive' | 'quiet';
-        selected?: boolean;
-        selectionStyle?: 'check' | 'fill';
-        checked?: boolean;
-        allowWhileLocked?: boolean;
-        loading?: boolean;
-        size?: 'default' | 'chip' | 'icon' | 'day' | 'header';
-      }) => JSX.Element);
+  SaveAction: typeof Action | typeof LedgerAction;
   busy: boolean;
   form: PlanForm | null;
   locked: boolean;

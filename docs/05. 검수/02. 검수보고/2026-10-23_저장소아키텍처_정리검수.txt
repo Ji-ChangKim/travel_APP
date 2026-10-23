@@ -1,0 +1,191 @@
+저장소 아키텍처와 빌드 경로 정리
+검토일: 2026-10-23
+상태: 재배치 및 로컬 검증 통과, 실제 서명 빌드 미실행
+범위: 제품 코드 배치·도구·검수 설정·Expo/Gradle 경로
+
+확인한 문제와 조치
+
+1. 화면별 브라우저 설정 24개가 루트에 있었다.
+   실제 설정을 tests/config로 옮기고 루트에는 기본 Playwright 진입점만 남겼다.
+   테스트 위치·기본 결과 위치·로컬 서버 실행 기준점을 명시해 설정의 이동에 영향을 받지 않게 했다.
+   기본 설정이 현행 workspace를 제외하고 .release의 과거 캡처를 읽던 문제도 수정했다.
+   test:trail:web는 격리된 로컬 번들을 준비한 뒤 유지하는 브라우저 시나리오를 실행한다.
+
+2. Android·웹 빌드·배포·문서 검사·디자인 도구 40개가 scripts에 섞여 있었다.
+   android·build·checks·design·qa·release·shared 역할 폴더로 나눴다.
+   r14-device-preflight.mjs는 버전 번호를 뺀 android-device-preflight.mjs로 변경했다.
+   npm 명령·GitHub Actions·Expo 플러그인·Gradle·검사·문서의 참조도 함께 수정했다.
+
+3. 서버 코드 36개가 진입점과 같은 폴더에 있었다.
+   진입점 app.ts·index.ts를 유지하고 기능·설정·저장소 연결·공통 계층으로 나눴다.
+   DB 스키마·공개 URL·API 계약은 바꾸지 않았다.
+
+4. 항공·장소·발견·경로 기능이 공통 HTTP 읽기 때문에 영수증 OCR을 가져왔다.
+   크기를 제한하는 응답 읽기를 shared/http/readBounded.ts로 분리했다.
+   재귀 호출마다 청크 배열을 복제하던 부분을 반복 처리로 바꿨다.
+   한도 초과 취소·실패 전달·스트림 잠금 해제 검사를 추가했다.
+
+5. Android 플러그인이 apps/mobile/android의 폴더 깊이를 고정해서 사용했다.
+   gradleScript.cjs가 루트 Expo·모바일 Expo의 경로를 계산하게 했다.
+   repository-root.gradle이 Gradle에서 저장소 기준점을 공유한다.
+   버전·지도 설정·내보내기·Android Studio 동기화·Worklets 연결에 적용했다.
+   기존 생성 프로젝트의 Gradle 연결도 갱신했으며 서명 설정을 재생성하지 않았다.
+
+6. 새 산출물의 기본 저장 폴더가 저장소 밖의 travel_APP_bulid였다.
+   새 APK·AAB의 기본 저장 위치를 outputs/android로 통일했다.
+   TRIPPRINT_BUILD_OUTPUT_DIR의 상대 경로는 저장소 기준, 절대 경로는 그대로 사용한다.
+   TripPrint_YYMMDD_VerNN 이름, 번호 예약, 기존 파일 보호, 임시 파일 보존 규칙을 유지했다.
+   외부 폴더의 기존 산출물은 이동·삭제·재서명하지 않았다.
+
+7. Git에서 제외된 scratch의 일회성 진단 도구가 제품 린트에 포함되어 있었다.
+   scratch·output·_workspace를 Git·EAS의 기존 로컬 작업 영역 구분에 맞춰 린트·서식에서 제외했다.
+   유지할 제품 코드와 scripts의 도구는 계속 모두 검사한다.
+   식별된 로컬 진단 도구 2개의 import 경로 3곳만 맞췄으며 나머지 본문과 사용자 변경은 보존했다.
+   이 두 파일은 비공개 정보가 포함될 가능성을 고려해 원문 대신 변경 전후 해시만 기록했다.
+
+추가한 유지 규칙
+
+- docs/03. 개발/00. 구조설계/저장소_아키텍처규격.md에 폴더 역할·이름·예외·빌드 경로·변경 절차를 정리했다.
+- README.md와 AGENTS.md에 현행 규격을 연결했다.
+- 폴더·파일 배치 검사와 회귀 검사를 check:architecture에 연결했다.
+- 공통 HTTP 계층이 기능 계층에 의존하거나, 루트에 화면별 검수 설정과 평면 도구가 다시 생기면 검사에 실패한다.
+- 공통 경로 모듈은 Node ESM과 Playwright의 CommonJS 로더가 함께 사용할 수 있게 구성했다.
+- 도구 이동 후 남은 앱 상대 URL과 기본 검사 대상 누락도 회귀 검사로 차단한다.
+- Expo Router 이름, 플랫폼 확장자, 도구가 요구하는 루트 설정, 디자인·라이선스·SQL 원본 이름은 예외로 보존했다.
+
+검증
+
+- API·DB 계약: 130/130 통과.
+- 앱 모델·인증: 282/282 통과.
+- Workers 로컬 번들 및 D1·R2·항공 통합: 37/37 통과. 외부 공급자 실호출 인수를 뜻하지 않는다.
+- 브라우저 설정: 최종 소스의 24/24 로딩 통과.
+  루트 기본 진입점도 유지하는 243개 시나리오를 찾는 것을 확인했다.
+- 실제 Android 프로젝트: 옮긴 Gradle 경로와 versionCode=12/versionName=0.1.0 출력 통과.
+  Gradle BUILD SUCCESSFUL, 앱 생성 작업을 차단한 경로 확인으로 수행했다.
+- 릴리스 회귀: 91/91 통과.
+- npm run check: 문서·디자인·폴더·코드 경계·이동·TypeScript·ESLint·Prettier 모두 통과.
+- 로컬 웹 번들 생성과 생성물 확인 통과.
+- 로컬 웹 핵심 흐름: 여행 저장·GNB 320/390/430의 4/4 통과. 전체 243개를 실행한 결과는 아니다.
+- Android 기본 출력 폴더 작성·이름 변경: 통과. 검사 파일은 제거했으며 APK/AAB는 만들지 않았다.
+
+코드 점검의 범위
+
+코드 경계 검사로 앱·API·공유 패키지 417개를 확인했으며 위반 0건, any 타입 0개다.
+함수 길이는 수동 검토 지표로 분리했다.
+200행을 넘는 PlanEditorView·PublicFeedControls·PublishFlow·useWorkspaceController의 함수 4개는 별도 지표로 남겼다.
+이번 작업에서 해당 화면과 컨트롤러의 동작을 바꾸거나 길이만을 이유로 분할하지 않았다.
+자동 검사 통과를 모든 함수의 설계나 실기기 품질에 대한 승인으로 간주하지 않는다.
+
+보존 및 실행 범위
+
+작업 전부터 있던 ver.text의 사용자 변경을 보존했다. 공개 버전 안내는 그 값인 12/0.1.0에 맞췄다.
+Play에서 versionCode 12를 이미 사용했는지는 조회하지 않았다.
+비공개 키와 사용자 데이터, 기존 산출물, 디자인 원본, SQL 이력은 이동·삭제하지 않았다.
+실제 AAB/APK 생성·서명·원격 배포·Play 업로드·커밋·푸시는 실행하지 않았다.
+검사 로그·이동 전 파일·이동 명세는 outputs/architecture-20261023에 보관했다.
+이동한 파일 100개의 새 경로가 모두 존재하며 ver.text의 작업 전후 SHA-256도 같다.
+앱 빌드 입력 632개 SHA-256: 8fa220e9c2d4eb83d33fafff8fe5b2518dc5163ffdfd17cabfa7cd7d96d6ce8d
+이 해시는 로컬 앱 빌드 입력의 기록이며 실제 AAB 또는 배포된 Worker의 해시를 뜻하지 않는다.
+
+파일 이동 목록
+
+playwright.accessibility.config.ts -> tests/config/playwright.accessibility.config.ts
+playwright.auth-return.config.ts -> tests/config/playwright.auth-return.config.ts
+playwright.city-guide.config.ts -> tests/config/playwright.city-guide.config.ts
+playwright.community-plan.config.ts -> tests/config/playwright.community-plan.config.ts
+playwright.config.ts -> tests/config/playwright.default.config.ts
+playwright.current-location.config.ts -> tests/config/playwright.current-location.config.ts
+playwright.customer-server.config.ts -> tests/config/playwright.customer-server.config.ts
+playwright.final-review.config.ts -> tests/config/playwright.final-review.config.ts
+playwright.haru-hierarchy.config.ts -> tests/config/playwright.haru-hierarchy.config.ts
+playwright.haru-v3-detail.config.ts -> tests/config/playwright.haru-v3-detail.config.ts
+playwright.haru-v3-more.config.ts -> tests/config/playwright.haru-v3-more.config.ts
+playwright.haru-v3.config.ts -> tests/config/playwright.haru-v3.config.ts
+playwright.haru-wcag.config.ts -> tests/config/playwright.haru-wcag.config.ts
+playwright.haru-workspace.config.ts -> tests/config/playwright.haru-workspace.config.ts
+playwright.header.config.ts -> tests/config/playwright.header.config.ts
+playwright.launch.config.ts -> tests/config/playwright.launch.config.ts
+playwright.presentation.config.ts -> tests/config/playwright.presentation.config.ts
+playwright.receipt-publication.config.ts -> tests/config/playwright.receipt-publication.config.ts
+playwright.schedule.config.ts -> tests/config/playwright.schedule.config.ts
+playwright.screen-review.config.ts -> tests/config/playwright.screen-review.config.ts
+playwright.startup.config.ts -> tests/config/playwright.startup.config.ts
+playwright.trip-details.config.ts -> tests/config/playwright.trip-details.config.ts
+playwright.trip-planning.config.ts -> tests/config/playwright.trip-planning.config.ts
+playwright.workspace.config.ts -> tests/config/playwright.workspace.config.ts
+scripts/android-ci.gradle -> scripts/android/android-ci.gradle
+scripts/android-export.gradle -> scripts/android/android-export.gradle
+scripts/android-maps-key.gradle -> scripts/android/android-maps-key.gradle
+scripts/android-studio-sync.gradle -> scripts/android/android-studio-sync.gradle
+scripts/android-version.gradle -> scripts/android/android-version.gradle
+scripts/android-worklets-linking.gradle -> scripts/android/android-worklets-linking.gradle
+scripts/app-version.cjs -> scripts/shared/app-version.cjs
+scripts/app-version.d.cts -> scripts/shared/app-version.d.cts
+scripts/build-page-gallery.mjs -> scripts/qa/build-page-gallery.mjs
+scripts/capture-service-pages.mjs -> scripts/qa/capture-service-pages.mjs
+scripts/check-android-maps.mjs -> scripts/android/check-android-maps.mjs
+scripts/check-code-boundaries.mjs -> scripts/checks/check-code-boundaries.mjs
+scripts/check-design-contrast.mjs -> scripts/checks/check-design-contrast.mjs
+scripts/check-docs.mjs -> scripts/checks/check-docs.mjs
+scripts/check-mvp-build.mjs -> scripts/build/check-mvp-build.mjs
+scripts/check-navigation-boundaries.mjs -> scripts/checks/check-navigation-boundaries.mjs
+scripts/create-tripprint-assets.mjs -> scripts/design/create-tripprint-assets.mjs
+scripts/export-android-build.mjs -> scripts/android/export-android-build.mjs
+scripts/export-design-kit.mjs -> scripts/design/export-design-kit.mjs
+scripts/measure-mvp-performance.mjs -> scripts/qa/measure-mvp-performance.mjs
+scripts/mvp-config.mjs -> scripts/build/mvp-config.mjs
+scripts/navigation-guard/inspect.mjs -> scripts/checks/navigation-guard/inspect.mjs
+scripts/navigation-guard/rules.mjs -> scripts/checks/navigation-guard/rules.mjs
+scripts/prepare-android-ci.mjs -> scripts/android/prepare-android-ci.mjs
+scripts/prepare-mvp.mjs -> scripts/build/prepare-mvp.mjs
+scripts/prepare-release.mjs -> scripts/release/prepare-release.mjs
+scripts/prepare-schedule-preview.mjs -> scripts/qa/prepare-schedule-preview.mjs
+scripts/prepare-web-not-found.mjs -> scripts/build/prepare-web-not-found.mjs
+scripts/preview-trail.mjs -> scripts/qa/preview-trail.mjs
+scripts/r14-device-preflight.mjs -> scripts/qa/android-device-preflight.mjs
+scripts/release-artifact-checks.mjs -> scripts/release/release-artifact-checks.mjs
+scripts/release-artifacts.mjs -> scripts/release/release-artifacts.mjs
+scripts/release-config.mjs -> scripts/release/release-config.mjs
+scripts/release-source-manifest.mjs -> scripts/release/release-source-manifest.mjs
+scripts/verify-discovery-live.ts -> scripts/qa/verify-discovery-live.ts
+scripts/verify-header-web.mjs -> scripts/qa/verify-header-web.mjs
+scripts/verify-planning-journey.mjs -> scripts/qa/verify-planning-journey.mjs
+scripts/verify-planning-live.mjs -> scripts/qa/verify-planning-live.mjs
+scripts/verify-planning-providers-live.mjs -> scripts/qa/verify-planning-providers-live.mjs
+scripts/verify-workspace-web.mjs -> scripts/qa/verify-workspace-web.mjs
+apps/api/src/errors.ts -> apps/api/src/shared/errors.ts
+apps/api/src/types.ts -> apps/api/src/shared/types.ts
+apps/api/src/appConfig.ts -> apps/api/src/config/appConfig.ts
+apps/api/src/backend.ts -> apps/api/src/infrastructure/backend.ts
+apps/api/src/cloudModel.ts -> apps/api/src/infrastructure/storage/cloudModel.ts
+apps/api/src/cloudStore.ts -> apps/api/src/infrastructure/storage/cloudStore.ts
+apps/api/src/accountRetirement.ts -> apps/api/src/features/accounts/accountRetirement.ts
+apps/api/src/accountRetirementPolicy.ts -> apps/api/src/features/accounts/accountRetirementPolicy.ts
+apps/api/src/cloudProfiles.ts -> apps/api/src/features/accounts/cloudProfiles.ts
+apps/api/src/nicknames.ts -> apps/api/src/features/accounts/nicknames.ts
+apps/api/src/cloudAuth.ts -> apps/api/src/features/auth/cloudAuth.ts
+apps/api/src/guestLink.ts -> apps/api/src/features/auth/guestLink.ts
+apps/api/src/socialHandoff.ts -> apps/api/src/features/auth/socialHandoff.ts
+apps/api/src/socialProviders.ts -> apps/api/src/features/auth/socialProviders.ts
+apps/api/src/cloudMedia.ts -> apps/api/src/features/media/cloudMedia.ts
+apps/api/src/publicImage.ts -> apps/api/src/features/media/publicImage.ts
+apps/api/src/cloudRpc.ts -> apps/api/src/features/trips/cloudRpc.ts
+apps/api/src/communityImport.ts -> apps/api/src/features/trips/communityImport.ts
+apps/api/src/workspace.ts -> apps/api/src/features/trips/workspace.ts
+apps/api/src/discovery.ts -> apps/api/src/features/discovery/discovery.ts
+apps/api/src/discoveryAssets.ts -> apps/api/src/features/discovery/discoveryAssets.ts
+apps/api/src/discoveryProvider.ts -> apps/api/src/features/discovery/discoveryProvider.ts
+apps/api/src/startup.ts -> apps/api/src/features/startup/startup.ts
+apps/api/src/ocr.ts -> apps/api/src/features/receipts/ocr.ts
+apps/api/src/receiptAnalysis.ts -> apps/api/src/features/receipts/receiptAnalysis.ts
+apps/api/src/receiptCache.ts -> apps/api/src/features/receipts/receiptCache.ts
+apps/api/src/receiptDiagnostics.ts -> apps/api/src/features/receipts/receiptDiagnostics.ts
+apps/api/src/flights.ts -> apps/api/src/features/flights/flights.ts
+apps/api/src/kacFlights.ts -> apps/api/src/features/flights/kacFlights.ts
+apps/api/src/places.ts -> apps/api/src/features/places/places.ts
+apps/api/src/placePhotos.ts -> apps/api/src/features/places/placePhotos.ts
+apps/api/src/mapsShare.ts -> apps/api/src/features/places/mapsShare.ts
+apps/api/src/googleUsage.ts -> apps/api/src/features/places/googleUsage.ts
+apps/api/src/planning.ts -> apps/api/src/features/planning/planning.ts
+apps/api/src/planningRecommendations.ts -> apps/api/src/features/planning/planningRecommendations.ts
+apps/api/src/planningRoutes.ts -> apps/api/src/features/planning/planningRoutes.ts

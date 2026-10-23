@@ -1,29 +1,20 @@
 import { useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import Text from '@/components/AppText';
 import DesignInput from '@/components/DesignInput';
-import ActionSheet from '@/components/ActionSheet';
 import HaruState from '@/components/HaruState';
-import { Action, Field } from './ui';
+import { Action } from './ui';
 import type { CommunityFeedViewProps } from './communityFeedTypes';
 import PublicFeedButton from './PublicFeedButton';
+import {
+  PublicFeedFilterChips,
+  PublicFeedFilterSheet,
+} from './PublicFeedFilters';
 import {
   publicFeedStyles as s,
   publicFeedColors as c,
 } from './publicFeedStyles';
-
-const kinds = [
-  ['all', '유형 전체'],
-  ['plan', '여행계획'],
-  ['record', '여행기록'],
-] as const;
-const periods = [
-  ['all', '기간 전체'],
-  ['short', '1~3일'],
-  ['4', '4일'],
-  ['long', '5일 이상'],
-] as const;
 
 // 검색·필터·공개 준비는 실제 조회와 기존 여행 흐름으로 연결한다.
 export default function PublicFeedControls({
@@ -40,34 +31,6 @@ export default function PublicFeedControls({
 }: CommunityFeedViewProps) {
   // 선택 시트의 표시만 로컬 상태로 관리한다.
   const [opened, setOpened] = useState(false);
-  // 시안의 예시 월·동행값 대신 서버가 지원하는 조건과 전체 설정을 표시한다.
-  const chipItems = [
-    {
-      label: filters.q ? filters.q : '여행지 전체',
-      selected: true,
-      hint: `${filters.q || '여행지 전체'} 조건 선택`,
-    },
-    {
-      label: periods.find(([key]) => key === filters.days)?.[1] || '기간 전체',
-      selected: false,
-      hint: '기간 조건 선택',
-    },
-    {
-      label:
-        filters.kind === 'plan'
-          ? '여행계획'
-          : filters.kind === 'record'
-            ? '여행기록'
-            : '유형 전체',
-      selected: false,
-      hint: '공개 유형 선택',
-    },
-    {
-      label: '전체 조건',
-      selected: false,
-      hint: '전체 조건 보기',
-    },
-  ];
 
   return (
     <View style={s.controls}>
@@ -93,9 +56,7 @@ export default function PublicFeedControls({
           <PublicFeedButton
             label="여행 조건 선택"
             onPress={() => {
-              /* 현재 조건을 보존하고 선택 시트를 연다. */ return setOpened(
-                true,
-              );
+              setOpened(true);
             }}
             style={s.iconButton}
             expanded={opened}
@@ -109,35 +70,11 @@ export default function PublicFeedControls({
           {searchError}
         </Text>
       ) : null}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={s.chips}
-      >
-        {chipItems.map((chip, index) => {
-          // 4종 필터 칩을 시안 규격의 캡슐 형태로 렌더링한다.
-          return (
-            <PublicFeedButton
-              key={index}
-              label={chip.hint}
-              expanded={opened}
-              onPress={() => {
-                /* 조건 선택 시트를 연다. */ return setOpened(true);
-              }}
-              style={[s.chip, chip.selected && s.chipSelected]}
-            >
-              <Text style={[s.chipText, chip.selected && s.inverse]}>
-                {chip.label}
-              </Text>
-              <Ionicons
-                name="chevron-down"
-                size={16}
-                color={chip.selected ? c.card : c.muted}
-              />
-            </PublicFeedButton>
-          );
-        })}
-      </ScrollView>
+      <PublicFeedFilterChips
+        filters={filters}
+        opened={opened}
+        onOpen={() => setOpened(true)}
+      />
       <View style={s.callout}>
         <View style={s.calloutCopy}>
           <MaterialIcons name="add-location-alt" size={20} color={c.primary} />
@@ -183,86 +120,21 @@ export default function PublicFeedControls({
           <Action
             label="검색 조건 지우기"
             onPress={() => {
-              /* 입력과 조회 조건을 함께 초기화한다. */ return void (setSearch(
-                '',
-              ),
-              setFilters({ q: '', kind: 'all', days: 'all' }));
+              setSearch('');
+              setFilters({ q: '', kind: 'all', days: 'all' });
             }}
           />
         </HaruState>
       ) : null}
-      <ActionSheet
-        visible={opened}
-        title="여행 조건 선택"
-        onClose={() => {
-          /* 현재 조건을 유지하고 시트를 닫는다. */ return setOpened(false);
-        }}
-      >
-        <View style={s.sheet}>
-          <Field
-            label="나라·도시 또는 여행 이름"
-            value={search}
-            onChange={setSearch}
-            placeholder="예: 후쿠오카"
-          />
-          <Text style={s.sheetTitle}>여행 기간</Text>
-          <View style={s.options}>
-            {periods.map(([value, label]) => {
-              // 서버가 지원하는 기간 구간만 선택할 수 있다.
-              return (
-                <Action
-                  key={value}
-                  label={label}
-                  size="chip"
-                  selected={filters.days === value}
-                  onPress={() => {
-                    /* 변경한 기간으로 첫 페이지를 읽는다. */ return setFilters(
-                      (previous) => {
-                        /* 다른 조건은 보존한다. */ return {
-                          ...previous,
-                          days: value,
-                        };
-                      },
-                    );
-                  }}
-                />
-              );
-            })}
-          </View>
-          <Text style={s.sheetTitle}>공개 유형</Text>
-          <View style={s.options}>
-            {kinds.map(([value, label]) => {
-              // 계획과 기록은 실제 공개 종류로 구분한다.
-              return (
-                <Action
-                  key={value}
-                  label={label}
-                  size="chip"
-                  selected={filters.kind === value}
-                  onPress={() => {
-                    /* 변경한 종류의 목록을 읽는다. */ return setFilters(
-                      (previous) => {
-                        /* 다른 조건은 보존한다. */ return {
-                          ...previous,
-                          kind: value,
-                        };
-                      },
-                    );
-                  }}
-                />
-              );
-            })}
-          </View>
-          <Action
-            label="선택한 조건으로 보기"
-            variant="primary"
-            onPress={() => {
-              /* 입력한 검색과 선택 조건을 적용한다. */ return void (searchTrips(),
-              setOpened(false));
-            }}
-          />
-        </View>
-      </ActionSheet>
+      <PublicFeedFilterSheet
+        filters={filters}
+        setFilters={setFilters}
+        search={search}
+        setSearch={setSearch}
+        searchTrips={searchTrips}
+        opened={opened}
+        onClose={() => setOpened(false)}
+      />
     </View>
   );
 }

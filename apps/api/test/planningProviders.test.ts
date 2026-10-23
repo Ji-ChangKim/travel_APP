@@ -2,9 +2,9 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import test from 'node:test';
 import { newTrip } from '@wherego/validation';
-import { computeTravelRoute } from '../src/planningRoutes';
-import { recommendPlaces } from '../src/planningRecommendations';
-import type { ApiEnvironment } from '../src/types';
+import { computeTravelRoute } from '../src/features/planning/planningRoutes';
+import { recommendPlaces } from '../src/features/planning/planningRecommendations';
+import type { ApiEnvironment } from '../src/shared/types';
 import { createApp } from '../src/app';
 
 // 공급자 경계 검증용 응답이며 실제 Google·AI 연결 성공의 근거로 사용하지 않는다.

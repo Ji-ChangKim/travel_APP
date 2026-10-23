@@ -5857,11 +5857,15 @@ async function fillEditorField(
   value: string,
 ): Promise<void> {
   // 제거한 설정 필드는 여행 생성에서 더 이상 요구하지 않는다.
-  if (
-    label === '현지 시간대' &&
-    (await page.getByRole('button', { name: '다음', exact: true }).count())
-  )
-    return;
+  if (label === '현지 시간대') {
+    const next = page.getByRole('button', { name: '다음', exact: true });
+    const timezone = page.getByLabel(label, { exact: true });
+    await next.or(timezone).first().waitFor({ state: 'visible' });
+    if (await next.isVisible()) {
+      await expect(timezone).toHaveCount(0);
+      return;
+    }
+  }
   if (label === '나라 검색' || label === '도시 검색') {
     // 모달의 목록과 직접 입력 적용 버튼만 사용한다.
     await page
@@ -5920,17 +5924,21 @@ async function selectCalendarDay(page: Page, value: string): Promise<void> {
 
 // 기존 저장 회귀는 여행 생성일 때만 두 단계를 순서대로 진행한다.
 async function saveEditor(page: Page): Promise<void> {
-  // 일반 편집의 저장 버튼을 우선하고 생성 재시도 버튼은 별도로 선택한다.
-  if (await page.getByRole('button', { name: '다음', exact: true }).count())
-    await page.getByRole('button', { name: '다음', exact: true }).click();
+  const next = page.getByRole('button', { name: '다음', exact: true });
   const save = page.getByRole('button', {
     name: /^(확인하고 저장|항공편 없이 여행 만들기|여행 만들기|여행 기록 만들기|DAY \d+ 일정에 추가|일정 수정 저장)$/,
   });
-  if (await save.count()) await save.click();
-  else
-    await page
-      .getByRole('button', { name: '다시 저장하기', exact: true })
-      .click();
+  const retry = page.getByRole('button', {
+    name: '다시 저장하기',
+    exact: true,
+  });
+  // 선택창이 닫히는 중의 빈 DOM을 저장 실패로 오인하지 않는다.
+  await next.or(save).or(retry).first().waitFor({ state: 'visible' });
+  if (await next.isVisible()) {
+    await next.click();
+    await expect(next).toHaveCount(0);
+  }
+  await save.or(retry).first().click();
   if (await page.getByRole('dialog', { name: '항공편 안내' }).count())
     await page.getByRole('button', { name: '확인', exact: true }).click();
 }
@@ -8421,6 +8429,54 @@ async function r10Publication(page: Page): Promise<R07State> {
   return state;
 }
 
+test('RF-01 공개 단계: 헤더·Escape 복귀와 폼 재진입에서 선택·소개를 보존한다', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1024, height: 900 });
+  const state = await r10Publication(page);
+  const introduction = page.getByLabel('공유 소개 · 선택', { exact: true });
+  await introduction.fill('단계를 오가도 보존할 소개');
+  const selected = page.getByRole('checkbox', {
+    name: '일정: 확인할 장소',
+    exact: true,
+  });
+  await selected.click();
+  await page.getByRole('button', { name: '미리보기', exact: true }).click();
+  await expect(page.getByText('공개 범위 요약', { exact: true })).toBeVisible();
+  await page.screenshot({
+    path: 'outputs/function-refactor-20261023/publish-summary-1024.png',
+  });
+  await page.keyboard.press('Escape');
+  await expect(introduction).toHaveValue('단계를 오가도 보존할 소개');
+  await expect(selected).toBeChecked();
+  await page.getByRole('button', { name: '미리보기', exact: true }).click();
+  await page
+    .getByRole('button', { name: '공유 항목 선택으로', exact: true })
+    .click();
+  await expect(introduction).toHaveValue('단계를 오가도 보존할 소개');
+  await expect(selected).toBeChecked();
+  expect(state.writes).toHaveLength(0);
+  await page.keyboard.press('Escape');
+  await expect(
+    page.getByRole('dialog', {
+      name: '작성 중인 내용을 버릴까요?',
+      exact: true,
+    }),
+  ).toBeVisible();
+  await page
+    .getByRole('button', { name: '내용 버리고 이동', exact: true })
+    .click();
+  await page
+    .getByRole('button', { name: '여행기록으로 바꿔 공유', exact: true })
+    .click();
+  await page.getByRole('button', { name: '미리보기', exact: true }).click();
+  await page.keyboard.press('Escape');
+  await expect(
+    page.getByRole('button', { name: '미리보기', exact: true }),
+  ).toBeVisible();
+  expect(state.writes).toHaveLength(0);
+});
+
 test('R10 공개 미리보기: 선택 일정·일반 사진·통화별 실제 비용·응답 유실 재시도', async ({
   page,
 }) => {
@@ -8480,6 +8536,13 @@ test('R10 공개 미리보기: 선택 일정·일반 사진·통화별 실제 �
   ).toBeVisible();
   await expect(
     page.getByRole('button', { name: '선택 내용 수정', exact: true }),
+  ).toBeDisabled();
+  await page.keyboard.press('Escape');
+  await expect(
+    page.getByRole('dialog', { name: '여행 공유', exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: '공유 항목 선택으로', exact: true }),
   ).toBeDisabled();
   await page.setViewportSize({ width: 320, height: 844 });
   await page.evaluate(() => {

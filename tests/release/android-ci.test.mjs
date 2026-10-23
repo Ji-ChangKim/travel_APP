@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { readAppVersion } from '../../scripts/app-version.cjs';
+import { readAppVersion } from '../../scripts/shared/app-version.cjs';
 import {
   androidCiEnvironment,
   androidCiVersion,
-} from '../../scripts/prepare-android-ci.mjs';
+} from '../../scripts/android/prepare-android-ci.mjs';
 
 test('GitHub 실행 번호나 과거 입력값이 ver.text의 버전을 덮어쓰지 않는다', () => {
   // 수동 빌드·CI 산출물·Expo 설정이 같은 파일 번호를 사용한다.

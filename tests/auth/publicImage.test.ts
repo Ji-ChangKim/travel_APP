@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { publicImage } from '../../apps/api/src/publicImage';
+import { publicImage } from '../../apps/api/src/features/media/publicImage';
 
 const jpeg = readFileSync(
   new URL('../../apps/mobile/assets/destinations/osaka.jpg', import.meta.url),

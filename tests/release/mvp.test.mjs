@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { getMvpIssues } from '../../scripts/mvp-config.mjs';
+import { getMvpIssues } from '../../scripts/build/mvp-config.mjs';
 
 const publicSettings = {
   EXPO_PUBLIC_BACKEND: 'cloudflare',
@@ -18,7 +18,7 @@ function runHook(profile, settings) {
     process.execPath,
     [
       fileURLToPath(
-        new URL('../../scripts/check-mvp-build.mjs', import.meta.url),
+        new URL('../../scripts/build/check-mvp-build.mjs', import.meta.url),
       ),
       '--preview-only',
     ],

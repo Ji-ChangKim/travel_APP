@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createApp } from '../src/app';
-import { scanReceipt } from '../src/ocr';
+import { scanReceipt } from '../src/features/receipts/ocr';
 import { accounts } from './database';
 const trip = '00000000-0000-4000-8000-000000000010';
 const media = '00000000-0000-4000-8000-000000000011';

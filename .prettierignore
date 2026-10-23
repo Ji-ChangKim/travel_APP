@@ -12,6 +12,9 @@ package-lock.json
 expo-env.d.ts
 .vs/
 outputs/
+output/
+scratch/
+_workspace/
 
 # 디자인 원본은 출처 해시와 바이트 보존을 위해 재서식하지 않는다.
 docs/02. 디자인/03. 참조시안/00. 제공원본/

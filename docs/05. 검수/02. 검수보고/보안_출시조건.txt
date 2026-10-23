@@ -36,7 +36,7 @@ P2: 피해 경로가 확인되지 않은 강화 권고와 운영 개선. 담당�
 S01. 여행·기록 권한 [P0]
 tripId/dayId/scheduleId/mediaId/receiptId/postId를 검수 계정 사이에서 바꿔 조회·수정·삭제·업로드·OCR·공개 요청을 보낸다. 요청 본문의 userId/ownerId/role을 바꿔 권한을 얻지 못해야 한다.
 D/N은 비공개 원본을 읽거나 바꾸지 못한다. C의 쓰기와 B의 소유자 전용 명령이 서버에서 차단된다. 다른 여행의 DAY·사진·영수증을 끼워 넣어도 연결되지 않는다. 제거된 동행의 이전 세션·파일 URL도 현재 권한에 맞게 차단된다.
-검증 위치: apps/api/src/cloudStore.ts, cloudRpc.ts, workspace.ts, packages/validation/src/workspaceModel.ts.
+검증 위치: apps/api/src/infrastructure/storage/cloudStore.ts, cloudRpc.ts, workspace.ts, packages/validation/src/workspaceModel.ts.
 
 S02. 로그인·게스트·세션 [P0]
 없는/변조된/만료된 토큰, 로그아웃한 토큰, 다른 계정으로 전환한 직후의 늦은 응답을 검사한다. 인증 실패 이후 서버 데이터나 이전 회원 캐시가 새 계정에 표시되면 실패다.

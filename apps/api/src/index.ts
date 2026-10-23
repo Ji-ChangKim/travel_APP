@@ -1,5 +1,5 @@
 import { createApp } from './app';
-import { purgeRetiredAccounts } from './accountRetirement';
+import { purgeRetiredAccounts } from './features/accounts/accountRetirement';
 import type {
   ExecutionContext,
   ScheduledController,

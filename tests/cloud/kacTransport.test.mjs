@@ -22,7 +22,7 @@ before(async () => {
   // 제품 어댑터를 메모리에 묶고 검수용 API를 원격에 배포하지 않는다.
   const bundle = buildSync({
     stdin: {
-      contents: `import {lookupKacFlights} from './apps/api/src/kacFlights';
+      contents: `import {lookupKacFlights} from './apps/api/src/features/flights/kacFlights';
         // 실제 fetch의 옵션 처리를 workerd에서 검증한다.
         export default {async fetch(request) {
           // 원본 어댑터의 결과만 확인하며 DB·회원 정보는 사용하지 않는다.

@@ -1,5 +1,5 @@
 import type { ExpoConfig } from 'expo/config';
-import { readAppVersion } from './scripts/app-version.cjs';
+import { readAppVersion } from './scripts/shared/app-version.cjs';
 
 // 루트에서 실행하는 Expo 빌드도 공통 버전 파일을 사용한다.
 const appVersion = readAppVersion();

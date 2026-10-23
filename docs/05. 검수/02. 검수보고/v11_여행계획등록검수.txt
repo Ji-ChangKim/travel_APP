@@ -28,7 +28,7 @@ staging QA 여행: 1dfec2f1-07bf-4dc9-a099-aa2a36a8c41f. QA 계정: 5fb633da-fbb
 
 5. 재실행과 인계
 npm run test:planning:db: Worker dry-run 번들→전용 앱 웹 번들→실제 브라우저·로컬 D1 시나리오. Android 빌드와 원격 배포를 하지 않는다. 8851/8852 포트와 전용 산출물만 사용하며 제품 번들을 덮어쓰지 않는다.
-scripts/verify-planning-live.mjs는 TRIPPRINT_VERIFY_STAGING=1인 경우에만 고정 staging에 비공개 QA를 만든다. 반복할 때마다 계정·빈 여행이 남으므로 필요할 때 명시적으로 실행한다. CI에서 자동 실행하지 않는다.
+scripts/qa/verify-planning-live.mjs는 TRIPPRINT_VERIFY_STAGING=1인 경우에만 고정 staging에 비공개 QA를 만든다. 반복할 때마다 계정·빈 여행이 남으므로 필요할 때 명시적으로 실행한다. CI에서 자동 실행하지 않는다.
 다른 채팅의 홈 개편·서버·계정·타임라인·Android workflow 변경은 보존하고 이번 V11 등록 변경과 섞지 않는다. 이전 전체 화면 검사에서 확인한 화면 기대값 불일치는 별도 보류 사항이다. V10 원격 CI는 이번 확인 시점에도 진행 중이었고, V11의 부분 등록 검수를 전체 CI·Google 실제 로그인·실기기 인수·Play 업로드 성공으로 기록하지 않는다.
 버전은11로 준비하며 Android 컴파일·서명·AAB·APK 생성·Play 제출은 실행하지 않는다.
 

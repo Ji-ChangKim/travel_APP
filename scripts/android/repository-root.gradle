@@ -1,0 +1,8 @@
+// 루트 Expo와 apps/mobile의 생성 프로젝트가 같은 저장소를 사용하게 한다.
+if (!rootProject.ext.has('tripprintRepositoryRoot')) {
+    def repository = [new File(rootProject.projectDir, '..'), new File(rootProject.projectDir, '../../..')].find { candidate ->
+        new File(candidate, 'ver.text').isFile() && new File(candidate, 'scripts/shared/app-version.cjs').isFile()
+    }
+    if (repository == null) throw new GradleException('TripPrint 저장소 루트와 ver.text를 찾을 수 없습니다.')
+    rootProject.ext.tripprintRepositoryRoot = repository.canonicalFile
+}

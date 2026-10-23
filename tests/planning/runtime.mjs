@@ -47,7 +47,7 @@ export async function planningRuntime() {
     await mf.ready;
     const db = await mf.getD1Database('DB');
     await migratePlanningDb(db);
-    server = spawn(process.execPath, ['scripts/preview-trail.mjs'], {
+    server = spawn(process.execPath, ['scripts/qa/preview-trail.mjs'], {
       stdio: 'ignore',
       env: {
         ...process.env,

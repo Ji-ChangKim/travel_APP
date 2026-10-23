@@ -5,7 +5,7 @@ import {
   hasReleaseRewrites,
   hasUnsafeReleaseValues,
   hasSecurityHeaders,
-} from '../../scripts/release-artifact-checks.mjs';
+} from '../../scripts/release/release-artifact-checks.mjs';
 
 test('포트에 관계없이 로컬 검수 주소가 포함된 배포 번들을 거부한다', () => {
   // 다른 정적 문구에 staging 주소가 있어도 실제 로컬 요청 설정을 놓치지 않는다.

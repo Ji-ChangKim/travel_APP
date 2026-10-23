@@ -45,7 +45,7 @@ cef8600117cfb7f0b16de1dfc19cebb7dcf433745ebf672373e852d7b1ed2736
 packages/domain/src/workspace.ts,index.ts: WorkspaceDay/SchedulePlanContent·공개 계획 선택 필드와 타입 공개.
 packages/validation/src/workspace.ts: day.plan·schedule.planContent·공개kind 및 스냅샷 검사. 기존 body2000 유지.
 packages/validation/src/workspaceModel.ts: DAY 보완·같은날짜 보존·이전 앱 수정 보존·명시 계획 공유·허용 필드 투영.
-apps/api/src/workspace.ts,cloudRpc.ts: 단건 공개 조회와 D1 전용 공개 행 조회.
+apps/api/src/features/trips/workspace.ts,cloudRpc.ts: 단건 공개 조회와 D1 전용 공개 행 조회.
 tests/auth/communityPlan.test.ts: 실제 오사카 fixture 기반 구조/원문/공개 범위/경계 검사.
 apps/api/test/workspace-http.test.ts: 계획 설명 전달과 기존16KiB 상한 회귀.
 tests/cloud/runtime.test.mjs: 실제 로컬 Worker/D1 저장·20건 경계·단건조회·철회 검사.

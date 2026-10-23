@@ -30,5 +30,5 @@ web-preview-loading-delivery.log:최종 실제 앱 웹 내보내기 완료, .rel
 현재 API·웹 반영, 실제 Google 사진 전후 출처 비교, 신규 UI 저장/미리보기/공유/재조회·작은 폭/큰 글자 캡처를 진행했다. verify-preview-staging.mjs의 실제6개 검사도 통과했다. 최신 검사·시각 인수의 범위는 P0_STITCH_ACCEPTANCE.txt가 우선한다. 초기 자동 승인 검토 용량 오류와 당시 미실행 로그는 과정 증거로 보존한다.
 
 5. 변경 파일
-서버:apps/api/src/placePhotos.ts,app.ts. 앱:workspace/PlacePhoto.tsx,CommunityPlanView.tsx,PublishSelection.tsx;components/LoadingIndicator.tsx,LoadingBrand.tsx,TripPrintLoading.tsx,HaruState.tsx;startup/StartupLoading.tsx,useLaunchMotion.ts,launchTimeline.ts;app/index.tsx.
+서버:apps/api/src/features/places/placePhotos.ts,app.ts. 앱:workspace/PlacePhoto.tsx,CommunityPlanView.tsx,PublishSelection.tsx;components/LoadingIndicator.tsx,LoadingBrand.tsx,TripPrintLoading.tsx,HaruState.tsx;startup/StartupLoading.tsx,useLaunchMotion.ts,launchTimeline.ts;app/index.tsx.
 검사:tests/cloud/previewPhotos.test.mjs,tests/auth/launchTimeline.test.ts. 문서:DB_객체사전.txt,공개여행계획_화면규격.md,DESIGN_GUIDE.txt와 이 기록. 저장 구조·외부 키·권한·Android 버전 코드 변경 없음. 기존 사용자 오사카 공개본과 다른 채팅의 변경을 수정/덮어쓰지 않았다.

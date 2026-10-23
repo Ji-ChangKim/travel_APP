@@ -59,7 +59,7 @@ test('검수 서버는 앱 상세만 연결하고 없는 공개 API 요청 뒤�
   ];
   for (const name of names) writeFileSync(join(folder, name), name);
   const port = await availablePort();
-  const child = spawn(process.execPath, ['scripts/preview-trail.mjs'], {
+  const child = spawn(process.execPath, ['scripts/qa/preview-trail.mjs'], {
     env: {
       ...process.env,
       TRIPPRINT_PREVIEW_DIR: folder,

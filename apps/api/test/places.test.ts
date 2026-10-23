@@ -3,9 +3,9 @@ import { test } from 'node:test';
 import { createApp } from '../src/app';
 import { accounts } from './database';
 import { Hono } from 'hono';
-import { searchPlaces, getGooglePlace } from '../src/places';
-import { renderError } from '../src/errors';
-import type { ApiEnvironment } from '../src/types';
+import { searchPlaces, getGooglePlace } from '../src/features/places/places';
+import { renderError } from '../src/shared/errors';
+import type { ApiEnvironment } from '../src/shared/types';
 
 const env = {
   SUPABASE_URL: 'https://example.supabase.co',

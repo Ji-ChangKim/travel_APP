@@ -9,7 +9,7 @@ import {
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { checkDocumentation } from '../../scripts/check-docs.mjs';
+import { checkDocumentation } from '../../scripts/checks/check-docs.mjs';
 
 function fixture(context, files) {
   const root = mkdtempSync(join(tmpdir(), 'tripprint-docs-'));

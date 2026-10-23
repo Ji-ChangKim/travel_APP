@@ -1,6 +1,35 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { inspectCodeBoundary } from '../../scripts/check-code-boundaries.mjs';
+import { inspectCodeBoundary } from '../../scripts/checks/check-code-boundaries.mjs';
+
+test('편집·공개 화면을 분리해도 통신과 렌더링의 경계를 유지한다', () => {
+  for (const file of [
+    'PlanEditorOptions.tsx',
+    'PublicFeedFilters.tsx',
+    'PublishSummary.tsx',
+  ]) {
+    assert.equal(
+      inspectCodeBoundary(
+        file,
+        "import {getWorkspace} from '@wherego/api-client';",
+      ).length,
+      1,
+    );
+  }
+  for (const file of [
+    'workspaceEditorActions.ts',
+    'useWorkspaceOperations.ts',
+    'useWorkspaceData.ts',
+  ]) {
+    assert.equal(
+      inspectCodeBoundary(
+        file.replace(/\.ts$/, '.tsx'),
+        'const content = <View />;',
+      ).length,
+      1,
+    );
+  }
+});
 
 test('분리한 화면·요청 행동·스타일에도 실행 의존성 경계를 적용한다', () => {
   // 실제 요청은 작업 모듈에서 허용하고 화면이나 스타일로 역류하면 실패한다.
@@ -69,7 +98,10 @@ test('운영 기본 주소는 거부하고 검토한 정적 사진은 해당 파
   const asset =
     "const image = 'https://tripprint-staging.pages.dev/assets/destinations/taipei-101-tourism.jpg';";
   assert.deepEqual(
-    inspectCodeBoundary('apps/api/src/discoveryAssets.ts', asset),
+    inspectCodeBoundary(
+      'apps/api/src/features/discovery/discoveryAssets.ts',
+      asset,
+    ),
     [],
   );
   assert.equal(

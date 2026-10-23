@@ -18,7 +18,7 @@
 
 Android 기본 지도는 `GOOGLE_MAPS_ANDROID_API_KEY`를 사용한다. Google Cloud에서 Maps SDK for Android를 활성화하고 Android 앱 제한에 `com.tripprint.app`과 Play Console의 **앱 서명 인증서 SHA-1**을 등록한다. 직접 설치 APK와 Play 설치본의 서명은 다를 수 있으므로 업로드 키만 등록해서는 Play 동작을 보장할 수 없다. [Google 지도 키 보안 지침](https://developers.google.com/maps/api-security-best-practices).
 
-GitHub Actions에는 같은 이름의 Secret을 등록해야 한다. 워크플로는 이 값을 Expo 설정과 Gradle에 전달한다. `node scripts/check-android-maps.mjs`는 누락·형식 오류를 중단하지만 키의 실제 유효성이나 서명 제한을 검증하지는 않는다. EAS를 선택하면 해당 원격 빌드 환경에도 키가 필요하다. 키 원문은 공개 Expo 설정·JS 번들·문서·로그에 넣지 않으며, 앱에는 지도 사용 가능 여부만 전달한다. 네이티브 Manifest에 들어가는 Android 키는 앱 제한으로 보호한다.
+GitHub Actions에는 같은 이름의 Secret을 등록해야 한다. 워크플로는 이 값을 Expo 설정과 Gradle에 전달한다. `node scripts/android/check-android-maps.mjs`는 누락·형식 오류를 중단하지만 키의 실제 유효성이나 서명 제한을 검증하지는 않는다. EAS를 선택하면 해당 원격 빌드 환경에도 키가 필요하다. 키 원문은 공개 Expo 설정·JS 번들·문서·로그에 넣지 않으며, 앱에는 지도 사용 가능 여부만 전달한다. 네이티브 Manifest에 들어가는 Android 키는 앱 제한으로 보호한다.
 
 장소 검색은 서버 전용 `GOOGLE_PLACES_API_KEY`를 사용한다. Places API (New)를 활성화한 키를 `tripprint-api-staging`의 Worker Secret으로 등록해야 한다. 이 키는 앱에 전달하지 않고 서버에서만 Google 요청 헤더로 사용한다. Android SDK 키로 대신하지 않는다. [Text Search 공식 문서](https://developers.google.com/maps/documentation/places/web-service/text-search).
 
@@ -52,7 +52,7 @@ Android는 네이티브 Google 기본 지도를, 웹 검수 화면은 기존 위
 | `ScheduleEditor.tsx`, `PlanEditor.tsx`                                                                                                                | 폼·DAY·유형별 검색 수명 분리. 병행 헤더 수정 보존                                                       |
 | `TripMap.tsx`, `TripMapCanvas.native.tsx`                                                                                                             | 빈 일정 지도 생성과 빈 지도 오류 안내 보완                                                              |
 | `packages/api-client/src/index.ts`                                                                                                                    | 검색을 현재 인증 경로·공통 응답·취소 계약으로 교체                                                      |
-| `.github/workflows/play-internal.yml`, `scripts/check-android-maps.mjs`                                                                               | Android SDK 키 전달과 prebuild 전 누락·형식 검사                                                        |
+| `.github/workflows/play-internal.yml`, `scripts/android/check-android-maps.mjs`                                                                       | Android SDK 키 전달과 prebuild 전 누락·형식 검사                                                        |
 | `tests/auth/placeSearch.test.ts`, `tests/release/maps-config.test.mjs`                                                                                | 검색 HTTP 계약·오류·취소 및 키 누락·CI 검사                                                             |
 | `tests/web/workspace.spec.ts`                                                                                                                         | 검색·선택·저장·지연 폐기·빈 결과·503/401·영역 종료·빈 지도 4개 추가. 기존 위치·공유·일정·IA 15개와 검증 |
 | `docs/05. 검수/00. 검수기준/실기기_인수기준.txt`                                                                                                      | 빈 일정 실제 지도·Play 서명·실제 검색·오류 복구·지연 폐기 인수 항목 추가. 모두 미실행으로 유지          |

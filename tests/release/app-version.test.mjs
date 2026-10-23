@@ -9,7 +9,10 @@ import {
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { test } from 'node:test';
-import { parseAppVersion, readAppVersion } from '../../scripts/app-version.cjs';
+import {
+  parseAppVersion,
+  readAppVersion,
+} from '../../scripts/shared/app-version.cjs';
 import withAppVersion from '../../apps/mobile/plugins/withAppVersion.cjs';
 
 test('공개 릴리스 안내는 Android 빌드와 같은 버전 번호를 표시한다', () => {
@@ -85,10 +88,10 @@ test('prebuild는 루트·모바일 경로를 지원하고 버전 연결을 중�
   // 네이티브 프로젝트를 재생성한 경우에도 파일 연결을 유지한다.
   const repository = resolve(import.meta.dirname, '../..');
   for (const [projectRoot, relativePath] of [
-    [repository, '../scripts/android-version.gradle'],
+    [repository, '../scripts/android/android-version.gradle'],
     [
       join(repository, 'apps/mobile'),
-      '../../../scripts/android-version.gradle',
+      '../../../scripts/android/android-version.gradle',
     ],
   ]) {
     // 버전 플러그인의 실제 변환 함수에 생성 파일의 내용을 전달한다.

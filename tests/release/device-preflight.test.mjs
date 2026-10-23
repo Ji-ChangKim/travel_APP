@@ -4,7 +4,7 @@ import {
   parseDevices,
   parseInstalled,
   selectDevice,
-} from '../../scripts/r14-device-preflight.mjs';
+} from '../../scripts/qa/android-device-preflight.mjs';
 
 test('R14 연결 없음·미승인·오프라인은 인수 가능 기기가 아니다', () => {
   // USB 연결 안내를 실제 승인된 기기로 오인하지 않는다.

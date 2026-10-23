@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { PGlite } from '@electric-sql/pglite';
 import { accounts, asUser, createTrip, withDatabase } from './database';
-import { receiptDraft } from '../src/ocr';
+import { receiptDraft } from '../src/features/receipts/ocr';
 import type { WorkspaceSnapshot, CommunityPost } from '@wherego/domain';
 import {
   workspaceSnapshotSchema,

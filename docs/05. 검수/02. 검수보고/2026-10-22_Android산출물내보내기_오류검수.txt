@@ -5,7 +5,7 @@ Android 산출물 내보내기 오류 검수
 
 확인 결과
 
-스크린샷의 실패 지점은 scripts/android-export.gradle에서 Node 내보내기 작업을 실행하는 부분이다.
+스크린샷의 실패 지점은 scripts/android/android-export.gradle에서 Node 내보내기 작업을 실행하는 부분이다.
 원본 apps/mobile/android/app/release/app-release.aab와 14:58에 만들어진
 TripPrint_261022_Ver01.aab.partial이 남아 있었고, 두 파일의 SHA-256이 일치했다.
 앱 번들 생성과 서명은 끝났으며, 출력 폴더에서 최종 파일명으로 내보내는 후처리가 실패했다.

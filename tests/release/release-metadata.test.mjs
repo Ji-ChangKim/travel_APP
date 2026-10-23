@@ -2,8 +2,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { test } from 'node:test';
-import { readAppVersion } from '../../scripts/app-version.cjs';
-import { releaseSourceManifest } from '../../scripts/release-source-manifest.mjs';
+import { readAppVersion } from '../../scripts/shared/app-version.cjs';
+import { releaseSourceManifest } from '../../scripts/release/release-source-manifest.mjs';
 
 test('공개 릴리스 버전과 배포 후보 해시는 실제 버전 파일·정적 메타데이터를 함께 반영한다', () => {
   // 과거 공개 릴리스 번호를 새 Android 후보로 인계하지 않는다.

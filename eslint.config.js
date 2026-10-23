@@ -8,6 +8,9 @@ module.exports = defineConfig([
     ignores: [
       // 검수 번들과 임시 Metro 캐시는 제품 소스 검사에서 제외한다.
       'outputs/**',
+      'output/**',
+      'scratch/**',
+      '_workspace/**',
       '**/dist/**',
       '**/.expo/**',
       '**/.wrangler/**',

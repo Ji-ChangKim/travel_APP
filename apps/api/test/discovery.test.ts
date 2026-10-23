@@ -3,7 +3,10 @@ import { test } from 'node:test';
 import { discoveryDestinations } from '@wherego/domain';
 import { persistedTripCreateSchema } from '@wherego/validation';
 import { createApp } from '../src/app';
-import { discoveryPeriods, fetchDiscovery } from '../src/discovery';
+import {
+  discoveryPeriods,
+  fetchDiscovery,
+} from '../src/features/discovery/discovery';
 
 interface FixtureOptions {
   missingViews?: boolean;

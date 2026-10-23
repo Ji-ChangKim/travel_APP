@@ -6,7 +6,7 @@ import {
   playStoreUrl,
 } from '@wherego/validation';
 import { createApp } from '../src/app';
-import { commonDataVersion } from '../src/startup';
+import { commonDataVersion } from '../src/features/startup/startup';
 
 test('공통 데이터 버전은 같은 목록·월에 안정적이고 월간 데이터 변경을 반영한다', async () => {
   // 임의 배포 시각 대신 실제 데이터 구성으로 버전을 비교한다.

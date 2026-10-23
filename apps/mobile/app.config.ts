@@ -1,5 +1,5 @@
 import type { ExpoConfig } from 'expo/config';
-import { readAppVersion } from '../../scripts/app-version.cjs';
+import { readAppVersion } from '../../scripts/shared/app-version.cjs';
 
 // 공개 설정에는 키 원문 대신 지도 표시 가능 여부만 넣는다.
 import { readMapsAndroidKey } from './plugins/mapsBuildConfig.cjs';

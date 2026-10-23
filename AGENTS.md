@@ -92,3 +92,13 @@
 - `99. 아카이브`는 이전 자료 보존용입니다. 그 안의 `99. 삭제필요`는 삭제 검토 대상이며 사용자 지시 없이 실제 삭제하지 않습니다.
 - 현행 기준·검토안·과거 검수 결과를 구분하고 상세 규칙은 `docs/00. 문서안내/문서_관리규칙.md`를 따릅니다.
 - 문서 이동 시 코드·문서 링크·생성 도구·제외 경로도 함께 수정하고 `npm run check:docs`와 관련 검사를 실행합니다.
+
+---
+
+## 10. 코드 폴더와 빌드 경로
+
+- 기준은 `docs/03. 개발/00. 구조설계/저장소_아키텍처규격.md`입니다. 코드 폴더는 소문자 kebab-case, TypeScript 모듈은 camelCase, React 컴포넌트는 PascalCase를 사용하며 프레임워크와 출처 보존 예외를 따릅니다.
+- API 기능은 `apps/api/src/features`, 공통 오류·타입·HTTP 처리는 `shared`, 저장소 연결은 `infrastructure`에 둡니다. 공통 기능이 개별 기능에 의존하지 않게 합니다.
+- 도구는 `scripts/android`, `build`, `checks`, `design`, `qa`, `release`, `shared`로 구분합니다. 화면별 Playwright 설정은 `tests/config`에 둡니다.
+- 저장소 경로는 `scripts/shared/repository-paths.cjs`, 네이티브 연결은 `apps/mobile/plugins/gradleScript.cjs`와 `scripts/android/repository-root.gradle`을 기준으로 합니다. 새 Android 산출물의 기본 경로는 `outputs/android`이며 기존 외부 산출물은 보존합니다.
+- 파일 이동 후 npm 명령·import·플러그인·Gradle·CI·문서 참조를 함께 갱신하고 `npm run check`와 관련 회귀 검사로 확인합니다.

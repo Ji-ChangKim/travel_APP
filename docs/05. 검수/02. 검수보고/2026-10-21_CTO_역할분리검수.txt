@@ -172,8 +172,8 @@ API·DB 검사 이후 모바일 입력 해시가 바뀐 차이는 manifest 도�
 7. 변경 파일
 
 아래는 이번 구조·복구·검사·문서 변경 경로다. 각 파일에 이미 있던 병행 변경은 보존했다.
-  apps/api/src/cloudRpc.ts
-  apps/api/src/errors.ts
+  apps/api/src/features/trips/cloudRpc.ts
+  apps/api/src/shared/errors.ts
   apps/mobile/src/stores/useTripStore.ts
   packages/validation/src/workspaceModel.ts
   packages/validation/src/workspaceModelCore.ts
@@ -183,7 +183,7 @@ API·DB 검사 이후 모바일 입력 해시가 바뀐 차이는 manifest 도�
   apps/mobile/src/features/workspace/tripQueries.ts
   apps/mobile/src/features/workspace/workspaceSaveSession.ts
   apps/mobile/src/features/workspace/useCommunityImport.ts
-  scripts/check-code-boundaries.mjs
+  scripts/checks/check-code-boundaries.mjs
   tests/auth/formCommands.test.ts
   tests/auth/workspaceSaveSession.test.ts
   tests/auth/schedule.test.ts
@@ -202,10 +202,10 @@ API·DB 검사 이후 모바일 입력 해시가 바뀐 차이는 manifest 도�
   apps/mobile/src/services/cloudAuth.ts
   apps/mobile/src/services/sessionTokenStorage.ts
   tests/auth/sessionTokenStorage.test.ts
-  apps/api/src/accountRetirement.ts
-  apps/api/src/accountRetirementPolicy.ts
-  apps/api/src/cloudAuth.ts
-  scripts/release-source-manifest.mjs
+  apps/api/src/features/accounts/accountRetirement.ts
+  apps/api/src/features/accounts/accountRetirementPolicy.ts
+  apps/api/src/features/auth/cloudAuth.ts
+  scripts/release/release-source-manifest.mjs
   tests/release/source-inputs.test.mjs
   AGENTS.md
   docs/03. 개발/02. 데이터정의/DB_객체사전.txt

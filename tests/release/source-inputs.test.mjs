@@ -4,7 +4,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { test } from 'node:test';
 import ts from 'typescript';
-import { releaseSourceManifest } from '../../scripts/release-source-manifest.mjs';
+import { releaseSourceManifest } from '../../scripts/release/release-source-manifest.mjs';
 
 test('모바일 실행 코드가 읽는 JSON도 빌드 입력 목록과 해시에 포함한다', () => {
   // 디자인 파일만 바뀐 후보를 예전 검수 소스와 같다고 판정하지 않는다.

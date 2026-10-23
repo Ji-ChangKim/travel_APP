@@ -7,7 +7,7 @@ import {
   buildDay,
   buildName,
   finalizeBuildFile,
-} from '../../scripts/export-android-build.mjs';
+} from '../../scripts/android/export-android-build.mjs';
 
 function withExportFiles(check) {
   const folder = mkdtempSync(join(tmpdir(), 'tripprint-finalize-'));
@@ -162,7 +162,7 @@ test('APK·AAB 복사와 새 빌드 번호 예약이 실제 파일에서 동작�
   const { tmpdir } = await import('node:os');
   const { join, basename } = await import('node:path');
   const { exportBuild } =
-    await import('../../scripts/export-android-build.mjs');
+    await import('../../scripts/android/export-android-build.mjs');
   const folder = mkdtempSync(join(tmpdir(), 'tripprint-export-'));
   try {
     writeFileSync(join(folder, 'app.apk'), 'apk fixture');

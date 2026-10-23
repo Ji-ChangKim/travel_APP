@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { inspectNavigationSource } from '../../scripts/navigation-guard/inspect.mjs';
-import { inspectRoutePolicies } from '../../scripts/check-navigation-boundaries.mjs';
+import { inspectNavigationSource } from '../../scripts/checks/navigation-guard/inspect.mjs';
+import { inspectRoutePolicies } from '../../scripts/checks/check-navigation-boundaries.mjs';
 
 function violations(text, file = 'features/example/ExampleScreen.tsx') {
   // 제품 파일을 바꾸지 않고 규칙을 위반한 후보 구문만 검사한다.

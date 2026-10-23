@@ -1,4 +1,6 @@
-import { useLayoutEffect, useState, type RefObject } from 'react';
+import { type RefObject } from 'react';
+import PublishSummary from './PublishSummary';
+import { usePublishNavigation } from './usePublishNavigation';
 import { Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { WorkspaceSnapshot } from '@wherego/domain';
@@ -9,7 +11,7 @@ import { Field } from './ui';
 import { styles } from './workspaceStyles';
 
 import PublishSelection from './PublishSelection';
-import { publicationIssue, publicationPreview } from './publication';
+import { publicationIssue } from './publication';
 import { LedgerAction as Action, useLedgerWide } from './LedgerUI';
 import { ledgerStyles as l, ledgerColors } from './ledgerTheme';
 
@@ -43,36 +45,14 @@ export default function PublishFlow({
   onClose: () => void;
   backActionRef?: RefObject<(() => void) | null>;
 }) {
-  // 같은 폼의 선택값은 단계 이동과 저장 실패 뒤에도 그대로 유지한다.
-  const [preview, setPreview] = useState(false);
+  const { preview, step, goBack } = usePublishNavigation({
+    locked,
+    scroll,
+    onClose,
+    backActionRef,
+  });
   const wide = useLedgerWide();
   const issue = publicationIssue(snapshot, form.values);
-  const chosen = publicationPreview(snapshot, form.values);
-  useLayoutEffect(() => {
-    // 헤더와 Escape·시스템 뒤로가 같은 단계 규칙을 따르게 한다.
-    if (!backActionRef) return;
-    const back = () => {
-      // 저장 중에는 단계나 원본 선택을 바꾸지 않는다.
-      return locked
-        ? undefined
-        : preview
-          ? void (setPreview(false),
-            scroll.current?.scrollTo({ y: 0, animated: false }))
-          : onClose();
-    };
-    backActionRef.current = back;
-    return () => {
-      // 이전 폼이 새 공개 화면의 뒤로 동작을 지우지 않게 한다.
-      if (backActionRef.current === back) backActionRef.current = null;
-    };
-  }, [backActionRef, locked, preview, onClose, scroll]);
-  function step(next: boolean): void {
-    // 저장 중 단계 이동을 막고 새 단계의 제목부터 읽게 한다.
-    return locked
-      ? undefined
-      : void (setPreview(next),
-        scroll.current?.scrollTo({ y: 0, animated: false }));
-  }
   return (
     <SafeAreaView
       style={[styles.modal, { backgroundColor: ledgerColors.canvas }]}
@@ -82,10 +62,7 @@ export default function PublishFlow({
         inlineTitle={preview}
         backLabel={preview ? '공유 항목 선택으로' : '공유 화면 닫기'}
         disabled={locked}
-        onBack={() => {
-          // 미리보기에서는 선택으로, 선택에서는 기존 이탈 보호로 돌아간다.
-          return preview ? step(false) : onClose();
-        }}
+        onBack={goBack}
       />
       <ScrollView
         style={publishStyles.scroll}
@@ -180,46 +157,7 @@ export default function PublishFlow({
               )}
             </View>
           </View>
-          {wide && (
-            <View style={[l.card, { width: 300 }]}>
-              <Text style={l.section}>공개 범위 요약</Text>
-              <Text style={l.place}>{snapshot.trip.title}</Text>
-              <Text style={l.meta}>
-                선택 일정 {chosen?.snapshot.itinerary.length || 0}개 · 사진{' '}
-                {chosen?.photoPaths.length || 0}장
-              </Text>
-              {form.values.body ? (
-                <Text style={l.body}>{form.values.body}</Text>
-              ) : null}
-              <View style={l.tinted}>
-                <Text style={l.body}>
-                  개인 메모·예약번호·동행 정보·영수증 원본과 품목은 공개하지
-                  않아요.
-                </Text>
-              </View>
-              <Text style={l.section}>공개 지출</Text>
-              {form.values.includeCosts === 'true' &&
-              chosen &&
-              Object.entries(chosen.snapshot.costs).length ? (
-                Object.entries(chosen.snapshot.costs).map(
-                  ([currency, amount]) => {
-                    // 원화 환산이나 예시 비용 없이 선택된 실제 통화 합계만 표시한다.
-                    return (
-                      <Text key={currency} style={l.body}>
-                        {currency} {amount}
-                      </Text>
-                    );
-                  },
-                )
-              ) : (
-                <Text style={l.meta}>공개할 지출 합계가 없어요.</Text>
-              )}
-              <Text style={l.meta}>
-                미리보기에서 내용을 확인한 뒤 공개해 주세요. 원본을 수정해도
-                공개 사본이 자동으로 바뀌지는 않아요.
-              </Text>
-            </View>
-          )}
+          {wide && <PublishSummary form={form} snapshot={snapshot} />}
         </View>
       </ScrollView>
     </SafeAreaView>

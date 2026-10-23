@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test, mock } from 'node:test';
-import { parseReceiptAnalysis } from '../src/receiptAnalysis';
+import { parseReceiptAnalysis } from '../src/features/receipts/receiptAnalysis';
 import {
   ReceiptAnalysisError,
   logReceiptFailure,
   receiptProviderFailure,
-} from '../src/receiptDiagnostics';
+} from '../src/features/receipts/receiptDiagnostics';
 
 // 각 실패는 원문 없이 고정된 단계로만 분류한다.
 test('OCR 빈 출력·잘림·JSON·초안 계약 실패를 구분한다', () => {

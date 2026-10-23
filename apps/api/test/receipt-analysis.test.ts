@@ -5,9 +5,9 @@ import {
   persistedTripCreateSchema,
   workspaceCommandSchema,
 } from '@wherego/validation';
-import { printedCurrency } from '../src/ocr';
-import { parseReceiptAnalysis } from '../src/receiptAnalysis';
-import { newTrip, transform } from '../src/cloudModel';
+import { printedCurrency } from '../src/features/receipts/ocr';
+import { parseReceiptAnalysis } from '../src/features/receipts/receiptAnalysis';
+import { newTrip, transform } from '../src/infrastructure/storage/cloudModel';
 const draft = JSON.parse(
   readFileSync(
     new URL(

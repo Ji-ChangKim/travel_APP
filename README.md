@@ -17,7 +17,7 @@
 
 [staging 웹](https://tripprint-staging.pages.dev) · [공개 버전 정보](https://tripprint-staging.pages.dev/release.json)
 
-직접 내부 테스트용 AAB를 만들 때는 [빌드 설정·실행 순서](<docs/04. 운영/01. 배포절차/Android_GitHub빌드절차.md>)를 따릅니다. GitHub Actions에서 `main`·`aab`·`submit_play=false`·`draft`를 선택하며, 실제 게스트·Google 로그인 검수는 Play 설치 후 진행합니다. 현재 소스는 versionCode9이고 이미 사용한 번호라면 `ver.text`를 먼저 수정합니다.
+직접 내부 테스트용 AAB를 만들 때는 [빌드 설정·실행 순서](<docs/04. 운영/01. 배포절차/Android_GitHub빌드절차.md>)를 따릅니다. GitHub Actions에서 `main`·`aab`·`submit_play=false`·`draft`를 선택하며, 실제 게스트·Google 로그인 검수는 Play 설치 후 진행합니다. 현재 업로드 번호는 `ver.text`에서 확인하고, 이미 사용한 번호라면 빌드 전에 수정합니다.
 
 ## 개발 환경과 실행
 
@@ -48,17 +48,19 @@ apps/api/migrations/   D1 변경 이력
 packages/api-client/   인증·취소·제한 시간을 적용하는 API 클라이언트
 packages/domain/       도메인 모델
 packages/validation/   입력·응답 검증 계약
-scripts/               개발·배포 검사와 자산 제작 도구
-tests/                 자동 검사와 격리된 검수 자료
+scripts/               android·build·checks·design·qa·release·shared 역할별 도구
+tests/                 config·auth·cloud·release·web 및 격리된 검수 자료
 docs/                  현행 기능·디자인·DB·검수 문서
 outputs/               로컬 검수 증거·정리 명세, Git·EAS 제외
 .release/              로컬 빌드·도구 자료, Git·EAS 제외
-supabase/              이전 백엔드 스키마 참고 자료
+supabase/              이전 백엔드 SQL과 호환 계약 검사 입력
 ```
 
 `apps/mobile/android`의 생성 소스·서명·최종 APK/AAB와 에뮬레이터 데이터는 중간 빌드 캐시와 구분합니다. 용량만 보고 일괄 삭제하지 않습니다. 테스트의 fixture와 디자인 원본도 제품의 더미 데이터와 구분합니다.
 
 [CTO 코드 검토](<docs/05. 검수/02. 검수보고/CTO_코드검토.txt>)에서 기능·표현·예외·고정값의 검수 결과를 확인합니다.
+
+[저장소 아키텍처·이름·빌드 경로 규격](<docs/03. 개발/00. 구조설계/저장소_아키텍처규격.md>)을 따릅니다. 새 Android 산출물의 기본 위치는 `outputs/android`입니다. 기존 외부 산출물은 보존합니다.
 
 ## 작업 기준
 

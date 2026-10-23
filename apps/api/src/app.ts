@@ -9,22 +9,25 @@ import {
   persistedTripCreateSchema,
   tripVersionSchema,
 } from '@wherego/validation';
-import { runRpc, verifySession } from './backend';
-import { rejectRequest, renderError } from './errors';
-import type { ApiEnvironment, VerifiedSession } from './types';
-import { registerWorkspaceRoutes } from './workspace';
-import { registerSocialRoutes } from './socialHandoff';
-import { getGooglePlace, searchPlaces } from './places';
-import { importMapsShare } from './mapsShare';
-import { cloudAuth } from './cloudAuth';
-import { registerMediaRoutes } from './cloudMedia';
-import { registerProfileRoutes } from './cloudProfiles';
-import { registerDiscoveryRoutes } from './discovery';
-import { startupManifest } from './startup';
-import { appConfig } from './appConfig';
-import { lookupFlights } from './flights';
-import { previewPlanPhoto, publicPlanPhoto } from './placePhotos';
-import { registerPlanningRoutes } from './planning';
+import { runRpc, verifySession } from './infrastructure/backend';
+import { rejectRequest, renderError } from './shared/errors';
+import type { ApiEnvironment, VerifiedSession } from './shared/types';
+import { registerWorkspaceRoutes } from './features/trips/workspace';
+import { registerSocialRoutes } from './features/auth/socialHandoff';
+import { getGooglePlace, searchPlaces } from './features/places/places';
+import { importMapsShare } from './features/places/mapsShare';
+import { cloudAuth } from './features/auth/cloudAuth';
+import { registerMediaRoutes } from './features/media/cloudMedia';
+import { registerProfileRoutes } from './features/accounts/cloudProfiles';
+import { registerDiscoveryRoutes } from './features/discovery/discovery';
+import { startupManifest } from './features/startup/startup';
+import { appConfig } from './config/appConfig';
+import { lookupFlights } from './features/flights/flights';
+import {
+  previewPlanPhoto,
+  publicPlanPhoto,
+} from './features/places/placePhotos';
+import { registerPlanningRoutes } from './features/planning/planning';
 
 type ApiContext = Context<ApiEnvironment>;
 

@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { readMapsAndroidKey } from '../../apps/mobile/plugins/mapsBuildConfig.cjs';
-import { requireAndroidMapsKey } from '../../scripts/check-android-maps.mjs';
+import { requireAndroidMapsKey } from '../../scripts/android/check-android-maps.mjs';
 
 test('지도 키는 전용 변수에서 읽고 Places 키를 대신 사용하지 않는다', () => {
   // 실제 비밀 파일을 읽지 않는 격리된 디렉터리에서 검사한다.
@@ -91,7 +91,7 @@ test('내부 테스트 CI는 같은 Android 키를 전달하고 prebuild 전에 
     ),
   );
   assert.ok(
-    workflow.indexOf('node scripts/check-android-maps.mjs') <
+    workflow.indexOf('node scripts/android/check-android-maps.mjs') <
       workflow.indexOf('expo prebuild'),
   );
 });

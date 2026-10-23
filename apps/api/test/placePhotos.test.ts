@@ -1,8 +1,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createApp } from '../src/app';
-import { googleBillingMonth, googleMonthlyLimits } from '../src/googleUsage';
-import { googlePhotoLink } from '../src/placePhotos';
+import {
+  googleBillingMonth,
+  googleMonthlyLimits,
+} from '../src/features/places/googleUsage';
+import { googlePhotoLink } from '../src/features/places/placePhotos';
 import type { CommunityPost } from '@wherego/domain';
 
 const postId = '00000000-0000-4000-8000-000000000070';

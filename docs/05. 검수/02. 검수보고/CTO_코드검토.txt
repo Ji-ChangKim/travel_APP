@@ -81,7 +81,7 @@ API·인증·초대 기본 주소
 Google Maps·관광청·사진 저작권 링크
   기능 또는 출처 계약의 외부 링크다. 백엔드 운영값과 구분한다.
 남겨 둔 정적 자산 주소1건
-  apps/api/src/discoveryAssets.ts의 대만 관광청 사진은 이미 이용 조건과 함께 등록한 공용 정적 파일이다.
+  apps/api/src/features/discovery/discoveryAssets.ts의 대만 관광청 사진은 이미 이용 조건과 함께 등록한 공용 정적 파일이다.
   tripprint-staging.pages.dev/assets/destinations/taipei-101-tourism.jpg를 그대로 유지했다.
   코드 경계 검사는 해당 파일·정확한 주소에만 예외를 허용하며 다른 파일이나 새 운영 기본 주소는 거부한다.
   운영 CDN 주소를 확정할 때 이 자산도 분리하는 것이 후속 대상이다. ‘고정 문자열/주소가 전부0건’이라고 보고하지 않는다.
@@ -130,7 +130,7 @@ outputs/cto-review-20261019/
   home-390.png / community-390.png / plan-390.png / plan-320-200.png
 새 웹 출력: apps/mobile/.release/cto-review-web (공개 읽기 검수용, 원격 배포본과 구분).
 추가/변경/삭제한 코드·검사82개 파일은 changed-files.json에 전부 기록했다.
-별도 변경: package.json 통합 검사, scripts/check-code-boundaries.mjs, README, DB_객체사전.txt, DESIGN.md와 이 보고서.
+별도 변경: package.json 통합 검사, scripts/checks/check-code-boundaries.mjs, README, DB_객체사전.txt, DESIGN.md와 이 보고서.
 호출처가 사라진 isMembershipRequired 도우미는 제거하고 정확한 코드 해석은 공통 순수 함수로 유지했다.
 이전부터 있던 다른 작업의 수정분은 보존했다. Git 커밋/푸시·원격 배포·Android 빌드/번들·Play 업로드 없음.
 
