@@ -13,11 +13,13 @@ import {
 } from './publicFeedStyles';
 import { Action, Field } from './ui';
 import CommunityImportButton from './CommunityImportButton';
+import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 
 // 실제 공개 원본의 표지·배지·작성자·동선 행동을 표시한다.
 export default function PublicFeedCard(props: CommunityFeedPostProps) {
   // 메뉴만 로컬 상태이며 신고 초안은 기존 컨트롤러에 유지한다.
   const [opened, setOpened] = useState(false);
+  const { largeText } = useAppAccessibility();
   const {
     post,
     userId,
@@ -35,6 +37,16 @@ export default function PublicFeedCard(props: CommunityFeedPostProps) {
   return (
     <View style={s.post} testID={`public-feed-card-${post.id}`}>
       <View style={s.cover}>
+        <View
+          pointerEvents="none"
+          testID="public-feed-location"
+          style={largeText ? s.locationInline : s.location}
+        >
+          <View style={s.locationBadge}>
+            <MaterialIcons name="location-on" size={14} color={c.pin} />
+            <Text style={s.locationText}>{region}</Text>
+          </View>
+        </View>
         {post.photoPath ? (
           <CommunityPhoto
             path={post.photoPath}
@@ -49,12 +61,6 @@ export default function PublicFeedCard(props: CommunityFeedPostProps) {
           </View>
         )}
         <View pointerEvents="none" style={s.coverOverlay} />
-        <View pointerEvents="none" style={s.location}>
-          <View style={s.locationBadge}>
-            <MaterialIcons name="location-on" size={14} color={c.pin} />
-            <Text style={s.locationText}>{region}</Text>
-          </View>
-        </View>
       </View>
       <View style={s.body}>
         <View style={s.badges}>

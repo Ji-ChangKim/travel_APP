@@ -156,6 +156,12 @@ export const publicFeedStyles = StyleSheet.create({
     alignItems: 'flex-start',
     zIndex: 2,
   },
+  // 큰 글자에서는 지역명과 사진 오류 안내가 서로 덮이지 않게 높이를 확보한다.
+  locationInline: {
+    padding: 12,
+    alignItems: 'flex-start',
+    zIndex: 2,
+  },
   locationBadge: {
     backgroundColor: c.location,
     borderRadius: 9999,

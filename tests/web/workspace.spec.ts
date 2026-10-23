@@ -11,6 +11,7 @@ import {
   type Page,
   type Route,
   type Locator,
+  type TestInfo,
 } from '@playwright/test';
 
 import {
@@ -3006,6 +3007,7 @@ test('일정 디자인: 전체·DAY·장소 추가·중간 삽입·순서·체�
     .getByRole('button', { name: '방문 위치 지도 보기', exact: true })
     .click();
   await page
+    .getByRole('dialog', { name: '일정 작성', exact: true })
     .getByText('방문 위치 · 연결선은 실제 길과 다를 수 있어요.', {
       exact: true,
     })
@@ -3014,6 +3016,8 @@ test('일정 디자인: 전체·DAY·장소 추가·중간 삽입·순서·체�
     path: 'outputs/schedule/schedule-map-preview-430x844.png',
   });
   await saveEditor(page);
+  // 닫기 전환 중 보존하는 편집 내용을 저장된 타임라인 항목과 혼동하지 않는다.
+  await expect(page.getByTestId('app-modal')).toHaveCount(0);
   await expect(
     page.getByText('블루보틀 커피 신주쿠점', { exact: true }),
   ).toBeVisible();
@@ -14194,4 +14198,188 @@ test('UI 폴리싱 홈: 큰 글꼴의 장식 제외와 본문 읽기 바탕', as
   await expect(
     hero.getByText(/하루와 함께 가고 싶은 곳부터/).locator('..'),
   ).toHaveCSS('background-color', 'rgba(255, 255, 255, 0.9)');
+});
+
+// S24 전용 프로젝트에서만 실행하며 다른 화면 회귀의 기기 설정을 바꾸지 않는다.
+async function s24Environment(page: Page, testInfo: TestInfo) {
+  const scale = Number(testInfo.project.metadata.fontScale || 1);
+  await page.evaluate((fontScale) => {
+    document.documentElement.style.fontSize = `${16 * fontScale}px`;
+  }, scale);
+  const environment = await page.evaluate(() => ({
+    width: window.innerWidth,
+    height: window.innerHeight,
+    dpr: window.devicePixelRatio,
+    touchPoints: navigator.maxTouchPoints,
+    coarsePointer: matchMedia('(pointer: coarse)').matches,
+  }));
+  expect(environment.dpr).toBe(3);
+  expect(environment.touchPoints).toBeGreaterThan(0);
+  expect(environment.coarsePointer).toBe(true);
+  await testInfo.attach('mobile-environment', {
+    body: JSON.stringify({ ...environment, fontScale: scale }),
+    contentType: 'application/json',
+  });
+}
+
+async function s24Capture(page: Page, testInfo: TestInfo, name: string) {
+  await page.evaluate(() => document.fonts.ready);
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    )
+    .toBe(true);
+  const path = testInfo.outputPath(`${name}.png`);
+  await page.screenshot({ path });
+  await testInfo.attach(name, { path, contentType: 'image/png' });
+}
+
+test('S24-01 실제 터치: 발자국 조건 선택·검색창 없음·다섯 메뉴와 인증 경계', async ({
+  page,
+}, testInfo) => {
+  test.skip(
+    !testInfo.project.name.startsWith('s24-'),
+    'S24 전용 모바일 프로젝트',
+  );
+  await network(page);
+  await page.route('**/public/media/url?*', (route) =>
+    route.fulfill({
+      status: 503,
+      json: { error: { code: 'BACKEND_UNAVAILABLE' } },
+    }),
+  );
+  const post = kyushuPublicPlan();
+  const requests: URL[] = [];
+  await page.route('**/public/community*', (route) => {
+    requests.push(new URL(route.request().url()));
+    return route.fulfill({ json: { data: [post] } });
+  });
+  await page.goto('/footprints');
+  await expect(page.getByText(post.title, { exact: true })).toBeVisible();
+  await s24Environment(page, testInfo);
+  const card = page.getByTestId(`public-feed-card-${post.id}`);
+  const photoError = card.getByText('사진을 불러오지 못했어요.', {
+    exact: true,
+  });
+  await expect(photoError).toBeVisible();
+  await expect
+    .poll(async () => {
+      const regionBounds = (await card
+        .getByTestId('public-feed-location')
+        .boundingBox())!;
+      const errorBounds = (await photoError.boundingBox())!;
+      return regionBounds.y + regionBounds.height <= errorBounds.y;
+    })
+    .toBe(true);
+  await expect(page.getByRole('textbox')).toHaveCount(0);
+  const navigation = page.getByLabel('하단 내비게이션', { exact: true });
+  await expect(navigation.getByRole('button')).toHaveCount(5);
+  await s24Capture(page, testInfo, 'footprints');
+  await page
+    .getByRole('button', { name: '여행지 전체 조건 선택', exact: true })
+    .tap();
+  const sheet = page.getByTestId('action-sheet');
+  const search = sheet.getByLabel('나라·도시 또는 여행 이름', { exact: true });
+  await search.tap();
+  await search.fill('후쿠오카');
+  await sheet.getByRole('button', { name: '4일', exact: true }).tap();
+  await sheet.getByRole('button', { name: '여행계획', exact: true }).tap();
+  await s24Capture(page, testInfo, 'filters');
+  await sheet
+    .getByRole('button', { name: '선택한 조건으로 보기', exact: true })
+    .tap();
+  await expect
+    .poll(() => requests.at(-1)?.searchParams.get('q'))
+    .toBe('후쿠오카');
+  await expect.poll(() => requests.at(-1)?.searchParams.get('days')).toBe('4');
+  await expect
+    .poll(() => requests.at(-1)?.searchParams.get('kind'))
+    .toBe('plan');
+  await navigation
+    .getByRole('button', { name: '내 여행 탭', exact: true })
+    .tap();
+  await expect(page).toHaveURL(/\/login\?next=plans$/);
+});
+
+test('S24-02 비용 입력: 좁아진 화면·실제 터치·작성 유지와 취소의 원본 보존', async ({
+  page,
+}, testInfo) => {
+  test.skip(
+    !testInfo.project.name.startsWith('s24-'),
+    'S24 전용 모바일 프로젝트',
+  );
+  const state = await r07Network(page);
+  await login(page);
+  await page.goto(`/trips/${trip}`);
+  await expect(
+    page.getByRole('button', { name: '비용', exact: true }),
+  ).toBeVisible();
+  await s24Environment(page, testInfo);
+  await page.getByRole('button', { name: '비용', exact: true }).tap();
+  await page.getByRole('button', { name: '비용 추가', exact: true }).tap();
+  await expect(page.getByLabel('하단 내비게이션', { exact: true })).toHaveCount(
+    0,
+  );
+  const initial = page.viewportSize()!;
+  // 키보드를 실행한 결과가 아니라 입력 중 가용 높이가 줄어든 조건을 검사한다.
+  await page.setViewportSize({
+    width: initial.width,
+    height: initial.height > initial.width ? 420 : 240,
+  });
+  const title = page.getByLabel('제목', { exact: true });
+  await title.tap();
+  await title.fill('S24에서 입력 중인 긴 이름의 교통 비용');
+  const amount = page.getByLabel('금액', { exact: true });
+  await amount.tap();
+  await amount.fill('1500');
+  const save = page.getByRole('button', { name: '확인하고 저장', exact: true });
+  await save.scrollIntoViewIfNeeded();
+  await expect(save).toBeInViewport();
+  await s24Capture(page, testInfo, 'expense-reduced-height');
+  await page.getByRole('button', { name: '닫기', exact: true }).tap();
+  await page.getByRole('button', { name: '계속 작성', exact: true }).tap();
+  await expect(amount).toHaveValue('1500');
+  await expect(title).toHaveValue('S24에서 입력 중인 긴 이름의 교통 비용');
+  await page.getByRole('button', { name: '닫기', exact: true }).tap();
+  await page
+    .getByRole('button', { name: '내용 버리고 이동', exact: true })
+    .tap();
+  await expect(amount).toHaveCount(0);
+  expect(state.writes).toHaveLength(0);
+});
+
+test('S24-03 공개 일정: DAY 터치·긴 장소 설명·뒤로 복귀와 가로 넘침', async ({
+  page,
+}, testInfo) => {
+  test.skip(
+    !testInfo.project.name.startsWith('s24-'),
+    'S24 전용 모바일 프로젝트',
+  );
+  const post = await osakaPlanNetwork(page);
+  await page.goto(`/community/${post.id}`);
+  await expect(
+    page.getByRole('heading', { name: post.title, exact: true }),
+  ).toBeVisible();
+  await s24Environment(page, testInfo);
+  await page.getByRole('tab', { name: 'DAY 2', exact: true }).tap();
+  const opener = page.getByRole('button', {
+    name: '오사카 성 장소 설명·팁 보기',
+    exact: true,
+  });
+  await opener.tap();
+  await expect(
+    page.getByRole('heading', { name: '오사카 성', exact: true }),
+  ).toBeVisible();
+  await s24Capture(page, testInfo, 'place-description');
+  await page
+    .getByRole('button', { name: '장소 목록으로 돌아가기', exact: true })
+    .tap();
+  await expect(page.getByTestId('app-modal')).toHaveCount(0);
+  await expect(
+    page.getByRole('tab', { name: 'DAY 2', exact: true }),
+  ).toHaveAttribute('aria-selected', 'true');
+  await expect(opener).toBeInViewport();
+  await s24Capture(page, testInfo, 'public-day2');
 });

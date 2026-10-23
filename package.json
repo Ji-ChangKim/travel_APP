@@ -55,6 +55,7 @@
     "check:docs": "node --test tests/release/docs-structure.test.mjs && node scripts/checks/check-docs.mjs",
     "check:design": "node scripts/checks/check-design-contrast.mjs",
     "test:headers:web": "node scripts/qa/verify-header-web.mjs",
+    "test:s24:web": "node scripts/qa/verify-s24-web.mjs",
     "check:architecture": "node --test tests/release/repository-layout.test.mjs && node scripts/checks/check-repository-layout.mjs && node scripts/checks/check-code-boundaries.mjs",
     "check:navigation": "node --test tests/release/navigation-boundaries.test.mjs && node scripts/checks/check-navigation-boundaries.mjs"
   },
