@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>영수증 모바일 스케치 · 검토안</title>
+    <style>
+      @font-face {
+        font-family: Pretendard;
+        src: url('../../../apps/mobile/assets/brand/tripprint-v1/fonts/PretendardVariable.woff2')
+          format('woff2');
+        font-weight: 100 900;
+        font-display: swap;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #e9edf4;
+        color: #0b1c30;
+        font-family: Pretendard, system-ui, sans-serif;
+        font-size: 16px;
+        line-height: 1.625;
+      }
+      .tools {
+        padding: 24px;
+        background: #fff;
+        border-bottom: 1px solid #76777d;
+      }
+      .tools h1 {
+        font-size: 24px;
+        margin: 0 0 8px;
+      }
+      .tools p {
+        margin: 0 0 12px;
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .controls label {
+        display: grid;
+        gap: 4px;
+      }
+      .controls select {
+        font: inherit;
+        min-height: 48px;
+        border: 1px solid #76777d;
+        border-radius: 12px;
+        padding: 8px;
+        max-width: 100%;
+      }
+      .controls a {
+        color: #ae3115;
+      }
+      .board {
+        display: flex;
+        align-items: flex-start;
+        gap: 24px;
+        padding: 24px;
+        overflow-x: auto;
+      }
+      .panel {
+        width: var(--width, 390px);
+        flex: none;
+      }
+      .caption {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0 0 8px;
+      }
+      .phone {
+        background: #f8f9ff;
+        border: 1px solid #76777d;
+        --z: 1;
+        font-size: calc(16px * var(--z));
+        line-height: calc(26px * var(--z));
+        overflow-wrap: anywhere;
+      }
+      .header {
+        padding: 6px 20px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        min-height: 60px;
+        color: #203247;
+      }
+      .back {
+        flex: none;
+        width: 48px;
+        height: 48px;
+        display: grid;
+        place-items: center;
+      }
+      .back svg {
+        width: 24px;
+        height: 24px;
+      }
+      .header h1 {
+        font-size: calc(26px * var(--z));
+        line-height: calc(36px * var(--z));
+        font-weight: 700;
+        flex: 1;
+        min-width: 0;
+        margin: 0;
+        padding: 2px 0;
+      }
+      .content {
+        padding: 20px;
+        display: grid;
+        gap: 24px;
+      }
+      .content p {
+        margin: 0;
+      }
+      .content h2 {
+        font-size: calc(20px * var(--z));
+        line-height: calc(28px * var(--z));
+        font-weight: 700;
+        margin: 0;
+      }
+      .card,
+      .note {
+        display: grid;
+        gap: 12px;
+        padding: 16px;
+        background: #fff;
+        border: 1px solid #76777d;
+        border-radius: 16px;
+        min-width: 0;
+      }
+      .note {
+        background: #eff4ff;
+      }
+      .field {
+        display: grid;
+        gap: 8px;
+        min-width: 0;
+      }
+      .label,
+      .meta {
+        font-size: calc(14px * var(--z));
+        line-height: calc(22px * var(--z));
+        color: #45464d;
+      }
+      .input {
+        min-height: 48px;
+        padding: 12px;
+        background: #fff;
+        border: 1px solid #76777d;
+        border-radius: 12px;
+        min-width: 0;
+      }
+      .muted {
+        color: #45464d;
+      }
+      .invalid {
+        border: 2px solid #9e3438;
+      }
+      .error {
+        font-size: calc(14px * var(--z));
+        line-height: calc(22px * var(--z));
+        color: #9e3438;
+      }
+      .button,
+      .choice {
+        min-height: 48px;
+        min-width: 48px;
+        padding: 12px 16px;
+        border: 1px solid #76777d;
+        border-radius: 12px;
+        background: #fff;
+        font-size: calc(16px * var(--z));
+        line-height: calc(24px * var(--z));
+        font-weight: 600;
+        text-align: center;
+      }
+      .primary {
+        min-height: 52px;
+        background: #ae3115;
+        color: #fff;
+        border-color: #ae3115;
+      }
+      .locked {
+        background: #eee8e2;
+        color: #596574;
+        border-color: #76777d;
+      }
+      .choice {
+        text-align: left;
+        font-weight: 400;
+      }
+      .selected {
+        background: #131b2e;
+        color: #fff;
+      }
+      .photo {
+        padding: 24px;
+        min-height: 240px;
+        display: grid;
+        place-items: center;
+        background: #eff4ff;
+        border: 1px solid #76777d;
+        border-radius: 16px;
+      }
+      .paper {
+        width: 100%;
+        max-width: 220px;
+        min-height: 240px;
+        padding: 16px;
+        background: white;
+        border: 1px solid #76777d;
+        display: grid;
+        gap: 24px;
+        text-align: center;
+      }
+      .receipt-lines {
+        height: 48px;
+        background: repeating-linear-gradient(
+          to bottom,
+          #76777d 0,
+          #76777d 1px,
+          transparent 1px,
+          transparent 12px
+        );
+      }
+      .memo {
+        padding: 16px 24px;
+        background: #fff;
+        margin: 0;
+      }
+      .phone.saving .input,
+      .phone.saving .choice {
+        background: #eee8e2;
+        color: #596574;
+      }
+      .phone.saving .selected {
+        background: #131b2e;
+        color: #fff;
+      }
+      @media (max-width: 600px) {
+        .tools {
+          padding: 16px;
+        }
+        .board {
+          padding: 16px;
+        }
+        .controls {
+          display: grid;
+        }
+        .controls select {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="tools">
+      <h1>영수증 모바일 상태 스케치</h1>
+      <p>
+        검토용 배치 시안 · 정책 승인 / 화면 검토 중 · 가상 여행·금액 예시 · 실제
+        촬영·인식·저장 기능 없음
+      </p>
+      <div class="controls">
+        <label>화면<select id="screen"></select></label
+        ><label
+          >상태<select id="state">
+            <option value="all">네 상태 나란히</option>
+            <option value="normal">정상</option>
+            <option value="empty">빈 상태</option>
+            <option value="error">오류·복구</option>
+            <option value="busy">저장·처리 중</option>
+          </select></label
+        ><label
+          >논리 폭<select id="width">
+            <option>320</option>
+            <option>360</option>
+            <option selected>390</option>
+            <option>430</option>
+          </select></label
+        ><label
+          >글자 배율<select id="scale">
+            <option value="1">100%</option>
+            <option value="2">200%</option>
+          </select></label
+        >
+      </div>
+    </header>
+    <p class="memo" id="memo"></p>
+    <main class="board" id="board"></main>
+    <script>
+      const screens = [
+        {
+          key: 'select',
+          title: '기록할 여행',
+          ref: 'S0',
+          memo: '기존 여행 선택 맥락. 저장 동작 없음.',
+          states: {
+            normal:
+              '<section class="card"><h2>오사카 여행</h2><p>10월 20일–23일 · 여행 완료</p><p class="meta">다녀온 여행에도 기록을 더할 수 있어요.</p></section><div class="button primary ">이 여행에 기록하기</div>',
+            empty:
+              '<div class="note"><h2>등록할 여행이 없어요</h2><p>먼저 여행을 만들거나 다른 여행을 선택해 주세요.</p></div><div class="button primary ">여행 만들기</div><div class="button  ">돌아가기</div>',
+            error:
+              '<div class="note"><h2>여행을 불러오지 못했어요</h2><p>다시 시도하거나 여행 목록으로 돌아가 주세요.</p></div><div class="button primary ">다시 시도</div><div class="button  ">돌아가기</div>',
+            busy: '<div class="note"><h2>여행을 확인하고 있어요</h2><p>잠시만 기다려 주세요.</p></div><div class="button primary locked">여행 확인 중</div>',
+          },
+          busyLabel: '조회 중',
+        },
+        {
+          key: 'capture',
+          title: '영수증 촬영',
+          ref: 'S1 · 236',
+          memo: '사진 영역은 실제 구매 영수증이 아닌 배치 표식.',
+          states: {
+            normal:
+              '<div class="photo"><div class="paper"><span class="receipt-lines"></span><p>원본 사진 영역</p><span class="receipt-lines"></span></div></div><div class="button primary ">이 사진으로 계속</div><div class="button  ">다른 사진 선택</div>',
+            empty:
+              '<div class="note"><h2>영수증 한 장을 골라 주세요</h2><p>상호와 날짜, 메뉴가 모두 보이도록 촬영해 주세요.</p></div><div class="button primary ">영수증 촬영</div><div class="button  ">앨범에서 선택</div>',
+            error:
+              '<div class="note"><h2>카메라를 사용할 수 없어요</h2><p>설정에서 카메라 접근을 허용하거나 앨범에서 선택해 주세요.</p></div><div class="button primary ">앨범에서 선택</div><div class="button  ">기기 설정 열기</div>',
+            busy: '<div class="photo"><div class="paper"><span class="receipt-lines"></span><p>원본 사진 영역</p><span class="receipt-lines"></span></div></div><div class="note"><h2>사진을 올리고 있어요</h2><p>아직 일정과 지출에 저장된 상태는 아니에요.</p></div><div class="button primary locked">사진 업로드 중</div>',
+          },
+          busyLabel: '업로드 중',
+        },
+        {
+          key: 'recognize',
+          title: '영수증 확인',
+          ref: 'S2 · E2 · 713',
+          memo: '성공 안내는 전이 설명용. 실제 앱은 확인 폼으로 이동하며 별도 완료 화면을 추가하지 않음.',
+          states: {
+            normal:
+              '<div class="note"><h2>읽은 내용을 확인해 주세요</h2><p>결제 정보와 메뉴를 확인하고 수정할 수 있어요.</p></div><div class="button primary ">내용 확인</div>',
+            empty:
+              '<div class="note"><h2>읽힌 항목이 없어요</h2><p>원본을 보며 직접 입력하거나 다른 사진을 골라 주세요.</p></div><div class="button primary ">직접 입력</div><div class="button  ">다른 사진 선택</div>',
+            error:
+              '<div class="note"><h2>영수증을 읽지 못했어요</h2><p>입력으로 계속하거나 사진을 다시 확인해 주세요.</p></div><div class="button primary ">직접 입력으로 계속</div><div class="button  ">다시 스캔하기</div><div class="button  ">다른 사진 선택</div>',
+            busy: '<div class="note"><h2>영수증을 읽고 있어요</h2><p>상호, 결제일, 메뉴와 합계를 찾고 있어요.</p></div><div class="button primary locked">인식 중</div>',
+          },
+          busyLabel: '인식 중',
+        },
+        {
+          key: 'confirm',
+          title: '영수증 확인',
+          ref: 'S3 · S5 · S5M · S6 · 237',
+          memo: '한 화면의 연속 구역. 아래로 스크롤해 원본 보관·내용 확인·저장까지 확인.',
+          states: {
+            normal:
+              '<p class="meta">오사카 여행 · 10월 20일–23일</p><div class="button  ">원본 보기</div><section class="card"><h2>결제 정보</h2><div class="field"><p class="label">상호</p><div class="input ">골목 식당</div></div><div class="field"><p class="label">결제일</p><div class="input ">2026-10-21</div></div><div class="field"><p class="label">결제시각 · 선택</p><div class="input ">12:30</div></div><div class="field"><p class="label">통화</p><div class="input ">JPY · 일본 엔</div></div><div class="field"><p class="label">결제 총액</p><div class="input ">1,600</div></div></section><section class="card"><h2>방문 연결</h2><p class="meta">결제일에 맞춰 장소를 연결해요.</p><div class="choice">기존 일정 · 골목 식당</div><div class="choice selected">새 장소 기록 만들기</div><p class="meta">기존 계획은 바뀌지 않아요.</p></section><section class="card"><h2>메뉴·구매 내역</h2><div class="field"><p class="label">1번 메뉴 이름</p><div class="input ">라멘</div></div><div class="field"><p class="label">수량 · 선택</p><div class="input ">2</div></div><div class="field"><p class="label">단가 · 선택</p><div class="input ">800 JPY</div></div><div class="field"><p class="label">품목 금액 · 선택</p><div class="input ">1,600 JPY</div></div><div class="button  ">1번 메뉴 삭제</div><div class="button  ">메뉴 추가</div></section><section class="card"><h2>저장 전 확인</h2><p>메뉴와 결제 총액을 확인해 주세요.</p><div class="choice selected">사진도 보관 · 선택됨</div><div class="choice">내용만 보관</div><p class="meta">원본과 메뉴는 나와 여행 멤버가 볼 수 있어요. 공개 여행에는 자동으로 포함되지 않아요.</p><div class="choice selected">내용을 확인했어요 · 선택됨</div></section><div class="button primary ">영수증 저장</div>',
+            empty:
+              '<p class="meta">오사카 여행 · 10월 20일–23일</p><div class="button  ">원본 보기</div><section class="card"><h2>결제 정보</h2><div class="field"><p class="label">상호</p><div class="input "><span class=muted>입력해 주세요</span></div></div><div class="field"><p class="label">결제일</p><div class="input "><span class=muted>입력해 주세요</span></div></div><div class="field"><p class="label">결제시각 · 선택</p><div class="input "><span class=muted>입력해 주세요</span></div></div><div class="field"><p class="label">통화</p><div class="input ">통화를 선택해 주세요</div></div><div class="field"><p class="label">결제 총액</p><div class="input "><span class=muted>입력해 주세요</span></div></div></section><section class="card"><h2>방문 연결</h2><p>결제일을 입력하면 장소를 연결할 수 있어요.</p></section><section class="card"><h2>메뉴·구매 내역</h2><p>메뉴를 읽지 못했어요. 직접 추가하거나 메뉴 없이 저장할 수 있어요.</p><div class="button  ">메뉴 추가</div></section><section class="card"><h2>저장 전 확인</h2><p>메뉴와 결제 총액을 확인해 주세요.</p><div class="choice">사진도 보관</div><div class="choice">내용만 보관</div><p class="meta">원본과 메뉴는 나와 여행 멤버가 볼 수 있어요. 공개 여행에는 자동으로 포함되지 않아요.</p><div class="choice">내용을 확인했어요</div></section><div class="button primary locked">영수증 저장</div>',
+            error:
+              '<p class="meta">오사카 여행 · 10월 20일–23일</p><div class="note"><h2>결제일을 확인해 주세요</h2><p>여행 기간 안의 날짜를 선택해 주세요. 입력한 내용은 그대로 있어요.</p></div><div class="button  ">원본 보기</div><section class="card"><h2>결제 정보</h2><div class="field"><p class="label">상호</p><div class="input ">골목 식당</div></div><div class="field"><p class="label">결제일</p><div class="input invalid">2026-10-25</div><p class=error>여행 기간 안의 날짜를 확인해 주세요.</p></div><div class="field"><p class="label">결제시각 · 선택</p><div class="input ">12:30</div></div><div class="field"><p class="label">통화</p><div class="input ">JPY · 일본 엔</div></div><div class="field"><p class="label">결제 총액</p><div class="input ">1,600</div></div></section><section class="card"><h2>방문 연결</h2><p>결제일을 입력하면 장소를 연결할 수 있어요.</p></section><section class="card"><h2>메뉴·구매 내역</h2><div class="field"><p class="label">1번 메뉴 이름</p><div class="input ">라멘</div></div><div class="field"><p class="label">수량 · 선택</p><div class="input ">2</div></div><div class="field"><p class="label">단가 · 선택</p><div class="input ">800 JPY</div></div><div class="field"><p class="label">품목 금액 · 선택</p><div class="input ">1,600 JPY</div></div><div class="button  ">1번 메뉴 삭제</div><div class="button  ">메뉴 추가</div></section><section class="card"><h2>저장 전 확인</h2><p>메뉴와 결제 총액을 확인해 주세요.</p><div class="choice selected">사진도 보관 · 선택됨</div><div class="choice">내용만 보관</div><p class="meta">원본과 메뉴는 나와 여행 멤버가 볼 수 있어요. 공개 여행에는 자동으로 포함되지 않아요.</p><div class="choice">내용을 확인했어요</div></section><div class="button primary locked">영수증 저장</div>',
+            busy: '<p class="meta">오사카 여행 · 10월 20일–23일</p><div class="note"><h2>저장하고 있어요</h2><p>완료되면 저장된 기록을 보여드릴게요.</p></div><div class="button  locked">원본 보기</div><section class="card"><h2>결제 정보</h2><div class="field"><p class="label">상호</p><div class="input ">골목 식당</div></div><div class="field"><p class="label">결제일</p><div class="input ">2026-10-21</div></div><div class="field"><p class="label">결제시각 · 선택</p><div class="input ">12:30</div></div><div class="field"><p class="label">통화</p><div class="input ">JPY · 일본 엔</div></div><div class="field"><p class="label">결제 총액</p><div class="input ">1,600</div></div></section><section class="card"><h2>방문 연결</h2><p class="meta">결제일에 맞춰 장소를 연결해요.</p><div class="choice">기존 일정 · 골목 식당</div><div class="choice selected">새 장소 기록 만들기</div><p class="meta">기존 계획은 바뀌지 않아요.</p></section><section class="card"><h2>메뉴·구매 내역</h2><div class="field"><p class="label">1번 메뉴 이름</p><div class="input ">라멘</div></div><div class="field"><p class="label">수량 · 선택</p><div class="input ">2</div></div><div class="field"><p class="label">단가 · 선택</p><div class="input ">800 JPY</div></div><div class="field"><p class="label">품목 금액 · 선택</p><div class="input ">1,600 JPY</div></div><div class="button  locked">1번 메뉴 삭제</div><div class="button  locked">메뉴 추가</div></section><section class="card"><h2>저장 전 확인</h2><p>메뉴와 결제 총액을 확인해 주세요.</p><div class="choice selected">사진도 보관 · 선택됨</div><div class="choice">내용만 보관</div><p class="meta">원본과 메뉴는 나와 여행 멤버가 볼 수 있어요. 공개 여행에는 자동으로 포함되지 않아요.</p><div class="choice selected">내용을 확인했어요 · 선택됨</div></section><div class="button primary locked">저장 중…</div>',
+          },
+          busyLabel: '저장 중',
+        },
+        {
+          key: 'edit',
+          title: '영수증 수정',
+          ref: '기존 237 수정 모드',
+          memo: '같은 기록 ID 유지. 수정 모드의 빈 상태는 메뉴만 비어 있는 기존 기록.',
+          states: {
+            normal:
+              '<p class="meta">오사카 여행 · 10월 20일–23일</p><div class="note"><h2>저장한 기록을 수정해요</h2><p>원본 사진과 보관 선택은 그대로 유지돼요.</p></div><div class="button  ">원본 보기</div><section class="card"><h2>결제 정보</h2><div class="field"><p class="label">상호</p><div class="input ">골목 식당</div></div><div class="field"><p class="label">결제일</p><div class="input ">2026-10-21</div></div><div class="field"><p class="label">결제시각 · 선택</p><div class="input ">12:30</div></div><div class="field"><p class="label">통화</p><div class="input ">JPY · 일본 엔</div></div><div class="field"><p class="label">결제 총액</p><div class="input ">1,600</div></div></section><section class="card"><h2>방문 연결</h2><div class="choice selected">현재 연결 · 골목 식당</div><div class="choice">새 장소 기록 만들기</div><p class="meta">날짜를 바꾸지 않으면 현재 연결을 유지해요.</p></section><section class="card"><h2>메뉴·구매 내역</h2><div class="field"><p class="label">1번 메뉴 이름</p><div class="input ">라멘</div></div><div class="field"><p class="label">수량 · 선택</p><div class="input ">2</div></div><div class="field"><p class="label">단가 · 선택</p><div class="input ">800 JPY</div></div><div class="field"><p class="label">품목 금액 · 선택</p><div class="input ">1,600 JPY</div></div><div class="button  ">1번 메뉴 삭제</div><div class="button  ">메뉴 추가</div></section><section class="card"><h2>저장 전 확인</h2><p>메뉴와 결제 총액을 확인해 주세요.</p><div class="choice selected">사진도 보관 · 변경할 수 없음</div><p class="meta">원본과 메뉴는 나와 여행 멤버가 볼 수 있어요. 공개 여행에는 자동으로 포함되지 않아요.</p><div class="choice selected">내용을 확인했어요 · 선택됨</div></section><div class="button primary ">변경 저장</div>',
+            empty:
+              '<div class="note"><h2>메뉴가 없는 기록이에요</h2><p>필요한 메뉴를 직접 추가할 수 있어요.</p></div><section class="card"><h2>메뉴·구매 내역</h2><p>메뉴를 읽지 못했어요. 직접 추가하거나 메뉴 없이 저장할 수 있어요.</p><div class="button  ">메뉴 추가</div></section><div class="button primary ">변경 저장</div>',
+            error:
+              '<div class="note"><h2>결제일에 맞는 장소를 골라 주세요</h2><p>다른 날짜로 바꿨다면 방문 연결도 다시 확인해 주세요.</p></div><section class="card"><h2>방문 연결</h2><p>이 날짜에 등록한 장소가 없어요.</p><div class="choice">새 장소 기록 만들기</div></section><div class="button primary locked">변경 저장</div>',
+            busy: '<p class="meta">오사카 여행 · 10월 20일–23일</p><div class="note"><h2>저장한 기록을 수정해요</h2><p>원본 사진과 보관 선택은 그대로 유지돼요.</p></div><div class="note"><h2>저장하고 있어요</h2><p>완료되면 저장된 기록을 보여드릴게요.</p></div><div class="button  locked">원본 보기</div><section class="card"><h2>결제 정보</h2><div class="field"><p class="label">상호</p><div class="input ">골목 식당</div></div><div class="field"><p class="label">결제일</p><div class="input ">2026-10-21</div></div><div class="field"><p class="label">결제시각 · 선택</p><div class="input ">12:30</div></div><div class="field"><p class="label">통화</p><div class="input ">JPY · 일본 엔</div></div><div class="field"><p class="label">결제 총액</p><div class="input ">1,600</div></div></section><section class="card"><h2>방문 연결</h2><div class="choice selected">현재 연결 · 골목 식당</div><div class="choice">새 장소 기록 만들기</div><p class="meta">날짜를 바꾸지 않으면 현재 연결을 유지해요.</p></section><section class="card"><h2>메뉴·구매 내역</h2><div class="field"><p class="label">1번 메뉴 이름</p><div class="input ">라멘</div></div><div class="field"><p class="label">수량 · 선택</p><div class="input ">2</div></div><div class="field"><p class="label">단가 · 선택</p><div class="input ">800 JPY</div></div><div class="field"><p class="label">품목 금액 · 선택</p><div class="input ">1,600 JPY</div></div><div class="button  locked">1번 메뉴 삭제</div><div class="button  locked">메뉴 추가</div></section><section class="card"><h2>저장 전 확인</h2><p>메뉴와 결제 총액을 확인해 주세요.</p><div class="choice selected">사진도 보관 · 변경할 수 없음</div><p class="meta">원본과 메뉴는 나와 여행 멤버가 볼 수 있어요. 공개 여행에는 자동으로 포함되지 않아요.</p><div class="choice selected">내용을 확인했어요 · 선택됨</div></section><div class="button primary locked">저장 중…</div>',
+          },
+          busyLabel: '저장 중',
+        },
+        {
+          key: 'original',
+          title: '영수증 원본',
+          ref: 'S4 · 238 보완안',
+          memo: '독립 원본 확대는 신규 보완안. 원본 미보관을 네트워크 오류와 구분.',
+          states: {
+            normal:
+              '<div class="photo"><div class="paper"><span class="receipt-lines"></span><p>원본 전체 · 비율 유지</p><span class="receipt-lines"></span></div></div><div class="button  ">원본 확대</div><div class="button primary ">입력으로 돌아가기</div>',
+            empty:
+              '<div class="note"><h2>원본 사진을 보관하지 않은 기록이에요</h2><p>확인한 내용은 기록에서 볼 수 있어요.</p></div><div class="button primary ">기록으로 돌아가기</div>',
+            error:
+              '<div class="note"><h2>사진을 불러오지 못했어요</h2><p>다시 시도하거나 입력 화면으로 돌아가 주세요.</p></div><div class="button primary ">다시 시도</div><div class="button  ">입력으로 돌아가기</div>',
+            busy: '<div class="note"><h2>원본을 불러오고 있어요</h2><p>사진을 확인한 뒤 입력을 이어갈 수 있어요.</p></div>',
+          },
+          busyLabel: '조회 중',
+        },
+        {
+          key: 'duplicate',
+          title: '비슷한 결제 확인',
+          ref: 'S7',
+          memo: '후보 없음은 설명용 상태이며 실제 앱에서는 저장으로 진행.',
+          states: {
+            normal:
+              '<div class="note"><h2>이미 적은 결제인지 확인해 주세요</h2><p>같은 날짜와 금액의 기록이 있어요.</p></div><section class="card"><h2>기존 기록</h2><p>골목 식당 · 10월 21일 12:30</p><p>1,600 JPY · 영수증 기록</p></section><div class="button  ">기존 기록 보기</div><div class="button primary ">별도 결제로 계속</div><div class="button  ">내용으로 돌아가기</div>',
+            empty:
+              '<div class="note"><h2>비교할 기록이 없어요</h2><p>새 기록 저장으로 이어집니다.</p></div>',
+            error:
+              '<div class="note"><h2>기존 기록을 확인하지 못했어요</h2><p>다시 확인하거나 입력 화면으로 돌아가 주세요.</p></div><div class="button primary ">다시 확인</div><div class="button  ">내용으로 돌아가기</div>',
+            busy: '<div class="note"><h2>비슷한 결제를 확인하고 있어요</h2><p>중복으로 적은 내역이 없는지 확인해요.</p></div><div class="button primary locked">확인 중</div>',
+          },
+          busyLabel: '비교 중',
+        },
+        {
+          key: 'exact',
+          title: '이미 등록한 영수증',
+          ref: 'E7',
+          memo: '확정 중복에는 별도 결제로 계속 버튼이 없음.',
+          states: {
+            normal:
+              '<div class="note"><h2>이미 등록한 영수증이에요</h2><p>기존 기록을 확인해 주세요.</p></div><div class="button primary ">기존 기록 보기</div><div class="button  ">등록 취소</div>',
+            empty:
+              '<div class="note"><h2>기존 기록을 다시 확인해 주세요</h2><p>목록을 새로 확인한 뒤 진행할 수 있어요.</p></div><div class="button primary ">다시 확인</div>',
+            error:
+              '<div class="note"><h2>기존 기록을 불러오지 못했어요</h2><p>재시도하거나 등록을 취소해 주세요.</p></div><div class="button primary ">다시 확인</div><div class="button  ">등록 취소</div>',
+            busy: '<div class="note"><h2>기존 기록을 확인하고 있어요</h2><p>같은 영수증을 다시 저장하지 않아요.</p></div>',
+          },
+          busyLabel: '조회 중',
+        },
+        {
+          key: 'result',
+          title: '저장 결과 확인',
+          ref: 'S8 · E5 · E6',
+          memo: '성공은 상세로 이동. 오류·결과 미확인 상태에서 새 ID로 저장하지 않음.',
+          states: {
+            normal:
+              '<div class="note"><h2>저장 결과를 확인했어요</h2><p>기록 상세로 이동합니다.</p></div>',
+            empty:
+              '<div class="note"><h2>아직 결과를 확인하지 못했어요</h2><p>다시 등록하지 말고 저장 결과를 확인해 주세요.</p></div><div class="button primary ">저장 결과 확인</div>',
+            error:
+              '<div class="note"><h2>저장 결과를 확인하지 못했어요</h2><p>같은 기록의 저장 결과를 다시 확인해 주세요.</p></div><div class="button primary ">결과 다시 확인</div>',
+            busy: '<div class="note"><h2>저장하고 있어요</h2><p>같은 기록이 두 번 생기지 않도록 기다려 주세요.</p></div><div class="button primary locked">저장 중…</div>',
+          },
+          busyLabel: '저장 중',
+        },
+        {
+          key: 'detail',
+          title: '영수증 기록',
+          ref: 'S9',
+          memo: '정상은 가상 저장 결과의 배치 예시. 실제 저장 성공을 뜻하지 않음.',
+          states: {
+            normal:
+              '<section class="card"><h2>골목 식당</h2><p>10월 21일 · 12:30</p><p>1,600 JPY · 실제 지출</p><p>라멘 2개</p><p class="meta">영수증으로 남긴 기록 · 원본 사진 보관됨</p></section><div class="button primary ">영수증 기록 수정</div><div class="button  ">다음 영수증 등록</div><div class="button  ">여행 기록 보기</div><div class="button  ">영수증 삭제</div>',
+            empty:
+              '<div class="note"><h2>기록을 찾을 수 없어요</h2><p>여행 기록에서 다시 확인해 주세요.</p></div><div class="button primary ">여행 기록 보기</div>',
+            error:
+              '<div class="note"><h2>기록을 불러오지 못했어요</h2><p>다시 시도하거나 여행 기록으로 돌아가 주세요.</p></div><div class="button primary ">다시 시도</div><div class="button  ">여행 기록 보기</div>',
+            busy: '<div class="note"><h2>기록을 불러오고 있어요</h2><p>저장된 날짜와 메뉴를 확인하고 있어요.</p></div>',
+          },
+          busyLabel: '조회 중',
+        },
+        {
+          key: 'difference',
+          title: '결제 합계 확인',
+          ref: 'E4 · 715',
+          memo: '합계 차이 자체는 오류가 아님. 처리 중은 S8에 합쳐지는 상태.',
+          states: {
+            normal:
+              '<section class="card"><h2>합계가 달라요</h2><p>메뉴 합계 1,500 JPY</p><p>결제 총액 1,600 JPY</p><p class="meta">세금이나 할인 내역을 원본에서 확인해 주세요.</p></section><div class="button primary ">차이를 확인했어요</div><div class="button  ">금액 수정</div><div class="button  ">원본 보기</div>',
+            empty:
+              '<div class="note"><h2>비교할 메뉴 금액이 없어요</h2><p>결제 총액을 원본에서 확인해 주세요.</p></div><div class="button primary ">내용으로 돌아가기</div>',
+            error:
+              '<div class="note"><h2>결제 총액을 확인해 주세요</h2><p>올바른 금액을 입력한 뒤 계속할 수 있어요.</p></div><div class="button primary ">금액 수정</div>',
+            busy: '<div class="note"><h2>저장하고 있어요</h2><p>확인한 결제 총액으로 저장하고 있어요.</p></div><div class="button primary locked">저장 중…</div>',
+          },
+          busyLabel: '확인 후 저장',
+        },
+        {
+          key: 'exit',
+          title: '작성 중인 내용',
+          ref: 'X · E6',
+          memo: '실제 구현은 공통 확인 시트. 전체 카드 형태는 내용·행동 순서 설명용.',
+          states: {
+            normal:
+              '<div class="note"><h2>작성 중인 내용을 나갈까요?</h2><p>아직 저장하지 않은 변경은 남지 않아요.</p></div><div class="button primary ">계속 작성</div><div class="button  ">나가기</div>',
+            empty:
+              '<div class="note"><h2>작성한 내용이 없어요</h2><p>이전 화면으로 돌아갈 수 있어요.</p></div><div class="button primary ">돌아가기</div>',
+            error:
+              '<div class="note"><h2>동행자가 내용을 바꿨어요</h2><p>입력한 내용을 보관한 채 최신 기록을 확인해 주세요.</p></div><div class="button primary ">최신 내용 비교</div><div class="button  ">계속 작성</div>',
+            busy: '<div class="note"><h2>저장이 끝났는지 확인이 필요해요</h2><p>나가도 저장이 취소되는 것은 아니에요.</p></div><div class="button primary ">결과 다시 확인</div><div class="button  ">나가기</div>',
+          },
+          busyLabel: '저장 결과 불확실',
+        },
+        {
+          key: 'access',
+          title: '여행 기록 안내',
+          ref: 'E0',
+          memo: '보관 해제 행동은 해당 권한을 가진 사용자에게만 표시. 뷰어에게는 제공하지 않음.',
+          states: {
+            normal:
+              '<div class="note"><h2>이 여행은 조회만 할 수 있어요</h2><p>기록을 수정하려면 여행 소유자에게 편집 권한을 요청해 주세요.</p></div><div class="button primary ">여행 기록 보기</div>',
+            empty:
+              '<div class="note"><h2>로그인이 필요해요</h2><p>로그인한 뒤 선택한 여행을 다시 확인할 수 있어요.</p></div><div class="button primary ">로그인</div><div class="button  ">돌아가기</div>',
+            error:
+              '<div class="note"><h2>보관 중인 여행이에요</h2><p>기록을 추가하려면 먼저 여행 보관을 해제해 주세요.</p></div><div class="button primary ">보관 해제 화면으로</div><div class="button  ">여행 기록 보기</div>',
+            busy: '<div class="note"><h2>여행 권한을 확인하고 있어요</h2><p>확인 후 가능한 행동을 보여드릴게요.</p></div>',
+          },
+          busyLabel: '조회 중',
+        },
+        {
+          key: 'delete',
+          title: '영수증 삭제',
+          ref: 'S9 삭제 확인',
+          memo: '공통 확인 시트의 내용·행동 스케치. 보관 사진은 기록 삭제 후 별도 삭제.',
+          states: {
+            normal:
+              '<div class="note"><h2>영수증을 삭제할까요?</h2><p>영수증과 연결된 지출이 삭제돼요. 장소 일정과 보관 사진은 남아요.</p></div><div class="button primary ">취소</div><div class="button  ">영수증 삭제</div>',
+            empty:
+              '<div class="note"><h2>이미 삭제된 기록이에요</h2><p>여행 기록으로 돌아가 주세요.</p></div><div class="button primary ">여행 기록 보기</div>',
+            error:
+              '<div class="note"><h2>삭제하지 못했어요</h2><p>기존 기록은 그대로 있어요. 다시 시도해 주세요.</p></div><div class="button primary ">다시 시도</div><div class="button  ">취소</div>',
+            busy: '<div class="note"><h2>삭제하고 있어요</h2><p>처리 결과를 확인할 때까지 기다려 주세요.</p></div><div class="button primary locked">삭제 중</div>',
+          },
+          busyLabel: '삭제 중',
+        },
+      ];
+      const picker = document.querySelector('#screen');
+      // 검토 도구만 동작하며 화면 내부 행동은 실제 서비스를 실행하지 않는다.
+      for (const s of screens) {
+        const o = document.createElement('option');
+        o.value = s.key;
+        o.textContent = s.ref + ' · ' + s.title;
+        picker.append(o);
+      }
+      picker.value = 'confirm';
+      function render() {
+        const s = screens.find((x) => x.key === picker.value);
+        const state = document.querySelector('#state').value;
+        const keys =
+          state === 'all' ? ['normal', 'empty', 'error', 'busy'] : [state];
+        const names = {
+          normal: '정상',
+          empty: '빈 상태',
+          error: '오류·복구',
+          busy: s.busyLabel,
+        };
+        document.querySelector('#memo').textContent = s.memo;
+        document.querySelector('#board').innerHTML = keys
+          .map(
+            (k) =>
+              `<section class="panel" style="--width:${document.querySelector('#width').value}px"><p class="caption">${s.ref} · ${names[k]}</p><div class="phone ${k === 'busy' && s.busyLabel === '저장 중' ? 'saving' : ''}" inert style="--z:${document.querySelector('#scale').value}"><header class="header"><span class="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></span><h1>${s.title}</h1></header><div class="content">${s.states[k]}</div></div></section>`,
+          )
+          .join('');
+      }
+      for (const el of document.querySelectorAll('select'))
+        el.addEventListener('change', render);
+      render();
+    </script>
+  </body>
+</html>
