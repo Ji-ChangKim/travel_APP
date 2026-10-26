@@ -254,14 +254,120 @@
           width: 100%;
         }
       }
+
+      /* 기존 Ledger 시안의 면과 정보 위계를 적용한다. 공통 헤더 수치는 유지한다. */
+      .phone {
+        border-color: #d3e4fe;
+        border-radius: 16px;
+        min-height: 780px;
+      }
+      .card {
+        border: 0;
+      }
+      .note {
+        border: 0;
+      }
+      .input {
+        background: #eff4ff;
+      }
+      .input.invalid {
+        background: #fceeef;
+      }
+      .photo {
+        border-color: #d3e4fe;
+      }
+      .content > .meta:first-child {
+        padding: 12px 16px;
+        border-radius: 12px;
+        background: #eff4ff;
+      }
+      .card h2 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .section-icon {
+        width: 24px;
+        height: 24px;
+        flex: none;
+        color: #ae3115;
+      }
+      .haru {
+        width: 190px;
+        height: 210px;
+        max-width: 100%;
+        object-fit: contain;
+        justify-self: center;
+      }
+      .state-note {
+        background: #fff;
+        text-align: center;
+      }
+      .state-note p {
+        color: #45464d;
+        font-size: calc(14px * var(--z));
+        line-height: calc(22px * var(--z));
+      }
+      .state-note:has(.haru) {
+        padding: 24px;
+      }
+      .receipt-preview {
+        display: grid;
+        gap: 12px;
+      }
+      .receipt-preview .photo {
+        min-height: 180px;
+        padding: 16px;
+      }
+      .receipt-preview .paper {
+        min-height: 140px;
+        gap: 12px;
+      }
+      .receipt-preview .receipt-lines {
+        height: 24px;
+      }
+      .privacy-copy {
+        background: #fffdf5;
+        color: #78350f;
+        padding: 16px;
+        border-radius: 12px;
+      }
+      .tools {
+        border-bottom-color: #d3e4fe;
+      }
+      .tools-brand {
+        width: 154px;
+        height: 48px;
+        object-fit: contain;
+        object-position: left;
+        margin-bottom: 12px;
+      }
+      .caption {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .caption::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        background: #ae3115;
+        border-radius: 50%;
+        flex: none;
+      }
     </style>
   </head>
   <body>
     <header class="tools">
-      <h1>영수증 모바일 상태 스케치</h1>
+      <img
+        class="tools-brand"
+        src="../../../apps/mobile/assets/brand/tripprint-v1/TripPrint_logo-horizontal-navy_1024x320.png"
+        alt="TripPrint"
+      />
+      <h1>영수증 모바일 디자인 검토안</h1>
       <p>
-        검토용 배치 시안 · 정책 승인 / 화면 검토 중 · 가상 여행·금액 예시 · 실제
-        촬영·인식·저장 기능 없음
+        기존 Ledger 시안 적용 · 정책 승인 / 화면 검토 중 · 가상 여행·금액 예시 ·
+        실제 촬영·인식·저장 기능 없음
       </p>
       <div class="controls">
         <label>화면<select id="screen"></select></label
@@ -526,6 +632,50 @@
         picker.append(o);
       }
       picker.value = 'confirm';
+      // 원본 시안의 정보 카드와 브랜드 자산만 적용하고 상태별 문구·정책은 보존한다.
+      function applyDesign(screen, state) {
+        const body = document.createElement('div');
+        body.innerHTML = screen.states[state];
+        const poses = {
+          empty: 'TripPrint_Haru_empty_1024x1536.png',
+          error: 'TripPrint_Haru_error_1024x1536.png',
+          busy: 'TripPrint_Haru_loading_1233x1275.png',
+        };
+        const note = body.querySelector('.note');
+        if (note && poses[state]) {
+          note.classList.add('state-note');
+          const portrait = document.createElement('img');
+          portrait.className = 'haru';
+          portrait.alt = '';
+          portrait.src =
+            '../../../apps/mobile/assets/brand/haru-v1/' + poses[state];
+          note.prepend(portrait);
+        }
+        const icon =
+          '<svg class="section-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Zm3 4h6M9 11h6M9 15h4"/></svg>';
+        for (const heading of body.querySelectorAll('.card h2'))
+          heading.insertAdjacentHTML('afterbegin', icon);
+        for (const p of body.querySelectorAll('.meta')) {
+          if (p.textContent.startsWith('원본과 메뉴는'))
+            p.classList.add('privacy-copy');
+        }
+        if (screen.key === 'confirm') {
+          const original = [...body.querySelectorAll('.button')].find(
+            (e) => e.textContent === '원본 보기',
+          );
+          if (original) {
+            const preview = document.createElement('section');
+            preview.className = 'card receipt-preview';
+            preview.innerHTML =
+              '<h2>' +
+              icon +
+              '영수증 원본</h2><div class="photo"><div class="paper"><span class="receipt-lines"></span><p class="meta">원본 이미지 자리<br>검토용 도형</p><span class="receipt-lines"></span></div></div>';
+            original.before(preview);
+            preview.append(original);
+          }
+        }
+        return body.innerHTML;
+      }
       function render() {
         const s = screens.find((x) => x.key === picker.value);
         const state = document.querySelector('#state').value;
@@ -541,7 +691,7 @@
         document.querySelector('#board').innerHTML = keys
           .map(
             (k) =>
-              `<section class="panel" style="--width:${document.querySelector('#width').value}px"><p class="caption">${s.ref} · ${names[k]}</p><div class="phone ${k === 'busy' && s.busyLabel === '저장 중' ? 'saving' : ''}" inert style="--z:${document.querySelector('#scale').value}"><header class="header"><span class="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></span><h1>${s.title}</h1></header><div class="content">${s.states[k]}</div></div></section>`,
+              `<section class="panel" style="--width:${document.querySelector('#width').value}px"><p class="caption">${s.ref} · ${names[k]}</p><div class="phone ${k === 'busy' && s.busyLabel === '저장 중' ? 'saving' : ''}" inert style="--z:${document.querySelector('#scale').value}"><header class="header"><span class="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></span><h1>${s.title}</h1></header><div class="content">${applyDesign(s, k)}</div></div></section>`,
           )
           .join('');
       }
