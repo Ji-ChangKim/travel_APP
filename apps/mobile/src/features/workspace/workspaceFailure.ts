@@ -38,6 +38,8 @@ function httpFailure(
 ): string {
   // 메시지 부분에 코드가 섞여 있어도 회원 전환이나 동행 충돌로 오인하지 않는다.
   const code = foundationErrorCode(error);
+  if (code === 'RECEIPT_CLEANUP_PENDING')
+    return '영수증 내용은 저장됐지만 원본 사진 정리가 끝나지 않았어요. 다시 저장을 누르면 같은 기록의 사진 정리만 재시도해요.';
   if (error.status === 403 && code === 'MEMBERSHIP_REQUIRED')
     return '이 기능은 회원가입 후 사용할 수 있어요. 기기의 여행 기록은 그대로 보관돼요.';
   if (isWorkspaceVersionConflict(error))

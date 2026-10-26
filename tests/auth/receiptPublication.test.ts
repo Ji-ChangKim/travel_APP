@@ -36,6 +36,7 @@ function receiptForm(amount = '0.31'): PlanForm {
       receiptStatus: 'ready',
       receiptConfirmed: 'true',
       keepPhoto: 'false',
+      newReceiptPlace: 'true',
     },
   };
 }
@@ -188,7 +189,11 @@ test('R10 합계·품목·통화·연결 수정과 수정 시작은 두 확인�
     }),
     Array.from({ length: 6 }, () => {
       // 동일한 확인 무효화 계약을 기대한다.
-      return { receiptConfirmed: 'false', totalDifferenceAccepted: 'false' };
+      return {
+        receiptConfirmed: 'false',
+        totalDifferenceAccepted: 'false',
+        duplicateAccepted: '',
+      };
     }),
   );
 });

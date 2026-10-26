@@ -561,7 +561,7 @@ function applyCommand(
     case 'receipt.confirm':
       return confirmReceipt(s, command.input, identify);
     case 'receipt.update':
-      return updateReceipt(s, command.input);
+      return updateReceipt(s, command.input, identify);
     case 'receipt.delete':
       return changed(s, {
         receipts: without(s.receipts, command.input.id),
@@ -680,6 +680,7 @@ function confirmReceipt(
 function updateReceipt(
   s: Snapshot,
   input: Extract<WorkspaceCommand, { operation: 'receipt.update' }>['input'],
+  identify: WorkspaceId,
 ): Change {
   // 확정한 원본·보관 선택은 바꾸지 않고 같은 영수증·지출만 교체한다.
   return s.receipts.some((receipt) => {
@@ -691,7 +692,6 @@ function updateReceipt(
     );
   }) &&
     validDay(s, input.dayId) &&
-    Boolean(input.scheduleId) &&
     validSchedule(s, input.scheduleId, input.dayId) &&
     s.days.some((day) => {
       // 수정한 결제일도 같은 여행 날짜에 연결한다.
@@ -704,7 +704,7 @@ function updateReceipt(
           expenses: without(s.expenses, input.id),
         },
         input,
-        input.scheduleId!,
+        input.scheduleId || identify(),
       )
     : rejectRequest('VALIDATION_FAILED');
 }

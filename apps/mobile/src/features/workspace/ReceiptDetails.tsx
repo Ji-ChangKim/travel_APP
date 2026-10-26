@@ -13,6 +13,10 @@ export default function ReceiptDetails({
   return (
     <View style={{ gap: 6 }}>
       <Text style={styles.subtitle}>
+        영수증으로 기록 ·{' '}
+        {receipt.keepPhoto === false ? '원본 미보관' : '원본 보관'}
+      </Text>
+      <Text style={styles.subtitle}>
         결제 일시 · {receipt.date} {receipt.transactionTime || ''}
       </Text>
       {receipt.address && (

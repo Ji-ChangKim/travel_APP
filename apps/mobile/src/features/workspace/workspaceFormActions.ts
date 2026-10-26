@@ -217,6 +217,12 @@ export function useWorkspaceFormActions({
               ...(key === 'transactionDate' && previous.kind === 'receipt'
                 ? receiptDateValues(snapshot, value)
                 : {}),
+              ...(key === 'newReceiptPlace' && previous.kind === 'receipt'
+                ? { scheduleId: '' }
+                : {}),
+              ...(key === 'scheduleId' && previous.kind === 'receipt'
+                ? { newReceiptPlace: 'false' }
+                : {}),
               ...(key === 'dayId' && previous.kind === 'receipt'
                 ? { scheduleId: '' }
                 : key === 'scheduleId' && value

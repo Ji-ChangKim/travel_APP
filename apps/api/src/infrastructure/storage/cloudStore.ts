@@ -228,6 +228,16 @@ function changeStatements(m: Mutation, change: Change): D1PreparedStatement[] {
           guarded(
             m,
             change.snapshot,
+            'INSERT OR IGNORE INTO receipt_cleanup_jobs(path,trip_id,created_at) SELECT ?,?,? WHERE EXISTS(SELECT 1 FROM trips WHERE id=? AND last_key=?)',
+            [
+              change.result.discardedReceiptPath,
+              change.snapshot.trip.id,
+              Date.now(),
+            ],
+          ),
+          guarded(
+            m,
+            change.snapshot,
             'UPDATE uploads SET deleted_at=coalesce(deleted_at,?) WHERE path=? AND trip_id=? AND EXISTS(SELECT 1 FROM trips WHERE id=? AND last_key=?)',
             [
               Date.now(),

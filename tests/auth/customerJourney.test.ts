@@ -185,12 +185,31 @@ for (const keepPhoto of [true, false])
         input: { ...input, keepPhoto: !keepPhoto },
       }),
     );
-    assert.throws(() =>
-      change(snapshot, {
-        operation: 'receipt.update',
-        input: { ...input, scheduleId: undefined },
-      }),
+    const relinked = change(snapshot, {
+      operation: 'receipt.update',
+      input: {
+        ...input,
+        scheduleId: undefined,
+        dayId: snapshot.days[2]!.id,
+        transactionDate: '2026-10-03',
+      },
+    });
+    assert.equal(relinked.receipts[0]!.id, receiptId);
+    assert.equal(
+      relinked.expenses.filter((item) => item.id === receiptId).length,
+      1,
     );
+    assert.equal(relinked.itinerary.length, 2);
+    assert.deepEqual(relinked.itinerary[0], snapshot.itinerary[0]);
+    assert.equal(
+      relinked.expenses.find((item) => item.id === receiptId)?.dayId,
+      snapshot.days[2]!.id,
+    );
+    if (keepPhoto)
+      assert.equal(
+        relinked.media[0]?.scheduleId,
+        relinked.receipts[0]?.scheduleId,
+      );
     assert.equal(tripLifecycle(snapshot.trip, '2026-10-16'), 'COMPLETED');
     assert.equal(snapshot.trip.status, 'PLANNED');
     const publish = {

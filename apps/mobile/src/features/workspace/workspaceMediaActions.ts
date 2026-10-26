@@ -5,7 +5,13 @@ import {
 } from '@wherego/api-client';
 import type { Profile, WorkspaceSnapshot } from '@wherego/domain';
 import { type WorkspaceCommand } from '@wherego/validation';
-import { type Dispatch, type RefObject, type SetStateAction } from 'react';
+import {
+  useEffect,
+  useRef,
+  type Dispatch,
+  type RefObject,
+  type SetStateAction,
+} from 'react';
 import { type PlanForm } from './forms';
 import { receiptForm } from './receiptFlow';
 import {
@@ -44,7 +50,7 @@ export function useWorkspaceMediaActions({
   setScanning,
   userId,
   setShowReceiptCapture,
-  running,
+  running: runningRef,
   pending,
   setBusy,
   setError,
@@ -73,6 +79,14 @@ export function useWorkspaceMediaActions({
 }) {
   // 전달받은 참조와 콜백으로 해당 작업의 수명을 구성한다.
 
+  const lifetimeRef = useRef<object | null>(null);
+  useEffect(() => {
+    lifetimeRef.current = { userId, tripId: snapshot?.trip.id };
+    return () => {
+      lifetimeRef.current = null;
+    };
+  }, [userId, snapshot?.trip.id]);
+
   const receipt = function receipt(mediaId: string): Promise<unknown> {
     // 권한·일정 스냅샷이 있는 현재 화면만 인식 요청을 시작한다.
     return user?.authProvider === 'guest' && snapshot
@@ -87,6 +101,7 @@ export function useWorkspaceMediaActions({
   const beginReceiptScan = function beginReceiptScan(
     mediaId: string,
   ): Promise<unknown> {
+    const lifetime = lifetimeRef.current;
     // 상태 갱신과 초안 요청을 순서대로 처리한다.
     return Promise.resolve(setScanning(true))
       .then(() => {
@@ -102,19 +117,24 @@ export function useWorkspaceMediaActions({
       })
       .then((draft) => {
         // 계정 전환 이후에는 이전 계정의 인식 결과를 표시하지 않는다.
-        return useTripStore.getState().currentUser?.id === userId
+        return lifetime !== null &&
+          lifetimeRef.current === lifetime &&
+          useTripStore.getState().currentUser?.id === userId
           ? setForm(receiptForm(snapshot!, mediaId, draft))
           : undefined;
       })
       .catch((failure: unknown) => {
         // 실패를 빈 수동 입력 성공으로 대체하지 않고 재스캔을 안내한다.
-        return useTripStore.getState().currentUser?.id === userId
+        return lifetime !== null &&
+          lifetimeRef.current === lifetime &&
+          useTripStore.getState().currentUser?.id === userId
           ? setForm(receiptScanFailure(snapshot!, mediaId, failure))
           : undefined;
       })
       .finally(() => {
         // 완료 또는 실패 시에만 다음 사용자의 선택을 허용한다.
-        return setScanning(false);
+        if (lifetime !== null && lifetimeRef.current === lifetime)
+          setScanning(false);
       });
   };
   // 사용자 선택 사진을 비공개 저장하고 용도 메타데이터를 등록한다.
@@ -134,10 +154,11 @@ export function useWorkspaceMediaActions({
     camera = false,
     scheduleId?: string,
   ): void {
+    const lifetime = lifetimeRef.current;
     // 렌더링 이전 연속 선택을 막고 시작한 계정의 여행에만 사진을 저장한다.
-    return !snapshot || running.current || pending.current
+    return !snapshot || runningRef.current || pending.current
       ? undefined
-      : void ((running.current = true),
+      : void ((runningRef.current = true),
         setBusy(true),
         setError(''),
         selectImage(camera)
@@ -149,7 +170,10 @@ export function useWorkspaceMediaActions({
             // 계정 전환 이전 원본을 새 계정의 메타데이터로 등록하지 않는다.
             return (
               finishOperation(),
-              media && useTripStore.getState().currentUser?.id === userId
+              media &&
+              lifetime !== null &&
+              lifetimeRef.current === lifetime &&
+              useTripStore.getState().currentUser?.id === userId
                 ? command(
                     {
                       operation: 'media.register',
@@ -165,8 +189,10 @@ export function useWorkspaceMediaActions({
                           return Promise.resolve(
                             setTimeout(() => {
                               // execute의 성공 폼 초기화 이후 영수증 폼을 시작한다.
-                              return useTripStore.getState().currentUser?.id ===
-                                userId
+                              return lifetime !== null &&
+                                lifetimeRef.current === lifetime &&
+                                useTripStore.getState().currentUser?.id ===
+                                  userId
                                 ? void receipt(media.id)
                                 : undefined;
                             }, 0),
@@ -180,6 +206,8 @@ export function useWorkspaceMediaActions({
           .catch((failure: unknown) => {
             // 업로드 실패를 성공으로 안내하지 않으며 이전 계정의 오류는 표시하지 않는다.
             return void (finishOperation(),
+            lifetime !== null &&
+            lifetimeRef.current === lifetime &&
             useTripStore.getState().currentUser?.id === userId
               ? setError(workspaceError(failure))
               : undefined);

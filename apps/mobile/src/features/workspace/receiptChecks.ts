@@ -1,6 +1,10 @@
-import type { ReceiptItem, WorkspaceSnapshot } from '@wherego/domain';
+import type { WorkspaceSnapshot } from '@wherego/domain';
 import { z } from 'zod';
-import { receiptItemSchema, receiptTotalDifference } from '@wherego/validation';
+import {
+  receiptItemSchema,
+  receiptTotalDifference,
+  receiptDuplicateReview,
+} from '@wherego/validation';
 import type { PlanForm } from './forms';
 
 // 인식 결과나 연결 일정을 바꾸면 이전 정보 확인을 무효화한다.
@@ -30,21 +34,35 @@ export function receiptConfirmationValues(
             'details',
             'dayId',
             'scheduleId',
+            'newReceiptPlace',
           ].includes(key) ||
           (key === 'receiptEditing' && value === 'true')
-        ? { receiptConfirmed: 'false', totalDifferenceAccepted: 'false' }
+        ? {
+            receiptConfirmed: 'false',
+            totalDifferenceAccepted: 'false',
+            duplicateAccepted: '',
+          }
         : {};
 }
 
 // 두 가지 사용자 선택을 모두 마친 영수증만 저장할 수 있다.
-export function receiptCanSave(form: PlanForm): boolean {
+export function receiptCanSave(
+  form: PlanForm,
+  snapshot?: WorkspaceSnapshot,
+): boolean {
+  const review =
+    snapshot && receiptDuplicateReview(snapshot, form.id, form.values);
   // 날짜·필수 정보·인식 상태와 명시적인 사진 선택을 함께 확인한다.
   return Boolean(
+    (!review ||
+      (!review.exact &&
+        (!review.candidates.length ||
+          form.values.duplicateAccepted === review.fingerprint))) &&
     ['KRW', 'JPY', 'USD'].includes(form.values.currency || '') &&
     (!receiptDifference(form) ||
       form.values.totalDifferenceAccepted === 'true') &&
     form.values.dayId &&
-    (form.values.receiptOperation !== 'update' || form.values.scheduleId) &&
+    (form.values.scheduleId || form.values.newReceiptPlace === 'true') &&
     form.values.merchant &&
     form.values.amount &&
     ['ready', 'manual'].includes(form.values.receiptStatus || '') &&
@@ -54,13 +72,19 @@ export function receiptCanSave(form: PlanForm): boolean {
 }
 
 // 폼에 보존한 메뉴별 후보를 런타임 검증하여 읽는다.
-export function receiptItems(value = '[]'): ReceiptItem[] {
+const receiptItemDraftSchema = receiptItemSchema.extend({
+  name: z.string(),
+  unitPrice: z.string(),
+  amount: z.string(),
+  quantity: z.union([z.string(), z.number(), z.null()]),
+  rowId: z.string().optional(),
+});
+
+export function receiptItems(
+  value = '[]',
+): z.infer<typeof receiptItemDraftSchema>[] {
   // 손상된 초안을 메뉴가 없는 영수증처럼 조용히 저장하지 않는다.
-  return receiptItemSchema
-    .extend({ name: z.string(), unitPrice: z.string(), amount: z.string() })
-    .array()
-    .max(50)
-    .parse(JSON.parse(value));
+  return receiptItemDraftSchema.array().max(50).parse(JSON.parse(value));
 }
 
 // 사용자가 메뉴 항목 하나를 수정한 결과만 직렬화한다.
@@ -73,16 +97,12 @@ export function changedReceiptItem(
   // 다른 메뉴명·금액과 원문 후보를 보존한다.
   return JSON.stringify(
     receiptItems(value).map((item, current) => {
-      // 수량만 숫자로 변환하고 금액은 소수 문자열을 유지한다.
+      // 수량과 금액의 입력 문자열을 보존하고 저장 단계에서 검증한다.
       return current === index
         ? {
             ...item,
-            [key]:
-              key === 'quantity'
-                ? /^[1-9]\d*$/.test(next) && Number(next) <= 10000
-                  ? Number(next)
-                  : null
-                : next,
+            // 잘못 입력한 수량도 보존해 오류를 고칠 수 있게 한다.
+            [key]: next,
           }
         : item;
     }),
@@ -98,6 +118,7 @@ export function receiptDateValues(
   return {
     transactionDate: date,
     scheduleId: '',
+    newReceiptPlace: 'false',
     dayId:
       snapshot?.days.find((day) => {
         // 날짜별 기록이 다른 DAY에 저장되지 않게 한다.

@@ -143,6 +143,7 @@ export {
 } from './discovery';
 
 export * from './receiptReview';
+export * from './receiptDuplicates';
 export * from './communityFeed';
 export * from './communityImport';
 export * from './planning';

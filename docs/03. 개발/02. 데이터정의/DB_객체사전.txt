@@ -2538,3 +2538,15 @@ API POST /api/v1/trips/:tripId/routes: 인증·멤버십 및 저장된 일정의
 API POST /public/community/:postId/routes: 현재 공개 중인 계획에 저장된 동일 구간·수단만 조회한다. private DAY UUID·좌표·임의 URL 입력은 허용하지 않는다. 철회·비공개 일정은 공급자 호출 전에 거부한다.
 응답 RouteEstimate: tripVersion?:양의 정수, fromScheduleId UUID,toScheduleId UUID,mode enum,durationSeconds 유한 비음수 number,distanceMeters 유한 비음수 number,queriedAt ISO datetime. 클라이언트 메모리에서 조회 시각 기준 예상값으로 표시하고 no-store를 유지한다. 저장된 수단을 재조회할 때 숫자는 새로 요청한다. 권한 거절·외부 오류·빈 경로·키 누락은 성공값이나 가짜 경로로 대체하지 않는다.
 화면 입력 PlanForm.kind에는 destinations를 추가한다. values.destinations/assignments/additionalDestinations는 편집 중 JSON 문자열이며 확정 스키마로 검증한다. 계정·DAY·여행 버전·관심사·이동수단이 바뀌거나 화면 종료·백그라운드 진입 시 이전 조회 결과를 폐기한다.
+
+
+[2026-10-26 영수증 P0 계약 보완]
+DB명: Cloudflare D1 wherego-staging(배포 대상). 이번 검증은 격리된 로컬 D1/R2에서 수행했으며 원격 마이그레이션은 적용하지 않았다. 기존 trips.snapshot TEXT NOT NULL JSON, trips.version INTEGER, mutation_requests, uploads를 재사용한다.
+마이그레이션: apps/api/migrations/0009_receipt_cleanup_jobs.sql. receipt_cleanup_jobs: path TEXT PRIMARY KEY(R2 원본 경로), trip_id TEXT NOT NULL(원래 여행 UUID), created_at INTEGER NOT NULL(정리 등록 Unix ms), attempted_at INTEGER NULL(마지막 시도 Unix ms), completed_at INTEGER NULL(정리 완료 Unix ms), attempts INTEGER NOT NULL DEFAULT 0 CHECK >=0(시도 수). receipt_cleanup_pending 인덱스는 completed_at,attempted_at 순이다. 여행 삭제 후에도 원본 정리를 계속해야 하므로 trip_id에 삭제 연쇄 FK를 두지 않는다. 이미지·OCR 원문은 저장하지 않는다.
+정리 작업은 영수증 확정과 같은 CAS 트랜잭션에서 등록한다. 이전 mutation_requests의 discardedReceiptPath/tripId와 삭제 표시된 uploads가 모두 일치하는 행도 보완 등록하며, 이미 삭제된 R2 객체의 재삭제는 멱등 처리한다. 예약 실행은 미완료 최대50건을 오래된 시도부터 재시도한다.
+receipt.update 입력 scheduleId?: UUID: 생략하면 선택 dayId의 새 장소를 동일 원자 변경에서 생성한다. 영수증과 실제 지출 id는 유지하고 보관 원본 scheduleId만 재연결한다. 원래 일정·다른 영수증·사진은 유지한다.
+PlanForm.values.items: JSON 문자열. 편집 전용 항목 rowId?: string UUID, quantity: string | number | null. 잘못 입력한 수량도 초안에 보존한다. 저장 변환은 rowId를 제외하고 빈 수량만 null로 변환하며 나머지는 기존 receiptItemSchema로 검증한다.
+PlanForm.values.newReceiptPlace?: string: 'true'일 때 새 장소 명시 선택. 결제일·기존 일정 변경 시 초기화. duplicateAccepted?: string: 같은 여행 버전·비교 입력·후보 목록의 확인 문자열. 저장 DTO·DB·로그에는 포함하지 않는다.
+ReceiptCandidate: id string UUID, kind 'receipt'|'expense', title/date/amount/currency/reason string. 같은 여행 스냅샷에서만 계산하는 메모리 객체. 원본 내용이나 새 DB 엔티티를 생성하지 않는다.
+RECEIPT_CLEANUP_PENDING: DB 영수증 확정 이후 원본 파일 삭제 실패를 나타내는 503 공개 오류 코드. mutation_requests의 기존 요청 결과와 discardedReceiptPath로 같은 요청을 재생한다. 서버는 receipt_cleanup_jobs로 앱 종료 후에도 정리를 재개한다. 앱 초안·저장 요청의 재시작 복원은 이번 범위에 포함하지 않는다.
+적용 순서: 대상 DB 백업 및0001~0008 적용 상태 확인 →0009 적용 → 새 Worker 배포. 아직 배포하지 않았다. Worker 복구 시 추가 테이블은 보존하고 미완료 작업을 확인한 뒤 재개한다. 파일 삭제는 원본 미보관 선택의 결과이므로 되돌릴 수 없으며 임의 복원하지 않는다.

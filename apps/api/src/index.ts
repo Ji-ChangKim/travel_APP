@@ -1,5 +1,6 @@
 import { createApp } from './app';
 import { purgeRetiredAccounts } from './features/accounts/accountRetirement';
+import { retryReceiptCleanup } from './features/receipts/receiptCleanup';
 import type {
   ExecutionContext,
   ScheduledController,
@@ -17,7 +18,10 @@ export default {
   ): void {
     // 만료 시각이 지난 계정만 정리하며 여행 원본과 소유권은 보존한다.
     return context.waitUntil(
-      purgeRetiredAccounts(env, controller.scheduledTime),
+      Promise.all([
+        purgeRetiredAccounts(env, controller.scheduledTime),
+        retryReceiptCleanup(env),
+      ]),
     );
   },
 };

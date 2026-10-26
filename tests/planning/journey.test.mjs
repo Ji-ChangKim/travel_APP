@@ -180,6 +180,54 @@ test(
     await expect(
       page.getByLabel('12:30 · 구로몬 시장', { exact: true }),
     ).toHaveCount(0);
+    // 같은 브라우저 저장소로 새 페이지를 시작하면 재입력 없이 세션이 복원된다.
+    const resumed = await context.newPage();
+    await resumed.goto(`${webOrigin}/`);
+    await resumed
+      .getByRole('button', { name: '내 여행 탭', exact: true })
+      .click();
+    await expect(
+      resumed.getByText('V11 구매 항공권 여행계획', { exact: true }).first(),
+    ).toBeVisible();
+    for (const [label, path] of [
+      ['발자국 탭', '/footprints'],
+      ['MY 탭', '/my'],
+      ['홈 탭', '/'],
+      ['내 여행 탭', '/plans'],
+    ]) {
+      await resumed.getByRole('button', { name: label, exact: true }).click();
+      await expect.poll(() => new URL(resumed.url()).pathname).toBe(path);
+      await expect(
+        resumed.getByRole('button', { name: label, exact: true }),
+      ).toHaveAttribute('aria-selected', 'true');
+      if (path === '/my')
+        await expect(
+          resumed.getByRole('button', { name: '계정 관리', exact: true }),
+        ).toBeVisible();
+      if (path === '/plans')
+        await expect(
+          resumed
+            .getByText('V11 구매 항공권 여행계획', { exact: true })
+            .first(),
+        ).toBeVisible();
+      if (path === '/')
+        await expect(
+          resumed
+            .getByText('V11 구매 항공권 여행계획', { exact: true })
+            .first(),
+        ).toBeVisible();
+      if (path === '/footprints')
+        await expect(
+          resumed.getByRole('button', {
+            name: '내 발자국 공유하기',
+            exact: true,
+          }),
+        ).toBeVisible();
+    }
+    await resumed.screenshot({
+      path: 'outputs/planning-v11/05-restored-plans-390.png',
+      fullPage: true,
+    });
     await context.close();
     const reopened = await browser.newContext({
       viewport: { width: 320, height: 844 },
@@ -194,9 +242,22 @@ test(
       })
       .click();
     await fill(restored, { 이메일: account.email, 비밀번호: account.password });
+    const restoredLogin = restored.waitForResponse(
+      (response) =>
+        response.url().endsWith('/api/auth/sign-in/email') &&
+        response.request().method() === 'POST',
+    );
     await restored
       .getByRole('button', { name: '이메일 로그인', exact: true })
       .click();
+    // 현재 브라우저의 세션만 메모리에 보관한다. 가입 때 발급한 별도 토큰을 사용하지 않는다.
+    const browserSessionToken = await (
+      await restoredLogin
+    ).headerValue('set-auth-token');
+    assert.ok(
+      browserSessionToken,
+      '브라우저 로그인 세션이 발급되지 않았습니다.',
+    );
     await expect(restored).not.toHaveURL(/\/login(?:\?|$)/);
     await restored.goto(`${webOrigin}/trips/${tripId}`);
     await restored.getByRole('button', { name: 'DAY 2', exact: true }).click();
@@ -277,6 +338,66 @@ test(
         .description,
       '천수각을 보고 공원을 걸어요.',
     );
+    // 실제 로그아웃 취소·확정·보호 화면·재로그인까지 같은 저장 원본으로 확인한다.
+    await restored.goto(`${webOrigin}/`);
+    await restored.getByRole('button', { name: 'MY 탭', exact: true }).click();
+    await restored
+      .getByRole('button', { name: '로그아웃', exact: true })
+      .click();
+    await restored
+      .getByRole('button', { name: '계속 이용하기', exact: true })
+      .click();
+    await planningRequest(`/api/v1/trips/${tripId}/workspace`, {
+      token: browserSessionToken,
+    });
+    await expect(
+      restored.getByRole('button', { name: '계정 관리', exact: true }),
+    ).toBeVisible();
+    await restored
+      .getByRole('button', { name: '로그아웃', exact: true })
+      .click();
+    await restored
+      .getByTestId('app-modal')
+      .getByRole('button', { name: '로그아웃', exact: true })
+      .click();
+    await expect(restored).toHaveURL(/\/login(?:\?|$)/);
+    const revoked = await fetch(
+      `${apiOrigin}/api/v1/trips/${tripId}/workspace`,
+      {
+        headers: {
+          Origin: webOrigin,
+          Authorization: `Bearer ${browserSessionToken}`,
+        },
+      },
+    );
+    assert.equal(
+      revoked.status,
+      401,
+      '로그아웃한 브라우저 세션이 서버에서 거절되어야 합니다.',
+    );
+    await restored.goto(`${webOrigin}/trips/${tripId}`);
+    await expect(
+      restored.getByLabel('10:00 · 오사카성 천수각', { exact: true }),
+    ).toHaveCount(0);
+    await restored
+      .getByRole('button', {
+        name: '이메일 계정으로 로그인 / 회원가입',
+        exact: true,
+      })
+      .click();
+    await fill(restored, { 이메일: account.email, 비밀번호: account.password });
+    await restored
+      .getByRole('button', { name: '이메일 로그인', exact: true })
+      .click();
+    await expect(restored).toHaveURL(new RegExp(`/trips/${tripId}$`));
+    await restored.getByRole('button', { name: 'DAY 2', exact: true }).click();
+    await expect(
+      restored.getByLabel('10:00 · 오사카성 천수각', { exact: true }),
+    ).toBeVisible();
+    assert.deepEqual(
+      (await savedPlan(runtime.db, tripId)).itinerary,
+      final.itinerary,
+    );
     writeFileSync(
       'outputs/planning-v11/db-evidence.json',
       JSON.stringify(
@@ -289,6 +410,11 @@ test(
           responses,
           apiMatchesDb: true,
           restoredInNewBrowser: true,
+          storedSessionRestoredAndTabsNavigated: true,
+          logoutCancelConfirmAndRelogin: true,
+          logoutRevokedServerSession: true,
+          responsesScope:
+            '최초 page의 요청만 수집. 추가 페이지는 별도 UI/API 단언으로 검증.',
           largeTextLayout: { screenHeight, addButton, capturedButton },
           androidBuildExecuted: false,
         },

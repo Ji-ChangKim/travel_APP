@@ -145,27 +145,37 @@ export const receiptInputSchema = z
     category: receiptCategorySchema.default('food'),
   })
   .strict()
-  .refine((value) => {
-    // 사용자가 확인한 금액만 실제 지출로 저장한다.
-    return (
-      decimalExpenseSchema.safeParse({
+  .superRefine((value, context) => {
+    if (
+      !decimalExpenseSchema.safeParse({
         amount: value.amount,
         currency: value.currency,
-      }).success &&
-      value.items.every((item) => {
-        // 인식된 메뉴별 금액도 결제 통화의 소수 규칙을 따른다.
-        return [item.unitPrice, item.amount].every((amount) => {
-          // 읽지 못한 값은 빈 값으로 보존하며 결제 합계로 대체하지 않는다.
-          return (
-            !amount ||
-            (Number(amount) === 0 &&
-              (value.currency === 'USD' || !amount.includes('.'))) ||
-            decimalExpenseSchema.safeParse({ amount, currency: value.currency })
-              .success
-          );
-        });
-      })
-    );
+      }).success
+    )
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['amount'],
+        message: '결제 통화에 맞는 총액을 입력해 주세요.',
+      });
+    value.items.forEach((item, index) => {
+      for (const key of ['unitPrice', 'amount'] as const) {
+        const amount = item[key];
+        if (
+          amount &&
+          !(
+            Number(amount) === 0 &&
+            (value.currency === 'USD' || !amount.includes('.'))
+          ) &&
+          !decimalExpenseSchema.safeParse({ amount, currency: value.currency })
+            .success
+        )
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['items', index, key],
+            message: '결제 통화에 맞는 금액을 입력해 주세요.',
+          });
+      }
+    });
   });
 // 명령별 허용 필드와 기본값을 서버와 화면에서 함께 사용한다.
 export const workspaceCommandSchema = z.discriminatedUnion('operation', [

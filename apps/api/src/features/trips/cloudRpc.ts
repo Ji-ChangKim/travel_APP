@@ -29,7 +29,7 @@ import {
 import { rejectRequest } from '../../shared/errors';
 import type { VerifiedSession } from '../../shared/types';
 import { z } from 'zod';
-import { mediaBucket } from '../media/cloudMedia';
+import { cleanReceiptOriginal } from '../receipts/receiptCleanup';
 import { importPublicTrip } from './communityImport';
 
 // API 계약을 D1 명령과 조회로 연결한다.
@@ -157,17 +157,22 @@ function discardReceiptPhoto(m: Mutation, result: unknown): Promise<unknown> {
             }),
           })
           .parse(result).data.discardedReceiptPath,
-      ).then(() => {
-        // 원본 삭제가 완료된 이후에만 성공 응답을 반환한다.
-        return result;
-      })
+      )
+        .catch(() => {
+          // DB 저장은 끝났으므로 같은 요청을 재생해 파일 정리만 다시 시도한다.
+          return rejectRequest('RECEIPT_CLEANUP_PENDING');
+        })
+        .then(() => {
+          // 원본 삭제가 완료된 이후에만 성공 응답을 반환한다.
+          return result;
+        })
     : Promise.resolve(result);
 }
 
 // 확정된 사용자 선택의 사진 한 장만 삭제한다.
 function eraseReceiptPhoto(m: Mutation, path: string): Promise<unknown> {
   // 경로는 서버가 확정 결과에 기록한 값이며 사용자 입력 경로를 사용하지 않는다.
-  return mediaBucket(m.env).delete(path);
+  return cleanReceiptOriginal(m.env, path);
 }
 
 // 공개 게시물의 현재 차단 필터를 적용한다.

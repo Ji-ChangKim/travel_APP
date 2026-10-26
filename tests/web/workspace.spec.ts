@@ -4988,7 +4988,7 @@ for (const { largePhoto, keepPhoto } of [
       () => {
         // 선택 전에는 일정 등록을 진행할 수 없다.
         return expect(
-          page.getByRole('button', { name: '일정에 추가하기', exact: true }),
+          page.getByRole('button', { name: '영수증 저장', exact: true }),
         ).toBeDisabled();
       },
       () => {
@@ -5015,7 +5015,7 @@ for (const { largePhoto, keepPhoto } of [
       () => {
         // 보관 선택을 자동 동의로 채우지 않는다.
         return expect(
-          page.getByRole('button', { name: '일정에 추가하기', exact: true }),
+          page.getByRole('button', { name: '영수증 저장', exact: true }),
         ).toBeDisabled();
       },
       () => {
@@ -5038,7 +5038,7 @@ for (const { largePhoto, keepPhoto } of [
       () => {
         // 재확인 없이 변경된 정보가 저장되지 않는다.
         return expect(
-          page.getByRole('button', { name: '일정에 추가하기', exact: true }),
+          page.getByRole('button', { name: '영수증 저장', exact: true }),
         ).toBeDisabled();
       },
       () => {
@@ -5048,7 +5048,7 @@ for (const { largePhoto, keepPhoto } of [
       () => {
         // 두 선택을 마친 후에만 장소 기록과 지출을 등록한다.
         return page
-          .getByRole('button', { name: '일정에 추가하기', exact: true })
+          .getByRole('button', { name: '영수증 저장', exact: true })
           .click();
       },
       () => {
@@ -5142,7 +5142,18 @@ function uploadReceiptPhoto(page: Page, largePhoto = false): Promise<void> {
 }
 
 // 정보 확인과 사진 보관을 사용자 버튼으로 각각 선택한다.
-function confirmReceiptChoices(page: Page, keepPhoto: boolean): Promise<void> {
+async function confirmReceiptChoices(
+  page: Page,
+  keepPhoto: boolean,
+): Promise<void> {
+  // 연결 대상이 아직 없을 때만 새 장소를 명시적으로 선택한다.
+  const link = page.getByText('기존 일정이나 새 장소 기록을 선택해 주세요.', {
+    exact: true,
+  });
+  if (await link.count())
+    await page
+      .getByRole('button', { name: '새 장소 기록 만들기', exact: true })
+      .click();
   // 자동 동의 없이 두 선택을 순서대로 진행한다.
   return page
     .getByRole('button', { name: '맞아요, 일정에 추가할게요', exact: true })
@@ -7696,9 +7707,7 @@ test('로그인 → 여행 → 일정 재시도 → 영수증 → 종료·선택
   await page.getByRole('button', { name: /^(?:✓ )?JPY$/ }).click();
   await page.getByRole('button', { name: '도쿄 식당', exact: true }).click();
   await confirmReceiptChoices(page, true);
-  await page
-    .getByRole('button', { name: '일정에 추가하기', exact: true })
-    .click();
+  await page.getByRole('button', { name: '영수증 저장', exact: true }).click();
   // 확인한 영수증 원본과 내역은 사진 영역에서 조회한다.
   await openTripSection(page, '사진·영수증');
   await expect(
@@ -8289,6 +8298,9 @@ async function r10Receipt(
   await expect(
     page.getByText('사진에서 읽은 내용이에요', { exact: true }),
   ).toBeVisible();
+  await page
+    .getByRole('button', { name: '새 장소 기록 만들기', exact: true })
+    .click();
 }
 
 test('R10 영수증 합계 차이: 별도 확인·수정 후 재확인·사진 미보관·중복 제출 차단', async ({
@@ -8329,7 +8341,7 @@ test('R10 영수증 합계 차이: 별도 확인·수정 후 재확인·사진 �
     .click();
   await confirmReceiptChoices(page, false);
   await expect(
-    page.getByRole('button', { name: '일정에 추가하기', exact: true }),
+    page.getByRole('button', { name: '영수증 저장', exact: true }),
   ).toBeEnabled();
   await page
     .getByRole('button', { name: '인식 내용 수정', exact: true })
@@ -8345,7 +8357,7 @@ test('R10 영수증 합계 차이: 별도 확인·수정 후 재확인·사진 �
     }),
   ).toBeDisabled();
   await expect(
-    page.getByRole('button', { name: '일정에 추가하기', exact: true }),
+    page.getByRole('button', { name: '영수증 저장', exact: true }),
   ).toBeDisabled();
   await page
     .getByRole('button', {
@@ -8355,7 +8367,7 @@ test('R10 영수증 합계 차이: 별도 확인·수정 후 재확인·사진 �
     .click();
   await confirmReceiptChoices(page, false);
   await page
-    .getByRole('button', { name: '일정에 추가하기', exact: true })
+    .getByRole('button', { name: '영수증 저장', exact: true })
     .dblclick();
   await expect(
     page.getByLabel('16:36 · Kagerou Cafe', { exact: true }),
@@ -8382,7 +8394,7 @@ for (const currency of ['TWD', ''])
       page.getByText('영수증을 읽지 못했어요', { exact: true }),
     ).toHaveCount(0);
     await expect(
-      page.getByRole('button', { name: '일정에 추가하기', exact: true }),
+      page.getByRole('button', { name: '영수증 저장', exact: true }),
     ).toBeDisabled();
     await expect(
       page.getByRole('alert').filter({
@@ -8395,10 +8407,10 @@ for (const currency of ['TWD', ''])
       .getByRole('button', { name: '인식 내용 수정', exact: true })
       .click();
     if (currency) {
-      // 미지원 원 통화를 달러 버튼으로 바꾸어 확정할 수 없다.
+      // 오인식 정정은 허용하지만 선택 전에는 미지원 통화 저장을 막는다.
       await expect(
         page.getByRole('button', { name: 'USD', exact: true }),
-      ).toBeDisabled();
+      ).toBeEnabled();
       await page.getByRole('button', { name: '닫기', exact: true }).click();
       await page
         .getByRole('button', { name: '내용 버리고 이동', exact: true })
@@ -8412,9 +8424,11 @@ for (const currency of ['TWD', ''])
       await page.getByRole('button', { name: 'JPY', exact: true }).click();
       await confirmReceiptChoices(page, true);
       await expect(
-        page.getByRole('button', { name: '일정에 추가하기', exact: true }),
+        page.getByRole('button', { name: '영수증 저장', exact: true }),
       ).toBeEnabled();
-      await expect(page.getByLabel('금액', { exact: true })).toHaveCount(0);
+      await expect(page.getByLabel('금액', { exact: true })).toHaveValue(
+        '2450',
+      );
     }
   });
 
@@ -12479,7 +12493,7 @@ for (const keepPhoto of [true, false])
       .click();
     await expect(
       page.getByRole('button', { name: '새 장소 기록 만들기', exact: true }),
-    ).toHaveCount(0);
+    ).toBeVisible();
     await fields(page, { 금액: '2100' });
     await page
       .getByRole('button', {
@@ -12487,9 +12501,7 @@ for (const keepPhoto of [true, false])
         exact: true,
       })
       .click();
-    await page
-      .getByRole('button', { name: '영수증 수정 저장', exact: true })
-      .click();
+    await page.getByRole('button', { name: '변경 저장', exact: true }).click();
     await expect.poll(() => state.snapshot.receipts[0]?.amount).toBe('2100');
     expect(state.snapshot.receipts).toHaveLength(1);
     expect(state.snapshot.receipts[0]).toMatchObject({
@@ -14382,4 +14394,206 @@ test('S24-03 공개 일정: DAY 터치·긴 장소 설명·뒤로 복귀와 가�
   ).toHaveAttribute('aria-selected', 'true');
   await expect(opener).toBeInViewport();
   await s24Capture(page, testInfo, 'public-day2');
+});
+
+test('P0 메뉴 편집: 빈 목록·중간 삭제·포커스·수량 오류·재조회', async ({
+  page,
+}) => {
+  await r10Receipt(page, { ...receiptScan, items: [] });
+  await expect(
+    page.getByText(
+      '메뉴 없이 저장할 수 있어요. 필요한 메뉴는 직접 추가해 주세요.',
+      { exact: true },
+    ),
+  ).toBeVisible();
+  for (const [index, name] of [
+    '라멘',
+    '삭제할 메뉴',
+    '긴 일본어 메뉴 抹茶アイスクリーム',
+  ].entries()) {
+    await page.getByRole('button', { name: '메뉴 추가', exact: true }).click();
+    await expect(
+      page.getByLabel(`${index + 1}번 메뉴 이름`, { exact: true }),
+    ).toBeFocused();
+    await page
+      .getByLabel(`${index + 1}번 메뉴 이름`, { exact: true })
+      .fill(name);
+  }
+  await page
+    .getByRole('button', { name: '2번 메뉴 삭제', exact: true })
+    .click();
+  await expect(page.getByLabel('2번 메뉴 이름', { exact: true })).toHaveValue(
+    '긴 일본어 메뉴 抹茶アイスクリーム',
+  );
+  await expect(page.getByLabel('2번 메뉴 이름', { exact: true })).toBeFocused();
+  await page.getByLabel('1번 메뉴 수량', { exact: true }).fill('1.5');
+  await confirmReceiptChoices(page, true);
+  await page.getByRole('button', { name: '영수증 저장', exact: true }).click();
+  await expect(page.getByLabel('1번 메뉴 수량', { exact: true })).toHaveValue(
+    '1.5',
+  );
+  await expect(
+    page.getByText('1번 메뉴 수량 항목을 확인해 주세요.', { exact: true }),
+  ).toBeVisible();
+  await page
+    .getByLabel('1번 메뉴 수량', { exact: true })
+    .scrollIntoViewIfNeeded();
+  await page.screenshot({
+    path: 'outputs/receipt-screen-review/p0-menu-error-390.png',
+  });
+  await page.getByLabel('1번 메뉴 수량', { exact: true }).fill('');
+  await confirmReceiptChoices(page, true);
+  await page
+    .getByLabel('1번 메뉴 이름', { exact: true })
+    .scrollIntoViewIfNeeded();
+  await page.screenshot({
+    path: 'outputs/receipt-screen-review/p0-menu-390.png',
+    fullPage: true,
+  });
+  let releaseSave!: () => void;
+  const heldSave = new Promise<void>((resolve) => {
+    releaseSave = resolve;
+  });
+  await page.route('**/api/v1/trips/*/commands', async (route) => {
+    await heldSave;
+    await route.fallback();
+  });
+  await page.getByRole('button', { name: '영수증 저장', exact: true }).click();
+  try {
+    await expect(
+      page.getByRole('button', { name: '저장 중…', exact: true }),
+    ).toBeDisabled();
+    await expect(
+      page.getByLabel('1번 메뉴 이름', { exact: true }),
+    ).not.toBeEditable();
+    await page.screenshot({
+      path: 'outputs/receipt-screen-review/p0-saving-390.png',
+    });
+  } finally {
+    releaseSave();
+  }
+  await openTripSection(page, '사진·영수증');
+  await expect(
+    page.getByText(/긴 일본어 메뉴 抹茶アイスクリーム · 수량 미확인/),
+  ).toBeVisible();
+});
+
+for (const width of [320, 390, 430]) {
+  test(`P0 중복 비교 ${width}: 큰 글자·입력 보존·재확인`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 844 });
+    const source = r07Snapshot();
+    const receipt = source.receipts[0]!;
+    const expense = source.expenses.find((item) => item.id === receipt.id)!;
+    source.expenses.push({
+      ...expense,
+      id: '00000000-0000-4000-8000-000000000099',
+      source: 'manual',
+      title: '같은 날 직접 기록한 식사 비용',
+    });
+    const state = await r07Network(page, source);
+    await login(page);
+    await page.goto(`/trips/${trip}`);
+    await openTripSection(page, '사진·영수증');
+    await page
+      .getByRole('button', { name: '영수증 기록 수정', exact: true })
+      .click();
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = '32px';
+    });
+    await expect(
+      page.getByText('비슷한 결제 기록이 있어요', { exact: true }),
+    ).toBeVisible();
+    await page
+      .getByRole('button', { name: '기존 기록 보기', exact: true })
+      .click();
+    await expect(
+      page.getByText(
+        '직접 입력한 실제 지출이에요. 이 화면에서는 기존 지출을 바꾸거나 삭제하지 않아요.',
+        { exact: true },
+      ),
+    ).toBeVisible();
+    await page
+      .getByRole('button', {
+        name: '맞아요, 수정한 내용을 저장할게요',
+        exact: true,
+      })
+      .click();
+    const save = page.getByRole('button', { name: '변경 저장', exact: true });
+    await expect(save).toBeDisabled();
+    await page
+      .getByRole('button', { name: '별도 결제로 계속', exact: true })
+      .click();
+    await expect(save).toBeEnabled();
+    await page
+      .getByLabel('영수증 상호', { exact: true })
+      .fill('이름을 수정한 식당');
+    await expect(save).toBeDisabled();
+    await page
+      .getByRole('button', { name: '별도 결제로 계속', exact: true })
+      .click();
+    await page
+      .getByRole('button', {
+        name: '맞아요, 수정한 내용을 저장할게요',
+        exact: true,
+      })
+      .click();
+    await save.scrollIntoViewIfNeeded();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+    await page.screenshot({
+      path: `outputs/receipt-screen-review/p0-duplicate-${width}-200.png`,
+    });
+    await save.click();
+    await expect.poll(() => state.writes.length).toBe(1);
+    expect(
+      state.snapshot.expenses.some((item) => item.id.endsWith('0099')),
+    ).toBe(true);
+  });
+}
+
+test('P0 날짜 수정: 빈 DAY 새 장소·메뉴 없음·원본 미보관', async ({ page }) => {
+  const source = r07Snapshot();
+  const original = source.receipts[0]!;
+  source.receipts[0] = { ...original, keepPhoto: false };
+  source.media = source.media.filter((item) => item.id !== original.mediaId);
+  const state = await r07Network(page, source);
+  await login(page);
+  await page.goto(`/trips/${trip}`);
+  await openTripSection(page, '사진·영수증');
+  await page
+    .getByRole('button', { name: '영수증 기록 수정', exact: true })
+    .click();
+  await expect(
+    page.getByText(
+      '원본 사진을 보관하지 않은 기록이에요. 확인한 내용은 아래에서 볼 수 있어요.',
+      { exact: true },
+    ),
+  ).toBeVisible();
+  const target = source.days[2]!;
+  await page
+    .getByLabel('실제 결제 날짜', { exact: true })
+    .fill(target.tripDate);
+  await expect(
+    page.getByRole('button', { name: '변경 저장', exact: true }),
+  ).toBeDisabled();
+  await page
+    .getByRole('button', { name: '새 장소 기록 만들기', exact: true })
+    .click();
+  await page
+    .getByRole('button', {
+      name: '맞아요, 수정한 내용을 저장할게요',
+      exact: true,
+    })
+    .click();
+  await page.getByRole('button', { name: '변경 저장', exact: true }).click();
+  await expect
+    .poll(() => state.snapshot.receipts[0]?.date)
+    .toBe(target.tripDate);
+  expect(state.snapshot.receipts[0]?.id).toBe(original.id);
+  expect(
+    state.snapshot.expenses.filter((item) => item.id === original.id),
+  ).toHaveLength(1);
 });

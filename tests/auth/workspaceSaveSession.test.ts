@@ -155,6 +155,39 @@ test('버전 충돌의 최신 조회는 새 후보만 준비하며 자동으로 
   assert.equal(f.state.conflicted, false);
 });
 
+test('영수증 충돌 재조회는 입력을 보존하고 내용·합계·중복 확인을 초기화한다', async () => {
+  const f = fixture();
+  f.state.form = {
+    kind: 'receipt',
+    id: randomUUID(),
+    values: {
+      merchant: '입력한 식당',
+      items: '[{"name":"메뉴"}]',
+      receiptConfirmed: 'true',
+      totalDifferenceAccepted: 'true',
+      duplicateAccepted: 'old',
+    },
+  };
+  f.pendingUsesForm.current = true;
+  f.session.execute(async () => {
+    throw new FoundationClientError(409, {
+      error: { code: 'VERSION_CONFLICT' },
+    });
+  });
+  await settle();
+  f.cache.setQueryData(
+    foundationQueryKey(f.userId, 'workspace', f.snapshot.trip.id),
+    { ...f.snapshot, trip: { ...f.snapshot.trip, version: 2 } },
+  );
+  f.session.reload();
+  await settle();
+  assert.equal(f.state.form?.values.merchant, '입력한 식당');
+  assert.equal(f.state.form?.values.items, '[{"name":"메뉴"}]');
+  assert.equal(f.state.form?.values.receiptConfirmed, 'false');
+  assert.equal(f.state.form?.values.totalDifferenceAccepted, 'false');
+  assert.equal(f.state.form?.values.duplicateAccepted, '');
+});
+
 test('저장 성공 뒤 조회 실패를 미저장으로 되돌리거나 요청을 다시 남기지 않는다', async (context) => {
   const f = fixture();
   context.mock.method(f.cache, 'invalidateQueries', async () => {

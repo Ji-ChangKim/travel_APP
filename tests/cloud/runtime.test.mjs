@@ -847,6 +847,7 @@ before(() => {
         '0005_member_onboarding.sql',
         '0006_unique_nicknames.sql',
         '0007_account_retirements.sql',
+        '0009_receipt_cleanup_jobs.sql',
       ]
         .map((file) => {
           /* 배포 마이그레이션을 순서대로 읽는다. */ return readFileSync(

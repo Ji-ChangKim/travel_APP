@@ -32,7 +32,12 @@ export function savedReceiptForm(
           return day.tripDate === receipt.date;
         })?.id || '',
       scheduleId: receipt.scheduleId || '',
-      items: JSON.stringify(receipt.items || []),
+      items: JSON.stringify(
+        (receipt.items || []).map((item) => ({
+          ...item,
+          rowId: Crypto.randomUUID(),
+        })),
+      ),
       details: receipt.details,
       warnings: '[]',
     },
@@ -69,7 +74,12 @@ export function receiptForm(
           return day.tripDate === draft?.transactionDate;
         })?.id || '',
       scheduleId: '',
-      items: JSON.stringify(draft?.items || []),
+      items: JSON.stringify(
+        (draft?.items || []).map((item) => ({
+          ...item,
+          rowId: Crypto.randomUUID(),
+        })),
+      ),
       details: '',
       warnings: JSON.stringify(draft?.warnings || []),
     },

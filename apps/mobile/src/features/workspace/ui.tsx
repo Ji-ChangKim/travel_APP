@@ -60,6 +60,7 @@ export function Field({
   disabled = false,
   placeholder,
   inputMode = 'text',
+  inputRef,
 }: {
   label: string;
   value: string;
@@ -68,7 +69,9 @@ export function Field({
   disabled?: boolean;
   placeholder?: string;
   inputMode?: 'text' | 'numeric';
+  inputRef?: React.RefObject<TextInput | null>;
 }) {
+  const fallbackInput = useRef<TextInput>(null);
   // 화면의 라벨과 테스트·스크린리더 이름을 일치시킨다.
   return (
     <BoundField
@@ -79,7 +82,7 @@ export function Field({
       placeholder={placeholder}
       inputMode={inputMode}
       disabled={useFormScope().locked || disabled}
-      input={useRef<TextInput>(null)}
+      input={inputRef || fallbackInput}
     />
   );
 }

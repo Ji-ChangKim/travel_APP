@@ -124,7 +124,8 @@ export function formCommand(
     const issue = publicationIssue(snapshot, form.values);
     if (issue) requirePublicationSelection(issue);
   }
-  if (form.kind === 'receipt' && !receiptCanSave(form)) requireReceiptChoices();
+  if (form.kind === 'receipt' && !receiptCanSave(form, snapshot))
+    requireReceiptChoices();
   return workspaceCommandSchema.parse(formCommandValue(form, snapshot));
 }
 

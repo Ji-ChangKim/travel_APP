@@ -198,6 +198,8 @@ export function revisedFormFeedback(
     ...previous,
     fields: Object.fromEntries(
       Object.entries(previous.fields).filter(([label]) => {
+        // 행 번호가 달라진 메뉴에 이전 오류를 붙이지 않고 다음 제출에서 재검증한다.
+        if (key === 'items' && /^\d+번 메뉴 /.test(label)) return false;
         // 기간과 통화 변경은 서로 연관된 필드 안내를 함께 정리한다.
         return ![
           formFieldLabels[key],

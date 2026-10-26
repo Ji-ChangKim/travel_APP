@@ -14,9 +14,11 @@ import ScheduleFlightFields from './FlightEntryFields';
 import GooglePlace from './GooglePlace';
 import PlaceSearch from './PlaceSearch';
 import ReceiptConfirmation from './ReceiptConfirmation';
+import ReceiptDuplicates from './ReceiptDuplicates';
+import ReceiptMenuEditor from './ReceiptMenuEditor';
 import ReceiptReview from './ReceiptReview';
 import ScheduleLocation from './ScheduleLocation';
-import ServerPhoto from './ServerPhoto';
+import ReceiptOriginal from './ReceiptOriginal';
 import { DateField } from './TravelInputs';
 import TripPeriodSummary from './TripPeriodSummary';
 import type { PlanForm } from './forms';
@@ -108,7 +110,9 @@ export function renderPlanEditor({
             form?.kind === 'publish'
               ? '커뮤니티 공개'
               : form?.kind === 'receipt'
-                ? '영수증 확인'
+                ? form.values.receiptOperation === 'update'
+                  ? '영수증 수정'
+                  : '영수증 확인'
                 : form?.kind === 'expense'
                   ? '비용 기록'
                   : form?.kind === 'metadata'
@@ -161,6 +165,24 @@ export function renderPlanEditor({
               />
               {renderExpenseCurrency({ form, busy, onChange })}
               {renderExpenseLink({ form, busy, onChange, snapshot })}
+              {form.kind === 'receipt' &&
+                ['ready', 'manual'].includes(
+                  form.values.receiptStatus || '',
+                ) && (
+                  <ReceiptMenuEditor
+                    form={form}
+                    busy={busy || locked}
+                    onChange={onChange}
+                  />
+                )}
+              {form.kind === 'receipt' && snapshot && (
+                <ReceiptDuplicates
+                  form={form}
+                  snapshot={snapshot}
+                  busy={busy || locked}
+                  onChange={onChange}
+                />
+              )}
               <ExpenseOptions form={form} onChange={onChange} />
               <MetadataOptions form={form} onChange={onChange} />
               {form.kind === 'receipt' &&
@@ -243,15 +265,17 @@ function renderPlanSaveActions({
               ? '확인하고 게시'
               : form?.kind === 'receipt'
                 ? form.values.receiptOperation === 'update'
-                  ? '영수증 수정 저장'
-                  : '일정에 추가하기'
+                  ? '변경 저장'
+                  : '영수증 저장'
                 : '확인하고 저장'
         }
         disabled={
           (form?.kind === 'period' &&
             !locked &&
             Boolean(periodImpact?.blocked)) ||
-          (form?.kind === 'receipt' && !receiptCanSave(form)) ||
+          (form?.kind === 'receipt' &&
+            !locked &&
+            !receiptCanSave(form, snapshot)) ||
           (form?.kind === 'publish' &&
             !locked &&
             Boolean(snapshot && publicationIssue(snapshot, form.values)))
@@ -286,7 +310,17 @@ export function renderExpenseLink({
         ['ready', 'manual'].includes(form.values.receiptStatus || ''))) && (
       <View style={styles.card}>
         <Text style={styles.title}>연결할 일정</Text>
-        {form.values.receiptOperation !== 'update' && (
+        {form.kind === 'receipt' && (
+          <Text style={l.meta}>
+            {!form.values.dayId
+              ? '여행 기간 안의 결제 날짜를 입력해 주세요. 다른 여행의 영수증이라면 돌아가서 여행을 선택해 주세요.'
+              : !form.values.scheduleId &&
+                  form.values.newReceiptPlace !== 'true'
+                ? '기존 일정이나 새 장소 기록을 선택해 주세요.'
+                : '기존 계획은 바꾸지 않고 결제 기록만 연결해요.'}
+          </Text>
+        )}
+        {
           <Action
             label={
               form.kind === 'receipt'
@@ -294,19 +328,24 @@ export function renderExpenseLink({
                 : '새 기록 / 일정 연결 없이'
             }
             selected={
-              form.kind === 'expense' ? !form.values.scheduleId : undefined
+              form.kind === 'expense'
+                ? !form.values.scheduleId
+                : form.values.newReceiptPlace === 'true'
             }
             disabled={busy}
             onPress={() => {
               // 영수증은 새 일정을 생성하고 수동 비용은 여행 전체에 연결한다.
-              onChange('scheduleId', '');
+              onChange(
+                form.kind === 'receipt' ? 'newReceiptPlace' : 'scheduleId',
+                form.kind === 'receipt' ? 'true' : '',
+              );
             }}
           />
-        )}
+        }
         {form.values.receiptOperation === 'update' && (
           <Text style={styles.subtitle}>
-            수정할 영수증을 연결할 기존 일정을 선택해 주세요. 새 장소를
-            추가하려면 일정 추가를 이용해 주세요.
+            결제일에 맞는 기존 일정이나 새 장소를 선택해 주세요. 이전 일정은
+            그대로 남아요.
           </Text>
         )}
         {snapshot?.itinerary
@@ -360,12 +399,7 @@ export function renderExpenseCurrency({
               (form.values.currency || form.values.defaultCurrency) === currency
             }
             size="chip"
-            disabled={
-              busy ||
-              (form.kind === 'receipt' &&
-                Boolean(form.values.currency) &&
-                !['KRW', 'JPY', 'USD'].includes(form.values.currency!))
-            }
+            disabled={busy}
             onPress={() => {
               // 금액은 선택 통화의 정밀도로 검사한다.
               onChange(
@@ -577,11 +611,15 @@ export function renderReceiptOriginal({
       <View style={{ flexDirection: wide ? 'row' : 'column', gap: 24 }}>
         <View style={wide ? { width: 360, gap: 12 } : { gap: 12 }}>
           <Text style={l.eyebrow}>영수증 원본</Text>
-          <ServerPhoto
-            fit="contain"
+          <ReceiptOriginal
             userId={userId}
             tripId={snapshot.trip.id}
             mediaId={form.values.mediaId!}
+            retained={
+              form.values.receiptOperation !== 'update' ||
+              form.values.keepPhoto !== 'false'
+            }
+            disabled={busy}
           />
           <Text style={l.meta}>
             사진과 읽은 내용을 비교해 주세요. 등록 전에는 지출이 추가되지

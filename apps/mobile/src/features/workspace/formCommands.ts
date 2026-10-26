@@ -146,7 +146,20 @@ function receiptInput(form: PlanForm) {
     address: values.address || '',
     transactionTime: values.transactionTime || '',
     category: values.category || 'etc',
-    items: receiptItems(values.items),
+    items: receiptItems(values.items).map(
+      ({ name, quantity, unitPrice, amount }) => ({
+        name,
+        unitPrice,
+        amount,
+        // 빈 수량만 미확인으로 저장하며 잘못된 숫자는 스키마가 거부한다.
+        quantity:
+          quantity === null || quantity === ''
+            ? null
+            : /^[1-9]\d*$/.test(String(quantity))
+              ? Number(quantity)
+              : Number.NaN,
+      }),
+    ),
   };
 }
 

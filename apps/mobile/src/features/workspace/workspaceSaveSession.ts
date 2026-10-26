@@ -86,6 +86,20 @@ export function createWorkspaceSaveSession({
       return;
     }
     clearPending();
+    setForm((previous) =>
+      previous?.kind === 'receipt'
+        ? {
+            ...previous,
+            values: {
+              ...previous.values,
+              receiptConfirmed: 'false',
+              totalDifferenceAccepted: 'false',
+              duplicateAccepted: '',
+              receiptEditing: 'true',
+            },
+          }
+        : previous,
+    );
     setError('');
   }
 
