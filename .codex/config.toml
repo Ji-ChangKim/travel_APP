@@ -1,0 +1,4 @@
+# 주 에이전트 1명과 서브에이전트 2명으로 제한한다.
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 2
