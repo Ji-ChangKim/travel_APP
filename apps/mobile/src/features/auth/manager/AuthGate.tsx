@@ -170,6 +170,9 @@ function gateReturn(path: string, params: Record<string, unknown>) {
   return path === '/new-trip' && params.handoff
     ? authReturn('new-trip', params.destination, params.handoff)
     : path === '/profile-setup'
-      ? authReturn(params.next, params.destination, params.tripId)
-      : returnFromPath(path, params.destination);
+      ? authReturn(params.next, params.destination, params.tripId, params)
+      : {
+          ...returnFromPath(path, params.destination),
+          ...authReturn(undefined, undefined, undefined, params),
+        };
 }

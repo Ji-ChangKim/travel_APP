@@ -1,3 +1,4 @@
+import { localJsonResponse } from './localJsonResponse';
 import { UserFacingError } from './userFacingError';
 import * as Crypto from 'expo-crypto';
 import type { FoundationClientOptions } from '@wherego/api-client';
@@ -189,7 +190,7 @@ function storeGuestResult(
       : Promise.resolve()
   ).then(() => {
     // 로컬 사진의 파일 위치는 현재 문서 디렉터리로 복원한다.
-    return Response.json({
+    return localJsonResponse({
       data: localMediaResult(result.data),
       meta: { requestId: Crypto.randomUUID(), replayed: result.replayed },
     });
@@ -211,7 +212,7 @@ function localMediaResult(data: unknown): unknown {
 function rejectedGuestResponse(error: unknown): Response {
   // 저장소 오류는 한국어 복구 안내로 전달하고 내부 경로를 숨긴다.
   return error instanceof FoundationClientError
-    ? Response.json(
+    ? localJsonResponse(
         {
           error: {
             code:
@@ -224,7 +225,7 @@ function rejectedGuestResponse(error: unknown): Response {
       )
     : error instanceof GuestWorkspaceError ||
         error instanceof WorkspaceModelError
-      ? Response.json(
+      ? localJsonResponse(
           { error: { code: error.code } },
           {
             status:
@@ -238,7 +239,7 @@ function rejectedGuestResponse(error: unknown): Response {
           },
         )
       : error instanceof Error && error.name === 'ZodError'
-        ? Response.json(
+        ? localJsonResponse(
             { error: { code: 'VALIDATION_FAILED' } },
             { status: 422 },
           )

@@ -13,6 +13,12 @@ import { communityFeedCard } from '../model/communityFeedCard';
 import { loadCommunity } from './communityService';
 import { serverOptions } from '../../shared/manager/service';
 import { workspaceError } from '../../hub/model/workspaceFailure';
+import {
+  saveReportReturn,
+  readReportReturn,
+  clearReportReturn,
+} from '@/features/auth/manager/reportReturn';
+import { authReturn } from '@/features/auth/model/authReturn';
 
 // 현재 계정과 편집 요청의 수명을 관리하고 표시용 상태·행동을 반환한다.
 export function useDiscoveryController() {
@@ -23,9 +29,11 @@ export function useDiscoveryController() {
   });
   const userId = user?.id || '';
   const router = useRouter();
-  const { postId, kind } = useLocalSearchParams<{
+  const { postId, kind, intentKey, targetRef } = useLocalSearchParams<{
     postId?: string;
     kind?: string;
+    intentKey?: string;
+    targetRef?: string;
   }>();
   const cache = useQueryClient();
   const [filters, setFilters] = useState<CommunityFeedFilters>({
@@ -43,6 +51,33 @@ export function useDiscoveryController() {
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
   const lock = useRef(false);
+  useEffect(() => {
+    if (
+      intentKey !== 'report' ||
+      !targetRef ||
+      !userId ||
+      user?.authProvider === 'guest'
+    )
+      return;
+    let active = true;
+    void readReportReturn(userId, targetRef)
+      .then((value) => {
+        if (active && value) {
+          setReportId(value.postId);
+          setReason(value.reason);
+          void clearReportReturn(value).catch(() => undefined);
+        }
+      })
+      .catch(() => {
+        if (active)
+          setError(
+            '신고 내용을 불러오지 못했어요. 내용을 확인하고 다시 작성해 주세요.',
+          );
+      });
+    return () => {
+      active = false;
+    };
+  }, [intentKey, targetRef, userId, user?.authProvider]);
   useEffect(() => {
     // 이전 피드 형식의 단건 링크도 페이지 수와 무관한 공개 상세로 보낸다.
     if (foundationUuidSchema.safeParse(postId).success)
@@ -92,11 +127,31 @@ export function useDiscoveryController() {
   }
   function moderation(path: string, input: Record<string, string>): void {
     // 비회원은 신고 내용을 전송하기 전에 실제 로그인으로 연결한다.
-    if (!userId || user?.authProvider === 'guest')
-      return void router.push({
-        pathname: '/login',
-        params: { next: 'community' },
-      });
+    if (!userId || user?.authProvider === 'guest') {
+      if (path.endsWith('reports')) {
+        void saveReportReturn({
+          originId: userId || null,
+          guest: !userId || user?.authProvider === 'guest',
+          postId: input.postId || '',
+          reason: input.reason || '',
+        })
+          .then(() =>
+            router.push({
+              pathname: '/login',
+              params: authReturn('community', undefined, undefined, {
+                intentKey: 'report',
+                targetRef: input.postId,
+              }),
+            }),
+          )
+          .catch(() =>
+            setReasonError(
+              '신고 사유는 공백을 제외한 내용으로 1~500자 입력해 주세요.',
+            ),
+          );
+      } else router.push({ pathname: '/login', params: { next: 'community' } });
+      return;
+    }
     if (busy || lock.current) return;
     if (path.endsWith('reports') && !reportSchema.safeParse(input).success)
       return setReasonError(

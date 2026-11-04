@@ -51,6 +51,11 @@ export interface Profile {
   gender?: 'female' | 'male' | 'unspecified' | null;
   birthDate?: string | null;
   onboardingCompleted?: boolean;
+  avatarType?: 'default' | 'avatar' | 'photo';
+  avatarId?: string | null;
+  photoFileRef?: string | null;
+  completedAt?: string | null;
+  revision?: number;
   lastSignInAt?: string;
   createdAt: string;
   updatedAt: string;

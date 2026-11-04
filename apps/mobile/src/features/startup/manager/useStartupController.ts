@@ -36,6 +36,9 @@ import {
 import { useRouter, type Href, type ImperativeRouter } from 'expo-router';
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { logPlayStoreClick } from './playStoreAction';
+import { invalidateStartupAuth } from '@/features/auth/manager/authSessionRestore';
+import { startupTimeoutMs } from '../model/startupDeadline';
+import { Platform } from 'react-native';
 
 // 복원 완료한 실제 프로필로 다음 화면을 결정한다.
 export function restoredDestination(): Promise<Href> {
@@ -65,6 +68,10 @@ export function useStartupController(foreground: boolean) {
   const slow = useStartupSlow(foreground);
   const [updateAccepted, setUpdateAccepted] = useState(false);
   const navigatedRef = useRef(false);
+  const [timedOut, setTimedOut] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+  const [guestBusy, setGuestBusy] = useState(false);
+  const [guestError, setGuestError] = useState<string | null>(null);
   const local = useQuery({
     queryKey: ['startup', 'local'],
     queryFn: checkLocalData,
@@ -113,27 +120,37 @@ export function useStartupController(foreground: boolean) {
     decision.kind !== 'pass' &&
     !(decision.kind === 'optional' && updateAccepted);
   const queries = { local, common, play, policy, destination };
-  const pending =
+  const waiting =
     Object.values(queries).some((query) => {
       // 재확인 중 이전 성공 결과만 보고 화면을 떠나지 않는다.
       return query.isFetching;
     }) || !auth.startupReady;
+  useEffect(() => {
+    if (!waiting || timedOut) return;
+    const timer = setTimeout(() => setTimedOut(true), startupTimeoutMs);
+    return () => clearTimeout(timer);
+  }, [waiting, timedOut, attempt]);
+  const pending = (waiting && !timedOut) || guestBusy;
   const error =
+    guestError ||
+    (timedOut ? '연결 상태를 확인하지 못했어요.' : null) ||
     auth.startupError ||
     local.error?.message ||
     common.error?.message ||
     (destination.error ? '여행을 열지 못했어요. 다시 시도해 주세요.' : null);
   const failure = local.error
     ? 'local'
-    : common.error instanceof StartupCompatibilityError
-      ? 'incompatible'
-      : common.error
-        ? 'common'
-        : auth.startupError
-          ? 'auth'
-          : destination.error
-            ? 'destination'
-            : null;
+    : timedOut
+      ? 'timeout'
+      : common.error instanceof StartupCompatibilityError
+        ? 'incompatible'
+        : common.error
+          ? 'common'
+          : auth.startupError
+            ? 'auth'
+            : destination.error
+              ? 'destination'
+              : null;
   // 사용자가 재확인을 선택한 경우에 설치 버전과 정책만 다시 읽는다.
   function refreshUpdate(): Promise<unknown> {
     // 채널은 설치 경로에서 다시 읽고 정책은 현재 채널에서 재조회한다.
@@ -168,39 +185,93 @@ export function useStartupController(foreground: boolean) {
         : undefined,
     decision,
     slow,
+    guestBusy,
     retry: () => {
-      // 성공 검사는 보존하고 실패한 항목만 재실행한다.
-      return void Promise.all([
-        ...failedStartupChecks(queries).map((key) => {
-          // 선택한 실패 검사만 다시 조회한다.
-          return queries[key as keyof typeof queries].refetch();
-        }),
-        ...(auth.startupError && auth.startupReady
-          ? [restoreStartupAuth(clearAccountQueries.bind(null, client))]
-          : []),
-      ]);
+      setTimedOut(false);
+      setGuestError(null);
+      setAttempt((value) => value + 1);
+      // 시간 초과 요청을 취소한 뒤 새 조회를 시작해 늦은 응답의 캐시 적용을 막는다.
+      const keys = timedOut
+        ? Object.keys(queries).filter((key) => {
+            const query = queries[key as keyof typeof queries];
+            return query.isFetching || query.isPending || query.isError;
+          })
+        : failedStartupChecks(queries);
+      return void client
+        .cancelQueries({ queryKey: ['startup'] })
+        .then(() =>
+          Promise.all([
+            ...keys.map((key) =>
+              queries[key as keyof typeof queries].refetch(),
+            ),
+            ...(auth.startupError || !auth.startupReady
+              ? [restoreStartupAuth(clearAccountQueries.bind(null, client))]
+              : []),
+          ]),
+        );
     },
     retryUpdate: () => {
       // 설치 불가 상태에서는 Play·정책만 다시 확인한다.
       return void refreshUpdate();
     },
     login: () => {
-      // 정책·데이터 검사 실패를 로그인 경로로 우회하지 않는다.
-      return auth.startupError &&
-        local.isSuccess &&
-        common.isSuccess &&
+      if (
+        !local.error &&
         !updateAvailable &&
-        !pending
-        ? router.replace('/login?reauth=1')
-        : undefined;
+        !(common.error instanceof StartupCompatibilityError)
+      ) {
+        invalidateStartupAuth();
+        router.replace('/login?reauth=1');
+      }
     },
     canLogin: Boolean(
-      auth.startupError &&
-      local.isSuccess &&
-      common.isSuccess &&
+      error &&
+      !local.error &&
       !updateAvailable &&
-      !pending,
+      !(common.error instanceof StartupCompatibilityError),
     ),
+    canGuest: Boolean(
+      error &&
+      !local.error &&
+      !updateAvailable &&
+      !(common.error instanceof StartupCompatibilityError),
+    ),
+    guest: async () => {
+      if (
+        guestBusy ||
+        local.error ||
+        updateAvailable ||
+        common.error instanceof StartupCompatibilityError
+      )
+        return;
+      invalidateStartupAuth();
+      setGuestBusy(true);
+      setGuestError(null);
+      try {
+        clearAccountQueries(client);
+        await useTripStore
+          .getState()
+          .loginAsGuest(
+            Platform.OS === 'ios'
+              ? 'ios'
+              : Platform.OS === 'android'
+                ? 'android'
+                : 'web',
+          );
+        useAuthReady.setState({
+          ready: true,
+          startupReady: true,
+          startupError: null,
+        });
+        router.replace('/(tabs)');
+      } catch {
+        setGuestError(
+          '이 기기의 여행을 시작하지 못했어요. 저장 공간을 확인하고 다시 시도해 주세요.',
+        );
+      } finally {
+        setGuestBusy(false);
+      }
+    },
     acceptUpdate: () => {
       // 선택 업데이트만 이번 실행에서 미룰 수 있다.
       return decision.kind === 'optional' ? setUpdateAccepted(true) : undefined;

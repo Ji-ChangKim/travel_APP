@@ -5,7 +5,7 @@ import { requestFoundation, FoundationClientError } from '@wherego/api-client';
 import { serverOptions } from '@/features/workspace/shared/manager/service';
 import { useTripStore } from '@/stores/useTripStore';
 import { saveGuestSession } from './guestAuthService';
-const profileSchema = z.object({
+export const profileSchema = z.object({
   id: z.string().uuid(),
   nickname: z.string(),
   avatarUrl: z.string().nullable(),
@@ -20,6 +20,11 @@ const profileSchema = z.object({
   osPlatform: z.enum(['web', 'ios', 'android']),
   createdAt: z.string(),
   updatedAt: z.string(),
+  avatarType: z.enum(['default', 'avatar', 'photo']).optional(),
+  avatarId: z.string().nullable().optional(),
+  photoFileRef: z.string().nullable().optional(),
+  completedAt: z.string().nullable().optional(),
+  revision: z.number().int().optional(),
 });
 // 현재 서버 계정의 프로필을 조회한다.
 export function fetchUserProfile(userId: string): Promise<Profile | null> {

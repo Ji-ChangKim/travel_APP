@@ -5,6 +5,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { z } from 'zod';
 import { saveSocialReturn, clearSocialReturn } from './socialReturn';
 import type { AuthReturn } from '../model/authReturn';
+import { socialCancellation } from '../model/socialCancellation';
 import type { SocialProvider } from '../model/model';
 import { failAuth, readOAuthCode } from '../model/model';
 import { oauthStep } from './oauthSteps';
@@ -14,6 +15,9 @@ import {
   getCloudSession,
   type CloudSession,
 } from '@/services/cloudAuth';
+export function isSocialCancellation(url: string): boolean {
+  return socialCancellation(url, socialRedirectUrl());
+}
 
 const verifierKey = 'tripprint.oauth.verifier.v1';
 const providersSchema = z.object({
@@ -190,7 +194,7 @@ function openSocial(url: string): Promise<CloudSession | null> {
     : WebBrowser.openAuthSessionAsync(url, socialRedirectUrl()).then(
         (result) => {
           // 취소한 로그인은 성공으로 처리하지 않는다.
-          return result.type === 'success'
+          return result.type === 'success' && !isSocialCancellation(result.url)
             ? completeSocialAuth(result.url)
             : clearSocialExchange().then(() => {
                 // 취소 결과를 호출 화면으로 보낸다.

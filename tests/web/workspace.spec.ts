@@ -12144,7 +12144,7 @@ for (const width of [320, 390, 430]) {
         ['/diary/' + trip, 'diary', snapshot.trip.title],
         ['/account', 'account', '계정 관리'],
         ['/record/' + trip, 'record', '여행기록 추가'],
-        ['/auth/callback?error=access_denied', 'auth-error', '로그인 확인'],
+        ['/auth/callback?error=invalid_state', 'auth-error', '로그인 확인'],
         [
           '/community/00000000-0000-4000-8000-000000009999',
           'public-error',

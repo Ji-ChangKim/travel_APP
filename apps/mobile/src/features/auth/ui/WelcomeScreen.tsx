@@ -105,7 +105,9 @@ export default function WelcomeScreen() {
           <Animated.View style={versionStyle}>
             {Constants.expoConfig?.version && (
               <Text style={styles.version}>
-                {t('버전 {version}', { version: Constants.expoConfig.version })}
+                {t('TripPrint MVP - {version}', {
+                  version: Constants.expoConfig.version,
+                })}
               </Text>
             )}
           </Animated.View>

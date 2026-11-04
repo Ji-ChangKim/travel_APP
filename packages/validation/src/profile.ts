@@ -1,9 +1,27 @@
 import { z } from 'zod';
 
-export const nicknameHint =
-  '공백 포함 2~20바이트로 입력해 주세요. 한글은 한 글자당 3바이트예요.';
-export const nicknameError =
-  '닉네임은 공백을 포함해 2~20바이트로 입력해 주세요. 공백만으로는 사용할 수 없어요.';
+export const nicknameHint = '한글, 영문, 숫자로 2~10자 입력해 주세요.';
+export const nicknameError = '닉네임은 2~10자로 입력해 주세요.';
+
+export function normalizeProfileNickname(value: string): string {
+  return value.trim().normalize('NFC');
+}
+
+export function nicknameLength(value: string): number {
+  return Array.from(normalizeProfileNickname(value)).length;
+}
+
+export function nicknameValidationError(value: string): string | null {
+  const normalized = normalizeProfileNickname(value);
+  const length = nicknameLength(normalized);
+  return length < 2 || length > 10
+    ? nicknameError
+    : /^[가-힣A-Za-z0-9]+$/.test(normalized)
+      ? null
+      : '한글, 영문, 숫자만 사용할 수 있어요.';
+}
+
+export const profileNicknameError = nicknameValidationError;
 
 // 기기와 서버에서 UTF-8 저장 길이를 같은 방식으로 계산한다.
 export function nicknameBytes(value: string): number {
@@ -26,18 +44,16 @@ export function validProfileNickname(
   previous?: string,
 ): boolean {
   // 기존 회원이 이름을 그대로 둘 때는 길이와 공백을 바꾸지 않는다.
-  return (
-    value === previous ||
-    (Boolean(value.trim()) &&
-      nicknameBytes(value) >= 2 &&
-      nicknameBytes(value) <= 20)
-  );
+  return value === previous || nicknameValidationError(value) === null;
 }
 
-export const nicknameSchema = z.string().refine((value) => {
-  // 가입 입력에는 기존 닉네임 예외를 적용하지 않는다.
-  return validProfileNickname(value);
-}, nicknameError);
+export const nicknameSchema = z
+  .string()
+  .transform(normalizeProfileNickname)
+  .refine((value) => {
+    // 가입 입력에는 기존 닉네임 예외를 적용하지 않는다.
+    return validProfileNickname(value);
+  }, nicknameError);
 
 // 생일을 입력한 경우에만 실제 날짜와 허용 범위를 검사한다.
 export function validProfileBirthDate(value: string): boolean {

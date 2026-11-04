@@ -43,8 +43,19 @@ function fileActor(c: Ctx): Promise<Actor> {
   // 토큰을 경로나 로그에 기록하지 않는다.
   return /^Bearer [^\s]+$/i.test(c.req.header('Authorization') || '')
     ? cloudSession(c.env, (c.req.header('Authorization') || '').slice(7)).then(
-        (session) => {
-          /* 검증 사용자만 반환한다. */ return { env: c.env, session };
+        async (session) => {
+          // 가입 미완료 계정은 여행 파일 경로로 프로필 권한 제한을 우회할 수 없다.
+          if (!session.isAnonymous) {
+            const profile = await database(c.env)
+              .prepare(
+                'SELECT onboarding_completed_at FROM profiles WHERE user_id=?',
+              )
+              .bind(session.userId)
+              .first<{ onboarding_completed_at: number | null }>();
+            if (!profile?.onboarding_completed_at)
+              return rejectRequest('ONBOARDING_REQUIRED');
+          }
+          return { env: c.env, session };
         },
       )
     : Promise.reject(new Error('AUTH_REQUIRED')).catch(() => {

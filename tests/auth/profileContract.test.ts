@@ -11,57 +11,36 @@ import {
   storedGuestSchema,
 } from '../../apps/mobile/src/services/guestProfileStorage';
 
-test('닉네임은 공백과 한글·이모지를 UTF-8 바이트로 센다', () => {
-  // 1·2·20·21바이트 경계와 멀티바이트 입력을 같은 규칙으로 검사한다.
-  return assert.deepEqual(
+test('닉네임은 NFC 정규화와 공백 제거 후 한글·영문·숫자 2~10자를 허용한다', () => {
+  assert.deepEqual(
     [
       'a',
       'ab',
-      'a'.repeat(20),
-      'a'.repeat(21),
       '가',
-      '가'.repeat(6) + ' a',
-      '가'.repeat(7),
-      '😀'.repeat(5),
-      '😀'.repeat(6),
-      ' a',
-      '  ',
-    ].map((value) => {
-      // 실제 UTF-8 인코더와 공통 검증기의 결과를 함께 비교한다.
-      return [
-        nicknameBytes(value),
-        Buffer.byteLength(value, 'utf8'),
-        nicknameSchema.safeParse(value).success,
-      ];
-    }),
-    [
-      [1, 1, false],
-      [2, 2, true],
-      [20, 20, true],
-      [21, 21, false],
-      [3, 3, true],
-      [20, 20, true],
-      [21, 21, false],
-      [20, 20, true],
-      [24, 24, false],
-      [2, 2, true],
-      [2, 2, false],
-    ],
+      '가나다라마바사아자차',
+      'a'.repeat(11),
+      'a b',
+      '😀😀',
+      '  AB  ',
+      '하루',
+    ].map((value) => nicknameSchema.safeParse(value).success),
+    [false, true, false, true, false, false, false, true, true],
   );
+  assert.equal(nicknameSchema.parse('  하루01 '), '하루01');
+  assert.equal(nicknameBytes('가😀'), Buffer.byteLength('가😀'));
 });
 
-test('기존 이름은 그대로 유지하고 이름을 바꿀 때 새 제한을 적용한다', () => {
-  // 공백과 20바이트를 넘는 과거 이름을 다른 필드 수정 때문에 바꾸지 않는다.
-  return assert.deepEqual(
-    [
-      validProfileNickname(' 오래된 여행자의 이름 ', ' 오래된 여행자의 이름 '),
-      validProfileNickname('새로운 여행자의 긴 이름', ' 오래된 여행자의 이름 '),
-      nicknameSchema.parse(' a '),
-    ],
-    [true, false, ' a '],
+test('기존 이름은 보존하고 실제 이름 변경에는 새 제한을 적용한다', () => {
+  assert.equal(
+    validProfileNickname(' 오래된 여행자의 이름 ', ' 오래된 여행자의 이름 '),
+    true,
   );
+  assert.equal(
+    validProfileNickname('새로운 여행자의 긴 이름', ' 오래된 여행자의 이름 '),
+    false,
+  );
+  assert.equal(nicknameSchema.parse(' 여행자01 '), '여행자01');
 });
-
 test('생일은 실제 날짜만 허용하고 윤년·미래·1900년 이전을 검증한다', () => {
   // 빈 생일은 요청에서 null로 보내며 날짜 검사를 생략한다.
   return assert.deepEqual(

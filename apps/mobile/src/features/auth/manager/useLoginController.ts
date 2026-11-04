@@ -5,14 +5,14 @@ import {
   type SetStateAction,
   type RefObject,
 } from 'react';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTripStore } from '@/stores/useTripStore';
 import {
   authenticatedDestination,
   completedDestination,
 } from '../model/destination';
 import { signInWithSocial } from './oauth';
-import { authReturn } from '../model/authReturn';
+import { authReturn, type AuthReturn } from '../model/authReturn';
 import { clearSocialReturn } from './socialReturn';
 import { Platform } from 'react-native';
 
@@ -76,6 +76,7 @@ export default function useLoginController(
   next?: string,
   destination?: string,
   tripId?: string,
+  context: AuthReturn = {},
 ) {
   // 입력 모달과 요청 잠금은 현재 로그인 화면의 수명에만 보관한다.
   const [state, set] = useState<LoginState>({
@@ -86,6 +87,10 @@ export default function useLoginController(
   });
   const lock = useRef(false);
   const router = useRouter();
+  const entry = authReturn(next, destination, tripId, {
+    ...useLocalSearchParams<Record<string, string>>(),
+    ...context,
+  });
   const currentUser = useTripStore((store) => {
     // 계정 변경에 맞춰 이어서 시작하기를 표시한다.
     return store.currentUser;
@@ -95,8 +100,8 @@ export default function useLoginController(
     // 확인된 프로필에 따라 하나의 경로로 이동한다.
     return (
       useTripStore.getState().currentUser?.authProvider === 'guest'
-        ? completedDestination(next, destination, tripId)
-        : authenticatedDestination(next, destination, tripId)
+        ? completedDestination(next, destination, tripId, false, entry)
+        : authenticatedDestination(next, destination, tripId, entry)
     ).then((target) => {
       // 실제 인증이 끝난 뒤에만 여행 화면으로 교체한다.
       return clearSocialReturn().then(() => {
@@ -129,7 +134,7 @@ export default function useLoginController(
             )
             .then(navigate);
         },
-        '게스트를 시작하지 못했어요. 처음 시작할 때는 인터넷 연결을 확인해 주세요.',
+        '이 기기의 여행을 시작하지 못했어요. 저장 공간을 확인하고 다시 시도해 주세요.',
       );
     },
     continueSession: () => {
@@ -160,10 +165,7 @@ export default function useLoginController(
         'google',
         () => {
           // 시스템 인증 브라우저의 취소는 로그인 성공으로 처리하지 않는다.
-          return signInWithSocial(
-            'google',
-            authReturn(next, destination, tripId),
-          ).then((session) => {
+          return signInWithSocial('google', entry).then((session) => {
             // 브라우저에서 인증을 완료한 회원만 프로필을 확인한다.
             return session ? navigate() : undefined;
           });

@@ -1,6 +1,6 @@
 {
   "name": "wherego-workspace",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "main": "apps/mobile/index.ts",
   "packageManager": "npm@11.5.2",
@@ -14,6 +14,7 @@
   "scripts": {
     "start": "npm --workspace=@wherego/mobile run start",
     "android": "npm --workspace=@wherego/mobile run android",
+    "android:metro": "node scripts/android/start-studio-metro.mjs",
     "ios": "npm --workspace=@wherego/mobile run ios",
     "web": "npm --workspace=@wherego/mobile run web",
     "mobile": "npm --workspace=@wherego/mobile run start",
@@ -59,7 +60,10 @@
     "test:s24:web": "node scripts/qa/verify-s24-web.mjs",
     "check:architecture": "node --test tests/release/repository-layout.test.mjs && node scripts/checks/check-repository-layout.mjs && node scripts/checks/check-code-boundaries.mjs",
     "check:navigation": "node --test tests/release/navigation-boundaries.test.mjs && node scripts/checks/check-navigation-boundaries.mjs",
-    "check:resources": "node --test tests/release/resources.test.mjs && node scripts/checks/check-resources.mjs"
+    "check:resources": "node --test tests/release/resources.test.mjs && node scripts/checks/check-resources.mjs",
+    "android:api": "node scripts/android/start-studio-api.mjs",
+    "android:metro:local": "node scripts/android/start-studio-metro.mjs --local-api",
+    "test:onboarding:web": "tsx scripts/qa/verify-onboarding-notion.mjs"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",

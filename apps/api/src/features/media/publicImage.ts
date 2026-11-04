@@ -19,9 +19,9 @@ const pngRenderingChunks = new Set([
 ]);
 
 // 공개할 이미지에서 픽셀·색상·방향 외의 메타정보를 제거한다.
-export function publicImage(bytes: Uint8Array): Uint8Array {
+export function publicImage(bytes: Uint8Array, maxBytes = 4194304): Uint8Array {
   // 지원 형식과 상한을 다시 검사해 기존 저장 파일에도 같은 정책을 적용한다.
-  return !bytes.length || bytes.length > 4194304
+  return !bytes.length || bytes.length > maxBytes
     ? rejectRequest('PAYLOAD_TOO_LARGE')
     : pngHeader.every((byte, index) => {
           // PNG 전체 시그니처를 대조한다.

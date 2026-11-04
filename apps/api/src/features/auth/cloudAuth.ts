@@ -1,11 +1,10 @@
 import { betterAuth } from 'better-auth';
 import { anonymous, bearer } from 'better-auth/plugins';
-import { linkGuest } from './guestLink';
 import { naverOAuth, socialProviders } from './socialProviders';
 import { rejectRequest } from '../../shared/errors';
 import {
   assertActiveAccount,
-  resumeRetiredAccount,
+  assertLoginAllowed,
 } from '../accounts/accountRetirementPolicy';
 import type { VerifiedSession } from '../../shared/types';
 import {
@@ -34,8 +33,8 @@ export function cloudAuth(env: Env, callbackState?: string) {
       session: {
         create: {
           before: async (session) => {
-            // 새 로그인에서만 유예를 취소하며 만료된 계정은 복원하지 않는다.
-            await resumeRetiredAccount(env, session.userId);
+            // 탈퇴·제한 계정은 명시적인 복원 절차 없이 새 세션을 발급하지 않는다.
+            await assertLoginAllowed(env, session.userId);
             return { data: session };
           },
         },
@@ -43,7 +42,7 @@ export function cloudAuth(env: Env, callbackState?: string) {
       user: {
         create: {
           before: (user, context) => {
-            // 인증 방식별 고유 닉네임을 사용자 INSERT 전에 결정한다.
+            // 인증 방식에 맞는 초기 표시명을 사용자 INSERT 전에 확인한다.
             return (
               context?.path === '/sign-in/anonymous'
                 ? availableGuestNickname(env)
@@ -99,15 +98,7 @@ export function cloudAuth(env: Env, callbackState?: string) {
           // DB 등록 전에 전체 회원과 겹치지 않는 게스트 이름을 발급한다.
           return availableGuestNickname(env);
         },
-        onLinkAccount: ({ anonymousUser, newUser }) => {
-          // 인증 서버가 확인한 두 계정 사이에서만 기존 기록을 이전한다.
-          return linkGuest(
-            env,
-            anonymousUser.user.id,
-            newUser.user.id,
-            newUser.user.name,
-          );
-        },
+        // 여행 연결은 별도 선택·확인 화면에서 실행하며 인증만으로 전체 이전하지 않는다.
       }),
     ],
     logger: { disabled: true },

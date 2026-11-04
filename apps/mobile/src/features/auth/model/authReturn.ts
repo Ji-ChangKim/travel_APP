@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { FoundationClientError } from '@wherego/api-client';
+import type { Href } from 'expo-router';
 import { homeDestination } from '../../workspace/home/model/homeDestinations';
 
 export type AuthReturn = {
@@ -17,10 +18,34 @@ export type AuthReturn = {
     | 'import-place';
   destination?: string;
   tripId?: string;
+  localDate?: string;
+  intentKey?:
+    'scan' | 'publish' | 'publish-record' | 'report' | 'edit' | 'invite';
+  targetRef?: string;
 };
 
 // 외부 파라미터를 앱이 지원하는 복귀 목적 하나로 좁힌다.
 export function authReturn(
+  next?: unknown,
+  destination?: unknown,
+  tripId?: unknown,
+  context: Record<string, unknown> = {},
+): AuthReturn {
+  const result = baseAuthReturn(next, destination, tripId);
+  const date = z.string().date().safeParse(context.localDate);
+  const intent = z
+    .enum(['scan', 'publish', 'publish-record', 'report', 'edit', 'invite'])
+    .safeParse(context.intentKey);
+  const target = z.string().uuid().safeParse(context.targetRef);
+  return {
+    ...result,
+    ...(date.success ? { localDate: date.data } : {}),
+    ...(intent.success ? { intentKey: intent.data } : {}),
+    ...(target.success ? { targetRef: target.data } : {}),
+  };
+}
+
+function baseAuthReturn(
   next?: unknown,
   destination?: unknown,
   tripId?: unknown,
@@ -87,17 +112,33 @@ export function authReturnPath(
   return params.next === 'new-trip' &&
     z.string().uuid().safeParse(params.tripId).success
     ? verifiedReturnPath(
-        authReturn(params.next, params.destination, params.tripId),
+        authReturn(params.next, params.destination, params.tripId, params),
       )
     : pending !== '/(tabs)'
       ? pending
       : verifiedReturnPath(
-          authReturn(params.next, params.destination, params.tripId),
+          authReturn(params.next, params.destination, params.tripId, params),
         );
 }
 
 // 검증한 목적을 Expo Router가 받을 고정 내부 경로로 변환한다.
-function verifiedReturnPath(params: AuthReturn) {
+function verifiedReturnPath(params: AuthReturn): Href {
+  if (params.localDate || params.intentKey || params.targetRef) {
+    const destination = verifiedReturnPath({
+      ...params,
+      localDate: undefined,
+      intentKey: undefined,
+      targetRef: undefined,
+    });
+    const extra = {
+      ...(params.localDate ? { localDate: params.localDate } : {}),
+      ...(params.intentKey ? { intentKey: params.intentKey } : {}),
+      ...(params.targetRef ? { targetRef: params.targetRef } : {}),
+    };
+    return typeof destination === 'string'
+      ? { pathname: destination, params: extra }
+      : { ...destination, params: { ...destination.params, ...extra } };
+  }
   // 여행 ID는 UUID 검증을 마친 값만 경로에 넣는다.
   return params.next === 'trip'
     ? (`/trips/${params.tripId}` as const)
@@ -176,6 +217,7 @@ function activeStoredReturn(value: unknown, now: number): AuthReturn {
         'next' in value ? value.next : undefined,
         'destination' in value ? value.destination : undefined,
         'tripId' in value ? value.tripId : undefined,
+        value as Record<string, unknown>,
       )
     : {};
 }

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 export * from './profile';
+export * from './guestImport';
 export * from './startup';
 export { flightDetailsSchema } from './flight';
 export { tripFlightEntrySchema } from './flight';

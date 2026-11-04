@@ -7,6 +7,18 @@ export const graceMilliseconds = 90 * 24 * 60 * 60 * 1000;
 
 type Retirement = { user_id: string; purge_after: number; state: string };
 
+// 탈퇴 유예도 새 로그인만으로 자동 취소하지 않고 별도 복구 절차를 요구한다.
+export async function assertLoginAllowed(
+  env: Env,
+  userId: string,
+): Promise<void> {
+  if (await retirement(env, userId))
+    throw new APIError('FORBIDDEN', {
+      code: 'ACCOUNT_UNAVAILABLE',
+      message: '이 계정은 지금 이용할 수 없어요. 계정 상태를 확인해 주세요.',
+    });
+}
+
 // 계정 상태를 확인할 때 개인 원문이나 인증 정보를 함께 읽지 않는다.
 function retirement(env: Env, userId: string): Promise<Retirement | null> {
   // 요청자가 지정한 다른 계정으로 탈퇴 대상을 바꾸지 않는다.
@@ -97,7 +109,7 @@ export async function resumeRetiredAccount(
 }
 
 // 계정 식별·인증 정보를 지우되 여행 기록은 분리해 보존한다.
-export function purgeRetiredAccount(
+export async function purgeRetiredAccount(
   env: Env,
   userId: string,
   now: number,
@@ -107,7 +119,36 @@ export function purgeRetiredAccount(
   const guard =
     "EXISTS(SELECT 1 FROM account_retirements WHERE user_id=? AND state='pending' AND purge_after<=?)";
   const anonymousName = `탈퇴-${crypto.randomUUID().replaceAll('-', '').slice(0, 12)}`;
+  // 계정만 비식별화해도 새 프로필 사진·미확정 연결 파일이 남지 않게 원본부터 정리한다.
+  const temporary = await db
+    .prepare(
+      `SELECT path FROM profile_photos WHERE owner_id=? AND ${guard}
+    UNION SELECT f.path FROM guest_import_files f JOIN guest_import_operations o ON o.actor_id=f.actor_id AND o.operation_id=f.operation_id
+    WHERE f.actor_id=? AND o.state='pending' AND ${guard}`,
+    )
+    .bind(userId, userId, now, userId, userId, now)
+    .all<{ path: string }>();
+  if (temporary.results.length) {
+    const bucket = env.MEDIA || rejectRequest('CONFIGURATION_REQUIRED');
+    for (let offset = 0; offset < temporary.results.length; offset += 1000)
+      await bucket.delete(
+        temporary.results.slice(offset, offset + 1000).map((row) => row.path),
+      );
+  }
   return db.batch([
+    db
+      .prepare(`DELETE FROM profile_photos WHERE owner_id=? AND ${guard}`)
+      .bind(userId, userId, now),
+    db
+      .prepare(
+        `DELETE FROM profile_submit_operations WHERE user_id=? AND ${guard}`,
+      )
+      .bind(userId, userId, now),
+    db
+      .prepare(
+        `DELETE FROM guest_import_operations WHERE actor_id=? AND ${guard}`,
+      )
+      .bind(userId, userId, now),
     db
       .prepare(`DELETE FROM plan_drafts WHERE owner_id=? AND ${guard}`)
       .bind(userId, userId, now),

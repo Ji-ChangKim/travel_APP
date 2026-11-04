@@ -19,8 +19,8 @@ import {
   accountChangeState,
   profileUpdateState,
 } from '@/features/auth/model/model';
-import { guestSession } from '@/services/guestSession';
-import { cloudProfile } from '@/services/cloudAuth';
+import * as Crypto from 'expo-crypto';
+import { selectLocalGuestSession } from '@/services/cloudAuth';
 
 interface TripState {
   currentUser: Profile | null;
@@ -53,9 +53,20 @@ export const useTripStore = create<TripState>((set, get) => ({
   loginAsGuest: async (osPlatform) => {
     // 기기 저장이 끝나야 같은 게스트의 여행으로 다시 진입할 수 있다.
     const stored = await loadStoredGuestSession(false);
-    const profile =
-      stored || cloudProfile((await guestSession()).user, osPlatform);
+    // 게스트는 서버 회원이 아닌 기기 문맥이므로 오프라인에서도 새 자료 영역을 만든다.
+    const now = new Date().toISOString();
+    const profile: Profile = stored || {
+      id: Crypto.randomUUID(),
+      nickname: '여행자',
+      authProvider: 'guest',
+      avatarUrl: null,
+      onboardingCompleted: true,
+      osPlatform,
+      createdAt: now,
+      updatedAt: now,
+    };
     await saveGuestSession(profile);
+    await selectLocalGuestSession();
     get().setCurrentUser(profile);
     return profile;
   },

@@ -13,7 +13,7 @@ export function saveSocialReturn(params: AuthReturn): Promise<void> {
   // 원문 URL이나 인증 토큰은 복귀 정보에 저장하지 않는다.
   return storeReturn(
     JSON.stringify({
-      ...authReturn(params.next, params.destination, params.tripId),
+      ...authReturn(params.next, params.destination, params.tripId, params),
       savedAt: Date.now(),
     }),
   );

@@ -195,6 +195,13 @@ export async function signOutCloud(): Promise<void> {
     notifySession(null);
   });
 }
+// 게스트를 명시적으로 선택하면 원격 확인 없이 이 기기의 회원 자격만 해제한다.
+export async function selectLocalGuestSession(): Promise<void> {
+  const token = await tokens.read();
+  await tokens.clearIfCurrent(token, () => {
+    notifySession(null);
+  });
+}
 // 서버에서 철회한 요청 토큰만 정리한다.
 export function clearRevokedCloudSession(token: string): Promise<boolean> {
   // 탈퇴 요청에 사용한 토큰만 지우고, 계정 반영은 인증 구독자에게 맡긴다.
@@ -215,8 +222,8 @@ export function cloudProfile(user: CloudUser, osPlatform: OsPlatform): Profile {
   // 실제 회원 UUID와 닉네임을 유지한다.
   return {
     id: user.id,
-    nickname: user.name,
-    avatarUrl: user.image || null,
+    nickname: user.isAnonymous ? user.name : '',
+    avatarUrl: null,
     authProvider: user.isAnonymous ? 'guest' : 'email',
     onboardingCompleted: Boolean(user.isAnonymous),
     osPlatform,

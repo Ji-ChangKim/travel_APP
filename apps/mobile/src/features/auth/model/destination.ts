@@ -2,13 +2,19 @@ import type { Href } from 'expo-router';
 import { useTripStore } from '@/stores/useTripStore';
 import { fetchUserProfile } from '@/services/profileService';
 import { pendingAuthDestination } from '@/features/workspace/hub/model/mapsShare';
-import { authReturn, authReturnPath } from './authReturn';
+import { authReturn, authReturnPath, type AuthReturn } from './authReturn';
+import {
+  localGuestTrips,
+  linkedGuestTrip,
+  linkedGuestTarget,
+} from '@/services/guestImportService';
 
 // 인증 후에는 개인정보 설정을 먼저 확인한 뒤 원래 요청한 행동을 이어간다.
 export function authenticatedDestination(
   next?: string,
   destination?: string,
   tripId?: string,
+  context: AuthReturn = {},
 ): Promise<Href> {
   // 로그인 이벤트에서 받은 실제 회원 UUID만 상세 조회에 사용한다.
   return memberDestination(
@@ -16,6 +22,7 @@ export function authenticatedDestination(
     next,
     destination,
     tripId,
+    context,
   );
 }
 
@@ -25,26 +32,27 @@ function memberDestination(
   next?: string,
   destination?: string,
   tripId?: string,
+  context: AuthReturn = {},
 ): Promise<Href> {
   // 프로필 조회 실패는 설정 절차를 건너뛰지 않는다.
   return !id
     ? Promise.resolve({
         pathname: '/login',
-        params: authReturn(next, destination, tripId),
+        params: authReturn(next, destination, tripId, context),
       })
     : fetchUserProfile(id).then((profile) => {
         // 조회 중 다른 계정으로 바뀌면 이전 요청을 적용하지 않는다.
         return !profile || useTripStore.getState().currentUser?.id !== id
           ? {
               pathname: '/login',
-              params: authReturn(next, destination, tripId),
+              params: authReturn(next, destination, tripId, context),
             }
           : (useTripStore.getState().updateProfile(profile),
             profile.onboardingCompleted
-              ? completedDestination(next, destination, tripId)
+              ? completedDestination(next, destination, tripId, false, context)
               : {
                   pathname: '/profile-setup',
-                  params: authReturn(next, destination, tripId),
+                  params: authReturn(next, destination, tripId, context),
                 });
       });
 }
@@ -54,10 +62,55 @@ export function completedDestination(
   next?: string,
   destination?: string,
   tripId?: string,
+  linkChecked = false,
+  context: AuthReturn = {},
 ): Promise<Href> {
+  const account = useTripStore.getState().currentUser;
+  if (
+    !linkChecked &&
+    account &&
+    account.authProvider !== 'guest' &&
+    next !== 'community' &&
+    next !== 'account'
+  ) {
+    return localGuestTrips().then(async (local) => {
+      const needsLink =
+        local &&
+        (
+          await Promise.all(
+            local.document.trips.map(
+              async (item) =>
+                !(await linkedGuestTrip(account.id, item.trip.id)),
+            ),
+          )
+        ).some(Boolean);
+      if (needsLink)
+        return {
+          pathname: '/login',
+          params: {
+            ...authReturn(next, destination, tripId, context),
+            link: '1',
+          },
+        };
+      const serverTrip = tripId && (await linkedGuestTrip(account.id, tripId));
+      const targetRef = tripId
+        ? await linkedGuestTarget(account.id, tripId, context.targetRef)
+        : context.targetRef;
+      return completedDestination(
+        next,
+        destination,
+        serverTrip || tripId,
+        true,
+        { ...context, targetRef },
+      );
+    });
+  }
   // 외부에서 임의 복귀 경로를 전달할 수 없도록 고정 경로만 사용한다.
   return pendingAuthDestination().then((pending) => {
     // 초대·공유를 우선하고 검증한 원래 화면으로 돌아간다.
-    return authReturnPath(authReturn(next, destination, tripId), pending);
+    return authReturnPath(
+      authReturn(next, destination, tripId, context),
+      pending,
+    );
   });
 }

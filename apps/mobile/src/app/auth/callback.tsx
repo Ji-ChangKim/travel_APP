@@ -14,6 +14,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
   completeSocialAuth,
   socialRedirectUrl,
+  isSocialCancellation,
+  clearSocialExchange,
 } from '@/features/auth/manager/oauth';
 import {
   readSocialReturn,
@@ -57,12 +59,18 @@ export default function AuthCallbackScreen() {
       .then((params) => {
         // 실패 후 새 로그인을 시작할 때도 원래 목적을 보존한다.
         if (active) setTarget(params);
+        if (isSocialCancellation(callbackUrl))
+          return clearSocialExchange().then(() => ({
+            pathname: '/login' as const,
+            params: { ...params, force_auth_entry: '1' },
+          }));
         return completeSocialAuth(callbackUrl).then(() => {
           // 신규 SNS 회원은 복귀 목적을 가진 개인정보 설정으로 이동한다.
           return authenticatedDestination(
             params.next,
             params.destination,
             params.tripId,
+            params,
           );
         });
       })

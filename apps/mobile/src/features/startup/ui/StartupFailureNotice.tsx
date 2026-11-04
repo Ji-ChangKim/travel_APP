@@ -21,6 +21,7 @@ export default function StartupFailureNotice({
   const local = controller.failure === 'local';
   const auth = controller.failure === 'auth';
   const update = controller.failure === 'incompatible' || local;
+  const connection = controller.failure === 'timeout' || auth;
   return blockedUpdate ? (
     <StartupUpdateNotice
       visible={visible}
@@ -43,25 +44,30 @@ export default function StartupFailureNotice({
             : '여행 시작 안내',
       )}
       paragraphs={
-        local
+        connection
           ? [
-              t('이 기기의 여행 기록을 열지 못했어요.'),
-              t('기록을 지우지 말고 앱을 업데이트한 뒤 다시 시도해 주세요.'),
+              t('연결 상태를 확인하지 못했어요.'),
+              t('연결을 확인하고 다시 시도해 주세요.'),
             ]
-          : auth
+          : local
             ? [
-                t('로그인 정보를 확인하지 못했어요.'),
-                t('연결을 확인하고 다시 시도해 주세요.'),
+                t('이 기기의 여행 기록을 열지 못했어요.'),
+                t('기록을 지우지 말고 앱을 업데이트한 뒤 다시 시도해 주세요.'),
               ]
-            : update
+            : auth
               ? [
-                  t('새로운 여행을 이어가려면 업데이트가 필요해요.'),
-                  t('새 버전으로 업데이트한 뒤 다시 시도해 주세요.'),
-                ]
-              : [
-                  t('여행을 준비하지 못했어요.'),
+                  t('로그인 정보를 확인하지 못했어요.'),
                   t('연결을 확인하고 다시 시도해 주세요.'),
                 ]
+              : update
+                ? [
+                    t('새로운 여행을 이어가려면 업데이트가 필요해요.'),
+                    t('새 버전으로 업데이트한 뒤 다시 시도해 주세요.'),
+                  ]
+                : [
+                    t('여행을 준비하지 못했어요.'),
+                    t('연결을 확인하고 다시 시도해 주세요.'),
+                  ]
       }
     >
       <DesignButton
@@ -76,6 +82,14 @@ export default function StartupFailureNotice({
           label={t('로그인으로 이동')}
           onPress={controller.login}
           disabled={controller.pending}
+        />
+      )}
+      {controller.canGuest && (
+        <DesignButton
+          label={t('게스트로 둘러보기')}
+          disabled={controller.guestBusy}
+          loading={controller.guestBusy}
+          onPress={() => void controller.guest()}
         />
       )}
       {update && Platform.OS === 'android' && (

@@ -174,7 +174,7 @@ function renderWorkspaceLayout(
                 label={t('로그인 / 회원가입')}
                 onPress={() => {
                   // 기기 여행을 자동 업로드하지 않고 회원 인증을 선택하게 한다.
-                  return router.push('/login');
+                  return props.login();
                 }}
               />
             </View>

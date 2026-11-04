@@ -1,0 +1,72 @@
+import { StyleSheet } from 'react-native';
+import { colors, radii, typography } from '@/constants/theme';
+
+export const profileSetupStyles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: colors.background },
+  content: {
+    flexGrow: 1,
+    width: '100%',
+    maxWidth: 640,
+    alignSelf: 'center',
+    padding: 20,
+    gap: 24,
+  },
+  introduction: { gap: 8 },
+  title: {
+    fontSize: 22,
+    lineHeight: 32,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  body: {
+    fontSize: typography.bodyMedium.size,
+    lineHeight: typography.bodyMedium.lineHeight,
+    color: colors.muted,
+  },
+  portraitGroup: { alignItems: 'center', gap: 12 },
+  portraitButton: {
+    minWidth: 120,
+    minHeight: 120,
+    borderRadius: 60,
+    borderWidth: 2,
+    borderColor: colors.border,
+    overflow: 'hidden',
+    backgroundColor: colors.surface,
+  },
+  portrait: { width: 120, height: 120, borderRadius: 60 },
+  camera: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: colors.brandCoral,
+  },
+  field: { gap: 8 },
+  label: {
+    fontSize: 16,
+    lineHeight: 24,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  counter: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: colors.muted,
+    textAlign: 'right',
+  },
+  error: { fontSize: 14, lineHeight: 22, color: colors.danger },
+  footer: { marginTop: 'auto', gap: 12, paddingTop: 16 },
+  choices: { gap: 12, paddingVertical: 12 },
+  avatar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    minHeight: 56,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radii.input,
+  },
+  avatarImage: { width: 48, height: 48, borderRadius: 24 },
+});

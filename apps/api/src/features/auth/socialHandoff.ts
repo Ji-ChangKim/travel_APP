@@ -1,3 +1,4 @@
+import { socialReturnError } from './socialOutcome';
 import { z } from 'zod';
 import { parseCookies } from 'better-auth/cookies';
 import type { Hono, Context } from 'hono';
@@ -207,7 +208,9 @@ function returned(c: Ctx): Promise<Response> {
       return !row
         ? rejectRequest('SESSION_EXPIRED')
         : c.req.query('failed')
-          ? c.redirect(`${row.redirect_uri}?error=cancelled`)
+          ? c.redirect(
+              `${row.redirect_uri}?error=${socialReturnError(c.req.query('error'))}`,
+            )
           : saveReturned(c, row);
     });
 }
@@ -245,9 +248,9 @@ function saveReturned(
                       ) || rejectRequest('SESSION_EXPIRED'),
                     );
                   })
-                : c.redirect(`${row.redirect_uri}?error=cancelled`);
+                : c.redirect(`${row.redirect_uri}?error=verification_failed`);
             })
-        : c.redirect(`${row.redirect_uri}?error=cancelled`);
+        : c.redirect(`${row.redirect_uri}?error=verification_failed`);
     });
 }
 

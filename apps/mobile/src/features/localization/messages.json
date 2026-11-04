@@ -1,6 +1,133 @@
 {
+  "이 기기의 여행을 계정에 연결할까요?": [
+    "Connect this device’s trips to your account?",
+    "この端末の旅行をアカウントに連携しますか？"
+  ],
+  "선택한 여행만 계정에 보관해요. 이 기기의 원본은 그대로 남아요.": [
+    "Only selected trips will be saved to your account. Originals stay on this device.",
+    "選んだ旅行だけをアカウントに保存します。この端末の元の記録は残ります。"
+  ],
+  "연결할 계정: {nickname}": ["Account: {nickname}", "連携先: {nickname}"],
+  "연결 완료": ["Connected", "連携完了"],
+  "연결 실패 · 다시 시도해 주세요": [
+    "Connection failed · Try again",
+    "連携できませんでした・もう一度お試しください"
+  ],
+  "선택됨": ["Selected", "選択済み"],
+  "선택한 여행 연결": ["Connect selected trips", "選んだ旅行を連携"],
+  "연결하지 않고 계속": ["Continue without connecting", "連携せずに続ける"],
+  "게스트 여행으로 돌아가기": ["Return to guest trips", "ゲストの旅行に戻る"],
+  "여행에서 사용할 프로필을 만들어요": [
+    "Create your travel profile",
+    "旅行で使うプロフィールを作成"
+  ],
+  "닉네임은 여행 기록에 표시돼요. 사진은 나중에 바꿀 수 있어요.": [
+    "Your nickname appears in travel records. You can change your photo later.",
+    "ニックネームは旅行記録に表示されます。写真は後から変更できます。"
+  ],
+  "프로필 이미지 선택": ["Choose a profile image", "プロフィール画像を選択"],
+  "사진을 불러오고 있어요…": ["Loading your photo…", "写真を読み込んでいます…"],
+  "기본 이미지로도 시작할 수 있어요.": [
+    "You can start with the default image.",
+    "標準の画像でも始められます。"
+  ],
+  "닉네임을 입력해 주세요": [
+    "Enter a nickname",
+    "ニックネームを入力してください"
+  ],
+  "닉네임 {count}/10자": [
+    "Nickname: {count}/10 characters",
+    "ニックネーム {count}/10文字"
+  ],
+  "한글, 영문, 숫자로 2~10자까지 사용할 수 있어요.": [
+    "Use 2–10 Korean or English letters or numbers.",
+    "韓国語・英字・数字で2～10文字を入力してください。"
+  ],
+  "저장 결과를 확인하고 있어요.": [
+    "Checking the save result.",
+    "保存結果を確認しています。"
+  ],
+  "시작하기": ["Get started", "始める"],
+  "기본 이미지, 여행자 아바타 또는 내 사진을 선택해 주세요.": [
+    "Choose the default image, a traveler avatar, or your photo.",
+    "標準の画像、旅行者アバター、自分の写真から選んでください。"
+  ],
+  "기본 이미지 사용": ["Use default image", "標準の画像を使用"],
+  "하루 아바타": ["Haru avatar", "ハルのアバター"],
+  "여행자 아바타": ["Traveler avatar", "旅行者アバター"],
+  "사진 선택": ["Choose a photo", "写真を選択"],
+  "사진 촬영": ["Take a photo", "写真を撮影"],
+  "게스트로 둘러보기": ["Explore as a guest", "ゲストとして見る"],
+  "연결 상태를 확인하지 못했어요.": [
+    "We couldn’t check your connection.",
+    "接続状況を確認できませんでした。"
+  ],
+  "TripPrint MVP - {version}": [
+    "TripPrint MVP - {version}",
+    "TripPrint MVP - {version}"
+  ],
+  "닉네임은 2~10자로 입력해 주세요.": [
+    "Enter a nickname with 2–10 characters.",
+    "ニックネームは2～10文字で入力してください。"
+  ],
+  "한글, 영문, 숫자만 사용할 수 있어요.": [
+    "Only Korean or English letters and numbers are allowed.",
+    "韓国語・英字・数字のみ使用できます。"
+  ],
+  "프로필을 불러오지 못했어요. 연결을 확인하고 다시 시도해 주세요.": [
+    "Couldn’t load your profile. Check your connection and try again.",
+    "プロフィールを読み込めませんでした。接続を確認して再度お試しください。"
+  ],
+  "프로필을 저장하지 못했어요. 입력한 내용은 그대로예요. 다시 시도해 주세요.": [
+    "Couldn’t save your profile. Your entries are kept. Please try again.",
+    "プロフィールを保存できませんでした。入力内容は残っています。もう一度お試しください。"
+  ],
+  "사진을 촬영하려면 카메라 접근 권한이 필요해요.": [
+    "Allow camera access to take a photo.",
+    "写真の撮影にはカメラへのアクセス許可が必要です。"
+  ],
+  "사진은 10MB 이하로 선택해 주세요.": [
+    "Choose a photo up to 10 MB.",
+    "10MB以下の写真を選んでください。"
+  ],
+  "사진을 불러오지 못했어요. 다른 사진을 선택해 주세요.": [
+    "Couldn’t load the photo. Choose another one.",
+    "写真を読み込めませんでした。別の写真を選んでください。"
+  ],
+  "사진을 불러오지 못했어요. 다시 시도하거나 다른 사진을 선택해 주세요.": [
+    "Couldn’t load the photo. Try again or choose another one.",
+    "写真を読み込めませんでした。再度試すか別の写真を選んでください。"
+  ],
+  "다시 로그인한 뒤 사진을 선택해 주세요.": [
+    "Sign in again, then choose a photo.",
+    "再ログインしてから写真を選んでください。"
+  ],
+  "이 기기의 여행을 불러오지 못했어요. 다시 시도해 주세요.": [
+    "Couldn’t load this device’s trips. Please try again.",
+    "この端末の旅行を読み込めませんでした。もう一度お試しください。"
+  ],
+  "연결하지 못한 여행이 있어요. 이 기기의 원본은 그대로예요. 다시 시도해 주세요.": [
+    "Some trips couldn’t be connected. Originals remain on this device. Please try again.",
+    "連携できなかった旅行があります。この端末の元の記録は残っています。もう一度お試しください。"
+  ],
+  "이 기기의 여행으로 돌아가지 못했어요. 다시 시도해 주세요.": [
+    "Couldn’t return to this device’s trips. Please try again.",
+    "この端末の旅行に戻れませんでした。もう一度お試しください。"
+  ],
+  "이 기기의 여행을 시작하지 못했어요. 저장 공간을 확인하고 다시 시도해 주세요.": [
+    "Couldn’t start trips on this device. Check your storage and try again.",
+    "この端末で旅行を始められませんでした。保存領域を確認して再度お試しください。"
+  ],
+  "사진 원본을 찾지 못했어요. 이 기기의 기록을 확인한 뒤 다시 시도해 주세요.": [
+    "Couldn’t find the original photo. Check this device’s records and try again.",
+    "元の写真が見つかりません。この端末の記録を確認して再度お試しください。"
+  ],
+  "연결 결과를 확인하지 못했어요. 다시 시도해 주세요.": [
+    "Couldn’t confirm the connection. Please try again.",
+    "連携結果を確認できませんでした。もう一度お試しください。"
+  ],
   "뒤로 버튼을 한 번 더 누르면 앱이 종료됩니다.": [
-    "Press Back again to exit the app.",
+    "Press back again to exit the app.",
     "もう一度戻るボタンを押すとアプリを終了します。"
   ],
   "나만의 여행 기록": ["My travel memories", "私だけの旅の記録"],
@@ -1427,10 +1554,7 @@
     "You can change these later in Travel tools on the home screen.",
     "後からホームの旅行ツールで設定を変更できます。"
   ],
-  "현재 위치 지도에서 보기": [
-    "Show my location on the map",
-    "現在地を地図で見る"
-  ],
+  "현재 위치 지도에서 보기": ["Show my location on map", "現在地を地図で表示"],
   "앱 권한 설정": ["App permissions", "アプリの権限設定"],
   "게스트 여행을 내 계정에 연결하기": [
     "Connect guest travel to my account",
@@ -2018,7 +2142,7 @@
   "이용 조건 열기 · {p0}": ["Open usage terms · {p0}", "利用条件を開く · {p0}"],
   "담은 일정 열기": ["Open copied itinerary", "取り込んだ予定を開く"],
   "일정 담기": ["Copy itinerary", "予定を取り込む"],
-  "담김": ["Copied", "取り込み済み"],
+  "담김": ["Added", "追加済み"],
   "저장": ["Save", "保存"],
   "내 여행에서 열기": ["Open in my trips", "自分の旅行で開く"],
   "같은 요청 다시 확인": [
@@ -4354,7 +4478,6 @@
   "일정 유형": ["Activity type", "予定の種類"],
   "당일치기": ["Day trip", "日帰り"],
   "총 {p0}일간의 여정": ["{p0}-day journey", "全{p0}日間の旅"],
-  "어디로 떠나시나요?": ["Where are you heading?", "どこへ出かけますか？"],
   "가고 싶은 도시를 선택하거나 검색해 보세요.": [
     "Select or search for a city you want to visit.",
     "行きたい都市を選ぶか検索してみましょう。"
@@ -4461,11 +4584,6 @@
     "Add & review flights (optional)",
     "フライトの追加と確認（任意）"
   ],
-  "뒤로 버튼을 한 번 더 누르면 앱이 종료됩니다.": [
-    "Press back again to exit the app.",
-    "もう一度戻るボタンを押すとアプリを終了します。"
-  ],
-  "현재 위치 지도에서 보기": ["Show my location on map", "現在地を地図で表示"],
   "위치 확인 중...": ["Locating...", "現在地を確認中..."],
   "내 위치": ["My location", "現在地"],
   "진행 중이거나 예정된 모든 여행 관리": [
@@ -4525,7 +4643,6 @@
   "{p0} 장소 찾기": ["Find {p0} places", "{p0}の場所を探す"],
   "카페/디저트": ["Cafe / Dessert", "カフェ・デザート"],
   "명소/관광": ["Sights / Attractions", "名所・観光"],
-  "쇼핑": ["Shopping", "ショッピング"],
   "필수 명소 바로 담기": ["Must-visit spots to add", "定番スポットをすぐ追加"],
   "추천 명소 지도에서 보기": [
     "View recommended spots on map",
@@ -4535,7 +4652,6 @@
   "추천 명소": ["Recommended spot", "おすすめの名所"],
   "{p0} 바로 담기": ["Quick add {p0}", "{p0}をすぐ追加"],
   "담기": ["Add", "追加"],
-  "담김": ["Added", "追加済み"],
   "여행 팁": ["Travel tip", "旅のヒント"],
   "가고 싶은 장소를 먼저 담아두면 날짜별 동선과 이동수단을 한눈에 비교할 수 있어요.": [
     "Add the places you want to visit first to easily compare daily routes and transit options.",
@@ -4799,5 +4915,14 @@
   "작성된 여행 계획은 언제든 비공개로 유지할 수 있으며, 준비가 완료되었을 때만 공개할 수 있어요.": [
     "Your trip plans stay private by default and are only shared when you choose to publish them.",
     "作成した旅行計画はいつでも非公開のまま保たれ、準備ができたときだけ公開できます。"
-  ]
+  ],
+  "신고 내용을 불러오지 못했어요. 내용을 확인하고 다시 작성해 주세요.": [
+    "Couldn’t restore your report. Check the content and enter it again.",
+    "通報内容を復元できませんでした。内容を確認してもう一度入力してください。"
+  ],
+  "이 작업을 이어가려면 해당 여행을 계정에 연결해 주세요.": [
+    "Connect this trip to your account to continue.",
+    "この操作を続けるには対象の旅行をアカウントに連携してください。"
+  ],
+  "홈으로 이동": ["Go to home", "ホームに移動"]
 }

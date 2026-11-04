@@ -15,6 +15,9 @@ import useLoginController from '@/features/auth/manager/useLoginController';
 import AuthFailureNotice from '@/features/auth/ui/AuthFailureNotice';
 import { loginStyles as styles } from '@/features/auth/styles/loginStyles';
 import { homeDestination } from '@/features/workspace/home/model/homeDestinations';
+import Constants from 'expo-constants';
+import { welcomeStyles as brandStyles } from '@/features/auth/styles/welcomeStyles';
+import GuestLinkNotice from '@/features/auth/ui/GuestLinkNotice';
 
 // 제공한 여행 이미지와 문구로 앱의 첫 인증 화면을 표시한다.
 function LoginHero({
@@ -28,27 +31,20 @@ function LoginHero({
   // 여행을 시작하기 전에 선택한 목적지는 로그인 이후에도 이어진다.
   return (
     <View style={styles.hero}>
-      <View style={styles.portrait}>
+      <View style={{ alignItems: 'center', gap: 16 }}>
         <Image
-          source={require('../../assets/brand/tripprint-v1/TripPrint_login-hero.png')}
-          style={styles.portraitImage}
-          resizeMode="cover"
-          accessibilityLabel={t('여행 노트 위에서 캐리어와 함께 떠나는 여행자')}
+          source={require('../../assets/brand/tripprint-v1/tripprint-app-icon-source.png')}
+          style={brandStyles.symbol}
+          resizeMode="contain"
+          accessibilityLabel="TripPrint"
         />
-        <View style={styles.flightBadge} accessible={false}>
-          <Ionicons name="airplane" size={20} color={colors.textLight} />
-        </View>
+        <Image
+          source={require('../../assets/brand/tripprint-v1/tripprint-wordmark-en.png')}
+          style={brandStyles.wordmark}
+          resizeMode="contain"
+          accessibilityLabel="TripPrint"
+        />
       </View>
-      <Text style={styles.eyebrow}>{t('트립프린트 · TRIPPRINT')}</Text>
-      <Text style={styles.title}>
-        {t('여행의')} <Text style={styles.highlight}>{t('발자취')}</Text>
-        {t('를 남기다')}
-      </Text>
-      <Text style={styles.description}>
-        {t('장소를 잇고 순간을 기록하는')}
-        {'\n'}
-        {t('나만의 여행 아카이브')}
-      </Text>
       {next === 'new-trip' ? (
         <Text style={styles.context}>
           {homeDestination(destination)?.city || t('새 여행')}{' '}
@@ -146,18 +142,22 @@ function ExistingSession({
 export default function LoginScreen() {
   useLocale();
   // 인증 전에 고른 여행의 고정 복귀 경로만 전달한다.
-  const { next, destination, tripId, reauth } = useLocalSearchParams<{
-    next?: string;
-    destination?: string;
-    tripId?: string;
-    reauth?: string;
-  }>();
+  const { next, destination, tripId, reauth, force_auth_entry, link } =
+    useLocalSearchParams<{
+      next?: string;
+      destination?: string;
+      tripId?: string;
+      reauth?: string;
+      force_auth_entry?: string;
+      link?: string;
+    }>();
   const router = useRouter();
   const controller = useLoginController(next, destination, tripId);
   const signedInMember = Boolean(
     controller.currentUser &&
     controller.currentUser.authProvider !== 'guest' &&
-    reauth !== '1',
+    reauth !== '1' &&
+    force_auth_entry !== '1',
   );
   // 인증 화면은 하단 메뉴 없이 Google 로그인과 게스트 시작 선택에 집중한다.
   return (
@@ -187,24 +187,41 @@ export default function LoginScreen() {
           <Text style={styles.context}>
             {t('다시 로그인하고 여행을 이어가요.')}
           </Text>
-        ) : (
+        ) : force_auth_entry !== '1' ? (
           <ExistingSession controller={controller} />
-        )}
+        ) : null}
         <View style={styles.actions}>
           <GoogleLogin
             busy={controller.operation === 'google'}
             disabled={controller.busy || signedInMember}
             onPress={controller.startGoogle}
           />
-          {!controller.currentUser && (
+          {(!controller.currentUser ||
+            force_auth_entry === '1' ||
+            reauth === '1') && (
             <>
               <View style={styles.guestDivider} accessible={false} />
               <GuestStart controller={controller} />
             </>
           )}
         </View>
+        <Text style={styles.status}>
+          {t('TripPrint MVP - {version}', {
+            version: Constants.expoConfig?.version || '0.0.1',
+          })}
+        </Text>
       </ScrollView>
       <AuthFailureNotice controller={controller} />
+      {link === '1' &&
+        controller.currentUser?.authProvider !== 'guest' &&
+        controller.currentUser && (
+          <GuestLinkNotice
+            key={controller.currentUser.id}
+            next={next}
+            destination={destination}
+            tripId={tripId}
+          />
+        )}
     </SafeAreaView>
   );
 }

@@ -3000,3 +3000,79 @@ ownerId: string, 선택. 최초 회원 복귀 후 계정에 귀속하며 다른 
 보관 위치: 웹 동일 탭 sessionStorage(tripprint.creation.return.v1), 네이티브 현재 앱 실행 메모리. 서버 초안과 구분한다. 인증 토큰·영수증 이미지는 보관하지 않는다.
 _authUnsaved: 화면 전용 string. true면 로그인 복귀 직후에도 이탈 확인을 표시한다. 서버 초안 payload에는 전송하지 않는다.
 정리: 여행 생성·명시적 폐기 때 제거. 초안 저장 성공 시 실제 반환 revision과 저장 상태로 갱신. 로그인 복귀만으로 서버 저장하지 않는다.
+
+[2026-11-04 Notion 최초 프로필 생성·회원 권한]
+DB명: Cloudflare D1 (Env.DB), 이미지: 비공개 R2 (Env.MEDIA). 소스 마이그레이션: 0011_profile_onboarding.sql. 원격 적용은 수행하지 않음.
+표시 닉네임 정책: user_nickname_unique 인덱스를 제거해 중복 허용. 사용자 식별은 user.id와 account(providerId,accountId)의 기존 고유 제약으로 유지한다. 변경 없는 기존 이름은 보존한다. 신규/변경 입력은 trim+NFC 정규화 후 완성형 한글·영문 대소문자·숫자 2~10 Unicode 코드 포인트만 허용한다.
+테이블명: profiles (기존 user_id PK/FK user(id), details JSON, gender, birth_date, onboarding_completed_at 유지)
+avatar_type: TEXT NOT NULL DEFAULT 'default', CHECK default/avatar/photo, 선택 이미지의 종류.
+avatar_id: nullable TEXT, avatar_type=avatar일 때 활성 카탈로그의 ID.
+photo_file_ref: nullable TEXT, avatar_type=photo일 때 profile_photos.id. 서버가 현재 계정 소유권을 다시 검증하며 임의 외래 참조를 허용하지 않는다.
+revision: INTEGER NOT NULL DEFAULT 1 CHECK >0, 최초 완료 시 1, 이후 편집마다 증가.
+onboarding_completed_at: nullable INTEGER UTC epoch ms, 프로필 최초 저장과 같은 D1 batch에서 확정. 완료된 계정의 재등록 요청은 기존 프로필을 반환하고 닉네임·이미지를 덮어쓰지 않는다.
+avatar_type별 avatar_id와 photo_file_ref는 API의 strict 배타 검증으로 하나만 사용하며 default는 둘 다 null이다.
+테이블명: profile_photos
+id: TEXT PRIMARY KEY UUID, 클라이언트가 생성한 업로드 식별자.
+owner_id: TEXT NOT NULL FK user(id) ON DELETE CASCADE, 세션에서 결정한 업로드 계정.
+path: TEXT NOT NULL UNIQUE, profiles/{ownerId}/{photoId}.jpg 또는 .png의 비공개 R2 경로.
+mime: TEXT NOT NULL CHECK image/jpeg 또는 image/png, 파일 내용 검사로 판정.
+size: INTEGER NOT NULL CHECK 1~10485760, 정리한 파일의 실제 바이트 수. 입력도 10MiB 제한.
+created_at: INTEGER NOT NULL, 서버 생성 UTC epoch ms.
+인덱스: profile_photos_owner(owner_id). 사진 읽기도 현재 계정의 Bearer 인증과 소유권을 요구한다.
+테이블명: profile_submit_operations
+user_id: TEXT NOT NULL FK user(id) ON DELETE CASCADE.
+operation_id: TEXT NOT NULL UUID, user_id와 복합 PK. 같은 계정/작업의 재시도는 같은 저장 결과를 반환한다.
+input_json: TEXT NOT NULL CHECK json_valid, 정규화한 닉네임·이미지 종류와 참조의 명령. 같은 operation_id의 다른 입력은 REQUEST_KEY_REUSED.
+result_json: TEXT NOT NULL CHECK json_valid, 최초 완료 시점의 Profile 응답 원본. 나중에 편집한 프로필로 재시도 결과를 바꾸지 않는다.
+created_at: INTEGER NOT NULL, UTC epoch ms.
+객체명: Profile 추가 필드(기존 필드 호환을 위해 타입에서는 optional)
+avatarType: 'default'|'avatar'|'photo'; avatarId: string|null; photoFileRef: UUID string|null; completedAt: ISO timestamp|null; revision: positive integer.
+객체명: ProfileCompleteInput
+operationId: UUID string 필수. nickname: 정규화된 표시명 필수. avatarType: enum 필수. avatarId/photoFileRef: nullable string, 선택 종류에 따라 배타적 필수.
+객체명: ProfileOperationResult
+operationId: UUID. state: confirmed|unknown. profile: confirmed이면 최초 완료의 Profile, unknown이면 null. unknown을 저장 실패나 완료 성공으로 오인하지 않는다.
+객체명: ProfileAvatar
+id: 안정 string(haru-traveler, tripprint-traveler). assetKey: 기존 앱 자산 키(haru-loading, login-hero). active: true. 새 브랜드 자산을 생성하지 않는다.
+권한: 미완료 회원은 본인 /api/v1/profile·avatars·photo·complete·operations만 허용한다. 여행·공유·공개·OCR API는 ONBOARDING_REQUIRED(403). 게스트와 회원 계정 자료를 병합하지 않는다. 탈퇴 대기·완료 계정은 새 로그인만으로 자동 복구하지 않는다.
+이미지 검증: JPEG/PNG 컨테이너·필수 프레임/청크·길이/크기를 확인하고 GPS·불필요한 EXIF를 제거한다. 방향 태그는 유지한다. Worker 기본 API에는 압축 픽셀 전체 디코딩이 없으므로 픽셀의 진위 보장은 하지 않으며 앱이 선택 이미지를 재인코딩한다. 미사용 임시 업로드의 영구 삭제 정책은 이번 소스 구현에서 자동 실행하지 않는다.
+
+[2026-11-04 기기 여행 선택 연결]
+DB명: Cloudflare D1 (Env.DB), 파일: 비공개 R2 (Env.MEDIA). 마이그레이션0012_guest_import.sql, 원격 적용 없음.
+테이블명: guest_import_operations
+actor_id: TEXT NOT NULL FK user(id) ON DELETE CASCADE, 현재 인증 완료 회원. operation_id: TEXT NOT NULL UUID, actor_id와 복합 기본 키.
+guest_context_ref: TEXT NOT NULL UUID, 사용자가 연결을 확인한 기기 게스트 문맥. 하드웨어 ID나 인증 토큰이 아니다.
+local_trip_id: TEXT NOT NULL UUID, 선택한 기기 여행 참조. UNIQUE(actor_id,guest_context_ref,local_trip_id)로 같은 자료의 재연결을 대응한다.
+server_trip_id: TEXT NOT NULL UNIQUE UUID, 서버에서 발급한 여행 참조. 기기 UUID를 서버 소유권 참조로 재사용하지 않는다.
+input_hash: TEXT NOT NULL SHA-256, 같은 작업 ID의 다른 입력을 거절한다.
+state: TEXT NOT NULL CHECK pending/confirmed, 모든 파일 수신과 DB 저장 확인 전에는 confirmed로 바꾸지 않는다.
+snapshot: TEXT NOT NULL CHECK json_valid, 가져올 여행·일정·지출·준비물·기록의 검증된 스냅샷.
+media_map: TEXT NOT NULL CHECK json_valid, 선택한 원본 파일과 서버 참조의 대응.
+id_map: TEXT NOT NULL CHECK json_valid, 여행과 하위 객체의 로컬 UUID → 서버 새 UUID 대응.
+created_at: INTEGER NOT NULL UTC epoch ms. confirmed_at: nullable INTEGER UTC epoch ms, 확정 저장 시 기록.
+테이블명: guest_import_files
+actor_id,operation_id: TEXT NOT NULL, 작업 테이블의 복합 외래키 ON DELETE CASCADE.
+local_media_id: TEXT NOT NULL UUID, actor_id+operation_id+local_media_id 복합 기본 키.
+path: TEXT NOT NULL UNIQUE, 서버가 정한 비공개 R2 경로.
+mime: TEXT NOT NULL CHECK image/jpeg 또는 image/png.
+size: INTEGER NOT NULL CHECK 1~4194304, 파일 실제 바이트 수.
+content_hash: TEXT NOT NULL SHA-256, 같은 파일 재시도와 내용 변경을 구분한다.
+created_at: INTEGER NOT NULL, 서버 생성 UTC epoch ms.
+연결 완료 전 여행은 계정 여행 목록에 공개하지 않는다. 항목별 결과와 같은 작업 재조회로 부분 실패를 복구하며 기기 원본은 서버 확인 이후에도 복구용으로 보존한다. 다른 계정의 여행·하위 객체 UUID는 가져오기에 사용할 수 없다. 원래 작업은 화면으로만 복귀하며 자동 제출하지 않는다.
+탈퇴 정리 연동: 유예 만료의 기존 purge는 profile_photos의 비공개 원본과 미확정 guest_import_files 원본을 먼저 R2에서 제거하고 해당 메타데이터·프로필 제출 결과·연결 작업을 삭제한다. 완료된 공유 여행의 기존 uploads 원본은 여행 보존 정책을 따른다. R2 정리 실패는 완료로 숨기지 않고 재시도 대상으로 남긴다. 유예 전 계정과 다른 계정의 파일은 정리하지 않는다. 이 변경은 코드와 격리 검증에만 적용했고 운영 계정 정리는 실행하지 않았다.
+
+
+[기기 객체] LocalGuestContext · 2026-11-04 노션 명세 반영
+- DB명: 없음. 기기 SecureStore/브라우저 localStorage와 기기 여행 JSON에 저장하며 서버 user 계정 생성과 구분한다.
+- guestContextRef/Profile.id: string UUID v4, 기기에서 무작위 발급, 필수. 하드웨어 ID·서버 인증 자격으로 사용하지 않는다.
+- nickname: string, 신규 기본값 여행자. 기존 기기 닉네임은 그대로 보존한다.
+- authProvider: literal guest, onboardingCompleted: boolean true, active: boolean. 회원 로그인 뒤 자동 복원 여부만 제어하며 원본 여행을 삭제하지 않는다.
+- createdAt/updatedAt: ISO timestamp string, osPlatform: web/ios/android.
+- GuestWorkspace.ownerId: guestContextRef와 동일한 UUID. 여행 문서는 해당 기기 UUID별로 분리한다.
+- 명시적인 게스트 선택 시 이 기기의 회원 토큰만 해제한다. 기기 UUID는 원격 API의 인증을 대신하지 않는다.
+- 이전 서버 발급 게스트 프로필도 기기 기록 소유자 확인 후 복원한다. 신규 게스트에 서버 회원 발급을 요구하던 이전 설명보다 이 절을 우선한다.
+
+[임시 객체] ReportAuthReturn · 2026-11-04
+- DB명: 없음. WEB sessionStorage/네이티브 SecureStore의 tripprint.auth.report-return. 신고 본문을 URL·분석 로그에 넣지 않는다.
+- originId: UUID string|null, guest: boolean, postId: UUID string, reason: string 최대500자, createdAt: epoch milliseconds number.
+- 같은 계정 또는 명시적인 게스트 전환에서만 해당 게시물의 입력을 복원한다. 다른 계정·미래 시각·1시간 만료·손상 값은 복원하지 않고 다음 조회에서 정리한다.
+- 저장·조회·정리는 한 큐에서 순서대로 실행한다. 실제 복원한 초안의 생성 시각·대상·원래 계정이 같을 때만 정리한다. 로그인이나 복원 성공만으로 신고를 자동 제출하지 않는다.
