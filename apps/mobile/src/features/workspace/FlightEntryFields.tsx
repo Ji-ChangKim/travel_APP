@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { View } from 'react-native';
 import { Action } from './ui';
 import { styles } from './workspaceStyles';
@@ -19,11 +21,12 @@ export default function ScheduleFlightFields({
   onChange: (key: string, value: string) => void;
   disabled?: boolean;
 }) {
+  useLocale();
   // 일반 이동 일정은 별도 항공편 입력을 요구하지 않는다.
   return values.type !== 'TRANSPORT' ? null : (
     <View style={styles.card}>
       <Action
-        label="항공편으로 등록"
+        label={t('항공편으로 등록')}
         selected={values.flightEnabled === 'true'}
         disabled={disabled}
         onPress={() => {

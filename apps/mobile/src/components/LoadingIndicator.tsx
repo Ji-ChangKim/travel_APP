@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { useEffect, useState } from 'react';
 import { Animated, Easing, Platform, StyleSheet, View } from 'react-native';
 import { colors } from '@/constants/theme';
@@ -5,6 +7,7 @@ import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 
 // 완료율 대신 실제 대기 상태를 작은 세 점으로 전달한다.
 export default function LoadingIndicator() {
+  useLocale();
   // 접근성 확인 전과 화면 읽기에서는 반복 움직임을 시작하지 않는다.
   const settings = useAppAccessibility();
   const [phase] = useState(() => new Animated.Value(0));
@@ -35,7 +38,7 @@ export default function LoadingIndicator() {
   return (
     <View
       accessibilityRole="progressbar"
-      accessibilityLabel="불러오는 중"
+      accessibilityLabel={t('불러오는 중')}
       style={s.row}
     >
       {[0, 1, 2].map((index) => {

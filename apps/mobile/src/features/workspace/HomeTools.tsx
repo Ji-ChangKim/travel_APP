@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
 import { useState, type Dispatch, type SetStateAction } from 'react';
@@ -9,6 +11,7 @@ import PermissionTools from '../permissions/PermissionTools';
 
 // 부가 기능은 여행을 시작하는 화면을 가리지 않도록 접어서 제공한다.
 export default function HomeTools() {
+  useLocale();
   // 도구를 펼치는 선택은 현재 홈 화면에만 유지한다.
   return <ToolsContent expanded={useState(false)} />;
 }
@@ -19,12 +22,13 @@ function ToolsContent({
 }: {
   expanded: [boolean, Dispatch<SetStateAction<boolean>>];
 }) {
+  useLocale();
   // 접힌 상태에는 설명 대신 도구를 여는 버튼 하나만 제공한다.
   return (
     <View style={s.tools}>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="여행 도구"
+        accessibilityLabel={t('여행 도구')}
         accessibilityState={{ expanded: open }}
         style={s.sectionHeader}
         onPress={() => {
@@ -32,7 +36,7 @@ function ToolsContent({
           return setOpen(!open);
         }}
       >
-        <Text style={s.linkText}>여행 도구</Text>
+        <Text style={s.linkText}>{t('여행 도구')}</Text>
         <Ionicons
           name={open ? 'chevron-up' : 'chevron-down'}
           size={18}
@@ -43,12 +47,7 @@ function ToolsContent({
         <View>
           <PermissionTools />
           <ToolLink
-            label="초대 링크로 참여"
-            icon="people-outline"
-            path="/invite"
-          />
-          <ToolLink
-            label="Google Maps 장소 가져오기"
+            label={t('Google Maps 장소 가져오기')}
             icon="map-outline"
             path="/import-place"
           />
@@ -68,6 +67,7 @@ function ToolLink({
   icon: keyof typeof Ionicons.glyphMap;
   path: Href;
 }) {
+  useLocale();
   // 내비게이션 동작은 선택한 도구의 경로 하나에만 연결한다.
   return (
     <ToolButton label={label} icon={icon} path={path} router={useRouter()} />
@@ -86,6 +86,7 @@ function ToolButton({
   path: Href;
   router: ReturnType<typeof useRouter>;
 }) {
+  useLocale();
   // 보조 설명을 반복하지 않고 버튼 이름으로 이동 결과를 알린다.
   return (
     <Pressable

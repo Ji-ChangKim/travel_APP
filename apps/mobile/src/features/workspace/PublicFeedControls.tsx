@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
@@ -29,6 +31,7 @@ export default function PublicFeedControls({
   router,
   hideSearchBar = false,
 }: CommunityFeedViewProps) {
+  useLocale();
   // 선택 시트의 표시만 로컬 상태로 관리한다.
   const [opened, setOpened] = useState(false);
 
@@ -38,8 +41,8 @@ export default function PublicFeedControls({
         <View style={s.searchRow}>
           <Ionicons name="search-outline" size={22} color={c.muted} />
           <DesignInput
-            accessibilityLabel="도시·여행 이름 검색"
-            placeholder="도시나 여행 이름을 찾아보세요"
+            accessibilityLabel={t('도시·여행 이름 검색')}
+            placeholder={t('도시나 여행 이름을 찾아보세요')}
             value={search}
             onChangeText={setSearch}
             onSubmitEditing={searchTrips}
@@ -47,14 +50,14 @@ export default function PublicFeedControls({
             style={s.search}
           />
           <PublicFeedButton
-            label="여행 검색"
+            label={t('여행 검색')}
             onPress={searchTrips}
             style={s.iconButton}
           >
             <Ionicons name="arrow-forward" size={22} color={c.primary} />
           </PublicFeedButton>
           <PublicFeedButton
-            label="여행 조건 선택"
+            label={t('여행 조건 선택')}
             onPress={() => {
               setOpened(true);
             }}
@@ -78,10 +81,10 @@ export default function PublicFeedControls({
       <View style={s.callout}>
         <View style={s.calloutCopy}>
           <MaterialIcons name="add-location-alt" size={20} color={c.primary} />
-          <Text style={s.copy}>다녀온 여정이 있다면?</Text>
+          <Text style={s.copy}>{t('다녀온 여정이 있다면?')}</Text>
         </View>
         <PublicFeedButton
-          label="내 발자국 공유하기"
+          label={t('내 발자국 공유하기')}
           onPress={() => {
             /* 내 여행을 골라 기존 선택 공개를 이어간다. */ return router.push(
               userId ? '/plans' : '/login?next=plans',
@@ -89,21 +92,25 @@ export default function PublicFeedControls({
           }}
           style={s.textButton}
         >
-          <Text style={s.link}>내 발자국 공유하기</Text>
+          <Text style={s.link}>{t('내 발자국 공유하기')}</Text>
           <Ionicons name="chevron-forward" size={16} color={c.primary} />
         </PublicFeedButton>
       </View>
       {query.isPending ? (
-        <HaruState kind="loading" title="공개된 여행을 찾고 있어요." compact />
+        <HaruState
+          kind="loading"
+          title={t('공개된 여행을 찾고 있어요.')}
+          compact
+        />
       ) : null}
       {query.isError ? (
         <HaruState
           kind="error"
-          title="여행을 불러오지 못했어요"
-          description="연결 상태를 확인하고 다시 시도해 주세요."
+          title={t('여행을 불러오지 못했어요')}
+          description={t('연결 상태를 확인하고 다시 시도해 주세요.')}
         >
           <Action
-            label="다시 불러오기"
+            label={t('다시 불러오기')}
             loading={query.isFetching}
             onPress={() => {
               /* 같은 공개 조회를 재시도한다. */ return void query.refetch();
@@ -114,11 +121,13 @@ export default function PublicFeedControls({
       {!query.isError && query.data?.pages[0]?.length === 0 ? (
         <HaruState
           kind="empty"
-          title="조건에 맞는 여행이 없어요"
-          description="도시 이름이나 공개 유형, 여행 기간을 바꿔 찾아보세요."
+          title={t('조건에 맞는 여행이 없어요')}
+          description={t(
+            '도시 이름이나 공개 유형, 여행 기간을 바꿔 찾아보세요.',
+          )}
         >
           <Action
-            label="검색 조건 지우기"
+            label={t('검색 조건 지우기')}
             onPress={() => {
               setSearch('');
               setFilters({ q: '', kind: 'all', days: 'all' });

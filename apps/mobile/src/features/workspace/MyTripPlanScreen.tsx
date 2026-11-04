@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import React from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTripStore } from '@/stores/useTripStore';
@@ -9,6 +11,7 @@ import PlanDetailTimelineView from './PlanDetailTimelineView';
 
 // 실제 내 여행 DB 스냅샷을 조회해 확정 일정 타임라인으로 렌더링한다.
 export default function MyTripPlanScreen() {
+  useLocale();
   const { id = '' } = useLocalSearchParams<{ id?: string }>();
   const router = useRouter();
   const userId = useTripStore((state) => state.currentUser?.id || '');
@@ -19,7 +22,10 @@ export default function MyTripPlanScreen() {
   // 로딩 상태를 표시한다.
   if (query.isPending) {
     return (
-      <HaruState kind="loading" title="내 여행 일정을 불러오는 중이에요." />
+      <HaruState
+        kind="loading"
+        title={t('내 여행 일정을 불러오는 중이에요.')}
+      />
     );
   }
 
@@ -28,16 +34,18 @@ export default function MyTripPlanScreen() {
     return (
       <HaruState
         kind="error"
-        title="여행을 불러오지 못했어요"
-        description="연결 상태를 확인하거나 내 여행 목록으로 돌아가 보세요."
+        title={t('여행을 불러오지 못했어요')}
+        description={t(
+          '연결 상태를 확인하거나 내 여행 목록으로 돌아가 보세요.',
+        )}
       >
         <Action
-          label="다시 불러오기"
+          label={t('다시 불러오기')}
           loading={query.isFetching}
           onPress={() => query.refetch()}
         />
         <Action
-          label="내 여행 목록으로 이동"
+          label={t('내 여행 목록으로 이동')}
           variant="quiet"
           onPress={() => router.push('/plans')}
         />

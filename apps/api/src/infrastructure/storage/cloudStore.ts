@@ -356,12 +356,16 @@ export function insertTrip(
   snapshot: Snapshot,
   source?: { postId: string; snapshot: string },
 ): Promise<unknown> {
+  // 생성 시에도 초안 버전을 같은 트랜잭션에서 확인해 다른 기기의 최신 입력을 보존한다.
+  const draftRevision = Number(
+    (m.args.p_input as { draftRevision?: number })?.draftRevision || 0,
+  );
   // 같은 요청이 경쟁해도 첫 요청이 기록한 여행 ID만 생성한다.
   return database(m.env)
     .batch([
       database(m.env)
         .prepare(
-          `INSERT OR IGNORE INTO mutation_requests(actor_id,request_key,input_hash,result,created_at) SELECT ?,?,?,?,?${source ? ' WHERE EXISTS(SELECT 1 FROM posts WHERE id=? AND snapshot=? AND NOT EXISTS(SELECT 1 FROM blocks WHERE actor_id=? AND blocked_id=posts.author_id))' : ''}`,
+          `INSERT OR IGNORE INTO mutation_requests(actor_id,request_key,input_hash,result,created_at) SELECT ?,?,?,?,?${source ? ' WHERE EXISTS(SELECT 1 FROM posts WHERE id=? AND snapshot=? AND NOT EXISTS(SELECT 1 FROM blocks WHERE actor_id=? AND blocked_id=posts.author_id))' : ' WHERE ((?=0 AND NOT EXISTS(SELECT 1 FROM plan_drafts WHERE owner_id=? AND id=?)) OR EXISTS(SELECT 1 FROM plan_drafts WHERE owner_id=? AND id=? AND revision=?))'}`,
         )
         .bind(
           m.session.userId,
@@ -373,7 +377,16 @@ export function insertTrip(
             trip: snapshot.trip,
           }),
           Date.now(),
-          ...(source ? [source.postId, source.snapshot, m.session.userId] : []),
+          ...(source
+            ? [source.postId, source.snapshot, m.session.userId]
+            : [
+                draftRevision,
+                m.session.userId,
+                m.key,
+                m.session.userId,
+                m.key,
+                draftRevision,
+              ]),
         ),
       database(m.env)
         .prepare(
@@ -396,11 +409,19 @@ export function insertTrip(
         [snapshot.trip.id, m.session.userId, 'owner'],
         false,
       ),
+      database(m.env)
+        .prepare(
+          "DELETE FROM plan_drafts WHERE owner_id=? AND id=? AND EXISTS(SELECT 1 FROM mutation_requests WHERE actor_id=? AND request_key=? AND json_extract(result,'$.tripId') IS NOT NULL)",
+        )
+        .bind(m.session.userId, m.key, m.session.userId, m.key),
     ])
     .then((result) => {
       /* 확정 요청 키의 결과만 사용한다. */ return replay(m).then((data) => {
         // 공개 원본이 저장 직전에 바뀌면 빈 성공이나 일부 여행을 남기지 않는다.
-        if (!data) return rejectRequest('RESOURCE_NOT_FOUND');
+        if (!data)
+          return rejectRequest(
+            source ? 'RESOURCE_NOT_FOUND' : 'VERSION_CONFLICT',
+          );
         /* 최초 저장과 재생을 구분한다. */ return {
           data,
           replayed: !result[0]?.meta.changes,

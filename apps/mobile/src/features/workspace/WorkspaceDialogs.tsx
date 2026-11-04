@@ -1,3 +1,4 @@
+import { t } from '@/features/localization/translate';
 import DesignButton from '@/components/DesignButton';
 import { Ionicons } from '@expo/vector-icons';
 import type { WorkspaceSchedule, WorkspaceSnapshot } from '@wherego/domain';
@@ -210,31 +211,52 @@ export function renderWorkspaceMoreMenu({
   );
 }
 
-// 일정 추가의 하단 주요 행동을 표시한다.
+// 지도 동선 확인과 일정 직접 추가의 하단 주요 행동을 분리해 표시한다.
 export function renderWorkspaceAddSchedule({
   busy,
   scanning,
   hasPending,
   actions,
   selectedDay,
+  setActiveSection,
 }: {
   busy: boolean;
   scanning: boolean;
   hasPending: boolean;
   actions: WorkspaceScreenActions;
   selectedDay: string;
+  setActiveSection: Dispatch<SetStateAction<string>>;
+  setShowReceiptCapture?: Dispatch<SetStateAction<boolean>>;
 }): import('react').ReactNode {
   // 전달받은 값과 행동을 기존 화면 규격으로 표시한다.
 
   return (
-    <View style={hub.primaryBar} testID="trip-primary-action">
-      <View style={hub.primaryButton}>
+    <View
+      style={[hub.primaryBar, { flexDirection: 'row', gap: 10 }]}
+      testID="trip-primary-action"
+    >
+      <View style={[hub.primaryButton, { flex: 1 }]}>
         <DesignButton
-          label="일정 추가"
+          label={t('지도 보며 동선 짜기')}
+          variant="secondary"
+          disabled={busy || scanning || hasPending}
+          icon={(color) => {
+            // 등록한 일정과 도시 동선을 지도 탭에서 바로 확인한다.
+            return <Ionicons name="map-outline" size={18} color={color} />;
+          }}
+          onPress={() => {
+            return setActiveSection('map');
+          }}
+        />
+      </View>
+      <View style={[hub.primaryButton, { flex: 1.15 }]}>
+        <DesignButton
+          label={t('일정 추가')}
+          accessibilityLabel={t('일정 추가')}
           variant="primary"
           disabled={busy || scanning || hasPending}
           icon={(color) => {
-            // 하단의 유일한 주요 행동에 추가 아이콘을 붙인다.
+            // 장소 검색 기반 일정 추가 버튼을 표시한다.
             return <Ionicons name="add" size={22} color={color} />;
           }}
           onPress={() => {

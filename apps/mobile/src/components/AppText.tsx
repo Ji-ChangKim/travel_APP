@@ -1,4 +1,5 @@
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
+import { useLocale } from '@/features/localization/localeState';
 import { createContext, useContext } from 'react';
 import {
   Platform,
@@ -8,15 +9,18 @@ import {
 } from 'react-native';
 import { colors, typography } from '@/constants/theme';
 import { AppFontsReady } from './AppFontProvider';
+import { appFontFamily } from './appFontFamily';
 
 const TextAncestor = createContext(false);
 type Props = TextProps & { variant?: 'body' | 'navigation' };
 
 // 스타일이 없는 본문에도 공통 글자색과 행간을 적용한다.
 export default function AppText(props: Props) {
+  const language = useLocale();
   // 중첩 글자는 부모의 크기를 상속해 로고와 강조 문구가 줄어들지 않게 한다.
   return (
     <TextView
+      accessibilityLanguage={language}
       {...props}
       nested={useContext(TextAncestor)}
       fontsReady={useContext(AppFontsReady)}
@@ -32,6 +36,7 @@ function TextView({
   variant = 'body',
   ...props
 }: Props & { nested: boolean; fontsReady: boolean }) {
+  const language = useLocale();
   const { fontScale } = useAppAccessibility();
   // 큰 글자는 보존하고 작은 안내와 중첩 날짜에도 최소 크기를 적용한다.
   return (
@@ -54,7 +59,10 @@ function TextView({
             fontSize: textSize(style, variant),
             lineHeight: textLineHeight(style, variant),
           },
-          !nested && fontsReady && { fontFamily: textFont(style) },
+          !nested &&
+            fontsReady && {
+              fontFamily: appFontFamily(textFont(style), Platform.OS, language),
+            },
           !nested &&
             Platform.OS === 'web' && {
               fontSize: textSize(style, variant) * fontScale,

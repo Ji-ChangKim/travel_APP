@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import {
   useState,
@@ -116,20 +118,22 @@ function SharedPlaceView({
   set: Set;
   request: RefObject<number>;
 }) {
+  useLocale();
   const Button = props.compact ? ScheduleButton : Action;
   const Input = props.compact ? ScheduleField : Field;
   // 외부 페이지의 원문을 표시하지 않고 검증한 후보만 보여준다.
   return (
     <View style={props.compact ? { gap: 10 } : styles.card}>
       {!props.compact && (
-        <Text style={styles.title}>Google Maps 공유 장소 가져오기</Text>
+        <Text style={styles.title}>{t('Google Maps 공유 장소 가져오기')}</Text>
       )}
       <Text style={props.compact ? schedule.meta : styles.subtitle}>
-        저장한 장소에서 공유 → 링크 복사 후 붙여 넣어 주세요. 장소 하나씩 여행에
-        추가할 수 있어요.
+        {t(
+          '저장한 장소에서 공유 → 링크 복사 후 붙여 넣어 주세요. 장소 하나씩 여행에 추가할 수 있어요.',
+        )}
       </Text>
       <Input
-        label="Google Maps 공유 링크"
+        label={t('Google Maps 공유 링크')}
         value={state.text}
         onChange={(text) => {
           // 입력 변경은 진행 중인 이전 요청을 무효화한다.
@@ -140,7 +144,7 @@ function SharedPlaceView({
         }}
       />
       <Button
-        label={state.busy ? '링크 확인 중…' : '공유 링크 확인'}
+        label={state.busy ? t('링크 확인 중…') : t('공유 링크 확인')}
         disabled={props.disabled || state.busy || !state.text.trim()}
         onPress={() => {
           // 현재 링크의 후보를 조회한다.
@@ -149,12 +153,12 @@ function SharedPlaceView({
       />
       {state.preview && (
         <>
-          <Text>{state.preview.query || '공유한 장소를 찾았어요.'}</Text>
+          <Text>{state.preview.query || t('공유한 장소를 찾았어요.')}</Text>
           <Button
             label={
               state.preview.googlePlaceId
-                ? '이 장소 선택'
-                : '이 장소 이름으로 검색'
+                ? t('이 장소 선택')
+                : t('이 장소 이름으로 검색')
             }
             disabled={props.disabled}
             onPress={() => {
@@ -171,7 +175,7 @@ function SharedPlaceView({
       )}
       {state.error && (
         <Text style={styles.error} accessibilityRole="alert">
-          {state.error}
+          {t(state.error)}
         </Text>
       )}
     </View>
@@ -180,6 +184,7 @@ function SharedPlaceView({
 
 // 팝업별 공유 링크 상태를 분리한다.
 export default function SharedPlaceInput(props: Props) {
+  useLocale();
   // 기존 편집 팝업의 생명주기와 같은 상태를 사용한다.
   return (
     <SharedPlaceState
@@ -205,6 +210,7 @@ function SharedPlaceState({
   statePair: [State, Set];
   request: RefObject<number>;
 }) {
+  useLocale();
   // 가져오기 후보는 서버 DB에 자동 저장하지 않는다.
   return (
     useEffect(() => {

@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { View } from 'react-native';
 import { Field } from './ui';
@@ -23,6 +25,7 @@ export function FlightExtraFields({
   values: Record<string, string>;
   onChange: (key: string, value: string) => void;
 }) {
+  useLocale();
   // 수하물·좌석 등급은 예약 조건이므로 운항 정보로 자동 추정하지 않는다.
   return (
     <View style={{ gap: 12 }}>
@@ -38,7 +41,7 @@ export function FlightExtraFields({
         />
       ))}
       <Text style={styles.subtitle}>
-        무료 수하물과 좌석 등급은 예약한 항공권에서 확인해 주세요.
+        {t('무료 수하물과 좌석 등급은 예약한 항공권에서 확인해 주세요.')}
       </Text>
     </View>
   );

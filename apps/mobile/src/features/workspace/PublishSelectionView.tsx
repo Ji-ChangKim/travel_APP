@@ -1,3 +1,4 @@
+import { t } from '@/features/localization/translate';
 import Text from '@/components/AppText';
 import type {
   CommunityPost,
@@ -52,11 +53,11 @@ export function renderPublicationSelection({
       {mode !== 'preview' && (
         <>
           {mode === 'both' && (
-            <Text style={styles.title}>공개할 내용 선택</Text>
+            <Text style={styles.title}>{t('공개할 내용 선택')}</Text>
           )}
           <View style={styles.row}>
             <LedgerAction
-              label="여행계획 공유"
+              label={t('여행계획 공유')}
               selected={form.values.kind === 'plan'}
               disabled={busy}
               onPress={() => {
@@ -65,7 +66,7 @@ export function renderPublicationSelection({
               }}
             />
             <LedgerAction
-              label="여행기록 공유"
+              label={t('여행기록 공유')}
               selected={form.values.kind !== 'plan'}
               disabled={busy || snapshot.trip.status !== 'COMPLETED'}
               onPress={() => {
@@ -76,8 +77,9 @@ export function renderPublicationSelection({
           </View>
           {form.values.kind === 'plan' && (
             <Text>
-              선택한 장소의 계획 설명·추천 메뉴·팁도 함께 공개돼요. 개인적인
-              내용은 일정 메모에 남겨 주세요.
+              {t(
+                '선택한 장소의 계획 설명·추천 메뉴·팁도 함께 공개돼요. 개인적인 내용은 일정 메모에 남겨 주세요.',
+              )}
             </Text>
           )}
           {snapshot.days.map((day) => {
@@ -104,7 +106,7 @@ export function renderPublicationSelection({
                     mediaId={item.id}
                   />
                   <LedgerAction
-                    label={`사진 ${index + 1}`}
+                    label={t('사진 {p0}', { p0: index + 1 })}
                     checked={publicationIds(form.values.photoIds).includes(
                       item.id,
                     )}
@@ -121,7 +123,7 @@ export function renderPublicationSelection({
               );
             })}
           <LedgerAction
-            label="여행 전체 실제 지출 합계 공개"
+            label={t('여행 전체 실제 지출 합계 공개')}
             checked={form.values.includeCosts === 'true'}
             disabled={busy}
             onPress={() => {
@@ -142,7 +144,7 @@ export function renderPublicationSelection({
               </Text>
               {!emptyPlan && (
                 <LedgerAction
-                  label="일정·사진 선택 비우기"
+                  label={t('일정·사진 선택 비우기')}
                   disabled={busy}
                   onPress={() => {
                     // 명시적 초기화로 제목·본문·비용 선택은 유지한다.
@@ -181,8 +183,10 @@ export function renderPublicationPreview({
   // 전달받은 값과 행동을 기존 화면 규격으로 표시한다.
 
   return (
-    <View accessibilityLabel="실제 공개 내용 미리보기" style={{ gap: 20 }}>
-      {mode === 'both' && <Text style={styles.title}>공개 내용 미리보기</Text>}
+    <View accessibilityLabel={t('실제 공개 내용 미리보기')} style={{ gap: 20 }}>
+      {mode === 'both' && (
+        <Text style={styles.title}>{t('공개 내용 미리보기')}</Text>
+      )}
       {form.values.kind !== 'plan' && (
         <Text>
           {preview.snapshot.country} · {preview.snapshot.city}
@@ -230,18 +234,21 @@ export function renderPublicationPreview({
         />
       )}
       <Text>
-        선택 일정 {preview.snapshot.itinerary.length}개 · 사진{' '}
-        {preview.photoPaths.length}장
+        {t('선택 일정')} {preview.snapshot.itinerary.length}
+        {t('개 · 사진')} {preview.photoPaths.length}
+        {t('장')}
       </Text>
-      {!preview.snapshot.itinerary.length && <Text>공개할 일정이 없어요.</Text>}
+      {!preview.snapshot.itinerary.length && (
+        <Text>{t('공개할 일정이 없어요.')}</Text>
+      )}
       {form.values.kind !== 'plan' &&
         preview.snapshot.itinerary.map((item, index) => {
           /* 현재 항목의 표시 또는 선택값만 갱신한다. */ return (
             <View key={index}>
               <Text>
-                {item.date} · {item.timeSlot || '시간 미정'} · {item.title}
+                {item.date} · {item.timeSlot || t('시간 미정')} · {item.title}
               </Text>
-              <Text>{item.address || '주소 없음'}</Text>
+              <Text>{item.address || t('주소 없음')}</Text>
             </View>
           );
         })}
@@ -256,18 +263,18 @@ export function renderPublicationPreview({
             />
           );
         })}
-      {!preview.photoPaths.length && <Text>공개할 사진이 없어요.</Text>}
+      {!preview.photoPaths.length && <Text>{t('공개할 사진이 없어요.')}</Text>}
       {form.values.kind !== 'plan' &&
         (form.values.includeCosts === 'true' ? (
           Object.entries(preview.snapshot.costs).map(([currency, amount]) => {
             /* 현재 항목의 표시 또는 선택값만 갱신한다. */ return (
               <Text key={currency}>
-                공개 실제 비용 · {amount} {currency}
+                {t('공개 실제 비용 ·')} {amount} {currency}
               </Text>
             );
           })
         ) : (
-          <Text>비용은 공개하지 않아요.</Text>
+          <Text>{t('비용은 공개하지 않아요.')}</Text>
         ))}
     </View>
   );
@@ -303,10 +310,18 @@ export function renderPublicationChoices({
             return publicationIds(form.values.scheduleIds).includes(item.id);
           }).length
         }{' '}
-        / {items.length}개 일정 선택
+        / {items.length}
+        {t('개 일정 선택')}
       </Text>
       <LedgerAction
-        label={`DAY ${day.dayNumber} 일정 전체 ${items.every((item) => publicationIds(form.values.scheduleIds).includes(item.id)) ? '해제' : '선택'}`}
+        label={t('DAY {p0} 일정 전체 {p1}', {
+          p0: day.dayNumber,
+          p1: items.every((item) =>
+            publicationIds(form.values.scheduleIds).includes(item.id),
+          )
+            ? '해제'
+            : '선택',
+        })}
         disabled={busy}
         onPress={() => {
           // 날짜 단위 명시적 선택은 사진과 비용 공개 선택을 바꾸지 않는다.
@@ -324,7 +339,7 @@ export function renderPublicationChoices({
         return (
           <View key={item.id} style={l.tinted}>
             <LedgerAction
-              label={`일정: ${item.title}`}
+              label={t('일정: {p0}', { p0: item.title })}
               checked={publicationIds(form.values.scheduleIds).includes(
                 item.id,
               )}
@@ -344,7 +359,8 @@ export function renderPublicationChoices({
               </Text>
             )}
             <Text style={l.meta}>
-              {item.timeSlot || '시간 미정'} · 개인 메모는 공개하지 않아요.
+              {item.timeSlot || t('시간 미정')}{' '}
+              {t('· 개인 메모는 공개하지 않아요.')}
             </Text>
           </View>
         );

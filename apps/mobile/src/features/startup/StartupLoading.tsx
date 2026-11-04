@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import type { ReactNode } from 'react';
 import { Animated, Platform, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -19,6 +21,7 @@ export default function StartupLoading({
   alreadyDone: boolean;
   children: ReactNode;
 }) {
+  useLocale();
   // 재시도와 인증 복귀는 이 두 구간을 다시 시작하지 않는다.
   const motion = useLoadingMotion(settings, complete, alreadyDone);
   return (
@@ -27,7 +30,7 @@ export default function StartupLoading({
       {...(Platform.OS === 'web'
         ? { dataSet: { loadingPhase: motion.phase } }
         : {})}
-      accessibilityLabel="TripPrint 준비"
+      accessibilityLabel={t('TripPrint 준비')}
       style={s.screen}
       onLayout={nativeFrameReady}
     >

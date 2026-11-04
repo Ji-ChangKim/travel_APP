@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import {
   Component,
@@ -46,6 +48,7 @@ export default function LaunchIntro({
   onComplete: () => void;
   settings: AppAccessibility;
 }) {
+  useLocale();
   // 프레임 준비 전에는 기본 스플래시와 같은 정적 자산을 유지한다.
   const { state, timeline, opacity } = useBiMotion(bundledBiVideo, settings);
   const [posterReady, setPosterReady] = useState(false);
@@ -77,7 +80,7 @@ export default function LaunchIntro({
             },
           }
         : {})}
-      accessibilityLabel="TripPrint 시작"
+      accessibilityLabel={t('TripPrint 시작')}
       style={[s.screen, { opacity }]}
     >
       {video && (

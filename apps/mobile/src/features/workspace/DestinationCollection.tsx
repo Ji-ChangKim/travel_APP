@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { useState } from 'react';
 import { View } from 'react-native';
 import * as Crypto from 'expo-crypto';
@@ -28,6 +30,7 @@ export default function DestinationCollection({
   canRemove?: (id: string) => boolean;
   maxItems?: number;
 }) {
+  useLocale();
   // 입력 중인 도시와 저장된 도시 목록은 같은 초안 안에서 관리한다.
   const [error, setError] = useState('');
   const country = values.destinationCountry || '';
@@ -62,11 +65,23 @@ export default function DestinationCollection({
     <View style={{ gap: 16 }}>
       {items.map((item, index) => (
         <View key={item.id} style={styles.card}>
-          <Text style={styles.title}>여행 도시 {index + 1}</Text>
+          <Text style={styles.title}>
+            {t('여행 도시')} {index + 1}
+          </Text>
           {(['country', 'city', 'timezone'] as const).map((key) => (
             <Field
               key={key}
               label={`${index + 1}번째 ${key === 'country' ? '나라' : key === 'city' ? '도시' : '현지 시간대'}`}
+              displayLabel={t('{count}번째 {field}', {
+                count: index + 1,
+                field: t(
+                  key === 'country'
+                    ? '나라'
+                    : key === 'city'
+                      ? '도시'
+                      : '현지 시간대',
+                ),
+              })}
               value={item[key]}
               disabled={disabled}
               onChange={(value) => {
@@ -91,7 +106,7 @@ export default function DestinationCollection({
             />
           ))}
           <Action
-            label={`${item.city || index + 1} 도시 삭제`}
+            label={t('{p0} 도시 삭제', { p0: item.city || index + 1 })}
             disabled={disabled || !canRemove(item.id)}
             onPress={() =>
               onItemsChange(items.filter((other) => other.id !== item.id))
@@ -99,7 +114,7 @@ export default function DestinationCollection({
           />
           {!canRemove(item.id) && (
             <Text style={styles.subtitle}>
-              DAY에 배정한 도시는 여행지를 바꾼 뒤 삭제할 수 있어요.
+              {t('DAY에 배정한 도시는 여행지를 바꾼 뒤 삭제할 수 있어요.')}
             </Text>
           )}
         </View>
@@ -116,13 +131,13 @@ export default function DestinationCollection({
         }}
       />
       <Action
-        label="여행 도시 추가"
+        label={t('여행 도시 추가')}
         disabled={disabled || items.length >= maxItems}
         onPress={add}
       />
       {error && (
         <Text accessibilityRole="alert" style={styles.error}>
-          {error}
+          {t(error)}
         </Text>
       )}
     </View>

@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
@@ -67,18 +69,21 @@ export default function HomeRecommendation({
   onSelectCourse,
   onViewAll,
 }: Props) {
+  useLocale();
   // 추천 여행 섹션 전체를 반환한다.
   return (
     <View style={styles.section}>
       <View style={styles.header}>
         <View style={styles.headerTitles}>
           <Text style={styles.sectionSub}>WHERE TO GO</Text>
-          <Text style={styles.sectionTitle}>어디로 떠나볼까요? 추천 코스</Text>
+          <Text style={styles.sectionTitle}>
+            {t('어디로 떠나볼까요? 추천 코스')}
+          </Text>
         </View>
         {onViewAll && (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="추천 코스 전체보기"
+            accessibilityLabel={t('추천 코스 전체보기')}
             disabled={disabled}
             onPress={onViewAll}
             style={({ pressed }) => [
@@ -86,7 +91,7 @@ export default function HomeRecommendation({
               pressed && styles.pressed,
             ]}
           >
-            <Text style={styles.viewAllText}>전체보기</Text>
+            <Text style={styles.viewAllText}>{t('전체보기')}</Text>
             <Ionicons name="chevron-forward" size={14} color={colors.muted} />
           </Pressable>
         )}
@@ -123,6 +128,7 @@ function CourseCard({
   disabled: boolean;
   onSelect: () => void;
 }) {
+  useLocale();
   // 코스의 썸네일과 설명 및 여행 일정 보기 버튼을 표시한다.
   return (
     <View style={styles.card}>
@@ -153,7 +159,7 @@ function CourseCard({
 
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`${course.title} 여행 일정 보기`}
+          accessibilityLabel={t('{p0} 여행 일정 보기', { p0: course.title })}
           accessibilityState={{ disabled }}
           disabled={disabled}
           onPress={onSelect}
@@ -164,7 +170,7 @@ function CourseCard({
           ]}
         >
           <Ionicons name="calendar-outline" size={15} color={colors.text} />
-          <Text style={styles.copyButtonText}>여행 일정 보기</Text>
+          <Text style={styles.copyButtonText}>{t('여행 일정 보기')}</Text>
         </Pressable>
       </View>
     </View>

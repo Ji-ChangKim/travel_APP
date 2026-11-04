@@ -33,22 +33,17 @@ import {
   type UseQueryResult,
 } from '@tanstack/react-query';
 import { playStoreUrl } from '@wherego/validation';
-import {
-  useRouter,
-  type Href,
-  type HrefObject,
-  type ImperativeRouter,
-} from 'expo-router';
+import { useRouter, type Href, type ImperativeRouter } from 'expo-router';
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { AppState, Linking } from 'react-native';
 
 // 복원 완료한 실제 프로필로 다음 화면을 결정한다.
 export function restoredDestination(): Promise<Href> {
-  // 프로필 확인 실패를 로그인 화면으로 우회하지 않는다.
-  return !useTripStore.getState().currentUser
+  // 비로그인 상태는 로그인 화면으로, 게스트 및 온보딩 완료 회원은 메인으로 이동한다.
+  const currentUser = useTripStore.getState().currentUser;
+  return !currentUser
     ? Promise.resolve('/login')
-    : useTripStore.getState().currentUser?.onboardingCompleted ||
-        useTripStore.getState().currentUser?.authProvider === 'guest'
+    : currentUser.authProvider === 'guest' || currentUser.onboardingCompleted
       ? completedDestination()
       : Promise.resolve('/profile-setup');
 }
@@ -280,7 +275,7 @@ export function useStartupLifecycle({
   local: UseQueryResult<'valid' | 'absent', Error>;
   play: UseQueryResult<PlayUpdate, Error>;
   policy: UseQueryResult<PolicyResult, Error>;
-  destination: UseQueryResult<string | HrefObject, Error>;
+  destination: UseQueryResult<Href, Error>;
   error: string | null;
   pending: boolean;
   updateAvailable: boolean;
@@ -294,6 +289,8 @@ export function useStartupLifecycle({
       ? client.removeQueries({ queryKey: ['public'] })
       : undefined;
   }, [common.data, client]);
+  const playRefetch = play.refetch;
+  const policyRefetch = policy.refetch;
   useEffect(() => {
     // 외부 스토어 복귀에는 연출·계정 확인을 반복하지 않는다.
     const listener = AppState.addEventListener('change', (state) => {
@@ -301,14 +298,15 @@ export function useStartupLifecycle({
       return void (state === 'active' &&
       storeOpened.current &&
       !updateLock.current
-        ? ((storeOpened.current = false), refreshUpdate())
+        ? ((storeOpened.current = false),
+          playRefetch().then(() => policyRefetch()))
         : undefined);
     });
     return () => {
       // 시작 화면을 떠나면 복귀 구독도 정리한다.
       return listener.remove();
     };
-  });
+  }, [playRefetch, policyRefetch, storeOpened, updateLock]);
   useEffect(() => {
     // 모든 필수 점검과 연출이 끝난 뒤 현재 계정 목적지로 이동한다.
     if (

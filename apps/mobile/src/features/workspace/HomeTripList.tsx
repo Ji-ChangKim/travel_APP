@@ -1,3 +1,5 @@
+import { useLocale } from '@/features/localization/localeState';
+import { t } from '@/features/localization/translate';
 import Text from '@/components/AppText';
 import { View } from 'react-native';
 import type { useRouter } from 'expo-router';
@@ -21,21 +23,20 @@ export default function HomeTripList({
   userId: string;
   router: ReturnType<typeof useRouter>;
 }) {
+  useLocale();
   // 현재·다음 여행의 재개 요약만 제공하고 전체 관리는 내 여행에서 한다.
   const trip = trips[0];
   if (!trip) return null;
   const info = tripPresentation(trip);
   return (
-    <View testID="home-trip-summary" style={s.section}>
+    <View testID="home-trip-summary" style={s.tripTicket}>
       <Text accessibilityRole="header" style={s.sectionTitle}>
-        {info.phase === 'IN_PROGRESS' ? '오늘의 여행' : '다음 여행 준비'}
+        {info.phase === 'IN_PROGRESS' ? t('오늘의 여행') : t('다음 여행 준비')}
       </Text>
       <Text style={s.linkText}>{trip.title}</Text>
       <Text style={s.supporting}>
         {info.dates} · {info.label}
       </Text>
-      <Text style={s.supporting}>{info.reminder}</Text>
-      <HomeNextSchedule userId={userId} tripId={trip.id} />
       <DesignButton
         label={info.action}
         variant="primary"
@@ -44,6 +45,7 @@ export default function HomeTripList({
           return router.push(tripOpenPath(trip));
         }}
       />
+      <HomeNextSchedule userId={userId} tripId={trip.id} />
     </View>
   );
 }

@@ -14,6 +14,40 @@ const approvedStaticAssets = new Map([
   ],
 ]);
 const views = new Set([
+  'ModalSurface.tsx',
+  'PlacePhoto.tsx',
+  'SettingsScreenView.tsx',
+  'SettingsSections.tsx',
+  'AccountScreenView.tsx',
+  'AccountConnectionCard.tsx',
+  'AccountRetirementSections.tsx',
+  'AccountRetirementConfirmation.tsx',
+  'LogoutConfirmation.tsx',
+  'AccountProfileCard.tsx',
+  'MyAccountStatistics.tsx',
+  'MyAccountMenus.tsx',
+  'ProfileEditor.tsx',
+  'ProfileFields.tsx',
+  'TrailWorkspaceView.tsx',
+  'TrailJourneyView.tsx',
+  'TrailEditorView.tsx',
+  'TrailEditorModal.tsx',
+  'TrailControls.tsx',
+  'WorkspaceItineraryView.tsx',
+  'WorkspaceMapView.tsx',
+  'WorkspaceMediaView.tsx',
+  'WorkspaceExpenseView.tsx',
+  'WorkspaceSharingView.tsx',
+  'WorkspaceMembersView.tsx',
+  'WorkspaceChecklistView.tsx',
+  'WorkspaceHeadingView.tsx',
+  'WorkspaceReceiptCard.tsx',
+  'ScheduleEditorChoices.tsx',
+  'ScheduleAdvancedFields.tsx',
+  'ScheduleEditorActions.tsx',
+  'TripPlanningProgress.tsx',
+  'TripPlanningBasics.tsx',
+  'TripPlanningFlights.tsx',
   'WorkspaceView.tsx',
   'PrivatePhotoView.tsx',
   'ui.tsx',
@@ -38,6 +72,10 @@ const views = new Set([
   'WorkspaceDialogs.tsx',
 ]);
 const controllers = new Set([
+  'useSettingsController.ts',
+  'useAccountRetirement.ts',
+  'useTrailController.ts',
+  'usePlacePhoto.ts',
   'useWorkspaceController.ts',
   'useWorkspaceEditorState.ts',
   'useWorkspaceNavigationState.ts',
@@ -53,6 +91,10 @@ const controllers = new Set([
 ]);
 // 요청 행동은 기기·통신 기능을 사용할 수 있지만 화면과 스타일을 소유하지 않는다.
 const workflows = new Set([
+  'authSessionRestore.ts',
+  'authQueryCache.ts',
+  'trailActions.ts',
+  'placePhotoService.ts',
   'tripQueries.ts',
   'useCommunityImport.ts',
   'workspaceSaveSession.ts',
@@ -69,6 +111,11 @@ const workflows = new Set([
   'usePublishedPlanShare.ts',
 ]);
 const pureModels = new Set([
+  'authProfileProjection.ts',
+  'trailSelectors.ts',
+  'trailAttachmentReferences.ts',
+  'workspaceDaySelection.ts',
+  'workspaceMediaSelection.ts',
   'sessionTokenStorage.ts',
   'formCommands.ts',
   'workspaceModelCore.ts',
@@ -87,6 +134,7 @@ const pureModels = new Set([
   'recordDetails.ts',
 ]);
 const styles = new Set([
+  'trailStyles.ts',
   'workspaceStyles.ts',
   'ledgerTheme.ts',
   'ledgerShellStyles.ts',

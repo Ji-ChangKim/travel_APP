@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { returnToScreen } from '@/components/navigationModel';
 import { ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -21,6 +23,7 @@ import { requestSignal } from '@wherego/api-client';
 
 // 공개 여행계획 한 건을 주소로 직접 열 수 있게 한다.
 export default function CommunityPlanScreen() {
+  useLocale();
   // 계정 전환에서 취소된 공개 조회는 새 화면 수명으로 다시 시작한다.
   return (
     <PublicPlanContent
@@ -34,6 +37,7 @@ export default function CommunityPlanScreen() {
 
 // 최초 인증 복원 중 캐시 정리가 끝난 뒤 공개 계획을 조회한다.
 function PublicPlanContent() {
+  useLocale();
   // 비공개 여행 API나 로그인 계정의 여행을 대신 조회하지 않는다.
   const { postId = '' } = useLocalSearchParams<{ postId?: string }>();
   const router = useRouter();
@@ -58,26 +62,29 @@ function PublicPlanContent() {
 
   return (
     <LedgerScreen
-      title={post?.title || '공유된 여행'}
+      title={post?.title || t('공유된 여행')}
       onBack={() => {
         // 직접 링크로 들어와도 공개 계획 목록으로 돌아간다.
         return returnToScreen(router, '/(tabs)/footprints');
       }}
     >
       {!startupReady || (query.isPending && validId) ? (
-        <HaruState kind="loading" title="공유된 여행을 불러오는 중이에요." />
+        <HaruState
+          kind="loading"
+          title={t('공유된 여행을 불러오는 중이에요.')}
+        />
       ) : startupReady && (!validId || query.isError) ? (
         <HaruState
           kind="error"
-          title="공유된 여행을 열 수 없어요"
+          title={t('공유된 여행을 열 수 없어요')}
           description={
             query.error?.message ||
-            '주소를 다시 확인하거나 발자국에서 다른 여행을 살펴보세요.'
+            t('주소를 다시 확인하거나 발자국에서 다른 여행을 살펴보세요.')
           }
         >
           {validId && (
             <Action
-              label="다시 불러오기"
+              label={t('다시 불러오기')}
               loading={query.isFetching}
               onPress={() => {
                 // 실패한 공개 조회만 다시 요청한다.

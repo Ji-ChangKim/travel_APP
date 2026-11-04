@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { getLocale, useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
 import { useState, type Dispatch, type SetStateAction } from 'react';
@@ -17,13 +19,14 @@ export default function TripCalendar(props: {
   values: Record<string, string>;
   onChange: (key: string, value: string) => void;
 }) {
+  useLocale();
   // 좁은 화면이나 큰 글자에서7열의 날짜 터치 영역을 줄이지 않고 플랫폼 선택기를 쓴다.
   const { width } = useWindowDimensions();
   const { fontScale } = useAppAccessibility();
   const monthState = useState(() => monthStart(props.values.startDate || ''));
-  return width < 400 || fontScale > 1.3 ? (
+  return width < 310 || fontScale > 1.6 ? (
     <View style={styles.card}>
-      <Text style={styles.title}>여행 기간</Text>
+      <Text style={styles.title}>{t('여행 기간')}</Text>
       <DateField
         label="시작일"
         value={props.values.startDate || ''}
@@ -67,18 +70,21 @@ function selectDate(
 
 // 날짜가 없으면 이름만, 선택 후에는 작은 이름 아래 월·일을 표시한다.
 function SummaryDate({
+  field,
   label,
   value,
   showYear,
 }: {
+  field: '시작일' | '종료일';
   label: string;
   value?: string;
   showYear: boolean;
 }) {
+  useLocale();
   // 저장 날짜는 유지하고 화면에 보이는 표현만 간단하게 바꾼다.
   return (
     <View style={s.summaryColumn}>
-      <FormAnchor name={label === '출발일' ? '시작일' : '종료일'}>
+      <FormAnchor name={field}>
         <View style={s.summaryDate}>
           <Text style={value ? s.summaryLabel : s.emptyDate}>{label}</Text>
           {value && (
@@ -105,14 +111,16 @@ function CalendarContent({
   onChange: (key: string, value: string) => void;
   monthState: [Date, Dispatch<SetStateAction<Date>>];
 }) {
+  useLocale();
   // 월·요일·기간을 한 화면에서 확인할 수 있게 한다.
   const locked = useFormScope().locked;
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>여행 날짜</Text>
+      <Text style={styles.title}>{t('여행 날짜')}</Text>
       <View style={s.summary}>
         <SummaryDate
-          label="출발일"
+          field="시작일"
+          label={t('출발일')}
           value={values.startDate}
           showYear={Boolean(
             values.startDate &&
@@ -122,7 +130,8 @@ function CalendarContent({
         />
         <Ionicons name="arrow-forward" size={18} color={colors.muted} />
         <SummaryDate
-          label="도착일"
+          field="종료일"
+          label={t('도착일')}
           value={values.endDate}
           showYear={Boolean(
             values.startDate &&
@@ -131,10 +140,49 @@ function CalendarContent({
           )}
         />
       </View>
+      {Boolean(values.startDate && values.endDate) &&
+        (() => {
+          const start = new Date(`${values.startDate}T00:00:00Z`).getTime();
+          const end = new Date(`${values.endDate}T00:00:00Z`).getTime();
+          const days = Math.max(
+            1,
+            Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1,
+          );
+          const nights = days > 1 ? days - 1 : 0;
+          return (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: colors.selectedSurface,
+                paddingVertical: 6,
+                paddingHorizontal: 12,
+                borderRadius: 20,
+                borderWidth: 1,
+                borderColor: colors.brandCoral,
+                alignSelf: 'center',
+                gap: 6,
+              }}
+            >
+              <Ionicons name="calendar" size={14} color={colors.brandCoral} />
+              <Text
+                style={{
+                  fontSize: 13,
+                  fontWeight: '700',
+                  color: colors.brandCoral,
+                }}
+              >
+                {nights > 0 ? `${nights}박 ${days}일` : t('당일치기')} ·{' '}
+                {t('총 {p0}일간의 여정', { p0: days })}
+              </Text>
+            </View>
+          );
+        })()}
       <View style={s.month}>
         <DesignButton
           label=""
-          accessibilityLabel="이전 달"
+          accessibilityLabel={t('이전 달')}
           size="icon"
           variant="quiet"
           disabled={locked}
@@ -150,11 +198,14 @@ function CalendarContent({
           }}
         />
         <Text accessibilityRole="header" style={s.date}>
-          {month.getFullYear()}년 {month.getMonth() + 1}월
+          {new Intl.DateTimeFormat(getLocale(), {
+            year: 'numeric',
+            month: 'long',
+          }).format(month)}
         </Text>
         <DesignButton
           label=""
-          accessibilityLabel="다음 달"
+          accessibilityLabel={t('다음 달')}
           size="icon"
           variant="quiet"
           disabled={locked}
@@ -171,7 +222,12 @@ function CalendarContent({
         />
       </View>
       <View style={s.grid}>
-        {['일', '월', '화', '수', '목', '금', '토'].map((day) => {
+        {Array.from({ length: 7 }, (_, index) =>
+          new Intl.DateTimeFormat(getLocale(), {
+            weekday: 'short',
+            timeZone: 'UTC',
+          }).format(new Date(Date.UTC(2026, 0, 4 + index))),
+        ).map((day) => {
           // 요일 이름은 날짜 버튼과 동일한 열 너비를 사용한다.
           return (
             <Text key={day} style={s.weekday}>

@@ -1,3 +1,5 @@
+import { useLocale } from '@/features/localization/localeState';
+import { t } from '@/features/localization/translate';
 import { View, StyleSheet } from 'react-native';
 import ScreenTitle from './ScreenTitle';
 import HeaderAction from './HeaderAction';
@@ -22,6 +24,7 @@ export default function ScreenHeader({
   inset?: boolean;
   inlineTitle?: boolean;
 }) {
+  useLocale();
   // 글자 확대 여부로 빈 행을 만들지 않고 실제 콘텐츠만 배치한다.
   return (
     <View testID="screen-header" style={[s.header, inset && s.inset]}>
@@ -29,7 +32,7 @@ export default function ScreenHeader({
         {onBack ? (
           <HeaderAction
             icon="back"
-            label={backLabel || '이전 화면으로 돌아가기'}
+            label={backLabel || t('이전 화면으로 돌아가기')}
             disabled={disabled}
             onPress={onBack}
           />

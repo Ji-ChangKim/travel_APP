@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import ScreenHeader from '@/components/ScreenHeader';
 import { useContext, useLayoutEffect, useRef, useState } from 'react';
@@ -30,6 +32,7 @@ export default function CitySourcesModal({
   story?: DiscoveryCity;
   onClose: () => void;
 }) {
+  useLocale();
   // 모달을 다시 열면 이전 오류·요청 잠금을 재사용하지 않는다.
   const [error, setError] = useState('');
   // 외부 열기 한 건이 끝날 때까지 다른 출처 열기를 잠근다.
@@ -87,21 +90,21 @@ export default function CitySourcesModal({
       <SafeAreaView style={[s.backdrop, { backgroundColor: 'transparent' }]}>
         <View accessibilityViewIsModal style={s.sheet}>
           <ScreenHeader
-            title={`${city.city} 정보·사진 출처`}
+            title={t('{p0} 정보·사진 출처', { p0: city.city })}
             onBack={onClose}
-            backLabel="출처 닫기"
+            backLabel={t('출처 닫기')}
           />
           <ScrollView contentContainerStyle={s.detail}>
             <Text style={s.caption}>
-              원문 열기나 이용 조건 열기를 누르면 선택한 사이트가 열려요.
+              {t('원문 열기나 이용 조건 열기를 누르면 선택한 사이트가 열려요.')}
             </Text>
             {error && (
               <Text accessibilityRole="alert" style={styles.error}>
-                {error}
+                {t(error)}
               </Text>
             )}
             <Text accessibilityRole="header" style={s.title}>
-              대표 사진
+              {t('대표 사진')}
             </Text>
             <Attribution
               source={photoAttribution(city.key)}
@@ -109,11 +112,12 @@ export default function CitySourcesModal({
               onOpen={open}
             />
             <Text accessibilityRole="header" style={s.title}>
-              여행 정보 참고 자료
+              {t('여행 정보 참고 자료')}
             </Text>
             <Text>
-              소개·볼거리·먹거리·계절 안내는 TripPrint가 편집했어요. 참고한
-              원문은 아래에서 확인할 수 있어요.
+              {t(
+                '소개·볼거리·먹거리·계절 안내는 TripPrint가 편집했어요. 참고한 원문은 아래에서 확인할 수 있어요.',
+              )}
             </Text>
             {informationAttributions(sources).map((source) => (
               <Attribution
@@ -126,7 +130,7 @@ export default function CitySourcesModal({
             {storySource && (
               <>
                 <Text accessibilityRole="header" style={s.title}>
-                  도시 이야기 발췌
+                  {t('도시 이야기 발췌')}
                 </Text>
                 <Attribution source={storySource} busy={busy} onOpen={open} />
               </>
@@ -148,6 +152,7 @@ function Attribution({
   busy: boolean;
   onOpen: (url: string) => void;
 }) {
+  useLocale();
   // 사진 CC 라이선스를 관광청 원문에 일괄 적용하지 않는다.
   return (
     <View
@@ -157,16 +162,26 @@ function Attribution({
       <Text accessibilityRole="header" style={styles.label}>
         {source.title}
       </Text>
-      <Text>저작자·제공자: {source.author}</Text>
-      <Text selectable>원문: {source.sourceUrl}</Text>
-      <Text>이용 조건: {source.license}</Text>
-      <Text>변경·편집: {source.changes}</Text>
+      <Text>
+        {t('저작자·제공자:')} {source.author}
+      </Text>
+      <Text selectable>
+        {t('원문:')} {source.sourceUrl}
+      </Text>
+      <Text>
+        {t('이용 조건:')} {source.license}
+      </Text>
+      <Text>
+        {t('변경·편집:')} {source.changes}
+      </Text>
       {source.checkedAt && (
-        <Text style={s.caption}>출처 확인일: {source.checkedAt}</Text>
+        <Text style={s.caption}>
+          {t('출처 확인일:')} {source.checkedAt}
+        </Text>
       )}
       <Action
-        label="원문 보기"
-        accessibilityLabel={`원문 열기 · ${source.title}`}
+        label={t('원문 보기')}
+        accessibilityLabel={t('원문 열기 · {p0}', { p0: source.title })}
         disabled={busy}
         onPress={() => {
           // 선택한 자료 한 건의 원문만 연다.
@@ -175,8 +190,10 @@ function Attribution({
       />
       {source.licenseUrl && (
         <Action
-          label="이용 조건 보기"
-          accessibilityLabel={`이용 조건 열기 · ${source.license}`}
+          label={t('이용 조건 보기')}
+          accessibilityLabel={t('이용 조건 열기 · {p0}', {
+            p0: source.license,
+          })}
           disabled={busy}
           onPress={() => {
             // 해당 자료에 기록된 라이선스 주소만 연다.

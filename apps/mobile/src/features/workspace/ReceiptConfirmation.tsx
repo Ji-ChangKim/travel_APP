@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { View } from 'react-native';
 import { styles } from './workspaceStyles';
@@ -17,6 +19,7 @@ export default function ReceiptConfirmation({
   busy: boolean;
   onChange: (key: string, value: string) => void;
 }) {
+  useLocale();
   // 수정한 합계와 품목을 기준으로 차이 확인 여부를 판단한다.
   const difference = receiptDifference(form);
   // 통화를 읽은 성공과 확정할 수 없는 상태를 구분한다.
@@ -26,28 +29,29 @@ export default function ReceiptConfirmation({
     <View style={{ gap: 16 }}>
       {currencyIssue && (
         <Text accessibilityRole="alert" style={styles.error}>
-          {currencyIssue}
+          {t(currencyIssue)}
         </Text>
       )}
       {difference && (
         <View style={l.card}>
-          <Text style={l.section}>품목 합계와 결제 총액이 달라요</Text>
+          <Text style={l.section}>{t('품목 합계와 결제 총액이 달라요')}</Text>
           <Text>
-            품목 합계 · {difference.itemTotal} {form.values.currency}
+            {t('품목 합계 ·')} {difference.itemTotal} {form.values.currency}
           </Text>
           <Text>
-            결제 총액 · {form.values.amount} {form.values.currency}
+            {t('결제 총액 ·')} {form.values.amount} {form.values.currency}
           </Text>
           <Text>
-            차이 (총액 − 품목 합계) · {difference.difference}{' '}
+            {t('차이 (총액 − 품목 합계) ·')} {difference.difference}{' '}
             {form.values.currency}
           </Text>
           <Text>
-            세금이나 할인 때문일 수 있어요. 원본을 확인해 주세요. 지출에는 결제
-            총액만 기록돼요.
+            {t(
+              '세금이나 할인 때문일 수 있어요. 원본을 확인해 주세요. 지출에는 결제 총액만 기록돼요.',
+            )}
           </Text>
           <Action
-            label="차이를 확인했어요. 결제 총액으로 기록할게요"
+            label={t('차이를 확인했어요. 결제 총액으로 기록할게요')}
             selected={form.values.totalDifferenceAccepted === 'true'}
             disabled={busy || Boolean(currencyIssue)}
             onPress={() => {
@@ -58,18 +62,22 @@ export default function ReceiptConfirmation({
         </View>
       )}
       <View style={l.card}>
-        <Text style={styles.label}>1 · 정보 확인</Text>
-        <Text style={l.section}>영수증 정보가 맞나요?</Text>
+        <Text style={styles.label}>{t('1 · 정보 확인')}</Text>
+        <Text style={l.section}>{t('영수증 정보가 맞나요?')}</Text>
         <Text style={l.meta}>
           {form.values.receiptOperation === 'update'
-            ? '장소, 결제 일시, 메뉴와 금액을 확인해 주세요. 기존 영수증과 실제 지출에 수정한 내용을 반영해요.'
-            : '장소, 결제 일시, 메뉴와 금액을 확인해 주세요. 맞다면 선택한 날짜의 일정에 추가할 수 있어요.'}
+            ? t(
+                '장소, 결제 일시, 메뉴와 금액을 확인해 주세요. 기존 영수증과 실제 지출에 수정한 내용을 반영해요.',
+              )
+            : t(
+                '장소, 결제 일시, 메뉴와 금액을 확인해 주세요. 맞다면 선택한 날짜의 일정에 추가할 수 있어요.',
+              )}
         </Text>
         <Action
           label={
             form.values.receiptOperation === 'update'
-              ? '맞아요, 수정한 내용을 저장할게요'
-              : '맞아요, 일정에 추가할게요'
+              ? t('맞아요, 수정한 내용을 저장할게요')
+              : t('맞아요, 일정에 추가할게요')
           }
           selected={form.values.receiptConfirmed === 'true'}
           disabled={
@@ -85,7 +93,7 @@ export default function ReceiptConfirmation({
           }}
         />
         <Action
-          label="아니요, 수정할게요"
+          label={t('아니요, 수정할게요')}
           disabled={busy}
           onPress={() => {
             // 아니요는 저장하지 않고 틀린 정보의 수정 화면을 연다.
@@ -95,21 +103,23 @@ export default function ReceiptConfirmation({
       </View>
       {form.values.receiptOperation === 'update' && (
         <Text style={l.meta}>
-          처음 선택한 영수증 사진 보관 여부는 유지돼요. 수정한 내용은 기존
-          지출에 반영돼요.
+          {t(
+            '처음 선택한 영수증 사진 보관 여부는 유지돼요. 수정한 내용은 기존 지출에 반영돼요.',
+          )}
         </Text>
       )}
       {form.values.receiptConfirmed === 'true' &&
         form.values.receiptOperation !== 'update' && (
           <View style={l.card}>
-            <Text style={styles.label}>2 · 사진 보관</Text>
-            <Text style={l.section}>영수증 사진도 함께 보관할까요?</Text>
+            <Text style={styles.label}>{t('2 · 사진 보관')}</Text>
+            <Text style={l.section}>{t('영수증 사진도 함께 보관할까요?')}</Text>
             <Text style={l.meta}>
-              사진을 보관하면 나와 여행 친구가 원본을 다시 볼 수 있어요.
-              커뮤니티에는 공개되지 않아요.
+              {t(
+                '사진을 보관하면 나와 여행 친구가 원본을 다시 볼 수 있어요. 커뮤니티에는 공개되지 않아요.',
+              )}
             </Text>
             <Action
-              label="네, 사진도 보관할게요"
+              label={t('네, 사진도 보관할게요')}
               selected={form.values.keepPhoto === 'true'}
               disabled={busy}
               onPress={() => {
@@ -118,7 +128,7 @@ export default function ReceiptConfirmation({
               }}
             />
             <Action
-              label="아니요, 정보만 저장할게요"
+              label={t('아니요, 정보만 저장할게요')}
               selected={form.values.keepPhoto === 'false'}
               disabled={busy}
               onPress={() => {
@@ -129,8 +139,10 @@ export default function ReceiptConfirmation({
             {form.values.keepPhoto && (
               <Text style={l.meta}>
                 {form.values.keepPhoto === 'true'
-                  ? '장소·메뉴·실제 지출과 영수증 사진을 함께 저장해요.'
-                  : '장소·메뉴·실제 지출만 저장해요. 등록이 끝나면 인식에 사용한 사진은 삭제해요.'}
+                  ? t('장소·메뉴·실제 지출과 영수증 사진을 함께 저장해요.')
+                  : t(
+                      '장소·메뉴·실제 지출만 저장해요. 등록이 끝나면 인식에 사용한 사진은 삭제해요.',
+                    )}
               </Text>
             )}
           </View>

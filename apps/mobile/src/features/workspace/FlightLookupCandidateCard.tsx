@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
 import { useState } from 'react';
@@ -17,6 +19,7 @@ export default function FlightLookupCandidateCard({
   disabled?: boolean;
   onSelect: () => void;
 }) {
+  useLocale();
   // 게이트와 상태는 조회 당시 정보로만 표시하고 저장된 일정의 실시간 상태로 취급하지 않는다.
   const [details, setDetails] = useState(false);
   return (
@@ -27,10 +30,14 @@ export default function FlightLookupCandidateCard({
           {item.airline ? <Text style={s.note}>{item.airline}</Text> : null}
         </View>
         {item.departureStatus ? (
-          <Text style={s.badge}>조회 당시 · {item.departureStatus}</Text>
+          <Text style={s.badge}>
+            {t('조회 당시 ·')} {item.departureStatus}
+          </Text>
         ) : null}
       </View>
-      <Text style={s.note}>{item.departureDate} · 각 공항 현지 시각</Text>
+      <Text style={s.note}>
+        {item.departureDate} {t('· 각 공항 현지 시각')}
+      </Text>
       <FlightRoutePreview
         {...item}
         arrivalDate={
@@ -38,21 +45,29 @@ export default function FlightLookupCandidateCard({
         }
       />
       {!item.arrivalTime ? (
-        <Text style={s.hint}>도착 시각은 항공권에서 확인해 주세요.</Text>
+        <Text style={s.hint}>{t('도착 시각은 항공권에서 확인해 주세요.')}</Text>
       ) : null}
       {item.departureGate || item.actualDepartureTime ? (
         <View style={s.status}>
           {item.departureGate ? (
-            <Text style={s.note}>출발 게이트 {item.departureGate}</Text>
+            <Text style={s.note}>
+              {t('출발 게이트')} {item.departureGate}
+            </Text>
           ) : null}
           {item.actualDepartureTime ? (
-            <Text style={s.note}>실제 출발 {item.actualDepartureTime}</Text>
+            <Text style={s.note}>
+              {t('실제 출발')} {item.actualDepartureTime}
+            </Text>
           ) : null}
-          <Text style={s.small}>조회 당시 · 변경될 수 있어요</Text>
+          <Text style={s.small}>{t('조회 당시 · 변경될 수 있어요')}</Text>
         </View>
       ) : null}
       <Action
-        label={`${item.departure} → ${item.arrival} ${item.departureTime} 항공편 선택`}
+        label={t('{p0} → {p1} {p2} 항공편 선택', {
+          p0: item.departure,
+          p1: item.arrival,
+          p2: item.departureTime,
+        })}
         variant="primary"
         disabled={disabled}
         onPress={onSelect}
@@ -60,9 +75,9 @@ export default function FlightLookupCandidateCard({
       {item.aircraftType || item.aircraftRegistration ? (
         <>
           <DesignButton
-            label={details ? '기체 정보 접기 −' : '기체 정보 보기 +'}
+            label={details ? t('기체 정보 접기 −') : t('기체 정보 보기 +')}
             variant="quiet"
-            accessibilityLabel={`${item.number} 기체 정보`}
+            accessibilityLabel={t('{p0} 기체 정보', { p0: item.number })}
             expanded={details}
             disabled={disabled}
             onPress={() => {
@@ -73,11 +88,13 @@ export default function FlightLookupCandidateCard({
           {details ? (
             <View style={{ gap: 6 }}>
               {item.aircraftType ? (
-                <Text style={s.note}>기종 {item.aircraftType}</Text>
+                <Text style={s.note}>
+                  {t('기종')} {item.aircraftType}
+                </Text>
               ) : null}
               {item.aircraftRegistration ? (
                 <Text style={s.note}>
-                  항공기 등록번호 {item.aircraftRegistration}
+                  {t('항공기 등록번호')} {item.aircraftRegistration}
                 </Text>
               ) : null}
             </View>

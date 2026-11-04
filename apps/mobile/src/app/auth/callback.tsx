@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import ScreenHeader from '@/components/ScreenHeader';
 import { userFacingMessage } from '@/services/userFacingError';
 import { useEffect, useState } from 'react';
@@ -19,6 +21,7 @@ import { authenticatedDestination } from '@/features/auth/destination';
 
 // 웹 및 모바일 OAuth의 공통 복귀 화면을 제공한다.
 export default function AuthCallbackScreen() {
+  useLocale();
   // 인증 코드는 화면이나 로그에 출력하지 않는다.
   const { code, error, error_code, sb_flow_id } = useLocalSearchParams<{
     code?: string;
@@ -92,7 +95,7 @@ export default function AuthCallbackScreen() {
   // 성공 대기와 인증 실패 복귀 동작을 구분한다.
   return (
     <SafeAreaView style={styles.screen}>
-      <ScreenHeader title="로그인 확인" />
+      <ScreenHeader title={t('로그인 확인')} />
       <ScrollView
         contentContainerStyle={[
           styles.content,
@@ -101,12 +104,14 @@ export default function AuthCallbackScreen() {
       >
         <HaruState
           kind={failed ? 'error' : 'loading'}
-          title={failed ? '로그인을 마치지 못했어요' : message}
-          description={failed ? message : '확인이 끝나면 여행으로 안내할게요.'}
+          title={failed ? t('로그인을 마치지 못했어요') : message}
+          description={
+            failed ? message : t('확인이 끝나면 여행으로 안내할게요.')
+          }
         >
           {failed && (
             <Action
-              label="로그인으로 돌아가기"
+              label={t('로그인으로 돌아가기')}
               variant="primary"
               onPress={() => {
                 // 만료된 코드 재사용 대신 새 로그인을 시작한다.

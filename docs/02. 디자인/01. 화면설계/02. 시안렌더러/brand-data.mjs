@@ -467,7 +467,8 @@ export const brand = {
       latinAssetStatus: 'integrated',
       numericVariant: 'tabular-nums',
       brand: 'Poppins',
-      semiboldAsset: 'apps/mobile/assets/fonts/pretendard-semibold.otf',
+      semiboldAsset:
+        'apps/mobile/assets/fonts/pretendard/pretendard-semibold.otf',
       brandAsset:
         'apps/mobile/assets/brand/tripprint-v1/fonts/Poppins-Bold.ttf',
     },

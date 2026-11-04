@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { workspaceQueryOptions } from './tripQueries';
 import Text from '@/components/AppText';
 import DesignButton from '@/components/DesignButton';
@@ -15,6 +17,7 @@ export default function HomeNextSchedule({
   userId: string;
   tripId: string;
 }) {
+  useLocale();
   // 계정과 여행별 캐시로 늦은 응답을 다른 여행에 표시하지 않는다.
   const query = useQuery({
     ...workspaceQueryOptions(userId, tripId),
@@ -24,17 +27,17 @@ export default function HomeNextSchedule({
   return (
     <View testID="home-next-schedule" style={{ gap: 8 }}>
       <Text accessibilityRole="header" style={s.linkText}>
-        다음 일정 브리핑
+        {t('다음 일정 브리핑')}
       </Text>
       {query.isPending ? (
-        <Text style={s.supporting}>다음 일정을 불러오는 중이에요</Text>
+        <Text style={s.supporting}>{t('다음 일정을 불러오는 중이에요')}</Text>
       ) : query.isError ? (
         <>
           <Text style={s.supporting}>
-            다음 일정을 불러오지 못했어요. 다시 확인해 주세요.
+            {t('다음 일정을 불러오지 못했어요. 다시 확인해 주세요.')}
           </Text>
           <DesignButton
-            label="브리핑 다시 불러오기"
+            label={t('브리핑 다시 불러오기')}
             variant="quiet"
             onPress={() => {
               /* 같은 여행의 일정만 다시 조회한다. */ return void query.refetch();
@@ -44,13 +47,14 @@ export default function HomeNextSchedule({
       ) : next ? (
         <>
           <Text style={s.supporting}>
-            DAY {next.dayNumber} · {next.date} · {next.timeSlot || '시간 미정'}
+            DAY {next.dayNumber} · {next.date} ·{' '}
+            {next.timeSlot || t('시간 미정')}
           </Text>
           <Text style={s.linkText}>{next.title}</Text>
         </>
       ) : (
         <Text style={s.supporting}>
-          아직 예정된 일정이 없어요. 계획에서 다음 일정을 추가해 보세요.
+          {t('아직 예정된 일정이 없어요. 계획에서 다음 일정을 추가해 보세요.')}
         </Text>
       )}
     </View>

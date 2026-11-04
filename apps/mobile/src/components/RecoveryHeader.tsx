@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import ScreenHeader from './ScreenHeader';
 import HomeHeader from './HomeHeader';
 import { recoveryHeaderPolicy } from './navigationPolicy';
@@ -10,6 +12,7 @@ export default function RecoveryHeader({
   path: string;
   onBack: () => void;
 }) {
+  useLocale();
   const policy = recoveryHeaderPolicy(path);
   return policy.header === 'brand' ? (
     <HomeHeader
@@ -22,7 +25,7 @@ export default function RecoveryHeader({
       title={policy.title || undefined}
       inlineTitle={policy.header === 'inline'}
       onBack={policy.header === 'root' ? undefined : onBack}
-      backLabel="공개 여행 둘러보기"
+      backLabel={t('공개 여행 둘러보기')}
     />
   );
 }

@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
@@ -17,6 +19,7 @@ import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 
 // 실제 공개 원본의 표지·배지·작성자·동선 행동을 표시한다.
 export default function PublicFeedCard(props: CommunityFeedPostProps) {
+  useLocale();
   // 메뉴만 로컬 상태이며 신고 초안은 기존 컨트롤러에 유지한다.
   const [opened, setOpened] = useState(false);
   const { largeText } = useAppAccessibility();
@@ -57,7 +60,7 @@ export default function PublicFeedCard(props: CommunityFeedPostProps) {
         ) : (
           <View style={s.noPhoto}>
             <Ionicons name="map-outline" size={44} color={c.muted} />
-            <Text style={s.meta}>공개 사진 없이 담은 여행</Text>
+            <Text style={s.meta}>{t('공개 사진 없이 담은 여행')}</Text>
           </View>
         )}
         <View pointerEvents="none" style={s.coverOverlay} />
@@ -90,7 +93,10 @@ export default function PublicFeedCard(props: CommunityFeedPostProps) {
           <View style={s.actions}>
             <CommunityImportButton postId={post.id} compact />
             <PublicFeedButton
-              label={`${post.title} ${post.kind === 'plan' ? '여행계획' : '여행기록'} 보기`}
+              label={t('{p0} {p1} 보기', {
+                p0: post.title,
+                p1: post.kind === 'plan' ? '여행계획' : '여행기록',
+              })}
               style={s.textButton}
               onPress={() => {
                 /* 공개한 실제 일정 상세를 연다. */ return router.push({
@@ -99,11 +105,11 @@ export default function PublicFeedCard(props: CommunityFeedPostProps) {
                 });
               }}
             >
-              <Text style={s.link}>동선 보기</Text>
+              <Text style={s.link}>{t('동선 보기')}</Text>
               <Ionicons name="chevron-forward" size={16} color={c.primary} />
             </PublicFeedButton>
             <PublicFeedButton
-              label={`${post.title} 더 보기`}
+              label={t('{p0} 더 보기', { p0: post.title })}
               style={s.iconButton}
               disabled={busy}
               expanded={opened}
@@ -119,13 +125,13 @@ export default function PublicFeedCard(props: CommunityFeedPostProps) {
       </View>
       <ActionSheet
         visible={opened}
-        title="공개 여행 더 보기"
+        title={t('공개 여행 더 보기')}
         onClose={() => {
           /* 서버 변경 없이 메뉴만 닫는다. */ return setOpened(false);
         }}
       >
         <Action
-          label="신고"
+          label={t('신고')}
           disabled={busy}
           onPress={() => {
             /* 이전 사유를 지우고 선택한 게시물 입력을 연다. */ return void (setOpened(
@@ -138,7 +144,7 @@ export default function PublicFeedCard(props: CommunityFeedPostProps) {
         />
         {post.authorId !== userId ? (
           <Action
-            label="작성자 차단"
+            label={t('작성자 차단')}
             disabled={busy}
             onPress={() => {
               /* 실제 차단 전에 기존 확인 시트를 연다. */ return void (setOpened(
@@ -164,6 +170,7 @@ function PublicFeedReport({
   moderation,
   setReportId,
 }: CommunityFeedPostProps) {
+  useLocale();
   // 다른 게시물의 입력을 같은 카드에 표시하지 않는다.
   return reportId === post.id ? (
     <View style={s.sheet}>
@@ -180,7 +187,7 @@ function PublicFeedReport({
         </Text>
       ) : null}
       <Action
-        label="신고 접수"
+        label={t('신고 접수')}
         variant="primary"
         loading={busy}
         disabled={!reason.trim()}
@@ -192,7 +199,7 @@ function PublicFeedReport({
         }}
       />
       <Action
-        label="신고 취소"
+        label={t('신고 취소')}
         disabled={busy}
         onPress={() => {
           /* 서버 변경 없이 입력만 닫는다. */ return setReportId('');

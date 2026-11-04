@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { returnToScreen } from '@/components/navigationModel';
 import { tripListQueryOptions, workspaceQueryOptions } from './tripQueries';
 import { useState } from 'react';
@@ -27,6 +29,7 @@ import { ledgerStyles as s } from './ledgerTheme';
 
 // Stitch 보관함을 현재 계정의 실제 여행 목록에 연결한다.
 export default function FootprintsScreen() {
+  useLocale();
   // 날짜 변경과 계정 전환에 같은 완료 판정을 사용한다.
   useTripDateRefresh();
   const user = useTripStore((state) => {
@@ -58,6 +61,7 @@ function ArchiveContent({
   local: boolean;
   query: UseQueryResult<PersistedTrip[], Error>;
 }) {
+  useLocale();
   // 검색·연도 변경은 여행 원본을 수정하지 않는다.
   const [year, setYear] = useState('');
   const [search, setSearch] = useState('');
@@ -87,7 +91,7 @@ function ArchiveContent({
   });
   return (
     <LedgerScreen
-      title="나의 발자국"
+      title={t('나의 발자국')}
       onBack={() => {
         // 개인 보관함을 연 출발 화면으로 돌아간다.
         return returnToScreen(router, '/(tabs)/my');
@@ -95,14 +99,14 @@ function ArchiveContent({
     >
       <ScrollView contentContainerStyle={[s.content, wide && s.wideContent]}>
         <View style={s.tinted}>
-          <Text style={s.eyebrow}>다녀온 여행 모음</Text>
+          <Text style={s.eyebrow}>{t('다녀온 여행 모음')}</Text>
           <Text accessibilityRole="header" style={s.title}>
             {query.isSuccess
-              ? `다녀온 여행의 발자국 ${summary.trips}개`
-              : '다녀온 여행의 발자국'}
+              ? t('다녀온 여행의 발자국 {p0}개', { p0: summary.trips })
+              : t('다녀온 여행의 발자국')}
           </Text>
           <Text style={s.meta}>
-            걸어온 길마다 소중한 추억을 온전히 담아두었어요.
+            {t('걸어온 길마다 소중한 추억을 온전히 담아두었어요.')}
           </Text>
           {query.isSuccess && (
             <View style={[s.row, { justifyContent: 'space-around' }]}>
@@ -126,7 +130,9 @@ function ArchiveContent({
           )}
         </View>
         <LedgerAction
-          label={userId ? '다녀온 여행 추가' : '로그인하고 여행 기록 시작'}
+          label={
+            userId ? t('다녀온 여행 추가') : t('로그인하고 여행 기록 시작')
+          }
           primary
           onPress={() => {
             // 실제 생성 또는 목적 복귀가 있는 로그인으로 연결한다.
@@ -137,14 +143,15 @@ function ArchiveContent({
         />
         {local && (
           <Text style={s.meta}>
-            이 기록은 이 기기에 보관돼요. 앱이나 기기 데이터를 지우면 사라질 수
-            있어요.
+            {t(
+              '이 기록은 이 기기에 보관돼요. 앱이나 기기 데이터를 지우면 사라질 수 있어요.',
+            )}
           </Text>
         )}
         {query.isPending && userId ? (
           <HaruState
             kind="loading"
-            title="여행 기록을 불러오고 있어요"
+            title={t('여행 기록을 불러오고 있어요')}
             compact
           />
         ) : null}
@@ -164,12 +171,12 @@ function ArchiveContent({
             <Field
               label="여행 기록 검색"
               value={search}
-              placeholder="여행 이름, 도시, 국가"
+              placeholder={t('여행 이름, 도시, 국가')}
               onChange={setSearch}
             />
             <View style={s.row}>
               <LedgerAction
-                label={`전체 ${trips.length}`}
+                label={t('전체 {p0}', { p0: trips.length })}
                 selected={!year}
                 onPress={() => {
                   // 전체 결과로 되돌린다.
@@ -181,12 +188,13 @@ function ArchiveContent({
                 return (
                   <LedgerAction
                     key={value}
-                    label={`${value}년 ${
-                      trips.filter((trip) => {
+                    label={t('{p0}년 {p1}', {
+                      p0: value,
+                      p1: trips.filter((trip) => {
                         // 같은 연도 경계를 사용한다.
                         return trip.startDate.startsWith(value);
-                      }).length
-                    }`}
+                      }).length,
+                    })}
                     selected={year === value}
                     onPress={() => {
                       // 연도 선택은 읽기 필터만 바꾼다.
@@ -199,8 +207,8 @@ function ArchiveContent({
             {!filtered.length && (
               <HaruState
                 kind="empty"
-                title="조건에 맞는 여행이 없어요"
-                description="검색어나 연도를 바꿔 다시 찾아보세요."
+                title={t('조건에 맞는 여행이 없어요')}
+                description={t('검색어나 연도를 바꿔 다시 찾아보세요.')}
               />
             )}
             <View style={[s.row, { alignItems: 'stretch' }]}>
@@ -218,7 +226,7 @@ function ArchiveContent({
             </View>
             {filtered.length > limit && (
               <LedgerAction
-                label="여행 기록 더 보기"
+                label={t('여행 기록 더 보기')}
                 onPress={() => {
                   // 요청한 다음 묶음만 표시한다.
                   return setLimit(limit + 12);
@@ -231,11 +239,13 @@ function ArchiveContent({
           <View style={s.card}>
             <HaruState
               kind="empty"
-              title="아직 남긴 발자국이 없어요"
-              description="다녀온 여행의 날짜와 장소를 등록하고 사진과 지출을 한곳에 모아보세요."
+              title={t('아직 남긴 발자국이 없어요')}
+              description={t(
+                '다녀온 여행의 날짜와 장소를 등록하고 사진과 지출을 한곳에 모아보세요.',
+              )}
             />
             <LedgerAction
-              label="내 여행 살펴보기"
+              label={t('내 여행 살펴보기')}
               onPress={() => {
                 // 예정 여행은 기존 내 여행에서 이어간다.
                 return router.push('/plans');
@@ -256,6 +266,7 @@ function ArchiveCard({
   trip: PersistedTrip;
   userId: string;
 }) {
+  useLocale();
   // 다이어리와 조회 키를 공유한다.
   const query = useQuery({ ...workspaceQueryOptions(userId, trip.id) });
   const router = useRouter();
@@ -264,7 +275,7 @@ function ArchiveCard({
   return (
     <View style={s.card}>
       <Text style={s.eyebrow}>
-        {snapshot?.postId ? '공개 사본 있음 · 개인 원본' : '여행 완료'}
+        {snapshot?.postId ? t('공개 사본 있음 · 개인 원본') : t('여행 완료')}
       </Text>
       <Text accessibilityRole="header" style={s.section}>
         {trip.title}
@@ -290,11 +301,11 @@ function ArchiveCard({
         })}
       </View>
       {query.isPending && (
-        <Text style={s.meta}>사진과 기록을 불러오고 있어요.</Text>
+        <Text style={s.meta}>{t('사진과 기록을 불러오고 있어요.')}</Text>
       )}
       {query.isError && (
         <LedgerAction
-          label="기록 정보 다시 불러오기"
+          label={t('기록 정보 다시 불러오기')}
           onPress={() => {
             // 실패를 사진0장이나 지출0원으로 표시하지 않는다.
             return void query.refetch();
@@ -304,8 +315,10 @@ function ArchiveCard({
       {detail && (
         <View style={s.tinted}>
           <Text style={s.meta}>
-            사진 {detail.photos.length}장 · 일정 {detail.schedules}개 · 영수증{' '}
-            {detail.receipts}장
+            {t('사진')} {detail.photos.length}
+            {t('장 · 일정')} {detail.schedules}
+            {t('개 · 영수증')} {detail.receipts}
+            {t('장')}
           </Text>
           {diaryCosts(snapshot!.expenses).map((cost) => {
             // 서로 다른 통화와 예상 지출을 합치지 않는다.
@@ -318,8 +331,8 @@ function ArchiveCard({
         </View>
       )}
       <LedgerAction
-        label="기록 열기"
-        accessibilityLabel={`${trip.title} 기록 열기`}
+        label={t('기록 열기')}
+        accessibilityLabel={t('{p0} 기록 열기', { p0: trip.title })}
         onPress={() => {
           // 해당 여행의 멤버 원본을 연다.
           return router.push(`/diary/${trip.id}`);

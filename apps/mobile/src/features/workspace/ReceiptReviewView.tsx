@@ -1,3 +1,4 @@
+import { t } from '@/features/localization/translate';
 import Text from '@/components/AppText';
 import type { WorkspaceSnapshot } from '@wherego/domain';
 import { View } from 'react-native';
@@ -98,22 +99,26 @@ export function renderReceiptSummary({
     <View style={l.card}>
       <Text style={l.section}>
         {form.values.receiptStatus === 'manual'
-          ? '직접 확인할 내용'
-          : '사진에서 읽은 내용이에요'}
+          ? t('직접 확인할 내용')
+          : t('사진에서 읽은 내용이에요')}
       </Text>
       <Text style={l.meta}>
         {form.values.receiptStatus === 'manual'
-          ? '영수증 정보를 입력하고 확인하면 장소와 실제 지출이 함께 기록돼요.'
-          : '맞게 읽었는지 확인하면 장소와 실제 지출이 함께 기록돼요.'}
+          ? t(
+              '영수증 정보를 입력하고 확인하면 장소와 실제 지출이 함께 기록돼요.',
+            )
+          : t('맞게 읽었는지 확인하면 장소와 실제 지출이 함께 기록돼요.')}
       </Text>
-      <Text style={l.section}>{form.values.merchant || '상호 확인 필요'}</Text>
-      <Text>{form.values.address || '주소를 읽지 못했어요'}</Text>
+      <Text style={l.section}>
+        {form.values.merchant || t('상호 확인 필요')}
+      </Text>
+      <Text>{form.values.address || t('주소를 읽지 못했어요')}</Text>
       <Text>
-        결제 일시 · {form.values.transactionDate || '날짜 확인 필요'}{' '}
+        {t('결제 일시 ·')} {form.values.transactionDate || t('날짜 확인 필요')}{' '}
         {form.values.transactionTime}
       </Text>
       <Text style={l.section}>
-        결제 합계 · {form.values.amount || '금액 확인 필요'}{' '}
+        {t('결제 합계 ·')} {form.values.amount || t('금액 확인 필요')}{' '}
         {form.values.currency}
       </Text>
       <Text>
@@ -121,13 +126,13 @@ export function renderReceiptSummary({
           // 인식 날짜와 연결된 DAY를 표시한다.
           return day.id === form.values.dayId;
         })
-          ? `DAY ${
-              snapshot.days.find((day) => {
+          ? t('DAY {p0}에 기록돼요', {
+              p0: snapshot.days.find((day) => {
                 // 표시할 날짜 번호 하나를 선택한다.
                 return day.id === form.values.dayId;
-              })!.dayNumber
-            }에 기록돼요`
-          : '결제 날짜가 여행 기간과 맞는지 확인해 주세요.'}
+              })!.dayNumber,
+            })
+          : t('결제 날짜가 여행 기간과 맞는지 확인해 주세요.')}
       </Text>
       {(JSON.parse(form.values.warnings || '[]') as string[])
         .filter((warning) => {
@@ -144,8 +149,8 @@ export function renderReceiptSummary({
       <Action
         label={
           form.values.receiptEditing === 'true'
-            ? '수정 마치기'
-            : '인식 내용 수정'
+            ? t('수정 마치기')
+            : t('인식 내용 수정')
         }
         disabled={busy}
         onPress={() => {
@@ -158,7 +163,7 @@ export function renderReceiptSummary({
       />
       {form.values.receiptOperation !== 'update' && (
         <Action
-          label="다시 스캔하기"
+          label={t('다시 스캔하기')}
           disabled={busy}
           variant="quiet"
           onPress={onRetry}

@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { Image, View, StyleSheet } from 'react-native';
 import Text from '@/components/AppText';
 import { Action } from './ui';
@@ -20,6 +22,7 @@ export default function PrivatePhotoView({
   onFailure: () => void;
   onRetry: () => void;
 }) {
+  useLocale();
   // 기존 이미지 비율·문구·터치 동작을 그대로 유지한다.
   return uri ? (
     <Image
@@ -28,19 +31,21 @@ export default function PrivatePhotoView({
       resizeMode={fit}
       resizeMethod="resize"
       style={photoStyles.image}
-      accessibilityLabel="여행에 등록한 사진"
+      accessibilityLabel={t('여행에 등록한 사진')}
       onError={onFailure}
     />
   ) : (
     <View style={photoStyles.status}>
       <Text accessibilityRole={failed ? 'alert' : undefined}>
         {failed
-          ? '사진을 불러오지 못했어요. 연결을 확인하고 다시 시도해 주세요.'
-          : '사진을 불러오는 중입니다.'}
+          ? t('사진을 불러오지 못했어요. 연결을 확인하고 다시 시도해 주세요.')
+          : t('사진을 불러오는 중입니다.')}
       </Text>
       {failed && (
         <Action
-          label={fetching ? '사진을 다시 불러오는 중…' : '사진 다시 불러오기'}
+          label={
+            fetching ? t('사진을 다시 불러오는 중…') : t('사진 다시 불러오기')
+          }
           disabled={fetching}
           onPress={onRetry}
         />

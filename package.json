@@ -1,8 +1,8 @@
 {
   "name": "wherego-workspace",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "private": true,
-  "main": "expo-router/entry",
+  "main": "apps/mobile/index.ts",
   "packageManager": "npm@11.5.2",
   "engines": {
     "node": "^22.13.0 || ^24.3.0"
@@ -28,7 +28,7 @@
     "api:dev": "npm --workspace=@wherego/api run dev",
     "api:build": "npm --workspace=@wherego/api run build",
     "test:foundation": "npm --workspace=@wherego/api run test",
-    "test:trail:web": "node scripts/qa/prepare-schedule-preview.mjs && playwright test",
+    "test:trail:web": "node scripts/qa/verify-planning-journey.mjs --device-records",
     "test:auth": "tsx --test tests/auth/*.test.ts",
     "test:release": "node --test tests/release/*.test.mjs",
     "release:check": "node --env-file-if-exists=.env.release scripts/release/release-config.mjs",
@@ -38,12 +38,13 @@
     "test:workspace:web": "node scripts/qa/verify-workspace-web.mjs",
     "test:planning:db": "node scripts/qa/verify-planning-journey.mjs",
     "test:schedule:web": "node scripts/qa/prepare-schedule-preview.mjs && playwright test --config tests/config/playwright.schedule.config.ts",
+    "test:localization:web": "node scripts/qa/prepare-schedule-preview.mjs && playwright test --config tests/config/playwright.schedule.config.ts --grep \"다국어 UI\"",
     "preview:trail": "node scripts/qa/preview-trail.mjs",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "npm run check:docs && npm run check:design && npm run check:architecture && npm run check:navigation && npm run typecheck && npm run lint && npm run format:check",
+    "check": "npm run check:docs && npm run check:design && npm run check:resources && npm run check:architecture && npm run check:navigation && npm run typecheck && npm run lint && npm run format:check",
     "build:web": "npm --workspace=@wherego/mobile run build:web",
     "build:apk": "npm --workspace=@wherego/mobile run build:apk",
     "build:all": "npm --workspace=@wherego/mobile run build:all",
@@ -57,7 +58,8 @@
     "test:headers:web": "node scripts/qa/verify-header-web.mjs",
     "test:s24:web": "node scripts/qa/verify-s24-web.mjs",
     "check:architecture": "node --test tests/release/repository-layout.test.mjs && node scripts/checks/check-repository-layout.mjs && node scripts/checks/check-code-boundaries.mjs",
-    "check:navigation": "node --test tests/release/navigation-boundaries.test.mjs && node scripts/checks/check-navigation-boundaries.mjs"
+    "check:navigation": "node --test tests/release/navigation-boundaries.test.mjs && node scripts/checks/check-navigation-boundaries.mjs",
+    "check:resources": "node --test tests/release/resources.test.mjs && node scripts/checks/check-resources.mjs"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",

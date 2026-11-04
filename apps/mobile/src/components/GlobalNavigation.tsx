@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { useEffect, useRef, useState } from 'react';
 import {
   Animated,
@@ -26,6 +28,7 @@ const gnb = designTokens.navigation.gnb;
 
 // 최상위 화면의 탐색 메뉴를 하단 안전 영역에 맞춰 한 번만 배치한다.
 export default function GlobalNavigation() {
+  useLocale();
   // 모달 뒤의 메뉴는 읽기와 터치를 함께 차단한다.
   const modal = useTopModal();
   const path = usePathname();
@@ -73,7 +76,7 @@ export default function GlobalNavigation() {
   return !starting && hasGlobalNavigation(path) && !(modal && !modal.strict) ? (
     <Animated.View
       testID="global-navigation"
-      accessibilityLabel="하단 내비게이션"
+      accessibilityLabel={t('하단 내비게이션')}
       accessibilityElementsHidden={blocked}
       importantForAccessibility={blocked ? 'no-hide-descendants' : 'auto'}
       aria-hidden={blocked}
@@ -119,17 +122,18 @@ function NavigationButton({
   selected: boolean;
   onPress: () => void;
 }) {
+  useLocale();
   // 색과 초점 테두리만 변경해 선택 시 주변 메뉴가 움직이지 않게 한다.
   const [focused, setFocused] = useState(false);
-  const foreground = item.isAction
-    ? gnb.actionLabel
-    : selected
-      ? gnb.selectedForeground
-      : gnb.foreground;
+  const foreground = selected ? gnb.selectedForeground : gnb.foreground;
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={item.isAction ? item.label : item.label + ' 탭'}
+      accessibilityLabel={
+        item.isAction
+          ? t(item.label)
+          : t('{label} 탭', { label: t(item.label) })
+      }
       accessibilityState={item.isAction ? undefined : { selected }}
       aria-selected={item.isAction ? undefined : selected}
       onPress={onPress}
@@ -143,26 +147,20 @@ function NavigationButton({
       }}
       style={({ pressed }) => [
         styles.item,
-        !item.isAction && pressed && styles.pressed,
+        pressed && styles.pressed,
         focused && styles.focused,
       ]}
     >
-      {({ pressed }) => {
+      {() => {
         // 중앙 생성 행동은 선택 상태 없이 누름 색만 표현한다.
         return (
           <>
             <View testID="navigation-icon-slot" style={styles.iconSlot}>
-              <View
-                style={
-                  item.isAction
-                    ? [styles.action, pressed && styles.actionPressed]
-                    : [styles.chip, selected && styles.selectedChip]
-                }
-              >
+              <View style={[styles.chip, selected && styles.selectedChip]}>
                 <Ionicons
                   name={selected ? item.activeIcon : item.icon}
-                  size={item.isAction ? gnb.actionIconSize : gnb.iconSize}
-                  color={item.isAction ? gnb.actionForeground : foreground}
+                  size={gnb.iconSize}
+                  color={foreground}
                 />
               </View>
             </View>
@@ -170,7 +168,7 @@ function NavigationButton({
               variant="navigation"
               style={[styles.label, { color: foreground }]}
             >
-              {item.label}
+              {t(item.label)}
             </Text>
           </>
         );
@@ -211,7 +209,7 @@ const styles = StyleSheet.create({
     outlineOffset: -2,
   },
   iconSlot: {
-    height: gnb.actionSize + gnb.actionOffset,
+    height: gnb.chipHeight,
     alignSelf: 'stretch',
     alignItems: 'center',
     justifyContent: 'center',

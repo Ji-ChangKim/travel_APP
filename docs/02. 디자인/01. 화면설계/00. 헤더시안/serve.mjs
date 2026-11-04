@@ -17,9 +17,9 @@ const files = [
     'docs/02. 디자인/02. 리소스/리소스_저장경로.md',
     'text/plain; charset=utf-8',
   ],
-  [asset + 'fonts/pretendard-regular.otf', 'font/otf'],
-  [asset + 'fonts/pretendard-semibold.otf', 'font/otf'],
-  [asset + 'fonts/pretendard-bold.otf', 'font/otf'],
+  [asset + 'fonts/pretendard/pretendard-regular.otf', 'font/otf'],
+  [asset + 'fonts/pretendard/pretendard-semibold.otf', 'font/otf'],
+  [asset + 'fonts/pretendard/pretendard-bold.otf', 'font/otf'],
   [asset + 'brand/tripprint-v1/fonts/Poppins-Bold.ttf', 'font/ttf'],
   [
     asset + 'brand/tripprint-v1/TripPrint_symbol-coral-clean_1024x1024.png',

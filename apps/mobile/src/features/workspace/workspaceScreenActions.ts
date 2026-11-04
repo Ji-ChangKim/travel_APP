@@ -151,6 +151,22 @@ export function createWorkspaceScreenActions(options: Options) {
         values: { ...draft.values, placeSearchExpanded: 'true' },
       });
     },
+    addScheduleByCategory: (
+      dayId: string,
+      category: { label: string; type: 'PLACE' | 'STAY'; query: string },
+    ) => {
+      // 선택한 카테고리 유형과 검색 펼침 상태를 작성 초안에 반영한다.
+      if (!snapshot) return;
+      const draft = createSchedule(snapshot, undefined, dayId);
+      return edit({
+        ...draft,
+        values: {
+          ...draft.values,
+          type: category.type,
+          placeSearchExpanded: 'true',
+        },
+      });
+    },
     startSchedule: (dayId: string) => {
       // 하단 추가 버튼은 검색을 강제로 펼치지 않는 기존 작성 진입을 유지한다.
       return snapshot
@@ -159,7 +175,7 @@ export function createWorkspaceScreenActions(options: Options) {
     },
     chooseCoursePlace: (
       dayId: string,
-      place: { title: string; description: string },
+      place: { title: string; description: string; locationLabel?: string },
     ) => {
       // 코스에서 고른 설명과 새 일정 ID를 한 번 만든 초안에 채운다.
       if (!snapshot) return;

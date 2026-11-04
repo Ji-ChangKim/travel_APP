@@ -1,3 +1,4 @@
+import { t } from '@/features/localization/translate';
 import Text from '@/components/AppText';
 import { type Dispatch, type SetStateAction } from 'react';
 import { Platform, View } from 'react-native';
@@ -70,23 +71,23 @@ export function renderLocationEditor({
     <FormAnchor name="지도 위치">
       <View style={compact ? schedule.card : styles.card}>
         <Text style={compact ? schedule.title : styles.title} numberOfLines={1}>
-          일정의 지도 위치
+          {t('일정의 지도 위치')}
         </Text>
         <Text style={styles.subtitle}>
           {coordinate
-            ? '이 일정의 위치를 선택했어요.'
-            : '방문할 위치를 선택하면 여행 지도에 번호 핀으로 표시돼요.'}
+            ? t('이 일정의 위치를 선택했어요.')
+            : t('방문할 위치를 선택하면 여행 지도에 번호 핀으로 표시돼요.')}
         </Text>
         {Platform.OS !== 'web' || compact ? (
           <Action
             label={
               Platform.OS === 'web'
                 ? expanded
-                  ? '위치 입력 접기'
-                  : '좌표로 위치 추가'
+                  ? t('위치 입력 접기')
+                  : t('좌표로 위치 추가')
                 : expanded
-                  ? '지도 접기'
-                  : '지도에서 위치 선택'
+                  ? t('지도 접기')
+                  : t('지도에서 위치 선택')
             }
             disabled={locked}
             onPress={() => {
@@ -102,8 +103,8 @@ export function renderLocationEditor({
           <>
             <Text style={styles.subtitle}>
               {Platform.OS === 'web'
-                ? '후보 위치를 확인한 뒤 적용해 주세요.'
-                : '지도를 이동한 뒤 방문할 위치를 길게 눌러 주세요.'}
+                ? t('후보 위치를 확인한 뒤 적용해 주세요.')
+                : t('지도를 이동한 뒤 방문할 위치를 길게 눌러 주세요.')}
             </Text>
             <TripMapCanvas
               stops={stops}
@@ -116,7 +117,9 @@ export function renderLocationEditor({
         {(!compact || expanded) && (
           <>
             <Action
-              label={current.busy ? '현재 위치 확인 중…' : '현재 위치 사용'}
+              label={
+                current.busy ? t('현재 위치 확인 중…') : t('현재 위치 사용')
+              }
               disabled={locked || current.busy}
               onPress={() => {
                 // 원본 위치는 유지하고 새 현재 위치 후보만 요청한다.
@@ -142,11 +145,12 @@ export function renderLocationEditor({
               }}
             />
             <Text style={styles.subtitle}>
-              Google Maps에서 확인한 ‘위도, 경도’를 붙여 넣어도 위치를 선택할 수
-              있어요.
+              {t(
+                'Google Maps에서 확인한 ‘위도, 경도’를 붙여 넣어도 위치를 선택할 수 있어요.',
+              )}
             </Text>
             <Action
-              label="붙여 넣은 위치 확인"
+              label={t('붙여 넣은 위치 확인')}
               disabled={locked || !input.trim()}
               onPress={() => {
                 // 화면 중심이나 장소 이름을 정확한 위치로 추측하지 않는다.
@@ -161,17 +165,18 @@ export function renderLocationEditor({
           </>
         )}
         {candidate && (expanded || !compact) ? (
-          <View accessibilityLabel="선택한 위치 후보" style={styles.card}>
+          <View accessibilityLabel={t('선택한 위치 후보')} style={styles.card}>
             <Text>
-              선택한 위치 후보: {candidate.latitude.toFixed(6)},{' '}
+              {t('선택한 위치 후보:')} {candidate.latitude.toFixed(6)},{' '}
               {candidate.longitude.toFixed(6)}
             </Text>
             <Text style={styles.subtitle}>
-              위치 적용을 누르면 작성 중인 일정에 반영돼요. 일정 저장은 별도로
-              해 주세요.
+              {t(
+                '위치 적용을 누르면 작성 중인 일정에 반영돼요. 일정 저장은 별도로 해 주세요.',
+              )}
             </Text>
             <Action
-              label="위치 적용"
+              label={t('위치 적용')}
               disabled={locked || current.busy}
               onPress={apply}
             />
@@ -179,7 +184,7 @@ export function renderLocationEditor({
         ) : null}
         {coordinate ? (
           <Action
-            label="지도 위치 지우기"
+            label={t('지도 위치 지우기')}
             disabled={locked}
             onPress={() => {
               // 기존 일정 내용은 유지하고 지도 위치만 해제한다.
@@ -191,7 +196,7 @@ export function renderLocationEditor({
         ) : null}
         {error ? (
           <Text accessibilityRole="alert" style={styles.error}>
-            {error}
+            {t(error)}
           </Text>
         ) : null}
       </View>

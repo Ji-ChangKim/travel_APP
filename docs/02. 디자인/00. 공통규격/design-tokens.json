@@ -1,7 +1,7 @@
 {
   "schemaVersion": 3,
-  "revision": "3.0.4",
-  "date": "2026-10-21",
+  "revision": "3.0.5",
+  "date": "2026-10-26",
   "status": "app-integrated",
   "unit": "logical-pixel",
   "sourceScreens": {
@@ -67,16 +67,20 @@
     }
   },
   "font": {
-    "korean": "Pretendard",
-    "latin": "Pretendard",
+    "korean": "LINE Seed KR",
+    "latin": "LINE Seed Sans",
     "fallback": "system-ui",
-    "koreanWebAsset": "apps/mobile/assets/brand/tripprint-v1/fonts/PretendardVariable.woff2",
+    "koreanWebAsset": "apps/mobile/assets/fonts/line-seed/line-seed-ko-regular.ttf",
     "nativeAssetsStatus": "integrated",
     "latinAssetStatus": "integrated",
     "numericVariant": "tabular-nums",
     "brand": "Poppins",
-    "semiboldAsset": "apps/mobile/assets/fonts/pretendard-semibold.otf",
-    "brandAsset": "apps/mobile/assets/brand/tripprint-v1/fonts/Poppins-Bold.ttf"
+    "semiboldAsset": "apps/mobile/assets/fonts/line-seed/line-seed-ko-bold.ttf",
+    "brandAsset": "apps/mobile/assets/brand/tripprint-v1/fonts/Poppins-Bold.ttf",
+    "japanese": "LINE Seed JP",
+    "semiboldMapping": "Bold (700): LINE Seed는 Semibold 파일을 제공하지 않음",
+    "japaneseAsset": "apps/mobile/assets/fonts/line-seed/line-seed-ja-regular.ttf",
+    "latinAsset": "apps/mobile/assets/fonts/line-seed/line-seed-en-regular.ttf"
   },
   "typography": {
     "displayMobile": {

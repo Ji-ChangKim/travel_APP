@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import * as Crypto from 'expo-crypto';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -19,6 +21,7 @@ export default function ReceiptMenuEditor({
   busy: boolean;
   onChange: (key: string, value: string) => void;
 }) {
+  useLocale();
   const items = receiptItems(form.values.items);
   const [focusId, setFocusId] = useState('');
   const clearFocus = useCallback(() => setFocusId(''), [setFocusId]);
@@ -36,10 +39,10 @@ export default function ReceiptMenuEditor({
 
   return (
     <View style={l.card}>
-      <Text style={l.section}>메뉴·구매 내역</Text>
+      <Text style={l.section}>{t('메뉴·구매 내역')}</Text>
       {items.length === 0 && (
         <Text>
-          메뉴 없이 저장할 수 있어요. 필요한 메뉴는 직접 추가해 주세요.
+          {t('메뉴 없이 저장할 수 있어요. 필요한 메뉴는 직접 추가해 주세요.')}
         </Text>
       )}
       {items.map((item, index) => {
@@ -57,7 +60,7 @@ export default function ReceiptMenuEditor({
               onChange={onChange}
             />
             <LedgerAction
-              label={`${index + 1}번 메뉴 삭제`}
+              label={t('{p0}번 메뉴 삭제', { p0: index + 1 })}
               disabled={locked}
               onPress={() => {
                 // 삭제한 행 외의 키와 값을 보존하고 인접 입력으로 이동한다.
@@ -71,9 +74,9 @@ export default function ReceiptMenuEditor({
           </View>
         );
       })}
-      <View ref={emptyTarget} focusable accessibilityLabel="메뉴 추가">
+      <View ref={emptyTarget} focusable accessibilityLabel={t('메뉴 추가')}>
         <LedgerAction
-          label="메뉴 추가"
+          label={t('메뉴 추가')}
           disabled={locked || items.length >= 50}
           onPress={() => {
             const rowId = Crypto.randomUUID();
@@ -89,10 +92,12 @@ export default function ReceiptMenuEditor({
         />
       </View>
       {items.length >= 50 && (
-        <Text style={l.meta}>메뉴는 최대 50개까지 추가할 수 있어요.</Text>
+        <Text style={l.meta}>
+          {t('메뉴는 최대 50개까지 추가할 수 있어요.')}
+        </Text>
       )}
       <Text style={l.meta}>
-        수량·단가·금액을 모르면 비워 두세요. 결제 총액은 별도로 기록해요.
+        {t('수량·단가·금액을 모르면 비워 두세요. 결제 총액은 별도로 기록해요.')}
       </Text>
     </View>
   );
@@ -116,6 +121,7 @@ function MenuFields({
   onFocused: () => void;
   onChange: (key: string, value: string) => void;
 }) {
+  useLocale();
   const input = useRef<TextInput>(null);
   useEffect(() => {
     if (!shouldFocus || locked) return;
@@ -132,6 +138,17 @@ function MenuFields({
           key={key}
           inputRef={key === 'name' ? input : undefined}
           label={`${index + 1}번 메뉴 ${{ name: '이름', quantity: '수량', unitPrice: '단가', amount: '금액' }[key]}`}
+          displayLabel={t('{count}번 메뉴 {field}', {
+            count: index + 1,
+            field: t(
+              {
+                name: '이름',
+                quantity: '수량',
+                unitPrice: '단가',
+                amount: '금액',
+              }[key],
+            ),
+          })}
           value={String(item[key] ?? '')}
           disabled={locked}
           onChange={(value) =>

@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { colors } from '@/constants/theme';
 import Text from '@/components/AppText';
 import { Linking, View } from 'react-native';
@@ -30,6 +32,7 @@ export function GoogleAttribution({
 }: {
   attributions?: z.infer<typeof googlePlaceSchema>['attributions'];
 }) {
+  useLocale();
   // 좁은 모바일 카드에는 공식 표기와 가독성 규격을 유지한 텍스트 출처를 사용한다.
   return (
     <View style={{ gap: 8 }}>
@@ -63,11 +66,12 @@ export default function GooglePlace({
   placeId: string;
   label: string;
 }) {
+  useLocale();
   // 외부 구글 지도 링크는 공급자 조회가 실패해도 저장한 장소 ID로 열 수 있다.
   return (
     <View style={{ gap: 8 }}>
       <Action
-        label="Google Maps에서 장소 보기"
+        label={t('Google Maps에서 장소 보기')}
         onPress={() => {
           // 선택한 장소를 구글 지도 앱 또는 웹에서 바로 연다.
           void Linking.openURL(

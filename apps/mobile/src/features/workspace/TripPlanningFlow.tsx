@@ -5,6 +5,9 @@ import type { FieldErrors } from './formFeedback';
 import { formFailureFields, formInputFields } from './formFeedback';
 import type { PlanForm } from './forms';
 import { tripBasicsError, tripCreationInput } from './tripCreation';
+import { useRouter } from 'expo-router';
+import { useTripStore } from '@/stores/useTripStore';
+import { requestCreationLogin } from './requestCreationLogin';
 
 import { tripToday } from '@wherego/domain';
 import FlightTicketEditor from './FlightTicketEditor';
@@ -25,13 +28,37 @@ type Props = {
   onChange: (key: string, value: string) => void;
   onInvalid: (fields: FieldErrors) => void;
   onSave: () => void;
+  onDraftPending?: (pending: boolean) => void;
   onClose: () => void;
 };
 
 // 여행 기본 정보·항공편 목록·항공권 입력을 분리해 같은 초안으로 연결한다.
-export default function TripPlanningFlow({ scroll, ...props }: Props) {
+export default function TripPlanningFlow({ scroll, ...inputProps }: Props) {
+  const router = useRouter();
+  const [draftBusy, setDraftBusy] = useState(false);
+  const props = {
+    ...inputProps,
+    locked: inputProps.locked || draftBusy,
+    busy: inputProps.busy || draftBusy,
+    onChange: (key: string, value: string) => {
+      if (!draftBusy) inputProps.onChange(key, value);
+    },
+    onSave: () => {
+      if (!draftBusy) inputProps.onSave();
+    },
+    onDraftPending: (pending: boolean) => {
+      setDraftBusy(pending);
+      inputProps.onDraftPending?.(pending);
+    },
+    onDraftSaved: (revision: number) => {
+      inputProps.onChange('_draftRevision', String(revision));
+      inputProps.onChange('_authUnsaved', 'false');
+    },
+  };
   // 페이지 이동은 작성한 여행과 항공편 목록을 초기화하지 않는다.
-  const [step, setStep] = useState<'basics' | 'flights'>('basics');
+  const [step, setStep] = useState<'basics' | 'flights'>(
+    props.form.values._creationStep === 'flights' ? 'flights' : 'basics',
+  );
   const [slot, setSlot] = useState<FlightSlot | null>(null);
   const [ticketDrafts, setTicketDrafts] = useState<
     Record<string, FlightTicketDraft>
@@ -45,7 +72,7 @@ export default function TripPlanningFlow({ scroll, ...props }: Props) {
       props.form.values.endDate <
         tripToday(props.form.values.timezone || 'Asia/Seoul'),
     );
-  function next(): void {
+  function proceed(onValid: () => void): void {
     // 첫 단계에서는 등록한 항공편과 별개로 여행지·기간만 검사한다.
     try {
       if (props.locked) return;
@@ -54,11 +81,13 @@ export default function TripPlanningFlow({ scroll, ...props }: Props) {
         return void (props.onInvalid(fields),
         setBasicsError(tripBasicsError(props.form.values)));
       tripCreationInput({ ...props.form.values, flights: '[]' });
-      if (props.form.values.flights === undefined)
-        props.onChange('flights', '[]');
-      setStep('flights');
+      const user = useTripStore.getState().currentUser;
+      if (!user || user.authProvider === 'guest') {
+        requestCreationLogin(router, props.form, 'basics');
+        return;
+      }
       setBasicsError('');
-      scroll.current?.scrollTo({ y: 0, animated: false });
+      onValid();
     } catch (failure) {
       // 작성값은 유지하고 현재 화면에서 고칠 항목만 알려준다.
       return void (props.onInvalid(formFailureFields(failure, 'trip')),
@@ -66,6 +95,14 @@ export default function TripPlanningFlow({ scroll, ...props }: Props) {
         tripBasicsError(props.form.values) || '입력한 항목을 확인해 주세요.',
       ));
     }
+  }
+  function next(): void {
+    proceed(() => {
+      if (props.form.values.flights === undefined)
+        props.onChange('flights', '[]');
+      setStep('flights');
+      scroll.current?.scrollTo({ y: 0, animated: false });
+    });
   }
   function back(): void {
     // 저장 중 이탈과 항공권 수정 중의 예상치 못한 초기화를 막는다.
@@ -118,6 +155,7 @@ export default function TripPlanningFlow({ scroll, ...props }: Props) {
     back,
     props,
     next,
+    create: () => proceed(props.onSave),
     scroll,
     setBasicsError,
     items,

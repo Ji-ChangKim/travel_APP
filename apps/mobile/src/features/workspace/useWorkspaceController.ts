@@ -5,7 +5,7 @@ import { useWorkspaceData } from './useWorkspaceData';
 import { useTripStore } from '@/stores/useTripStore';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { scheduleForm } from './forms';
+import { scheduleForm, type PlanForm } from './forms';
 import { savedReceiptForm } from './receiptFlow';
 import { useSharedSchedule } from './useSharedSchedule';
 import { useTripDateRefresh } from './useTripDateRefresh';
@@ -15,9 +15,11 @@ import { useWorkspaceScreenActions } from './workspaceScreenActions';
 export function useWorkspaceController({
   creating,
   importing,
+  initialForm,
 }: {
   creating: boolean;
   importing: boolean;
+  initialForm?: PlanForm;
 }) {
   // 서버 자료의 기준 계정과 현재 경로를 구독한다.
   useTripDateRefresh();
@@ -34,7 +36,12 @@ export function useWorkspaceController({
   const router = useRouter();
   const cache = useQueryClient();
   const userId = user?.id || '';
-  const editor = useWorkspaceEditorState({ creating, destination, mode });
+  const editor = useWorkspaceEditorState({
+    creating,
+    destination,
+    mode,
+    initialForm,
+  });
   const navigation = useWorkspaceNavigationState(section);
   const { trips, workspace, snapshot, writable, owner } = useWorkspaceData(
     userId,
@@ -83,6 +90,8 @@ export function useWorkspaceController({
     form: editor.form,
     setForm: editor.setForm,
     busy: editor.busy,
+    draftSaving: editor.draftSaving,
+    setDraftSaving: editor.setDraftSaving,
     scanning: editor.scanning,
     confirmation: editor.confirmation,
     showReceiptCapture: editor.showReceiptCapture,

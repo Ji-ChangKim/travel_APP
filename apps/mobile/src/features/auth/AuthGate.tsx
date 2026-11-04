@@ -1,5 +1,10 @@
 import { useEffect } from 'react';
-import { usePathname, useRouter, useGlobalSearchParams } from 'expo-router';
+import {
+  usePathname,
+  useRouter,
+  useGlobalSearchParams,
+  useSegments,
+} from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthReady } from './AuthBridge';
 import { authReturn, returnFromPath } from './authReturn';
@@ -16,6 +21,7 @@ import {
 // 직접 링크와 화면 복귀에도 로그인 선택 및 개인정보 설정 순서를 지킨다.
 export default function AuthGate() {
   // 서버에서 확정한 프로필만 화면 전환의 근거로 사용한다.
+  const starting = useSegments().join('/') === '';
   return useMemberGate(
     useTripStore((state) => {
       // 계정 변경을 구독한다.
@@ -25,6 +31,7 @@ export default function AuthGate() {
       // 최초 인증 복원이 끝나기 전에는 이동을 보류한다.
       return state.ready;
     }),
+    starting,
     usePathname(),
     useRouter(),
     Linking.useURL(),
@@ -36,6 +43,7 @@ export default function AuthGate() {
 function useMemberGate(
   user: ReturnType<typeof useTripStore.getState>['currentUser'],
   ready: boolean,
+  starting: boolean,
   path: string,
   router: ReturnType<typeof useRouter>,
   url: string | null,
@@ -45,6 +53,7 @@ function useMemberGate(
   return useGateEffects(
     user,
     ready,
+    starting,
     path,
     router,
     url,
@@ -52,7 +61,7 @@ function useMemberGate(
     useQuery({
       queryKey: ['member-profile', user?.id],
       enabled:
-        ready && path !== '/' && Boolean(user && user.authProvider !== 'guest'),
+        ready && !starting && Boolean(user && user.authProvider !== 'guest'),
       queryFn: () => {
         // 다른 계정의 프로필을 대체하지 않는다.
         return fetchUserProfile(user!.id);
@@ -66,6 +75,7 @@ function useMemberGate(
 function useGateEffects(
   user: ReturnType<typeof useTripStore.getState>['currentUser'],
   ready: boolean,
+  starting: boolean,
   path: string,
   router: ReturnType<typeof useRouter>,
   url: string | null,
@@ -77,9 +87,10 @@ function useGateEffects(
     useEffect(() => {
       // 인증 전에는 로그인 선택으로, 신규 회원은 세 가지 프로필 설정으로 이동한다.
       return ready &&
+        !starting &&
         path !== '/auth/callback' &&
         path !== '/login' &&
-        path !== '/'
+        path !== '/welcome'
         ? !user
           ? isPublicBrowsePath(path)
             ? undefined
@@ -94,7 +105,7 @@ function useGateEffects(
               })
             : undefined
         : undefined;
-    }, [ready, path, user, profile, router, url, params]),
+    }, [ready, starting, path, user, profile, router, url, params]),
     useEffect(() => {
       // 상세 프로필 확인 중 계정이 바뀌면 이전 결과를 적용하지 않는다.
       return profile && useTripStore.getState().currentUser?.id === profile.id
@@ -153,7 +164,9 @@ function preserveIncoming(path: string, url: string | null): Promise<void> {
 // 온보딩 중 다시 인증해도 이미 검증한 원래 목적을 유지한다.
 function gateReturn(path: string, params: Record<string, unknown>) {
   // 일반 화면은 실제 경로에서, 설정 화면은 허용된 복귀 파라미터에서 읽는다.
-  return path === '/profile-setup'
-    ? authReturn(params.next, params.destination, params.tripId)
-    : returnFromPath(path, params.destination);
+  return path === '/new-trip' && params.handoff
+    ? authReturn('new-trip', params.destination, params.handoff)
+    : path === '/profile-setup'
+      ? authReturn(params.next, params.destination, params.tripId)
+      : returnFromPath(path, params.destination);
 }

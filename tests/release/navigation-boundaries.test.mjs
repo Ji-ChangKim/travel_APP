@@ -104,6 +104,30 @@ const policy = {
   title: 'MY',
   gnb: true,
 };
+test('간단 시작 화면의 헤더 생략은 welcome 경로에만 허용한다', () => {
+  const entry = {
+    file: 'welcome.tsx',
+    path: '/welcome',
+    header: 'entry',
+    title: 'TripPrint',
+    gnb: false,
+  };
+  assert.deepEqual(
+    inspectRoutePolicies(['welcome.tsx'], [entry], () => false),
+    [],
+  );
+  const other = { ...entry, file: 'login.tsx', path: '/login' };
+  assert.ok(
+    inspectRoutePolicies(['login.tsx'], [other], () => false).length > 0,
+  );
+  assert.ok(
+    inspectRoutePolicies(
+      ['welcome.tsx'],
+      [{ ...entry, gnb: true }],
+      () => false,
+    ).length > 0,
+  );
+});
 test('신규·삭제 라우트의 정책 누락과 오래된 정책을 잡는다', () => {
   assert.ok(inspectRoutePolicies(['new-page.tsx'], [], () => true).length > 0);
   assert.ok(inspectRoutePolicies([], [policy], () => true).length > 0);

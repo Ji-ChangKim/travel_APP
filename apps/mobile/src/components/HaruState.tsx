@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
 import type { ReactNode } from 'react';
@@ -34,6 +36,7 @@ export default function HaruState({
   compact?: boolean;
   children?: ReactNode;
 }) {
+  useLocale();
   // 가짜 진행률이나 자동 이동 없이 호출 화면의 상태와 행동만 보여준다.
   return kind === 'loading' ? (
     <View style={[styles.loading, compact && styles.loadingCompact]}>
@@ -50,7 +53,7 @@ export default function HaruState({
     <View style={[styles.card, compact && styles.compact]}>
       <Image
         source={poses[kind].source}
-        accessibilityLabel={poses[kind].label}
+        accessibilityLabel={t(poses[kind].label)}
         resizeMode="contain"
         style={compact ? styles.smallPortrait : styles.portrait}
       />
@@ -93,22 +96,22 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     padding: 24,
-    gap: 12,
+    gap: 16,
     borderRadius: 20,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
   },
   compact: { flexDirection: 'row', padding: 14, gap: 14 },
-  portrait: { width: 190, height: 210 },
-  smallPortrait: { width: 64, height: 72 },
-  copy: { width: '100%', gap: 10, alignItems: 'center' },
+  portrait: { width: 96, height: 112 },
+  smallPortrait: { width: 48, height: 56 },
+  copy: { width: '100%', gap: 8, alignItems: 'center' },
   compactCopy: { flex: 1, width: undefined, alignItems: 'flex-start' },
   heading: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   title: {
     flexShrink: 1,
-    fontSize: 20,
-    lineHeight: 28,
+    fontSize: 18,
+    lineHeight: 26,
     fontWeight: '700',
     color: colors.text,
     textAlign: 'center',

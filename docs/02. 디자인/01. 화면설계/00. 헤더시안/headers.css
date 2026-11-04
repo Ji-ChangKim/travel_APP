@@ -1,20 +1,20 @@
 @font-face {
   font-family: Pretendard;
-  src: url('../../../../apps/mobile/assets/fonts/pretendard-regular.otf')
+  src: url('../../../../apps/mobile/assets/fonts/pretendard/pretendard-regular.otf')
     format('opentype');
   font-weight: 400;
   font-display: swap;
 }
 @font-face {
   font-family: Pretendard;
-  src: url('../../../../apps/mobile/assets/fonts/pretendard-semibold.otf')
+  src: url('../../../../apps/mobile/assets/fonts/pretendard/pretendard-semibold.otf')
     format('opentype');
   font-weight: 600;
   font-display: swap;
 }
 @font-face {
   font-family: Pretendard;
-  src: url('../../../../apps/mobile/assets/fonts/pretendard-bold.otf')
+  src: url('../../../../apps/mobile/assets/fonts/pretendard/pretendard-bold.otf')
     format('opentype');
   font-weight: 700;
   font-display: swap;

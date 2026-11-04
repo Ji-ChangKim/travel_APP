@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { useState } from 'react';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
@@ -16,10 +18,15 @@ export type MapCanvasProps = {
 
 // 웹에서는 모바일 SDK를 불러오거나 유료 웹 지도로 전환하지 않는다.
 export default function TripMapCanvas(props: MapCanvasProps) {
+  useLocale();
   // SVG의 축소 비율과 사용자 글자 배율을 번호 크기에 반영한다.
   const [width, setWidth] = useState(320);
   const { fontScale } = useAppAccessibility();
   // 웹에서는 실제 좌표의 상대 위치를 도식으로 제공한다.
+  const activeStop =
+    props.stops.find((stop) => stop.item.id === props.selectedId) ||
+    props.stops.find((stop) => Boolean(stop.coordinate)) ||
+    props.stops[0];
   return (
     <View
       onLayout={(event) => {
@@ -28,50 +35,151 @@ export default function TripMapCanvas(props: MapCanvasProps) {
         );
       }}
       style={{
-        padding: 12,
-        gap: 8,
+        padding: 14,
+        gap: 10,
         borderRadius: 16,
         backgroundColor: theme.color.surface.low,
+        borderWidth: 1,
+        borderColor: theme.color.border.subtle,
       }}
     >
-      <Text
+      <View
         style={{
-          color: theme.color.text.secondary,
-          fontSize: 14,
-          lineHeight: 22,
-          fontFamily: theme.font.regular,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 8,
+          flexWrap: 'wrap',
         }}
       >
-        방문 위치 · 연결선은 실제 길과 다를 수 있어요.
-      </Text>
+        <Text
+          style={{
+            color: theme.color.text.secondary,
+            fontSize: 13,
+            lineHeight: 20,
+            fontFamily: theme.font.regular,
+          }}
+        >
+          {t('방문 위치 · 연결선은 실제 길과 다를 수 있어요.')}
+        </Text>
+        <View
+          style={{
+            paddingHorizontal: 8,
+            paddingVertical: 2,
+            borderRadius: 9999,
+            backgroundColor: theme.color.surface.card,
+            borderWidth: 1,
+            borderColor: theme.color.border.subtle,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 12,
+              lineHeight: 18,
+              fontFamily: theme.font.semibold,
+              color: theme.color.text.primary,
+            }}
+          >
+            {props.stops.length}
+            {t('개')}
+          </Text>
+        </View>
+      </View>
       {props.stops.some((stop) => {
         // 실제 위치가 하나라도 있을 때만 도식을 표시한다.
         return Boolean(stop.coordinate);
       }) ? (
-        <Svg
-          width="100%"
-          height={180}
-          viewBox="0 0 320 180"
-          accessibilityLabel="선택한 장소의 위치와 방문 순서"
-        >
-          {props.stops.map((stop, index, stops) =>
-            stop.coordinate ? (
-              <ViewPoint
-                key={stop.item.id}
-                stop={stop}
-                previous={index > 0 ? stops[index - 1] : undefined}
-                stops={stops}
-                selected={props.selectedId === stop.item.id}
-                onSelect={props.onSelect}
-                scale={Math.max(1, 320 / width)}
-                fontScale={fontScale}
-              />
-            ) : null,
+        <>
+          <View
+            style={{
+              borderRadius: 12,
+              overflow: 'hidden',
+              backgroundColor: theme.color.surface.card,
+              borderWidth: 1,
+              borderColor: theme.color.border.subtle,
+            }}
+          >
+            <Svg
+              width="100%"
+              height={180}
+              viewBox="0 0 320 180"
+              accessibilityLabel={t('선택한 장소의 위치와 방문 순서')}
+            >
+              {props.stops.map((stop, index, stops) =>
+                stop.coordinate ? (
+                  <ViewPoint
+                    key={stop.item.id}
+                    stop={stop}
+                    previous={index > 0 ? stops[index - 1] : undefined}
+                    stops={stops}
+                    selected={props.selectedId === stop.item.id}
+                    onSelect={props.onSelect}
+                    scale={Math.max(1, 320 / width)}
+                    fontScale={fontScale}
+                  />
+                ) : null,
+              )}
+            </Svg>
+          </View>
+          {activeStop && (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 8,
+                paddingHorizontal: 12,
+                paddingVertical: 8,
+                borderRadius: 10,
+                backgroundColor: theme.color.surface.card,
+                borderWidth: 1,
+                borderColor: theme.color.border.subtle,
+                flexWrap: 'wrap',
+              }}
+            >
+              <View
+                style={{
+                  width: 24,
+                  height: 24,
+                  borderRadius: 12,
+                  backgroundColor: theme.color.action.primary,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                accessible={false}
+              >
+                <Text
+                  style={{
+                    fontSize: 12,
+                    lineHeight: 16,
+                    fontFamily: theme.font.bold,
+                    color: theme.color.action.foreground,
+                  }}
+                >
+                  {activeStop.order}
+                </Text>
+              </View>
+              <Text
+                style={{
+                  flex: 1,
+                  minWidth: 120,
+                  fontSize: 14,
+                  lineHeight: 20,
+                  fontFamily: theme.font.semibold,
+                  color: theme.color.text.primary,
+                }}
+                numberOfLines={1}
+                accessible={false}
+              >
+                {activeStop.item.timeSlot
+                  ? `${activeStop.item.timeSlot} · ${activeStop.item.title}`
+                  : activeStop.item.title}
+              </Text>
+            </View>
           )}
-        </Svg>
+        </>
       ) : (
         <Text style={{ color: theme.color.text.secondary, lineHeight: 22 }}>
-          장소의 위치를 선택하면 방문 순서를 확인할 수 있어요.
+          {t('장소의 위치를 선택하면 방문 순서를 확인할 수 있어요.')}
         </Text>
       )}
     </View>
@@ -96,6 +204,7 @@ function ViewPoint({
   scale: number;
   fontScale: number;
 }) {
+  useLocale();
   // 위치가 빠진 장소를 건너뛰어 거짓 연결선을 만들지 않는다.
   return (
     <>

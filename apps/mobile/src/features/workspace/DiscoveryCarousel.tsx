@@ -1,4 +1,5 @@
-import Text from '@/components/AppText';
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { colors } from '@/constants/theme';
 import type { ReactNode } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
@@ -18,6 +19,7 @@ type Controller = ReturnType<typeof useDiscoveryCarousel>;
 
 // 사진과 도시 이야기를 한 장씩 자동으로 넘기는 추천 영역을 제공한다.
 export default function DiscoveryCarousel(props: Props) {
+  useLocale();
   // 상세 화면에서는 선택한 도시를 읽는 동안 배경 이동을 멈춘다.
   return (
     <CarouselContent
@@ -48,6 +50,7 @@ function CarouselContent({
     move,
   },
 }: Props & { carousel: Controller }) {
+  useLocale();
   // 카드 세 장만 유지하며 자동 전환 때문에 사진이나 소개를 다시 조회하지 않는다.
   return (
     <View
@@ -104,7 +107,9 @@ function CarouselContent({
               <Pressable
                 style={s.card}
                 accessibilityRole="button"
-                accessibilityLabel={`${name(city)} 여행지 살펴보기`}
+                accessibilityLabel={t('{p0} 여행지 살펴보기', {
+                  p0: name(city),
+                })}
                 tabIndex={activeIndex === index ? 0 : -1}
                 onPress={() => {
                   // 현재 도시의 실제 소개 원문을 연다.
@@ -127,53 +132,52 @@ function CarouselContent({
         })}
       </ScrollView>
       <View style={s.carouselControls}>
-        <View style={s.carouselDots}>
-          {cities.map((city, index) => {
-            // 색상 외에 길이로도 현재 카드 위치를 구분한다.
-            return (
-              <View
-                key={city.key}
-                style={[s.dot, activeIndex === index && s.activeDot]}
-              />
-            );
+        <View
+          style={s.carouselDots}
+          testID="destination-carousel-position"
+          accessibilityLabel={t('{p0} · {p1}개 중 {p2}번째 여행지', {
+            p0: cities[activeIndex] ? name(cities[activeIndex]) : '여행지',
+            p1: cities.length,
+            p2: activeIndex + 1,
           })}
-          <Text
-            style={s.caption}
-            testID="destination-carousel-position"
-            accessibilityLiveRegion={restricted || paused ? 'polite' : 'none'}
-            accessibilityLabel={`${cities[activeIndex] ? name(cities[activeIndex]) : '여행지'} · ${cities.length}개 중 ${activeIndex + 1}번째 여행지`}
-          >
-            {activeIndex + 1} / {cities.length}
-          </Text>
+          accessibilityLiveRegion={restricted || paused ? 'polite' : 'none'}
+        >
+          {cities.map((city, index) => (
+            <Pressable
+              key={city.key}
+              accessibilityRole="button"
+              accessibilityLabel={t('{p0} · {p1}개 중 {p2}번째 여행지', {
+                p0: name(city),
+                p1: cities.length,
+                p2: index + 1,
+              })}
+              accessibilityState={{ selected: activeIndex === index }}
+              aria-pressed={activeIndex === index}
+              style={{
+                minWidth: 48,
+                minHeight: 48,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              onFocus={pause}
+              onPress={() => move(index)}
+            >
+              <View style={[s.dot, activeIndex === index && s.activeDot]} />
+            </Pressable>
+          ))}
         </View>
         <View style={s.carouselActions}>
           {!restricted && cities.length > 1 && (
             <CarouselButton
               label={
-                paused ? '여행지 자동 넘김 재생' : '여행지 자동 넘김 일시정지'
+                paused
+                  ? t('여행지 자동 넘김 재생')
+                  : t('여행지 자동 넘김 일시정지')
               }
               icon={paused ? 'play' : 'pause'}
               onPress={toggle}
             />
           )}
-          <CarouselButton
-            label="이전 추천 여행지"
-            icon="chevron-back"
-            onFocus={pause}
-            onPress={() => {
-              // 현재 카드에서 한 장 이전으로 이동한다.
-              return move(activeIndex - 1);
-            }}
-          />
-          <CarouselButton
-            label="다음 추천 여행지"
-            icon="chevron-forward"
-            onFocus={pause}
-            onPress={() => {
-              // 현재 카드에서 한 장 다음으로 이동한다.
-              return move(activeIndex + 1);
-            }}
-          />
         </View>
       </View>
     </View>
@@ -192,6 +196,7 @@ function CarouselButton({
   onPress: () => void;
   onFocus?: Controller['pause'];
 }) {
+  useLocale();
   // 기호만 보이더라도 보조 기술에서는 정확한 행동을 읽는다.
   return (
     <Pressable

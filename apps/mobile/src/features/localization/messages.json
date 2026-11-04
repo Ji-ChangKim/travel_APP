@@ -1,0 +1,4553 @@
+{
+  "뒤로 버튼을 한 번 더 누르면 앱이 종료됩니다.": [
+    "Press Back again to exit the app.",
+    "もう一度戻るボタンを押すとアプリを終了します。"
+  ],
+  "나만의 여행 기록": ["My travel memories", "私だけの旅の記録"],
+  "여행의 순간을 간직하고": [
+    "Keep your travel moments",
+    "旅のひとときを大切に"
+  ],
+  "나만의 발자취를 남겨보세요": [
+    "Leave a trail of your own",
+    "自分だけの足跡を残しましょう"
+  ],
+  "Google로 계속하기": ["Continue with Google", "Googleで続ける"],
+  "계획을 저장할 때 로그인할 수 있어요.": [
+    "You can sign in when you save your plan.",
+    "プランを保存するときにログインできます。"
+  ],
+  "다른 방법으로 로그인": ["Sign in another way", "別の方法でログイン"],
+  "Google 로그인을 지금 이용할 수 없어요. 다시 확인하거나 게스트로 시작해 주세요.": [
+    "Google sign-in is unavailable right now. Check again or continue as a guest.",
+    "現在Googleログインを利用できません。再確認するか、ゲストとして始めてください。"
+  ],
+  "이 기기의 이전 계획 가져오기": [
+    "Import plans from this device",
+    "この端末の以前の計画を取り込む"
+  ],
+  "이 기기에만 저장한 이전 계획이 있어요. 계정으로 가져오면 다른 기기에서도 이어 쓸 수 있어요.": [
+    "You have older plans saved only on this device. Import them to your account to continue on other devices.",
+    "この端末だけに保存した以前の計画があります。アカウントに取り込むと別の端末でも続けられます。"
+  ],
+  "가져오지 못한 계획은 이 기기에 보관했어요. 연결 상태와 저장한 계획 수를 확인하고 다시 시도해 주세요.": [
+    "Plans that could not be imported remain on this device. Check your connection and saved plan count, then try again.",
+    "取り込めなかった計画はこの端末に残しています。通信状態と保存数を確認して再試行してください。"
+  ],
+  "계획을 저장하지 못했어요. 연결 상태와 계획 수(최대 5개)를 확인해 주세요. 다른 기기에서 수정했다면 최신 계획을 다시 열어 주세요.": [
+    "Could not save the plan. Check your connection and plan count (up to 5). If edited on another device, reopen the latest plan.",
+    "計画を保存できませんでした。通信状態と計画数（最大5件）を確認してください。別の端末で編集した場合は最新の計画を開き直してください。"
+  ],
+  "계정에 저장한 작성 내용을 삭제해요. 삭제한 내용은 복구할 수 없어요.": [
+    "Delete this plan from your account. This cannot be undone.",
+    "アカウントの計画を削除します。元に戻すことはできません。"
+  ],
+  "계정에 저장한 작성 중인 계획": [
+    "Plan saved to your account",
+    "アカウントに保存した作成中の計画"
+  ],
+  "계정에 저장하고 다른 기기에서도 이어서 작성해요.": [
+    "Save to your account and continue on another device.",
+    "アカウントに保存して、別の端末でも続きを作成できます。"
+  ],
+  "여행 팁을 불러오지 못했어요.": [
+    "Could not load travel tips.",
+    "旅行のヒントを読み込めませんでした。"
+  ],
+  "로그인하고 계획 저장하기": [
+    "Sign in to save a plan",
+    "ログインして計画を保存"
+  ],
+  "로그인하고 계획을 저장해 주세요.": [
+    "Sign in to save your plan.",
+    "ログインして計画を保存してください。"
+  ],
+  "전체 여행": ["All trips", "すべての旅行"],
+  "일정 보기": ["View itinerary", "旅程を見る"],
+  "커뮤니티": ["Community", "コミュニティ"],
+  "만들기": ["Create", "作成"],
+  "첫 여행을 계획해 보세요": [
+    "Plan your first trip",
+    "最初の旅行を計画しましょう"
+  ],
+  "전체 여행 관리": ["Manage all trips", "すべての旅行を管理"],
+  "작성 중인 일정": ["Plans in progress", "作成中の旅程"],
+  "다가오는 여행": ["Next trip", "もうすぐ出発する旅行"],
+  "친구 초대": ["Invite friends", "友達を招待"],
+  "이어서 계획": ["Continue planning", "計画を続ける"],
+  "여행 정보 다시 불러오기": ["Reload trip details", "旅行情報を再読み込み"],
+  "숙소 일정 등록": ["Accommodation added", "宿泊予定登録済み"],
+  "항공편 등록": ["Flight added", "フライト登録済み"],
+  "동행 {p0}명": ["{p0} companions", "同行者 {p0}人"],
+  "함께 여행할 친구와 만나기로 한 장소를 미리 정해 보세요.": [
+    "Agree on a meeting place with your travel companions in advance.",
+    "一緒に旅行する友達と、待ち合わせ場所を決めておきましょう。"
+  ],
+  "꼭 가고 싶은 장소부터 정하고 주변 일정을 채워 보세요.": [
+    "Start with your must-see places, then plan nearby activities.",
+    "行きたい場所を決めてから、周辺の予定を追加してみましょう。"
+  ],
+  "여행 중 받은 영수증은 방문한 날짜와 함께 정리해 보세요.": [
+    "Organize your receipts with the dates you visited.",
+    "旅先のレシートは訪問日と一緒に整理してみましょう。"
+  ],
+  "예약 확인서를 한곳에 모아 두면 여행 중 찾기 편해요.": [
+    "Keep booking confirmations together for easy access during your trip.",
+    "予約確認書をまとめておくと、旅行中に探しやすくなります。"
+  ],
+  "일정 사이에 이동 시간을 남겨 두면 계획을 조정하기 편해요.": [
+    "Allow travel time between activities to keep your plans flexible.",
+    "予定の間に移動時間を確保すると、調整しやすくなります。"
+  ],
+  "숙소 이름과 주소를 저장해 두면 도착 후 다시 찾기 편해요.": [
+    "Save your accommodation name and address so you can find them on arrival.",
+    "宿泊先の名前と住所を保存しておくと、到着後に確認しやすくなります。"
+  ],
+  "하루가 알려주는 오늘의 여행 팁": [
+    "Today’s travel tip from Haru",
+    "ハルが教える今日の旅のヒント"
+  ],
+  "계획 만들기로 돌아가기": ["Back to trip planning", "旅行計画に戻る"],
+  "날짜와 여행지를 정하고 일정을 채워 보세요.": [
+    "Choose your dates and destination, then add your itinerary.",
+    "日程と旅行先を決めて、予定を追加しましょう。"
+  ],
+  "신규 계획 생성하기": ["Create a new plan", "新しい旅行計画を作成"],
+  "계획 만들기": ["Plan a trip", "旅行を計画"],
+  "영수증 사진 선택": ["Choose receipt photo", "レシート写真を選択"],
+  "영수증 촬영": ["Scan receipt", "レシートを撮影"],
+  "영수증 사진 선택 닫기": [
+    "Close receipt photo selection",
+    "レシート写真の選択を閉じる"
+  ],
+  "사진 촬영 → 정보 확인 → 일정 등록": [
+    "Take a photo → Review → Add to itinerary",
+    "撮影 → 内容確認 → 予定に追加"
+  ],
+  "영수증 한 장으로 지출 기록": [
+    "Record expenses with a receipt",
+    "レシートで支出を記録"
+  ],
+  "영수증 전체가 보이게 촬영해 주세요": [
+    "Include the entire receipt",
+    "レシート全体を撮影してください"
+  ],
+  "상호와 날짜, 메뉴, 합계가 잘리지 않게 담아주세요.": [
+    "Include the business name, date, items and total.",
+    "店名、日付、品目、合計が切れないように撮影してください。"
+  ],
+  "평평한 곳에 펼치고 밝은 곳에서 촬영해 주세요.": [
+    "Lay it flat and take the photo in good light.",
+    "平らに広げ、明るい場所で撮影してください。"
+  ],
+  "카드번호와 개인정보는 가려도 괜찮아요.": [
+    "You may cover card numbers and personal information.",
+    "カード番号や個人情報は隠してもかまいません。"
+  ],
+  "카메라로 영수증 촬영": ["Take a receipt photo", "カメラでレシートを撮影"],
+  "앨범에서 영수증 선택": ["Choose from photos", "アルバムからレシートを選択"],
+  "사진 없이 지출 직접 입력": [
+    "Enter an expense without a photo",
+    "写真なしで支出を入力"
+  ],
+  "나중에 할게요": ["Later", "あとで"],
+  "품목 합계와 결제 총액이 달라요": [
+    "Item totals differ from the payment total",
+    "品目の合計と支払総額が異なります"
+  ],
+  "품목 합계 ·": ["Items total ·", "品目合計 ·"],
+  "결제 총액 ·": ["Payment total ·", "支払総額 ·"],
+  "차이 (총액 − 품목 합계) ·": [
+    "Difference (payment − items) ·",
+    "差額（支払総額 − 品目合計） ·"
+  ],
+  "세금이나 할인 때문일 수 있어요. 원본을 확인해 주세요. 지출에는 결제 총액만 기록돼요.": [
+    "Taxes or discounts may explain the difference. Check the receipt. Only the payment total is recorded as an expense.",
+    "税金や割引による差額かもしれません。原本を確認してください。支出には支払総額のみが記録されます。"
+  ],
+  "차이를 확인했어요. 결제 총액으로 기록할게요": [
+    "I checked the difference. Use the payment total",
+    "差額を確認しました。支払総額で記録します"
+  ],
+  "1 · 정보 확인": ["1 · Review details", "1 · 内容の確認"],
+  "영수증 정보가 맞나요?": [
+    "Are the receipt details correct?",
+    "レシートの内容は正しいですか？"
+  ],
+  "아니요, 수정할게요": ["No, edit details", "いいえ、修正します"],
+  "처음 선택한 영수증 사진 보관 여부는 유지돼요. 수정한 내용은 기존 지출에 반영돼요.": [
+    "Your original photo retention choice stays the same. Changes update the existing expense.",
+    "最初に選んだ写真の保管設定は維持されます。変更は既存の支出に反映されます。"
+  ],
+  "2 · 사진 보관": ["2 · Keep photo", "2 · 写真の保管"],
+  "영수증 사진도 함께 보관할까요?": [
+    "Keep the receipt photo too?",
+    "レシート写真も保管しますか？"
+  ],
+  "사진을 보관하면 나와 여행 친구가 원본을 다시 볼 수 있어요. 커뮤니티에는 공개되지 않아요.": [
+    "You and your travel companions can view the original later. It is not published to the community.",
+    "保管すると自分と同行者が原本を見返せます。コミュニティには公開されません。"
+  ],
+  "네, 사진도 보관할게요": ["Yes, keep the photo", "はい、写真も保管します"],
+  "아니요, 정보만 저장할게요": [
+    "No, save details only",
+    "いいえ、情報のみ保存します"
+  ],
+  "영수증으로 기록 ·": ["Recorded from receipt ·", "レシートから記録 ·"],
+  "결제 일시 ·": ["Payment date and time ·", "支払日時 ·"],
+  "음식·구매 기록:": ["Food and purchases:", "飲食・購入記録："],
+  "이미 등록한 영수증이에요": [
+    "This receipt is already registered",
+    "このレシートは登録済みです"
+  ],
+  "같은 원본으로 새 결제를 만들 수 없어요. 기존 기록을 확인한 뒤 돌아가 주세요.": [
+    "You cannot create another payment from the same original. Check the existing record and go back.",
+    "同じ原本から新しい支払いは登録できません。既存の記録を確認して戻ってください。"
+  ],
+  "비슷한 결제 기록이 있어요": [
+    "A similar payment exists",
+    "似た支払いの記録があります"
+  ],
+  "직접 입력한 실제 지출이에요. 이 화면에서는 기존 지출을 바꾸거나 삭제하지 않아요.": [
+    "This is a manually entered expense. This screen will not change or delete it.",
+    "手入力した実際の支出です。この画面では既存の支出を変更・削除しません。"
+  ],
+  "별도 결제로 계속": [
+    "Continue as a separate payment",
+    "別の支払いとして続ける"
+  ],
+  "같은 결제라면 등록을 취소해 주세요. 별도 결제로 저장해도 기존 기록은 유지돼요.": [
+    "Cancel if this is the same payment. Saving a separate payment keeps the existing record.",
+    "同じ支払いの場合は登録を取り消してください。別の支払いとして保存しても既存の記録は残ります。"
+  ],
+  "메뉴·구매 내역": ["Items purchased", "メニュー・購入明細"],
+  "메뉴 없이 저장할 수 있어요. 필요한 메뉴는 직접 추가해 주세요.": [
+    "You can save without items, or add them manually.",
+    "品目なしでも保存できます。必要な品目は手入力してください。"
+  ],
+  "메뉴 추가": ["Add item", "品目を追加"],
+  "메뉴는 최대 50개까지 추가할 수 있어요.": [
+    "You can add up to 50 items.",
+    "品目は50件まで追加できます。"
+  ],
+  "수량·단가·금액을 모르면 비워 두세요. 결제 총액은 별도로 기록해요.": [
+    "Leave quantity, unit price or amount blank if unknown. The payment total is recorded separately.",
+    "数量・単価・金額が不明な場合は空欄にしてください。支払総額は別に記録します。"
+  ],
+  "원본 사진을 보관하지 않은 기록이에요. 확인한 내용은 아래에서 볼 수 있어요.": [
+    "The original photo was not kept. The confirmed details are below.",
+    "原本写真は保管されていません。確認済みの内容は以下で見られます。"
+  ],
+  "확대한 영수증 원본. 좌우로 이동할 수 있어요.": [
+    "Enlarged receipt. Scroll sideways to view it.",
+    "拡大したレシート原本。左右に移動できます。"
+  ],
+  "영수증을 읽고 있어요": [
+    "Reading your receipt",
+    "レシートを読み取っています"
+  ],
+  "장소, 결제 일시, 메뉴와 합계를 찾고 있어요.": [
+    "Finding the place, payment time, items and total.",
+    "場所、支払日時、品目、合計を読み取っています。"
+  ],
+  "영수증을 읽지 못했어요": [
+    "Could not read the receipt",
+    "レシートを読み取れませんでした"
+  ],
+  "다시 스캔하기": ["Scan again", "もう一度読み取る"],
+  "다른 영수증 사진 선택": [
+    "Choose another receipt photo",
+    "別のレシート写真を選択"
+  ],
+  "직접 입력으로 계속": ["Continue with manual entry", "手入力で続ける"],
+  "영수증 상호": ["Business name on receipt", "レシートの店名"],
+  "지역명·주소": ["Area or address", "地域名・住所"],
+  "실제 결제 날짜": ["Actual payment date", "実際の支払日"],
+  "실제 결제 시간": ["Actual payment time", "実際の支払時刻"],
+  "금액": ["Amount", "金額"],
+  "구매 내역": ["Purchases", "購入明細"],
+  "결제 합계 ·": ["Payment total ·", "支払合計 ·"],
+  "여행기록 추가": ["Add travel memory", "旅行記録を追加"],
+  "여행을 찾을 수 없어요. 내 여행에서 다시 열어 주세요.": [
+    "Trip not found. Open it again from My Trips.",
+    "旅行が見つかりません。マイ旅行から開き直してください。"
+  ],
+  "로그인하고 기록 편집": [
+    "Sign in to edit memories",
+    "ログインして記録を編集"
+  ],
+  "이 여행은 읽기만 할 수 있어요.": [
+    "This trip is read-only.",
+    "この旅行は閲覧のみ可能です。"
+  ],
+  "기록할 장소 선택": ["Choose a place to record", "記録する場所を選択"],
+  "일정 추가하러 가기": ["Go to add an activity", "予定の追加へ"],
+  "나와 동행자만 읽는 원본이에요. 공개할 사진과 장소 설명은 공유할 때 직접 골라요.": [
+    "Only you and your companions can read the original. Choose which photos and place descriptions to publish when sharing.",
+    "原本は自分と同行者だけが閲覧できます。公開する写真や場所の説明は共有時に選びます。"
+  ],
+  "기록할 장소": ["Place to record", "記録する場所"],
+  "다른 장소 선택": ["Choose another place", "別の場所を選択"],
+  "최신 원본 확인하고 다시 편집": [
+    "Reload the latest version and edit",
+    "最新の原本を確認して再編集"
+  ],
+  "취소": ["Cancel", "キャンセル"],
+  "사진을 삭제할까요?": ["Delete this photo?", "写真を削除しますか？"],
+  "이 여행의 원본 사진이 삭제돼요. 이미 공개한 사본의 사진도 더 이상 열리지 않을 수 있어요.": [
+    "The original photo will be deleted. Photos in published copies may also become unavailable.",
+    "この旅行の原本写真が削除されます。公開済みのコピーでも写真を開けなくなる場合があります。"
+  ],
+  "사진 유지": ["Keep photo", "写真を残す"],
+  "사진 삭제": ["Delete photo", "写真を削除"],
+  "저장한 기록으로 돌아가고 있어요": [
+    "Returning to your saved memories",
+    "保存した記録に戻っています"
+  ],
+  "기록 메모": ["Private note", "記録メモ"],
+  "/ 300자": ["/ 300 characters", "/ 300文字"],
+  "장소 설명·팁 · 공유할 때 선택": [
+    "Place description and tips · Optional when sharing",
+    "場所の説明・ヒント · 共有時に選択"
+  ],
+  "/ 4,000자 · 공개할 때 선택한 장소에만 포함돼요.": [
+    "/ 4,000 characters · Only included for places you choose to publish.",
+    "/ 4,000文字 · 公開時に選んだ場所にのみ含まれます。"
+  ],
+  "장소 연계 지출": ["Expenses for this place", "この場所に関連する支出"],
+  "연결한 실제 지출이 없어요.": [
+    "No actual expenses are linked.",
+    "関連する実際の支出はありません。"
+  ],
+  "영수증·지출 보완": ["Update receipt or expenses", "レシート・支出を補足"],
+  "현장 사진 ·": ["Trip photos ·", "現地写真 ·"],
+  "이 사진 삭제": ["Delete this photo", "この写真を削除"],
+  "사진 추가": ["Add photo", "写真を追加"],
+  "사진은 추가·삭제할 때 저장돼요. 아래 메모는 기록 저장을 누르면 반영돼요.": [
+    "Photo changes are saved immediately. Save the record to apply note changes below.",
+    "写真は追加・削除時に保存されます。下のメモは記録を保存すると反映されます。"
+  ],
+  "시간 경고 자세히": ["Time warning details", "時刻の注意点を見る"],
+  "방문 시간": ["Visit time", "訪問時刻"],
+  "건 확인 ·": [" checked ·", "件確認 ·"],
+  "추가로": ["Also, ", "さらに"],
+  "건의 시간이 겹치거나 순서와 달라요.": [
+    " times overlap or differ from the visit order.",
+    "件の時刻が重なるか、順序と異なっています。"
+  ],
+  "예정 시각은 자동으로 바뀌지 않아요. 시간이나 방문 순서를 수정할 수 있어요.": [
+    "Scheduled times will not change automatically. You can edit times or visit order.",
+    "予定時刻は自動変更されません。時刻や訪問順序を修正できます。"
+  ],
+  "추천 코스": ["Suggested itinerary", "おすすめコース"],
+  "에서 가볼 곳": [" · Places to visit", "で行きたい場所"],
+  "이 장소로 일정 작성": ["Plan an activity here", "この場所で予定を作成"],
+  "TripPrint 도시 가이드 ·": [
+    "TripPrint city guide ·",
+    "TripPrint都市ガイド ·"
+  ],
+  "장소 검색으로 추가": ["Add by searching places", "場所を検索して追加"],
+  "의 내용을 가져왔어요. 날짜와 시간을 확인한 뒤 저장하면 새 일정이 생겨요. 사진·영수증·실제 지출은 복사하지 않아요.": [
+    " was copied. Check the date and time, then save to create a new activity. Photos, receipts and actual expenses are not copied.",
+    "の内容を取り込みました。日付と時刻を確認して保存すると新しい予定ができます。写真・レシート・実際の支出はコピーしません。"
+  ],
+  "영수증으로 기록하기": ["Record from receipt", "レシートで記録"],
+  "결제한 영수증을 확인하고 장소와 지출을 함께 남길 수 있어요.": [
+    "Review your receipt to record the place and expense together.",
+    "支払い済みのレシートを確認して、場所と支出を一緒に記録できます。"
+  ],
+  "일정 세부 설정": ["Activity details", "予定の詳細設定"],
+  "일정 시간 (HH:mm)": ["Activity time (HH:mm)", "予定時刻（HH:mm）"],
+  "체류 예정 시간 (분)": ["Planned stay (minutes)", "滞在予定時間（分）"],
+  "예: 60": ["e.g. 60", "例：60"],
+  "일정 메모": ["Private activity note", "予定メモ"],
+  "예상 지출 금액": ["Estimated expense", "支出予定額"],
+  "금액을 입력해 주세요": ["Enter an amount", "金額を入力してください"],
+  "주소 또는 위치 메모": ["Address or location note", "住所または場所のメモ"],
+  "아직 저장하지 않은 내용이 있어요. 계속 작성하거나 내용을 버리고 이동할 수 있어요.": [
+    "You have unsaved changes. Keep editing or discard them to leave.",
+    "未保存の内容があります。編集を続けるか、内容を破棄して移動できます。"
+  ],
+  "계속 작성": ["Keep editing", "編集を続ける"],
+  "내용 버리고 이동": ["Discard and leave", "破棄して移動"],
+  "일정의 지도 위치": ["Activity map location", "予定の地図上の位置"],
+  "위치 좌표 또는 Google Maps 좌표 링크": [
+    "Coordinates or Google Maps coordinate link",
+    "座標またはGoogle Mapsの座標リンク"
+  ],
+  "Google Maps에서 확인한 ‘위도, 경도’를 붙여 넣어도 위치를 선택할 수 있어요.": [
+    "You can also paste latitude and longitude from Google Maps.",
+    "Google Mapsで確認した緯度・経度を貼り付けても場所を選べます。"
+  ],
+  "붙여 넣은 위치 확인": ["Check pasted location", "貼り付けた位置を確認"],
+  "선택한 위치 후보": ["Selected location candidate", "選択した位置の候補"],
+  "선택한 위치 후보:": ["Selected location:", "選択した位置の候補："],
+  "위치 적용을 누르면 작성 중인 일정에 반영돼요. 일정 저장은 별도로 해 주세요.": [
+    "Apply the location to your draft, then save the activity separately.",
+    "位置を適用すると編集中の予定に反映されます。予定は別途保存してください。"
+  ],
+  "위치 적용": ["Apply location", "位置を適用"],
+  "지도 위치 지우기": ["Clear map location", "地図の位置を消去"],
+  "여행계획 설명": ["Itinerary description", "旅行計画の説明"],
+  "계획을 공유할 때 함께 보여 줄 설명·추천 메뉴·팁을 적어 주세요. 개인적인 내용은 일정 메모에 남겨 주세요.": [
+    "Add descriptions, recommended dishes and tips to share. Keep private details in the activity note.",
+    "共有する説明・おすすめメニュー・ヒントを入力してください。個人的な内容は予定メモに残してください。"
+  ],
+  "계획 설명·추천 메뉴·팁": [
+    "Description, recommended dishes and tips",
+    "計画の説明・おすすめメニュー・ヒント"
+  ],
+  "같은 선택지 묶음": ["Option group", "選択肢のグループ"],
+  "예: 1일차 카페": ["e.g. Day 1 cafes", "例：1日目のカフェ"],
+  "선택지 안내": ["Option guidance", "選択肢の案内"],
+  "예: 두 카페 중 한 곳 선택": [
+    "e.g. Choose one of two cafes",
+    "例：2つのカフェから1つ選択"
+  ],
+  "선택 후보": ["Option", "選択候補"],
+  "대체 장소": ["Alternative place", "代替の場所"],
+  "작성 중인 장소의 지도 위치는 아직 없어요. ‘일정의 지도 위치’에서 지정하면 지도에도 표시돼요.": [
+    "This draft has no map location yet. Set it under Activity map location to show it on the map.",
+    "編集中の場所には地図上の位置がありません。「予定の地図上の位置」で指定すると地図にも表示されます。"
+  ],
+  "맨 앞": ["First", "先頭"],
+  "마지막": ["Last", "最後"],
+  "Google Maps 공유 장소 가져오기": [
+    "Import a Google Maps place",
+    "Google Mapsの共有場所を取り込む"
+  ],
+  "저장한 장소에서 공유 → 링크 복사 후 붙여 넣어 주세요. 장소 하나씩 여행에 추가할 수 있어요.": [
+    "Share a saved place, copy its link and paste it here. Add places to your trip one at a time.",
+    "保存した場所で共有→リンクをコピーして貼り付けてください。場所を1件ずつ旅行に追加できます。"
+  ],
+  "Google Maps 공유 링크": [
+    "Google Maps share link",
+    "Google Mapsの共有リンク"
+  ],
+  "여행지 선택": ["Choose destination", "旅行先を選択"],
+  "나라": ["Country", "国"],
+  "도시": ["City", "都市"],
+  "다음 장소까지 이동": ["Travel to the next place", "次の場所への移動"],
+  "이동수단을 선택하면 구간을 저장하고 이동시간을 조회할 수 있어요.": [
+    "Choose transport to save this leg and check travel time.",
+    "移動手段を選ぶと区間を保存し、所要時間を確認できます。"
+  ],
+  "분 ·": [" min ·", "分 ·"],
+  "조회 기준 예상 시간이에요. 교통과 운행 상황에 따라 달라져요.": [
+    "This is an estimate at the time of lookup. Traffic and service conditions may change it.",
+    "検索時点の目安です。交通や運行状況により変わります。"
+  ],
+  "로그인하고 이어가기": ["Sign in to continue", "ログインして続ける"],
+  "여행 다시 불러오기": ["Reload trip", "旅行を再読み込み"],
+  "시작일": ["Start date", "開始日"],
+  "종료일": ["End date", "終了日"],
+  "여행 날짜": ["Trip dates", "旅行日程"],
+  "출발일": ["Departure date", "出発日"],
+  "도착일": ["Arrival date", "到着日"],
+  "이전 달": ["Previous month", "前の月"],
+  "년": [" year ", "年"],
+  "월": [" month", "月"],
+  "다음 달": ["Next month", "次の月"],
+  "함께하는": ["Companions: ", "同行者"],
+  "명": [" people", "人"],
+  "동행 보기 →": ["View companions →", "同行者を見る →"],
+  "동행 보기": ["View companions", "同行者を見る"],
+  "아직 기록한 지출이 없어요.": [
+    "No expenses recorded yet.",
+    "まだ支出が記録されていません。"
+  ],
+  "통화별로 모았어요. 서로 다른 통화는 합산하지 않아요.": [
+    "Grouped by currency. Different currencies are not added together.",
+    "通貨ごとに集計しています。異なる通貨は合算しません。"
+  ],
+  "연결한 일정 ·": ["Linked activity ·", "関連する予定 ·"],
+  "개 준비했어요": [" items ready", "個準備できました"],
+  "여러 도시 여행하기": ["Visit multiple cities", "複数の都市を旅する"],
+  "여행 이름 · 선택": ["Trip name · Optional", "旅行名 · 任意"],
+  "예: 가을 골목을 걷는 교토 여행": [
+    "e.g. Autumn walks in Kyoto",
+    "例：秋の路地を歩く京都旅行"
+  ],
+  "추가 항공편": ["Additional flights", "追加のフライト"],
+  "추가 항공권 등록": ["Add another flight", "航空券を追加"],
+  "지도 보기": ["View map", "地図を見る"],
+  "동선 지도 보기": ["View route map", "ルートを地図で見る"],
+  "일정 추가": ["Add activity", "予定を追加"],
+  "지도에서 보는 여행": ["Your trip on a map", "地図で見る旅行"],
+  "번호는 방문 순서예요. 연결선은 장소 사이를 잇는 선으로, 실제 이동 경로와 다를 수 있어요.": [
+    "Numbers show visit order. Lines connect places and may differ from actual routes.",
+    "番号は訪問順です。線は場所同士を結んだもので、実際の経路と異なる場合があります。"
+  ],
+  "아직 이날의 일정이 없어요": [
+    "No activities for this day yet",
+    "この日の予定はまだありません"
+  ],
+  "아직 지도 위치를 선택하지 않은 일정이 있어요. 장소에서 ‘위치 선택’을 눌러 주세요.": [
+    "Some activities have no map location. Choose a location from the place details.",
+    "地図の位置が未設定の予定があります。場所の「位置を選択」を押してください。"
+  ],
+  "지도에서 선택": ["Choose on map", "地図で選択"],
+  "Google Maps 길 안내": ["Directions in Google Maps", "Google Mapsで経路案内"],
+  "지도를 열 수 없어요": ["Could not open the map", "地図を開けませんでした"],
+  "지도가 늦게 열리고 있어요. 잠시 기다리거나 Google Maps에서 장소를 확인해 주세요.": [
+    "The map is taking longer to load. Wait or view the place in Google Maps.",
+    "地図の表示に時間がかかっています。少し待つかGoogle Mapsで場所を確認してください。"
+  ],
+  "방문 위치 · 연결선은 실제 길과 다를 수 있어요.": [
+    "Visit locations · Lines may differ from actual roads.",
+    "訪問位置 · 線は実際の道と異なる場合があります。"
+  ],
+  "선택한 장소의 위치와 방문 순서": [
+    "Selected places and visit order",
+    "選んだ場所の位置と訪問順"
+  ],
+  "장소의 위치를 선택하면 방문 순서를 확인할 수 있어요.": [
+    "Set place locations to see the visit order.",
+    "場所の位置を選ぶと訪問順を確認できます。"
+  ],
+  "기간 변경 영향": ["Date change impact", "期間変更の影響"],
+  "기간을 바꾸면 이렇게 달라져요": [
+    "What changes with the new dates",
+    "期間を変えるとこうなります"
+  ],
+  "유지되는 날짜의 일정과 기록은 그대로 남아요. 새로 포함한 날짜에는 빈 일정이 생겨요.": [
+    "Activities and records on retained dates stay unchanged. Newly added dates start empty.",
+    "残る日付の予定と記録は維持されます。新しく含まれる日付には空の予定が作られます。"
+  ],
+  "제외할 날짜": ["Dates to remove", "除外する日付"],
+  "일 · 새로 포함할 날짜": [" days · Dates to add: ", "日 · 新しく含める日付"],
+  "일": [" days", "日"],
+  "DAY 소개": ["Day overview", "DAYの紹介"],
+  "개 · 일정": [" · Activities: ", "件 · 予定"],
+  "개 · 비용": [" · Expenses: ", "件 · 費用"],
+  "기록이 없는 날짜만 여행에서 제외돼요.": [
+    "Only dates without records can be removed.",
+    "記録のない日付のみ旅行から除外できます。"
+  ],
+  "손을 흔드는 하루": ["Haru waving", "手を振るハル"],
+  "항공편은 선택 사항이에요. 여행을 만든 뒤에도 추가할 수 있어요.": [
+    "Flights are optional. You can add them after creating the trip.",
+    "航空便は任意です。旅行の作成後にも追加できます。"
+  ],
+  "다시 저장하기": ["Try saving again", "もう一度保存"],
+  "한 장씩 쌓이는 여행의 기억": [
+    "Travel memories, one photo at a time",
+    "一枚ずつ重なる旅の思い出"
+  ],
+  "도시 가이드에서 가고 싶은 장소를 골라 보세요.": [
+    "Choose places to visit from the city guide.",
+    "都市ガイドで行きたい場所を選びましょう。"
+  ],
+  "추천 코스 불러오기": [
+    "Load suggested itinerary",
+    "おすすめコースを読み込む"
+  ],
+  "장소명을 검색하거나 지도 링크로 일정을 작성해요.": [
+    "Search a place or use a map link to plan an activity.",
+    "場所名を検索するか地図リンクで予定を作成します。"
+  ],
+  "여행 작업 영역": ["Trip workspace", "旅行の作業エリア"],
+  "여행 더보기": ["More trip options", "旅行のその他の操作"],
+  "여행 관리": ["Manage trip", "旅行を管理"],
+  "여행 정보 / 기록 정리": [
+    "Trip details / Organize memories",
+    "旅行情報 / 記録の整理"
+  ],
+  "여행 기간 변경": ["Change trip dates", "旅行期間を変更"],
+  "전체": ["All", "すべて"],
+  "전체 일정": ["All activities", "すべての予定"],
+  "이날 여행계획 정리": ["Edit this day's overview", "この日の旅行計画を整理"],
+  "화살표를 눌러 방문 순서를 바꿔 보세요.": [
+    "Use the arrows to change visit order.",
+    "矢印で訪問順を変更できます。"
+  ],
+  "다음 일정": ["Next activity", "次の予定"],
+  "도착 후 이어질 일정을 추가해 보세요.": [
+    "Add activities after your arrival.",
+    "到着後の予定を追加しましょう。"
+  ],
+  "체류": ["Stay", "滞在"],
+  "일정 관리": ["Manage activity", "予定を管理"],
+  "이 일정에서 사진 촬영": [
+    "Take a photo for this activity",
+    "この予定の写真を撮影"
+  ],
+  "이 일정에 사진 추가": [
+    "Add a photo to this activity",
+    "この予定に写真を追加"
+  ],
+  "일정 수정": ["Edit activity", "予定を編集"],
+  "일정 복사": ["Copy activity", "予定をコピー"],
+  "비용 추가": ["Add expense", "費用を追加"],
+  "여행을 불러오는 중입니다.": [
+    "Loading your trip.",
+    "旅行を読み込んでいます。"
+  ],
+  "선택해서 공유": ["Choose what to share", "選んで共有"],
+  "공개된 여행 둘러보기": ["Browse public trips", "公開された旅行を見る"],
+  "공개할 일정·사진·금액을 직접 골라 주세요. 게시하지 않아도 개인 기록은 남아요.": [
+    "Choose the activities, photos and amounts to publish. Your private records remain even if you do not publish.",
+    "公開する予定・写真・金額を選んでください。投稿しなくても個人の記録は残ります。"
+  ],
+  "다시 공개하면 같은 링크의 내용이 새 선택으로 바뀌어요. 여행계획과 여행기록은 한 여행당 하나만 공개돼요.": [
+    "Republishing updates the same link with your new selection. Each trip has one public plan or travel record.",
+    "再公開すると同じリンクの内容が新しい選択に変わります。1つの旅行につき計画または記録を1つだけ公開できます。"
+  ],
+  "내 공개 화면 보기": ["View my public trip", "自分の公開画面を見る"],
+  "여행계획 공유하기": ["Share itinerary", "旅行計画を共有"],
+  "공개 중단": ["Stop publishing", "公開を停止"],
+  "동행": ["Members", "同行者"],
+  "명 · 여행을 만든 사람이 초대와 역할을 관리해요.": [
+    " people · The trip owner manages invitations and roles.",
+    "人 · 旅行の作成者が招待と役割を管理します。"
+  ],
+  "동행 참여 해제": ["Remove companion", "同行者の参加を解除"],
+  "편집 초대 공유": ["Invite to edit", "編集権限で招待"],
+  "보기 초대 공유": ["Invite to view", "閲覧権限で招待"],
+  "초대 내역": ["Invitations", "招待履歴"],
+  "아직 보낸 초대가 없어요. 위에서 함께할 사람을 초대해 보세요.": [
+    "No invitations yet. Invite someone above.",
+    "まだ招待していません。上から同行者を招待しましょう。"
+  ],
+  "· 만료": ["· Expires ", "· 有効期限"],
+  "초대 취소": ["Revoke invitation", "招待を取り消す"],
+  "아직 준비물이 없어요": ["No packing items yet", "持ち物はまだありません"],
+  "새 준비물": ["New packing item", "新しい持ち物"],
+  "준비물 추가": ["Add packing item", "持ち物を追加"],
+  "사진 · 영수증": ["Photos · Receipts", "写真 · レシート"],
+  "정보만 저장한 영수증": [
+    "Receipt details without photo",
+    "情報のみ保存したレシート"
+  ],
+  "영수증 기록 수정": ["Edit receipt record", "レシート記録を編集"],
+  "영수증 기록·지출 삭제": [
+    "Delete receipt record and expense",
+    "レシート記録・支出を削除"
+  ],
+  "영수증 확인 / 인식 재시도": [
+    "Review receipt / Retry reading",
+    "レシート確認 / 読み取り再試行"
+  ],
+  "사진 등록 삭제": ["Remove photo registration", "写真の登録を削除"],
+  "아직 기록한 비용이 없어요": [
+    "No expenses recorded yet",
+    "まだ費用が記録されていません"
+  ],
+  "비용 수정": ["Edit expense", "費用を編集"],
+  "비용 삭제": ["Delete expense", "費用を削除"],
+  "여행이 끝났어요. 남긴 일정과 사진, 비용을 기록에서 확인해 보세요.": [
+    "Your trip is over. View your activities, photos and expenses in your travel memories.",
+    "旅行が終わりました。予定・写真・費用を記録で振り返りましょう。"
+  ],
+  "· 함께하는 멤버": ["· Companions: ", "· 同行メンバー"],
+  "명 ·": [" people ·", "人 ·"],
+  "기록 보러가기": ["View memories", "記録を見る"],
+  "내 여행 목록": ["My trip list", "自分の旅行一覧"],
+  "게스트 여행은 이 기기에만 저장돼요. 다른 기기에서는 볼 수 없으며 앱이나 저장 데이터를 삭제하면 복구할 수 없어요.": [
+    "Guest trips are stored only on this device. They cannot be viewed elsewhere or recovered if you delete the app or its data.",
+    "ゲストの旅行はこの端末だけに保存されます。他の端末では見られず、アプリや保存データを削除すると復元できません。"
+  ],
+  "로그인하고 여행을 시작하세요": [
+    "Sign in to start your trip",
+    "ログインして旅行を始めましょう"
+  ],
+  "로그인하면 여행을 저장하고 친구와 함께 계획할 수 있어요.": [
+    "Sign in to save trips and plan with friends.",
+    "ログインすると旅行を保存し、友だちと一緒に計画できます。"
+  ],
+  "읽기 전용 또는 보관된 여행에는 장소를 추가할 수 없습니다. 편집 가능한 여행을 선택해 주세요.": [
+    "You cannot add places to read-only or archived trips. Choose a trip you can edit.",
+    "閲覧専用または保管済みの旅行には場所を追加できません。編集可能な旅行を選んでください。"
+  ],
+  "여행에 반영하고 있어요…": ["Updating your trip…", "旅行に反映しています…"],
+  "무료 수하물과 좌석 등급은 예약한 항공권에서 확인해 주세요.": [
+    "Check your booking for baggage allowance and cabin class.",
+    "無料手荷物許容量と座席クラスは予約した航空券で確認してください。"
+  ],
+  "출발 예정": ["Expected departure", "出発予定"],
+  "도착 예정": ["Expected arrival", "到着予定"],
+  "항공권 입력": ["Enter flight details", "航空券情報を入力"],
+  "항공편 목록으로 돌아가기": ["Back to flights", "フライト一覧に戻る"],
+  "항공편 출발일": ["Flight departure date", "フライト出発日"],
+  "선택한 항공편 ·": ["Selected flight ·", "選択したフライト ·"],
+  "항공사 코드": ["Airline code", "航空会社コード"],
+  "예: KE": ["e.g. KE", "例：KE"],
+  "항공사를 찾지 못했어요. 항공권의 두 자리 코드를 확인해 주세요.": [
+    "Airline not found. Check the two-character code on your ticket.",
+    "航空会社が見つかりません。航空券の2文字のコードを確認してください。"
+  ],
+  "항공편 번호": ["Flight number", "便番号"],
+  "예: 901": ["e.g. 901", "例：901"],
+  "항공사를 선택하고 항공권의 번호 3~4자리를 입력해 주세요.": [
+    "Select an airline and enter the 3–4 digit flight number on your ticket.",
+    "航空会社を選び、航空券に記載された3〜4桁の便番号を入力してください。"
+  ],
+  "항공권 직접 입력": ["Enter ticket details manually", "航空券を直接入力"],
+  "항공권에 적힌 정보를 입력해 주세요. 시각은 각 공항의 현지 시각이에요. 모르는 도착 정보와 터미널은 비워 두어도 괜찮아요.": [
+    "Enter the details on your ticket. Times are local to each airport. Leave arrival details and terminals blank if you don't know them.",
+    "航空券に記載された情報を入力してください。時刻は各空港の現地時刻です。不明な到着情報やターミナルは空欄で構いません。"
+  ],
+  "도착일 (현지, 선택)": [
+    "Arrival date (local, optional)",
+    "到着日（現地日付・任意）"
+  ],
+  "해당 날짜의 항공편을 찾지 못했어요. 항공권의 날짜와 편명을 확인한 뒤 다시 조회해 주세요.": [
+    "No flight found for this date. Check the date and flight number on your ticket, then search again.",
+    "この日のフライトが見つかりません。航空券の日付と便名を確認して、もう一度検索してください。"
+  ],
+  "출발 터미널 ·": ["Departure terminal ·", "出発ターミナル ·"],
+  "도착 터미널 ·": ["Arrival terminal ·", "到着ターミナル ·"],
+  "공개된 발자국 여행을 불러오는 중이에요.": [
+    "Loading the public trip.",
+    "公開された旅を読み込んでいます。"
+  ],
+  "발자국 여행을 불러오지 못했어요": [
+    "Couldn't load the trip",
+    "旅を読み込めませんでした"
+  ],
+  "네트워크 연결을 확인하거나 발자국 탭에서 다른 여행을 둘러보세요.": [
+    "Check your connection or explore other trips in the Footprints tab.",
+    "通信状況を確認するか、足あとタブでほかの旅をご覧ください。"
+  ],
+  "나의 발자국": ["My footprints", "自分の足あと"],
+  "다녀온 여행 모음": ["Past trips", "これまでの旅"],
+  "걸어온 길마다 소중한 추억을 온전히 담아두었어요.": [
+    "Keep the memories of every journey together.",
+    "旅先での大切な思い出を、ここにまとめています。"
+  ],
+  "이 기록은 이 기기에 보관돼요. 앱이나 기기 데이터를 지우면 사라질 수 있어요.": [
+    "These records are stored on this device. Deleting app or device data may erase them.",
+    "この記録はこの端末に保存されます。アプリや端末のデータを削除すると、失われることがあります。"
+  ],
+  "여행 기록을 불러오고 있어요": [
+    "Loading trip records",
+    "旅の記録を読み込んでいます"
+  ],
+  "여행 기록 검색": ["Search trip records", "旅の記録を検索"],
+  "여행 이름, 도시, 국가": ["Trip name, city, country", "旅行名、都市、国"],
+  "조건에 맞는 여행이 없어요": [
+    "No trips match your filters",
+    "条件に合う旅がありません"
+  ],
+  "검색어나 연도를 바꿔 다시 찾아보세요.": [
+    "Try a different search term or year.",
+    "検索語や年を変えて探してみてください。"
+  ],
+  "여행 기록 더 보기": ["More trip records", "旅の記録をもっと見る"],
+  "아직 남긴 발자국이 없어요": ["No footprints yet", "まだ足あとがありません"],
+  "다녀온 여행의 날짜와 장소를 등록하고 사진과 지출을 한곳에 모아보세요.": [
+    "Add the dates and places from a past trip, and keep photos and expenses together.",
+    "旅した日付と場所を登録して、写真や支出をひとつにまとめましょう。"
+  ],
+  "내 여행 살펴보기": ["Explore my trips", "自分の旅を見る"],
+  "사진과 기록을 불러오고 있어요.": [
+    "Loading photos and records.",
+    "写真と記録を読み込んでいます。"
+  ],
+  "기록 정보 다시 불러오기": ["Reload records", "記録を再読み込み"],
+  "사진": ["Photos", "写真"],
+  "장 · 일정": [" photos · Activities", "枚 · 予定"],
+  "개 · 영수증": [" items · Receipts", "件 · レシート"],
+  "기록 열기": ["Open record", "記録を開く"],
+  "Google Maps에서 장소 보기": [
+    "View place on Google Maps",
+    "Google Mapsで場所を見る"
+  ],
+  "월의 여행지": [" — destinations of the month", "月の旅先"],
+  "도시 이야기와 여행 팁 보기 →": [
+    "City stories and travel tips →",
+    "街の紹介と旅のヒントを見る →"
+  ],
+  "다음 여행, 어디로 떠나볼까요?": [
+    "Where will your next trip take you?",
+    "次の旅は、どこへ行きましょう？"
+  ],
+  "다음 여행,": ["Your next trip,", "次の旅は、"],
+  "어디로 떠나볼까요?": ["Where shall we go?", "どこへ行きましょう？"],
+  "하루와 함께 가고 싶은 곳부터": [
+    "Start with places you'd love to visit",
+    "ハルと一緒に、行きたい場所から"
+  ],
+  "담아보세요.": [" and save them with Haru.", "集めてみましょう。"],
+  "새 여행 만들기": ["Create a new trip", "新しい旅行を作成"],
+  "다른 여행자의 일정 둘러보기": [
+    "Explore other travelers' itineraries",
+    "ほかの旅行者の旅程を見る"
+  ],
+  "공개 일정 더 둘러보기": [
+    "Explore more public itineraries",
+    "公開された旅程をもっと見る"
+  ],
+  "더보기": ["See more", "もっと見る"],
+  "여행자들의 실제 일정에서 영감을 얻어보세요.": [
+    "Find inspiration in other travelers' real itineraries.",
+    "旅行者の実際の旅程から、旅のアイデアを見つけましょう。"
+  ],
+  "공개 여행 불러오는 중…": [
+    "Loading public trips…",
+    "公開された旅を読み込み中…"
+  ],
+  "다른 여행을 불러오지 못했어요.": [
+    "Couldn't load other trips.",
+    "ほかの旅を読み込めませんでした。"
+  ],
+  "공개 여행 다시 불러오기": [
+    "Reload public trips",
+    "公開された旅を再読み込み"
+  ],
+  "아직 공개된 여행이 없어요. 나의 첫 여행을 계획해 보세요.": [
+    "No public trips yet. Start planning your first trip.",
+    "まだ公開された旅がありません。最初の旅を計画してみましょう。"
+  ],
+  "일정 구경하기": ["Browse itineraries", "旅程を見てみる"],
+  "여행 활용 가이드": ["Travel planning guide", "旅の活用ガイド"],
+  "처음이라면": ["Getting started", "初めての方へ"],
+  "다음 일정 브리핑": ["What's next", "次の予定"],
+  "다음 일정을 불러오는 중이에요": [
+    "Loading your next activity",
+    "次の予定を読み込んでいます"
+  ],
+  "다음 일정을 불러오지 못했어요. 다시 확인해 주세요.": [
+    "Couldn't load your next activity. Please try again.",
+    "次の予定を読み込めませんでした。もう一度確認してください。"
+  ],
+  "브리핑 다시 불러오기": ["Reload what's next", "次の予定を再読み込み"],
+  "아직 예정된 일정이 없어요. 계획에서 다음 일정을 추가해 보세요.": [
+    "Nothing scheduled yet. Add your next activity to your plan.",
+    "まだ予定がありません。旅行プランに次の予定を追加しましょう。"
+  ],
+  "어디로 떠나볼까요? 추천 코스": [
+    "Where to next? Suggested routes",
+    "どこへ行きましょう？おすすめコース"
+  ],
+  "추천 코스 전체보기": [
+    "View all suggested routes",
+    "おすすめコースをすべて見る"
+  ],
+  "전체보기": ["View all", "すべて見る"],
+  "여행 일정 보기": ["View itinerary", "旅程を見る"],
+  "내 여행 불러오는 중…": ["Loading my trips…", "自分の旅を読み込み中…"],
+  "내 여행을 불러오지 못했어요": [
+    "Couldn't load your trips",
+    "自分の旅を読み込めませんでした"
+  ],
+  "내 여행 다시 불러오기": ["Reload my trips", "自分の旅を再読み込み"],
+  "여행 도구": ["Travel tools", "旅のツール"],
+  "초대 링크로 참여": ["Join with an invite link", "招待リンクで参加"],
+  "Google Maps 장소 가져오기": [
+    "Import a place from Google Maps",
+    "Google Mapsの場所を取り込む"
+  ],
+  "반가워요,": ["Welcome,", "ようこそ、"],
+  "님! 👋": ["! 👋", "さん！👋"],
+  "당신만의 여행 발자국을 남겨볼까요?": [
+    "Ready to leave your own travel footprints?",
+    "あなただけの旅の足あとを残しませんか？"
+  ],
+  "저장한 장소를 여행으로": [
+    "Add saved places to your trip",
+    "保存した場所を旅へ"
+  ],
+  "가져오기 취소": ["Cancel import", "取り込みをキャンセル"],
+  "Google Maps에서 찾은 장소를 내 일정에 추가하세요. 장소와 날짜를 확인한 뒤 직접 저장합니다.": [
+    "Add a place from Google Maps to your itinerary. Check the place and date before saving.",
+    "Google Mapsで見つけた場所を旅程に追加しましょう。場所と日付を確認してから保存します。"
+  ],
+  "받은 Google Maps 링크": [
+    "Received Google Maps link",
+    "受け取ったGoogle Mapsリンク"
+  ],
+  "로그인하고 장소 가져오기": [
+    "Log in to import a place",
+    "ログインして場所を取り込む"
+  ],
+  "추가할 여행 선택": ["Choose a trip to add it to", "追加先の旅を選択"],
+  "여행 목록을 불러오는 중입니다.": [
+    "Loading your trip list.",
+    "旅行一覧を読み込んでいます。"
+  ],
+  "여행을 불러오지 못했습니다.": [
+    "Couldn't load your trips.",
+    "旅を読み込めませんでした。"
+  ],
+  "이 여행에 장소 추가": ["Add place to this trip", "この旅に場所を追加"],
+  "여행 초대": ["Trip invitation", "旅への招待"],
+  "내 여행으로": ["Go to my trips", "自分の旅へ"],
+  "친구가 보낸 링크로 여행에 참여해 보세요. 함께 일정을 확인하고 여행을 준비할 수 있어요.": [
+    "Join a trip using a friend's link. View the itinerary and prepare for the trip together.",
+    "友だちからのリンクで旅に参加しましょう。一緒に旅程を確認し、旅の準備ができます。"
+  ],
+  "초대 링크": ["Invite link", "招待リンク"],
+  "기록 장소": ["Recorded places", "記録した場所"],
+  "곳": [" places", "か所"],
+  "영수증": ["Receipts", "レシート"],
+  "원본은 나와 동행자만 볼 수 있어요. 직접 고른 내용만 발견에 공개돼요.": [
+    "Only you and your travel companions can view the original. Only what you select appears in Discover.",
+    "元の記録は自分と同行者だけが見られます。選んだ内容だけが「見つける」に公開されます。"
+  ],
+  "여행 기록 요약": ["Trip record summary", "旅の記録まとめ"],
+  "일 · 일정": [" days · Activities", "日 · 予定"],
+  "개": [" items", "件"],
+  "장 · 영수증": [" photos · Receipts", "枚 · レシート"],
+  "여행 경비 요약": ["Travel expense summary", "旅費のまとめ"],
+  "일정·기록 보완": ["Update itinerary and records", "旅程・記録を補足"],
+  "공유할 내용 선택": ["Choose what to share", "共有する内容を選択"],
+  "개 장소·일정": [" places and activities", "件の場所・予定"],
+  "이날 등록한 일정이 없어요.": [
+    "No activities added for this day.",
+    "この日に登録した予定はありません。"
+  ],
+  "아직 등록한 여행 사진이 없어요.": [
+    "No trip photos added yet.",
+    "まだ旅の写真が登録されていません。"
+  ],
+  "기록한 실제 지출이 없어요.": [
+    "No actual expenses recorded.",
+    "記録した実際の支出はありません。"
+  ],
+  "나와 동행자만 보는 메모": [
+    "Notes for you and your companions only",
+    "自分と同行者だけが見られるメモ"
+  ],
+  "비용": ["Expenses", "費用"],
+  "여행 비용 보기": ["View travel expenses", "旅の費用を見る"],
+  "공개 범위 관리": ["Manage what is public", "公開範囲を管理"],
+  "여행에 등록한 표지 사진": [
+    "Cover photo added to this trip",
+    "この旅に登録したカバー写真"
+  ],
+  "표지 사진 다시 불러오기": ["Reload cover photo", "カバー写真を再読み込み"],
+  "오늘의 다음 일정": ["Next up today", "今日の次の予定"],
+  "건": [" entries", "件"],
+  "항공편": ["Flights", "フライト"],
+  "숙소": ["Stay", "宿泊先"],
+  "준비물": ["Checklist", "持ち物"],
+  "개 중": [" items, ", "個中"],
+  "개 준비": [" ready", "個準備済み"],
+  "내 여행 일정을 불러오는 중이에요.": [
+    "Loading your itinerary.",
+    "自分の旅程を読み込んでいます。"
+  ],
+  "여행을 불러오지 못했어요": [
+    "Couldn't load the trip",
+    "旅を読み込めませんでした"
+  ],
+  "연결 상태를 확인하거나 내 여행 목록으로 돌아가 보세요.": [
+    "Check your connection or return to your trip list.",
+    "通信状況を確認するか、自分の旅行一覧に戻ってください。"
+  ],
+  "내 여행 목록으로 이동": ["Go to my trip list", "自分の旅行一覧へ"],
+  "내 여행 계획": ["My trip plans", "自分の旅行プラン"],
+  "내 여행 아카이브": ["My trip archive", "自分の旅のアーカイブ"],
+  "나의 모든 여정과 소중한 기록": [
+    "All your journeys and treasured memories",
+    "すべての旅と大切な記録"
+  ],
+  "새 여행": ["New trip", "新しい旅行"],
+  "여행 검색": ["Search trips", "旅を検索"],
+  "여행 제목, 도시, 국가 검색": [
+    "Search trip title, city, or country",
+    "旅行名・都市・国で検索"
+  ],
+  "검색어 지우기": ["Clear search", "検索語を消去"],
+  "여행 상태 필터": ["Filter by trip status", "旅の状態で絞り込み"],
+  "여행 정렬 변경": ["Change trip sorting", "旅の並び順を変更"],
+  "아직 등록된 여행이 없어요": [
+    "No trips added yet",
+    "まだ旅が登録されていません"
+  ],
+  "새로운 여행을 계획하거나, 다른 여행자의 발자국 일정을 참고해 나만의 여행을 시작해 보세요.": [
+    "Plan a new trip or get ideas from other travelers' itineraries in Footprints.",
+    "新しい旅を計画したり、足あとでほかの旅行者の旅程を参考にしたりして、自分の旅を始めましょう。"
+  ],
+  "추천 시작": ["Suggested starting point", "おすすめの始め方"],
+  "새 여행 계획 만들기": ["Create a new trip plan", "新しい旅行プランを作成"],
+  "목적지와 일정을 선택하고 나만의 여행 코스를 짜보세요.": [
+    "Choose your destination and activities to build your own route.",
+    "目的地と予定を選び、自分だけの旅行コースを作りましょう。"
+  ],
+  "여행 시작이 막막하신가요?": [
+    "Not sure where to start?",
+    "旅の計画、何から始めますか？"
+  ],
+  "발자국에서 다른 여행자의 동선을 살펴보세요. 가고 싶은 장소를 참고해 새 여행 계획을 만들어 보세요.": [
+    "Explore other travelers' routes in Footprints. Find places you'd like to visit and plan your own trip.",
+    "足あとでほかの旅行者のルートを見てみましょう。行きたい場所を参考に、新しい旅行プランを作れます。"
+  ],
+  "공개 일정": ["Public itineraries", "公開旅程"],
+  "다른 여행자의 발자국 둘러보기": [
+    "Explore other travelers' footprints",
+    "ほかの旅行者の足あとを見る"
+  ],
+  "발자국 더보기": ["More footprints", "足あとをもっと見る"],
+  "더보기 ›": ["See more ›", "もっと見る ›"],
+  "공개된 일정을 불러오는 중이에요.": [
+    "Loading public itineraries.",
+    "公開された旅程を読み込んでいます。"
+  ],
+  "공개된 일정을 불러오지 못했어요.": [
+    "Couldn't load public itineraries.",
+    "公開された旅程を読み込めませんでした。"
+  ],
+  "공개 일정 다시 불러오기": [
+    "Reload public itineraries",
+    "公開旅程を再読み込み"
+  ],
+  "아직 공개된 일정이 없어요. 나만의 여행부터 시작해 보세요.": [
+    "No public itineraries yet. Start with your own trip.",
+    "まだ公開された旅程がありません。自分の旅から始めましょう。"
+  ],
+  "장소": ["Place", "場所"],
+  "발자국 일정 보기": ["View Footprints itinerary", "足あとの旅程を見る"],
+  "이 기기에서만 볼 수 있는 여행이에요.": [
+    "This trip is only available on this device.",
+    "この旅はこの端末でのみ見られます。"
+  ],
+  "내 여행을 불러오는 중이에요": [
+    "Loading your trips",
+    "自分の旅を読み込んでいます"
+  ],
+  "나만의 여행을 시작해 보세요": [
+    "Start your own journey",
+    "自分だけの旅を始めましょう"
+  ],
+  "로그인 / 게스트로 시작": [
+    "Log in / Start as a guest",
+    "ログイン／ゲストで始める"
+  ],
+  "검색된 여행이 없습니다": ["No trips found", "旅が見つかりません"],
+  "다른 검색어나 상태 필터를 선택해 보세요.": [
+    "Try a different search term or status filter.",
+    "検索語や状態フィルターを変えてみてください。"
+  ],
+  "필터 초기화": ["Reset filters", "フィルターをリセット"],
+  "다음 여행 준비": ["Plan your next trip", "次の旅の準備"],
+  "새로운 여행을 계획 중인가요?": [
+    "Planning a new trip?",
+    "新しい旅を計画中ですか？"
+  ],
+  "새로운 여행 만들기": ["Create a new trip", "新しい旅を作成"],
+  "여행 만들기 →": ["Create a trip →", "旅を作成 →"],
+  "여행을 계획하고 소중한 순간을 기록해요.": [
+    "Plan your trip and record the moments that matter.",
+    "旅を計画して、大切な瞬間を記録しましょう。"
+  ],
+  "나의 여행 기록 보기": ["View my trip records", "自分の旅の記録を見る"],
+  "여행할 장소 찾기": ["Find places to visit", "訪れたい場所を探す"],
+  "제목": ["Title", "タイトル"],
+  "어디에 가고 싶으세요?": [
+    "Where would you like to go?",
+    "どこへ行きたいですか？"
+  ],
+  "장소 검색어": ["Place search term", "場所の検索語"],
+  "Google Maps에서 찾기": ["Search on Google Maps", "Google Mapsで探す"],
+  "장소를 확인한 뒤 일정 제목을 입력하고 지도 위치를 선택해 주세요.": [
+    "Check the place, then enter an activity title and select its location on the map.",
+    "場所を確認してから予定名を入力し、地図上の位置を選んでください。"
+  ],
+  "장소 이름을 두 글자 이상 입력해 주세요. 도시를 포함해 200자까지 검색할 수 있어요.": [
+    "Enter at least 2 characters for the place name. Your search can include the city, up to 200 characters.",
+    "場所の名前を2文字以上入力してください。都市名を含めて200文字まで検索できます。"
+  ],
+  "찾은 장소가 없어요. 이름을 바꿔 검색하거나 직접 입력해 주세요.": [
+    "No places found. Try another name or enter the details manually.",
+    "場所が見つかりません。名前を変えて検索するか、手入力してください。"
+  ],
+  "장소를 선택한 뒤 지도 위치를 확인하고 일정을 저장해 주세요.": [
+    "Select a place, check its map location, then save the activity.",
+    "場所を選んで地図上の位置を確認し、予定を保存してください。"
+  ],
+  "여행 사진": ["Trip photos", "旅の写真"],
+  "실제 지출 ·": ["Actual expenses ·", "実際の支出 ·"],
+  "대체 지점": ["Alternative stop", "代替スポット"],
+  "장소 설명·팁 보기": [
+    "View place details and tips",
+    "場所の説明・ヒントを見る"
+  ],
+  "장소 목록으로 돌아가기": ["Back to places", "場所一覧に戻る"],
+  "작성자가 남긴 장소 설명이에요. 가격·영업시간은 방문 전에 확인해 주세요.": [
+    "Place details provided by the author. Check prices and opening hours before visiting.",
+    "投稿者による場所の説明です。料金や営業時間は訪問前に確認してください。"
+  ],
+  "전체 요약": ["Overview", "全体のまとめ"],
+  "일정": ["Itinerary", "日程"],
+  "이동 동선 요약": ["Route overview", "移動ルートのまとめ"],
+  "방문 장소": ["Place to visit", "訪問場所"],
+  "예상 도보": ["Estimated walking time", "徒歩の目安"],
+  "예상 소요": ["Estimated duration", "所要時間の目安"],
+  "전체 여정 한눈에 보기": [
+    "View the whole trip at a glance",
+    "旅全体をひと目で見る"
+  ],
+  "일정 공유 및 인쇄": ["Share and print itinerary", "旅程の共有・印刷"],
+  "여행 날짜 선택": ["Choose a trip date", "旅行日を選択"],
+  "실제 지출": ["Actual expenses", "実際の支出"],
+  "예상 비용": ["Estimated expenses", "予想費用"],
+  "여행 단계는 날짜에 맞춰 바뀌어요. 공개할 기록의 정리 여부를 선택해 주세요.": [
+    "Your trip stage changes with the dates. Choose whether your records are ready to publish.",
+    "旅の段階は日付に合わせて変わります。公開する記録の整理が済んだか選んでください。"
+  ],
+  "최신 내용 불러오기": ["Load latest details", "最新の内容を読み込む"],
+  "연결할 일정": ["Activity to link", "関連付ける予定"],
+  "결제일에 맞는 기존 일정이나 새 장소를 선택해 주세요. 이전 일정은 그대로 남아요.": [
+    "Choose an existing activity or a new place for the payment date. The previous activity stays unchanged.",
+    "支払日に合う既存の予定か新しい場所を選んでください。以前の予定はそのまま残ります。"
+  ],
+  "장소를 어떻게 추가할까요?": [
+    "How would you like to add a place?",
+    "どの方法で場所を追加しますか？"
+  ],
+  "영수증 촬영으로 추가": [
+    "Add by taking a receipt photo",
+    "レシートを撮影して追加"
+  ],
+  "영수증 사진으로 추가": [
+    "Add from a receipt photo",
+    "レシートの写真から追加"
+  ],
+  "선택한 구글 장소 연결 해제": [
+    "Unlink selected Google place",
+    "選択したGoogleの場所の関連付けを解除"
+  ],
+  "영수증 원본": ["Original receipt", "レシート原本"],
+  "사진과 읽은 내용을 비교해 주세요. 등록 전에는 지출이 추가되지 않아요.": [
+    "Compare the photo with the extracted details. No expense is added until you save.",
+    "写真と読み取った内容を見比べてください。登録するまでは支出は追加されません。"
+  ],
+  "여행에 등록한 사진": ["Photo added to the trip", "旅に登録した写真"],
+  "공개 사진 없이 담은 여행": [
+    "Trip saved without public photos",
+    "公開写真なしで保存した旅"
+  ],
+  "동선 보기": ["View route", "ルートを見る"],
+  "공개 여행 더 보기": ["More public trips", "公開された旅をもっと見る"],
+  "신고": ["Report", "通報"],
+  "신고 사유": ["Reason for reporting", "通報理由"],
+  "신고 접수": ["Submit report", "通報を送信"],
+  "신고 취소": ["Cancel report", "通報をキャンセル"],
+  "도시·여행 이름 검색": ["Search city or trip name", "都市・旅行名で検索"],
+  "도시나 여행 이름을 찾아보세요": [
+    "Search for a city or trip name",
+    "都市名や旅行名で探してみましょう"
+  ],
+  "여행 조건 선택": ["Choose trip filters", "旅の条件を選択"],
+  "다녀온 여정이 있다면?": [
+    "Have a trip to look back on?",
+    "旅の思い出があるなら"
+  ],
+  "내 발자국 공유하기": ["Share my footprints", "自分の足あとを共有"],
+  "공개된 여행을 찾고 있어요.": [
+    "Finding public trips.",
+    "公開された旅を探しています。"
+  ],
+  "도시 이름이나 공개 유형, 여행 기간을 바꿔 찾아보세요.": [
+    "Try a different city, post type, or trip duration.",
+    "都市名、公開タイプ、旅行期間を変えて探してみてください。"
+  ],
+  "검색 조건 지우기": ["Clear search filters", "検索条件をクリア"],
+  "나라·도시 또는 여행 이름": [
+    "Country, city, or trip name",
+    "国・都市または旅行名"
+  ],
+  "예: 후쿠오카": ["e.g. Fukuoka", "例：福岡"],
+  "공개 유형": ["Post type", "公開タイプ"],
+  "선택한 조건으로 보기": ["Apply selected filters", "選択した条件で表示"],
+  "링크 공유": ["Share link", "リンクを共有"],
+  "공유 링크 보내기": ["Send share link", "共有リンクを送る"],
+  "링크를 받은 사람은 공개한 내용만 볼 수 있어요. 함께 편집하려면 동행 메뉴에서 초대해 주세요.": [
+    "People with the link can only see what you've published. To edit together, invite them from Companions.",
+    "リンクを受け取った人は、公開した内容だけを見られます。一緒に編集するには、同行者メニューから招待してください。"
+  ],
+  "개인 메모·예약번호·동행 정보·영수증 원본과 품목은 공개하지 않아요.": [
+    "Private notes, booking references, companion details, original receipts, and receipt items are not published.",
+    "個人メモ・予約番号・同行者情報・レシート原本と明細は公開されません。"
+  ],
+  "다시 공개하면 기존 링크의 내용이 이번 선택으로 바뀌어요. 내 여행 원본은 그대로 남아요.": [
+    "Publishing again updates the existing link with your current selection. Your original trip stays unchanged.",
+    "再公開すると、既存リンクの内容が今回の選択に更新されます。元の旅はそのまま残ります。"
+  ],
+  "공유 소개 · 선택": ["Introduction · Optional", "共有する紹介文 · 任意"],
+  "선택 내용 수정": ["Edit selection", "選択内容を変更"],
+  "기록을 정리한 뒤 공개할 내용을 골라요": [
+    "Organize your records, then choose what to publish",
+    "記録を整理してから、公開する内容を選びましょう"
+  ],
+  "여행 날짜가 지났어도 공개는 직접 선택해요. 기록 정리를 마치면 일정·사진·비용 중 공개할 내용을 고를 수 있어요.": [
+    "Your trip isn't published automatically when it ends. Once your records are ready, choose which activities, photos, and expenses to publish.",
+    "旅行日が過ぎても自動では公開されません。記録を整理したら、予定・写真・費用から公開する内容を選べます。"
+  ],
+  "기록 정리 마치기": ["Finish organizing records", "記録の整理を終える"],
+  "기록 정리를 마칠까요?": [
+    "Finished organizing your records?",
+    "記録の整理を終えますか？"
+  ],
+  "개인 기록은 계속 수정할 수 있어요. 이 단계에서는 게시하지 않아요. 완료 후 ‘여행기록 공유하기’에서 공개할 내용을 선택해 주세요.": [
+    "You can still edit your private records. Nothing is published at this step. When you're done, choose what to publish under 'Share trip records'.",
+    "個人の記録は引き続き編集できます。この段階では公開されません。完了後、「旅の記録を共有」で公開する内容を選んでください。"
+  ],
+  "계속 정리하기": ["Keep organizing", "整理を続ける"],
+  "기록 정리 완료": ["Records ready", "記録の整理完了"],
+  "공개할 내용 선택": ["Choose what to publish", "公開する内容を選択"],
+  "여행계획 공유": ["Share trip plan", "旅行プランを共有"],
+  "여행기록 공유": ["Share trip records", "旅の記録を共有"],
+  "선택한 장소의 계획 설명·추천 메뉴·팁도 함께 공개돼요. 개인적인 내용은 일정 메모에 남겨 주세요.": [
+    "Plan descriptions, recommended dishes, and tips for selected places are also published. Keep private details in activity notes.",
+    "選んだ場所のプラン説明・おすすめメニュー・ヒントも公開されます。個人的な内容は予定のメモに残してください。"
+  ],
+  "여행 전체 실제 지출 합계 공개": [
+    "Publish total actual expenses for the trip",
+    "旅全体の実際の支出合計を公開"
+  ],
+  "일정·사진 선택 비우기": [
+    "Clear activity and photo selections",
+    "予定・写真の選択を解除"
+  ],
+  "실제 공개 내용 미리보기": [
+    "Preview exactly what will be public",
+    "実際に公開される内容をプレビュー"
+  ],
+  "공개 내용 미리보기": ["Preview public content", "公開内容をプレビュー"],
+  "선택 일정": ["Selected activities", "選択した予定"],
+  "개 · 사진": [" items · Photos", "件 · 写真"],
+  "공개할 일정이 없어요.": [
+    "No activities to publish.",
+    "公開する予定はありません。"
+  ],
+  "공개할 사진이 없어요.": [
+    "No photos to publish.",
+    "公開する写真はありません。"
+  ],
+  "공개 실제 비용 ·": ["Public actual expenses ·", "公開する実際の費用 ·"],
+  "비용은 공개하지 않아요.": [
+    "Expenses will stay private.",
+    "費用は公開しません。"
+  ],
+  "개 일정 선택": [" activities selected", "件の予定を選択"],
+  "· 개인 메모는 공개하지 않아요.": [
+    "· Private notes are not published.",
+    "· 個人メモは公開されません。"
+  ],
+  "공개 범위 요약": ["Public content summary", "公開範囲のまとめ"],
+  "공개 지출": ["Public expenses", "公開する支出"],
+  "공개할 지출 합계가 없어요.": [
+    "No expense total to publish.",
+    "公開する支出合計はありません。"
+  ],
+  "미리보기에서 내용을 확인한 뒤 공개해 주세요. 원본을 수정해도 공개 사본이 자동으로 바뀌지는 않아요.": [
+    "Check the preview before publishing. Editing the original does not automatically update the public copy.",
+    "プレビューで内容を確認してから公開してください。元の記録を編集しても、公開されたコピーは自動では更新されません。"
+  ],
+  "계정을 확인하고 있어요": [
+    "Checking your account",
+    "アカウントを確認しています"
+  ],
+  "페이지를 찾을 수 없어요": ["Page not found", "ページが見つかりません"],
+  "길을 조금 벗어났어요": ["A little off the path", "少し道を外れたようです"],
+  "찾는 페이지가 없거나 주소가 바뀌었어요. 홈에서 여행을 이어가 주세요.": [
+    "This page is missing or its address has changed. Head home to continue your trip.",
+    "ページが存在しないか、アドレスが変更されました。ホームから旅を続けてください。"
+  ],
+  "홈으로 돌아가기": ["Back to home", "ホームに戻る"],
+  "계정 관리": ["Account settings", "アカウント管理"],
+  "탈퇴 유예를 시작했어요": [
+    "Your account closure grace period has started",
+    "退会の猶予期間が始まりました"
+  ],
+  "에 계정 연결 정보를 삭제해요. 90일 안에 다시 로그인하면 탈퇴가 취소되고 여행을 다시 볼 수 있어요.": [
+    " is when your account links will be deleted. Sign in again within 90 days to cancel account closure and see your trips again.",
+    "にアカウントの連携情報を削除します。90日以内に再ログインすると退会が取り消され、旅行を再び見られます。"
+  ],
+  "홈으로": ["Home", "ホームへ"],
+  "회원 탈퇴": ["Close account", "退会"],
+  "탈퇴를 요청하면 로그아웃되고, 여행에서는 ‘탈퇴 멤버’로 표시돼요.": [
+    "Requesting account closure signs you out. You will appear as a former member in trips.",
+    "退会を申請するとログアウトし、旅行では「退会メンバー」と表示されます。"
+  ],
+  "90일 안에 같은 계정으로 다시 로그인하면 탈퇴를 취소하고 여행을 복구할 수 있어요. 90일이 지나면 이메일·로그인 연결·프로필을 삭제해요.": [
+    "Sign in with the same account within 90 days to cancel closure and restore access to your trips. After 90 days, your email, sign-in links, and profile are deleted.",
+    "90日以内に同じアカウントで再ログインすると、退会を取り消して旅行を復元できます。90日が過ぎると、メールアドレス・ログイン連携・プロフィールを削除します。"
+  ],
+  "내가 만든 여행과 함께한 여행, 사진·영수증·공개본은 계정과 분리해 보관해요. 혼자 만든 여행도 보관되며 동행자의 여행 접근과 기존 권한은 유지돼요. 소유권을 다른 동행자에게 넘기지 않아요.": [
+    "Trips you created or joined, photos, receipts, and public copies are retained separately from your account. Solo trips are also retained. Travel companions keep their existing access and permissions. Ownership is not transferred to another companion.",
+    "作成・参加した旅行、写真・レシート・公開版はアカウントと切り離して保管します。一人で作成した旅行も保管され、同行者のアクセス権限は維持されます。所有権を他の同行者に移すことはありません。"
+  ],
+  "로그인하고 계정 관리": [
+    "Sign in to manage your account",
+    "ログインしてアカウントを管理"
+  ],
+  "로그아웃하고 다시 확인": [
+    "Sign out and check again",
+    "ログアウトして再確認"
+  ],
+  "탈퇴 유예를 시작할까요?": [
+    "Start the account closure grace period?",
+    "退会の猶予期間を開始しますか？"
+  ],
+  "지금 로그아웃돼요. 90일 안에 다시 로그인하면 취소할 수 있어요. 여행·사진·영수증과 공개본은 계정과 분리해 보관해요.": [
+    "You will be signed out now. Sign in again within 90 days to cancel. Trips, photos, receipts, and public copies are retained separately from your account.",
+    "ログアウトします。90日以内に再ログインすると取り消せます。旅行・写真・レシート・公開版はアカウントと切り離して保管します。"
+  ],
+  "계속 이용하기": ["Keep using TripPrint", "利用を続ける"],
+  "탈퇴 유예 시작": ["Start closure grace period", "退会の猶予期間を開始"],
+  "로그인 확인": ["Verifying sign-in", "ログイン確認"],
+  "로그인으로 돌아가기": ["Back to sign-in", "ログインに戻る"],
+  "다시 시도": ["Try again", "再試行"],
+  "로그인으로 이동": ["Go to sign-in", "ログインへ"],
+  "Google Play에서 업데이트": ["Update on Google Play", "Google Playで更新"],
+  "다시 확인": ["Check again", "再確認"],
+  "현재 버전으로 시작": [
+    "Continue with this version",
+    "現在のバージョンで始める"
+  ],
+  "앱 닫기": ["Close app", "アプリを閉じる"],
+  "여행 노트 위에서 캐리어와 함께 떠나는 여행자": [
+    "A traveler setting off with a suitcase on a travel notebook",
+    "旅のノートの上でスーツケースと一緒に出発する旅行者"
+  ],
+  "트립프린트 · TRIPPRINT": [
+    "TripPrint · TRIPPRINT",
+    "トリッププリント · TRIPPRINT"
+  ],
+  "여행의": ["Your travel ", "旅の"],
+  "발자취": ["footprints", "足跡"],
+  "를 남기다": [" live on", "を残す"],
+  "장소를 잇고 순간을 기록하는": [
+    "Connect places and capture moments",
+    "場所をつなぎ、瞬間を記録する"
+  ],
+  "나만의 여행 아카이브": [
+    "Your personal travel archive",
+    "自分だけの旅のアーカイブ"
+  ],
+  "여행 계획을 이어가요.": [
+    "Continue planning your trip.",
+    "旅の計画を続けましょう。"
+  ],
+  "가볍게 여행을 시작해요": [
+    "Start your journey with ease",
+    "気軽に旅を始めましょう"
+  ],
+  "가입 없이 시작해요. 기록은 이 기기에만 저장돼요.": [
+    "Start without signing up. Your records stay on this device only.",
+    "登録せずに始められます。記録はこの端末だけに保存されます。"
+  ],
+  "님, 반가워요": [", welcome", "さん、ようこそ"],
+  "로그인": ["Sign in", "ログイン"],
+  "다시 로그인하고 여행을 이어가요.": [
+    "Sign in again to continue your trip.",
+    "再ログインして旅を続けましょう。"
+  ],
+  "이메일 계정으로 로그인 / 회원가입": [
+    "Sign in / Sign up with email",
+    "メールでログイン / 新規登録"
+  ],
+  "로그인 없이 여행 발자국 둘러보기": [
+    "Explore travel footprints without signing in",
+    "ログインせずに旅の足跡を見る"
+  ],
+  "회원가입": ["Sign up", "新規登録"],
+  "닉네임": ["Nickname", "ニックネーム"],
+  "여행에서 사용할 이름": ["Name to use on your trips", "旅で使う名前"],
+  "성별": ["Gender", "性別"],
+  "닫기": ["Close", "閉じる"],
+  "화면을 준비하는 중": ["Preparing the screen", "画面を準備しています"],
+  "하단 내비게이션": ["Bottom navigation", "下部ナビゲーション"],
+  "내 계정 보기": ["View my account", "マイアカウントを見る"],
+  "TripPrint 트립프린트": ["TripPrint", "TripPrint トリッププリント"],
+  "불러오는 중": ["Loading", "読み込み中"],
+  "공개 여행 둘러보기": ["Explore public trips", "公開された旅行を見る"],
+  "로그인 화면으로 돌아가기": [
+    "Back to the sign-in screen",
+    "ログイン画面に戻る"
+  ],
+  "회원가입 진행": ["Sign-up progress", "新規登録の進行状況"],
+  "나를 소개하는 여행 프로필": [
+    "Your travel profile",
+    "自分を紹介する旅のプロフィール"
+  ],
+  "닉네임만 보여요. 성별과 생일은 공개하지 않아요.": [
+    "Only your nickname is visible. Your gender and birthday stay private.",
+    "表示されるのはニックネームだけです。性別と誕生日は公開しません。"
+  ],
+  "로그인 정보 다시 확인": [
+    "Check sign-in details again",
+    "ログイン情報を再確認"
+  ],
+  "로그인 정보를 확인하지 못했어요": [
+    "We couldn't verify your sign-in details",
+    "ログイン情報を確認できませんでした"
+  ],
+  "연결을 확인하고 다시 시도해 주세요. 확인을 마치면 열려던 여행으로 돌아와요.": [
+    "Check your connection and try again. Once verified, you will return to the trip you were opening.",
+    "接続を確認して再試行してください。確認が終わると、開こうとしていた旅行に戻ります。"
+  ],
+  "생년월일 (선택)": ["Date of birth (optional)", "生年月日（任意）"],
+  "입력하지 않아도 여행을 시작할 수 있어요.": [
+    "You can start your trip without entering this.",
+    "入力しなくても旅を始められます。"
+  ],
+  "생년월일 선택": ["Select date of birth", "生年月日を選択"],
+  "날짜 선택 완료": ["Confirm date", "日付の選択を完了"],
+  "생년월일 지우기": ["Clear date of birth", "生年月日をクリア"],
+  "이메일로 로그인": ["Sign in with email", "メールでログイン"],
+  "이메일": ["Email", "メールアドレス"],
+  "비밀번호": ["Password", "パスワード"],
+  "비밀번호 확인": ["Confirm password", "パスワードの確認"],
+  "비밀번호 한 번 더 입력": [
+    "Enter your password again",
+    "パスワードをもう一度入力"
+  ],
+  "Google 계정으로 계속하기": ["Continue with Google", "Googleで続ける"],
+  "Google 계정으로 로그인하고 있어요…": [
+    "Signing in with Google…",
+    "Googleでログインしています…"
+  ],
+  "Google 로그인을 지금 이용할 수 없어요. 이메일로 계속하거나 다시 시도해 주세요.": [
+    "Google sign-in is unavailable right now. Continue with email or try again.",
+    "現在Googleログインを利用できません。メールで続けるか、再試行してください。"
+  ],
+  "Google 로그인 다시 확인": [
+    "Check Google sign-in again",
+    "Googleログインを再確認"
+  ],
+  "기기 위치 설정 열기": [
+    "Open device location settings",
+    "端末の位置情報設定を開く"
+  ],
+  "여행을 위한 권한 안내": [
+    "Permissions for your trip",
+    "旅行で使う権限のご案内"
+  ],
+  "필요한 기능을 선택해 주세요. 허용하지 않아도 여행을 계획하고 기록할 수 있어요.": [
+    "Choose the features you need. You can plan and record trips without granting these permissions.",
+    "必要な機能を選んでください。許可しなくても旅行の計画や記録はできます。"
+  ],
+  "이대로 시작하기": ["Start with these settings", "この設定で始める"],
+  "나중에 홈의 여행 도구에서 다시 설정할 수 있어요.": [
+    "You can change these later in Travel tools on the home screen.",
+    "後からホームの旅行ツールで設定を変更できます。"
+  ],
+  "현재 위치 지도에서 보기": [
+    "Show my location on the map",
+    "現在地を地図で見る"
+  ],
+  "앱 권한 설정": ["App permissions", "アプリの権限設定"],
+  "게스트 여행을 내 계정에 연결하기": [
+    "Connect guest travel to my account",
+    "ゲストの旅行をアカウントにつなぐ"
+  ],
+  "회원가입 후에는 새 여행을 계정에 보관할 수 있어요. 기존 게스트 여행은 이 기기에 남으며 자동으로 다른 기기에 옮겨지지 않아요.": [
+    "After signing up, you can save new trips to your account. Existing guest trips stay on this device and are not automatically transferred to other devices.",
+    "登録後は新しい旅行をアカウントに保存できます。これまでのゲストの旅行はこの端末に残り、他の端末へ自動では移りません。"
+  ],
+  "로그인 / 회원가입": ["Sign in / Sign up", "ログイン / 新規登録"],
+  "여행 통계를 불러오지 못했어요. 다시 시도해 주세요.": [
+    "Couldn't load your travel stats. Please try again.",
+    "旅行の統計を読み込めませんでした。再試行してください。"
+  ],
+  "여행 통계 다시 불러오기": ["Reload travel stats", "旅行の統計を再読み込み"],
+  "나의 여행을 불러오고 있어요.": [
+    "Loading your trips.",
+    "旅行を読み込んでいます。"
+  ],
+  "앱 정보": ["About the app", "アプリ情報"],
+  "앱 버전": ["App version", "アプリのバージョン"],
+  "이 기기에 저장한 이전 기록 보기": [
+    "View earlier records on this device",
+    "この端末に保存した以前の記録を見る"
+  ],
+  "로그아웃": ["Sign out", "ログアウト"],
+  "로그아웃할까요?": ["Sign out?", "ログアウトしますか？"],
+  "계정에 저장한 여행은 같은 계정으로 다시 로그인하면 볼 수 있어요.": [
+    "Sign in with the same account to see your saved trips again.",
+    "同じアカウントで再ログインすると、保存した旅行を再び見られます。"
+  ],
+  "총 여행": ["Total trips", "旅行の総数"],
+  "예정된 여행": ["Upcoming trips", "これからの旅行"],
+  "완성된 발자국": ["Completed footprints", "完成した足跡"],
+  "나의 여행을 한곳에": ["All your trips in one place", "自分の旅をひとつに"],
+  "로그인하면 여행 계획을 저장하고 친구와 함께 작성할 수 있어요.": [
+    "Sign in to save trip plans and work on them with friends.",
+    "ログインすると旅行の計画を保存し、友達と一緒に作成できます。"
+  ],
+  "개인 프로필 수정": ["Edit personal profile", "個人プロフィールを編集"],
+  "프로필 수정 닫기": ["Close profile editor", "プロフィール編集を閉じる"],
+  "닉네임과 소개, 좋아하는 여행 스타일을 적어보세요.": [
+    "Add your nickname, a short bio, and your favorite travel styles.",
+    "ニックネームや自己紹介、好きな旅行スタイルを入力しましょう。"
+  ],
+  "닉네임 입력": ["Enter nickname", "ニックネームを入力"],
+  "한 줄 소개 (소개글)": [
+    "Short bio (introduction)",
+    "ひとこと紹介（自己紹介）"
+  ],
+  "한 줄 소개": ["Short bio", "ひとこと紹介"],
+  "예: 힐링과 맛집 탐방을 사랑하는 여행자입니다 :)": [
+    "e.g. I love relaxing getaways and discovering great food :)",
+    "例：のんびり過ごす旅と食べ歩きが好きです :)"
+  ],
+  "나의 여행 스타일 (다중 선택)": [
+    "My travel styles (select multiple)",
+    "好きな旅行スタイル（複数選択可）"
+  ],
+  "수정": ["Edit", "編集"],
+  "프로필 수정": ["Edit profile", "プロフィール編集"],
+  "TripPrint 시작": ["Start TripPrint", "TripPrintを開始"],
+  "TripPrint 준비": ["Getting TripPrint ready", "TripPrintを準備"],
+  "나의 발자취": ["My footprints", "自分の足跡"],
+  "MY로 돌아가기": ["Back to MY", "MYに戻る"],
+  "계획부터 여행 기록까지": [
+    "From planning to travel memories",
+    "計画から旅の記録まで"
+  ],
+  "날짜와 장소로 여행을 계획하고, 사진과 영수증으로 경험을 남겨보세요.": [
+    "Plan your trip with dates and places, then capture your experiences with photos and receipts.",
+    "日付と場所で旅を計画し、写真やレシートで体験を残しましょう。"
+  ],
+  "이 기기에 남긴 여행": ["Trips saved on this device", "この端末に残した旅行"],
+  "여기에 남긴 기록은 이 기기에서만 볼 수 있어요.": [
+    "Records saved here are only available on this device.",
+    "ここに残した記録は、この端末だけで見られます。"
+  ],
+  "+ 새 여행 계획": ["+ New trip plan", "+ 新しい旅行計画"],
+  "기록을 불러오는 중입니다.": ["Loading records.", "記録を読み込んでいます。"],
+  "첫 여행 계획을 만들어 보세요": [
+    "Create your first trip plan",
+    "最初の旅行計画を作りましょう"
+  ],
+  "여행 날짜와 장소를 정한 뒤 항공편을 추가해 보세요. 영수증도 일정에 연결해 보관할 수 있어요.": [
+    "Choose your travel dates and places, then add flights. You can also link receipts to your itinerary.",
+    "旅行の日付と場所を決めて、航空便を追加しましょう。レシートも予定につなげて保存できます。"
+  ],
+  "내 여행 계획 가져오기": ["Import my trip plan", "自分の旅行計画を取り込む"],
+  "기존 장소 계획을 복사해 영수증을 연결합니다. 이후 두 계획은 자동 동기화되지 않습니다.": [
+    "Copy an existing place itinerary and link receipts to it. The two plans will not sync automatically afterward.",
+    "既存の場所の計画をコピーしてレシートをつなげます。その後、2つの計画は自動同期されません。"
+  ],
+  "기존 체크인 기록": ["Previous check-ins", "以前のチェックイン記録"],
+  "기존 내 여행에서 기록한 체크인입니다.": [
+    "Check-ins recorded in your earlier trips.",
+    "以前の旅行で残したチェックインです。"
+  ],
+  "가는 편 출발일 → 오는 편 도착일을 여행 기간으로 사용합니다. 공항별 현지 시각·UTC 오프셋을 함께 기록합니다.": [
+    "The trip runs from your outbound departure date to your return arrival date. Local times and UTC offsets are recorded for each airport.",
+    "往路の出発日から復路の到着日までを旅行期間にします。各空港の現地時刻とUTCオフセットも記録します。"
+  ],
+  "01 항공편 기준표": ["01 Flight overview", "01 航空便の基本情報"],
+  "편명 검색·등록": ["Find and add flights", "便名を検索・登録"],
+  "가는 편과 오는 편을 각각 등록해 출발·귀국의 기준을 세우세요.": [
+    "Add outbound and return flights to set your departure and return details.",
+    "往路と復路をそれぞれ登録して、出発と帰国の基準を決めましょう。"
+  ],
+  "· 직접 확인": ["· Manually checked", "· 自分で確認"],
+  "출발": ["Departure", "出発"],
+  "도착": ["Arrival", "到着"],
+  "편명·시각 수정": ["Edit flight number and time", "便名・時刻を編集"],
+  "02 날짜별 계획": ["02 Daily itinerary", "02 日付別の計画"],
+  "+ 일정 생성": ["+ Add itinerary item", "+ 予定を追加"],
+  "방문할 장소와 날짜·시각을 적어 계획표를 만드세요.": [
+    "Build your itinerary with places, dates, and times.",
+    "訪れる場所と日付・時刻を入力して予定表を作りましょう。"
+  ],
+  "03 영수증으로 남긴 발자취": [
+    "03 Footprints from receipts",
+    "03 レシートで残した足跡"
+  ],
+  "개 계획 ·": [" plans ·", "件の計画 ·"],
+  "개 영수증": [" receipts", "件のレシート"],
+  "실제 결제 내역은 연결한 장소 카드에 표시됩니다. 통화가 다른 금액은 합산하지 않습니다.": [
+    "Actual payments appear on the linked place card. Amounts in different currencies are not added together.",
+    "実際の支払い内容は、つなげた場所のカードに表示します。異なる通貨の金額は合算しません。"
+  ],
+  "계획": ["Plan", "計画"],
+  "계획 수정": ["Edit plan", "計画を編集"],
+  "영수증 등록": ["Add receipt", "レシートを登録"],
+  "일정 삭제": ["Delete itinerary item", "予定を削除"],
+  "영수증 · 사용자 확인": [
+    "Receipt · Reviewed by user",
+    "レシート · ユーザー確認済み"
+  ],
+  "실제 결제": ["Actual payment", "実際の支払い"],
+  "원본 열기": ["Open original", "原本を開く"],
+  "기록 삭제": ["Delete record", "記録を削除"],
+  "가는 편": ["Outbound", "往路"],
+  "오는 편": ["Return", "復路"],
+  "편명+날짜 웹 검색으로 항공사 정보를 확인한 뒤 시각을 입력하세요. 검색 결과는 항공권 구매·예약 확정이 아닙니다.": [
+    "Search the web by flight number and date, check the airline's information, then enter the times. Search results do not confirm a ticket purchase or booking.",
+    "便名と日付でウェブ検索し、航空会社の情報を確認してから時刻を入力してください。検索結果は航空券の購入や予約の確定を示すものではありません。"
+  ],
+  "편명·운항일 검색 열기 ↗": [
+    "Search flight number and date ↗",
+    "便名・運航日で検索 ↗"
+  ],
+  "영수증 사진과 결제 내역을 남겨 지난 여행을 정리해 보세요.": [
+    "Add receipt photos and payment details to organize past trips.",
+    "レシートの写真と支払い内容を残して、過去の旅をまとめましょう。"
+  ],
+  "사진을 불러오지 못했어요. 여행 정보는 계속 볼 수 있어요.": [
+    "Couldn't load the photo. Travel information is still available.",
+    "写真を読み込めませんでした。旅行情報は引き続き見られます。"
+  ],
+  "여행지 목록으로 돌아가기": ["Back to destinations", "旅行先の一覧に戻る"],
+  "찾는 여행지가 없어요. 목록으로 돌아가 다른 도시를 선택해 주세요.": [
+    "Destination not found. Return to the list and choose another city.",
+    "旅行先が見つかりません。一覧に戻って別の都市を選んでください。"
+  ],
+  "추천 여행지·관광지": [
+    "Recommended places and sights",
+    "おすすめの旅行先・観光スポット"
+  ],
+  "추천 먹거리": ["Recommended food", "おすすめの食べ物"],
+  "언제 가면 좋을까요?": ["When should you visit?", "いつ行くのがおすすめ？"],
+  "꽃과 단풍 시기는 해마다 달라요. 행사 날짜와 운영 시간은 여행 전에 공식 안내에서 확인해 주세요.": [
+    "Bloom and autumn foliage seasons vary each year. Check official event dates and opening hours before your trip.",
+    "花や紅葉の時期は毎年変わります。イベントの日程や営業時間は、旅行前に公式案内で確認してください。"
+  ],
+  "도시 이야기": ["About the city", "街の物語"],
+  "한국어 위키백과 기여자 · CC BY-SA 4.0 · 소개 일부 발췌": [
+    "Korean Wikipedia contributors · CC BY-SA 4.0 · Introduction excerpt",
+    "韓国語版ウィキペディアの執筆者 · CC BY-SA 4.0 · 紹介文の一部を抜粋"
+  ],
+  "여행 정보·사진 출처": [
+    "Travel information and photo sources",
+    "旅行情報・写真の出典"
+  ],
+  "사진:": ["Photo:", "写真："],
+  "정보·사진 출처 보기": [
+    "View information and photo sources",
+    "情報・写真の出典を見る"
+  ],
+  "출처 닫기": ["Close sources", "出典を閉じる"],
+  "원문 열기나 이용 조건 열기를 누르면 선택한 사이트가 열려요.": [
+    "Opening the original or usage terms takes you to the selected website.",
+    "原文や利用条件を開くと、選んだサイトに移動します。"
+  ],
+  "대표 사진": ["Cover photo", "代表写真"],
+  "여행 정보 참고 자료": [
+    "Travel information references",
+    "旅行情報の参考資料"
+  ],
+  "소개·볼거리·먹거리·계절 안내는 TripPrint가 편집했어요. 참고한 원문은 아래에서 확인할 수 있어요.": [
+    "TripPrint edited the introduction, sights, food, and seasonal guidance. Original references are listed below.",
+    "紹介・見どころ・食べ物・季節の案内はTripPrintが編集しました。参考にした原文は以下から確認できます。"
+  ],
+  "도시 이야기 발췌": ["City story excerpt", "街の物語の抜粋"],
+  "저작자·제공자:": ["Author / Provider:", "著作者・提供者："],
+  "원문:": ["Original:", "原文："],
+  "이용 조건:": ["Usage terms:", "利用条件："],
+  "변경·편집:": ["Changes / Edits:", "変更・編集："],
+  "출처 확인일:": ["Source checked on:", "出典の確認日："],
+  "원문 보기": ["View original", "原文を見る"],
+  "이용 조건 보기": ["View usage terms", "利用条件を見る"],
+  "내 여행에 일정 담기": [
+    "Copy itinerary to my trips",
+    "自分の旅行に予定を取り込む"
+  ],
+  "공개된 장소·시간·설명을 내 여행으로 담아요. 원본은 그대로 두고 내가 자유롭게 수정할 수 있어요. 항공권·사진·지출·개인 메모는 담지 않아요.": [
+    "Copy the public places, times, and descriptions to your own trip. Edit your copy freely without changing the original. Flights, photos, expenses, and private notes are not copied.",
+    "公開された場所・時刻・説明を自分の旅行に取り込みます。原本はそのままで、自由に編集できます。航空券・写真・支出・個人メモは取り込みません。"
+  ],
+  "담을 여행 이름 · 선택": [
+    "Trip name · Optional",
+    "取り込む旅行の名前 · 任意"
+  ],
+  "내 여행 출발일": ["My trip start date", "自分の旅行の出発日"],
+  "여행 기간": ["Trip dates", "旅行期間"],
+  "담을 수 있는 공개 일정이 없어요.": [
+    "There are no public itinerary items to copy.",
+    "取り込める公開予定がありません。"
+  ],
+  "공개 일정을 불러오지 못했어요. 다시 불러오거나 다른 일정을 선택해 주세요.": [
+    "Couldn't load the public itinerary. Reload it or choose another one.",
+    "公開予定を読み込めませんでした。再読み込みするか、別の予定を選んでください。"
+  ],
+  "다시 불러오기": ["Reload", "再読み込み"],
+  "담을 일정을 불러오는 중이에요.": [
+    "Loading the itinerary to copy.",
+    "取り込む予定を読み込んでいます。"
+  ],
+  "작성자가 공개한 여행 사진": [
+    "Travel photo shared by the author",
+    "投稿者が公開した旅行写真"
+  ],
+  "사진 다시 불러오기": ["Reload photo", "写真を再読み込み"],
+  "공유된 여행을 불러오는 중이에요.": [
+    "Loading the shared trip.",
+    "共有された旅行を読み込んでいます。"
+  ],
+  "공유된 여행을 열 수 없어요": [
+    "Can't open the shared trip",
+    "共有された旅行を開けません"
+  ],
+  "공개된 여행계획": ["Public trip plan", "公開された旅行計画"],
+  "일 여행": ["-day trip", "日間の旅行"],
+  "공유": ["Share", "共有"],
+  "선택 공개한 여행 전체 실제 지출": [
+    "Actual trip expenses selected for sharing",
+    "選択して公開した旅行全体の実際の支出"
+  ],
+  "영수증 원본과 상세 품목은 공개하지 않아요.": [
+    "Original receipts and item details stay private.",
+    "レシートの原本と詳しい品目は公開しません。"
+  ],
+  "여행 갤러리 ·": ["Trip gallery ·", "旅行ギャラリー ·"],
+  "장": [" photos", "枚"],
+  "개인 메모·예약번호·동행 정보·영수증 원본과 품목은 공개하지 않아요. 장소 설명은 작성자의 원문이며 가격과 영업시간은 방문 전에 확인해 주세요.": [
+    "Private notes, booking numbers, companion details, original receipts, and receipt items stay private. Place descriptions are the author's own words. Check prices and opening hours before visiting.",
+    "個人メモ・予約番号・同行者情報・レシートの原本と品目は公開しません。場所の説明は投稿者の原文です。価格と営業時間は訪問前に確認してください。"
+  ],
+  "· 여행기록": ["· Travel journal", "· 旅行記録"],
+  "실제 지출 합계 ·": ["Total actual expenses ·", "実際の支出合計 ·"],
+  "작성자가 공개한 소개만 볼 수 있어요.": [
+    "Only the introduction shared by the author is visible.",
+    "投稿者が公開した紹介文だけを見られます。"
+  ],
+  "여행 더 보기": ["See more trips", "旅行をもっと見る"],
+  "이 작성자를 차단할까요?": [
+    "Block this author?",
+    "この投稿者をブロックしますか？"
+  ],
+  "’의 공개 여행을 내 목록에서 숨겨요.": [
+    "’s public trips will be hidden from your list.",
+    "」の公開旅行を自分の一覧から非表示にします。"
+  ],
+  "차단하지 않기": ["Don't block", "ブロックしない"],
+  "작성자 차단": ["Block author", "投稿者をブロック"],
+  "추천 여행 코스를 불러오는 중이에요.": [
+    "Loading the recommended itinerary.",
+    "おすすめの旅行コースを読み込んでいます。"
+  ],
+  "추천 여행을 불러오지 못했어요": [
+    "Couldn't load the recommended trip",
+    "おすすめの旅行を読み込めませんでした"
+  ],
+  "연결 상태를 확인하고 다시 시도해 주세요.": [
+    "Check your connection and try again.",
+    "接続を確認して再試行してください。"
+  ],
+  "에서 가보고 싶은 곳을 골라 주세요.": [
+    " — choose the places you would like to visit.",
+    "で行ってみたい場所を選んでください。"
+  ],
+  "AI가 관심사에 맞는 검색 방향을 정해요. 장소와 영업 정보는 방문 전 확인해 주세요.": [
+    "AI helps guide the search based on your interests. Check place details and business information before visiting.",
+    "AIが興味に合わせて検索の方向を決めます。場所や営業情報は訪問前に確認してください。"
+  ],
+  "새로 추천할 장소를 찾지 못했어요. 다른 관심사를 선택하거나 직접 검색해 주세요.": [
+    "No new places to recommend. Choose another interest or search directly.",
+    "新しくおすすめできる場所が見つかりませんでした。別の興味を選ぶか、直接検索してください。"
+  ],
+  "여행 도시": ["Trip cities", "旅行する都市"],
+  "DAY에 배정한 도시는 여행지를 바꾼 뒤 삭제할 수 있어요.": [
+    "To delete a city assigned to a day, assign that day to another destination first.",
+    "DAYに割り当てた都市は、その日の旅行先を変更してから削除できます。"
+  ],
+  "여행 도시 추가": ["Add a trip city", "旅行する都市を追加"],
+  "여행 도시 관리": ["Manage trip cities", "旅行する都市を管理"],
+  "도시를 추가하고 날짜마다 머무를 여행지를 골라 주세요. 첫 번째 도시가 여행의 대표 여행지가 돼요.": [
+    "Add cities and choose where you will stay each day. The first city becomes the trip's main destination.",
+    "都市を追加し、日付ごとの滞在先を選んでください。最初の都市が旅行の代表旅行先になります。"
+  ],
+  "도시를 바꿔도 입력한 일정 시각과 항공권은 유지돼요. 해당 날짜의 현지 시간을 확인해 주세요.": [
+    "Changing cities keeps your itinerary times and flight details unchanged. Check the local time for that date.",
+    "都市を変更しても、入力した予定の時刻と航空券情報は変わりません。その日の現地時刻を確認してください。"
+  ],
+  "최신 여행 다시 불러오기": [
+    "Reload the latest trip",
+    "最新の旅行を再読み込み"
+  ],
+  "선택 닫기": ["Close selection", "選択を閉じる"],
+  "직접 입력하기": ["Enter manually", "直接入力"],
+  "전체 지역": ["All regions", "すべての地域"],
+  "도시 없이 진행": ["Continue without a city", "都市を選ばずに進む"],
+  "입력한 이름 적용": ["Use entered name", "入力した名前を適用"],
+  "도시를 비워 두거나 위에 이름을 입력해 주세요.": [
+    "Leave the city blank or enter its name above.",
+    "都市を空欄にするか、上に名前を入力してください。"
+  ],
+  "여행의 순간을 모으고 있어요": [
+    "Gathering your travel moments",
+    "旅の思い出を集めています"
+  ],
+  "로그인하고 발자국 보기": [
+    "Sign in to view footprints",
+    "ログインして足跡を見る"
+  ],
+  "여행을 찾을 수 없어요. 나의 여행 기록에서 다시 선택해 주세요.": [
+    "Trip not found. Choose it again from your travel records.",
+    "旅行が見つかりません。自分の旅行記録から選び直してください。"
+  ],
+  "여행을 마치면 일정과 사진, 지출을 발자국으로 모아볼 수 있어요.": [
+    "After your trip, see your itinerary, photos, and expenses together as travel footprints.",
+    "旅行が終わると、予定・写真・支出を旅の足跡としてまとめて見られます。"
+  ],
+  "여행 일정 열기": ["Open trip itinerary", "旅行の予定を開く"],
+  "이전 추천 여행지": [
+    "Previous recommended destination",
+    "前のおすすめ旅行先"
+  ],
+  "다음 추천 여행지": ["Next recommended destination", "次のおすすめ旅行先"],
+  "출발·도착 모두 현지 시각": [
+    "Departure and arrival are in local time",
+    "出発・到着ともに現地時刻"
+  ],
+  "도착 시각은 항공권에서 확인해 주세요.": [
+    "Check your ticket for the arrival time.",
+    "到着時刻は航空券で確認してください。"
+  ],
+  "항공편 정보 보기": ["View flight details", "航空便の情報を見る"],
+  "기종": ["Aircraft type", "機種"],
+  "항공기 등록번호": ["Aircraft registration", "機体記号"],
+  "편명과 날짜로 검색해요.": [
+    "Search by flight number and date.",
+    "便名と日付で検索します。"
+  ],
+  "수하물 · 좌석 정보": ["Baggage · Seat details", "手荷物 · 座席情報"],
+  "무료 위탁수하물": ["Free checked baggage", "無料受託手荷物"],
+  "좌석 등급": ["Cabin class", "搭乗クラス"],
+  "아직 입력한 정보가 없어요. 일정 수정에서 항공권 내용을 추가할 수 있어요.": [
+    "No details entered yet. Edit the itinerary item to add your flight ticket details.",
+    "まだ情報が入力されていません。予定の編集から航空券の内容を追加できます。"
+  ],
+  "항공편으로 등록": ["Add as a flight", "航空便として登録"],
+  "출발일 ·": ["Departure date ·", "出発日 ·"],
+  "항공 편명 (예: KE123)": ["Flight number (e.g. KE123)", "便名（例：KE123）"],
+  "선택한 항공편": ["Selected flight", "選択した航空便"],
+  "각 공항 현지 시각 · 항공권과 비교해 확인해 주세요.": [
+    "Local time at each airport · Check against your ticket.",
+    "各空港の現地時刻 · 航空券と照らし合わせて確認してください。"
+  ],
+  "항공권과 비교해 확인해 주세요. 터미널과 운항 시각은 바뀔 수 있어요.": [
+    "Check against your ticket. Terminals and flight times may change.",
+    "航空券と照らし合わせて確認してください。ターミナルや運航時刻は変更されることがあります。"
+  ],
+  "조회 당시 ·": ["At time of lookup ·", "照会時点 ·"],
+  "· 각 공항 현지 시각": ["· Local time at each airport", "· 各空港の現地時刻"],
+  "출발 게이트": ["Departure gate", "出発ゲート"],
+  "실제 출발": ["Actual departure", "実際の出発"],
+  "조회 당시 · 변경될 수 있어요": [
+    "At time of lookup · Subject to change",
+    "照会時点 · 変更されることがあります"
+  ],
+  "기기에 보관한 게스트 여행은 회원 탈퇴로 삭제되지 않아요. 연결한 회원 계정을 관리하려면 해당 계정으로 로그인해 주세요.": [
+    "Closing your account does not delete guest trips stored on this device. Sign in to the linked account to manage it.",
+    "退会しても、この端末に保存したゲストの旅行は削除されません。連携した会員アカウントを管理するには、そのアカウントでログインしてください。"
+  ],
+  "TripPrint 계정으로 로그인한 뒤 탈퇴를 요청할 수 있어요.": [
+    "Sign in to your TripPrint account to request account closure.",
+    "TripPrintアカウントでログインすると退会を申請できます。"
+  ],
+  "요청 중…": ["Sending request…", "リクエスト中…"],
+  "탈퇴 내용 확인": ["Review account closure details", "退会内容を確認"],
+  "로그인을 마치지 못했어요": [
+    "Couldn't complete sign-in",
+    "ログインを完了できませんでした"
+  ],
+  "확인이 끝나면 여행으로 안내할게요.": [
+    "We'll take you to your trip once verification is complete.",
+    "確認が終わると旅行の画面に進みます。"
+  ],
+  "업데이트를 확인하지 못했어요. 잠시 후 다시 확인해 주세요.": [
+    "Couldn't check for updates. Please try again shortly.",
+    "更新を確認できませんでした。しばらくしてから再確認してください。"
+  ],
+  "새 버전으로 업데이트해 주세요.": [
+    "Please update to the new version.",
+    "新しいバージョンに更新してください。"
+  ],
+  "새로운 TripPrint가 준비됐어요.": [
+    "A new version of TripPrint is ready.",
+    "新しいTripPrintが利用できます。"
+  ],
+  "연결을 확인하고 있어요": [
+    "Checking your connection",
+    "接続を確認しています"
+  ],
+  "여행을 준비하고 있어요": ["Getting your trip ready", "旅の準備をしています"],
+  "게스트를 시작하고 있어요…": [
+    "Starting guest mode…",
+    "ゲスト利用を開始しています…"
+  ],
+  "게스트로 시작하기": ["Start as a guest", "ゲストで始める"],
+  "이 기기의 여행을 이어가세요. 회원가입 후 새 여행은 계정에 보관할 수 있어요.": [
+    "Continue your trips on this device. After signing up, you can save new trips to your account.",
+    "この端末の旅行を続けましょう。登録後は新しい旅行をアカウントに保存できます。"
+  ],
+  "나의 여행을 이어서 기록해 보세요.": [
+    "Keep recording your journey.",
+    "旅の続きを記録しましょう。"
+  ],
+  "여행을 열고 있어요…": ["Opening your trip…", "旅行を開いています…"],
+  "이어서 시작하기": ["Continue", "続きから始める"],
+  "로그아웃하고 있어요…": ["Signing out…", "ログアウトしています…"],
+  "다른 계정으로 로그인": [
+    "Sign in with another account",
+    "別のアカウントでログイン"
+  ],
+  "저장하고 있어요": ["Saving", "保存しています"],
+  "설정하고 여행 시작하기": ["Save settings and start", "設定して旅を始める"],
+  "이전 화면으로 돌아가기": ["Back to the previous screen", "前の画面に戻る"],
+  "계정 만들기": ["Create account", "アカウントを作成"],
+  "프로필 설정": ["Set up profile", "プロフィール設定"],
+  "생일 선택 (선택 사항)": [
+    "Choose birthday (optional)",
+    "誕生日を選択（任意）"
+  ],
+  "이메일 로그인": ["Sign in with email", "メールでログイン"],
+  "이메일 회원가입": ["Sign up with email", "メールで新規登録"],
+  "8자 이상 입력": ["Enter at least 8 characters", "8文字以上で入力"],
+  "비밀번호 입력": ["Enter password", "パスワードを入力"],
+  "가입하고 있어요…": ["Creating your account…", "登録しています…"],
+  "로그인하고 있어요…": ["Signing in…", "ログインしています…"],
+  "이메일로 회원가입": ["Sign up with email", "メールで新規登録"],
+  "이미 계정이 있어요": ["I already have an account", "アカウントをお持ちの方"],
+  "{p0}위치 오차 반경은 약 {p1}m예요. 방문할 위치가 맞는지 확인해 주세요.": [
+    "{p0}Location accuracy is approximately {p1} m. Check that this is the place you want to visit.",
+    "{p0}位置の誤差半径は約{p1}mです。訪れる場所で合っているか確認してください。"
+  ],
+  "위치 설정을 확인했어요. 현재 위치 사용을 눌러 다시 확인해 주세요.": [
+    "Location settings checked. Tap Use current location to try again.",
+    "位置情報の設定を確認しました。「現在地を使用」を押して再確認してください。"
+  ],
+  "위치 설정을 확인했어요. 현재 위치 지도에서 보기를 눌러 다시 확인해 주세요.": [
+    "Location settings checked. Tap Show my location on the map to try again.",
+    "位置情報の設定を確認しました。「現在地を地図で見る」を押して再確認してください。"
+  ],
+  "위치 서비스가 꺼져 있어요. 기기 설정에서 켜거나 위치를 직접 선택해 주세요.": [
+    "Location services are off. Turn them on in device settings or choose a location manually.",
+    "位置情報サービスがオフです。端末の設定でオンにするか、位置を直接選んでください。"
+  ],
+  "위치 서비스가 꺼져 있어요. 기기 설정에서 켠 뒤 다시 확인해 주세요.": [
+    "Location services are off. Turn them on in device settings and try again.",
+    "位置情報サービスがオフです。端末の設定でオンにしてから再確認してください。"
+  ],
+  "브라우저의 사이트 설정에서 위치 권한을 허용하거나 좌표를 직접 입력해 주세요.": [
+    "Allow location access in your browser's site settings or enter coordinates manually.",
+    "ブラウザのサイト設定で位置情報を許可するか、座標を直接入力してください。"
+  ],
+  "위치 권한을 허용하지 않았어요. 현재 위치 사용을 다시 누르거나 위치를 직접 선택해 주세요.": [
+    "Location access wasn't granted. Tap Use current location again or choose a location manually.",
+    "位置情報が許可されていません。「現在地を使用」をもう一度押すか、位置を直接選んでください。"
+  ],
+  "위치 권한을 허용하지 않았어요. 현재 위치 지도에서 보기를 다시 눌러 주세요.": [
+    "Location access wasn't granted. Tap Show my location on the map again.",
+    "位置情報が許可されていません。「現在地を地図で見る」をもう一度押してください。"
+  ],
+  "앱 설정에서 위치 권한을 허용하거나 위치를 직접 선택해 주세요.": [
+    "Allow location access in app settings or choose a location manually.",
+    "アプリ設定で位置情報を許可するか、位置を直接選んでください。"
+  ],
+  "앱 설정에서 위치 권한을 허용한 뒤 다시 확인해 주세요.": [
+    "Allow location access in app settings, then try again.",
+    "アプリ設定で位置情報を許可してから再確認してください。"
+  ],
+  "현재 위치의 정확도를 확인하지 못했어요. {p0}": [
+    "Couldn't determine your location accuracy. {p0}",
+    "現在地の精度を確認できませんでした。{p0}"
+  ],
+  "현재 위치를 확인하지 못했어요. {p0}": [
+    "Couldn't find your current location. {p0}",
+    "現在地を確認できませんでした。{p0}"
+  ],
+  "알림 · 선택": ["Notifications · Optional", "通知 · 任意"],
+  "위치 · 선택": ["Location · Optional", "位置情報 · 任意"],
+  "여행 출발일 오전 9시에 알림을 받아요.": [
+    "Get a reminder at 9 a.m. on your trip's departure date.",
+    "旅行の出発日の午前9時に通知を受け取ります。"
+  ],
+  "현재 위치를 지도에서 볼 때 사용해요. 앱을 사용 중일 때만 위치를 확인해요.": [
+    "Used to show your current location on the map. Your location is checked only while you use the app.",
+    "現在地を地図で表示するために使います。アプリの使用中だけ位置情報を確認します。"
+  ],
+  "허용됨": ["Allowed", "許可済み"],
+  "상태 확인 다시 시도": ["Check status again", "状態を再確認"],
+  "기기 설정 열기": ["Open device settings", "端末の設定を開く"],
+  "허용하기": ["Allow", "許可する"],
+  "현재 위치 확인 중…": ["Finding your location…", "現在地を確認中…"],
+  "로그아웃 중…": ["Signing out…", "ログアウト中…"],
+  "저장 중...": ["Saving...", "保存中..."],
+  "프로필 저장하기": ["Save profile", "プロフィールを保存"],
+  "여행자": ["Traveler", "旅行者"],
+  "게스트": ["Guest", "ゲスト"],
+  "내 계정": ["My account", "マイアカウント"],
+  "게스트 여행은 이 기기에만 보관합니다": [
+    "Guest trips are stored on this device only",
+    "ゲストの旅行はこの端末だけに保存します"
+  ],
+  "여행과 기록을 계정에 보관합니다": [
+    "Trips and records are saved to your account",
+    "旅行と記録をアカウントに保存します"
+  ],
+  "로그인 전 둘러보기 중입니다": [
+    "Browsing without signing in",
+    "ログインせずに閲覧中です"
+  ],
+  "업데이트를 확인하고 있어요": [
+    "Checking for updates",
+    "更新を確認しています"
+  ],
+  "항공편으로 기준 세우기": [
+    "Set your trip around flights",
+    "航空便を基準に決める"
+  ],
+  "장소 계획 작성": ["Plan places to visit", "訪れる場所を計画"],
+  "영수증으로 상세 기록": [
+    "Record details with receipts",
+    "レシートで詳しく記録"
+  ],
+  "{p0} 영수증 원본": ["Original receipt for {p0}", "{p0}のレシート原本"],
+  "영수증 원본 다시 선택": [
+    "Select receipt original again",
+    "レシート原本を選び直す"
+  ],
+  "영수증 사진·PDF 선택 (2MB 이하)": [
+    "Choose receipt photo or PDF (up to 2 MB)",
+    "レシートの写真・PDFを選択（2MB以下）"
+  ],
+  "기기에 저장 중…": ["Saving to this device…", "端末に保存中…"],
+  "저장하기": ["Save", "保存する"],
+  "{p0} 사진 다시 불러오기": ["Reload photo of {p0}", "{p0}の写真を再読み込み"],
+  "{p0} 여행 가이드": ["{p0} travel guide", "{p0}の旅行ガイド"],
+  "여행지 안내": ["Destination guide", "旅行先の案内"],
+  "{p0} 여행 계획하기": ["Plan a trip to {p0}", "{p0}への旅行を計画"],
+  "{p0} 정보·사진 출처": [
+    "{p0} information and photo sources",
+    "{p0}の情報・写真の出典"
+  ],
+  "원문 열기 · {p0}": ["Open original · {p0}", "原文を開く · {p0}"],
+  "이용 조건 열기 · {p0}": ["Open usage terms · {p0}", "利用条件を開く · {p0}"],
+  "담은 일정 열기": ["Open copied itinerary", "取り込んだ予定を開く"],
+  "일정 담기": ["Copy itinerary", "予定を取り込む"],
+  "담김": ["Copied", "取り込み済み"],
+  "저장": ["Save", "保存"],
+  "내 여행에서 열기": ["Open in my trips", "自分の旅行で開く"],
+  "같은 요청 다시 확인": [
+    "Check the same request again",
+    "同じリクエストを再確認"
+  ],
+  "담고 일정 수정하기": ["Copy and edit itinerary", "取り込んで予定を編集"],
+  "사진을 불러오지 못했어요.": [
+    "Couldn't load the photo.",
+    "写真を読み込めませんでした。"
+  ],
+  "사진을 불러오는 중이에요.": [
+    "Loading the photo.",
+    "写真を読み込んでいます。"
+  ],
+  "공유된 여행": ["Shared trip", "共有された旅行"],
+  "주소를 다시 확인하거나 발자국에서 다른 여행을 살펴보세요.": [
+    "Check the address or explore other trips in Footprints.",
+    "アドレスを確認するか、足跡で別の旅行をご覧ください。"
+  ],
+  " 중 {p0}일 공개": [" · {p0} days shared", "のうち{p0}日を公開"],
+  "DAY {p0} 여행계획": ["DAY {p0} itinerary", "DAY {p0}の旅行計画"],
+  "시간 미정": ["Time undecided", "時刻未定"],
+  "여행 커뮤니티": ["Travel community", "旅行コミュニティ"],
+  "{p0} 공개 일정": ["{p0} public itinerary", "{p0}の公開予定"],
+  "AI 장소 추천 접기": [
+    "Collapse AI place recommendations",
+    "AIのおすすめスポットを折りたたむ"
+  ],
+  "AI 장소 추천": ["AI place recommendations", "AIのおすすめスポット"],
+  "장소 찾는 중…": ["Finding places…", "場所を検索中…"],
+  "추천 장소 찾기": ["Find recommended places", "おすすめの場所を探す"],
+  "{p0} 일정 작성": ["Plan a visit to {p0}", "{p0}の予定を作成"],
+  "{p0} 도시 삭제": ["Delete city: {p0}", "都市「{p0}」を削除"],
+  "저장 중…": ["Saving…", "保存中…"],
+  "여행 도시 저장": ["Save trip cities", "旅行する都市を保存"],
+  "나라 선택": ["Choose country", "国を選択"],
+  "{p0} · 도시 선택": ["{p0} · Choose city", "{p0} · 都市を選択"],
+  "{p0} 직접 입력": ["Enter {p0} manually", "{p0}を直接入力"],
+  "여행기록": ["Travel journal", "旅行記録"],
+  "{p0} 여행지 살펴보기": ["Explore {p0}", "{p0}の旅行先を見る"],
+  "{p0} · {p1}개 중 {p2}번째 여행지": [
+    "{p0} · Destination {p2} of {p1}",
+    "{p0} · {p1}件中{p2}番目の旅行先"
+  ],
+  "여행지 자동 넘김 재생": [
+    "Play destination slideshow",
+    "旅行先の自動切り替えを再生"
+  ],
+  "여행지 자동 넘김 일시정지": [
+    "Pause destination slideshow",
+    "旅行先の自動切り替えを一時停止"
+  ],
+  "항공권 확인": ["Check ticket", "航空券を確認"],
+  "비행시간 {p0}": ["Flight duration {p0}", "飛行時間 {p0}"],
+  "네이버 검색": ["Search Naver", "Naverで検索"],
+  "구글 검색": ["Search Google", "Googleで検索"],
+  "여행 날짜를 먼저 선택해 주세요": [
+    "Choose your travel dates first",
+    "先に旅行の日付を選んでください"
+  ],
+  "항공편 상세 접기": ["Collapse flight details", "航空便の詳細を折りたたむ"],
+  "항공편 정보 수정": ["Edit flight details", "航空便の情報を編集"],
+  "항공편 찾는 중…": ["Finding flights…", "航空便を検索中…"],
+  "항공편 찾기": ["Find flight", "航空便を探す"],
+  "항공권과 같은 구간을 선택해 주세요.": [
+    "Choose the route shown on your ticket.",
+    "航空券と同じ区間を選んでください。"
+  ],
+  "해당 출발일의 항공편을 찾지 못했어요. 날짜와 편명을 확인하거나 직접 입력해 주세요.": [
+    "No flight found for that departure date. Check the date and flight number, or enter the details manually.",
+    "指定した出発日の航空便が見つかりませんでした。日付と便名を確認するか、直接入力してください。"
+  ],
+  "항공편 정보: {p0} · {p1} 조회": [
+    "Flight information: {p0} · Checked {p1}",
+    "航空便情報：{p0} · {p1}照会"
+  ],
+  "{p0} → {p1} {p2} 항공편 선택": [
+    "Select flight {p2}: {p0} → {p1}",
+    "{p0} → {p1} {p2}便を選択"
+  ],
+  "기체 정보 접기 −": ["Collapse aircraft details −", "機体情報を折りたたむ −"],
+  "기체 정보 보기 +": ["Show aircraft details +", "機体情報を見る +"],
+  "{p0} 기체 정보": ["{p0} aircraft details", "{p0}の機体情報"],
+  "항공편 조회로 돌아가기": ["Back to flight search", "航空便の検索に戻る"],
+  "조회 중…": ["Looking up…", "照会中…"],
+  "조회하기": ["Look up", "照会する"],
+  "정보 없음": ["No information", "情報なし"],
+  "다녀온 여행의 발자국 {p0}개": [
+    "{p0} footprints from past trips",
+    "過去の旅の足跡{p0}件"
+  ],
+  "다녀온 여행의 발자국": ["Footprints from past trips", "過去の旅の足跡"],
+  "다녀온 여행 추가": ["Add a past trip", "過去の旅行を追加"],
+  "로그인하고 여행 기록 시작": [
+    "Sign in to start your travel journal",
+    "ログインして旅行の記録を始める"
+  ],
+  "전체 {p0}": ["All {p0}", "全{p0}件"],
+  "{p0}년 {p1}": ["{p0} · {p1}", "{p0}年 {p1}"],
+  "공개 사본 있음 · 개인 원본": [
+    "Public copy available · Private original",
+    "公開版あり · 個人の原本"
+  ],
+  "여행 완료": ["Completed", "旅行終了"],
+  "{p0} 기록 열기": ["Open {p0} journal", "{p0}の記録を開く"],
+  "공개 여행 {p0}": ["Public trips {p0}", "公開旅行 {p0}"],
+  "{p0} 공개 일정 보기": ["View {p0} public itinerary", "{p0}の公開予定を見る"],
+  "{p0} 여행 일정 보기": ["View {p0} itinerary", "{p0}の旅行予定を見る"],
+  "{p0} 선택": ["Select {p0}", "{p0}を選択"],
+  "오늘의 여행": ["Today's trip", "今日の旅行"],
+  "이 여행에 추가: {p0}": ["Add to this trip: {p0}", "この旅行に追加：{p0}"],
+  "확인 중…": ["Checking…", "確認中…"],
+  "초대 확인하고 참여": ["Review invitation and join", "招待を確認して参加"],
+  "로그인하고 참여": ["Sign in to join", "ログインして参加"],
+  "발견에 공개 사본이 있어요. 원본 수정은 자동 공개되지 않아요.": [
+    "A public copy is available in Discover. Changes to your original are not published automatically.",
+    "発見に公開版があります。原本の変更は自動では公開されません。"
+  ],
+  "아직 발견에 공개하지 않은 원본이에요.": [
+    "This original hasn't been published in Discover yet.",
+    "まだ発見に公開していない原本です。"
+  ],
+  "사진·메모 보완: {p0}": [
+    "Add photos and notes: {p0}",
+    "写真・メモを追加：{p0}"
+  ],
+  "처리 중…": ["Processing…", "処理中…"],
+  "{p0}일 중 {p1}일차": ["Day {p1} of {p0}", "{p0}日中{p1}日目"],
+  "등록 장소 {p0}곳": ["{p0} saved places", "登録した場所{p0}か所"],
+  "여행 {p0}일 중 {p1}일차": [
+    "Trip day {p1} of {p0}",
+    "{p0}日間の旅行の{p1}日目"
+  ],
+  "여행 정보를 불러오지 못했어요.": [
+    "Couldn't load trip details.",
+    "旅行情報を読み込めませんでした。"
+  ],
+  "여행 정보를 불러오는 중이에요.": [
+    "Loading trip details.",
+    "旅行情報を読み込んでいます。"
+  ],
+  "{p0} 정보 다시 불러오기": ["Reload {p0} details", "{p0}の情報を再読み込み"],
+  "{p0} 비용 보기": ["View {p0} expenses", "{p0}の費用を見る"],
+  "{p0} 메뉴 더보기": ["More options for {p0}", "{p0}のその他のメニュー"],
+  "공개한 여행": ["Published trip", "公開した旅行"],
+  "비공개 여행": ["Private trip", "非公開の旅行"],
+  " · {p0}박 {p1}일": [" · {p0} nights, {p1} days", " · {p0}泊{p1}日"],
+  "사진을 불러오지 못했어요": [
+    "Couldn't load the photo",
+    "写真を読み込めませんでした"
+  ],
+  "사진 불러오는 중…": ["Loading photo…", "写真を読み込み中…"],
+  "남은 일정이 없어요. 여행 일정을 확인해 보세요.": [
+    "No itinerary items remaining. Check your trip itinerary.",
+    "残りの予定はありません。旅行の予定を確認してみましょう。"
+  ],
+  "발자국에 공개한 여행이에요": [
+    "This trip is published in Footprints",
+    "足跡に公開した旅行です"
+  ],
+  "나만의 비공개 아카이브": [
+    "My private archive",
+    "自分だけの非公開アーカイブ"
+  ],
+  "등록한 항공편이 없어요": ["No flights added", "登録した航空便はありません"],
+  "등록한 숙소가 없어요": [
+    "No accommodation added",
+    "登録した宿泊先はありません"
+  ],
+  "{p0} 여행 필터": ["{p0} trip filter", "{p0}の旅行フィルター"],
+  "최근 출발순": ["Latest departure first", "出発日が新しい順"],
+  "출발일순": ["By departure date", "出発日順"],
+  "내 여행 목록 {p0}개": ["My trips, {p0} items", "自分の旅行一覧{p0}件"],
+  "{p0} Google Maps 사진 원본 보기": [
+    "View original Google Maps photo of {p0}",
+    "{p0}のGoogle Maps写真の原本を見る"
+  ],
+  "{p0} Google 장소 사진": [
+    "Google place photo of {p0}",
+    "{p0}のGoogleスポット写真"
+  ],
+  "장소 사진을 표시하지 못했어요. 다시 불러와 주세요.": [
+    "Couldn't display the place photo. Please reload it.",
+    "場所の写真を表示できませんでした。再読み込みしてください。"
+  ],
+  "장소 사진을 표시하지 못했어요.": [
+    "Couldn't display the place photo.",
+    "場所の写真を表示できませんでした。"
+  ],
+  "지도 검색·링크 접기": [
+    "Hide map search and links",
+    "地図検索・リンクを閉じる"
+  ],
+  "Google Maps로 찾거나 가져오기": [
+    "Search or import with Google Maps",
+    "Google Mapsで検索・取り込み"
+  ],
+  "장소 검색 중…": ["Searching for places…", "場所を検索中…"],
+  "장소 검색": ["Search places", "場所を検索"],
+  "{p0} 장소 설명·팁 보기": [
+    "View details and tips for {p0}",
+    "{p0}の説明・ヒントを見る"
+  ],
+  "{p0} 장소 설명·팁": ["Details and tips for {p0}", "{p0}の説明・ヒント"],
+  "TripPrint 플래너 팁": [
+    "TripPrint planning tips",
+    "TripPrintの旅づくりヒント"
+  ],
+  "기록 정리 중": ["Organizing records", "記録を整理中"],
+  "커뮤니티 공개": ["Publish to the community", "コミュニティに公開"],
+  "영수증 수정": ["Edit receipt", "レシートを編集"],
+  "영수증 확인": ["Review receipt", "レシートを確認"],
+  "비용 기록": ["Record expenses", "費用を記録"],
+  "여행 정보 수정": ["Edit trip details", "旅行情報を編集"],
+  "이날 소개": ["About this day", "この日の紹介"],
+  "여행 내용 작성": ["Enter trip details", "旅の内容を入力"],
+  "확인하고 게시": ["Confirm and publish", "確認して公開"],
+  "변경 저장": ["Save changes", "変更を保存"],
+  "영수증 저장": ["Save receipt", "レシートを保存"],
+  "확인하고 저장": ["Confirm and save", "確認して保存"],
+  "여행 기간 안의 결제 날짜를 입력해 주세요. 다른 여행의 영수증이라면 돌아가서 여행을 선택해 주세요.": [
+    "Enter a payment date within this trip. If the receipt belongs to another trip, go back and select that trip.",
+    "旅行期間内の支払日を入力してください。別の旅のレシートなら、戻ってその旅を選んでください。"
+  ],
+  "기존 일정이나 새 장소 기록을 선택해 주세요.": [
+    "Choose an existing activity or a new place record.",
+    "既存の予定か新しい場所の記録を選んでください。"
+  ],
+  "기존 계획은 바꾸지 않고 결제 기록만 연결해요.": [
+    "Only the payment record is linked. Your existing plan stays unchanged.",
+    "既存のプランは変更せず、支払いの記録だけを関連付けます。"
+  ],
+  "새 장소 기록 만들기": [
+    "Create a new place record",
+    "新しい場所の記録を作成"
+  ],
+  "새 기록 / 일정 연결 없이": [
+    "New record / No activity linked",
+    "新しい記録／予定に関連付けない"
+  ],
+  "사진을 불러오지 못했어요. 연결을 확인하고 다시 시도해 주세요.": [
+    "Couldn't load the photo. Check your connection and try again.",
+    "写真を読み込めませんでした。通信状況を確認して、もう一度お試しください。"
+  ],
+  "사진을 불러오는 중입니다.": [
+    "Loading the photo.",
+    "写真を読み込んでいます。"
+  ],
+  "사진을 다시 불러오는 중…": ["Reloading the photo…", "写真を再読み込み中…"],
+  "{p0} {p1} 보기": ["View {p0} {p1}", "{p0} {p1}を見る"],
+  "{p0} 더 보기": ["See more {p0}", "{p0}をもっと見る"],
+  "내 여행에 담기": ["Save to my trips", "自分の旅に保存"],
+  "내 여행으로 일정 담기": [
+    "Save itinerary to my trips",
+    "旅程を自分の旅に保存"
+  ],
+  "공유 항목 선택으로": ["Back to sharing selections", "共有項目の選択に戻る"],
+  "공유 화면 닫기": ["Close sharing", "共有画面を閉じる"],
+  "2 / 2 · 공개 화면 미리보기": [
+    "2 / 2 · Preview public page",
+    "2 / 2 · 公開画面をプレビュー"
+  ],
+  "1 / 2 · 공개 항목 선택": [
+    "1 / 2 · Choose what to publish",
+    "1 / 2 · 公開する項目を選択"
+  ],
+  "공개 중…": ["Publishing…", "公開中…"],
+  "다시 공개하기": ["Publish again", "再公開する"],
+  "공개 범위 확인": ["Review what will be public", "公開範囲を確認"],
+  "미리보기": ["Preview", "プレビュー"],
+  "사진 {p0}": ["Photo {p0}", "写真 {p0}"],
+  "주소 없음": ["No address", "住所なし"],
+  "DAY {p0} 일정 전체 {p1}": [
+    "DAY {p0}: {p1} all activities",
+    "DAY {p0}の予定をすべて{p1}"
+  ],
+  "일정: {p0}": ["Activity: {p0}", "予定：{p0}"],
+  "사진을 이 기기에 보관하고 장소, 결제 일시와 금액을 직접 입력해요.": [
+    "Keep the photo on this device and enter the place, payment date, time, and amount yourself.",
+    "写真をこの端末に保存し、場所・支払日時・金額を手入力します。"
+  ],
+  "장소, 결제 일시, 메뉴와 금액을 사진에서 찾아드릴게요.": [
+    "We'll read the place, payment date, time, items, and amount from the photo.",
+    "写真から場所・支払日時・品目・金額を読み取ります。"
+  ],
+  "나중에도 내용을 확인할 수 있게 촬영해요": [
+    "Take a photo you can read again later",
+    "あとからも内容を確認できるように撮影しましょう"
+  ],
+  "글자가 선명하면 더 잘 읽어요": [
+    "Clear text is easier to read",
+    "文字が鮮明だと読み取りやすくなります"
+  ],
+  "사진은 서버로 전송하지 않아요. 확인 후 원본을 보관할지 선택하세요. 등록 전에는 일정과 지출이 추가되지 않아요.": [
+    "The photo won't be sent to a server. After reviewing, choose whether to keep the original. No activity or expense is added until you save.",
+    "写真はサーバーに送信されません。確認後、原本を保存するか選んでください。登録するまでは予定や支出は追加されません。"
+  ],
+  "정보를 읽기 위해 사진을 전송해요. 확인 후 원본 사진을 보관할지 직접 선택할 수 있어요. 등록 전에는 일정과 지출이 추가되지 않아요.": [
+    "The photo is sent to read its details. After reviewing, you can choose whether to keep the original. No activity or expense is added until you save.",
+    "情報を読み取るために写真を送信します。確認後、原本の写真を保存するか選べます。登録するまでは予定や支出は追加されません。"
+  ],
+  "장소, 결제 일시, 메뉴와 금액을 확인해 주세요. 기존 영수증과 실제 지출에 수정한 내용을 반영해요.": [
+    "Check the place, payment date, time, items, and amount. Your changes will update the existing receipt and actual expense.",
+    "場所・支払日時・品目・金額を確認してください。変更内容を既存のレシートと実際の支出に反映します。"
+  ],
+  "장소, 결제 일시, 메뉴와 금액을 확인해 주세요. 맞다면 선택한 날짜의 일정에 추가할 수 있어요.": [
+    "Check the place, payment date, time, items, and amount. If they're correct, you can add them to the selected day's itinerary.",
+    "場所・支払日時・品目・金額を確認してください。正しければ、選んだ日の旅程に追加できます。"
+  ],
+  "맞아요, 수정한 내용을 저장할게요": [
+    "Correct, save my changes",
+    "正しいので、変更を保存します"
+  ],
+  "맞아요, 일정에 추가할게요": [
+    "Correct, add to my itinerary",
+    "正しいので、旅程に追加します"
+  ],
+  "장소·메뉴·실제 지출과 영수증 사진을 함께 저장해요.": [
+    "Save the place, items, actual expense, and receipt photo together.",
+    "場所・品目・実際の支出とレシート写真を一緒に保存します。"
+  ],
+  "장소·메뉴·실제 지출만 저장해요. 등록이 끝나면 인식에 사용한 사진은 삭제해요.": [
+    "Save only the place, items, and actual expense. The photo used for reading will be deleted after saving.",
+    "場所・品目・実際の支出だけを保存します。登録が終わると、読み取りに使った写真は削除されます。"
+  ],
+  "원본 미보관": ["Original not retained", "原本の保存なし"],
+  "원본 보관": ["Original retained", "原本を保存"],
+  "수량 미확인": ["Quantity unknown", "数量未確認"],
+  "{p0}개": ["{p0} items", "{p0}個"],
+  "금액 미확인": ["Amount unknown", "金額未確認"],
+  "기존 기록 접기": ["Hide existing record", "既存の記録を閉じる"],
+  "기존 기록 보기": ["View existing record", "既存の記録を見る"],
+  "{p0}번 메뉴 삭제": ["Delete item {p0}", "{p0}番の品目を削除"],
+  "원본 접고 입력 계속": [
+    "Hide original and continue",
+    "原本を閉じて入力を続ける"
+  ],
+  "원본 확대": ["Enlarge original", "原本を拡大"],
+  "글자가 선명하게 보이도록 촬영해 주세요. 원본 사진은 보관되어 있어요.": [
+    "Take a photo with clear text. Your original photo has been kept.",
+    "文字がはっきり見えるように撮影してください。原本の写真は保存されています。"
+  ],
+  "직접 확인할 내용": ["Details to review", "確認する内容"],
+  "사진에서 읽은 내용이에요": [
+    "Details read from the photo",
+    "写真から読み取った内容です"
+  ],
+  "영수증 정보를 입력하고 확인하면 장소와 실제 지출이 함께 기록돼요.": [
+    "Enter and confirm the receipt details to record the place and actual expense together.",
+    "レシート情報を入力して確認すると、場所と実際の支出が一緒に記録されます。"
+  ],
+  "맞게 읽었는지 확인하면 장소와 실제 지출이 함께 기록돼요.": [
+    "Confirm the details were read correctly to record the place and actual expense together.",
+    "正しく読み取れたか確認すると、場所と実際の支出が一緒に記録されます。"
+  ],
+  "상호 확인 필요": ["Check merchant name", "店名を確認してください"],
+  "주소를 읽지 못했어요": [
+    "Couldn't read the address",
+    "住所を読み取れませんでした"
+  ],
+  "날짜 확인 필요": ["Check date", "日付を確認してください"],
+  "금액 확인 필요": ["Check amount", "金額を確認してください"],
+  "DAY {p0}에 기록돼요": [
+    "Will be recorded on DAY {p0}",
+    "DAY {p0}に記録されます"
+  ],
+  "결제 날짜가 여행 기간과 맞는지 확인해 주세요.": [
+    "Check that the payment date falls within your trip.",
+    "支払日が旅行期間内か確認してください。"
+  ],
+  "수정 마치기": ["Finish editing", "編集を終える"],
+  "인식 내용 수정": ["Edit extracted details", "読み取った内容を編集"],
+  "전송한 내용 저장 결과 다시 확인": [
+    "Check the submitted save again",
+    "送信した内容の保存結果を再確認"
+  ],
+  "기록 저장하기": ["Save record", "記録を保存"],
+  "접기": ["Collapse", "閉じる"],
+  "자세히": ["Details", "詳しく"],
+  "가고 싶은 장소를 고르면 일정 작성 화면에 채워져요. 방문 시간과 위치를 확인한 뒤 저장해 주세요.": [
+    "Choose a place to fill in the activity form. Check the visit time and location before saving.",
+    "行きたい場所を選ぶと、予定の作成画面に入力されます。訪問時刻と位置を確認してから保存してください。"
+  ],
+  "아직 이 도시의 추천 코스가 없어요. 가고 싶은 장소를 직접 찾아 일정을 시작해 보세요.": [
+    "No suggested routes for this city yet. Find places you'd like to visit and start your itinerary.",
+    "この都市のおすすめコースはまだありません。行きたい場所を探して旅程を作りましょう。"
+  ],
+  "일정 추가 및 정리": ["Add and organize activities", "予定の追加・整理"],
+  "일정 수정 저장": ["Save activity changes", "予定の変更を保存"],
+  "DAY {p0} 일정에 추가": ["Add to DAY {p0}", "DAY {p0}の予定に追加"],
+  "일정 내용": ["Activity details", "予定の内容"],
+  "방문할 장소": ["Place to visit", "訪問する場所"],
+  "메모를 남겨요": ["Add a note", "メモを残しましょう"],
+  "할 일을 추가해요": ["Add a task", "やることを追加しましょう"],
+  "방문할 장소를 추가해요": [
+    "Add a place to visit",
+    "訪問する場所を追加しましょう"
+  ],
+  "이 일정의 위치를 선택했어요.": [
+    "Location selected for this activity.",
+    "この予定の位置を選択しました。"
+  ],
+  "방문할 위치를 선택하면 여행 지도에 번호 핀으로 표시돼요.": [
+    "Choose a location to show it as a numbered pin on your trip map.",
+    "訪問する位置を選ぶと、旅行マップに番号付きのピンで表示されます。"
+  ],
+  "위치 입력 접기": ["Hide location input", "位置入力を閉じる"],
+  "좌표로 위치 추가": ["Add location by coordinates", "座標で位置を追加"],
+  "지도 접기": ["Hide map", "地図を閉じる"],
+  "지도에서 위치 선택": ["Choose location on map", "地図で位置を選択"],
+  "후보 위치를 확인한 뒤 적용해 주세요.": [
+    "Check the suggested location before applying it.",
+    "候補の位置を確認してから適用してください。"
+  ],
+  "지도를 이동한 뒤 방문할 위치를 길게 눌러 주세요.": [
+    "Move the map, then press and hold the location you want to visit.",
+    "地図を移動し、訪問する位置を長押ししてください。"
+  ],
+  "현재 위치 사용": ["Use current location", "現在地を使用"],
+  "일정 동선 미리보기": ["Preview route", "移動ルートをプレビュー"],
+  "일정 순서 미리보기": ["Preview activity order", "予定の順序をプレビュー"],
+  "이날의 첫 일정으로 추가해요": [
+    "Add as the first activity of the day",
+    "この日の最初の予定として追加します"
+  ],
+  "‘{p0}’ 다음에 넣어요": ["Add after ‘{p0}’", "「{p0}」の次に追加します"],
+  "삽입 위치 선택 접기": ["Hide position selection", "追加位置の選択を閉じる"],
+  "삽입 위치 바꾸기": ["Change position", "追加位置を変更"],
+  "{p0}. {p1} 뒤": ["{p0}. After {p1}", "{p0}. {p1}の後"],
+  " · 작성 중": [" · Draft", " · 作成中"],
+  "앞뒤 일정만 보기": ["Show adjacent activities only", "前後の予定だけを見る"],
+  "전체 {p0}개 일정 보기": ["View all {p0} activities", "全{p0}件の予定を見る"],
+  "방문 위치 지도 접기": ["Hide visit location map", "訪問先の地図を閉じる"],
+  "방문 위치 지도 보기": ["View visit locations on map", "訪問先を地図で見る"],
+  "방문 순서를 미리 확인해요. 위치를 선택한 장소는 지도에도 표시돼요.": [
+    "Preview your visit order. Places with selected locations also appear on the map.",
+    "訪問順を事前に確認できます。位置を選んだ場所は地図にも表示されます。"
+  ],
+  "이날의 일정 순서를 미리 확인해요.": [
+    "Preview this day's activity order.",
+    "この日の予定の順序を事前に確認できます。"
+  ],
+  "링크 확인 중…": ["Checking link…", "リンクを確認中…"],
+  "공유 링크 확인": ["Check shared link", "共有リンクを確認"],
+  "공유한 장소를 찾았어요.": [
+    "Found the shared place.",
+    "共有された場所が見つかりました。"
+  ],
+  "이 장소 선택": ["Select this place", "この場所を選択"],
+  "이 장소 이름으로 검색": [
+    "Search by this place name",
+    "この場所の名前で検索"
+  ],
+  "도시 선택": ["Select city", "都市を選択"],
+  "이동시간 조회 중…": ["Checking travel time…", "移動時間を確認中…"],
+  "실제 이동시간 조회": ["Check current travel time", "実際の移動時間を確認"],
+  "로그인을 다시 확인해 주세요": [
+    "Please check your login",
+    "ログイン状態を確認してください"
+  ],
+  "이 여행을 열 수 없어요": ["Can't open this trip", "この旅を開けません"],
+  "다시 로그인하면 보고 있던 여행으로 돌아와요.": [
+    "Log in again to return to the trip you were viewing.",
+    "再ログインすると、見ていた旅に戻れます。"
+  ],
+  "참여 권한이 없거나 삭제된 여행이에요. 내 여행에서 다른 여행을 선택해 주세요.": [
+    "You don't have access to this trip, or it has been deleted. Choose another trip from My trips.",
+    "参加権限がないか、削除された旅です。自分の旅から別の旅を選んでください。"
+  ],
+  "연결을 확인하고 다시 시도해 주세요.": [
+    "Check your connection and try again.",
+    "通信状況を確認して、もう一度お試しください。"
+  ],
+  "내 여행 목록으로": ["Back to my trip list", "自分の旅行一覧へ"],
+  "여": ["T", "旅"],
+  "예상 비용 접기": ["Hide estimated expenses", "予想費用を閉じる"],
+  "예상 비용 보기": ["View estimated expenses", "予想費用を見る"],
+  "직접 기록": ["Entered manually", "手入力の記録"],
+  "영수증에서 기록": ["Recorded from a receipt", "レシートから記録"],
+  " (나)": [" (me)", "（自分）"],
+  "출발 항공편": ["Outbound flight", "往路便"],
+  "도착 항공편": ["Return flight", "復路便"],
+  "{p0} 변경": ["Change {p0}", "{p0}を変更"],
+  "{p0} 삭제": ["Delete {p0}", "{p0}を削除"],
+  "{p0} 추가하기": ["Add {p0}", "{p0}を追加"],
+  "일정이 추가되면 장소와 방문 순서를 함께 볼 수 있어요.": [
+    "Once you add activities, you'll see the places and visit order together.",
+    "予定を追加すると、場所と訪問順を一緒に確認できます。"
+  ],
+  "일정 탭에서 첫 장소를 추가해 보세요.": [
+    "Add your first place in the Itinerary tab.",
+    "旅程タブで最初の場所を追加しましょう。"
+  ],
+  " · 위치 선택 전": [" · Location not selected", " · 位置未選択"],
+  "{p0}. {p1} 지도에서 선택": [
+    "{p0}. Select {p1} on the map",
+    "{p0}. {p1}を地図で選択"
+  ],
+  "위치 변경": ["Change location", "位置を変更"],
+  "위치 선택": ["Select location", "位置を選択"],
+  "Google Maps에서 위치를 확인한 뒤 좌표를 붙여 넣어 주세요.": [
+    "Check the location on Google Maps, then paste its coordinates.",
+    "Google Mapsで位置を確認してから、座標を貼り付けてください。"
+  ],
+  "아래 장소에서 Google Maps로 확인해 주세요.": [
+    "Open Google Maps from a place below to check its location.",
+    "下の場所からGoogle Mapsを開いて確認してください。"
+  ],
+  "일정 탭에서 장소를 추가한 뒤 Google Maps로 확인해 주세요.": [
+    "Add a place in the Itinerary tab, then check it on Google Maps.",
+    "旅程タブで場所を追加してから、Google Mapsで確認してください。"
+  ],
+  "다녀온 여행 기록하기": ["Record a past trip", "これまでの旅を記録"],
+  "여행 계획 만들기": ["Create a trip plan", "旅行プランを作成"],
+  "여행 내용 확인": ["Review trip details", "旅の内容を確認"],
+  "내 여행으로 돌아가기": ["Back to my trips", "自分の旅に戻る"],
+  "여행지와 날짜로 돌아가기": [
+    "Back to destination and dates",
+    "旅先と日付に戻る"
+  ],
+  "1 / 2 · 날짜와 여행지": [
+    "1 / 2 · Dates and destination",
+    "1 / 2 · 日付と旅先"
+  ],
+  "2 / 2 · 항공권과 내용 확인": [
+    "2 / 2 · Flights and review",
+    "2 / 2 · 航空券と内容の確認"
+  ],
+  "어디를, 언제 다녀오셨나요?": [
+    "Where did you go, and when?",
+    "いつ、どこへ行きましたか？"
+  ],
+  "여행 날짜와 방문할 나라·도시를 선택해 주세요.": [
+    "Choose your travel dates and the country and city you'll visit.",
+    "旅行日と訪問する国・都市を選んでください。"
+  ],
+  "구매한 항공권의 편명과 출발·도착 정보를 입력해 주세요.": [
+    "Enter the flight number and departure and arrival details from your booked ticket.",
+    "購入した航空券の便名と出発・到着情報を入力してください。"
+  ],
+  "여행 이름은 자동으로 정해요": [
+    "Your trip name is created automatically",
+    "旅行名は自動で設定されます"
+  ],
+  "여행 기록 만들기": ["Create trip record", "旅の記録を作成"],
+  "여행 만들기": ["New trip", "旅を作成"],
+  "항공편 없이 여행 만들기": [
+    "Create trip without flights",
+    "フライトなしで旅を作成"
+  ],
+  "나의 여행": ["My trip", "自分の旅"],
+  "첫 장소부터 정해 볼까요?": [
+    "Let's choose your first place",
+    "最初の場所を決めましょう"
+  ],
+  "이날은 등록된 일정이 없어요": [
+    "No activities for this day",
+    "この日に登録された予定はありません"
+  ],
+  "편한 방법으로 시작해요.": [
+    "Start in whichever way suits you.",
+    "使いやすい方法で始めましょう。"
+  ],
+  "동행이 일정을 추가하면 여기에서 확인할 수 있어요.": [
+    "Activities added by your companions will appear here.",
+    "同行者が追加した予定をここで確認できます。"
+  ],
+  "순서 편집 마치기": ["Finish reordering", "並べ替えを完了"],
+  "순서 편집": ["Reorder", "並べ替え"],
+  "완료": ["Done", "完了"],
+  "미정": ["Not set", "未定"],
+  "미리보기로 돌아가기": ["Back to preview", "プレビューに戻る"],
+  "변경하지 않기": ["Keep unchanged", "変更しない"],
+  "여행기록으로 바꿔 공유": [
+    "Switch to trip records and share",
+    "旅の記録に切り替えて共有"
+  ],
+  "여행기록 공유하기": ["Share trip records", "旅の記録を共有"],
+  "편집자로 변경": ["Change to editor", "編集者に変更"],
+  "보기 전용으로 변경": ["Change to view only", "閲覧のみに変更"],
+  "취소됨": ["Cancelled", "キャンセル済み"],
+  "수락됨": ["Accepted", "承諾済み"],
+  "대기 중": ["Pending", "待機中"],
+  "아래에 챙길 물건을 적어보세요. 준비한 항목은 체크할 수 있어요.": [
+    "List what you need to bring below. Check items off as you get them ready.",
+    "下に持ち物を書きましょう。準備できた項目はチェックできます。"
+  ],
+  "동행자가 추가한 준비물을 여기서 함께 확인해요.": [
+    "View the checklist items your companions added here.",
+    "同行者が追加した持ち物をここで一緒に確認できます。"
+  ],
+  "비공개 영수증": ["Private receipt", "非公開のレシート"],
+  "비용 추가에서 실제 지출이나 예상 비용을 남겨보세요.": [
+    "Use Add expense to record actual or estimated expenses.",
+    "費用の追加から、実際の支出や予想費用を記録しましょう。"
+  ],
+  "여행에서 남긴 비용을 여기서 함께 확인해요.": [
+    "View the expenses recorded for this trip together here.",
+    "旅で記録した費用をここで一緒に確認できます。"
+  ],
+  "계정 보호를 위해 다시 로그인한 뒤 요청해 주세요.": [
+    "Please sign in again before making this request to protect your account.",
+    "アカウントを保護するため、再ログインしてからリクエストしてください。"
+  ],
+  "요청 결과를 확인하지 못했어요. 다시 로그인해 계정 상태를 확인해 주세요.": [
+    "Couldn't confirm the result. Sign in again to check your account status.",
+    "結果を確認できませんでした。再ログインしてアカウントの状態を確認してください。"
+  ],
+  "로그아웃하지 못했어요. 연결을 확인하고 다시 시도해 주세요.": [
+    "Couldn't sign out. Check your connection and try again.",
+    "ログアウトできませんでした。接続を確認して再試行してください。"
+  ],
+  "로그인을 완료하지 못했어요. 다시 시도해 주세요.": [
+    "Couldn't complete sign-in. Please try again.",
+    "ログインを完了できませんでした。再試行してください。"
+  ],
+  "업데이트": ["Update", "更新"],
+  "성별을 선택해 주세요. 밝히고 싶지 않다면 선택 안 함을 눌러 주세요.": [
+    "Choose your gender, or select Prefer not to say.",
+    "性別を選んでください。回答したくない場合は「選択しない」を選んでください。"
+  ],
+  "생년월일을 확인해 주세요. 입력하지 않고 시작할 수도 있어요.": [
+    "Check your date of birth. You can also continue without entering it.",
+    "生年月日を確認してください。入力せずに始めることもできます。"
+  ],
+  "계정이 변경됐어요. 다시 로그인해 주세요.": [
+    "The account has changed. Please sign in again.",
+    "アカウントが変更されました。再ログインしてください。"
+  ],
+  "로그인 정보를 확인하지 못했어요. 연결을 확인하고 다시 시도해 주세요.": [
+    "Couldn't verify your sign-in details. Check your connection and try again.",
+    "ログイン情報を確認できませんでした。接続を確認して再試行してください。"
+  ],
+  "올바른 이메일 주소를 입력해 주세요.": [
+    "Enter a valid email address.",
+    "有効なメールアドレスを入力してください。"
+  ],
+  "비밀번호를 입력해 주세요.": [
+    "Enter your password.",
+    "パスワードを入力してください。"
+  ],
+  "비밀번호는 8자 이상 입력해 주세요.": [
+    "Enter a password of at least 8 characters.",
+    "パスワードは8文字以上で入力してください。"
+  ],
+  "비밀번호 확인이 일치하지 않습니다.": [
+    "The passwords don't match.",
+    "確認用パスワードが一致しません。"
+  ],
+  "이메일과 비밀번호로 로그인하고 여행을 시작해 주세요.": [
+    "Sign in with your email and password to start your trip.",
+    "メールアドレスとパスワードでログインして旅を始めてください。"
+  ],
+  "연결이 끊겼어요. 잠시 후 다시 시도해 주세요.": [
+    "Connection lost. Please try again shortly.",
+    "接続が切れました。しばらくしてから再試行してください。"
+  ],
+  "로그인을 완료하지 못했어요. 잠시 후 다시 시도해 주세요.": [
+    "Couldn't complete sign-in. Please try again shortly.",
+    "ログインを完了できませんでした。しばらくしてから再試行してください。"
+  ],
+  "로그인을 시작하지 못했어요. 잠시 후 다시 시도해 주세요.": [
+    "Couldn't start sign-in. Please try again shortly.",
+    "ログインを開始できませんでした。しばらくしてから再試行してください。"
+  ],
+  "로그인이 만료됐어요. 다시 로그인해 주세요.": [
+    "Your session has expired. Please sign in again.",
+    "ログインの有効期限が切れました。再ログインしてください。"
+  ],
+  "로그인을 완료하지 못했어요. 다시 로그인해 주세요.": [
+    "Couldn't complete sign-in. Please sign in again.",
+    "ログインを完了できませんでした。もう一度ログインしてください。"
+  ],
+  "로그인이 취소됐어요. 다시 로그인해 주세요.": [
+    "Sign-in was canceled. Please sign in again.",
+    "ログインがキャンセルされました。もう一度ログインしてください。"
+  ],
+  "다시 로그인하고 여행을 이어가세요.": [
+    "Sign in again to continue your trip.",
+    "再ログインして旅を続けてください。"
+  ],
+  "로그인 방법을 확인하지 못했어요. 다시 시도해 주세요.": [
+    "Couldn't check the sign-in options. Please try again.",
+    "ログイン方法を確認できませんでした。再試行してください。"
+  ],
+  "이 로그인 방법은 지금 사용할 수 없어요. 다른 방법으로 계속해 주세요.": [
+    "This sign-in method is unavailable right now. Please use another method.",
+    "このログイン方法は現在利用できません。別の方法で続けてください。"
+  ],
+  "PKCE 암호 어댑터는 SHA-256만 지원합니다.": [
+    "The PKCE crypto adapter supports SHA-256 only.",
+    "PKCE暗号アダプターはSHA-256のみ対応しています。"
+  ],
+  "보안 로그인 기능을 사용할 수 없습니다. 앱을 업데이트하거나 HTTPS 웹 주소에서 다시 시도해 주세요.": [
+    "Secure sign-in is unavailable. Update the app or try again at an HTTPS web address.",
+    "安全なログイン機能を利用できません。アプリを更新するか、HTTPSのウェブアドレスで再試行してください。"
+  ],
+  "게스트를 시작하지 못했어요. 처음 시작할 때는 인터넷 연결을 확인해 주세요.": [
+    "Couldn't start guest mode. Check your internet connection when starting for the first time.",
+    "ゲスト利用を開始できませんでした。初めて利用する際はインターネット接続を確認してください。"
+  ],
+  "계정을 확인하지 못했어요. 이어서 시작하기를 눌러 다시 시도해 주세요.": [
+    "Couldn't verify your account. Tap Continue to try again.",
+    "アカウントを確認できませんでした。「続きから始める」を押して再試行してください。"
+  ],
+  "로그아웃하지 못했어요. 잠시 후 다시 시도해 주세요.": [
+    "Couldn't sign out. Please try again shortly.",
+    "ログアウトできませんでした。しばらくしてから再試行してください。"
+  ],
+  "로그인을 완료하지 못했어요. 다시 시도하거나 이메일로 계속해 주세요.": [
+    "Couldn't complete sign-in. Try again or continue with email.",
+    "ログインを完了できませんでした。再試行するか、メールで続けてください。"
+  ],
+  "위치 확인을 취소했어요.": [
+    "Location lookup canceled.",
+    "位置の確認をキャンセルしました。"
+  ],
+  "다시 시도하거나 위치를 직접 선택해 주세요.": [
+    "Try again or choose a location manually.",
+    "再試行するか、位置を直接選んでください。"
+  ],
+  "잠시 후 다시 시도해 주세요.": [
+    "Please try again shortly.",
+    "しばらくしてから再試行してください。"
+  ],
+  "위치 확인을 다시 시도해 주세요.": [
+    "Please try finding your location again.",
+    "位置の確認をもう一度試してください。"
+  ],
+  "브라우저 사이트 설정에서 위치 권한을 확인해 주세요.": [
+    "Check location permissions in your browser's site settings.",
+    "ブラウザのサイト設定で位置情報の権限を確認してください。"
+  ],
+  "위치를 확인하지 못했어요. 기기 위치 설정을 확인한 뒤 다시 시도해 주세요.": [
+    "Couldn't find your location. Check your device's location settings and try again.",
+    "位置を確認できませんでした。端末の位置情報設定を確認して再試行してください。"
+  ],
+  "위치를 확인하지 못했어요. 잠시 후 다시 시도해 주세요.": [
+    "Couldn't find your location. Please try again shortly.",
+    "位置を確認できませんでした。しばらくしてから再試行してください。"
+  ],
+  "지도를 열지 못했어요. 다시 시도해 주세요.": [
+    "Couldn't open the map. Please try again.",
+    "地図を開けませんでした。再試行してください。"
+  ],
+  "권한을 확인하지 못했어요. 다시 시도하거나 나중에 계속해 주세요.": [
+    "Couldn't check permissions. Try again or continue later.",
+    "権限を確認できませんでした。再試行するか、後で続けてください。"
+  ],
+  "허용하지 않아도 여행을 계속할 수 있어요. 원할 때 다시 설정해 주세요.": [
+    "You can continue your trip without allowing this. Change the setting whenever you like.",
+    "許可しなくても旅を続けられます。必要なときに設定してください。"
+  ],
+  "권한을 설정하지 못했어요. 다시 시도하거나 나중에 계속해 주세요.": [
+    "Couldn't set permissions. Try again or continue later.",
+    "権限を設定できませんでした。再試行するか、後で続けてください。"
+  ],
+  "로그인과 닉네임을 확인해 주세요.": [
+    "Check your sign-in and nickname.",
+    "ログイン状態とニックネームを確認してください。"
+  ],
+  "프로필을 저장했어요.": ["Profile saved.", "プロフィールを保存しました。"],
+  "정책 확인 실패": ["Couldn't check the policy", "ポリシーの確認に失敗"],
+  "정책 시각 확인 실패": [
+    "Couldn't verify the policy timestamp",
+    "ポリシーの時刻確認に失敗"
+  ],
+  "이 기기의 여행 기록을 열지 못했어요. 앱을 업데이트한 뒤 다시 시도해 주세요.": [
+    "Couldn't open the travel records on this device. Update the app and try again.",
+    "この端末の旅行記録を開けませんでした。アプリを更新して再試行してください。"
+  ],
+  "여행을 준비하지 못했어요. 연결을 확인하고 다시 시도해 주세요.": [
+    "Couldn't get your trip ready. Check your connection and try again.",
+    "旅行の準備ができませんでした。接続を確認して再試行してください。"
+  ],
+  "새로운 여행을 이어가려면 앱을 업데이트해 주세요.": [
+    "Update the app to continue with new trips.",
+    "新しい旅行を続けるにはアプリを更新してください。"
+  ],
+  "업데이트를 취소했어요. 다시 업데이트하거나 앱을 닫을 수 있어요.": [
+    "Update canceled. You can try updating again or close the app.",
+    "更新をキャンセルしました。もう一度更新するか、アプリを閉じられます。"
+  ],
+  "스토어를 열지 못했어요. 잠시 후 다시 시도해 주세요.": [
+    "Couldn't open the store. Please try again shortly.",
+    "ストアを開けませんでした。しばらくしてから再試行してください。"
+  ],
+  "여행을 열지 못했어요. 다시 시도해 주세요.": [
+    "Couldn't open the trip. Please try again.",
+    "旅行を開けませんでした。再試行してください。"
+  ],
+  "왕복 시각 또는 기간이 맞지 않습니다. 기존 일정·영수증 날짜를 확인해 주세요.": [
+    "The round-trip times or trip dates don't match. Check existing itinerary and receipt dates.",
+    "往復の時刻または期間が一致しません。既存の予定とレシートの日付を確認してください。"
+  ],
+  "일정 날짜가 여행 기간 밖입니다.": [
+    "The itinerary date is outside the trip dates.",
+    "予定の日付が旅行期間外です。"
+  ],
+  "연결할 일정 또는 실제 결제 날짜를 확인해 주세요.": [
+    "Check the itinerary item to link or the actual payment date.",
+    "つなげる予定、または実際の支払い日を確認してください。"
+  ],
+  "영수증이 연결된 일정은 삭제할 수 없습니다.": [
+    "You can't delete an itinerary item with linked receipts.",
+    "レシートがつながっている予定は削除できません。"
+  ],
+  "2MB 이하 JPG·PNG·PDF 파일을 선택해 주세요.": [
+    "Choose a JPG, PNG, or PDF file up to 2 MB.",
+    "2MB以下のJPG・PNG・PDFファイルを選んでください。"
+  ],
+  "기록을 불러오는 중이거나 저장 중입니다. 잠시 후 다시 시도해 주세요.": [
+    "Records are loading or saving. Please try again shortly.",
+    "記録の読み込み中、または保存中です。しばらくしてから再試行してください。"
+  ],
+  "기기 저장소를 확인하고 다시 시도해 주세요.": [
+    "Check your device storage and try again.",
+    "端末のストレージを確認して再試行してください。"
+  ],
+  "먼저 여행을 선택해 주세요.": [
+    "Choose a trip first.",
+    "先に旅行を選んでください。"
+  ],
+  "영수증 원본 사진 또는 PDF를 선택해 주세요.": [
+    "Choose the original receipt photo or PDF.",
+    "レシート原本の写真またはPDFを選んでください。"
+  ],
+  "이 기기에 저장했습니다.": [
+    "Saved on this device.",
+    "この端末に保存しました。"
+  ],
+  "작업을 다시 확인하고 다시 시도해 주세요.": [
+    "Check the action and try again.",
+    "操作内容を確認して再試行してください。"
+  ],
+  "일본 중부 아이치현의 중심 도시예요. 성과 정원을 걷고, 사카에의 현대적인 거리와 오스의 오래된 상점가를 함께 즐길 수 있어요. 진한 된장 요리와 장어 요리 등 나고야만의 음식도 여행의 즐거움이에요.": [
+    "A major city in Aichi Prefecture in central Japan. Explore its castle and gardens, the modern streets of Sakae, and the old shopping arcades of Osu. Local specialties such as rich miso dishes and eel are another highlight of Nagoya.",
+    "日本の中部、愛知県の中心都市です。城や庭園を歩き、栄の現代的な街並みと大須の昔ながらの商店街を楽しめます。濃厚な味噌料理やうなぎ料理など、名古屋ならではの食も旅の楽しみです。"
+  ],
+  "성 주변과 혼마루 어전에서 나고야의 역사를 만나 보세요.": [
+    "Discover Nagoya's history around the castle and at Honmaru Palace.",
+    "城の周辺や本丸御殿で名古屋の歴史に触れてみましょう。"
+  ],
+  "도심 공원과 미라이 타워를 따라 걷고 카페와 상점을 둘러보세요.": [
+    "Walk through the city park around Mirai Tower and explore nearby cafés and shops.",
+    "都心の公園やミライタワー周辺を歩き、カフェやお店を巡りましょう。"
+  ],
+  "사찰 주변 골목에서 작은 가게와 길거리 먹거리를 찾아보세요.": [
+    "Explore the lanes around the temple for small shops and street food.",
+    "寺院の周りの路地で、小さなお店や食べ歩きの味を探してみましょう。"
+  ],
+  "연못을 중심으로 이어지는 일본식 정원에서 계절 풍경을 즐겨 보세요.": [
+    "Enjoy seasonal scenery in a Japanese garden arranged around a pond.",
+    "池を中心に広がる日本庭園で、季節の風景を楽しみましょう。"
+  ],
+  "잘게 썬 장어 덮밥을 그대로, 고명과 함께, 육수를 부어 맛보는 요리예요.": [
+    "Chopped eel over rice, enjoyed on its own, with condiments, and with broth poured over it.",
+    "刻んだうなぎをのせたご飯を、そのまま、薬味と一緒に、だしをかけて味わう料理です。"
+  ],
+  "진한 붉은 된장 소스 돈가스와 된장 국물 우동을 맛보세요.": [
+    "Try pork cutlets with rich red miso sauce and udon in miso broth.",
+    "濃厚な赤味噌だれのとんかつや、味噌仕立てのうどんを味わいましょう。"
+  ],
+  "양념 닭 날개와 팥을 얹은 토스트도 나고야의 대표 먹거리예요.": [
+    "Seasoned chicken wings and toast topped with sweet red beans are also Nagoya favorites.",
+    "味付けした手羽先や小倉トーストも、名古屋を代表する食べ物です。"
+  ],
+  "야마자키강과 성 주변에서 벚꽃 산책을 계획해 보세요.": [
+    "Plan a cherry blossom walk along the Yamazaki River and around the castle.",
+    "山崎川や城の周辺で、桜を楽しむ散歩を計画しましょう。"
+  ],
+  "도심 산책과 정원을 함께 즐기기 좋아요. 단풍은 보통 11월 중·하순부터 살펴볼 수 있어요.": [
+    "A good time for city walks and gardens. Autumn colors usually begin to appear around mid- to late November.",
+    "街歩きと庭園を一緒に楽しむのに向いています。紅葉は例年11月中旬から下旬ごろから見られます。"
+  ],
+  "박물관·수족관과 따뜻한 미소니코미 우동을 묶어 실내 중심으로 둘러보세요.": [
+    "Plan an indoor-focused day with museums, an aquarium, and a warm bowl of miso nikomi udon.",
+    "博物館や水族館と温かい味噌煮込みうどんを組み合わせて、屋内中心に巡りましょう。"
+  ],
+  "전통 골목과 새로운 문화가 가까이 있는 일본의 수도예요. 아사쿠사의 사찰, 시부야의 거리, 넓은 공원을 취향에 맞게 골라 하루씩 둘러보세요.": [
+    "Japan's capital brings traditional lanes and new culture close together. Explore Asakusa's temples, Shibuya's streets, and spacious parks, choosing a different area each day.",
+    "伝統的な路地と新しい文化が身近にある日本の首都です。浅草の寺院、渋谷の街、広い公園を好みに合わせて選び、一日ずつ巡ってみましょう。"
+  ],
+  "사찰과 나카미세 상점가를 걸으며 오래된 도쿄의 분위기를 느껴 보세요.": [
+    "Walk around the temple and Nakamise shopping street for a taste of old Tokyo.",
+    "寺院や仲見世商店街を歩いて、昔ながらの東京の雰囲気を感じてみましょう。"
+  ],
+  "거리 풍경, 쇼핑, 카페를 묶어 취향대로 산책해 보세요.": [
+    "Combine street scenery, shopping, and cafés in a walk that suits your interests.",
+    "街の風景、買い物、カフェを組み合わせて、好みの散歩を楽しみましょう。"
+  ],
+  "공원 산책과 박물관 관람을 함께 계획하기 좋아요.": [
+    "A good area to combine a park walk with a museum visit.",
+    "公園の散歩と博物館の見学を一緒に計画するのに向いています。"
+  ],
+  "도쿄의 대표 음식인 스시를 시장과 동네 식당에서 찾아보세요.": [
+    "Try sushi, one of Tokyo's signature foods, at markets and neighborhood restaurants.",
+    "東京を代表する寿司を、市場や街のお店で探してみましょう。"
+  ],
+  "철판에서 구워 먹는 쓰키시마의 대표 요리를 즐겨 보세요.": [
+    "Enjoy Tsukishima's signature dish cooked on a hot griddle.",
+    "鉄板で焼いて食べる月島の名物料理を楽しみましょう。"
+  ],
+  "골목 식당에서 메밀국수와 튀김을 함께 맛보세요.": [
+    "Try soba noodles and tempura at a restaurant tucked down a side street.",
+    "路地のお店で、そばと天ぷらを一緒に味わいましょう。"
+  ],
+  "우에노 공원과 스미다강 주변의 벚꽃을 살펴보세요.": [
+    "See the cherry blossoms at Ueno Park and along the Sumida River.",
+    "上野公園や隅田川周辺の桜を見に行きましょう。"
+  ],
+  "여름 축제와 불꽃놀이를 찾아보세요. 낮에는 더위를 피해 실내 일정을 섞어 주세요.": [
+    "Look for summer festivals and fireworks. Include indoor stops during the day to escape the heat.",
+    "夏祭りや花火大会を探してみましょう。昼間は暑さを避けて屋内の予定も入れてください。"
+  ],
+  "단풍과 은행나무길, 겨울 조명으로 저녁 산책을 계획해 보세요.": [
+    "Plan evening walks around autumn foliage, ginkgo-lined streets, and winter illuminations.",
+    "紅葉やイチョウ並木、冬のイルミネーションを楽しむ夕方の散歩を計画しましょう。"
+  ],
+  "활기찬 상점가와 음식 문화로 사랑받는 간사이의 도시예요. 도톤보리의 강변과 오사카성의 공원, 시장 골목을 걸으며 미식 여행을 즐겨 보세요.": [
+    "This Kansai city is loved for its lively shopping streets and food culture. Enjoy a food-focused trip through Dotonbori's riverfront, Osaka Castle Park, and market lanes.",
+    "活気ある商店街と食文化で親しまれる関西の都市です。道頓堀の川沿い、大阪城の公園、市場の路地を歩きながら食の旅を楽しみましょう。"
+  ],
+  "강변의 간판과 야경을 구경하고 가까운 음식 골목을 둘러보세요.": [
+    "Take in the riverside signs and night views, then explore nearby food streets.",
+    "川沿いの看板や夜景を眺め、近くの飲食店街を巡りましょう。"
+  ],
+  "성 주변의 넓은 산책길과 계절 풍경을 즐겨 보세요.": [
+    "Enjoy broad walking paths and seasonal scenery around the castle.",
+    "城の周りの広い散歩道と季節の風景を楽しみましょう。"
+  ],
+  "시장 먹거리와 오래된 상점가의 분위기를 만나 보세요.": [
+    "Sample market food and soak up the atmosphere of traditional shopping streets.",
+    "市場の食べ物と昔ながらの商店街の雰囲気を楽しみましょう。"
+  ],
+  "문어가 들어간 동그란 철판 간식을 따뜻할 때 맛보세요.": [
+    "Try these round, griddle-cooked octopus snacks while they're warm.",
+    "タコが入った丸い鉄板料理を、温かいうちに味わいましょう。"
+  ],
+  "양배추와 다양한 재료를 철판에서 구운 오사카의 대표 요리예요.": [
+    "An Osaka specialty made by cooking cabbage and assorted ingredients on a griddle.",
+    "キャベツやさまざまな具材を鉄板で焼く、大阪を代表する料理です。"
+  ],
+  "고기와 채소를 꼬치에 끼워 튀긴 신세카이의 대표 먹거리예요.": [
+    "A Shinsekai favorite of skewered, deep-fried meat and vegetables.",
+    "肉や野菜を串に刺して揚げる、新世界の名物です。"
+  ],
+  "오사카성 공원과 게마 사쿠라노미야 공원의 벚꽃을 즐겨 보세요.": [
+    "Enjoy cherry blossoms at Osaka Castle Park and Kema Sakuranomiya Park.",
+    "大阪城公園や毛馬桜之宮公園の桜を楽しみましょう。"
+  ],
+  "도심 산책과 미노오 공원의 가을 풍경을 함께 계획해 보세요.": [
+    "Combine a city walk with the autumn scenery of Minoh Park.",
+    "街歩きと箕面公園の秋の風景を組み合わせて計画しましょう。"
+  ],
+  "쇼핑과 실내 명소를 둘러보고 따뜻한 철판 요리를 맛보세요.": [
+    "Explore shops and indoor attractions, then enjoy a warm griddle-cooked meal.",
+    "買い物や屋内の見どころを巡り、温かい鉄板料理を味わいましょう。"
+  ],
+  "짜오프라야강을 따라 사원과 시장, 현대적인 도심이 이어지는 태국의 수도예요. 낮에는 사원과 골목을, 저녁에는 강변과 야시장을 둘러보세요.": [
+    "Thailand's capital brings temples, markets, and a modern cityscape together along the Chao Phraya River. Explore temples and lanes by day, then the riverfront and night markets in the evening.",
+    "チャオプラヤー川沿いに寺院や市場、現代的な街が広がるタイの首都です。昼は寺院や路地を、夜は川沿いやナイトマーケットを巡りましょう。"
+  ],
+  "태국 전통 건축과 화려한 사원 장식을 만나 보세요.": [
+    "Discover traditional Thai architecture and ornate temple decorations.",
+    "タイの伝統建築や華やかな寺院の装飾を見てみましょう。"
+  ],
+  "짜오프라야강 건너 사원을 보고 강변 풍경을 즐겨 보세요.": [
+    "Visit the temple across the Chao Phraya River and enjoy the riverside views.",
+    "チャオプラヤー川の向こうにある寺院を訪れ、川沿いの風景を楽しみましょう。"
+  ],
+  "차이나타운 골목에서 먹거리와 저녁 거리 풍경을 즐겨 보세요.": [
+    "Enjoy food and evening street scenes in Chinatown's lanes.",
+    "チャイナタウンの路地で、食べ物や夜の街並みを楽しみましょう。"
+  ],
+  "볶음 쌀국수에 라임과 견과류를 곁들여 맛보세요.": [
+    "Try stir-fried rice noodles with lime and nuts.",
+    "炒めた米麺にライムやナッツを添えて味わいましょう。"
+  ],
+  "새우와 허브를 넣은 새콤하고 매콤한 국물 요리예요.": [
+    "A sour and spicy soup made with shrimp and herbs.",
+    "エビとハーブを入れた、酸味と辛味のあるスープです。"
+  ],
+  "망고와 코코넛밀크 찹쌀밥을 함께 즐기는 디저트예요.": [
+    "A dessert pairing mango with coconut milk sticky rice.",
+    "マンゴーとココナッツミルクのもち米を一緒に楽しむデザートです。"
+  ],
+  "사원과 강변을 걷는 일정을 계획해 보세요. 낮의 햇볕은 피하고 쉬는 시간을 넣어 주세요.": [
+    "Plan walks around temples and along the river. Avoid the midday sun and include rest stops.",
+    "寺院や川沿いを歩く予定を立てましょう。日中の日差しを避け、休憩時間も入れてください。"
+  ],
+  "태국 새해 송끄란의 물 축제를 찾아볼 수 있어요. 해당 연도의 장소와 일정을 확인해 주세요.": [
+    "Look for Songkran water festivities celebrating the Thai New Year. Check this year's locations and dates.",
+    "タイの新年、ソンクラーンの水かけ祭りを楽しめます。その年の開催場所と日程を確認してください。"
+  ],
+  "비를 만날 수 있어 시장 산책 사이에 박물관·카페 일정을 섞어 보세요.": [
+    "Rain is possible, so mix museum and café visits into your market walks.",
+    "雨に遭うこともあるので、市場の散策の合間に博物館やカフェの予定を入れましょう。"
+  ],
+  "황푸강 양쪽에서 오래된 건축과 초고층 도시 풍경을 함께 볼 수 있어요. 와이탄의 강변과 정원, 골목 식당을 걸으며 상하이의 서로 다른 표정을 만나 보세요.": [
+    "See historic buildings and soaring skyscrapers on either side of the Huangpu River. Discover Shanghai's contrasting sides along the Bund, in gardens, and at restaurants down side streets.",
+    "黄浦江の両岸では、歴史ある建物と超高層ビルの景色を一緒に見られます。外灘の川沿い、庭園、路地のお店を歩き、上海のさまざまな表情に出会いましょう。"
+  ],
+  "강변 산책로에서 푸둥의 스카이라인을 보고 저녁 풍경을 즐겨 보세요.": [
+    "View Pudong's skyline from the riverside promenade and enjoy the evening scenery.",
+    "川沿いの遊歩道から浦東の高層ビル群を眺め、夕景を楽しみましょう。"
+  ],
+  "전통 정원과 주변 상점가를 함께 둘러보세요.": [
+    "Explore the traditional garden and nearby shopping streets.",
+    "伝統的な庭園と周辺の商店街を一緒に巡りましょう。"
+  ],
+  "도심 밖 수향마을에서 운하와 돌다리를 따라 산책해 보세요.": [
+    "Walk along canals and stone bridges in a water town outside the city center.",
+    "都心を離れた水郷の町で、運河や石橋に沿って散歩しましょう。"
+  ],
+  "얇은 피 안에 육즙을 품은 작은 만두예요. 뜨거운 국물을 조심해 주세요.": [
+    "Small, thin-skinned dumplings filled with savory broth. Watch out for the hot soup inside.",
+    "薄い皮の中に肉汁が詰まった小さな点心です。熱いスープに気をつけてください。"
+  ],
+  "바닥을 바삭하게 구운 만두를 골목 식당에서 맛보세요.": [
+    "Try dumplings with crisp, pan-fried bottoms at a neighborhood restaurant.",
+    "路地のお店で、底をカリッと焼いた小籠包を味わいましょう。"
+  ],
+  "파기름 비빔면 등 간단한 한 끼로 즐길 지역 음식을 찾아보세요.": [
+    "Look for local dishes for a simple meal, such as noodles tossed in scallion oil.",
+    "ネギ油の和え麺など、気軽な一食にぴったりの地元料理を探してみましょう。"
+  ],
+  "봄꽃과 정원 산책을 묶어 둘러보세요.": [
+    "Combine spring flowers with a garden walk.",
+    "春の花と庭園の散歩を一緒に楽しみましょう。"
+  ],
+  "강변과 오래된 거리의 가을 풍경을 즐겨 보세요.": [
+    "Enjoy autumn scenery along the river and historic streets.",
+    "川沿いや古い街並みの秋の風景を楽しみましょう。"
+  ],
+  "박물관과 실내 전시를 중심으로 계획하고 강변에서는 따뜻하게 입어 주세요.": [
+    "Plan around museums and indoor exhibitions, and dress warmly by the river.",
+    "博物館や屋内展示を中心に計画し、川沿いでは暖かい服装で過ごしてください。"
+  ],
+  "도심 전망대와 야시장, 산과 온천을 함께 즐길 수 있는 대만의 도시예요. 낮에는 동네와 명소를 걷고 저녁에는 야시장 먹거리를 맛보세요.": [
+    "This Taiwanese city offers urban viewpoints, night markets, mountains, and hot springs. Explore neighborhoods and sights by day, then sample night-market food in the evening.",
+    "都心の展望台や夜市、山や温泉を一緒に楽しめる台湾の都市です。昼は街や名所を歩き、夜は夜市の食べ物を味わいましょう。"
+  ],
+  "전망대 또는 샹산 산책길에서 도시 전경을 즐겨 보세요.": [
+    "Enjoy city views from an observation deck or the Xiangshan walking trail.",
+    "展望台や象山の散策路から街の全景を楽しみましょう。"
+  ],
+  "오래된 상점과 카페가 이어지는 골목을 둘러보세요.": [
+    "Explore lanes lined with old shops and cafés.",
+    "昔ながらのお店やカフェが並ぶ路地を巡りましょう。"
+  ],
+  "온천 마을과 공원을 함께 방문해 여유롭게 쉬어 보세요.": [
+    "Visit the hot spring town and its parks for a relaxing break.",
+    "温泉街や公園を訪れて、ゆったり過ごしましょう。"
+  ],
+  "진한 소고기 국물과 면을 함께 맛보는 대표 음식이에요.": [
+    "A signature dish of noodles in rich beef broth.",
+    "濃厚な牛肉のスープと麺を味わう代表的な料理です。"
+  ],
+  "달고 짭짤하게 조린 돼지고기를 얹은 덮밥을 맛보세요.": [
+    "Try rice topped with sweet and savory braised pork.",
+    "甘辛く煮込んだ豚肉をのせたご飯を味わいましょう。"
+  ],
+  "후추빵과 지파이 등 작은 먹거리를 나눠 즐겨 보세요.": [
+    "Share snacks such as pepper buns and Taiwanese fried chicken.",
+    "胡椒餅やジーパイなどを分け合って楽しみましょう。"
+  ],
+  "봄꽃을 찾아 공원과 베이터우 일대를 산책해 보세요.": [
+    "Walk through parks and around Beitou in search of spring flowers.",
+    "春の花を探して、公園や北投周辺を散歩しましょう。"
+  ],
+  "동네 산책과 야시장을 묶어 둘러보세요.": [
+    "Combine neighborhood walks with night-market visits.",
+    "街歩きと夜市を一緒に巡りましょう。"
+  ],
+  "베이터우 온천과 따뜻한 면 요리로 겨울 여행을 계획해 보세요.": [
+    "Plan a winter trip around Beitou's hot springs and warm noodle dishes.",
+    "北投の温泉と温かい麺料理を楽しむ冬の旅を計画しましょう。"
+  ],
+  "해변과 한강, 산이 가까이 있는 베트남 중부의 도시예요. 해변에서 쉬는 날과 시장·사원을 둘러보는 날을 나누면 여유롭게 즐길 수 있어요.": [
+    "A city in central Vietnam with beaches, the Han River, and mountains close by. Alternate beach days with visits to markets and temples for a relaxed trip.",
+    "海辺とハン川、山が近くにあるベトナム中部の都市です。海辺で休む日と市場や寺院を巡る日を分けると、ゆったり楽しめます。"
+  ],
+  "긴 해변을 따라 걷고 이른 아침이나 해 질 무렵 바다를 즐겨 보세요.": [
+    "Walk along the long beach and enjoy the sea early in the morning or around sunset.",
+    "長い海岸を歩き、早朝や夕暮れに海を楽しみましょう。"
+  ],
+  "강변을 걸으며 다리와 도심의 저녁 풍경을 구경해 보세요.": [
+    "Stroll along the river for evening views of the bridges and city center.",
+    "川沿いを歩いて、橋や街の夕景を眺めましょう。"
+  ],
+  "산과 사원에서 해안 도시의 또 다른 풍경을 만나 보세요.": [
+    "Discover another side of this coastal city in its mountains and temples.",
+    "山や寺院で、海辺の街の違った風景に出会いましょう。"
+  ],
+  "베트남 중부의 넓은 쌀국수에 고명과 허브를 곁들여 맛보세요.": [
+    "Try central Vietnam's broad rice noodles with toppings and herbs.",
+    "ベトナム中部の幅広い米麺を、具材やハーブと一緒に味わいましょう。"
+  ],
+  "바삭한 쌀가루 부침을 채소와 함께 즐겨 보세요.": [
+    "Enjoy a crispy rice-flour pancake with vegetables.",
+    "米粉で作るパリッとした生地を、野菜と一緒に楽しみましょう。"
+  ],
+  "해변 근처 식당에서 해산물을 고르고 주문 전 가격과 조리법을 확인해 주세요.": [
+    "Choose seafood at restaurants near the beach, and check the price and cooking method before ordering.",
+    "海辺のお店で魚介を選び、注文前に価格と調理方法を確認してください。"
+  ],
+  "베트남 관광청이 추천하는 방문 시기예요. 해변과 야외 명소를 함께 계획해 보세요.": [
+    "This is a visiting season recommended by Vietnam's tourism authority. Plan for both the beach and outdoor sights.",
+    "ベトナム観光当局がおすすめする訪問時期です。海辺と屋外の名所を一緒に計画しましょう。"
+  ],
+  "해변은 아침·저녁에 즐기고 낮에는 카페와 실내 휴식을 넣어 보세요.": [
+    "Enjoy the beach in the morning and evening, with café stops and indoor breaks during the day.",
+    "海辺は朝や夕方に楽しみ、日中はカフェや屋内での休憩を入れましょう。"
+  ],
+  "비가 잦을 수 있어 해변 일정은 날씨를 보고 유연하게 정해 주세요.": [
+    "Rain may be frequent, so keep beach plans flexible and check the weather.",
+    "雨が多いこともあるため、海辺の予定は天気を見て柔軟に決めてください。"
+  ],
+  "열대 정원과 현대적인 건축, 여러 문화의 동네가 모인 도시국가예요. 마리나 베이의 풍경과 호커 센터의 음식, 차이나타운의 골목을 함께 즐겨 보세요.": [
+    "A city-state bringing together tropical gardens, modern architecture, and multicultural neighborhoods. Enjoy Marina Bay's views, hawker-center food, and Chinatown's lanes.",
+    "熱帯の庭園、現代建築、多様な文化の街が集まる都市国家です。マリーナベイの景色、ホーカーセンターの食事、チャイナタウンの路地を一緒に楽しみましょう。"
+  ],
+  "강변을 따라 걷고 싱가포르의 대표 도시 풍경을 만나 보세요.": [
+    "Walk along the waterfront and take in Singapore's iconic city views.",
+    "川沿いを歩いて、シンガポールを代表する街の風景を眺めましょう。"
+  ],
+  "열대 정원과 실내 온실을 둘러보세요.": [
+    "Explore tropical gardens and indoor conservatories.",
+    "熱帯の庭園や屋内温室を巡りましょう。"
+  ],
+  "서로 다른 문화의 골목과 상점, 음식을 즐겨 보세요.": [
+    "Enjoy the lanes, shops, and food of different cultures.",
+    "さまざまな文化の路地やお店、食べ物を楽しみましょう。"
+  ],
+  "향긋한 밥과 부드러운 닭고기, 소스를 함께 맛보세요.": [
+    "Try fragrant rice with tender chicken and sauces.",
+    "香り豊かなご飯と柔らかな鶏肉を、ソースと一緒に味わいましょう。"
+  ],
+  "코코넛 국물과 향신료가 어우러진 면 요리예요.": [
+    "A noodle dish combining coconut broth and spices.",
+    "ココナッツのスープと香辛料が合わさった麺料理です。"
+  ],
+  "매콤달콤한 소스의 게 요리를 빵과 함께 즐겨 보세요.": [
+    "Enjoy crab in a sweet and spicy sauce with bread.",
+    "甘辛いソースのカニ料理を、パンと一緒に楽しみましょう。"
+  ],
+  "일 년 내내 열대 정원과 도시 여행을 즐길 수 있어요. 더운 낮에는 온실·박물관을 섞어 주세요.": [
+    "Enjoy tropical gardens and city exploring year-round. Include conservatories and museums during hot afternoons.",
+    "一年中、熱帯の庭園や街歩きを楽しめます。暑い日中は温室や博物館も組み合わせてください。"
+  ],
+  "자연공원에서 철새를 관찰하는 여행도 계획해 볼 수 있어요.": [
+    "You can also plan a trip to watch migratory birds in nature parks.",
+    "自然公園で渡り鳥を観察する旅も計画できます。"
+  ],
+  "가든스 바이 더 베이의 꽃 전시와 도시 행사는 공식 관광 안내에서 해당 월의 일정을 확인해 보세요.": [
+    "Check the official tourism guide for that month's flower exhibitions at Gardens by the Bay and city events.",
+    "ガーデンズ・バイ・ザ・ベイの花の展示や街のイベントは、公式観光案内でその月の日程を確認してください。"
+  ],
+  "TripPrint가 이 자료를 참고해 소개·볼거리·먹거리·계절 정보를 한국어로 작성했어요.": [
+    "TripPrint used these references to write the introduction, sights, food, and seasonal information in Korean.",
+    "TripPrintがこの資料を参考に、紹介・見どころ・食べ物・季節の情報を韓国語で作成しました。"
+  ],
+  "원문 소개를 일반 텍스트로 일부 발췌하고 앞뒤 공백과 길이를 정리했어요.": [
+    "Part of the original introduction was excerpted as plain text, with surrounding whitespace and length adjusted.",
+    "原文の紹介文をプレーンテキストで一部抜粋し、前後の空白と長さを調整しました。"
+  ],
+  "출처 주소를 열 수 없어요. 가이드로 돌아가 다시 확인해 주세요.": [
+    "Can't open the source address. Return to the guide and check again.",
+    "出典のアドレスを開けません。ガイドに戻って再確認してください。"
+  ],
+  "링크를 열지 못했어요. 연결이나 팝업 허용을 확인하고 같은 버튼을 다시 눌러 주세요. 가이드는 계속 볼 수 있어요.": [
+    "Couldn't open the link. Check your connection or pop-up permissions, then tap the same button again. You can still view the guide.",
+    "リンクを開けませんでした。接続やポップアップの許可を確認して、同じボタンをもう一度押してください。ガイドは引き続き見られます。"
+  ],
+  "공개가 중단됐거나 찾을 수 없는 여행이에요. 발자국에서 다른 여행을 살펴보세요.": [
+    "This trip is no longer public or couldn't be found. Explore other trips in Footprints.",
+    "公開が中止されたか、見つからない旅行です。足跡で別の旅行をご覧ください。"
+  ],
+  "여행을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.": [
+    "Couldn't load the trip. Please try again shortly.",
+    "旅行を読み込めませんでした。しばらくしてから再試行してください。"
+  ],
+  "여행 이야기를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.": [
+    "Couldn't load the travel story. Please try again shortly.",
+    "旅の物語を読み込めませんでした。しばらくしてから再試行してください。"
+  ],
+  "이 나라는 현재 여행지로 선택할 수 없어요. 다른 나라를 선택해 주세요.": [
+    "This country can't currently be selected as a destination. Please choose another country.",
+    "この国は現在旅行先に選べません。別の国を選んでください。"
+  ],
+  "나라 이름은 50자 이하로 입력해 주세요.": [
+    "Enter a country name of 50 characters or fewer.",
+    "国名は50文字以内で入力してください。"
+  ],
+  "추천 일정을 불러오지 못했어요.": [
+    "Couldn't load the recommended itinerary.",
+    "おすすめの予定を読み込めませんでした。"
+  ],
+  "장소를 추천하지 못했어요. 잠시 후 다시 시도하거나 장소를 직접 검색해 주세요.": [
+    "Couldn't recommend places. Try again shortly or search for a place directly.",
+    "場所をおすすめできませんでした。しばらくしてから再試行するか、場所を直接検索してください。"
+  ],
+  "워싱턴 D.C.": ["Washington, D.C.", "ワシントンD.C."],
+  "나라와 도시를 선택해 주세요. 같은 도시는 한 번만 추가할 수 있어요.": [
+    "Choose a country and city. Each city can only be added once.",
+    "国と都市を選んでください。同じ都市は一度だけ追加できます。"
+  ],
+  "여행지를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.": [
+    "Couldn't load destinations. Please try again shortly.",
+    "旅行先を読み込めませんでした。しばらくしてから再試行してください。"
+  ],
+  "검색을 열지 못했어요. 네이버나 구글 검색을 다시 눌러 주세요.": [
+    "Couldn't open the search. Tap Naver or Google search again.",
+    "検索を開けませんでした。NaverまたはGoogle検索をもう一度押してください。"
+  ],
+  "편명과 출발일을 확인해 주세요. 예: KE123": [
+    "Check the flight number and departure date. Example: KE123",
+    "便名と出発日を確認してください。例：KE123"
+  ],
+  "조회가 잠시 많아졌어요. 잠시 후 다시 찾거나 직접 입력해 주세요.": [
+    "Search is busy right now. Try again shortly or enter the details manually.",
+    "現在、照会が混み合っています。しばらくしてから検索するか、直接入力してください。"
+  ],
+  "항공편을 불러오지 못했어요. 다시 찾거나 직접 입력해 주세요.": [
+    "Couldn't load the flight. Search again or enter the details manually.",
+    "航空便を読み込めませんでした。もう一度検索するか、直接入力してください。"
+  ],
+  "출처 페이지를 열지 못했어요. 다시 눌러 주세요.": [
+    "Couldn't open the source page. Please tap again.",
+    "出典ページを開けませんでした。もう一度押してください。"
+  ],
+  "항공편 출발일을 여행 기간 안에서 선택해 주세요.": [
+    "Choose a flight departure date within your trip dates.",
+    "航空便の出発日は旅行期間内から選んでください。"
+  ],
+  "편명, 서로 다른 공항 코드 3자리와 출발 시각 HH:mm을 확인해 주세요. 도착일·도착 시각을 입력했다면 함께 확인해 주세요.": [
+    "Check the flight number, two different three-letter airport codes, and departure time in HH:mm format. If you entered an arrival date and time, check those too.",
+    "便名、異なる3文字の空港コード、HH:mm形式の出発時刻を確認してください。到着日・到着時刻を入力した場合は、それらも確認してください。"
+  ],
+  "조회가 잠시 많아졌어요. 잠시 후 다시 시도해 주세요.": [
+    "Search is busy right now. Please try again shortly.",
+    "ただいま検索が混み合っています。しばらくしてからもう一度お試しください。"
+  ],
+  "항공편을 불러오지 못했어요. 잠시 후 다시 조회해 주세요.": [
+    "Couldn't load flights. Please search again shortly.",
+    "フライトを読み込めませんでした。しばらくしてからもう一度検索してください。"
+  ],
+  "공개 여행을 찾을 수 없어요.": [
+    "This public trip couldn't be found.",
+    "公開された旅行が見つかりません。"
+  ],
+  "여행 정보를 확인하고 다시 저장해 주세요.": [
+    "Check the trip details and save again.",
+    "旅行情報を確認して、もう一度保存してください。"
+  ],
+  "소요시간 (분, 선택)": [
+    "Duration (minutes, optional)",
+    "所要時間（分、任意）"
+  ],
+  "시간은 00:00~23:59의 HH:mm 형식으로 입력해 주세요.": [
+    "Enter a time from 00:00 to 23:59 in HH:mm format.",
+    "00:00〜23:59の時刻をHH:mm形式で入力してください。"
+  ],
+  "위도는 -90~90, 경도는 -180~180 범위로 함께 선택해 주세요.": [
+    "Select both latitude from -90 to 90 and longitude from -180 to 180.",
+    "緯度は-90〜90、経度は-180〜180の範囲で両方を選択してください。"
+  ],
+  "영수증 정보를 확인하고 사진 보관 여부를 선택해 주세요.": [
+    "Check the receipt details and choose whether to keep the photo.",
+    "レシートの内容を確認し、写真を保管するか選んでください。"
+  ],
+  "날짜별 일정과 장소를 지도에서 확인해요.": [
+    "View each day's itinerary and places on the map.",
+    "日付ごとの予定と場所を地図で確認できます。"
+  ],
+  "인식한 금액을 확인한 뒤 지출로 저장해요.": [
+    "Check the scanned amount, then save it as an expense.",
+    "読み取った金額を確認して、支出として保存できます。"
+  ],
+  "사진과 메모를 여행별로 모아 보세요.": [
+    "Keep your photos and notes together for each trip.",
+    "写真とメモを旅行ごとにまとめましょう。"
+  ],
+  "JPG 또는 PNG 사진을 선택해 주세요.": [
+    "Choose a JPG or PNG photo.",
+    "JPGまたはPNGの写真を選んでください。"
+  ],
+  "Google Maps에서 장소 하나의 공유 링크를 붙여 넣어 주세요.": [
+    "Paste a Google Maps share link for a single place.",
+    "Google Mapsから1か所の共有リンクを貼り付けてください。"
+  ],
+  "공유 입력을 정리하지 못했습니다. 다시 시도해 주세요.": [
+    "Couldn't clear the shared input. Please try again.",
+    "共有された入力内容を消去できませんでした。もう一度お試しください。"
+  ],
+  "받은 초대 링크 전체를 붙여넣어 주세요.": [
+    "Paste the entire invitation link you received.",
+    "受け取った招待リンクをすべて貼り付けてください。"
+  ],
+  "초대 링크를 확인하고 다시 붙여넣어 주세요.": [
+    "Check the invitation link and paste it again.",
+    "招待リンクを確認して、もう一度貼り付けてください。"
+  ],
+  "출처 창을 열지 못했어요. 브라우저의 팝업 허용을 확인하고 다시 눌러 주세요.": [
+    "Couldn't open the source window. Allow pop-ups in your browser and try again.",
+    "出典のウィンドウを開けませんでした。ブラウザでポップアップを許可して、もう一度押してください。"
+  ],
+  "사진 불러오기를 취소했어요.": [
+    "Photo loading was canceled.",
+    "写真の読み込みをキャンセルしました。"
+  ],
+  "지금은 사진을 더 불러올 수 없어요. 나중에 다시 시도해 주세요.": [
+    "More photos aren't available right now. Please try again later.",
+    "現在、これ以上写真を読み込めません。後でもう一度お試しください。"
+  ],
+  "장소 사진을 불러오지 못했어요. 다시 시도해 주세요.": [
+    "Couldn't load photos of this place. Please try again.",
+    "この場所の写真を読み込めませんでした。もう一度お試しください。"
+  ],
+  "장소 사진을 불러오는 중이에요.": [
+    "Loading photos of this place.",
+    "この場所の写真を読み込んでいます。"
+  ],
+  "Google에 등록된 장소 사진이 없어요.": [
+    "There are no photos of this place on Google.",
+    "Googleにこの場所の写真がありません。"
+  ],
+  "검색 취소": ["Cancel search", "検索をキャンセル"],
+  "로그인 후 다시 검색해 주세요. 직접 입력하거나 Google Maps에서 찾을 수도 있어요.": [
+    "Sign in and search again. You can also enter the place manually or find it on Google Maps.",
+    "ログインしてからもう一度検索してください。手動で入力するか、Google Mapsで探すこともできます。"
+  ],
+  "장소를 찾지 못했어요. 다시 검색하거나 Google Maps에서 찾아 주세요.": [
+    "Couldn't find the place. Search again or look it up on Google Maps.",
+    "場所が見つかりませんでした。もう一度検索するか、Google Mapsで探してください。"
+  ],
+  "계획 소개": ["Plan overview", "プランの紹介"],
+  "보관한 여행": ["Archived trip", "アーカイブした旅行"],
+  "여행 상태 확인 중": ["Checking trip status", "旅行の状態を確認中"],
+  "여행을 만든 사람만 공개할 수 있어요. 작성한 내용은 닫기 전까지 유지돼요.": [
+    "Only the trip creator can publish it. Your changes will remain until you close this screen.",
+    "旅行を作成した人だけが公開できます。この画面を閉じるまで入力内容は保持されます。"
+  ],
+  "보관한 여행은 공유할 수 없어요.": [
+    "Archived trips can't be shared.",
+    "アーカイブした旅行は共有できません。"
+  ],
+  "공유할 장소를 한 곳 이상 골라 주세요.": [
+    "Choose at least one place to share.",
+    "共有する場所を1か所以上選んでください。"
+  ],
+  "공개할 기록의 정리를 먼저 마쳐 주세요. 여행 설정에서 기록 정리 완료를 선택해 주세요.": [
+    "Finish organizing your records before publishing. Select Finish organizing records in trip settings.",
+    "公開する記録の整理を先に完了してください。旅行設定で「記録の整理を完了」を選んでください。"
+  ],
+  "선택한 일정이나 사진이 삭제되었거나 공개할 수 없는 항목이에요. 선택을 비우고 다시 골라 주세요. 제목과 본문은 유지돼요.": [
+    "A selected itinerary item or photo was deleted or can't be published. Clear your selection and choose again. Your title and text will be kept.",
+    "選択した予定や写真が削除されたか、公開できない項目です。選択を解除して選び直してください。タイトルと本文は保持されます。"
+  ],
+  "기간 조건 선택": ["Choose a duration filter", "期間の条件を選択"],
+  "공개 유형 선택": ["Choose a post type", "公開する種類を選択"],
+  "전체 조건 보기": ["View all filters", "すべての条件を見る"],
+  "공유 링크를 만들지 못했어요. 공개 화면에서 다시 시도해 주세요.": [
+    "Couldn't create a share link. Try again from the public trip page.",
+    "共有リンクを作成できませんでした。公開画面でもう一度お試しください。"
+  ],
+  "이 브라우저에서는 링크를 보내지 못했어요. 공개 화면의 주소를 복사해 주세요.": [
+    "Couldn't share the link from this browser. Copy the address of the public trip page.",
+    "このブラウザではリンクを送れませんでした。公開画面のアドレスをコピーしてください。"
+  ],
+  "결제 통화를 읽지 못했어요. 원본을 확인하고 KRW·JPY·USD 중 실제 결제 통화를 선택해 주세요.": [
+    "Couldn't read the payment currency. Check the original and select the currency used: KRW, JPY, or USD.",
+    "支払い通貨を読み取れませんでした。原本を確認して、実際に支払った通貨をKRW・JPY・USDから選んでください。"
+  ],
+  "입력 내용을 확인해 주세요. 표시한 항목을 고친 뒤 다시 저장할 수 있어요.": [
+    "Check your entries. Correct the marked fields, then save again.",
+    "入力内容を確認してください。表示された項目を修正すると、もう一度保存できます。"
+  ],
+  "다른 동행이 내용을 바꿨어요. 최신 원본을 확인한 뒤 다시 저장해 주세요.": [
+    "A travel companion changed the content. Check the latest original and save again.",
+    "同行者が内容を変更しました。最新の原本を確認してから、もう一度保存してください。"
+  ],
+  "저장 결과를 확인하지 못했어요. 같은 내용으로 다시 확인해 주세요.": [
+    "Couldn't confirm whether it was saved. Check again with the same content.",
+    "保存結果を確認できませんでした。同じ内容でもう一度確認してください。"
+  ],
+  "기록하지 못했어요. 입력값과 연결을 확인하고 다시 시도해 주세요.": [
+    "Couldn't save the record. Check your entries and connection, then try again.",
+    "記録を保存できませんでした。入力内容と接続を確認して、もう一度お試しください。"
+  ],
+  "사진 변경을 저장했어요. 메모는 기록 저장을 눌러 마쳐 주세요.": [
+    "Photo changes are saved. Tap Save record to save your notes.",
+    "写真の変更を保存しました。メモは「記録を保存」を押して保存してください。"
+  ],
+  "변경은 저장했어요. 최신 기록을 다시 불러온 뒤 이어서 작성해 주세요.": [
+    "Your changes are saved. Reload the latest record before continuing.",
+    "変更は保存しました。最新の記録を読み込み直してから、続きを入力してください。"
+  ],
+  "작성 중인 내용을 버릴까요?": [
+    "Discard your changes?",
+    "入力中の内容を破棄しますか？"
+  ],
+  "작성 중인 일정을 버릴까요?": [
+    "Discard this itinerary draft?",
+    "作成中の予定を破棄しますか？"
+  ],
+  "위도와 경도를 함께 붙여 넣어 주세요. 장소 이름만 있는 링크는 지도에서 위치를 직접 선택해 주세요.": [
+    "Paste both latitude and longitude. If the link only contains a place name, choose its location on the map.",
+    "緯度と経度を両方貼り付けてください。場所の名前だけが含まれるリンクの場合は、地図で位置を選んでください。"
+  ],
+  "계정이 변경됐어요. 여행을 다시 열어 주세요.": [
+    "Your account has changed. Reopen the trip.",
+    "アカウントが切り替わりました。旅行を開き直してください。"
+  ],
+  "카메라 권한을 허용하거나 사진 선택을 이용해 주세요.": [
+    "Allow camera access or choose a photo instead.",
+    "カメラへのアクセスを許可するか、写真を選択してください。"
+  ],
+  "계정이 변경되었어요. 여행을 다시 열고 사진을 선택해 주세요.": [
+    "Your account has changed. Reopen the trip and select a photo.",
+    "アカウントが切り替わりました。旅行を開き直して写真を選んでください。"
+  ],
+  "JPG/PNG 사진을 4MB 이하로 선택해 주세요.": [
+    "Choose a JPG or PNG photo no larger than 4 MB.",
+    "4MB以下のJPGまたはPNGの写真を選んでください。"
+  ],
+  "다시 로그인해 주세요.": [
+    "Please sign in again.",
+    "もう一度ログインしてください。"
+  ],
+  "원본 삭제를 확인하지 못했습니다. 다시 시도해 주세요.": [
+    "Couldn't confirm deletion of the original. Please try again.",
+    "原本の削除を確認できませんでした。もう一度お試しください。"
+  ],
+  "계정이 변경되었거나 로그인이 만료되었어요. 여행을 다시 열고 사진을 선택해 주세요.": [
+    "Your account changed or your sign-in expired. Reopen the trip and select a photo.",
+    "アカウントが切り替わったか、ログインの有効期限が切れました。旅行を開き直して写真を選んでください。"
+  ],
+  "사진 업로드에 실패했습니다. 연결과 파일 형식을 확인해 주세요.": [
+    "Couldn't upload the photo. Check your connection and the file format.",
+    "写真をアップロードできませんでした。接続とファイル形式を確認してください。"
+  ],
+  "초대 링크를 만들지 못했어요. 잠시 후 다시 시도해 주세요.": [
+    "Couldn't create an invitation link. Please try again shortly.",
+    "招待リンクを作成できませんでした。しばらくしてからもう一度お試しください。"
+  ],
+  "장소 링크를 확인하지 못했습니다. 저장 목록에서 장소 하나를 공유하거나 이름으로 검색해 주세요.": [
+    "Couldn't identify the place link. Share a single place from your saved list or search by name.",
+    "場所のリンクを確認できませんでした。保存済みリストから1か所を共有するか、名前で検索してください。"
+  ],
+  "일정에 장소와 메모를 추가해보세요.": [
+    "Add places and notes to your itinerary.",
+    "予定に場所やメモを追加しましょう。"
+  ],
+  "이동 경로를 찾지 못했어요. 이동수단을 바꾸거나 잠시 후 다시 조회해 주세요.": [
+    "Couldn't find a route. Change your travel mode or try again shortly.",
+    "ルートが見つかりませんでした。移動手段を変えるか、しばらくしてからもう一度検索してください。"
+  ],
+  "나라를 선택하거나 직접 입력해 주세요.": [
+    "Choose a country or enter one manually.",
+    "国を選ぶか、直接入力してください。"
+  ],
+  "달력에서 출발일과 도착일을 선택해 주세요.": [
+    "Choose your departure and return dates on the calendar.",
+    "カレンダーで出発日と帰着日を選んでください。"
+  ],
+  "도착일은 출발일과 같거나 이후여야 해요.": [
+    "The return date must be on or after the departure date.",
+    "帰着日は出発日と同じ日か、それ以降にしてください。"
+  ],
+  "여행 기간은 최대 90일까지 선택할 수 있어요.": [
+    "You can choose a trip of up to 90 days.",
+    "旅行期間は最大90日まで選べます。"
+  ],
+  "지도를 열지 못했어요. 잠시 후 다시 시도해 주세요.": [
+    "Couldn't open the map. Please try again shortly.",
+    "地図を開けませんでした。しばらくしてからもう一度お試しください。"
+  ],
+  "기간에서 빠지는 날짜에 기록이 있어요. 기록을 정리하거나 여행 기간을 다시 선택해 주세요.": [
+    "There are records on dates outside the new trip period. Update those records or choose the dates again.",
+    "変更後の期間から外れる日付に記録があります。記録を整理するか、旅行期間を選び直してください。"
+  ],
+  "입력한 항목을 확인해 주세요.": [
+    "Check your entries.",
+    "入力した項目を確認してください。"
+  ],
+  "공개가 중단됐거나 담을 수 없는 일정이에요. 발자국에서 다른 일정을 선택해 주세요.": [
+    "This itinerary is no longer public or can't be added. Choose another itinerary in Footprints.",
+    "この予定は公開が停止されたか、取り込めません。「足あと」で別の予定を選んでください。"
+  ],
+  "로그인 상태를 확인한 뒤 다시 담아 주세요.": [
+    "Check that you're signed in, then try adding it again.",
+    "ログイン状態を確認してから、もう一度取り込んでください。"
+  ],
+  "여행 이름과 출발일을 확인해 주세요. 여행 기간은 최대 90일이에요.": [
+    "Check the trip name and departure date. Trips can last up to 90 days.",
+    "旅行名と出発日を確認してください。旅行期間は最大90日です。"
+  ],
+  "저장을 확인하지 못했어요. 다시 시도하면 같은 요청의 결과를 확인해요.": [
+    "Couldn't confirm the save. Try again to check the result of the same request.",
+    "保存を確認できませんでした。もう一度試すと、同じリクエストの結果を確認できます。"
+  ],
+  "도시나 여행 이름은 100자 이내로 입력해 주세요.": [
+    "Enter a city or trip name in 100 characters or fewer.",
+    "都市名や旅行名は100文字以内で入力してください。"
+  ],
+  "신고 사유는 공백을 제외한 내용으로 1~500자 입력해 주세요.": [
+    "Enter a report reason of 1–500 characters, excluding spaces.",
+    "通報理由は空白を除いて1〜500文字で入力してください。"
+  ],
+  "신고를 접수했어요.": [
+    "Your report has been submitted.",
+    "通報を受け付けました。"
+  ],
+  "이 작성자의 여행을 숨겼어요.": [
+    "Trips by this author are now hidden.",
+    "この投稿者の旅行を非表示にしました。"
+  ],
+  "공유 링크를 복사했어요. 원하는 곳에 붙여넣어 보내세요.": [
+    "Share link copied. Paste it wherever you'd like to send it.",
+    "共有リンクをコピーしました。送りたい場所に貼り付けてください。"
+  ],
+  "링크를 보내지 못했어요. 공개 화면은 그대로 있으니 다시 시도해 주세요.": [
+    "Couldn't send the link. The public page is still available, so please try again.",
+    "リンクを送れませんでした。公開画面はそのまま残っているので、もう一度お試しください。"
+  ],
+  "위도와 경도를 확인한 뒤 다시 선택해 주세요.": [
+    "Check the latitude and longitude, then select again.",
+    "緯度と経度を確認してから、もう一度選択してください。"
+  ],
+  "공유한 링크를 불러오지 못했습니다. 일정 추가에서 다시 붙여 넣어 주세요.": [
+    "Couldn't load the shared link. Paste it again in Add itinerary item.",
+    "共有されたリンクを読み込めませんでした。「予定を追加」でもう一度貼り付けてください。"
+  ],
+  "준비물 이름은 1~100자로 입력해 주세요. 공백만으로는 저장할 수 없어요.": [
+    "Enter a packing item name of 1–100 characters. It can't contain only spaces.",
+    "持ち物の名前は1〜100文字で入力してください。空白だけでは保存できません。"
+  ],
+  "사진 등록은 삭제했지만 원본 파일을 정리하지 못했어요. 다시 저장하기를 눌러 마무리해 주세요.": [
+    "The photo entry was deleted, but the original file couldn't be removed. Tap Save again to finish.",
+    "写真の登録は削除しましたが、元のファイルを削除できませんでした。「もう一度保存」を押して完了してください。"
+  ],
+  "여행 내용이 바뀌었어요. 최신 내용을 불러온 뒤 대상을 다시 확인해 주세요.": [
+    "The trip has changed. Load the latest content and check the selected item again.",
+    "旅行の内容が変更されました。最新の内容を読み込んでから、対象をもう一度確認してください。"
+  ],
+  "일정을 삭제할까요?": [
+    "Delete this itinerary item?",
+    "この予定を削除しますか？"
+  ],
+  " 이 여행의 커뮤니티 게시물도 함께 철회돼요.": [
+    " The community post for this trip will also be withdrawn.",
+    "この旅行のコミュニティ投稿も取り下げられます。"
+  ],
+  "동행 참여를 해제할까요?": [
+    "Remove this travel companion?",
+    "この同行者の参加を解除しますか？"
+  ],
+  "초대를 취소할까요?": [
+    "Cancel this invitation?",
+    "この招待を取り消しますか？"
+  ],
+  "선택한 초대 링크로는 더 이상 이 여행에 참여할 수 없어요. 이미 참여한 동행의 권한은 그대로 유지돼요.": [
+    "The selected invitation link will no longer allow anyone to join this trip. Existing companions will keep their access.",
+    "選択した招待リンクからは、この旅行に参加できなくなります。すでに参加している同行者の権限は変わりません。"
+  ],
+  "게시물을 철회할까요?": ["Withdraw this post?", "この投稿を取り下げますか？"],
+  "공개 내용을 바꿀까요?": [
+    "Update the published content?",
+    "公開内容を変更しますか？"
+  ],
+  "선택한 내용을 공개할까요?": [
+    "Publish the selected content?",
+    "選択した内容を公開しますか？"
+  ],
+  " 기존 링크의 내용은 이번 선택으로 바뀌며 내 여행 원본은 그대로 남아요.": [
+    " The existing link will show this selection. Your original trip remains unchanged.",
+    "既存リンクの内容が今回の選択に置き換わります。元の旅行記録はそのまま残ります。"
+  ],
+  "비용을 삭제할까요?": ["Delete this expense?", "この支出を削除しますか？"],
+  "영수증 기록을 삭제할까요?": [
+    "Delete this receipt record?",
+    "このレシート記録を削除しますか？"
+  ],
+  "로그인이 만료되었습니다. 다시 로그인해 주세요.": [
+    "Your sign-in has expired. Please sign in again.",
+    "ログインの有効期限が切れました。もう一度ログインしてください。"
+  ],
+  "이 여행을 변경할 권한이 없습니다.": [
+    "You don't have permission to edit this trip.",
+    "この旅行を変更する権限がありません。"
+  ],
+  "초대가 만료되었거나 취소되었습니다.": [
+    "This invitation has expired or was canceled.",
+    "この招待は有効期限が切れたか、取り消されました。"
+  ],
+  "날짜와 입력한 내용을 확인해 주세요.": [
+    "Check the dates and your entries.",
+    "日付と入力内容を確認してください。"
+  ],
+  "잠시 연결할 수 없어요. 조금 뒤에 다시 시도해 주세요.": [
+    "Can't connect right now. Please try again shortly.",
+    "現在、接続できません。少し待ってからもう一度お試しください。"
+  ],
+  "날짜, 필수 항목, 금액 형식을 확인해 주세요.": [
+    "Check the dates, required fields, and amount format.",
+    "日付、必須項目、金額の形式を確認してください。"
+  ],
+  "여행을 불러오지 못했어요. 연결을 확인하고 다시 불러와 주세요.": [
+    "Couldn't load the trip. Check your connection and reload it.",
+    "旅行を読み込めませんでした。接続を確認して、もう一度読み込んでください。"
+  ],
+  "연결이 끊겼어요. 입력한 내용은 그대로 있으니 다시 시도해 주세요.": [
+    "The connection was lost. Your entries are still here, so please try again.",
+    "接続が切れました。入力内容は残っているので、もう一度お試しください。"
+  ],
+  "진행하지 못했어요. 입력한 내용과 연결을 확인하고 다시 시도해 주세요.": [
+    "Couldn't continue. Check your entries and connection, then try again.",
+    "続行できませんでした。入力内容と接続を確認して、もう一度お試しください。"
+  ],
+  "영수증 내용은 저장됐지만 원본 사진 정리가 끝나지 않았어요. 다시 저장을 누르면 같은 기록의 사진 정리만 재시도해요.": [
+    "The receipt details are saved, but the original photo hasn't been removed yet. Tap Save again to retry only the photo removal for this record.",
+    "レシートの内容は保存されましたが、元の写真の削除が完了していません。もう一度保存を押すと、同じ記録の写真の削除だけを再試行します。"
+  ],
+  "이 기능은 회원가입 후 사용할 수 있어요. 기기의 여행 기록은 그대로 보관돼요.": [
+    "Create an account to use this feature. Trip records on your device will be kept.",
+    "この機能は会員登録後に利用できます。端末の旅行記録はそのまま保管されます。"
+  ],
+  "다른 동행이 내용을 변경했습니다. 최신 내용을 불러온 뒤 다시 저장해 주세요. 작성한 내용은 유지됩니다.": [
+    "A travel companion changed the content. Load the latest version and save again. Your entries will be kept.",
+    "同行者が内容を変更しました。最新の内容を読み込んでから、もう一度保存してください。入力内容は保持されます。"
+  ],
+  "보관된 여행은 수정할 수 없어요. 내 여행 목록으로 돌아가 주세요.": [
+    "Archived trips can't be edited. Return to your trip list.",
+    "アーカイブした旅行は編集できません。自分の旅行一覧に戻ってください。"
+  ],
+  "저장 결과를 다시 확인해야 해요. 입력한 내용을 유지하고 다시 저장해 주세요.": [
+    "The save result needs to be checked again. Keep your entries and save again.",
+    "保存結果をもう一度確認する必要があります。入力内容をそのままにして、もう一度保存してください。"
+  ],
+  "저장하지 못했어요. 입력한 내용은 그대로 있으니 다시 저장해 주세요.": [
+    "Couldn't save. Your entries are still here, so please save again.",
+    "保存できませんでした。入力内容は残っているので、もう一度保存してください。"
+  ],
+  "입력한 항목을 확인해 주세요. 작성한 내용은 그대로 있어요.": [
+    "Check your entries. Your content is still here.",
+    "入力した項目を確認してください。入力内容はそのまま残っています。"
+  ],
+  "스캔 횟수가 많아요. 잠시 후 다시 시도해 주세요. 하루 한도에 도달했다면 내일 다시 이용할 수 있어요. 원본 사진은 보관되어 있어요.": [
+    "You've scanned many times. Please try again shortly. If you've reached the daily limit, you can scan again tomorrow. Your original photo is saved.",
+    "スキャン回数が多くなっています。しばらくしてからもう一度お試しください。1日の上限に達した場合は、明日また利用できます。元の写真は保管されています。"
+  ],
+  "사진을 처리하지 못했어요. 잠시 후 다시 스캔하거나 글자가 선명한 사진을 선택해 주세요. 원본 사진은 보관되어 있어요.": [
+    "Couldn't process the photo. Scan again shortly or choose a photo with clearer text. Your original photo is saved.",
+    "写真を処理できませんでした。しばらくしてから再スキャンするか、文字が鮮明な写真を選んでください。元の写真は保管されています。"
+  ],
+  "동행의 최신 내용을 불러오지 못했어요. 최신 내용 불러오기를 다시 눌러 주세요.": [
+    "Couldn't load your companion's latest changes. Tap Load latest content again.",
+    "同行者の最新の変更を読み込めませんでした。「最新の内容を読み込む」をもう一度押してください。"
+  ],
+  "최신 내용을 불러왔어요. 다시 저장하기를 눌러 작성한 내용을 반영해 주세요.": [
+    "The latest content is loaded. Tap Save again to apply your changes.",
+    "最新の内容を読み込みました。「もう一度保存」を押して、入力内容を反映してください。"
+  ],
+  "동행의 최신 내용을 불러오지 못했어요. 작성한 내용은 유지돼요. 최신 내용 불러오기를 다시 눌러 주세요.": [
+    "Couldn't load your companion's latest changes. Your entries are kept. Tap Load latest content again.",
+    "同行者の最新の変更を読み込めませんでした。入力内容は保持されています。「最新の内容を読み込む」をもう一度押してください。"
+  ],
+  "저장은 완료했지만 최신 내용을 불러오지 못했어요. 여행 다시 불러오기를 눌러 주세요.": [
+    "Saved, but couldn't load the latest content. Tap Reload trip.",
+    "保存は完了しましたが、最新の内容を読み込めませんでした。「旅行を再読み込み」を押してください。"
+  ],
+  "로그아웃에 실패했습니다. 다시 시도해 주세요.": [
+    "Couldn't sign out. Please try again.",
+    "ログアウトできませんでした。もう一度お試しください。"
+  ],
+  "지금은 로그인할 수 없어요. 잠시 후 다시 시도해 주세요.": [
+    "Can't sign in right now. Please try again shortly.",
+    "現在、ログインできません。しばらくしてからもう一度お試しください。"
+  ],
+  "이미 사용 중인 닉네임이에요. 다른 닉네임을 입력해 주세요.": [
+    "This nickname is already taken. Enter a different one.",
+    "このニックネームはすでに使用されています。別のニックネームを入力してください。"
+  ],
+  "요청이 많습니다. 잠시 후 다시 시도해 주세요.": [
+    "Too many requests. Please try again shortly.",
+    "リクエストが混み合っています。しばらくしてからもう一度お試しください。"
+  ],
+  "이메일과 비밀번호를 확인하고 다시 시도해 주세요.": [
+    "Check your email and password, then try again.",
+    "メールアドレスとパスワードを確認して、もう一度お試しください。"
+  ],
+  "로그인 상태를 확인하지 못했어요. 잠시 후 다시 시도해 주세요.": [
+    "Couldn't check your sign-in status. Please try again shortly.",
+    "ログイン状態を確認できませんでした。しばらくしてからもう一度お試しください。"
+  ],
+  "이 기기의 여행을 다시 열고 사진을 선택해 주세요.": [
+    "Reopen the trip on this device and select a photo.",
+    "この端末の旅行を開き直して、写真を選んでください。"
+  ],
+  "사진을 읽지 못했어요. 다시 선택해 주세요.": [
+    "Couldn't read the photo. Please select it again.",
+    "写真を読み取れませんでした。もう一度選んでください。"
+  ],
+  "게스트 로그인을 시작하지 못했어요. 연결을 확인하고 다시 시도해 주세요.": [
+    "Couldn't start guest sign-in. Check your connection and try again.",
+    "ゲストログインを開始できませんでした。接続を確認して、もう一度お試しください。"
+  ],
+  "이 기기에 저장하지 못했어요. 저장 공간을 확인하고 다시 시도해 주세요.": [
+    "Couldn't save to this device. Check available storage and try again.",
+    "この端末に保存できませんでした。空き容量を確認して、もう一度お試しください。"
+  ],
+  "일치하는 여행 초대 코드를 찾을 수 없습니다.": [
+    "No matching trip invitation code was found.",
+    "一致する旅行の招待コードが見つかりません。"
+  ],
+  "출발 공항과 도착 공항을 다르게 선택해 주세요.": [
+    "Choose different departure and arrival airports.",
+    "出発空港と到着空港は異なる空港を選んでください。"
+  ],
+  "실제 달력 날짜를 YYYY-MM-DD로 입력해 주세요.": [
+    "Enter a valid calendar date in YYYY-MM-DD format.",
+    "実在する日付をYYYY-MM-DD形式で入力してください。"
+  ],
+  "유효한 현지 시간대를 입력해 주세요.": [
+    "Enter a valid local time zone.",
+    "有効な現地のタイムゾーンを入力してください。"
+  ],
+  "같은 도시는 한 번만 추가할 수 있어요.": [
+    "You can add each city only once.",
+    "同じ都市は1回だけ追加できます。"
+  ],
+  "유효한 여행 시간대를 선택해 주세요.": [
+    "Select a valid time zone for your trip.",
+    "旅行の有効なタイムゾーンを選んでください。"
+  ],
+  "첫 여행지와 대표 여행지 정보를 확인해 주세요.": [
+    "Check the details of your first and main destinations.",
+    "最初の旅行先と代表の旅行先の情報を確認してください。"
+  ],
+  "여행 기간은 시작일 포함 1~90일이어야 합니다.": [
+    "The trip must last 1–90 days, including the start date.",
+    "旅行期間は開始日を含めて1〜90日にしてください。"
+  ],
+  "항공편의 출발일과 중복 등록 여부를 확인해 주세요.": [
+    "Check the flight's departure date and whether it has already been added.",
+    "フライトの出発日と、重複して登録されていないかを確認してください。"
+  ],
+  "통화에 맞는 양수 금액을 입력해 주세요.": [
+    "Enter an amount greater than zero in the correct format for the currency.",
+    "通貨に合った形式で、0より大きい金額を入力してください。"
+  ],
+  "여행 제목을 2글자 이상 입력해 주세요.": [
+    "Enter a trip title of at least 2 characters.",
+    "旅行タイトルは2文字以上で入力してください。"
+  ],
+  "여행 제목은 50글자 이하여야 합니다.": [
+    "The trip title must be 50 characters or fewer.",
+    "旅行タイトルは50文字以内にしてください。"
+  ],
+  "국가를 선택하거나 입력해 주세요.": [
+    "Select or enter a country.",
+    "国を選択するか、入力してください。"
+  ],
+  "도시를 입력해 주세요.": ["Enter a city.", "都市を入力してください。"],
+  "YYYY-MM-DD 형식으로 입력해 주세요.": [
+    "Enter the date in YYYY-MM-DD format.",
+    "YYYY-MM-DD形式で入力してください。"
+  ],
+  "종료일은 시작일 이후여야 합니다.": [
+    "The end date must be after the start date.",
+    "終了日は開始日より後の日付にしてください。"
+  ],
+  "장소 이름을 입력해 주세요.": [
+    "Enter a place name.",
+    "場所の名前を入力してください。"
+  ],
+  "HH:MM 형식으로 입력해 주세요.": [
+    "Enter the time in HH:MM format.",
+    "HH:MM形式で入力してください。"
+  ],
+  "메모는 200자 이내로 입력해 주세요.": [
+    "Keep your note within 200 characters.",
+    "メモは200文字以内で入力してください。"
+  ],
+  "일정 제목을 입력해 주세요.": [
+    "Enter an itinerary item title.",
+    "予定のタイトルを入力してください。"
+  ],
+  "메모는 300자 이내로 입력해 주세요.": [
+    "Keep your note within 300 characters.",
+    "メモは300文字以内で入力してください。"
+  ],
+  "지출 항목명을 입력해 주세요.": [
+    "Enter an expense name.",
+    "支出項目の名前を入力してください。"
+  ],
+  "금액은 0보다 커야 합니다.": [
+    "The amount must be greater than zero.",
+    "金額は0より大きい値にしてください。"
+  ],
+  "준비물 항목을 입력해 주세요.": [
+    "Enter a packing item.",
+    "持ち物の項目を入力してください。"
+  ],
+  "후기를 최소 5자 이상 작성해 주세요.": [
+    "Write a review of at least 5 characters.",
+    "レビューは5文字以上で入力してください。"
+  ],
+  "Google Maps의 장소 공유 링크를 입력해 주세요.": [
+    "Enter a Google Maps place share link.",
+    "Google Mapsの場所共有リンクを入力してください。"
+  ],
+  "공백 포함 2~20바이트로 입력해 주세요. 한글은 한 글자당 3바이트예요.": [
+    "Enter 2–20 bytes, including spaces. Each Korean character counts as 3 bytes.",
+    "空白を含めて2〜20バイトで入力してください。ハングルは1文字あたり3バイトです。"
+  ],
+  "닉네임은 공백을 포함해 2~20바이트로 입력해 주세요. 공백만으로는 사용할 수 없어요.": [
+    "Enter a nickname of 2–20 bytes, including spaces. It can't contain only spaces.",
+    "ニックネームは空白を含めて2〜20バイトで入力してください。空白だけでは使用できません。"
+  ],
+  "상호·날짜·시각·통화·총액이 같아요.": [
+    "The merchant, date, time, currency, and total match.",
+    "店名・日付・時刻・通貨・合計金額が一致しています。"
+  ],
+  "같은 날 같은 상호에서 비슷한 금액을 결제했어요.": [
+    "A similar amount was paid at the same merchant on the same day.",
+    "同じ日に同じ店で、近い金額の支払いがあります。"
+  ],
+  "같은 날짜·통화·총액의 직접 입력한 지출이에요. 다른 결제일 수 있어요.": [
+    "A manually entered expense has the same date, currency, and total. It may be a different payment.",
+    "同じ日付・通貨・合計金額の手入力の支出です。別の支払いである可能性があります。"
+  ],
+  "도착 시각은 출발 시각보다 늦어야 합니다.": [
+    "The arrival time must be later than the departure time.",
+    "到着時刻は出発時刻より後にしてください。"
+  ],
+  "여행 기간은 1~90일로 입력해 주세요.": [
+    "Enter a trip duration of 1–90 days.",
+    "旅行期間は1〜90日で入力してください。"
+  ],
+  "선택할 장소 그룹을 지정해 주세요.": [
+    "Specify a group of places to choose from.",
+    "選択候補となる場所のグループを指定してください。"
+  ],
+  "항공편은 이동 일정으로 등록해 주세요.": [
+    "Add flights as transport itinerary items.",
+    "フライトは移動の予定として登録してください。"
+  ],
+  "결제 통화에 맞는 총액을 입력해 주세요.": [
+    "Enter a total in the correct format for the payment currency.",
+    "支払い通貨に合った形式で合計金額を入力してください。"
+  ],
+  "결제 통화에 맞는 금액을 입력해 주세요.": [
+    "Enter an amount in the correct format for the payment currency.",
+    "支払い通貨に合った形式で金額を入力してください。"
+  ],
+  "공유할 여행 일정을 선택해 주세요.": [
+    "Choose the trip itinerary items to share.",
+    "共有する旅行の予定を選んでください。"
+  ],
+  "언어 / Language": ["Language", "言語 / Language"],
+  "이 기기에서 사용할 언어를 선택해 주세요. 여행 기록은 원문 그대로 유지돼요.": [
+    "Choose the language for this device. Your travel records stay in their original language.",
+    "この端末の表示言語を選択してください。旅行の記録は原文のまま残ります。"
+  ],
+  "언어 설정을 저장하지 못했어요. 다시 시도해 주세요.": [
+    "Could not save your language. Please try again.",
+    "言語設定を保存できませんでした。もう一度お試しください。"
+  ],
+  "홈": ["Home", "ホーム"],
+  "내 여행": ["My trips", "マイ旅行"],
+  "발자국": ["Explore", "足あと"],
+  "{label} 탭": ["{label} tab", "{label}タブ"],
+  "지도": ["Map", "地図"],
+  "사진·영수증": ["Photos & receipts", "写真・レシート"],
+  "여행 공유": ["Share trip", "旅行を共有"],
+  "MY": ["MY", "MY"],
+  "{label} 숨기기": ["Hide {label}", "{label}を非表示"],
+  "{label} 보기": ["Show {label}", "{label}を表示"],
+  "{count}시간": ["{count} hr", "{count}時間"],
+  "{count}분": ["{count} min", "{count}分"],
+  "출발까지 {count}일 남았어요": [
+    "{count} days until departure",
+    "出発まであと{count}日"
+  ],
+  "{count}번 메뉴 {field}": ["Item {count}: {field}", "品目{count}：{field}"],
+  "{label} 입력은 {maximum}자 이하로 입력해 주세요.": [
+    "Enter no more than {maximum} characters for {label}.",
+    "{label}は{maximum}文字以内で入力してください。"
+  ],
+  "{label} 입력은 {maximum} 이하로 입력해 주세요.": [
+    "Enter {maximum} or less for {label}.",
+    "{label}は{maximum}以下で入力してください。"
+  ],
+  "{label} 항목을 입력해 주세요.": [
+    "Enter {label}.",
+    "{label}を入力してください。"
+  ],
+  "{label} 항목을 확인해 주세요.": [
+    "Check {label}.",
+    "{label}を確認してください。"
+  ],
+  "준비 중": ["Draft", "準備中"],
+  "여행 예정": ["Upcoming", "旅行予定"],
+  "여행 중": ["On trip", "旅行中"],
+  "날짜 미정": ["Dates undecided", "日程未定"],
+  "계획 계속하기": ["Continue planning", "計画を続ける"],
+  "여행의 기록": ["Travel memories", "旅の記録"],
+  "여행의 일정과 기록을 돌아보세요": [
+    "Look back on your itinerary and memories",
+    "旅の日程と記録を振り返りましょう"
+  ],
+  "여행 날짜를 정하고 계획을 시작해 보세요": [
+    "Choose your dates and start planning",
+    "日程を決めて計画を始めましょう"
+  ],
+  "오늘 출발해요": ["Your trip starts today", "今日出発です"],
+  "지금 여행 중이에요": ["Your trip is underway", "ただいま旅行中です"],
+  "여행 만든 사람": ["Trip owner", "旅行の作成者"],
+  "함께 편집": ["Can edit", "共同編集"],
+  "보기 전용": ["View only", "閲覧のみ"],
+  "권한 확인 중": ["Checking access", "権限を確認中"],
+  "여성": ["Female", "女性"],
+  "남성": ["Male", "男性"],
+  "선택 안 함": ["Prefer not to say", "回答しない"],
+  "휴양/힐링": ["Rest & relaxation", "休養・リラックス"],
+  "미식/맛집": ["Food & dining", "グルメ"],
+  "액티비티": ["Activities", "アクティビティ"],
+  "자연/풍경": ["Nature & scenery", "自然・景色"],
+  "쇼핑": ["Shopping", "ショッピング"],
+  "문화/역사": ["Culture & history", "文化・歴史"],
+  "인스타감성": ["Photogenic spots", "写真映え"],
+  "배낭여행": ["Backpacking", "バックパック旅行"],
+  "이동": ["Transport", "移動"],
+  "예약": ["Reservation", "予約"],
+  "할 일": ["To-do", "やること"],
+  "메모": ["Note", "メモ"],
+  "이름": ["Name", "名前"],
+  "수량": ["Quantity", "数量"],
+  "단가": ["Unit price", "単価"],
+  "선택한 일정": ["Selected activity", "選択した予定"],
+  "선택한 동행": ["Selected member", "選択した同行者"],
+  "선택한 비용": ["Selected expense", "選択した費用"],
+  "선택한 영수증": ["Selected receipt", "選択したレシート"],
+  "‘{p0}’을 삭제해요. 연결된 사진과 수동 비용은 남고, 이 일정에서 추가한 예상 비용은 삭제돼요. 영수증이 연결돼 있으면 삭제할 수 없어요.": [
+    "Delete ‘{p0}’. Linked photos and manually entered expenses remain. Estimated expenses added from this activity are deleted. You cannot delete an activity with a linked receipt.",
+    "「{p0}」を削除します。紐づく写真と手入力した費用は残り、この予定から追加した予算は削除されます。レシートが紐づいている予定は削除できません。"
+  ],
+  "선택한 사진을 삭제해요. 확정한 영수증이 사용하는 사진은 삭제할 수 없어요.{p0}": [
+    "Delete the selected photo. Photos used by confirmed receipts cannot be deleted.{p0}",
+    "選択した写真を削除します。確定済みのレシートで使っている写真は削除できません。{p0}"
+  ],
+  "‘{p0}’이 이 여행의 기록을 보거나 수정할 수 없게 돼요. 이전에 수락한 초대도 취소돼요.": [
+    "‘{p0}’ will no longer be able to view or edit this trip. Their previously accepted invitation will also be revoked.",
+    "「{p0}」はこの旅行の記録を閲覧・編集できなくなります。以前に承諾した招待も取り消されます。"
+  ],
+  "‘{p0}’의 커뮤니티 게시물을 철회해요. 개인 여행 기록과 사진은 그대로 남아요.": [
+    "Withdraw the community post for ‘{p0}’. Your private trip records and photos remain.",
+    "「{p0}」のコミュニティ投稿を取り下げます。個人の旅行記録と写真はそのまま残ります。"
+  ],
+  "·통화별 실제 지출 합계": [
+    ", and actual spending totals by currency",
+    "・通貨ごとの実際の支出合計"
+  ],
+  "링크를 가진 누구나 ‘{p0}’의 선택 일정 {p1}개·사진 {p2}장{p3}을 볼 수 있어요. 개인 메모·예약번호·동행 정보·영수증 원본과 품목은 공개하지 않아요.{p4}": [
+    "Anyone with the link can view {p1} selected activities and {p2} photos{p3} from ‘{p0}’. Private notes, booking numbers, member details, receipt images and receipt items are not shared.{p4}",
+    "リンクを持つ人は誰でも「{p0}」の選択した予定{p1}件・写真{p2}枚{p3}を見ることができます。個人メモ・予約番号・同行者情報・レシート原本と品目は公開されません。{p4}"
+  ],
+  "‘{p0}’ 비용{p1}을 삭제해요. 연결된 일정은 남아요. 영수증 비용은 영수증 기록에서 삭제해 주세요.": [
+    "Delete the expense ‘{p0}’{p1}. The linked activity remains. To delete a receipt expense, delete its receipt record.",
+    "費用「{p0}」{p1}を削除します。紐づく予定は残ります。レシートの費用はレシート記録から削除してください。"
+  ],
+  "‘{p0}’의 영수증 기록{p1}과 실제 지출을 함께 삭제해요. 장소 일정과 보관한 사진은 남아요.": [
+    "Delete the receipt record for ‘{p0}’{p1} and its actual expense. The place activity and saved photos remain.",
+    "「{p0}」のレシート記録{p1}と実際の支出を一緒に削除します。場所の予定と保存した写真は残ります。"
+  ],
+  "일정 삭제하기": ["Delete activity", "予定を削除"],
+  "사진 삭제하기": ["Delete photo", "写真を削除"],
+  "참여 해제하기": ["Remove member", "参加を解除"],
+  "초대 취소하기": ["Cancel invitation", "招待を取り消す"],
+  "게시 철회하기": ["Withdraw post", "投稿を取り下げる"],
+  "공개 내용 바꾸기": ["Update published content", "公開内容を変更"],
+  "선택한 내용 공개": ["Publish selection", "選択した内容を公開"],
+  "비용 삭제하기": ["Delete expense", "費用を削除"],
+  "기록·지출 삭제하기": ["Delete record & expense", "記録と支出を削除"],
+  "{currency} 영수증은 읽었지만 이 통화의 지출은 아직 저장할 수 없어요. 원본 사진을 보관하고, 장소는 일정 추가에서 직접 기록해 주세요.": [
+    "We read this {currency} receipt, but expenses in this currency cannot be saved yet. Keep the original photo and add the place to your itinerary manually.",
+    "{currency}のレシートを読み取りましたが、この通貨の支出はまだ保存できません。原本の写真を保管し、場所は予定に直接追加してください。"
+  ],
+  "{p0} 일정 관리": ["Manage {p0}", "{p0}の予定を管理"],
+  "{count}번째 {field}": [
+    "Destination {count}: {field}",
+    "旅行先{count}：{field}"
+  ],
+  "{title} 위로 이동": ["Move {title} up", "{title}を上に移動"],
+  "{title} 아래로 이동": ["Move {title} down", "{title}を下に移動"],
+  "{title} 사진 추가": ["Add photo to {title}", "{title}に写真を追加"],
+  "{title} 비용 추가": ["Add expense to {title}", "{title}に費用を追加"],
+  "이메일 인증 닫기": ["Close email sign-in", "メール認証を閉じる"],
+  "여행 검색 열기": ["Open trip search", "旅行検索を開く"],
+  "여행지 전체": ["All destinations", "すべての旅行先"],
+  "기간 전체": ["Any duration", "すべての期間"],
+  "유형 전체": ["All types", "すべての種類"],
+  "전체 조건": ["All filters", "すべての条件"],
+  "1~3일": ["1–3 days", "1〜3日"],
+  "4일": ["4 days", "4日"],
+  "5일 이상": ["5+ days", "5日以上"],
+  "{label} 조건 선택": ["Choose filter: {label}", "{label}の条件を選択"],
+  "캐리어와 함께 걷는 하루": [
+    "Haru walking with a suitcase",
+    "スーツケースと歩くハル"
+  ],
+  "지도를 살펴보는 하루": ["Haru looking at a map", "地図を見るハル"],
+  "현지 시간대": ["Local time zone", "現地のタイムゾーン"],
+  "기본 통화": ["Default currency", "基本通貨"],
+  "일정 순서": ["Activity order", "予定の順序"],
+  "지도 위치": ["Map location", "地図上の位置"],
+  "이날 제목 · 선택": ["Day title · optional", "この日のタイトル・任意"],
+  "이날 소개 · 선택": ["Day overview · optional", "この日の紹介・任意"],
+  "출발 공항 코드": ["Departure airport code", "出発空港コード"],
+  "도착 공항 코드": ["Arrival airport code", "到着空港コード"],
+  "출발 시각 (선택, HH:mm)": [
+    "Departure time (optional, HH:mm)",
+    "出発時刻（任意、HH:mm）"
+  ],
+  "도착일 (현지, YYYY-MM-DD, 선택)": [
+    "Arrival date (local, YYYY-MM-DD, optional)",
+    "到着日（現地、YYYY-MM-DD、任意）"
+  ],
+  "도착 시각 (현지, HH:mm, 선택)": [
+    "Arrival time (local, HH:mm, optional)",
+    "到着時刻（現地、HH:mm、任意）"
+  ],
+  "출발 터미널 (선택)": [
+    "Departure terminal (optional)",
+    "出発ターミナル（任意）"
+  ],
+  "도착 터미널 (선택)": [
+    "Arrival terminal (optional)",
+    "到着ターミナル（任意）"
+  ],
+  "무료 위탁수하물 (kg, 선택)": [
+    "Free checked baggage (kg, optional)",
+    "無料受託手荷物（kg、任意）"
+  ],
+  "좌석 등급 (선택)": ["Cabin class (optional)", "座席クラス（任意）"],
+  "항공기 기종 (선택)": ["Aircraft model (optional)", "機種（任意）"],
+  "항공기 등록번호 (선택)": [
+    "Aircraft registration (optional)",
+    "機体記号（任意）"
+  ],
+  "여행계획": ["Travel plan", "旅行プラン"],
+  "다음": ["Next", "次へ"],
+  "여행의 시작부터, 오래 남을 순간까지": [
+    "From your first plan to lasting memories",
+    "旅のはじまりから、心に残る瞬間まで"
+  ],
+  "여행 둘러보기": ["Explore trips", "旅を探す"],
+  "초대 참여": ["Join a trip", "招待に参加"],
+  "영수증을 추가할 여행 선택": [
+    "Choose a trip for your receipt",
+    "レシートを追加する旅を選ぶ"
+  ],
+  "영수증 한 장, 여행의 기록으로": [
+    "Turn a receipt into a travel memory",
+    "レシートを旅の記録に"
+  ],
+  "방문 일정": ["Visits", "訪問日程"],
+  "메뉴 기록": ["Menu items", "メニュー記録"],
+  "장소와 메뉴를 확인하고 여행에 남겨요.": [
+    "Review the place and items, then save them to your trip.",
+    "場所とメニューを確認して旅に残しましょう。"
+  ],
+  "하루가 고른 {month}월 여행지": [
+    "Haru’s picks for month {month}",
+    "ハルが選んだ{month}月の旅先"
+  ],
+  "계절과 도시의 매력을 담은 하루의 추천이에요.": [
+    "Explore Haru’s seasonal city picks.",
+    "季節と街の魅力を楽しむ、ハルのおすすめです。"
+  ],
+  "여행지 검색": ["Find a destination", "旅先を探す"],
+  "여행지 검색어": ["Destination search", "旅先の検索語"],
+  "나라 또는 도시를 입력하세요": [
+    "Enter a country or city",
+    "国名または都市名を入力"
+  ],
+  "가이드가 있는 여행지를 찾아보세요.": [
+    "Find destinations with travel guides.",
+    "ガイドのある旅先を探しましょう。"
+  ],
+  "일치하는 여행지가 없어요. 다른 이름으로 검색해 주세요.": [
+    "No matches. Try another name.",
+    "該当する旅先がありません。別の名前で検索してください。"
+  ],
+  "결제·교통카드": ["Payments & transit cards", "決済・交通系カード"],
+  "일본": ["Japan", "日本"],
+  "동남아": ["Southeast Asia", "東南アジア"],
+  "택시 앱": ["Taxi apps", "タクシーアプリ"],
+  "버스·철도": ["Buses & trains", "バス・鉄道"],
+  "현지 여행 정보": ["Local travel information", "現地の旅行情報"],
+  "떠나기 전에 챙겨보세요": ["Before you go", "出発前にチェック"],
+  "공식 안내 보기": ["Open official guide", "公式案内を見る"],
+  "정보 확인일: {date}": ["Checked: {date}", "情報確認日：{date}"],
+  "교통카드와 모바일 결제를 준비해요. 지원 기기와 충전 조건은 공식 안내에서 확인해 주세요.": [
+    "Prepare transit cards and mobile payments. Check supported devices and top-up conditions in the official guide.",
+    "交通系カードやモバイル決済を準備しましょう。対応機種とチャージ条件は公式案内で確認してください。"
+  ],
+  "이동할 도시의 차량 호출 서비스와 결제 방법을 확인해 보세요. 제공 서비스는 지역마다 달라요.": [
+    "Check ride services and payment options in your destination. Availability varies by region.",
+    "訪問する街の配車サービスと支払い方法を確認しましょう。サービスは地域によって異なります。"
+  ],
+  "대중교통 경로와 철도 정보를 찾는 앱을 살펴보세요. 이용할 노선과 지원 언어를 먼저 확인해 주세요.": [
+    "Explore apps for transit routes and rail information. Check route coverage and supported languages first.",
+    "公共交通の経路や鉄道情報を調べるアプリです。利用する路線と対応言語を先に確認してください。"
+  ],
+  "여행 준비와 현지 이동에 필요한 관광청 안내를 확인해 보세요.": [
+    "Read official tourism guidance for travel preparation and getting around.",
+    "旅の準備や現地での移動に役立つ観光局の案内を確認しましょう。"
+  ],
+  "링크를 열지 못했어요. 다시 시도하거나 닫아 주세요.": [
+    "Could not open the link. Retry or close this guide.",
+    "リンクを開けませんでした。再試行するか閉じてください。"
+  ],
+  "임시 계획을 삭제하지 못했어요. 다시 시도해 주세요.": [
+    "Could not delete the draft. Try again.",
+    "下書きを削除できませんでした。もう一度お試しください。"
+  ],
+  "임시 계획을 불러오지 못했어요.": [
+    "Could not load your drafts.",
+    "下書きを読み込めませんでした。"
+  ],
+  "임시 계획 다시 불러오기": ["Reload drafts", "下書きを再読み込み"],
+  "작성하던 여행을 이어가세요": [
+    "Continue planning your trip",
+    "旅行プランの作成を続ける"
+  ],
+  "새 여행 계획": ["New trip plan", "新しい旅行プラン"],
+  "이 기기에 저장한 임시 계획": [
+    "Draft saved on this device",
+    "この端末に保存した下書き"
+  ],
+  "작성 이어가기": ["Continue editing", "作成を続ける"],
+  "임시 계획 삭제": ["Delete draft", "下書きを削除"],
+  "임시 계획을 삭제할까요?": ["Delete this draft?", "下書きを削除しますか？"],
+  "이 기기에 저장한 작성 내용을 삭제해요. 삭제한 내용은 복구할 수 없어요.": [
+    "This deletes the draft on this device. It cannot be restored.",
+    "この端末の下書きを削除します。削除後は復元できません。"
+  ],
+  "임시 저장을 완료하지 못했어요. 저장 공간과 임시 계획 수(최대 5개)를 확인하고 다시 시도해 주세요.": [
+    "Could not save the draft. Check device storage and the draft limit (5), then retry.",
+    "下書きを保存できませんでした。空き容量と下書き数（最大5件）を確認して再試行してください。"
+  ],
+  "나중에 계속하기": ["Save for later", "保存して後で続ける"],
+  "이 기기에 임시 저장하고 홈에서 이어서 작성해요.": [
+    "Save on this device and continue from Home.",
+    "この端末に保存し、ホームから作成を続けられます。"
+  ],
+  "임시 계획 불러오는 중…": ["Loading draft…", "下書きを読み込み中…"],
+  "저장된 임시 계획을 찾을 수 없어요.": [
+    "This draft could not be found.",
+    "保存した下書きが見つかりません。"
+  ],
+  "다녀온 여행을 만나보세요": [
+    "Explore travelers’ journeys",
+    "みんなの旅の記録"
+  ],
+  "여행자들이 공개한 여행 기록이에요.": [
+    "Travel stories shared by travelers.",
+    "旅行者が公開した旅の記録です。"
+  ],
+  "도쿄": ["Tokyo", "東京"],
+  "오사카": ["Osaka", "大阪"],
+  "나고야": ["Nagoya", "名古屋"],
+  "방콕": ["Bangkok", "バンコク"],
+  "태국": ["Thailand", "タイ"],
+  "상하이": ["Shanghai", "上海"],
+  "중국": ["China", "中国"],
+  "타이베이": ["Taipei", "台北"],
+  "대만": ["Taiwan", "台湾"],
+  "다낭": ["Da Nang", "ダナン"],
+  "베트남": ["Vietnam", "ベトナム"],
+  "싱가포르": ["Singapore", "シンガポール"],
+  "도시 산책과 새로운 취향 찾기": [
+    "City walks and new discoveries",
+    "街歩きと新しい発見"
+  ],
+  "골목마다 만나는 미식 여행": [
+    "A food journey through the streets",
+    "路地で出会うグルメ旅"
+  ],
+  "나만의 속도로 둘러보는 도시": [
+    "Explore the city at your own pace",
+    "自分のペースで街を巡る"
+  ],
+  "강변 풍경과 활기찬 거리": [
+    "Riverside views and lively streets",
+    "川沿いの景色と活気ある街"
+  ],
+  "옛 거리와 새로운 도시 풍경": [
+    "Old streets and a modern skyline",
+    "古い街並みと新しい都市風景"
+  ],
+  "야시장부터 동네 산책까지": [
+    "Night markets and neighborhood walks",
+    "夜市から街歩きまで"
+  ],
+  "해변과 도시를 함께 둘러보기": [
+    "Explore the beach and the city",
+    "ビーチと街を巡る"
+  ],
+  "다채로운 동네와 도시 여행": [
+    "Discover the city’s diverse neighborhoods",
+    "多彩な街を楽しむ旅"
+  ],
+  "하루와 함께, TripPrint": ["TripPrint, with Haru", "ハルと一緒に、TripPrint"],
+  "나만의 일정을 만들고, 여행의 순간을 기록하세요.": [
+    "Plan your trip and keep the moments that matter.",
+    "自分だけの旅を計画し、旅の思い出を残しましょう。"
+  ],
+  "영수증으로 남기는 여행": ["Your journey, in receipts", "レシートで残す旅"],
+  "다녀온 장소와 먹었던 메뉴, 여행을 선택해 정리해 보세요.": [
+    "Choose a trip to record places you visited and meals you enjoyed.",
+    "旅を選んで、訪れた場所や食べたメニューを記録しましょう。"
+  ],
+  "기록할 여행 선택": ["Choose a trip to record", "記録する旅を選ぶ"],
+  "위의 새 여행 만들기에서 날짜와 여행지를 정해 보세요.": [
+    "Choose dates and a destination with New trip above.",
+    "上の新しい旅を作成から、日程と行き先を決めましょう。"
+  ],
+  "여행의 비용 화면에서 영수증을 등록하고 방문 기록을 확인할 수 있어요.": [
+    "Add receipts and review visits in your trip’s expenses screen.",
+    "旅の費用画面でレシートを登録し、訪問記録を確認できます。"
+  ],
+  "먼저 여행을 만들어 주세요": [
+    "Create a trip first",
+    "まず旅を作成してください"
+  ],
+  "다음 여행을 계획해 보세요": [
+    "Plan your next trip",
+    "次の旅を計画しましょう"
+  ],
+  "작성 중인 계획 관리": ["Manage drafts", "下書きを管理"],
+  "로그인하고 내 여행 찾기": [
+    "Sign in to find your trips",
+    "ログインして自分の旅を探す"
+  ],
+  "떠나요.\n남겨요.": [
+    "Go places.\nKeep memories.",
+    "旅に出よう。\n思い出を残そう。"
+  ],
+  "하루의 여행 팩트 팁": ["Travel facts from Haru", "ハルの旅の豆知識"],
+  "영수증 등록, 방문 장소와 비용 정리": [
+    "Add receipts, organize visits and expenses",
+    "レシートを追加して訪問先と費用を整理"
+  ],
+  "방문 장소·비용 정리": ["Organize visits and expenses", "訪問先と費用を整理"],
+  "새 여행 만들기, 날짜와 여행지 추가": [
+    "Create a trip, add dates and destinations",
+    "新しい旅を作成して日程と行き先を追加"
+  ],
+  "날짜·여행지 추가": ["Add dates and destinations", "日程と行き先を追加"],
+  "어디로 떠나시나요?": ["Where are you heading?", "どこへ出かけますか？"],
+  "일정을 등록하고 영수증을 모아보세요.\n나만의 여행 노트가 완성됩니다.": [
+    "Add plans and collect receipts.\nBuild your own travel journal.",
+    "予定を登録してレシートを集めましょう。\n自分だけの旅ノートができあがります。"
+  ],
+  "새 여행 시작하기": ["Start a new trip", "新しい旅を始める"],
+  "초안을 저장했어요. 계속 작성할 수 있어요.": [
+    "Draft saved. You can keep editing.",
+    "下書きを保存しました。続けて編集できます。"
+  ],
+  "작성하던 내용을 이어 불러올 수 없어요. 다시 시작해 주세요.": [
+    "We could not restore your draft. Please start again.",
+    "入力内容を復元できませんでした。もう一度始めてください。"
+  ],
+  "새 계획 만들기": ["Create a new plan", "新しいプランを作る"],
+  "인기 여행지를 누르면 나라와 도시가 한 번에 입력돼요.": [
+    "Tap a popular destination to fill in the country and city together.",
+    "人気の旅行先を選ぶと、国と都市がまとめて入力されます。"
+  ],
+  "STEP 01 / 02 · 여행지와 일정": [
+    "STEP 01 / 02 · Destination and dates",
+    "STEP 01 / 02 · 旅行先と日程"
+  ],
+  "STEP 02 / 02 · 항공편 입력과 확인": [
+    "STEP 02 / 02 · Flight details and review",
+    "STEP 02 / 02 · フライトの入力と確認"
+  ],
+  "다녀온 여행의 도시와 기간을 선택해 주세요.": [
+    "Choose the city and dates of your past trip.",
+    "訪れた都市と旅行期間を選んでください。"
+  ],
+  "떠나고 싶은 여행지와 일정을 선택해 주세요.": [
+    "Choose where and when you want to travel.",
+    "行きたい旅行先と日程を選んでください。"
+  ],
+  "예약한 항공편을 추가하고 여행 내용을 확인해 주세요.": [
+    "Add your booked flights and review your trip details.",
+    "予約済みのフライトを追加し、旅行の内容を確認してください。"
+  ],
+  "총 {p0}개 일정": ["{p0} schedules total", "全{p0}件の予定"],
+  "주요 일정 하이라이트": ["Itinerary highlights", "主な予定のハイライト"],
+  "여행 실용 정보": ["Practical travel info", "旅の実用情報"],
+  "{p0} 도시 가이드 보기": ["View {p0} city guide", "{p0}の都市ガイドを見る"],
+  "도시 가이드 →": ["City guide →", "都市ガイド →"],
+  "추천 방문 시기": ["Best time to visit", "おすすめの時期"],
+  "대표 명소 · 미식": ["Top sights · local food", "定番スポット・グルメ"],
+  "{p0}일차": ["Day {p0}", "{p0}日目"],
+  "방금 결제한 영수증이 있나요?": [
+    "Have a receipt from a recent payment?",
+    "支払ったばかりのレシートはありますか？"
+  ],
+  "찍어두면 방문 장소와 지출 내역을 한곳에 정리할 수 있어요.": [
+    "Snap a photo to organize your visited places and expenses in one spot.",
+    "撮影しておくと、訪問先と支出をまとめて整理できます。"
+  ],
+  "영수증 촬영 및 업로드": [
+    "Scan or upload receipt",
+    "レシートを撮影・アップロード"
+  ],
+  "저장한 영수증": ["Saved receipts", "保存したレシート"],
+  "추천 여행지 가이드": [
+    "Recommended destination guides",
+    "おすすめの旅行先ガイド"
+  ],
+  "관광청 공식 정보": ["Official tourism info", "観光局の公式情報"],
+  "일차 선택": ["Select day", "日を選択"],
+  "공유 링크 복사": ["Copy share link", "共有リンクをコピー"],
+  "일정 유형": ["Activity type", "予定の種類"],
+  "당일치기": ["Day trip", "日帰り"],
+  "총 {p0}일간의 여정": ["{p0}-day journey", "全{p0}日間の旅"],
+  "어디로 떠나시나요?": ["Where are you heading?", "どこへ出かけますか？"],
+  "가고 싶은 도시를 선택하거나 검색해 보세요.": [
+    "Select or search for a city you want to visit.",
+    "行きたい都市を選ぶか検索してみましょう。"
+  ],
+  "도시나 국가명을 검색해 보세요 (예: 오사카, 도쿄)": [
+    "Search city or country (e.g., Osaka, Tokyo)",
+    "都市名や国名で検索（例：大阪、東京）"
+  ],
+  "선택된 여행지": ["Selected destination", "選択した旅行先"],
+  "다음: 항공편 및 일정 확인": [
+    "Next: Review flights & itinerary",
+    "次へ：フライトと日程の確認"
+  ],
+  "설정으로 돌아가기": ["Return to Settings", "設定に戻る"],
+  "게스트 계정": ["Guest account", "ゲストアカウント"],
+  "Google 계정": ["Google account", "Googleアカウント"],
+  "현재 기기 전용 게스트 계정으로 이용 중이에요. Google 계정의 탈퇴를 진행하려면 해당 계정으로 로그인해 주세요.": [
+    "You are currently using a device-only guest account. Please sign in with your Google account to manage its deletion.",
+    "現在は端末専用のゲストアカウントで利用中です。Googleアカウントの退会を進めるには、該当アカウントでログインしてください。"
+  ],
+  "현재 연결된 Google 계정의 보관 및 탈퇴 정책을 안내해요.": [
+    "Review data retention and deletion policies for your connected Google account.",
+    "現在連携されているGoogleアカウントの保管および退会ポリシーをご案内します。"
+  ],
+  "로그인 화면으로": ["Go to Sign in", "ログイン画面へ"],
+  "이 기기의 여행을 이어가세요. Google 계정으로 연결하면 새 여행을 계정에 보관할 수 있어요.": [
+    "Continue your trips on this device. Connect a Google account to save new trips to your account.",
+    "この端末の旅行を続けましょう。Googleアカウントを連携すると、新しい旅行をアカウントに保管できます。"
+  ],
+  "성별 (선택)": ["Gender (optional)", "性別（任意）"],
+  "기본 닉네임으로 바로 시작하기": [
+    "Start right away with default nickname",
+    " 기본ニックネームですぐに始める"
+  ],
+  "설정": ["Settings", "設定"],
+  "계정 정보": ["Account info", "アカウント情報"],
+  "현재 닉네임": ["Current nickname", "現在のニックネーム"],
+  "로그인 방식": ["Sign-in method", "ログイン方法"],
+  "게스트 (이 기기에만 저장)": [
+    "Guest (saved on this device only)",
+    "ゲスト（この端末のみに保存）"
+  ],
+  "Google 계정 연결 / 전환하기": [
+    "Connect or switch to Google account",
+    "Googleアカウントの連携・切り替え"
+  ],
+  "앱 환경설정": ["App preferences", "アプリ環境設定"],
+  "회원 탈퇴 및 데이터 보관 안내": [
+    "Account deletion & data retention",
+    "退会およびデータ保管のご案内"
+  ],
+  "게스트 계정을 로그아웃해도 이 기기에 저장된 여행 기록은 유지돼요.": [
+    "Even if you sign out of the guest account, trips saved on this device remain preserved.",
+    "ゲストアカウントからログアウトしても、この端末に保存された旅行記録は維持されます。"
+  ],
+  "계정에 저장한 여행은 같은 Google 계정으로 다시 로그인하면 언제든 볼 수 있어요.": [
+    "Trips saved to your account can be viewed anytime by signing back in with the same Google account.",
+    "アカウントに保存した旅行は、同じGoogleアカウントで再ログインすればいつでも見られます。"
+  ],
+  "게스트 여행을 Google 계정에 연결하기": [
+    "Connect guest trips to a Google account",
+    "ゲスト旅行をGoogleアカウントに連携する"
+  ],
+  "Google 계정으로 로그인하면 새 여행을 계정에 안전하게 보관할 수 있어요. 기존 게스트 여행은 이 기기에 유지돼요.": [
+    "Sign in with Google to safely store new trips in your account. Existing guest trips remain on this device.",
+    "Googleアカウントでログインすると、新しい旅行をアカウントに安全に保管できます。既存のゲスト旅行はこの端末に維持されます。"
+  ],
+  "Google 계정 연결하기": [
+    "Connect Google account",
+    "Googleアカウントを連携する"
+  ],
+  "나의 여행 보관함": ["My travel archive", "マイ旅行アーカイブ"],
+  "내 여행 계획 보기": ["View my travel plans", "マイ旅行計画を見る"],
+  "나의 발자국 관리": ["Manage my footprints", "マイ足跡の管理"],
+  "환경설정 및 계정": ["Preferences & account", "環境設定とアカウント"],
+  "언어 · 앱 정보 (v0.0.1) · 계정 관리": [
+    "Language · App info (v0.0.1) · Account",
+    "言語・アプリ情報 (v0.0.1)・アカウント管理"
+  ],
+  "설정 열기": ["Open settings", "設定を開く"],
+  "총 여행 목록 보기": ["View all trips", "すべての旅行を見る"],
+  "예정된 여행 목록 보기": ["View upcoming trips", "予定された旅行を見る"],
+  "완성된 발자국 보기": ["View completed footprints", "完成した足跡を見る"],
+  "로그인하기": ["Sign in", "ログインする"],
+  "여행과 기록을 Google 계정에 보관합니다": [
+    "Trips and records are stored in your Google account",
+    "旅行と記録をGoogleアカウントに保管します"
+  ],
+  "로그인 후 이용해 주세요": [
+    "Please sign in to continue",
+    "ログインしてからご利用ください"
+  ],
+  "고급 옵션 접기 (동선 순서 · 지도 핀 · 후보 묶음)": [
+    "Hide advanced options (route order · map pin · candidate group)",
+    "詳細オプションを閉じる（動線順序・地図ピン・候補グループ）"
+  ],
+  "+ 고급 옵션 열기 (동선 순서 · 지도 핀 · 후보 묶음)": [
+    "+ Show advanced options (route order · map pin · candidate group)",
+    "+ 詳細オプションを開く（動線順序・地図ピン・候補グループ）"
+  ],
+  "바로 여행 기록 만들기": ["Create trip record now", "今すぐ旅行記録を作成"],
+  "바로 여행 만들기": ["Create trip now", "今すぐ旅行を作成"],
+  "항공편 추가 및 확인 (선택)": [
+    "Add & review flights (optional)",
+    "フライトの追加と確認（任意）"
+  ],
+  "뒤로 버튼을 한 번 더 누르면 앱이 종료됩니다.": [
+    "Press back again to exit the app.",
+    "もう一度戻るボタンを押すとアプリを終了します。"
+  ],
+  "현재 위치 지도에서 보기": ["Show my location on map", "現在地を地図で表示"],
+  "위치 확인 중...": ["Locating...", "現在地を確認中..."],
+  "내 위치": ["My location", "現在地"],
+  "진행 중이거나 예정된 모든 여행 관리": [
+    "Manage all ongoing and upcoming trips",
+    "進行中または予定されているすべての旅行を管理"
+  ],
+  "다녀온 여행 기록과 공유한 일정 모음": [
+    "Completed trip records and shared itineraries",
+    "完了した旅行記録と共有した日程のまとめ"
+  ],
+  "클라우드에 여행을 안전하게 보관해요": [
+    "Safely back up your trips to the cloud",
+    "クラウドに旅行を安全に保管します"
+  ],
+  "로컬에 남아 있는 여행과 방문 기록 확인": [
+    "View trips and visit records stored locally",
+    "端末に残っている旅行と訪問記録を確認"
+  ],
+  "90일 유예 정책 및 여행 데이터 보존 안내": [
+    "90-day grace period and trip data retention guide",
+    "90日間の猶予ポリシーと旅行データ保持のご案内"
+  ],
+  "현재 기기의 게스트 세션을 종료해요": [
+    "End the guest session on this device",
+    "この端末のゲストセッションを終了します"
+  ],
+  "현재 연결된 Google 계정에서 로그아웃해요": [
+    "Sign out of the connected Google account",
+    "現在連携しているGoogleアカウントからログアウトします"
+  ],
+  "연결된 계정": ["Connected account", "連携中のアカウント"],
+  "즉시 로그아웃 및 탈퇴 멤버 전환": [
+    "Immediate sign-out & retired member status",
+    "即時ログアウトおよび退会メンバーへの切り替え"
+  ],
+  "90일 복구 유예 기간": [
+    "90-day recovery grace period",
+    "90日間の復旧猶予期間"
+  ],
+  "여행·영수증·동행자 기록 보존": [
+    "Trip, receipt & companion record retention",
+    "旅行・領収書・同行者記録の保持"
+  ],
+  "아직 등록된 일정이 없어요": [
+    "No activities added yet",
+    "まだ登録された予定がありません"
+  ],
+  "가고 싶은 장소를 검색하거나 추천 명소를 일정에 쏙 담아보세요.": [
+    "Search for places you want to visit or add recommended spots to your itinerary.",
+    "行きたい場所を検索するか、おすすめの名所を予定に追加してみましょう。"
+  ],
+  "장소 추가하기": ["Add a place", "場所を追加する"],
+  "어떤 장소를 찾고 계신가요?": [
+    "What kind of place are you looking for?",
+    "どんな場所をお探しですか？"
+  ],
+  "{p0} 장소 찾기": ["Find {p0} places", "{p0}の場所を探す"],
+  "카페/디저트": ["Cafe / Dessert", "カフェ・デザート"],
+  "명소/관광": ["Sights / Attractions", "名所・観光"],
+  "쇼핑": ["Shopping", "ショッピング"],
+  "필수 명소 바로 담기": ["Must-visit spots to add", "定番スポットをすぐ追加"],
+  "추천 명소 지도에서 보기": [
+    "View recommended spots on map",
+    "おすすめの名所を地図で見る"
+  ],
+  "지도에서 보기": ["View on map", "地図で見る"],
+  "추천 명소": ["Recommended spot", "おすすめの名所"],
+  "{p0} 바로 담기": ["Quick add {p0}", "{p0}をすぐ追加"],
+  "담기": ["Add", "追加"],
+  "담김": ["Added", "追加済み"],
+  "여행 팁": ["Travel tip", "旅のヒント"],
+  "가고 싶은 장소를 먼저 담아두면 날짜별 동선과 이동수단을 한눈에 비교할 수 있어요.": [
+    "Add the places you want to visit first to easily compare daily routes and transit options.",
+    "行きたい場所を先に追加しておくと、日別の動線や移動手段をひと目で比較できます。"
+  ],
+  "이날의 여행 메모 · 계획 수정하기": [
+    "Edit today's travel notes and plan",
+    "この日の旅行メモ・計画を編集"
+  ],
+  "이날의 준비물이나 특별한 여행 메모를 적어보세요": [
+    "Jot down packing items or special travel notes for this day",
+    "この日の持ち物や特別な旅行メモを書いてみましょう"
+  ],
+  "지도 보며 동선 짜기": ["Plan route with map", "地図を見ながら動線を作る"]
+}

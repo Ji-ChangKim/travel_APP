@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { returnToScreen } from '@/components/navigationModel';
 import { workspaceQueryOptions } from './tripQueries';
 import { ScrollView } from 'react-native';
@@ -20,6 +22,7 @@ import LedgerDiary from './LedgerDiary';
 
 // 신규 기록 상세도 현재 계정의 실제 멤버 원본만 읽는다.
 export default function DiaryScreen() {
+  useLocale();
   // 늦은 이전 계정의 조회/편집 상태를 새 계정에 적용하지 않는다.
   const userId = useTripStore((state) => {
     // 게스트도 실제 기기 원본의 소유 ID로 구분한다.
@@ -31,6 +34,7 @@ export default function DiaryScreen() {
 
 // 인증 복원·조회 실패·빈 원본을 서로 다른 화면 상태로 처리한다.
 function DiaryContent({ id, userId }: { id: string; userId: string }) {
+  useLocale();
   // 날짜 상태와 현재 기기 폭은 원본을 수정하지 않는다.
   useTripDateRefresh();
   const wide = useLedgerWide();
@@ -47,7 +51,7 @@ function DiaryContent({ id, userId }: { id: string; userId: string }) {
   const snapshot = query.isError ? undefined : query.data;
   return (
     <LedgerScreen
-      title={snapshot?.trip.title || '여행기록'}
+      title={snapshot?.trip.title || t('여행기록')}
       onBack={() => {
         // 개인 기록 상세는 공개 피드가 아닌 나의 보관함으로 돌아간다.
         return returnToScreen(router, '/my-footprints');
@@ -57,13 +61,13 @@ function DiaryContent({ id, userId }: { id: string; userId: string }) {
         {!ready || (userId && valid && query.isPending) ? (
           <HaruState
             kind="loading"
-            title="여행의 순간을 모으고 있어요"
+            title={t('여행의 순간을 모으고 있어요')}
             compact
           />
         ) : null}
         {ready && !userId && (
           <LedgerAction
-            label="로그인하고 발자국 보기"
+            label={t('로그인하고 발자국 보기')}
             onPress={() => {
               // 로그인 뒤 같은 여행으로 복귀한다.
               return router.push({
@@ -75,7 +79,7 @@ function DiaryContent({ id, userId }: { id: string; userId: string }) {
         )}
         {!valid && (
           <Text>
-            여행을 찾을 수 없어요. 나의 여행 기록에서 다시 선택해 주세요.
+            {t('여행을 찾을 수 없어요. 나의 여행 기록에서 다시 선택해 주세요.')}
           </Text>
         )}
         {query.isError && (
@@ -96,10 +100,12 @@ function DiaryContent({ id, userId }: { id: string; userId: string }) {
           ) : (
             <>
               <Text style={s.body}>
-                여행을 마치면 일정과 사진, 지출을 발자국으로 모아볼 수 있어요.
+                {t(
+                  '여행을 마치면 일정과 사진, 지출을 발자국으로 모아볼 수 있어요.',
+                )}
               </Text>
               <LedgerAction
-                label="여행 일정 열기"
+                label={t('여행 일정 열기')}
                 onPress={() => {
                   // 진행 중인 여행은 실제 원본 일정으로 연결한다.
                   return router.replace(`/trips/${id}`);

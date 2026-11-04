@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -8,16 +10,11 @@ import { loadDiscovery } from './discoveryService';
 import { discoveryStyles as s } from './discoveryStyles';
 import DiscoveryCarousel from './DiscoveryCarousel';
 import CityGuidePhoto from './CityGuidePhoto';
-import {
-  bundledDiscoveryCity,
-  cityPhotoCredit,
-  guideDestination,
-} from './cityGuides';
+import { bundledDiscoveryCity, guideDestination } from './cityGuides';
 
 type CityKey = DiscoveryDestination['key'];
 interface Props {
   disabled: boolean;
-  onPlan: (key: CityKey) => void;
 }
 // 월별 추천은 관광청 자료를 바탕으로 편집한 여행 아이디어다.
 const ideas: CityKey[][] = [
@@ -37,6 +34,7 @@ const ideas: CityKey[][] = [
 
 // 사진과 편집 가이드는 앱에 포함하고 외부 소개는 추가로 읽는다.
 export default function HomeDiscovery({ disabled }: Props) {
+  useLocale();
   // 외부 조회가 실패하거나 아직 진행 중이어도 도시 카드를 표시한다.
   return (
     <DiscoverySections
@@ -62,18 +60,22 @@ function DiscoverySections({
   router: ReturnType<typeof useRouter>;
   query: ReturnType<typeof useQuery<DestinationDiscovery>>;
 }) {
+  useLocale();
   // 카탈로그 도시마다 실제 사진이 있어 소개 API의 사진 누락에 영향을 받지 않는다.
   return (
-    <View style={s.section}>
+    <View style={s.section} testID="home-recommendations">
       <Text accessibilityRole="header" style={s.title}>
-        {new Date().getMonth() + 1}월의 여행지
+        {t('하루가 고른 {month}월 여행지', {
+          month: new Date().getMonth() + 1,
+        })}
       </Text>
       <DiscoveryCarousel
         cities={monthlyCities(query.data)}
         blocked={disabled}
         name={(city) => {
-          /* 도시의 한국어 이름을 읽는다. */ return guideDestination(city.key)!
-            .city;
+          /* 도시의 한국어 이름을 읽는다. */ return t(
+            guideDestination(city.key)!.city,
+          );
         }}
         onSelect={(city) => {
           /* 도시 키를 상세 경로에 전달한다. */ return router.push({
@@ -82,7 +84,7 @@ function DiscoverySections({
           });
         }}
         renderCity={(city) => {
-          // 앱에 포함한 사진과 출처를 카드에 표시한다.
+          // 홈은 사진과 도시만 보여주고 상세 가이드의 출처 정보는 유지한다.
           return (
             <>
               <CityGuidePhoto
@@ -92,17 +94,11 @@ function DiscoverySections({
               />
               <View style={s.cardCopy}>
                 <Text style={s.caption}>
-                  {guideDestination(city.key)!.country}
+                  {t(guideDestination(city.key)!.country)}
                 </Text>
-                <Text style={s.city}>{guideDestination(city.key)!.city}</Text>
-                <Text style={s.supporting}>
-                  {guideDestination(city.key)!.theme}
+                <Text style={s.city}>
+                  {t(guideDestination(city.key)!.city)}
                 </Text>
-                <Text style={s.caption}>
-                  사진: {cityPhotoCredit(city.key).author} ·{' '}
-                  {cityPhotoCredit(city.key).license}
-                </Text>
-                <Text style={s.source}>도시 이야기와 여행 팁 보기 →</Text>
               </View>
             </>
           );

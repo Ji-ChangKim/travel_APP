@@ -6,11 +6,18 @@ import {
 import type { DiscoveryCity } from '@wherego/validation';
 import credits from '../../../assets/destinations/credits.json';
 
+export interface CityGuidePlace {
+  title: string;
+  description: string;
+  areaTag?: string;
+  locationLabel?: string;
+}
+
 export interface CityGuide {
   intro: string;
   photoDescription: string;
   photo: ImageSourcePropType;
-  places: { title: string; description: string }[];
+  places: CityGuidePlace[];
   foods: { title: string; description: string }[];
   seasons: { months: string; description: string }[];
   sources: { label: string; url: string }[];
@@ -26,20 +33,28 @@ export const cityGuides: Record<DiscoveryDestination['key'], CityGuide> = {
     places: [
       {
         title: '나고야성',
+        areaTag: '명소 · 혼마루',
+        locationLabel: '나고야 나카구 혼마루',
         description: '성 주변과 혼마루 어전에서 나고야의 역사를 만나 보세요.',
       },
       {
         title: '사카에·히사야오도리 공원',
+        areaTag: '도심 · 사카에',
+        locationLabel: '나고야 나카구 사카에',
         description:
           '도심 공원과 미라이 타워를 따라 걷고 카페와 상점을 둘러보세요.',
       },
       {
         title: '오스 상점가',
+        areaTag: '쇼핑 · 오스',
+        locationLabel: '나고야 나카구 오스',
         description:
           '사찰 주변 골목에서 작은 가게와 길거리 먹거리를 찾아보세요.',
       },
       {
         title: '도쿠가와엔',
+        areaTag: '정원 · 도쿠가와',
+        locationLabel: '나고야 히가시구 도쿠가와초',
         description:
           '연못을 중심으로 이어지는 일본식 정원에서 계절 풍경을 즐겨 보세요.',
       },
@@ -99,15 +114,21 @@ export const cityGuides: Record<DiscoveryDestination['key'], CityGuide> = {
     places: [
       {
         title: '아사쿠사·센소지',
+        areaTag: '명소 · 아사쿠사',
+        locationLabel: '도쿄 다이토구 아사쿠사',
         description:
           '사찰과 나카미세 상점가를 걸으며 오래된 도쿄의 분위기를 느껴 보세요.',
       },
       {
         title: '시부야·하라주쿠',
+        areaTag: '거리 · 시부야',
+        locationLabel: '도쿄 시부야구',
         description: '거리 풍경, 쇼핑, 카페를 묶어 취향대로 산책해 보세요.',
       },
       {
         title: '우에노 공원',
+        areaTag: '공원 · 우에노',
+        locationLabel: '도쿄 다이토구 우에노 공원',
         description: '공원 산책과 박물관 관람을 함께 계획하기 좋아요.',
       },
     ],
@@ -165,15 +186,21 @@ export const cityGuides: Record<DiscoveryDestination['key'], CityGuide> = {
     places: [
       {
         title: '도톤보리',
+        areaTag: '관광지 · 난바',
+        locationLabel: '오사카 주오구 도톤보리',
         description:
           '강변의 간판과 야경을 구경하고 가까운 음식 골목을 둘러보세요.',
       },
       {
         title: '오사카성 공원',
+        areaTag: '명소 · 오사카성',
+        locationLabel: '오사카 주오구 오사카성',
         description: '성 주변의 넓은 산책길과 계절 풍경을 즐겨 보세요.',
       },
       {
         title: '구로몬 시장·신세카이',
+        areaTag: '시장 · 미식 골목',
+        locationLabel: '오사카 니혼바시·신세카이',
         description: '시장 먹거리와 오래된 상점가의 분위기를 만나 보세요.',
       },
     ],
@@ -232,14 +259,20 @@ export const cityGuides: Record<DiscoveryDestination['key'], CityGuide> = {
     places: [
       {
         title: '왕궁·왓 프라깨우',
+        areaTag: '사원 · 구시가지',
+        locationLabel: '방콕 프라나콘',
         description: '태국 전통 건축과 화려한 사원 장식을 만나 보세요.',
       },
       {
         title: '왓 아룬·강변',
+        areaTag: '명소 · 짜오프라야강',
+        locationLabel: '방콕 왓 아룬',
         description: '짜오프라야강 건너 사원을 보고 강변 풍경을 즐겨 보세요.',
       },
       {
         title: '야오와랏',
+        areaTag: '야시장 · 차이나타운',
+        locationLabel: '방콕 삼판타웡 야오와랏',
         description:
           '차이나타운 골목에서 먹거리와 저녁 거리 풍경을 즐겨 보세요.',
       },
@@ -294,15 +327,21 @@ export const cityGuides: Record<DiscoveryDestination['key'], CityGuide> = {
     places: [
       {
         title: '와이탄·황푸강',
+        areaTag: '명소 · 강변 야경',
+        locationLabel: '상하이 황푸구 와이탄',
         description:
           '강변 산책로에서 푸둥의 스카이라인을 보고 저녁 풍경을 즐겨 보세요.',
       },
       {
         title: '예원',
+        areaTag: '전통 정원 · 구시가지',
+        locationLabel: '상하이 황푸구 예원',
         description: '전통 정원과 주변 상점가를 함께 둘러보세요.',
       },
       {
         title: '주자자오',
+        areaTag: '근교 · 수향마을',
+        locationLabel: '상하이 칭푸구 주자자오',
         description: '도심 밖 수향마을에서 운하와 돌다리를 따라 산책해 보세요.',
       },
     ],
@@ -353,14 +392,20 @@ export const cityGuides: Record<DiscoveryDestination['key'], CityGuide> = {
     places: [
       {
         title: '타이베이 101·샹산',
+        areaTag: '전망 · 신이구',
+        locationLabel: '타이베이 신이구',
         description: '전망대 또는 샹산 산책길에서 도시 전경을 즐겨 보세요.',
       },
       {
         title: '다다오청',
+        areaTag: '감성 골목 · 다퉁구',
+        locationLabel: '타이베이 다퉁구 다다오청',
         description: '오래된 상점과 카페가 이어지는 골목을 둘러보세요.',
       },
       {
         title: '베이터우',
+        areaTag: '온천 · 휴식',
+        locationLabel: '타이베이 베이터우구',
         description: '온천 마을과 공원을 함께 방문해 여유롭게 쉬어 보세요.',
       },
     ],
@@ -412,15 +457,21 @@ export const cityGuides: Record<DiscoveryDestination['key'], CityGuide> = {
     places: [
       {
         title: '미케 해변',
+        areaTag: '해변 · 산책',
+        locationLabel: '다낭 선짜구 미케 해변',
         description:
           '긴 해변을 따라 걷고 이른 아침이나 해 질 무렵 바다를 즐겨 보세요.',
       },
       {
         title: '용다리·한강',
+        areaTag: '야경 · 한강변',
+        locationLabel: '다낭 하이쩌우구 용다리',
         description: '강변을 걸으며 다리와 도심의 저녁 풍경을 구경해 보세요.',
       },
       {
         title: '오행산·선짜반도',
+        areaTag: '자연 · 사원',
+        locationLabel: '다낭 응우하인선',
         description: '산과 사원에서 해안 도시의 또 다른 풍경을 만나 보세요.',
       },
     ],
@@ -472,15 +523,21 @@ export const cityGuides: Record<DiscoveryDestination['key'], CityGuide> = {
     places: [
       {
         title: '마리나 베이·머라이언 공원',
+        areaTag: '명소 · 마리나 베이',
+        locationLabel: '싱가포르 마리나 베이',
         description:
           '강변을 따라 걷고 싱가포르의 대표 도시 풍경을 만나 보세요.',
       },
       {
         title: '가든스 바이 더 베이',
+        areaTag: '식물원 · 온실 정원',
+        locationLabel: '싱가포르 가든스 바이 더 베이',
         description: '열대 정원과 실내 온실을 둘러보세요.',
       },
       {
         title: '차이나타운·리틀 인디아',
+        areaTag: '문화 거리 · 미식',
+        locationLabel: '싱가포르 차이나타운',
         description: '서로 다른 문화의 골목과 상점, 음식을 즐겨 보세요.',
       },
     ],
@@ -558,4 +615,22 @@ export function bundledDiscoveryCity(
 export function cityPhotoCredit(key: DiscoveryDestination['key']) {
   // 라이선스 정보는 다운로드 시 확인한 메타데이터에서 읽는다.
   return credits[key];
+}
+
+// 일정에 넣을 장소는 앱에 이미 수록된 도시 가이드에서만 읽는다.
+export function guideForTrip(
+  country: string,
+  city: string,
+): CityGuide | undefined {
+  // 같은 이름의 다른 나라 도시를 추천하지 않는다.
+  const trimmed = city.trim();
+  if (!trimmed) return undefined;
+  const destination = discoveryDestinations.find((item) => {
+    // 한글 도시명과 도시 키를 정확히 대조하며 빈 나라만 예외로 허용한다.
+    return (
+      (!country || country === item.country) &&
+      (item.city === trimmed || item.key === trimmed.toLowerCase())
+    );
+  });
+  return destination ? cityGuides[destination.key] : undefined;
 }

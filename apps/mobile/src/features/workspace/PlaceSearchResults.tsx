@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
@@ -26,6 +28,7 @@ type State = {
 
 // 검색 결과는 화면 메모리에서만 확인하고 장소 ID만 편집 폼에 전달한다.
 export default function PlaceSearchResults(props: Props) {
+  useLocale();
   // 부모의 계정·도시·검색어·잠금 변경은 컴포넌트를 교체해 이전 요청을 취소한다.
   const [state, setState] = useState<State>({
     busy: false,
@@ -89,7 +92,7 @@ export default function PlaceSearchResults(props: Props) {
   return (
     <View style={{ gap: 10 }} testID="place-search-results">
       <Button
-        label={state.busy ? '장소 검색 중…' : '장소 검색'}
+        label={state.busy ? t('장소 검색 중…') : t('장소 검색')}
         disabled={
           props.disabled ||
           state.busy ||
@@ -100,8 +103,9 @@ export default function PlaceSearchResults(props: Props) {
       />
       {props.query.trim().length < 2 || text.length > 200 ? (
         <Text style={styles.subtitle}>
-          장소 이름을 두 글자 이상 입력해 주세요. 도시를 포함해 200자까지 검색할
-          수 있어요.
+          {t(
+            '장소 이름을 두 글자 이상 입력해 주세요. 도시를 포함해 200자까지 검색할 수 있어요.',
+          )}
         </Text>
       ) : null}
       {state.results ? (
@@ -109,14 +113,16 @@ export default function PlaceSearchResults(props: Props) {
           <GoogleAttribution />
           {state.results.length === 0 ? (
             <Text accessibilityLiveRegion="polite" style={styles.subtitle}>
-              찾은 장소가 없어요. 이름을 바꿔 검색하거나 직접 입력해 주세요.
+              {t(
+                '찾은 장소가 없어요. 이름을 바꿔 검색하거나 직접 입력해 주세요.',
+              )}
             </Text>
           ) : null}
           {state.results.map((place) => (
             <View key={place.id} style={{ gap: 8 }}>
               <Text style={styles.subtitle}>{place.address}</Text>
               <Button
-                label={`${place.title} 선택`}
+                label={t('{p0} 선택', { p0: place.title })}
                 disabled={props.disabled}
                 onPress={() => {
                   // 공급자 이름·주소는 저장하지 않고 직접 입력한 제목을 유지한다.
@@ -130,14 +136,14 @@ export default function PlaceSearchResults(props: Props) {
           ))}
           {state.results.length > 0 ? (
             <Text style={styles.subtitle}>
-              장소를 선택한 뒤 지도 위치를 확인하고 일정을 저장해 주세요.
+              {t('장소를 선택한 뒤 지도 위치를 확인하고 일정을 저장해 주세요.')}
             </Text>
           ) : null}
         </>
       ) : null}
       {state.error ? (
         <Text accessibilityRole="alert" style={styles.error}>
-          {state.error}
+          {t(state.error)}
         </Text>
       ) : null}
     </View>

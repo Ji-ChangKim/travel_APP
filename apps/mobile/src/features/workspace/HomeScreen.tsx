@@ -1,19 +1,19 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import HaruState from '@/components/HaruState';
-import { ScrollView, View } from 'react-native';
+import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import type { listServerTrips } from '@wherego/api-client';
 import { useAuthReady } from '@/features/auth/AuthBridge';
-import { useTripStore } from '@/stores/useTripStore';
 import { Action } from './ui';
 import HomeTripList, { continuingTrips } from './HomeTripList';
 import { homeStyles as s } from './homeStyles';
-import HomeWelcomeGreeting from './HomeWelcomeGreeting';
-import HomeEmptyHero from './HomeEmptyHero';
+import HomeLanding from './HomeLanding';
 import HomeDiscovery from './HomeDiscovery';
 import HomeExplore from './HomeExplore';
-import { homeDestinations } from './homeDestinations';
-import HomeGuide from './HomeGuide';
+import HomePreparation from './HomePreparation';
+import HomeDraftResume from './HomeDraftResume';
 import HomeTools from './HomeTools';
 import { useTripDateRefresh } from './useTripDateRefresh';
 import HomeHeader from '@/components/HomeHeader';
@@ -29,6 +29,7 @@ interface HomeProps {
 
 // 첫 방문과 재방문의 목적에 맞는 홈 콘텐츠를 연결한다.
 export default function HomeScreen(props: HomeProps) {
+  useLocale();
   // 인증 확인 전에는 처음 온 사용자로 단정하지 않는다.
   return (
     <HomeContent
@@ -45,19 +46,13 @@ export default function HomeScreen(props: HomeProps) {
 // 목적지를 누르면 중간 선택 화면 없이 여행 생성 또는 로그인으로 이동한다.
 function startTrip(
   router: ReturnType<typeof useRouter>,
-  userId: string,
   destination = '',
 ): void {
   // 인증 후에도 선택한 목적지를 같은 생성 폼으로 전달한다.
   return router.push(
-    userId
-      ? destination
-        ? { pathname: '/new-trip', params: { destination } }
-        : '/new-trip'
-      : {
-          pathname: '/login',
-          params: { next: 'new-trip', ...(destination ? { destination } : {}) },
-        },
+    destination
+      ? { pathname: '/new-trip', params: { destination } }
+      : '/new-trip',
   );
 }
 
@@ -74,7 +69,8 @@ function HomeContent({
   router: ReturnType<typeof useRouter>;
   ready: boolean;
 }) {
-  // 사용자 닉네임과 실제 여행 목록을 표시 전용 화면에 전달한다.
+  useLocale();
+  // 날짜가 바뀌면 기존 여행의 표시 상태를 다시 계산한다.
   useTripDateRefresh();
   return (
     <HomeView
@@ -86,10 +82,6 @@ function HomeContent({
       router={router}
       ready={ready}
       activeTrips={continuingTrips(trips)}
-      userNickname={useTripStore((state) => {
-        // 계정 전환 때 화면에 이전 닉네임을 남기지 않는다.
-        return state.currentUser?.nickname;
-      })}
     />
   );
 }
@@ -103,14 +95,13 @@ function HomeView({
   router,
   ready,
   activeTrips,
-  userNickname,
 }: HomeProps & {
   router: ReturnType<typeof useRouter>;
   ready: boolean;
   activeTrips: ReturnType<typeof continuingTrips>;
-  userNickname?: string;
 }) {
-  // 조회 실패 중에도 새 여행과 목적지 선택을 사용할 수 있다.
+  useLocale();
+  // 조회 실패 중에도 브랜드 배너와 주요 기능 입구를 유지한다.
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={s.screen}>
       <HomeHeader signedIn={Boolean(userId)} ready={ready} />
@@ -119,74 +110,26 @@ function HomeView({
         onScroll={onGnbScroll}
         scrollEventThrottle={16}
       >
+        <HomeDiscovery disabled={!ready} />
+        <HomeLanding ready={ready} onCreate={() => startTrip(router)} />
+        <HomeDraftResume userId={userId} />
         {!ready || loading ? (
-          <HaruState kind="loading" title="내 여행 불러오는 중…" compact />
+          <HaruState kind="loading" title={t('내 여행 불러오는 중…')} compact />
         ) : error ? (
           <HaruState
             kind="error"
-            title="내 여행을 불러오지 못했어요"
+            title={t('내 여행을 불러오지 못했어요')}
             description={error}
             compact
           >
-            <Action label="내 여행 다시 불러오기" onPress={onReload} />
+            <Action label={t('내 여행 다시 불러오기')} onPress={onReload} />
           </HaruState>
         ) : activeTrips.length > 0 ? (
           <HomeTripList trips={activeTrips} router={router} userId={userId} />
-        ) : (
-          <>
-            <HomeWelcomeGreeting nickname={userNickname} />
-            <HomeEmptyHero
-              disabled={!ready}
-              onCreateTrip={() => {
-                // 새 여행 계획 생성 폼으로 즉시 이동한다.
-                return startTrip(router, userId);
-              }}
-              onExplore={() => {
-                // 공개 여행 탐색은 로그인 여부와 관계없이 연다.
-                return router.push('/(tabs)/footprints');
-              }}
-            />
-          </>
-        )}
+        ) : null}
 
-        {(!ready || loading || Boolean(error) || activeTrips.length > 0) && (
-          <View style={s.planning}>
-            <Action
-              label="새 여행 만들기"
-              variant="secondary"
-              disabled={!ready}
-              onPress={() => {
-                // 목록 조회 결과와 별개로 실제 여행 생성 폼을 연다.
-                return startTrip(router, userId);
-              }}
-            />
-            <View style={s.destinations}>
-              {homeDestinations.slice(0, 3).map((destination) => (
-                <Action
-                  key={destination.key}
-                  label={`${destination.city} 선택`}
-                  disabled={!ready}
-                  onPress={() => {
-                    // 템플릿을 복사한 것처럼 안내하지 않고 목적지만 폼에 채운다.
-                    return startTrip(router, userId, destination.key);
-                  }}
-                />
-              ))}
-            </View>
-          </View>
-        )}
-
-        <HomeGuide />
-
+        <HomePreparation />
         <HomeExplore userId={userId} />
-
-        <HomeDiscovery
-          disabled={!ready}
-          onPlan={(key) => {
-            // 공개 여행지에서 고른 목적지를 인증 뒤에도 생성 폼에 유지한다.
-            return startTrip(router, userId, key);
-          }}
-        />
 
         <HomeTools />
       </ScrollView>

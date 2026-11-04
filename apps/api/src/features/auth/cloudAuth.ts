@@ -134,7 +134,11 @@ export function cloudSession(
       // 임의 사용자 ID와 만료 토큰으로 여행에 접근하지 못하게 한다.
       if (result) await assertActiveAccount(env, result.user.id);
       return result
-        ? { userId: result.user.id, token }
+        ? {
+            userId: result.user.id,
+            token,
+            isAnonymous: result.user.isAnonymous === true,
+          }
         : rejectRequest('SESSION_EXPIRED');
     });
 }

@@ -33,6 +33,9 @@ export function tripCreationInput(values: Record<string, string>) {
     values.timezone || countryDefaults(values.country || '').timezone;
   const destinations = createdDestinations(values, timezone);
   return persistedTripCreateSchema.parse({
+    ...(Number(values._draftRevision) > 0
+      ? { draftRevision: Number(values._draftRevision) }
+      : {}),
     ...(destinations ? { destinations } : {}),
     title: values.title?.trim() || undefined,
     country: values.country?.trim(),

@@ -1,4 +1,5 @@
 import { useTripStore } from '@/stores/useTripStore';
+import { clearCreationHandoff } from './creationAuthHandoff';
 import {
   createFoundationTrip,
   sendWorkspaceCommand,
@@ -31,6 +32,7 @@ import { workspaceError } from './workspaceFailure';
 // 여행 작성 행동에 필요한 상태와 실행 경로의 계약이다.
 type WorkspaceFormActionOptions = {
   setSelectedDay: Dispatch<SetStateAction<string>>;
+  setSelectedScheduleId: Dispatch<SetStateAction<string>>;
   setActiveSection: Dispatch<SetStateAction<string>>;
   running: RefObject<boolean>;
   scanning: boolean;
@@ -66,6 +68,7 @@ type WorkspaceFormActionOptions = {
 // 입력 검증·여행 생성·필드 변경 행동을 구성한다.
 export function useWorkspaceFormActions({
   setSelectedDay,
+  setSelectedScheduleId,
   setActiveSection,
   running,
   scanning,
@@ -87,14 +90,15 @@ export function useWorkspaceFormActions({
 }: WorkspaceFormActionOptions) {
   // 전달받은 참조와 콜백으로 해당 작업의 수명을 구성한다.
 
-  const receiptRegistered = function receiptRegistered(
+  const scheduleRegistered = function scheduleRegistered(
     dayId: string,
+    scheduleId = '',
   ): Promise<void> {
-    // 서버에서 성공한 등록에만 날짜와 일정 탭을 변경한다.
-    return Promise.resolve(setSelectedDay(dayId)).then(() => {
-      // 영수증에서 생성된 여행 기록을 바로 확인한다.
-      return setActiveSection('itinerary');
-    });
+    // 폼의 날짜 변경은 저장 성공 후에만 목록에 반영해 실패·취소 시 원래 탐색을 보존한다.
+    setSelectedDay(dayId);
+    setSelectedScheduleId(scheduleId);
+    setActiveSection('itinerary');
+    return Promise.resolve();
   };
   // 새 여행 또는 기존 여행 폼을 확정한다.
   const save = function save(): void {
@@ -117,13 +121,24 @@ export function useWorkspaceFormActions({
           command(
             formCommand(form, snapshot),
             form.kind === 'receipt'
-              ? receiptRegistered.bind(null, form.values.dayId || '')
-              : undefined,
+              ? scheduleRegistered.bind(null, form.values.dayId || '', '')
+              : form.kind === 'schedule'
+                ? scheduleRegistered.bind(
+                    null,
+                    form.values.dayId || '',
+                    form.id,
+                  )
+                : undefined,
             true,
           );
         return;
       }
       // 선택 여행지와 기간, 두 번째 단계의 항공편만 저장 계약으로 검증한다.
+      const member = useTripStore.getState().currentUser;
+      if (!member || member.id !== userId || member.authProvider === 'guest') {
+        setError('로그인하고 여행을 저장해 주세요.');
+        return;
+      }
       const input = tripCreationInput(form.values);
       const key = form.id;
       execute(() => {
@@ -161,7 +176,11 @@ export function useWorkspaceFormActions({
     setError('입력한 항목을 확인해 주세요. 작성한 내용은 그대로 있어요.'));
   };
   // 생성 성공 후에만 작성 수명을 해제하고 서버 여행으로 이동한다.
-  const createdTrip = function createdTrip(tripId: string): void {
+  const createdTrip = async function createdTrip(
+    tripId: string,
+  ): Promise<void> {
+    if (useTripStore.getState().currentUser?.id !== userId) return;
+    if (form) clearCreationHandoff(form.id);
     // 일반 이탈 보호가 성공한 여행 생성의 화면 이동을 막지 않게 한다.
     return void (clearPending(),
     setForm(null),

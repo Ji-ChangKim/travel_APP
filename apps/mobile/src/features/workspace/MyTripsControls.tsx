@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { ScrollView, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { Dispatch, SetStateAction } from 'react';
@@ -30,14 +32,15 @@ export function MyTripsHeader({
 }: {
   selectionState: MyTripsSelectionState;
 }) {
+  useLocale();
   const router = useRouter();
   return (
     <ScreenHeader
-      title="내 여행 계획"
+      title={t('내 여행 계획')}
       actions={[
         {
           icon: 'search',
-          label: '여행 검색 열기',
+          label: t('여행 검색 열기'),
           expanded: selection.searching,
           onPress: () => {
             // 검색 창만 전환하고 기존 검색 조건은 유지한다.
@@ -49,7 +52,7 @@ export function MyTripsHeader({
         },
         {
           icon: 'account',
-          label: '내 계정 보기',
+          label: t('내 계정 보기'),
           onPress: () => {
             // 계정 탭으로 이동해도 여행 목록 상태를 유지한다.
             return router.navigate('/(tabs)/my');
@@ -68,6 +71,7 @@ export function MyTripsControls({
   empty: boolean;
   selectionState: MyTripsSelectionState;
 }) {
+  useLocale();
   // 새 여행과 실제 검색·정렬 동작은 원본 데이터 변경 없이 실행한다.
   const router = useRouter();
   return (
@@ -76,19 +80,19 @@ export function MyTripsControls({
         <View style={s.wrapRow}>
           <View style={s.heading}>
             <Text accessibilityRole="header" style={s.headingTitle}>
-              내 여행 아카이브
+              {t('내 여행 아카이브')}
             </Text>
-            <Text style={s.body}>나의 모든 여정과 소중한 기록</Text>
+            <Text style={s.body}>{t('나의 모든 여정과 소중한 기록')}</Text>
           </View>
           <MyTripsButton
-            label="새 여행 만들기"
+            label={t('새 여행 만들기')}
             style={[s.action, s.primary]}
             onPress={() => {
               /* 기존 여행 작성 화면을 연다. */ return router.push('/new-trip');
             }}
           >
             <Ionicons name="add" size={18} color={c.card} />
-            <Text style={[s.actionText, s.inverse]}>새 여행</Text>
+            <Text style={[s.actionText, s.inverse]}>{t('새 여행')}</Text>
           </MyTripsButton>
         </View>
       )}
@@ -96,8 +100,8 @@ export function MyTripsControls({
         <View style={s.search}>
           <Ionicons name="search-outline" size={20} color={c.muted} />
           <DesignInput
-            accessibilityLabel="여행 검색"
-            placeholder="여행 제목, 도시, 국가 검색"
+            accessibilityLabel={t('여행 검색')}
+            placeholder={t('여행 제목, 도시, 국가 검색')}
             value={selection.search}
             style={s.input}
             onChangeText={(search) => {
@@ -107,7 +111,7 @@ export function MyTripsControls({
             }}
           />
           <MyTripsButton
-            label="검색어 지우기"
+            label={t('검색어 지우기')}
             style={s.iconButton}
             onPress={() => {
               /* 다른 선택은 바꾸지 않는다. */ return setSelection({
@@ -125,12 +129,12 @@ export function MyTripsControls({
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={s.filters}
-          accessibilityLabel="여행 상태 필터"
+          accessibilityLabel={t('여행 상태 필터')}
         >
           {myTripFilters.map(([filter, label]) => (
             <MyTripsButton
               key={filter}
-              label={`${label} 여행 필터`}
+              label={t('{p0} 여행 필터', { p0: label })}
               compact
               selected={selection.filter === filter}
               style={[s.chip, selection.filter === filter && s.selectedChip]}
@@ -143,14 +147,14 @@ export function MyTripsControls({
               <Text
                 style={[s.chipText, selection.filter === filter && s.inverse]}
               >
-                {label}
+                {t(label)}
               </Text>
             </MyTripsButton>
           ))}
         </ScrollView>
         {!empty && (
           <MyTripsButton
-            label="여행 정렬 변경"
+            label={t('여행 정렬 변경')}
             compact
             style={[s.chip, { paddingHorizontal: 8 }]}
             onPress={() => {
@@ -169,7 +173,7 @@ export function MyTripsControls({
                 color={c.muted}
               />
               <Text style={s.chipText}>
-                {selection.sort === 'recent' ? '최근 출발순' : '출발일순'}
+                {selection.sort === 'recent' ? t('최근 출발순') : t('출발일순')}
               </Text>
             </View>
           </MyTripsButton>

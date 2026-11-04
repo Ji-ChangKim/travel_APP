@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { createContext, type ReactNode } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { useFonts } from 'expo-font';
@@ -5,15 +7,22 @@ import { colors } from '@/constants/theme';
 
 export const AppFontsReady = createContext(false);
 
-// 로그인부터 기록 화면까지 동일한 한글 글꼴을 준비한다.
+// 언어 전환 시 화면이 깜박이지 않도록 한·영·일 글꼴을 함께 준비한다.
 export default function AppFontProvider({ children }: { children: ReactNode }) {
-  // 기존 앱에 포함된 글꼴만 사용하고 새 패키지를 추가하지 않는다.
+  useLocale();
+  // 공식 Regular·Bold 파일을 포함하며 Semibold 역할은 제공되는 Bold에 연결한다.
   return (
     <FontView
       state={useFonts({
-        TripPrintRegular: require('../../assets/fonts/pretendard-regular.otf'),
-        TripPrintSemibold: require('../../assets/fonts/pretendard-semibold.otf'),
-        TripPrintBold: require('../../assets/fonts/pretendard-bold.otf'),
+        TripPrintRegular: require('../../assets/fonts/line-seed/line-seed-ko-regular.ttf'),
+        TripPrintSemibold: require('../../assets/fonts/line-seed/line-seed-ko-bold.ttf'),
+        TripPrintBold: require('../../assets/fonts/line-seed/line-seed-ko-bold.ttf'),
+        TripPrintRegularEN: require('../../assets/fonts/line-seed/line-seed-en-regular.ttf'),
+        TripPrintSemiboldEN: require('../../assets/fonts/line-seed/line-seed-en-bold.ttf'),
+        TripPrintBoldEN: require('../../assets/fonts/line-seed/line-seed-en-bold.ttf'),
+        TripPrintRegularJP: require('../../assets/fonts/line-seed/line-seed-ja-regular.ttf'),
+        TripPrintSemiboldJP: require('../../assets/fonts/line-seed/line-seed-ja-bold.ttf'),
+        TripPrintBoldJP: require('../../assets/fonts/line-seed/line-seed-ja-bold.ttf'),
         TripPrintLogo: require('../../assets/brand/tripprint-v1/fonts/Poppins-Bold.ttf'),
       })}
     >
@@ -30,6 +39,7 @@ function FontView({
   state: ReturnType<typeof useFonts>;
   children: ReactNode;
 }) {
+  useLocale();
   // 처음 읽는 화면에서 글꼴이 뒤늦게 바뀌는 현상을 줄인다.
   return ready || error ? (
     <AppFontsReady.Provider value={ready}>{children}</AppFontsReady.Provider>
@@ -43,7 +53,7 @@ function FontView({
     >
       <ActivityIndicator
         color={colors.primary}
-        accessibilityLabel="화면을 준비하는 중"
+        accessibilityLabel={t('화면을 준비하는 중')}
       />
     </View>
   );

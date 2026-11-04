@@ -1,27 +1,33 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import HaruState from '@/components/HaruState';
 import { colors } from '@/constants/theme';
 import { useEffect, useRef, useState } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View } from 'react-native';
 import Constants from 'expo-constants';
+import { Ionicons } from '@expo/vector-icons';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
+import LocationFeedback from '@/features/permissions/LocationFeedback';
+import { useCurrentLocation } from '@/features/permissions/useCurrentLocation';
 import type { MapCanvasProps } from './TripMapCanvas';
 import { tripMapLines } from './tripMapModel';
 
 // Android는 기본 Google 지도만 사용하고 Map ID·경로 API를 연결하지 않는다.
 export default function TripMapCanvas(props: MapCanvasProps) {
+  useLocale();
   // 키가 없는 Android 빌드에서는 초기화 오류 대신 복구 안내를 제공한다.
   return Platform.OS === 'android' &&
     !Constants.expoConfig?.extra?.androidMapsEnabled ? (
     <HaruState
       kind="error"
-      title="지도를 열 수 없어요"
+      title={t('지도를 열 수 없어요')}
       description={
         props.picking
-          ? 'Google Maps에서 위치를 확인한 뒤 좌표를 붙여 넣어 주세요.'
+          ? t('Google Maps에서 위치를 확인한 뒤 좌표를 붙여 넣어 주세요.')
           : props.stops.length
-            ? '아래 장소에서 Google Maps로 확인해 주세요.'
-            : '일정 탭에서 장소를 추가한 뒤 Google Maps로 확인해 주세요.'
+            ? t('아래 장소에서 Google Maps로 확인해 주세요.')
+            : t('일정 탭에서 장소를 추가한 뒤 Google Maps로 확인해 주세요.')
       }
       compact
     />
@@ -38,11 +44,18 @@ function NativeCanvas({
   onPick,
   picking,
 }: MapCanvasProps) {
-  // 지도 위치만 읽는 화면은 GPS 권한을 요청하지 않는다.
+  useLocale();
+  // 사용자가 내 위치 버튼을 누른 경우에만 GPS 권한과 현재 좌표를 요청한다.
   const map = useRef<MapView>(null);
   const [ready, setReady] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [slow, setSlow] = useState(false);
+  const currentLocation = useCurrentLocation(true);
+  const located = currentLocation.result?.status === 'located';
+  const liveCoordinate =
+    currentLocation.result?.status === 'located'
+      ? currentLocation.result.fix.coordinate
+      : undefined;
   // 지도 타일 지연 안내의 타이머를 화면 수명에 맞춰 정리한다.
   useEffect(() => {
     // 키 제한·네트워크 문제에서도 빈 지도만 계속 표시하지 않는다.
@@ -87,13 +100,22 @@ function NativeCanvas({
             )
           : undefined;
   }, [ready, selected, stops]);
+  useEffect(() => {
+    if (!ready || !liveCoordinate) return undefined;
+    map.current?.animateCamera(
+      { center: liveCoordinate, zoom: 15 },
+      { duration: 280 },
+    );
+    return undefined;
+  }, [ready, liveCoordinate]);
   // 지도 공급자 로고와 저작권 영역을 가리지 않는다.
   return (
     <View style={{ gap: 8 }}>
       {slow && !loaded ? (
         <Text accessibilityRole="alert" style={s.message}>
-          지도가 늦게 열리고 있어요. 잠시 기다리거나 Google Maps에서 장소를
-          확인해 주세요.
+          {t(
+            '지도가 늦게 열리고 있어요. 잠시 기다리거나 Google Maps에서 장소를 확인해 주세요.',
+          )}
         </Text>
       ) : null}
       <View style={s.frame}>
@@ -107,8 +129,8 @@ function NativeCanvas({
             latitudeDelta: 100,
             longitudeDelta: 160,
           }}
-          showsUserLocation={false}
-          showsMyLocationButton={false}
+          showsUserLocation={located}
+          showsMyLocationButton={located}
           toolbarEnabled={false}
           onMapReady={() => {
             // 네이티브 지도가 준비된 뒤에만 카메라 조작을 허용한다.
@@ -169,7 +191,33 @@ function NativeCanvas({
             ) : null,
           )}
         </MapView>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('현재 위치 지도에서 보기')}
+          disabled={currentLocation.busy}
+          onPress={currentLocation.locate}
+          style={({ pressed }) => [
+            s.gpsButton,
+            located && s.gpsButtonActive,
+            pressed && s.gpsButtonPressed,
+          ]}
+        >
+          <Ionicons
+            name={located ? 'locate' : 'locate-outline'}
+            size={18}
+            color={located ? colors.surface : colors.text}
+          />
+          <Text style={[s.gpsButtonLabel, located && s.gpsButtonLabelActive]}>
+            {currentLocation.busy ? t('위치 확인 중...') : t('내 위치')}
+          </Text>
+        </Pressable>
       </View>
+      <LocationFeedback
+        result={currentLocation.result}
+        onSettings={currentLocation.settings}
+        disabled={currentLocation.busy}
+        manual={false}
+      />
     </View>
   );
 }
@@ -180,8 +228,44 @@ const s = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
     backgroundColor: colors.surfaceMuted,
+    position: 'relative',
   },
   map: { flex: 1 },
+  gpsButton: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    minHeight: 40,
+    borderRadius: 9999,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    shadowColor: '#000000',
+    shadowOpacity: 0.14,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  gpsButtonActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  gpsButtonPressed: {
+    opacity: 0.85,
+  },
+  gpsButtonLabel: {
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  gpsButtonLabelActive: {
+    color: colors.surface,
+  },
   pin: {
     minWidth: 48,
     minHeight: 48,

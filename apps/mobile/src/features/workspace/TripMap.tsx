@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
 import { useMemo, useState } from 'react';
@@ -22,6 +24,7 @@ export default function TripMap({
   disabled: boolean;
   onEdit: (item: WorkspaceSchedule) => void;
 }) {
+  useLocale();
   // 번호 핀과 목록은 같은 배열을 사용하여 방문 순서가 어긋나지 않게 한다.
   const stops = useMemo(() => {
     // 편집 결과나 날짜 변경 때만 위치 목록을 재계산한다.
@@ -33,10 +36,11 @@ export default function TripMap({
   // 지도 없이도 제목·위치 선택·외부 길 안내를 이용할 수 있다.
   return (
     <View testID="trip-map-panel" style={s.content}>
-      <Text style={s.title}>지도에서 보는 여행</Text>
+      <Text style={s.title}>{t('지도에서 보는 여행')}</Text>
       <Text style={s.note}>
-        번호는 방문 순서예요. 연결선은 장소 사이를 잇는 선으로, 실제 이동 경로와
-        다를 수 있어요.
+        {t(
+          '번호는 방문 순서예요. 연결선은 장소 사이를 잇는 선으로, 실제 이동 경로와 다를 수 있어요.',
+        )}
       </Text>
       <TripMapCanvas
         stops={stops}
@@ -45,11 +49,11 @@ export default function TripMap({
       />
       {!stops.length ? (
         <TripDetailEmpty
-          title="아직 이날의 일정이 없어요"
+          title={t('아직 이날의 일정이 없어요')}
           description={
             disabled
-              ? '일정이 추가되면 장소와 방문 순서를 함께 볼 수 있어요.'
-              : '일정 탭에서 첫 장소를 추가해 보세요.'
+              ? t('일정이 추가되면 장소와 방문 순서를 함께 볼 수 있어요.')
+              : t('일정 탭에서 첫 장소를 추가해 보세요.')
           }
         />
       ) : null}
@@ -58,8 +62,9 @@ export default function TripMap({
         return !stop.coordinate;
       }) ? (
         <Text style={s.note}>
-          아직 지도 위치를 선택하지 않은 일정이 있어요. 장소에서 ‘위치 선택’을
-          눌러 주세요.
+          {t(
+            '아직 지도 위치를 선택하지 않은 일정이 있어요. 장소에서 ‘위치 선택’을 눌러 주세요.',
+          )}
         </Text>
       ) : null}
       {stops.map((stop) => (
@@ -72,17 +77,20 @@ export default function TripMap({
             <View style={{ flex: 1, gap: 4 }}>
               <Text style={s.stopTitle}>{stop.item.title}</Text>
               <Text style={s.note}>
-                {stop.item.timeSlot || '시간 미정'}
+                {stop.item.timeSlot || t('시간 미정')}
                 {stop.item.address ? ` · ${stop.item.address}` : ''}
-                {!stop.coordinate ? ' · 위치 선택 전' : ''}
+                {!stop.coordinate ? t(' · 위치 선택 전') : ''}
               </Text>
             </View>
           </View>
           <View style={s.actions}>
             <DesignButton
-              label="지도에서 선택"
+              label={t('지도에서 선택')}
               size="chip"
-              accessibilityLabel={`${stop.order}. ${stop.item.title} 지도에서 선택`}
+              accessibilityLabel={t('{p0}. {p1} 지도에서 선택', {
+                p0: stop.order,
+                p1: stop.item.title,
+              })}
               selected={stop.item.id === selectedId}
               onPress={() => {
                 /* 지도 핀과 목록의 선택을 같은 일정으로 맞춘다. */ return setSelectedId(
@@ -91,7 +99,7 @@ export default function TripMap({
               }}
             />
             <Action
-              label="Google Maps 길 안내"
+              label={t('Google Maps 길 안내')}
               variant="quiet"
               size="chip"
               onPress={() => {
@@ -110,7 +118,7 @@ export default function TripMap({
               }}
             />
             <Action
-              label={stop.coordinate ? '위치 변경' : '위치 선택'}
+              label={stop.coordinate ? t('위치 변경') : t('위치 선택')}
               size="chip"
               disabled={disabled}
               onPress={() => {
@@ -123,7 +131,7 @@ export default function TripMap({
       ))}
       {error ? (
         <Text accessibilityRole="alert" style={{ color: colors.danger }}>
-          {error}
+          {t(error)}
         </Text>
       ) : null}
     </View>

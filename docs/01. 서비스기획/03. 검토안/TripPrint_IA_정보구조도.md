@@ -1,3 +1,5 @@
+> 2026-10-27 정책 확정 반영: 이 문서는 이전 구조 이력입니다. 아래 공식 승인·단일 기준 표기를 현재 전체 구조의 승인으로 해석하지 않습니다. 현행 정책과 새 페이지 이동 구조는 연결된 기준을 우선합니다. 새 구조는 검토안이며 구현 완료가 아닙니다. [확정 정책](<../01. 기능정의/핵심정책_확정사항.md>)
+
 # TripPrint (트립프린트) 정보 구조도 (Information Architecture, IA)
 
 ## System Navigation & Screen Hierarchy Specification

@@ -1,5 +1,14 @@
 import { test, expect, type Page } from '@playwright/test';
 
+test.beforeEach(async ({ page }) => {
+  // 기기 기록도 현재 인증 정책을 거쳐 연다. 실제 로컬 API가 게스트를 발급해야 한다.
+  await page.goto('/login');
+  await page
+    .getByRole('button', { name: '게스트로 시작하기', exact: true })
+    .click();
+  await expect(page.getByTestId('travel-home')).toBeVisible();
+});
+
 // 브라우저 UI에서 여행과 장소 계획을 생성한다.
 function createContent(page: Page): Promise<void> {
   // 외부 계정이나 데이터 주입 없이 실제 폼을 사용한다.
@@ -143,6 +152,48 @@ test('여행→계획→영수증 원본 등록→새로고침 후 보존', ({ p
         page.getByRole('img', { name: '도쿄 식당 영수증 원본' }),
       ).toHaveAttribute('src', /^data:image\/png;base64,/);
     });
+});
+
+test('닫은 편집창의 늦은 파일 선택은 새 영수증에 연결하지 않는다', async ({
+  page,
+}) => {
+  await createContent(page);
+  await page.getByRole('button', { name: '영수증 등록', exact: true }).click();
+  const [chooser] = await Promise.all([
+    page.waitForEvent('filechooser'),
+    page
+      .getByRole('button', {
+        name: '영수증 사진·PDF 선택 (2MB 이하)',
+        exact: true,
+      })
+      .click(),
+  ]);
+  await page
+    .getByRole('dialog', { name: '영수증으로 상세 기록', exact: true })
+    .getByRole('button', { name: '닫기', exact: true })
+    .first()
+    .click();
+  await page.getByRole('button', { name: '영수증 등록', exact: true }).click();
+  await chooser.setFiles({
+    name: 'closed-editor.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWM8AAAAASUVORK5CYII=',
+      'base64',
+    ),
+  });
+  await expect(
+    page.getByRole('button', {
+      name: '영수증 사진·PDF 선택 (2MB 이하)',
+      exact: true,
+    }),
+  ).toBeEnabled();
+  await expect(
+    page.getByText('closed-editor.png', { exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole('button', { name: '영수증 원본 다시 선택', exact: true }),
+  ).toHaveCount(0);
 });
 
 test('왕복 항공편 입력이 출발·귀국 기준표에 보존', ({ page }) => {

@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { Image, View } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -13,8 +15,9 @@ export default function HomeHeader({
 }: {
   signedIn: boolean;
   ready: boolean;
-  variant?: 'home' | 'public-feed';
+  variant?: 'home' | 'public-feed' | 'travel-home';
 }) {
+  useLocale();
   // 중복 목적지를 가진 팝업 메뉴를 만들지 않는다.
   const router = useRouter();
   return (
@@ -41,19 +44,20 @@ export default function HomeHeader({
           </Text>
         </View>
         <View style={s.topRightActions}>
-          {signedIn && ready && (
+          {signedIn && ready && variant !== 'travel-home' && (
             <HeaderAction
               icon="account"
-              label="내 계정 보기"
+              label={t('내 계정 보기')}
+              disabled={!ready}
               onPress={() => {
                 // 계정 탭은 기존 탐색 상태를 보존하며 연다.
                 return router.navigate('/(tabs)/my');
               }}
             />
           )}
-          {!signedIn && ready && (
+          {!signedIn && ready && variant !== 'travel-home' && (
             <DesignButton
-              label="로그인"
+              label={t('로그인')}
               variant="quiet"
               size="header"
               onPress={() => {

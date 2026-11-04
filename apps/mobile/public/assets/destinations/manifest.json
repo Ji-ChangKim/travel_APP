@@ -1,0 +1,16 @@
+{
+  "role": "public-discovery-image",
+  "provenance": "기존 discoveryAssets.ts 등록 정보. 이번 정리에서 새 다운로드나 이용 조건 재검증은 하지 않음.",
+  "files": [
+    {
+      "filename": "taipei-101-tourism.jpg",
+      "bytes": 203394,
+      "sha256": "03e58ecf0d0b71e9b05328fb02f9f2c9492063473369e3b9f4bfa0d2b2c1f15a",
+      "sourceUrl": "https://media.taiwan.net.tw/zh-tw/portal/media?Keyword=%E5%8F%B0%E5%8C%97101",
+      "author": "대만 교통부 관광서 (交通部觀光署)",
+      "license": "Taiwan Open Government Data License 1.0",
+      "licenseUrl": "https://data.gov.tw/license",
+      "usage": "기존 공개 이미지 URL 유지. 앱에 포함된 taipei.jpg와 다른 원본."
+    }
+  ]
+}

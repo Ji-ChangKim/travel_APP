@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { useRouter } from 'expo-router';
 import HaruState from '@/components/HaruState';
 import { tripAccessFailure, type AuthReturn } from '../auth/authReturn';
@@ -16,6 +18,7 @@ export default function TripAccessFeedback({
   onRetry: () => void;
   busy?: boolean;
 }) {
+  useLocale();
   // 로그인으로 보내기 전에 기존 입력·미확정 요청 보호를 확인한다.
   const router = useRouter();
   const failure = tripAccessFailure(error);
@@ -25,22 +28,24 @@ export default function TripAccessFeedback({
       kind="error"
       title={
         failure === 'login'
-          ? '로그인을 다시 확인해 주세요'
+          ? t('로그인을 다시 확인해 주세요')
           : failure === 'list'
-            ? '이 여행을 열 수 없어요'
-            : '여행을 불러오지 못했어요'
+            ? t('이 여행을 열 수 없어요')
+            : t('여행을 불러오지 못했어요')
       }
       description={
         failure === 'login'
-          ? '다시 로그인하면 보고 있던 여행으로 돌아와요.'
+          ? t('다시 로그인하면 보고 있던 여행으로 돌아와요.')
           : failure === 'list'
-            ? '참여 권한이 없거나 삭제된 여행이에요. 내 여행에서 다른 여행을 선택해 주세요.'
-            : '연결을 확인하고 다시 시도해 주세요.'
+            ? t(
+                '참여 권한이 없거나 삭제된 여행이에요. 내 여행에서 다른 여행을 선택해 주세요.',
+              )
+            : t('연결을 확인하고 다시 시도해 주세요.')
       }
     >
       {failure === 'login' ? (
         <Action
-          label="로그인하고 이어가기"
+          label={t('로그인하고 이어가기')}
           onPress={() => {
             // 작성 중인 내용이 있으면 기존 이탈 확인을 거친다.
             return requestScheduleExit(() => {
@@ -55,7 +60,9 @@ export default function TripAccessFeedback({
       ) : failure === 'list' ? (
         <Action
           label={
-            target.next === 'plans' ? '홈으로 돌아가기' : '내 여행 목록으로'
+            target.next === 'plans'
+              ? t('홈으로 돌아가기')
+              : t('내 여행 목록으로')
           }
           onPress={() => {
             // 현재 목록 자체의 권한 오류는 홈에서 다시 시작한다.
@@ -68,7 +75,11 @@ export default function TripAccessFeedback({
           }}
         />
       ) : (
-        <Action label="여행 다시 불러오기" disabled={busy} onPress={onRetry} />
+        <Action
+          label={t('여행 다시 불러오기')}
+          disabled={busy}
+          onPress={onRetry}
+        />
       )}
     </HaruState>
   );

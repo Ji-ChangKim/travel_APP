@@ -1,5 +1,12 @@
 [
   {
+    "file": "welcome.tsx",
+    "path": "/welcome",
+    "header": "entry",
+    "title": "TripPrint",
+    "gnb": false
+  },
+  {
     "file": "index.tsx",
     "path": null,
     "header": "launch",
@@ -95,6 +102,13 @@
     "path": "/account",
     "header": "task",
     "title": "계정 관리",
+    "gnb": false
+  },
+  {
+    "file": "settings.tsx",
+    "path": "/settings",
+    "header": "task",
+    "title": "설정",
     "gnb": false
   },
   {

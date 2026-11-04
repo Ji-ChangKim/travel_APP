@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { useState } from 'react';
 import { Image, View } from 'react-native';
@@ -14,6 +16,7 @@ export default function CityGuidePhoto({
   city: DiscoveryDestination;
   compact?: boolean;
 }) {
+  useLocale();
   // 재시도는 같은 도시 자산만 새 이미지 요청으로 표시한다.
   const [attempt, setAttempt] = useState(0);
   // 도시 전환과 각 재시도의 실패 상태를 서로 분리한다.
@@ -43,6 +46,7 @@ function PhotoAttempt({
   compact: boolean;
   onRetry: () => void;
 }) {
+  useLocale();
   // 늦게 도착한 이전 이미지 오류는 새 시도의 상태를 바꾸지 못한다.
   const [failed, setFailed] = useState(false);
   // 실패 시 사진 영역만 도시 이름과 대체색으로 바꾼다.
@@ -62,10 +66,13 @@ function PhotoAttempt({
     >
       <Text style={s.title}>{city.city}</Text>
       <Text accessibilityRole="alert">
-        사진을 불러오지 못했어요. 여행 정보는 계속 볼 수 있어요.
+        {t('사진을 불러오지 못했어요. 여행 정보는 계속 볼 수 있어요.')}
       </Text>
       {!compact && (
-        <Action label={`${city.city} 사진 다시 불러오기`} onPress={onRetry} />
+        <Action
+          label={t('{p0} 사진 다시 불러오기', { p0: city.city })}
+          onPress={onRetry}
+        />
       )}
     </View>
   ) : (

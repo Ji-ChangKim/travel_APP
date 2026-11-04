@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { ActivityIndicator, Image, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,11 +13,14 @@ export default function GoogleLogin({
   busy,
   disabled,
   onPress,
+  presentation = 'default',
 }: {
   busy: boolean;
   disabled: boolean;
   onPress: () => void;
+  presentation?: 'default' | 'welcome';
 }) {
+  useLocale();
   // 미등록 공급자를 실행하지 않고 조회 실패 시 재시도를 제공한다.
   const providers = useQuery({
     queryKey: ['social-providers'],
@@ -26,7 +31,11 @@ export default function GoogleLogin({
   return (
     <View style={{ gap: 8 }}>
       <LoginButton
-        label="Google 계정으로 계속하기"
+        label={
+          presentation === 'welcome'
+            ? t('Google로 계속하기')
+            : t('Google 계정으로 계속하기')
+        }
         variant="google"
         disabled={disabled || busy || !providers.data?.google}
         busy={busy || providers.isFetching}
@@ -40,7 +49,8 @@ export default function GoogleLogin({
           />
         }
         trailing={
-          busy || providers.isFetching ? (
+          presentation === 'welcome' ? undefined : busy ||
+            providers.isFetching ? (
             <ActivityIndicator size="small" color={loginTheme.secondary} />
           ) : (
             <Ionicons name="arrow-forward" size={18} color={loginTheme.muted} />
@@ -49,18 +59,23 @@ export default function GoogleLogin({
       />
       {busy ? (
         <Text accessibilityLiveRegion="polite" style={styles.status}>
-          Google 계정으로 로그인하고 있어요…
+          {t('Google 계정으로 로그인하고 있어요…')}
         </Text>
       ) : null}
       {!providers.isPending && !providers.data?.google ? (
         <Text accessibilityRole="alert" style={styles.status}>
-          Google 로그인을 지금 이용할 수 없어요. 이메일로 계속하거나 다시 시도해
-          주세요.
+          {presentation === 'welcome'
+            ? t(
+                'Google 로그인을 지금 이용할 수 없어요. 다시 확인하거나 게스트로 시작해 주세요.',
+              )
+            : t(
+                'Google 로그인을 지금 이용할 수 없어요. 이메일로 계속하거나 다시 시도해 주세요.',
+              )}
         </Text>
       ) : null}
       {!providers.isPending && !providers.data?.google ? (
         <LoginButton
-          label="Google 로그인 다시 확인"
+          label={t('Google 로그인 다시 확인')}
           disabled={disabled || busy || providers.isFetching}
           onPress={() => {
             // Google 이용 가능 여부만 다시 조회한다.

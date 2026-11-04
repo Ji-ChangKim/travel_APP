@@ -98,6 +98,7 @@ type EditorProps = {
   conflicted?: boolean;
   onChange: (key: string, value: string) => void;
   onSave: () => void;
+  onDraftPending?: (pending: boolean) => void;
   onReload: () => void;
   onClose: () => void;
   onReceipt: (camera: boolean) => void;

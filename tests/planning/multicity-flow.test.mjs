@@ -3,6 +3,7 @@ import { randomBytes, randomUUID } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { chromium, expect } from '@playwright/test';
+import { signInPlanningMember } from './member-session.mjs';
 import {
   planningRuntime,
   planningRequest,
@@ -62,17 +63,8 @@ test(
     });
     const page = await context.newPage();
     await page.goto(`${webOrigin}/login`);
-    await page
-      .getByRole('button', {
-        name: '이메일 계정으로 로그인 / 회원가입',
-        exact: true,
-      })
-      .click();
-    await page.getByLabel('이메일', { exact: true }).fill(email);
-    await page.getByLabel('비밀번호', { exact: true }).fill(password);
-    await page
-      .getByRole('button', { name: '이메일 로그인', exact: true })
-      .click();
+    // 실제 로컬 세션으로 도시 저장을 검수하며 외부 Google 인증을 대체 검증하지 않는다.
+    await signInPlanningMember(page, { email, password });
     await expect(page).not.toHaveURL(/\/login/);
     await page.goto(`${webOrigin}/trips/${tripId}`);
     await page
@@ -243,6 +235,7 @@ test(
           publicCitiesAndDayAssignmentsMatchedDb: true,
           renewedSessionMatchedDb: true,
           publicPostWithdrawn: true,
+          externalGoogleAuthenticationVerified: false,
         },
         null,
         2,

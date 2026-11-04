@@ -1,3 +1,5 @@
+import { useLocale } from '@/features/localization/localeState';
+import { t } from '@/features/localization/translate';
 import { ledgerShellStyles as local } from './ledgerShellStyles';
 import {
   ledgerActionContainer,
@@ -51,6 +53,7 @@ export function LedgerAction({
   variant?: 'primary' | 'secondary' | 'quiet' | 'danger' | 'destructive';
   allowWhileLocked?: boolean;
 }) {
+  useLocale();
   // 단일 선택은 채움, 다중 선택은 고정된 체크 공간을 사용한다.
   const [focused, setFocused] = useState(false);
   const scope = useFormScope();
@@ -113,7 +116,7 @@ export function LedgerAction({
           { color: ledgerActionForeground(blocked, Boolean(filled)) },
         ]}
       >
-        {loading ? '처리 중…' : label}
+        {loading ? t('처리 중…') : label}
       </Text>
     </Pressable>
   );
@@ -129,6 +132,7 @@ export function LedgerScreen({
   title?: string;
   onBack?: () => void;
 }) {
+  useLocale();
   // 상세·작성 화면은 중복 로고나 탐색 메뉴 없이 제목에 집중한다.
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={s.screen}>

@@ -1,3 +1,4 @@
+import { t } from '@/features/localization/translate';
 import type { WorkspaceSnapshot } from '@wherego/domain';
 import { z } from 'zod';
 import {
@@ -144,6 +145,9 @@ export function receiptCurrencyIssue(currency: string): string {
   return !currency
     ? '결제 통화를 읽지 못했어요. 원본을 확인하고 KRW·JPY·USD 중 실제 결제 통화를 선택해 주세요.'
     : !['KRW', 'JPY', 'USD'].includes(currency)
-      ? `${currency} 영수증은 읽었지만 이 통화의 지출은 아직 저장할 수 없어요. 원본 사진을 보관하고, 장소는 일정 추가에서 직접 기록해 주세요.`
+      ? t(
+          '{currency} 영수증은 읽었지만 이 통화의 지출은 아직 저장할 수 없어요. 원본 사진을 보관하고, 장소는 일정 추가에서 직접 기록해 주세요.',
+          { currency },
+        )
       : '';
 }

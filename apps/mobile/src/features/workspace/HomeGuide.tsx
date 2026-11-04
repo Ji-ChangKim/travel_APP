@@ -1,115 +1,82 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { Ionicons } from '@expo/vector-icons';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { homeColors as colors } from './homeTheme';
 
-const tips = [
-  {
-    icon: 'git-branch-outline',
-    title: '일정과 동선 한눈에',
-    description: '날짜별 일정과 장소를 지도에서 확인해요.',
-    color: colors.ink,
-  },
-  {
-    icon: 'receipt-outline',
-    title: '영수증 사진으로 비용 정리',
-    description: '인식한 금액을 확인한 뒤 지출로 저장해요.',
-    color: colors.accent,
-  },
-  {
-    icon: 'book-outline',
-    title: '여행의 순간 남기기',
-    description: '사진과 메모를 여행별로 모아 보세요.',
-    color: colors.mint,
-  },
-] as const;
-
-// 실제 사용 흐름에 맞는 세 가지 활용 팁을 시안 순서로 배치한다.
+// 사용 설명을 줄이고 영수증에서 방문·메뉴로 이어지는 관계를 보여준다.
 export default function HomeGuide() {
-  // 자동 확정이나 개인 전용 메모처럼 지원하지 않는 기능은 약속하지 않는다.
+  useLocale();
+  const router = useRouter();
   return (
-    <View style={styles.section} testID="home-guide">
-      <View style={styles.header}>
-        <View style={styles.heading}>
-          <Ionicons name="bulb-outline" size={20} color={colors.accent} />
-          <Text accessibilityRole="header" style={styles.title}>
-            여행 활용 가이드
-          </Text>
-        </View>
-        <Text style={styles.badge}>처음이라면</Text>
+    <Pressable
+      testID="home-guide"
+      accessibilityRole="button"
+      accessibilityLabel={`${t('영수증 한 장, 여행의 기록으로')}. ${t('영수증을 추가할 여행 선택')}`}
+      onPress={() => router.push('/(tabs)/plans')}
+      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+    >
+      <View style={styles.heading}>
+        <Text accessibilityRole="header" style={styles.title}>
+          {t('영수증 한 장, 여행의 기록으로')}
+        </Text>
+        <Ionicons name="arrow-forward" size={20} color={colors.primary} />
       </View>
-      {tips.map((tip) => {
-        // 팁의 제목과 설명을 큰 글꼴에서도 잘리지 않게 함께 표시한다.
-        return (
-          <View key={tip.icon} style={styles.card}>
-            <View style={styles.icon}>
-              <Ionicons name={tip.icon} size={24} color={tip.color} />
-            </View>
-            <View style={styles.copy}>
-              <Text style={styles.tipTitle}>{tip.title}</Text>
-              <Text style={styles.description}>{tip.description}</Text>
-            </View>
+      <View style={styles.steps}>
+        {(
+          [
+            ['receipt-outline', '영수증'],
+            ['location-outline', '방문 일정'],
+            ['restaurant-outline', '메뉴 기록'],
+          ] as const
+        ).map(([icon, label]) => (
+          <View key={icon} style={styles.step}>
+            <Ionicons name={icon} size={24} color={colors.primary} />
+            <Text style={styles.label}>{t(label)}</Text>
           </View>
-        );
-      })}
-    </View>
+        ))}
+      </View>
+      <Text style={styles.description}>
+        {t('장소와 메뉴를 확인하고 여행에 남겨요.')}
+      </Text>
+    </Pressable>
   );
 }
-
 const styles = StyleSheet.create({
-  section: { gap: 12 },
-  header: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 8,
-    marginBottom: 4,
+  card: {
+    padding: 20,
+    gap: 16,
+    borderRadius: 24,
+    backgroundColor: colors.surface,
   },
-  heading: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    flexShrink: 1,
-  },
+  heading: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   title: {
-    flexShrink: 1,
+    flex: 1,
     fontSize: 18,
     lineHeight: 26,
     fontWeight: '700',
     color: colors.ink,
   },
-  badge: {
-    backgroundColor: '#FFECE7',
-    color: colors.accent,
-    fontSize: 14,
-    lineHeight: 22,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  card: {
-    backgroundColor: colors.surface,
+  steps: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  step: {
+    flexBasis: '28%',
+    flexGrow: 1,
+    padding: 8,
+    gap: 8,
+    alignItems: 'center',
     borderRadius: 12,
-    padding: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
+    backgroundColor: colors.canvas,
   },
-  icon: {
-    width: 48,
-    height: 48,
-    borderRadius: 8,
-    backgroundColor: colors.selected,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  copy: { flex: 1, gap: 2 },
-  tipTitle: {
+  label: {
+    alignSelf: 'stretch',
+    textAlign: 'center',
     fontSize: 14,
     lineHeight: 22,
-    fontWeight: '700',
+    fontWeight: '600',
     color: colors.ink,
   },
   description: { fontSize: 14, lineHeight: 22, color: colors.muted },
+  pressed: { opacity: 0.78 },
 });

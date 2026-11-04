@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import React from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
@@ -17,6 +19,7 @@ const DEFAULT_CURATED_POST_ID = 'dac90238-8825-4359-93b1-bd43c946f757';
 
 // 실제 DB에 등록된 추천 여행 코스를 조회해 테마 최적 동선으로 렌더링한다.
 export default function CuratedPlanDetailScreen() {
+  useLocale();
   // 경로 매개변수로 지정된 추천 계획 ID 또는 기본 공식 추천 일정을 조회한다.
   const params = useLocalSearchParams<{ planId?: string }>();
   const postId = params.planId || DEFAULT_CURATED_POST_ID;
@@ -39,7 +42,10 @@ export default function CuratedPlanDetailScreen() {
   // 로딩 상태를 표시한다.
   if (query.isPending) {
     return (
-      <HaruState kind="loading" title="추천 여행 코스를 불러오는 중이에요." />
+      <HaruState
+        kind="loading"
+        title={t('추천 여행 코스를 불러오는 중이에요.')}
+      />
     );
   }
 
@@ -48,11 +54,11 @@ export default function CuratedPlanDetailScreen() {
     return (
       <HaruState
         kind="error"
-        title="추천 여행을 불러오지 못했어요"
-        description="연결 상태를 확인하고 다시 시도해 주세요."
+        title={t('추천 여행을 불러오지 못했어요')}
+        description={t('연결 상태를 확인하고 다시 시도해 주세요.')}
       >
         <Action
-          label="다시 불러오기"
+          label={t('다시 불러오기')}
           loading={query.isFetching}
           onPress={() => query.refetch()}
         />

@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { userFacingMessage } from '@/services/userFacingError';
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
@@ -168,11 +170,12 @@ function EmailForm({
   onClose: () => void;
   onAuthenticated: () => void;
 }) {
+  useLocale();
   // 모달이 닫히면 민감한 입력 상태도 함께 해제한다.
   return (
     <Modal
       accessibilityLabel={
-        state.mode === 'login' ? '이메일 로그인' : '이메일 회원가입'
+        state.mode === 'login' ? t('이메일 로그인') : t('이메일 회원가입')
       }
       animationType="slide"
       onRequestClose={
@@ -186,7 +189,7 @@ function EmailForm({
     >
       <SafeAreaView style={styles.screen}>
         <AuthNavigation
-          title={state.mode === 'login' ? '로그인' : '회원가입'}
+          title={state.mode === 'login' ? t('로그인') : t('회원가입')}
           disabled={state.busy}
           onBack={onClose}
           onClose={onClose}
@@ -205,10 +208,10 @@ function EmailForm({
                 <TravelerPortrait />
               </>
             ) : (
-              <Text style={styles.formHeader}>이메일로 로그인</Text>
+              <Text style={styles.formHeader}>{t('이메일로 로그인')}</Text>
             )}
             <AuthInput
-              label="이메일"
+              label={t('이메일')}
               placeholder="you@example.com"
               value={state.email}
               email
@@ -220,9 +223,9 @@ function EmailForm({
             />
             {state.mode === 'signup' && (
               <AuthInput
-                label="닉네임"
-                placeholder="여행에서 사용할 이름"
-                hint={nicknameHint}
+                label={t('닉네임')}
+                placeholder={t('여행에서 사용할 이름')}
+                hint={t(nicknameHint)}
                 value={state.nickname}
                 disabled={state.busy}
                 onChange={(value) => {
@@ -233,9 +236,11 @@ function EmailForm({
             )}
             <AuthInput
               key={`${state.mode}-password`}
-              label="비밀번호"
+              label={t('비밀번호')}
               placeholder={
-                state.mode === 'signup' ? '8자 이상 입력' : '비밀번호 입력'
+                state.mode === 'signup'
+                  ? t('8자 이상 입력')
+                  : t('비밀번호 입력')
               }
               maxLength={128}
               value={state.password}
@@ -249,8 +254,8 @@ function EmailForm({
             />
             {state.mode === 'signup' && (
               <AuthInput
-                label="비밀번호 확인"
-                placeholder="비밀번호 한 번 더 입력"
+                label={t('비밀번호 확인')}
+                placeholder={t('비밀번호 한 번 더 입력')}
                 maxLength={128}
                 value={state.confirmation}
                 secret
@@ -264,12 +269,12 @@ function EmailForm({
             )}
             {state.error && (
               <Text style={styles.error} accessibilityRole="alert">
-                {state.error}
+                {t(state.error)}
               </Text>
             )}
             {state.notice && (
               <Text accessibilityRole="alert" style={styles.status}>
-                {state.notice}
+                {t(state.notice)}
               </Text>
             )}
             <LoginButton
@@ -278,11 +283,11 @@ function EmailForm({
               label={
                 state.busy
                   ? state.mode === 'signup'
-                    ? '가입하고 있어요…'
-                    : '로그인하고 있어요…'
+                    ? t('가입하고 있어요…')
+                    : t('로그인하고 있어요…')
                   : state.mode === 'login'
-                    ? '이메일 로그인'
-                    : '회원가입'
+                    ? t('이메일 로그인')
+                    : t('회원가입')
               }
               disabled={state.busy}
               trailing={
@@ -300,8 +305,8 @@ function EmailForm({
             <LoginButton
               label={
                 state.mode === 'login'
-                  ? '이메일로 회원가입'
-                  : '이미 계정이 있어요'
+                  ? t('이메일로 회원가입')
+                  : t('이미 계정이 있어요')
               }
               disabled={state.busy}
               onPress={() => {
@@ -327,6 +332,7 @@ export default function EmailAuth(props: {
   onClose: () => void;
   onAuthenticated: () => void;
 }) {
+  useLocale();
   // 상태 훅을 한 번씩 호출하고 입력 화면에 연결한다.
   return (
     <EmailStateForm
@@ -348,6 +354,7 @@ function EmailStateForm({
   onClose: () => void;
   onAuthenticated: () => void;
 }) {
+  useLocale();
   // 인증 상태는 기존 AuthBridge에서 전역 세션에 반영한다.
   return <EmailForm state={state} set={set} lock={lock} {...props} />;
 }

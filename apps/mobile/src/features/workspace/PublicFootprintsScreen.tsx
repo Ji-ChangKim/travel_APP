@@ -1,3 +1,4 @@
+import { useLocalSearchParams } from 'expo-router';
 import { useTripStore } from '@/stores/useTripStore';
 import { renderDiscoveryContent } from './CommunityScreenView';
 import { useDiscoveryController } from './useDiscoveryController';
@@ -10,7 +11,8 @@ export default function PublicFootprintsScreen() {
       state.currentUser?.id || 'public'
     );
   });
-  return <PublicFootprintsContent key={userId} />;
+  const { kind } = useLocalSearchParams<{ kind?: string }>();
+  return <PublicFootprintsContent key={`${userId}:${kind || 'all'}`} />;
 }
 
 // 승인된 브랜드 유형과 실제 공개 목록을 연결한다.

@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { View } from 'react-native';
 import { Action } from './ui';
@@ -16,6 +18,7 @@ export default function TripFlightList({
   onEdit: (slot: FlightSlot) => void;
   onRemove: (index: number) => void;
 }) {
+  useLocale();
   // 빈 슬롯은 실제 항공권이나 예시 운항편으로 표시하지 않는다.
   return (
     <View style={{ gap: 16 }}>
@@ -25,7 +28,7 @@ export default function TripFlightList({
         return (
           <FlightSlotCard
             key={role}
-            label={role === 'outbound' ? '출발 항공편' : '도착 항공편'}
+            label={role === 'outbound' ? t('출발 항공편') : t('도착 항공편')}
             item={items[index]}
             disabled={index < 0 && items.length >= 30}
             onEdit={() => {
@@ -43,7 +46,7 @@ export default function TripFlightList({
         item.role === 'additional' ? (
           <FlightSlotCard
             key={index}
-            label="추가 항공편"
+            label={t('추가 항공편')}
             item={item}
             onEdit={() => {
               // 추가 구간의 원래 순서를 유지하며 수정한다.
@@ -57,7 +60,7 @@ export default function TripFlightList({
         ) : null,
       )}
       <Action
-        label="추가 항공권 등록"
+        label={t('추가 항공권 등록')}
         disabled={items.length >= 30}
         onPress={() => {
           // 여행 중 국내선 등 별도 구간을 새 항공편으로 등록한다.
@@ -82,6 +85,7 @@ function FlightSlotCard({
   onRemove: () => void;
   disabled?: boolean;
 }) {
+  useLocale();
   // 입력 페이지를 완료한 구간만 실제 정보 카드로 표시한다.
   return (
     <View style={styles.card}>
@@ -101,15 +105,15 @@ function FlightSlotCard({
             }
           />
           <Text style={styles.subtitle}>
-            출발 터미널 · {item.departureTerminal || '정보 없음'}
+            {t('출발 터미널 ·')} {item.departureTerminal || t('정보 없음')}
           </Text>
           <Text style={styles.subtitle}>
-            도착 터미널 · {item.arrivalTerminal || '정보 없음'}
+            {t('도착 터미널 ·')} {item.arrivalTerminal || t('정보 없음')}
           </Text>
           <View style={styles.row}>
-            <Action label={`${label} 변경`} onPress={onEdit} />
+            <Action label={t('{p0} 변경', { p0: label })} onPress={onEdit} />
             <Action
-              label={`${label} 삭제`}
+              label={t('{p0} 삭제', { p0: label })}
               variant="quiet"
               onPress={onRemove}
             />
@@ -117,7 +121,7 @@ function FlightSlotCard({
         </>
       ) : (
         <Action
-          label={`${label} 추가하기`}
+          label={t('{p0} 추가하기', { p0: label })}
           disabled={disabled}
           onPress={onEdit}
         />

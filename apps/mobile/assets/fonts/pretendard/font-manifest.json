@@ -18,6 +18,14 @@
       "bytes": 1576660,
       "sha256": "2e91915fab54df71cc9598ebf608b2bdb54c6fe3c066ac61dff0bc44fca71cc7",
       "source": "https://raw.githubusercontent.com/orioncactus/pretendard/main/packages/pretendard/dist/public/static/Pretendard-Bold.otf"
+    },
+    {
+      "filename": "pretendard-semibold.otf",
+      "family": "Pretendard",
+      "weight": 600,
+      "bytes": 1583704,
+      "sha256": "c89bc43027dc7cde5726e96223376f8eec09302b2fc1f8147fd5b57cfc376118",
+      "sourceStatus": "기존 저장소 파일 보존. 원본 다운로드 주소 확인 필요."
     }
   ]
 }

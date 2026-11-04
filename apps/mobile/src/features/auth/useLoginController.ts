@@ -79,7 +79,6 @@ export default function useLoginController(
     error: '',
     operation: null,
   });
-  const [emailOpen, setEmailOpen] = useState(false);
   const lock = useRef(false);
   const router = useRouter();
   const currentUser = useTripStore((store) => {
@@ -101,11 +100,10 @@ export default function useLoginController(
       });
     });
   };
-  // 화면에는 서버 인증을 사용하는 행동만 전달한다.
+  // 화면에는 Google 로그인과 게스트 시작 행동만 전달한다.
   return {
     ...state,
     currentUser,
-    emailOpen,
     startGuest: () => {
       // 구글 인증 없이 이 기기 전용 게스트를 선택한다.
       return runLoginAction(
@@ -127,31 +125,6 @@ export default function useLoginController(
         },
         '게스트를 시작하지 못했어요. 처음 시작할 때는 인터넷 연결을 확인해 주세요.',
       );
-    },
-    browseCommunity: () => {
-      // 인증 토큰이나 임시 계정 생성 없이 공개된 여행만 읽는다.
-      return lock.current ? undefined : router.replace('/(tabs)/community');
-    },
-    openEmail: () => {
-      // Google 인증과 겹치는 이메일 입력 진입을 차단한다.
-      return lock.current ? undefined : setEmailOpen(true);
-    },
-    closeEmail: () => {
-      // 모달을 해제하여 비밀번호 입력도 메모리에서 제거한다.
-      return setEmailOpen(false);
-    },
-    onAuthenticated: () => {
-      // 이메일 인증 후 입력을 닫아 프로필 조회 재시도 안내를 보이게 한다.
-      return Promise.resolve(setEmailOpen(false)).then(() => {
-        // 프로필 조회 실패 후 유지된 세션으로 다시 시작할 수 있다.
-        return runLoginAction(
-          lock,
-          set,
-          'continue',
-          navigate,
-          '계정을 확인하지 못했어요. 이어서 시작하기를 눌러 다시 시도해 주세요.',
-        );
-      });
     },
     continueSession: () => {
       // 유지된 세션으로 원래 진행하던 여행을 연다.
@@ -189,7 +162,7 @@ export default function useLoginController(
             return session ? navigate() : undefined;
           });
         },
-        '로그인을 완료하지 못했어요. 다시 시도하거나 이메일로 계속해 주세요.',
+        'Google 로그인을 완료하지 못했어요. 다시 시도하거나 게스트로 시작해 주세요.',
       );
     },
   };

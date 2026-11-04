@@ -1,0 +1,46 @@
+{
+  "brand": "TripPrint",
+  "registeredAt": "2026-10-27",
+  "source": "사용자가 대화에 첨부한 PNG 원본",
+  "processing": "파일명만 규격화. 픽셀·투명도·크기·파일 내용 변경 없음.",
+  "status": "투명 로고 2개는 /welcome 시작 화면, Logo_APP.png 파생본은 설치용 아이콘으로 연결.",
+  "rights": "사용자 제공 자료. 별도 오픈소스 라이선스를 부여하지 않음.",
+  "assets": [
+    {
+      "originalName": "02_App_Logo-removebg-preview.png",
+      "filename": "tripprint-app-icon-source.png",
+      "role": "앱 아이콘 제작용 브랜드 심볼 원본",
+      "width": 337,
+      "height": 216,
+      "bytes": 44932,
+      "sha256": "f58e14fabd7bfbdcff4db03c5b354d62cd411cc89c4f526db4d98383dd59a3f9"
+    },
+    {
+      "originalName": "04_Text_Logo_English-removebg.png",
+      "filename": "tripprint-wordmark-en.png",
+      "role": "영문 TripPrint 텍스트 로고",
+      "width": 450,
+      "height": 106,
+      "bytes": 46497,
+      "sha256": "79cb24626a99516e3e3793b656e0f5c9fc3e86332e713fbb59c670537a5590c7"
+    },
+    {
+      "originalName": "Logo_APP.png",
+      "filename": "tripprint-launcher-source.png",
+      "role": "설치 아이콘 전용 원본",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 1225859,
+      "sha256": "c1ed548e5d49129788eab1906e153ae9e6b414a7e1aba494e65934f9d2f9672b"
+    }
+  ],
+  "launcherExports": {
+    "generator": "icon-generator/scripts/icon_generator.py",
+    "reproduction": "scripts/design/export-launcher-assets.mjs",
+    "icon": "tripprint-launcher-icon.png",
+    "adaptiveForeground": "tripprint-launcher-adaptive.png",
+    "adaptiveBackground": "#FC5041",
+    "processing": "일반 아이콘은 원본 비율을 유지한 1024px 출력. Android 전경은 밝은 심볼의 알파를 분리하고 원본 전체 기준 70%로 중앙 배치. 같은 알파를 테마 아이콘에 사용.",
+    "platformExports": "outputs/launcher-icons (local only)"
+  }
+}

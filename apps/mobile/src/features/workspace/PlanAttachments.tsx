@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { View } from 'react-native';
 import type { CommunityPost } from '@wherego/domain';
 import Text from '@/components/AppText';
@@ -15,11 +17,12 @@ export default function PlanAttachments({
   photoPaths?: string[];
   preview?: { tripId: string; userId: string; mediaIds: string[] };
 }) {
+  useLocale();
   // 공개 전 사진은 회원 권한으로, 공개 후 사진은 공개 사본의 경로로만 읽는다.
   return (
     <View style={ledgerStyles.content}>
       {(preview ? preview.mediaIds.length : photoPaths.length) > 0 && (
-        <Text style={ledgerStyles.section}>여행 사진</Text>
+        <Text style={ledgerStyles.section}>{t('여행 사진')}</Text>
       )}
       {preview
         ? preview.mediaIds.map((id) => {
@@ -41,7 +44,7 @@ export default function PlanAttachments({
         // 환율을 가정하지 않고 공개하기로 한 통화별 합계만 표시한다.
         return (
           <Text key={currency} style={ledgerStyles.body}>
-            실제 지출 · {amount} {currency}
+            {t('실제 지출 ·')} {amount} {currency}
           </Text>
         );
       })}

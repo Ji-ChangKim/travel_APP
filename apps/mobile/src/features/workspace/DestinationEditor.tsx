@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ScreenHeader from '@/components/ScreenHeader';
@@ -33,6 +35,7 @@ export default function DestinationEditor({
   conflicted: boolean;
   onReload: () => void;
 }) {
+  useLocale();
   // 삭제 전에 해당 도시를 쓰는 날짜가 남아 있는지 확인한다.
   const items = destinationDraftItems(form.values.destinations);
   const assignments = JSON.parse(form.values.assignments || '[]') as {
@@ -41,14 +44,19 @@ export default function DestinationEditor({
   }[];
   return (
     <SafeAreaView style={styles.modal}>
-      <ScreenHeader title="여행 도시 관리" onBack={onClose} disabled={locked} />
+      <ScreenHeader
+        title={t('여행 도시 관리')}
+        onBack={onClose}
+        disabled={locked}
+      />
       <ScrollView
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
       >
         <Text>
-          도시를 추가하고 날짜마다 머무를 여행지를 골라 주세요. 첫 번째 도시가
-          여행의 대표 여행지가 돼요.
+          {t(
+            '도시를 추가하고 날짜마다 머무를 여행지를 골라 주세요. 첫 번째 도시가 여행의 대표 여행지가 돼요.',
+          )}
         </Text>
         <DestinationCollection
           items={items}
@@ -97,23 +105,24 @@ export default function DestinationEditor({
           </View>
         ))}
         <Text style={styles.subtitle}>
-          도시를 바꿔도 입력한 일정 시각과 항공권은 유지돼요. 해당 날짜의 현지
-          시간을 확인해 주세요.
+          {t(
+            '도시를 바꿔도 입력한 일정 시각과 항공권은 유지돼요. 해당 날짜의 현지 시간을 확인해 주세요.',
+          )}
         </Text>
         {error && (
           <Text accessibilityRole="alert" style={styles.error}>
-            {error}
+            {t(error)}
           </Text>
         )}
         {conflicted ? (
           <Action
-            label="최신 여행 다시 불러오기"
+            label={t('최신 여행 다시 불러오기')}
             allowWhileLocked
             onPress={onReload}
           />
         ) : (
           <Action
-            label={busy ? '저장 중…' : '여행 도시 저장'}
+            label={busy ? t('저장 중…') : t('여행 도시 저장')}
             variant="primary"
             loading={busy}
             allowWhileLocked

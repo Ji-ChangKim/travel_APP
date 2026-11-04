@@ -1,3 +1,4 @@
+import { t } from '@/features/localization/translate';
 import Text from '@/components/AppText';
 import ScreenHeader from '@/components/ScreenHeader';
 import type { WorkspaceSnapshot } from '@wherego/domain';
@@ -108,22 +109,22 @@ export function renderPlanEditor({
         <ScreenHeader
           title={
             form?.kind === 'publish'
-              ? '커뮤니티 공개'
+              ? t('커뮤니티 공개')
               : form?.kind === 'receipt'
                 ? form.values.receiptOperation === 'update'
-                  ? '영수증 수정'
-                  : '영수증 확인'
+                  ? t('영수증 수정')
+                  : t('영수증 확인')
                 : form?.kind === 'expense'
-                  ? '비용 기록'
+                  ? t('비용 기록')
                   : form?.kind === 'metadata'
-                    ? '여행 정보 수정'
+                    ? t('여행 정보 수정')
                     : form?.kind === 'period'
-                      ? '여행 기간 변경'
+                      ? t('여행 기간 변경')
                       : form?.kind === 'dayPlan'
-                        ? '이날 소개'
-                        : '여행 내용 작성'
+                        ? t('이날 소개')
+                        : t('여행 내용 작성')
           }
-          backLabel="닫기"
+          backLabel={t('닫기')}
           onBack={onClose}
           disabled={busy || locked}
         />
@@ -202,7 +203,7 @@ export function renderPlanEditor({
           )}
           {error && (
             <Text style={styles.error} accessibilityRole="alert">
-              {error}
+              {t(error)}
             </Text>
           )}
           {renderPlanSaveActions({
@@ -260,14 +261,14 @@ function renderPlanSaveActions({
         variant="primary"
         label={
           busy
-            ? '저장 중…'
+            ? t('저장 중…')
             : form?.kind === 'publish'
-              ? '확인하고 게시'
+              ? t('확인하고 게시')
               : form?.kind === 'receipt'
                 ? form.values.receiptOperation === 'update'
-                  ? '변경 저장'
-                  : '영수증 저장'
-                : '확인하고 저장'
+                  ? t('변경 저장')
+                  : t('영수증 저장')
+                : t('확인하고 저장')
         }
         disabled={
           (form?.kind === 'period' &&
@@ -286,7 +287,7 @@ function renderPlanSaveActions({
       {conflicted && (
         <Action
           allowWhileLocked
-          label="최신 내용 불러오기"
+          label={t('최신 내용 불러오기')}
           disabled={busy}
           onPress={onReload}
         />
@@ -309,23 +310,25 @@ export function renderExpenseLink({
       (form.kind === 'receipt' &&
         ['ready', 'manual'].includes(form.values.receiptStatus || ''))) && (
       <View style={styles.card}>
-        <Text style={styles.title}>연결할 일정</Text>
+        <Text style={styles.title}>{t('연결할 일정')}</Text>
         {form.kind === 'receipt' && (
           <Text style={l.meta}>
             {!form.values.dayId
-              ? '여행 기간 안의 결제 날짜를 입력해 주세요. 다른 여행의 영수증이라면 돌아가서 여행을 선택해 주세요.'
+              ? t(
+                  '여행 기간 안의 결제 날짜를 입력해 주세요. 다른 여행의 영수증이라면 돌아가서 여행을 선택해 주세요.',
+                )
               : !form.values.scheduleId &&
                   form.values.newReceiptPlace !== 'true'
-                ? '기존 일정이나 새 장소 기록을 선택해 주세요.'
-                : '기존 계획은 바꾸지 않고 결제 기록만 연결해요.'}
+                ? t('기존 일정이나 새 장소 기록을 선택해 주세요.')
+                : t('기존 계획은 바꾸지 않고 결제 기록만 연결해요.')}
           </Text>
         )}
         {
           <Action
             label={
               form.kind === 'receipt'
-                ? '새 장소 기록 만들기'
-                : '새 기록 / 일정 연결 없이'
+                ? t('새 장소 기록 만들기')
+                : t('새 기록 / 일정 연결 없이')
             }
             selected={
               form.kind === 'expense'
@@ -344,8 +347,9 @@ export function renderExpenseLink({
         }
         {form.values.receiptOperation === 'update' && (
           <Text style={styles.subtitle}>
-            결제일에 맞는 기존 일정이나 새 장소를 선택해 주세요. 이전 일정은
-            그대로 남아요.
+            {t(
+              '결제일에 맞는 기존 일정이나 새 장소를 선택해 주세요. 이전 일정은 그대로 남아요.',
+            )}
           </Text>
         )}
         {snapshot?.itinerary
@@ -499,7 +503,6 @@ export function renderScheduleContext({
   snapshot,
   busy,
   onChange,
-  onReceipt,
 }: RenderScheduleContextProps) {
   // 전달받은 값과 행동을 기존 화면 규격으로 표시한다.
 
@@ -518,27 +521,6 @@ export function renderScheduleContext({
           values={form.values}
           onChange={onChange}
         />
-        <View style={styles.card}>
-          <Text style={styles.title}>장소를 어떻게 추가할까요?</Text>
-          <View style={styles.row}>
-            <Action
-              label="영수증 촬영으로 추가"
-              disabled={busy}
-              onPress={() => {
-                // 등록된 영수증 인식 흐름으로 연결한다.
-                onReceipt(true);
-              }}
-            />
-            <Action
-              label="영수증 사진으로 추가"
-              disabled={busy}
-              onPress={() => {
-                // 저장된 영수증 사진을 선택한다.
-                onReceipt(false);
-              }}
-            />
-          </View>
-        </View>
         <PlaceSearch
           key={`${form.id}:${form.values.dayId}:${form.values.type}`}
           userId={userId}
@@ -561,7 +543,7 @@ export function renderScheduleContext({
               label={form.values.title || ''}
             />
             <Action
-              label="선택한 구글 장소 연결 해제"
+              label={t('선택한 구글 장소 연결 해제')}
               disabled={busy}
               onPress={() => {
                 // 사용자 작성 내용은 유지하고 장소 참조만 해제한다.
@@ -610,7 +592,7 @@ export function renderReceiptOriginal({
     snapshot && (
       <View style={{ flexDirection: wide ? 'row' : 'column', gap: 24 }}>
         <View style={wide ? { width: 360, gap: 12 } : { gap: 12 }}>
-          <Text style={l.eyebrow}>영수증 원본</Text>
+          <Text style={l.eyebrow}>{t('영수증 원본')}</Text>
           <ReceiptOriginal
             userId={userId}
             tripId={snapshot.trip.id}
@@ -622,8 +604,9 @@ export function renderReceiptOriginal({
             disabled={busy}
           />
           <Text style={l.meta}>
-            사진과 읽은 내용을 비교해 주세요. 등록 전에는 지출이 추가되지
-            않아요.
+            {t(
+              '사진과 읽은 내용을 비교해 주세요. 등록 전에는 지출이 추가되지 않아요.',
+            )}
           </Text>
         </View>
         <View style={{ flex: 1, gap: 16 }}>

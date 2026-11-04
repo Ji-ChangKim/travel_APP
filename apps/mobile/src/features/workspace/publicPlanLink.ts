@@ -32,3 +32,59 @@ function invalidShareUrl(): never {
     '공유 링크를 만들지 못했어요. 공개 화면에서 다시 시도해 주세요.',
   );
 }
+
+// 웹 환경에서 공개 링크를 클립보드에 복사한다.
+export async function copyWebPublicPlanUrl(
+  url: string,
+  clipboard:
+    | { writeText?: (text: string) => Promise<void> }
+    | undefined = typeof navigator !== 'undefined'
+    ? navigator.clipboard
+    : undefined,
+): Promise<'copied'> {
+  if (clipboard?.writeText) {
+    try {
+      await clipboard.writeText(url);
+      return 'copied';
+    } catch {
+      throw new UserFacingError(
+        '링크를 복사하지 못했어요. 브라우저 권한을 확인하거나 공개 화면의 주소를 직접 복사해 주세요.',
+      );
+    }
+  }
+  throw new UserFacingError(
+    '이 브라우저에서는 링크를 복사하지 못했어요. 공개 화면의 주소를 직접 복사해 주세요.',
+  );
+}
+
+// 웹 환경에서 시스템 공유 시트 또는 클립보드 복사로 공개 링크를 전달한다.
+export async function shareWebPublicPlanUrl(
+  title: string,
+  url: string,
+  nav:
+    | {
+        share?: (data: { title: string; url: string }) => Promise<void>;
+        clipboard?: { writeText?: (text: string) => Promise<void> };
+      }
+    | undefined = typeof navigator !== 'undefined' ? navigator : undefined,
+): Promise<'shared' | 'copied' | 'dismissed'> {
+  if (nav?.share) {
+    try {
+      await nav.share({ title, url });
+      return 'shared';
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError')
+        return 'dismissed';
+      throw new UserFacingError(
+        '공유 창을 열지 못했어요. 공유 링크 복사를 이용해 주세요.',
+      );
+    }
+  }
+  if (nav?.clipboard?.writeText) {
+    await nav.clipboard.writeText(url);
+    return 'copied';
+  }
+  throw new UserFacingError(
+    '이 브라우저에서는 링크를 보내지 못했어요. 공개 화면의 주소를 복사해 주세요.',
+  );
+}

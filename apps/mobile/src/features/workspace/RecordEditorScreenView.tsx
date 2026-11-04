@@ -1,3 +1,4 @@
+import { t } from '@/features/localization/translate';
 import ActionSheet from '@/components/ActionSheet';
 import Text from '@/components/AppText';
 import HaruState from '@/components/HaruState';
@@ -86,16 +87,17 @@ export function renderRecordEditor({
         <View style={s.tinted}>
           <Text style={s.eyebrow}>{snapshot.trip.title}</Text>
           <Text style={s.meta}>
-            나와 동행자만 읽는 원본이에요. 공개할 사진과 장소 설명은 공유할 때
-            직접 골라요.
+            {t(
+              '나와 동행자만 읽는 원본이에요. 공개할 사진과 장소 설명은 공유할 때 직접 골라요.',
+            )}
           </Text>
         </View>
         <View style={s.card}>
-          <Text style={s.section}>기록할 장소</Text>
+          <Text style={s.section}>{t('기록할 장소')}</Text>
           <Text style={s.place}>{item.title}</Text>
-          <Text style={s.meta}>{item.address || '주소 없음'}</Text>
+          <Text style={s.meta}>{item.address || t('주소 없음')}</Text>
           <LedgerAction
-            label="다른 장소 선택"
+            label={t('다른 장소 선택')}
             disabled={busy || retryPending}
             onPress={onChoose}
           />
@@ -122,11 +124,11 @@ export function renderRecordEditor({
             snapshot,
           })}
         </View>
-        {notice && <Text accessibilityLiveRegion="polite">{notice}</Text>}
-        {error && <Text accessibilityRole="alert">{error}</Text>}
+        {notice && <Text accessibilityLiveRegion="polite">{t(notice)}</Text>}
+        {error && <Text accessibilityRole="alert">{t(error)}</Text>}
         {error && !retryPending && (
           <LedgerAction
-            label="최신 원본 확인하고 다시 편집"
+            label={t('최신 원본 확인하고 다시 편집')}
             disabled={busy}
             onPress={() => {
               // 기존 초안을 버리는 이동은 공통 확인을 거친다.
@@ -136,7 +138,9 @@ export function renderRecordEditor({
         )}
         <LedgerAction
           label={
-            retryPending ? '전송한 내용 저장 결과 다시 확인' : '기록 저장하기'
+            retryPending
+              ? t('전송한 내용 저장 결과 다시 확인')
+              : t('기록 저장하기')
           }
           allowWhileLocked
           primary
@@ -144,7 +148,7 @@ export function renderRecordEditor({
           onPress={saveRecord}
         />
         <LedgerAction
-          label="취소"
+          label={t('취소')}
           allowWhileLocked
           disabled={busy}
           onPress={() => {
@@ -156,7 +160,7 @@ export function renderRecordEditor({
         />
       </ScrollView>
       <ActionSheet
-        title="사진을 삭제할까요?"
+        title={t('사진을 삭제할까요?')}
         variant="confirm"
         visible={Boolean(deleting)}
         dismissDisabled={busy}
@@ -166,11 +170,12 @@ export function renderRecordEditor({
         }}
       >
         <Text>
-          이 여행의 원본 사진이 삭제돼요. 이미 공개한 사본의 사진도 더 이상
-          열리지 않을 수 있어요.
+          {t(
+            '이 여행의 원본 사진이 삭제돼요. 이미 공개한 사본의 사진도 더 이상 열리지 않을 수 있어요.',
+          )}
         </Text>
         <LedgerAction
-          label="사진 유지"
+          label={t('사진 유지')}
           disabled={busy}
           onPress={() => {
             // 취소는 저장 명령을 보내지 않는다.
@@ -178,7 +183,7 @@ export function renderRecordEditor({
           }}
         />
         <LedgerAction
-          label="사진 삭제"
+          label={t('사진 삭제')}
           primary
           loading={busy}
           onPress={deletePhoto}
@@ -186,7 +191,7 @@ export function renderRecordEditor({
       </ActionSheet>
     </FormFeedback>
   ) : (
-    <HaruState kind="loading" title="저장한 기록으로 돌아가고 있어요" />
+    <HaruState kind="loading" title={t('저장한 기록으로 돌아가고 있어요')} />
   );
 }
 // renderRecordNotes이 읽는 값과 실행 가능한 행동의 계약이다.
@@ -215,7 +220,7 @@ export function renderRecordNotes({
   return (
     <View style={{ flex: 1, gap: 16 }}>
       <View style={s.private}>
-        <Text style={s.section}>나와 동행자만 보는 메모</Text>
+        <Text style={s.section}>{t('나와 동행자만 보는 메모')}</Text>
         <Field
           label="기록 메모"
           value={form.values.memo || ''}
@@ -226,7 +231,9 @@ export function renderRecordNotes({
             return change('memo', value);
           }}
         />
-        <Text style={s.meta}>{(form.values.memo || '').length} / 300자</Text>
+        <Text style={s.meta}>
+          {(form.values.memo || '').length} {t('/ 300자')}
+        </Text>
       </View>
       <View style={s.card}>
         <Field
@@ -240,12 +247,12 @@ export function renderRecordNotes({
           }}
         />
         <Text style={s.meta}>
-          {(form.values.planDescription || '').length} / 4,000자 · 공개할 때
-          선택한 장소에만 포함돼요.
+          {(form.values.planDescription || '').length}{' '}
+          {t('/ 4,000자 · 공개할 때 선택한 장소에만 포함돼요.')}
         </Text>
       </View>
       <View style={s.tinted}>
-        <Text style={s.section}>장소 연계 지출</Text>
+        <Text style={s.section}>{t('장소 연계 지출')}</Text>
         {costs.length ? (
           costs.map((cost) => {
             // 추정 비용 없이 실제 연결 지출을 표시한다.
@@ -256,10 +263,10 @@ export function renderRecordNotes({
             );
           })
         ) : (
-          <Text style={s.meta}>연결한 실제 지출이 없어요.</Text>
+          <Text style={s.meta}>{t('연결한 실제 지출이 없어요.')}</Text>
         )}
         <LedgerAction
-          label="영수증·지출 보완"
+          label={t('영수증·지출 보완')}
           disabled={busy || retryPending}
           onPress={() => {
             // 미저장 메모는 이탈 보호로 확인한다.
@@ -301,7 +308,10 @@ export function renderRecordPhotos({
 
   return (
     <View style={{ flex: 1, gap: 16 }}>
-      <Text style={s.section}>현장 사진 · {photos.length}장</Text>
+      <Text style={s.section}>
+        {t('현장 사진 ·')} {photos.length}
+        {t('장')}
+      </Text>
       <View style={s.row}>
         {photos.map((media) => {
           // 사진 원본 권한을 유지하며 삭제는 별도 확인한다.
@@ -320,7 +330,7 @@ export function renderRecordPhotos({
                 mediaId={media.id}
               />
               <LedgerAction
-                label="이 사진 삭제"
+                label={t('이 사진 삭제')}
                 disabled={busy || retryPending}
                 onPress={() => {
                   // 사용자 확인 전에는 원본을 지우지 않는다.
@@ -332,7 +342,7 @@ export function renderRecordPhotos({
         })}
       </View>
       <LedgerAction
-        label="사진 추가"
+        label={t('사진 추가')}
         disabled={busy || retryPending}
         onPress={() => {
           // 실제 앨범 선택부터 서버 저장까지 한 번만 실행한다.
@@ -340,7 +350,9 @@ export function renderRecordPhotos({
         }}
       />
       <Text style={s.meta}>
-        사진은 추가·삭제할 때 저장돼요. 아래 메모는 기록 저장을 누르면 반영돼요.
+        {t(
+          '사진은 추가·삭제할 때 저장돼요. 아래 메모는 기록 저장을 누르면 반영돼요.',
+        )}
       </Text>
     </View>
   );

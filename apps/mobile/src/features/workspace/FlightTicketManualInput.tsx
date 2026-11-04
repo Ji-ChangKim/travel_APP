@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { View } from 'react-native';
 import { DateField } from './TravelInputs';
@@ -14,13 +16,15 @@ export default function FlightTicketManualInput({
   disabled: boolean;
   onChange: (key: string, value: string) => void;
 }) {
+  useLocale();
   // 시각은 각 공항의 현지 시각이며 누락된 도착 정보는 만들지 않는다.
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>항공권 직접 입력</Text>
+      <Text style={styles.title}>{t('항공권 직접 입력')}</Text>
       <Text style={styles.subtitle}>
-        항공권에 적힌 정보를 입력해 주세요. 시각은 각 공항의 현지 시각이에요.
-        모르는 도착 정보와 터미널은 비워 두어도 괜찮아요.
+        {t(
+          '항공권에 적힌 정보를 입력해 주세요. 시각은 각 공항의 현지 시각이에요. 모르는 도착 정보와 터미널은 비워 두어도 괜찮아요.',
+        )}
       </Text>
       {Object.entries({
         flightNumber: '항공 편명',

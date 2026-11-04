@@ -9,7 +9,11 @@ import {
 } from '@wherego/validation';
 import { copiedScheduleForm } from '../../apps/mobile/src/features/workspace/scheduleCopy';
 import { formCommandValue } from '../../apps/mobile/src/features/workspace/formCommands';
-import { publicPlanUrl } from '../../apps/mobile/src/features/workspace/publicPlanLink';
+import {
+  copyWebPublicPlanUrl,
+  publicPlanUrl,
+  shareWebPublicPlanUrl,
+} from '../../apps/mobile/src/features/workspace/publicPlanLink';
 import {
   publicationIssue,
   togglePublicationDay,
@@ -195,4 +199,29 @@ test('타임라인은 작성하지 않은 시간·거리·체크인·여행 후�
     adaptWorkspaceSnapshotToTimeline(saved).days[0]!.routeSummary?.distanceKm,
     undefined,
   );
+});
+
+test('G03: 공유 시트가 거절되면 링크 복사 안내를 반환하고 copyWebPublicPlanUrl은 공개 URL만 클립보드에 기록한다', async () => {
+  const postId = randomUUID();
+  const url = publicPlanUrl('https://trip.example/auth/callback', postId);
+  let copiedText = '';
+  const mockNav = {
+    share: async () => {
+      const err = new Error('Permission denied');
+      err.name = 'NotAllowedError';
+      throw err;
+    },
+    clipboard: {
+      writeText: async (text: string) => {
+        copiedText = text;
+      },
+    },
+  };
+  await assert.rejects(
+    () => shareWebPublicPlanUrl('오사카 여행', url, mockNav),
+    /공유 링크 복사를 이용해 주세요/,
+  );
+  const result = await copyWebPublicPlanUrl(url, mockNav.clipboard);
+  assert.equal(result, 'copied');
+  assert.equal(copiedText, `https://trip.example/community/${postId}`);
 });

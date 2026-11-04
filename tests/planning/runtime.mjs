@@ -90,7 +90,9 @@ async function migratePlanningDb(db) {
 
 // 고정 대기 시간으로 성공을 추정하지 않고 실제 로그인 페이지 응답을 확인한다.
 async function waitForWeb(server) {
-  for (let attempt = 0; attempt < 40; attempt += 1) {
+  // 느린 개발 PC의 프로세스 시작을 기다리되 HTTP 성공을 확인한 뒤 진행한다.
+  const deadline = Date.now() + 30000;
+  while (Date.now() < deadline) {
     assert.equal(server.exitCode, null, '검수 웹 서버가 종료됐습니다.');
     try {
       if ((await fetch(`${webOrigin}/login`)).ok) return;

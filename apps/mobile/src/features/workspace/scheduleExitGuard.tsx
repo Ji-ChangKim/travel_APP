@@ -1,3 +1,6 @@
+import { t } from '@/features/localization/translate';
+import { clearCreationHandoff } from './creationAuthHandoff';
+import { useLocale } from '@/features/localization/localeState';
 import ActionSheet from '@/components/ActionSheet';
 import Text from '@/components/AppText';
 import { useEffect, useId, useLayoutEffect, useRef } from 'react';
@@ -7,6 +10,7 @@ import { usePreventRemove } from 'expo-router/react-navigation';
 import { create } from 'zustand';
 import { ScheduleButton } from './ScheduleControls';
 import { scheduleStyles as s } from './scheduleTheme';
+import { connectBrowserHistoryGuard } from './browserHistoryEvents';
 
 // 모든 작성 폼은 화면 전용 값만 비교하며 서버 계약을 변경하지 않는다.
 type EditableForm = {
@@ -58,6 +62,17 @@ export function completeFormExit(action: () => void): void {
   });
 }
 
+// 로그인 복귀용 입력을 보관한 경우에만 버리기 확인 없이 이동한다.
+export function continueFormAfterPreserving(action: () => void): void {
+  if (guard.getState().busy || guard.getState().pending) return;
+  guard.setState({
+    blocked: false,
+    discard: null,
+    pending: action,
+    commit: true,
+  });
+}
+
 // 자신이 등록한 보호 상태만 해제해 뒤에 열린 화면의 보호를 지우지 않는다.
 function releaseGuard(owner: string): void {
   // 숨겨진 탭의 늦은 정리도 현재 화면에는 영향을 주지 않는다.
@@ -82,9 +97,11 @@ export function useScheduleExitGuard(
   // 계정별로 다시 마운트된 화면은 이전 화면의 기준값을 재사용하지 않는다.
   const owner = useId();
   const focused = useIsFocused();
-  const baseline = useRef({ id: '', values: '' });
+  const baseline = useRef({ id: '', values: '', revision: '' });
   const id = form ? `${form.kind}:${form.id}` : '';
   const values = form ? JSON.stringify(form.values) : '';
+  const revision =
+    form?.kind === 'trip' ? String(form.values._draftRevision || '') : '';
   const kind = form?.kind;
   const navigation = useNavigation();
   const blocked = guard((state) => {
@@ -102,8 +119,8 @@ export function useScheduleExitGuard(
     // 사용자 입력 다음 프레임에 이탈 버튼을 누르기 전 보호를 갱신한다.
     return !focused
       ? releaseGuard(owner)
-      : (baseline.current.id !== id
-          ? (baseline.current = { id, values })
+      : (baseline.current.id !== id || baseline.current.revision !== revision
+          ? (baseline.current = { id, values, revision })
           : undefined,
         guard.setState((state) => {
           // 같은 화면의 확인된 이동은 유지하고 다른 화면의 대기 이동은 폐기한다.
@@ -114,17 +131,22 @@ export function useScheduleExitGuard(
               kind === 'schedule'
                 ? '작성 중인 일정을 버릴까요?'
                 : '작성 중인 내용을 버릴까요?',
-            blocked: Boolean(id && baseline.current.values !== values),
+            blocked: Boolean(
+              id &&
+              (baseline.current.values !== values ||
+                form?.values._authUnsaved === 'true'),
+            ),
             busy,
             discard: id
               ? () => {
                   // 명시적으로 버린 폼만 닫고 원본·저장 요청은 삭제하지 않는다.
+                  if (form?.kind === 'trip') clearCreationHandoff(form.id);
                   return close(null);
                 }
               : null,
           };
         }));
-  }, [owner, focused, id, kind, busy, values, close]);
+  }, [owner, focused, id, kind, busy, values, close, form, revision]);
   useEffect(() => {
     // 같은 계정으로 돌아와도 해제된 화면의 대기 이동은 실행하지 않는다.
     return () => releaseGuard(owner);
@@ -135,6 +157,97 @@ export function useScheduleExitGuard(
       ? connectUnload()
       : undefined;
   }, [focused, blocked, busy]);
+}
+
+// 기록을 추가·덮어쓰지 않고 원래 항목으로 복귀한 뒤 기존 이탈 확인을 사용한다.
+function connectHistoryGuard(): (() => void) | undefined {
+  const browserNavigation = window.navigation;
+  if (!browserNavigation) return undefined;
+  let from: NavigationHistoryEntry | null = null;
+  let restoring = false;
+  let restoreKey: string | null = null;
+  let restoredKey: string | null = null;
+  let restoreOwner: string | null = null;
+  let replayDelta = 0;
+  let confirmExit = false;
+  const onNavigate = (event: NavigateEvent) => {
+    if (restoring) {
+      event.stopImmediatePropagation();
+      return;
+    }
+    const state = guard.getState();
+    if (!restoring && event.navigationType === 'traverse') restoredKey = null;
+    if (
+      !restoring &&
+      event.navigationType === 'traverse' &&
+      event.destination.sameDocument &&
+      state.owner !== null &&
+      !state.commit &&
+      (state.busy || state.blocked || state.pending)
+    ) {
+      from = browserNavigation.currentEntry;
+      restoreOwner = state.owner;
+      // 저장 중 눌렀던 뒤로 이동을 저장 완료 직후에 뒤늦게 실행하지 않는다.
+      confirmExit = !state.busy && !state.pending;
+      event.stopImmediatePropagation();
+    }
+  };
+  const handleRestore = (): boolean => {
+    if (restoring) {
+      // 원래 뒤로가기의 popstate를 복원 완료로 오인하면 왕복 이동이 다시 차단된다.
+      if (browserNavigation.currentEntry?.key !== restoreKey) return true;
+      restoring = false;
+      restoredKey = restoreKey;
+      restoreKey = null;
+      // 계정이나 작성 화면이 바뀌면 이전 화면의 이동 확인을 새 작성자에게 넘기지 않는다.
+      if (confirmExit && guard.getState().owner === restoreOwner) {
+        const confirmedDelta = replayDelta;
+        const confirmedOwner = restoreOwner;
+        requestScheduleExit(() => {
+          if (guard.getState().owner === confirmedOwner)
+            window.history.go(confirmedDelta);
+        });
+      }
+      return true;
+    }
+    const current = browserNavigation.currentEntry;
+    if (!from || !current) return false;
+    const targetKey = from.key;
+    const delta = from.index - current.index;
+    from = null;
+    if (!delta) return false;
+    // Router가 쿼리 변경으로 폼을 교체하기 전에 이동을 되돌린다.
+    replayDelta = -delta;
+    restoring = true;
+    restoreKey = targetKey;
+    window.history.go(delta);
+    return true;
+  };
+  const onPopState = (event: PopStateEvent) => {
+    if (
+      handleRestore() ||
+      (restoredKey !== null &&
+        browserNavigation.currentEntry?.key === restoredKey)
+    ) {
+      // 복원된 URL에 이전 항목의 상태를 전달하면 새 작성 폼이 다시 마운트된다.
+      event.stopImmediatePropagation();
+    }
+  };
+  const onEntryChange = (event: Event) => {
+    if (handleRestore()) event.stopImmediatePropagation();
+  };
+  browserNavigation.addEventListener('navigate', onNavigate, true);
+  browserNavigation.addEventListener('currententrychange', onEntryChange, true);
+  const disconnectPopState = connectBrowserHistoryGuard(onPopState);
+  return () => {
+    browserNavigation.removeEventListener('navigate', onNavigate, true);
+    browserNavigation.removeEventListener(
+      'currententrychange',
+      onEntryChange,
+      true,
+    );
+    disconnectPopState();
+  };
 }
 
 // 브라우저를 떠날 때만 기본 경고를 연결한다.
@@ -150,6 +263,11 @@ function connectUnload(): () => void {
 
 // 전역 메뉴보다 위에서 계속 작성과 버리기를 선택하게 한다.
 export default function ScheduleExitDialog() {
+  useLocale();
+  useLayoutEffect(() => {
+    // 화면 전환 중에도 같은 감시를 유지하며 진입점의 선행 구독에 검사기를 연결한다.
+    return Platform.OS === 'web' ? connectHistoryGuard() : undefined;
+  }, []);
   // 작성 화면은 그대로 유지해 취소 후 입력을 복원할 필요가 없게 한다.
   const state = guard();
   const { commit, pending } = state;
@@ -174,11 +292,12 @@ export default function ScheduleExitDialog() {
       }}
     >
       <Text style={s.body}>
-        아직 저장하지 않은 내용이 있어요. 계속 작성하거나 내용을 버리고 이동할
-        수 있어요.
+        {t(
+          '아직 저장하지 않은 내용이 있어요. 계속 작성하거나 내용을 버리고 이동할 수 있어요.',
+        )}
       </Text>
       <ScheduleButton
-        label="계속 작성"
+        label={t('계속 작성')}
         primary
         onPress={() => {
           // 기존 입력과 선택한 삽입 순서를 그대로 유지한다.
@@ -186,7 +305,7 @@ export default function ScheduleExitDialog() {
         }}
       />
       <ScheduleButton
-        label="내용 버리고 이동"
+        label={t('내용 버리고 이동')}
         onPress={() => {
           // 명시적으로 버린 경우에만 요청한 화면으로 이동한다.
           return (

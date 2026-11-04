@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import type { ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -24,6 +26,7 @@ export default function ActionSheet({
   variant?: 'sheet' | 'confirm';
   dismissDisabled?: boolean;
 }) {
+  useLocale();
   // 하단 시스템 영역과 키보드 탐색을 공통 모달 계층에서 보호한다.
   const insets = useSafeAreaInsets();
   function closeSheet(): void {
@@ -70,7 +73,7 @@ export default function ActionSheet({
               <ScreenTitle grow>{title}</ScreenTitle>
               <HeaderAction
                 icon="close"
-                label="닫기"
+                label={t('닫기')}
                 disabled={dismissDisabled}
                 onPress={closeSheet}
               />

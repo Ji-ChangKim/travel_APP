@@ -1,3 +1,4 @@
+import { t } from '@/features/localization/translate';
 import type { WorkspaceSnapshot } from '@wherego/domain';
 import type { WorkspaceCommand } from '@wherego/validation';
 import { publicSelection } from '@wherego/validation';
@@ -54,15 +55,19 @@ function confirmationDetails(
       return publicationConfirmation(snapshot, command.input);
     case 'schedule.delete':
       return {
-        title: '일정을 삭제할까요?',
-        label: '일정 삭제하기',
-        message: `‘${
-          snapshot.itinerary.find((item) => {
-            /* 선택한 일정의 제목만 읽는다. */ return (
-              item.id === command.input.id
-            );
-          })?.title || '선택한 일정'
-        }’을 삭제해요. 연결된 사진과 수동 비용은 남고, 이 일정에서 추가한 예상 비용은 삭제돼요. 영수증이 연결돼 있으면 삭제할 수 없어요.`,
+        title: t('일정을 삭제할까요?'),
+        label: t('일정 삭제하기'),
+        message: t(
+          '‘{p0}’을 삭제해요. 연결된 사진과 수동 비용은 남고, 이 일정에서 추가한 예상 비용은 삭제돼요. 영수증이 연결돼 있으면 삭제할 수 없어요.',
+          {
+            p0:
+              snapshot.itinerary.find((item) => {
+                /* 선택한 일정의 제목만 읽는다. */ return (
+                  item.id === command.input.id
+                );
+              })?.title || t('선택한 일정'),
+          },
+        ),
       };
     case 'expense.delete':
       return expenseConfirmation(snapshot, command.input.id);
@@ -70,34 +75,49 @@ function confirmationDetails(
       return receiptConfirmation(snapshot, command.input.id);
     case 'media.delete':
       return {
-        title: '사진을 삭제할까요?',
-        label: '사진 삭제하기',
-        message: `선택한 사진을 삭제해요. 확정한 영수증이 사용하는 사진은 삭제할 수 없어요.${snapshot.postId ? ' 이 여행의 커뮤니티 게시물도 함께 철회돼요.' : ''}`,
+        title: t('사진을 삭제할까요?'),
+        label: t('사진 삭제하기'),
+        message: t(
+          '선택한 사진을 삭제해요. 확정한 영수증이 사용하는 사진은 삭제할 수 없어요.{p0}',
+          {
+            p0: snapshot.postId
+              ? t(' 이 여행의 커뮤니티 게시물도 함께 철회돼요.')
+              : '',
+          },
+        ),
       };
     case 'member.remove':
       return {
-        title: '동행 참여를 해제할까요?',
-        label: '참여 해제하기',
-        message: `‘${
-          snapshot.members.find((item) => {
-            /* 선택한 동행 이름을 고정한다. */ return (
-              item.userId === command.input.userId
-            );
-          })?.nickname || '선택한 동행'
-        }’이 이 여행의 기록을 보거나 수정할 수 없게 돼요. 이전에 수락한 초대도 취소돼요.`,
+        title: t('동행 참여를 해제할까요?'),
+        label: t('참여 해제하기'),
+        message: t(
+          '‘{p0}’이 이 여행의 기록을 보거나 수정할 수 없게 돼요. 이전에 수락한 초대도 취소돼요.',
+          {
+            p0:
+              snapshot.members.find((item) => {
+                /* 선택한 동행 이름을 고정한다. */ return (
+                  item.userId === command.input.userId
+                );
+              })?.nickname || t('선택한 동행'),
+          },
+        ),
       };
     case 'invite.revoke':
       return {
-        title: '초대를 취소할까요?',
-        label: '초대 취소하기',
-        message:
+        title: t('초대를 취소할까요?'),
+        label: t('초대 취소하기'),
+        message: t(
           '선택한 초대 링크로는 더 이상 이 여행에 참여할 수 없어요. 이미 참여한 동행의 권한은 그대로 유지돼요.',
+        ),
       };
     case 'community.withdraw':
       return {
-        title: '게시물을 철회할까요?',
-        label: '게시 철회하기',
-        message: `‘${snapshot.trip.title}’의 커뮤니티 게시물을 철회해요. 개인 여행 기록과 사진은 그대로 남아요.`,
+        title: t('게시물을 철회할까요?'),
+        label: t('게시 철회하기'),
+        message: t(
+          '‘{p0}’의 커뮤니티 게시물을 철회해요. 개인 여행 기록과 사진은 그대로 남아요.',
+          { p0: snapshot.trip.title },
+        ),
       };
     default:
       return null;
@@ -113,10 +133,23 @@ function publicationConfirmation(
   // 원본 전체 개수가 아닌 이번에 선택한 항목만 공개 대상으로 안내한다.
   return {
     title: snapshot.postId
-      ? '공개 내용을 바꿀까요?'
-      : '선택한 내용을 공개할까요?',
-    label: snapshot.postId ? '공개 내용 바꾸기' : '선택한 내용 공개',
-    message: `링크를 가진 누구나 ‘${input.title}’의 선택 일정 ${preview.snapshot.itinerary.length}개·사진 ${preview.photoPaths.length}장${input.includeCosts ? '·통화별 실제 지출 합계' : ''}을 볼 수 있어요. 개인 메모·예약번호·동행 정보·영수증 원본과 품목은 공개하지 않아요.${snapshot.postId ? ' 기존 링크의 내용은 이번 선택으로 바뀌며 내 여행 원본은 그대로 남아요.' : ''}`,
+      ? t('공개 내용을 바꿀까요?')
+      : t('선택한 내용을 공개할까요?'),
+    label: snapshot.postId ? t('공개 내용 바꾸기') : t('선택한 내용 공개'),
+    message: t(
+      '링크를 가진 누구나 ‘{p0}’의 선택 일정 {p1}개·사진 {p2}장{p3}을 볼 수 있어요. 개인 메모·예약번호·동행 정보·영수증 원본과 품목은 공개하지 않아요.{p4}',
+      {
+        p0: input.title,
+        p1: preview.snapshot.itinerary.length,
+        p2: preview.photoPaths.length,
+        p3: input.includeCosts ? t('·통화별 실제 지출 합계') : '',
+        p4: snapshot.postId
+          ? t(
+              ' 기존 링크의 내용은 이번 선택으로 바뀌며 내 여행 원본은 그대로 남아요.',
+            )
+          : '',
+      },
+    ),
   };
 }
 
@@ -131,9 +164,15 @@ function expenseConfirmation(
 ): Details {
   // 같은 ID의 비용만 찾아 삭제 대상을 표시한다.
   return {
-    title: '비용을 삭제할까요?',
-    label: '비용 삭제하기',
-    message: `‘${expense?.title || '선택한 비용'}’ 비용${expense ? ` (${expense.amount} ${expense.currency})` : ''}을 삭제해요. 연결된 일정은 남아요. 영수증 비용은 영수증 기록에서 삭제해 주세요.`,
+    title: t('비용을 삭제할까요?'),
+    label: t('비용 삭제하기'),
+    message: t(
+      '‘{p0}’ 비용{p1}을 삭제해요. 연결된 일정은 남아요. 영수증 비용은 영수증 기록에서 삭제해 주세요.',
+      {
+        p0: expense?.title || t('선택한 비용'),
+        p1: expense ? ` (${expense.amount} ${expense.currency})` : '',
+      },
+    ),
   };
 }
 
@@ -148,9 +187,15 @@ function receiptConfirmation(
 ): Details {
   // 사진 보관 여부와 무관하게 같은 영수증을 확인한다.
   return {
-    title: '영수증 기록을 삭제할까요?',
-    label: '기록·지출 삭제하기',
-    message: `‘${receipt?.merchant || '선택한 영수증'}’의 영수증 기록${receipt ? ` (${receipt.amount} ${receipt.currency})` : ''}과 실제 지출을 함께 삭제해요. 장소 일정과 보관한 사진은 남아요.`,
+    title: t('영수증 기록을 삭제할까요?'),
+    label: t('기록·지출 삭제하기'),
+    message: t(
+      '‘{p0}’의 영수증 기록{p1}과 실제 지출을 함께 삭제해요. 장소 일정과 보관한 사진은 남아요.',
+      {
+        p0: receipt?.merchant || t('선택한 영수증'),
+        p1: receipt ? ` (${receipt.amount} ${receipt.currency})` : '',
+      },
+    ),
   };
 }
 

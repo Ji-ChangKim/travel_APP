@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { View } from 'react-native';
 import { useState } from 'react';
@@ -89,6 +91,7 @@ export default function ScheduleRoutePreview({
   onChange: (key: string, value: string) => void;
   showMap?: boolean;
 }) {
+  useLocale();
   // 방문 목록과 지도 핀은 같은 미리보기 순서를 사용한다.
   return (
     <RouteContent
@@ -118,6 +121,7 @@ function RouteContent({
   onChange: (key: string, value: string) => void;
   showMap: boolean;
 }) {
+  useLocale();
   // 기본 미리보기는 새 장소와 앞뒤 방문에 집중하고 전체는 선택해서 펼친다.
   const [expanded, setExpanded] = useState(false);
   const [choosing, setChoosing] = useState(false);
@@ -129,23 +133,26 @@ function RouteContent({
   // 없는 거리·소요시간·추천 동선을 만들어 표시하지 않는다.
   return (
     <ScheduleSection
-      title={showMap ? '일정 동선 미리보기' : '일정 순서 미리보기'}
+      title={showMap ? t('일정 동선 미리보기') : t('일정 순서 미리보기')}
       icon="route-outline"
     >
       <ScheduleConflictNotice items={items} />
       {showMap && !items[draftIndex]?.location && (
         <Text style={s.meta}>
-          작성 중인 장소의 지도 위치는 아직 없어요. ‘일정의 지도 위치’에서
-          지정하면 지도에도 표시돼요.
+          {t(
+            '작성 중인 장소의 지도 위치는 아직 없어요. ‘일정의 지도 위치’에서 지정하면 지도에도 표시돼요.',
+          )}
         </Text>
       )}
       <Text style={s.label}>
         {draftIndex === 0
-          ? '이날의 첫 일정으로 추가해요'
-          : `‘${items[draftIndex - 1]?.title}’ 다음에 넣어요`}
+          ? t('이날의 첫 일정으로 추가해요')
+          : t('‘{p0}’ 다음에 넣어요', {
+              p0: items[draftIndex - 1]?.title ?? '',
+            })}
       </Text>
       <ScheduleButton
-        label={choosing ? '삽입 위치 선택 접기' : '삽입 위치 바꾸기'}
+        label={choosing ? t('삽입 위치 선택 접기') : t('삽입 위치 바꾸기')}
         disabled={disabled}
         onPress={() => {
           // 변경할 때만 전체 삽입 후보를 펼친다.
@@ -155,7 +162,7 @@ function RouteContent({
       {choosing && (
         <View style={s.row}>
           <ScheduleButton
-            label="맨 앞"
+            label={t('맨 앞')}
             disabled={disabled}
             selected={form.values.afterScheduleId === ''}
             onPress={() => {
@@ -171,7 +178,7 @@ function RouteContent({
             .map((item, index) => (
               <ScheduleButton
                 key={item.id}
-                label={`${index + 1}. ${item.title} 뒤`}
+                label={t('{p0}. {p1} 뒤', { p0: index + 1, p1: item.title })}
                 disabled={disabled}
                 selected={form.values.afterScheduleId === item.id}
                 onPress={() => {
@@ -184,7 +191,7 @@ function RouteContent({
               />
             ))}
           <ScheduleButton
-            label="마지막"
+            label={t('마지막')}
             disabled={disabled}
             selected={form.values.afterScheduleId === 'last'}
             onPress={() => {
@@ -240,8 +247,8 @@ function RouteContent({
             <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
               <Text style={s.label}>{item.title}</Text>
               <Text style={s.meta}>
-                {item.timeSlot || '시간 미정'}
-                {item.id === form.id ? ' · 작성 중' : ''}
+                {item.timeSlot || t('시간 미정')}
+                {item.id === form.id ? t(' · 작성 중') : ''}
               </Text>
             </View>
             {item.id === form.id && (
@@ -253,7 +260,9 @@ function RouteContent({
       {items.length > 3 && (
         <ScheduleButton
           label={
-            expanded ? '앞뒤 일정만 보기' : `전체 ${items.length}개 일정 보기`
+            expanded
+              ? t('앞뒤 일정만 보기')
+              : t('전체 {p0}개 일정 보기', { p0: items.length })
           }
           onPress={() => {
             // 전체 순서는 필요한 경우에만 펼친다.
@@ -267,7 +276,9 @@ function RouteContent({
           return Boolean(item.location);
         }) && (
           <ScheduleButton
-            label={mapExpanded ? '방문 위치 지도 접기' : '방문 위치 지도 보기'}
+            label={
+              mapExpanded ? t('방문 위치 지도 접기') : t('방문 위치 지도 보기')
+            }
             onPress={() => {
               // 방문 순서를 먼저 확인하고 지도는 필요할 때 불러온다.
               return setMapExpanded(!mapExpanded);
@@ -293,8 +304,10 @@ function RouteContent({
         )}
       <Text style={s.meta}>
         {showMap
-          ? '방문 순서를 미리 확인해요. 위치를 선택한 장소는 지도에도 표시돼요.'
-          : '이날의 일정 순서를 미리 확인해요.'}
+          ? t(
+              '방문 순서를 미리 확인해요. 위치를 선택한 장소는 지도에도 표시돼요.',
+            )
+          : t('이날의 일정 순서를 미리 확인해요.')}
       </Text>
     </ScheduleSection>
   );

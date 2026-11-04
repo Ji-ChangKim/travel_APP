@@ -1,4 +1,6 @@
 import Text from '@/components/AppText';
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { useState, type Dispatch, type SetStateAction } from 'react';
 import { Pressable, View } from 'react-native';
 import DesignInput from '@/components/DesignInput';
@@ -20,6 +22,7 @@ type InputProps = {
 
 // 이메일·닉네임·비밀번호 입력의 색상과 간격을 인증 화면에 맞춘다.
 export default function AuthInput(props: InputProps) {
+  useLocale();
   // 비밀번호 표시 여부는 입력란이 사라질 때 함께 초기화한다.
   return <InputField {...props} visibility={useState(false)} />;
 }
@@ -38,6 +41,7 @@ function InputField({
   onChange,
   visibility: [visible, setVisible],
 }: InputProps & { visibility: [boolean, Dispatch<SetStateAction<boolean>>] }) {
+  useLocale();
   // 비밀번호를 별도 저장하지 않고 화면 표시 방식만 전환한다.
   return (
     <View style={styles.field}>
@@ -69,7 +73,9 @@ function InputField({
         {secret ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`${label} ${visible ? '숨기기' : '보기'}`}
+            accessibilityLabel={t(visible ? '{label} 숨기기' : '{label} 보기', {
+              label,
+            })}
             accessibilityState={{ disabled, expanded: visible }}
             disabled={disabled}
             onPress={() => {
@@ -86,7 +92,7 @@ function InputField({
           </Pressable>
         ) : null}
       </View>
-      {hint ? <Text style={styles.fieldHint}>{hint}</Text> : null}
+      {hint ? <Text style={styles.fieldHint}>{t(hint)}</Text> : null}
     </View>
   );
 }

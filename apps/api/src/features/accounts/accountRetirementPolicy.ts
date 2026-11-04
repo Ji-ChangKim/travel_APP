@@ -109,6 +109,9 @@ export function purgeRetiredAccount(
   const anonymousName = `탈퇴-${crypto.randomUUID().replaceAll('-', '').slice(0, 12)}`;
   return db.batch([
     db
+      .prepare(`DELETE FROM plan_drafts WHERE owner_id=? AND ${guard}`)
+      .bind(userId, userId, now),
+    db
       .prepare(
         `DELETE FROM verification WHERE identifier=(SELECT email FROM user WHERE id=?) AND ${guard}`,
       )

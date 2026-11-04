@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { z } from 'zod';
@@ -28,6 +30,7 @@ export default function DayRecommendations({
   disabled: boolean;
   onChoose: (item: RecommendedPlace) => void;
 }) {
+  useLocale();
   // 관심사나 속도를 바꾸면 이전 결과와 요청을 폐기한다.
   const [open, setOpen] = useState(false);
   const [interest, setInterest] = useState('sights');
@@ -35,15 +38,15 @@ export default function DayRecommendations({
   return (
     <View style={styles.card}>
       <Action
-        label={open ? 'AI 장소 추천 접기' : 'AI 장소 추천'}
+        label={open ? t('AI 장소 추천 접기') : t('AI 장소 추천')}
         disabled={disabled}
         onPress={() => setOpen(!open)}
       />
       {open && (
         <>
           <Text>
-            {destinationForDay(snapshot, dayId).city}에서 가보고 싶은 곳을 골라
-            주세요.
+            {destinationForDay(snapshot, dayId).city}
+            {t('에서 가보고 싶은 곳을 골라 주세요.')}
           </Text>
           <View style={styles.row}>
             {[
@@ -107,6 +110,7 @@ function RecommendationResults({
   pace: string;
   onChoose: (item: RecommendedPlace) => void;
 }) {
+  useLocale();
   // AI의 검색 방향과 Google 장소 결과를 공급자 정보와 함께 표시한다.
   const request = usePlanningRequest<
     z.infer<typeof recommendationResultSchema>
@@ -116,11 +120,12 @@ function RecommendationResults({
   return (
     <>
       <Text style={styles.subtitle}>
-        AI가 관심사에 맞는 검색 방향을 정해요. 장소와 영업 정보는 방문 전 확인해
-        주세요.
+        {t(
+          'AI가 관심사에 맞는 검색 방향을 정해요. 장소와 영업 정보는 방문 전 확인해 주세요.',
+        )}
       </Text>
       <Action
-        label={request.busy ? '장소 찾는 중…' : '추천 장소 찾기'}
+        label={request.busy ? t('장소 찾는 중…') : t('추천 장소 찾기')}
         loading={request.busy}
         disabled={disabled || request.busy}
         onPress={() => {
@@ -136,15 +141,16 @@ function RecommendationResults({
       />
       {request.error ? (
         <Text accessibilityRole="alert" style={styles.error}>
-          {request.error}
+          {t(request.error)}
         </Text>
       ) : null}
       {request.result?.tripVersion === snapshot.trip.version && (
         <>
           {!request.result.items.length && (
             <Text>
-              새로 추천할 장소를 찾지 못했어요. 다른 관심사를 선택하거나 직접
-              검색해 주세요.
+              {t(
+                '새로 추천할 장소를 찾지 못했어요. 다른 관심사를 선택하거나 직접 검색해 주세요.',
+              )}
             </Text>
           )}
           {request.result.items.map((item) => (
@@ -154,7 +160,7 @@ function RecommendationResults({
               <Text style={styles.subtitle}>{item.reason}</Text>
               <GoogleAttribution attributions={item.attributions} />
               <Action
-                label={`${item.title} 일정 작성`}
+                label={t('{p0} 일정 작성', { p0: item.title })}
                 disabled={disabled}
                 onPress={() => onChoose(item)}
               />

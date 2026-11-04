@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { homeColors as colors } from './homeTheme';
 import { StyleSheet, View } from 'react-native';
@@ -9,13 +11,17 @@ interface Props {
 
 // 장식 배지 없이 사용자에게 한 줄 환영 제목을 표시한다.
 export default function HomeWelcomeGreeting({ nickname }: Props) {
+  useLocale();
   // 닉네임과 큰 글꼴은 필요한 만큼 줄을 바꾸어 표시한다.
   return (
     <View style={styles.container}>
       <Text accessibilityRole="header" style={styles.headline}>
-        반가워요, {resolveDisplayName(nickname)}님! 👋
+        {t('반가워요,')} {resolveDisplayName(nickname)}
+        {t('님! 👋')}
       </Text>
-      <Text style={styles.subhead}>당신만의 여행 발자국을 남겨볼까요?</Text>
+      <Text style={styles.subhead}>
+        {t('당신만의 여행 발자국을 남겨볼까요?')}
+      </Text>
     </View>
   );
 }

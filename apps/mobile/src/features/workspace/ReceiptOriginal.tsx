@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { useState } from 'react';
 import { Image, ScrollView, View } from 'react-native';
@@ -14,16 +16,20 @@ export default function ReceiptOriginal(props: {
   retained: boolean;
   disabled: boolean;
 }) {
+  useLocale();
   return props.retained ? (
     <RetainedOriginal key={`${props.userId}:${props.mediaId}`} {...props} />
   ) : (
     <Text style={l.meta}>
-      원본 사진을 보관하지 않은 기록이에요. 확인한 내용은 아래에서 볼 수 있어요.
+      {t(
+        '원본 사진을 보관하지 않은 기록이에요. 확인한 내용은 아래에서 볼 수 있어요.',
+      )}
     </Text>
   );
 }
 
 function RetainedOriginal(props: Parameters<typeof ReceiptOriginal>[0]) {
+  useLocale();
   const [expanded, setExpanded] = useState(false);
   const [width, setWidth] = useState(280);
   const [ratio, setRatio] = useState(1);
@@ -46,12 +52,12 @@ function RetainedOriginal(props: Parameters<typeof ReceiptOriginal>[0]) {
       ) : (
         <ScrollView
           horizontal
-          accessibilityLabel="확대한 영수증 원본. 좌우로 이동할 수 있어요."
+          accessibilityLabel={t('확대한 영수증 원본. 좌우로 이동할 수 있어요.')}
         >
           <Image
             source={{ uri: query.data }}
             resizeMode="contain"
-            accessibilityLabel="영수증 원본"
+            accessibilityLabel={t('영수증 원본')}
             style={{ width: width * 2, height: (width * 2) / ratio }}
             onLoad={(event) => {
               const source = event.nativeEvent.source;
@@ -63,7 +69,7 @@ function RetainedOriginal(props: Parameters<typeof ReceiptOriginal>[0]) {
         </ScrollView>
       )}
       <LedgerAction
-        label={expanded ? '원본 접고 입력 계속' : '원본 확대'}
+        label={expanded ? t('원본 접고 입력 계속') : t('원본 확대')}
         disabled={props.disabled || !query.data || query.isError}
         onPress={() => {
           setFailed(false);

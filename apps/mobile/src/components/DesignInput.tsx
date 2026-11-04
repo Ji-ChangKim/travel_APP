@@ -1,3 +1,4 @@
+import { useLocale } from '@/features/localization/localeState';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 import { useContext, useState, type Ref } from 'react';
 import {
@@ -8,6 +9,7 @@ import {
 } from 'react-native';
 import { colors, radii, typography } from '@/constants/theme';
 import { AppFontsReady } from './AppFontProvider';
+import { appFontFamily } from './appFontFamily';
 
 type Props = TextInputProps & { inputRef?: Ref<TextInput> };
 
@@ -34,6 +36,7 @@ function InputView({
   focusState: [boolean, (value: boolean) => void];
   fontsReady: boolean;
 }) {
+  const language = useLocale();
   const { fontScale } = useAppAccessibility();
   // 비활성 입력은 투명도를 낮추지 않고 배경과 실제 편집 상태로 구분한다.
   return (
@@ -51,8 +54,14 @@ function InputView({
       }}
       style={[
         s.input,
-        fontsReady && { fontFamily: 'TripPrintRegular' },
         style,
+        fontsReady && {
+          fontFamily: appFontFamily(
+            StyleSheet.flatten(style)?.fontFamily || 'TripPrintRegular',
+            Platform.OS,
+            language,
+          ),
+        },
         Platform.OS === 'web' && {
           fontSize:
             (StyleSheet.flatten(style)?.fontSize ??

@@ -16,7 +16,7 @@ const config: ExpoConfig = {
   orientation: 'portrait',
   userInterfaceStyle: 'light',
   backgroundColor: '#F8F9FF',
-  icon: './assets/brand/tripprint-v1/TripPrint_app-icon_1024x1024.png',
+  icon: './assets/brand/tripprint-v1/tripprint-launcher-icon.png',
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.travelapp.mobile',
@@ -30,11 +30,11 @@ const config: ExpoConfig = {
     // 기기 전용 게스트 기록을 Android 자동 백업에 포함하지 않는다.
     allowBackup: false,
     adaptiveIcon: {
-      backgroundColor: '#FF6B57',
+      backgroundColor: '#FC5041',
       foregroundImage:
-        './assets/brand/tripprint-v1/TripPrint_android-foreground_1024x1024.png',
+        './assets/brand/tripprint-v1/tripprint-launcher-adaptive.png',
       monochromeImage:
-        './assets/brand/tripprint-v1/TripPrint_android-monochrome_1024x1024.png',
+        './assets/brand/tripprint-v1/tripprint-launcher-adaptive.png',
     },
   },
   web: {

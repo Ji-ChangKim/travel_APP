@@ -21,6 +21,7 @@ export function releaseSourceManifest() {
     '.easignore',
     'eas.json',
     'apps/mobile/src',
+    'apps/mobile/index.ts',
     'apps/mobile/assets',
     'apps/mobile/public',
     'docs/02. 디자인/00. 공통규격/design-tokens.json',

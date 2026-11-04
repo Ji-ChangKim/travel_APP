@@ -1,0 +1,36 @@
+LINE Seed 적용 검수 — 2026-10-26 시작
+
+승인 범위
+사용자 요청에 따라 앱 일반 UI 글꼴을 LINE Seed로 변경했다. 색상 재정의안은 적용하지 않았으며 기존 색·크기·행간·여백·터치 영역을 유지한다. 로고 Poppins와 Ionicons는 보존한다.
+
+적용 내용
+- 한국어: LINE Seed KR, 영어: LINE Seed Sans, 일본어: LINE Seed JP.
+- 공식 배포처 https://seed.line.me/index_en.html 에서 받은 TTF Regular/Bold 6개를 assets/fonts/line-seed에 포함. OFL.txt와 출처·원본 경로·크기·SHA-256 manifest를 함께 기록.
+- Regular 역할은 400 파일, 기존 Semibold(600)와 Bold(700) 역할은 실제 Bold 파일에 연결. 제공되지 않는 Semibold 파일을 임의 생성하지 않았다.
+- AppFontProvider에서 세 언어를 준비하고 AppText·DesignInput·웹 날짜 입력이 언어 선택을 구독한다. 영문/일문 입력 원문은 번역하거나 바꾸지 않는다.
+- 웹 혼합 언어는 같은 계열의 대체 글꼴을 순서대로 사용. 네이티브에서 주 글꼴에 없는 혼합 문자는 OS 대체를 사용하므로 별도 실기기 확인이 필요하다.
+- 기존 Pretendard 자산은 이전 시안 참조 때문에 보존한다. 현재 홈 HTML 목업은 LINE Seed KR로 변경했다. 과거 정적 헤더 보드는 변경 전 이력이다.
+
+변경 파일
+- apps/mobile/src/components/AppFontProvider.tsx, AppText.tsx, DesignInput.tsx, appFontFamily.ts
+- apps/mobile/src/features/workspace/TravelInputs.tsx
+- apps/mobile/assets/fonts/line-seed/*
+- docs/02. 디자인/00. 공통규격/design-tokens.json, 디자인시스템.md, 헤더GNB_규격.md, 언어선택_화면규격.txt
+- docs/02. 디자인/02. 리소스/리소스_저장경로.md
+- docs/01. 서비스기획/03. 검토안/홈_여행목록_레이아웃목업.html
+- tests/web/workspace.spec.ts: 언어별 실제 글꼴 로딩·입력값·200% 검사 추가
+
+확인 결과
+- npm run check 통과: outputs/line-seed-check.log.
+- npm run test:headers:web 21개 통과: outputs/line-seed-headers.log.
+- TTF 문자 매핑에서 언어별 예문·숫자·통화 기호 포함 확인: outputs/line-seed-glyphs.json.
+- 한국어 커뮤니티 320 화면 캡처 확인: outputs/header-standard/community-320-100.png. 글꼴이 바뀌었고 기존 헤더·GNB·카드 배치는 유지됐다.
+- 추가 한·영·일 브라우저 검사 결과는 아래에 기록한다.
+
+남은 검수
+Android/iOS 설치본의 한·일 혼합 제목, 키보드 조합 입력, 접근성 글자 확대와 줄바꿈, 폰트 로딩 실패 복구는 실기기에서 확인해야 한다. 웹 검사는 검수용 응답을 사용한 UI 검증이며 운영 데이터 검수가 아니다. 배포·커밋·푸시는 하지 않았다.
+추가 결과
+- LINE Seed 언어별 브라우저 검사 9/9 통과: outputs/line-seed-languages.log. KR/EN/JP × 너비 320/390/430, 320에서 200% 확대 확인.
+- 영어·일본어 320/200% 캡처를 직접 확인했다. 헤더와 버튼의 긴 문구는 높이를 늘려 줄바꿈하며 가로 넘침은 없었다. 입력값 전체는 유지되고 단일 행 입력의 보이는 영역은 스크롤된다.
+- 캡처: outputs/line-seed/{ko,en,ja}-{320,390,430}.png, {ko,en,ja}-320-200.png.
+- 총 TTF 자산 크기 14,122,668바이트(중복 별칭 제외). 언어 전환 시 다시 내려받지 않도록 세 언어를 시작 시 함께 준비한다. 실제 기기 시작 시간은 설치본 검수 대상이다.

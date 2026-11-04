@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
 import { StyleSheet, View } from 'react-native';
@@ -18,10 +20,15 @@ export default function FlightRoutePreview({
   arrivalTime?: string;
   arrivalDate?: string;
 }) {
+  useLocale();
   // 시각을 받지 못한 경우 항공권에서 확인할 항목임을 명시한다.
   return (
     <View style={s.route}>
-      <RouteAirport code={departure} time={departureTime} label="출발 예정" />
+      <RouteAirport
+        code={departure}
+        time={departureTime}
+        label={t('출발 예정')}
+      />
       <View style={s.connector}>
         <View style={s.line} />
         <TripIcon name="flight-outline" size={22} color={colors.primary} />
@@ -30,7 +37,7 @@ export default function FlightRoutePreview({
       <RouteAirport
         code={arrival}
         time={arrivalTime}
-        label="도착 예정"
+        label={t('도착 예정')}
         date={arrivalDate}
         right
       />
@@ -52,11 +59,12 @@ function RouteAirport({
   date?: string;
   right?: boolean;
 }) {
+  useLocale();
   // 빈 시각에 자정이나 미정 운항 상태를 임의로 부여하지 않는다.
   return (
     <View style={[s.airport, right && s.right]}>
       <Text style={s.label}>{label}</Text>
-      <Text style={time ? s.time : s.missing}>{time || '항공권 확인'}</Text>
+      <Text style={time ? s.time : s.missing}>{time || t('항공권 확인')}</Text>
       <Text style={s.code}>{code}</Text>
       <Text style={[s.name, right && { textAlign: 'right' }]}>
         {flightAirportName(code)}

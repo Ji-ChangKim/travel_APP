@@ -1,3 +1,4 @@
+import { t } from '@/features/localization/translate';
 import ActionSheet from '@/components/ActionSheet';
 import Text from '@/components/AppText';
 import { FlatList, View } from 'react-native';
@@ -34,10 +35,10 @@ export function renderDiscoveryContent(props: CommunityFeedViewProps) {
           variant="public-feed"
         />
       ) : (
-        <ScreenHeader title={title || '여행 커뮤니티'} />
+        <ScreenHeader title={title || t('여행 커뮤니티')} />
       )}
       <FlatList
-        accessibilityLabel={`${title} 공개 일정`}
+        accessibilityLabel={t('{p0} 공개 일정', { p0: title })}
         style={{ flex: 1 }}
         contentContainerStyle={s.content}
         keyboardShouldPersistTaps="handled"
@@ -61,7 +62,7 @@ export function renderDiscoveryContent(props: CommunityFeedViewProps) {
           <View style={s.sheet}>
             {query.hasNextPage ? (
               <Action
-                label="여행 더 보기"
+                label={t('여행 더 보기')}
                 loading={query.isFetchingNextPage}
                 onPress={() => {
                   /* 같은 조건의 다음 페이지를 읽는다. */ return void query.fetchNextPage();
@@ -70,12 +71,12 @@ export function renderDiscoveryContent(props: CommunityFeedViewProps) {
             ) : null}
             {notice ? (
               <Text accessibilityLiveRegion="polite" style={s.meta}>
-                {notice}
+                {t(notice)}
               </Text>
             ) : null}
             {error ? (
               <Text accessibilityRole="alert" style={s.link}>
-                {error}
+                {t(error)}
               </Text>
             ) : null}
           </View>
@@ -84,23 +85,26 @@ export function renderDiscoveryContent(props: CommunityFeedViewProps) {
       <ActionSheet
         visible={Boolean(block)}
         variant="confirm"
-        title="이 작성자를 차단할까요?"
+        title={t('이 작성자를 차단할까요?')}
         onClose={() => {
           /* 요청 중 중복 조작을 막는다. */ return busy
             ? undefined
             : setBlock(null);
         }}
       >
-        <Text>‘{block?.name}’의 공개 여행을 내 목록에서 숨겨요.</Text>
+        <Text>
+          ‘{block?.name}
+          {t('’의 공개 여행을 내 목록에서 숨겨요.')}
+        </Text>
         <Action
-          label="차단하지 않기"
+          label={t('차단하지 않기')}
           disabled={busy}
           onPress={() => {
             /* 원래 목록으로 돌아간다. */ return setBlock(null);
           }}
         />
         <Action
-          label="작성자 차단"
+          label={t('작성자 차단')}
           variant="danger"
           disabled={busy}
           onPress={() => {

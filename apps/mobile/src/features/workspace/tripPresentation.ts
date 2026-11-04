@@ -1,3 +1,4 @@
+import { t } from '@/features/localization/translate';
 import {
   tripLifecycle,
   tripToday,
@@ -21,7 +22,7 @@ export function tripDateRange(trip: TripTiming): string {
   // 잘못된 기간이나 부분 날짜를 확정된 여행 날짜로 안내하지 않는다.
   return validTripDates(trip)
     ? travelDateRange(trip.startDate!, trip.endDate!)
-    : '날짜 미정';
+    : t('날짜 미정');
 }
 
 // 뱃지·설명·버튼·정렬은 같은 시각에서 판별한 네 단계로 함께 만든다.
@@ -46,17 +47,17 @@ function phasePresentation(
   // 보관 여부는 별도 속성이며 다섯 번째 여행 단계가 아니다.
   return {
     phase,
-    badge: tripPhaseLabels[phase],
-    label: tripPhaseLabels[phase],
+    badge: t(tripPhaseLabels[phase]),
+    label: t(tripPhaseLabels[phase]),
     dates: tripDateRange(trip),
     archived: trip.status === 'ARCHIVED',
-    action: phase === 'COMPLETED' ? '기록 보러가기' : '계획 계속하기',
+    action: phase === 'COMPLETED' ? t('기록 보러가기') : t('계획 계속하기'),
     heading:
       phase === 'IN_PROGRESS'
-        ? '오늘의 여행'
+        ? t('오늘의 여행')
         : phase === 'COMPLETED'
-          ? '여행의 기록'
-          : '다음 여행 준비',
+          ? t('여행의 기록')
+          : t('다음 여행 준비'),
     reminder: phaseReminder(trip, phase, today),
     priority: { IN_PROGRESS: 0, PLANNED: 1, DRAFT: 2, COMPLETED: 3 }[phase],
   };
@@ -70,14 +71,18 @@ function phaseReminder(
 ): string {
   // 날짜가 없는 여행은 남은 일수를 추정하지 않는다.
   return phase === 'COMPLETED'
-    ? '여행의 일정과 기록을 돌아보세요'
+    ? t('여행의 일정과 기록을 돌아보세요')
     : !validTripDates(trip)
-      ? '여행 날짜를 정하고 계획을 시작해 보세요'
+      ? t('여행 날짜를 정하고 계획을 시작해 보세요')
       : phase === 'IN_PROGRESS'
         ? trip.startDate === today
-          ? '오늘 출발해요'
-          : '지금 여행 중이에요'
-        : `출발까지 ${Math.round((Date.parse(trip.startDate!) - Date.parse(today)) / 86400000)}일 남았어요`;
+          ? t('오늘 출발해요')
+          : t('지금 여행 중이에요')
+        : t('출발까지 {count}일 남았어요', {
+            count: Math.round(
+              (Date.parse(trip.startDate!) - Date.parse(today)) / 86400000,
+            ),
+          });
 }
 
 // 완료 표시의 주 행동은 실제 기록 화면으로 연결한다.

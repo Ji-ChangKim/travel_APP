@@ -1,3 +1,4 @@
+import { t } from '@/features/localization/translate';
 import Text from '@/components/AppText';
 import ScreenHeader from '@/components/ScreenHeader';
 import { type Dispatch, type SetStateAction } from 'react';
@@ -94,8 +95,8 @@ export function renderFlightEditor({
   return (
     <SafeAreaView style={styles.modal}>
       <ScreenHeader
-        title="항공권 입력"
-        backLabel="항공편 목록으로 돌아가기"
+        title={t('항공권 입력')}
+        backLabel={t('항공편 목록으로 돌아가기')}
         onBack={() => {
           // 확정하지 않은 입력은 해당 슬롯의 초안으로만 보존한다.
           return props.onBack({
@@ -111,7 +112,7 @@ export function renderFlightEditor({
         disabled={props.locked}
         actions={[
           {
-            label: '완료',
+            label: t('완료'),
             disabled: props.locked || (manual ? Boolean(issue) : !selected),
             onPress: finish,
           },
@@ -173,7 +174,7 @@ export function renderFlightEditor({
           />
         )}
         <Action
-          label={manual ? '항공편 조회로 돌아가기' : '항공권 직접 입력'}
+          label={manual ? t('항공편 조회로 돌아가기') : t('항공권 직접 입력')}
           disabled={props.locked}
           onPress={() => {
             // 조회 실패 후에도 이전 수동 입력을 보존하며 방식만 바꾼다.
@@ -207,7 +208,7 @@ export function renderFlightEditor({
         ) : null}
         {!manual && selected ? (
           <Text style={styles.label}>
-            선택한 항공편 · {selected.number} {selected.departure} →{' '}
+            {t('선택한 항공편 ·')} {selected.number} {selected.departure} →{' '}
             {selected.arrival}
           </Text>
         ) : null}
@@ -266,7 +267,7 @@ export function renderFlightIdentity({
     <View style={styles.card}>
       <Field
         label="항공사 코드"
-        placeholder="예: KE"
+        placeholder={t('예: KE')}
         value={code}
         disabled={props.locked}
         onChange={(value) => {
@@ -295,13 +296,13 @@ export function renderFlightIdentity({
         />
       ) : code.length === 2 ? (
         <Text style={styles.subtitle}>
-          항공사를 찾지 못했어요. 항공권의 두 자리 코드를 확인해 주세요.
+          {t('항공사를 찾지 못했어요. 항공권의 두 자리 코드를 확인해 주세요.')}
         </Text>
       ) : null}
       <Field
         label="항공편 번호"
         inputMode="numeric"
-        placeholder="예: 901"
+        placeholder={t('예: 901')}
         value={digits}
         disabled={!airline || props.locked}
         onChange={(value) => {
@@ -319,7 +320,7 @@ export function renderFlightIdentity({
         }}
       />
       <Text style={styles.subtitle}>
-        항공사를 선택하고 항공권의 번호 3~4자리를 입력해 주세요.
+        {t('항공사를 선택하고 항공권의 번호 3~4자리를 입력해 주세요.')}
       </Text>
     </View>
   );

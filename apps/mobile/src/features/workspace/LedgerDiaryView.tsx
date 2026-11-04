@@ -1,3 +1,4 @@
+import { t } from '@/features/localization/translate';
 import Text from '@/components/AppText';
 import type {
   WorkspaceMedia,
@@ -51,9 +52,18 @@ export function renderDiaryContent({
           {travelDateRange(snapshot.trip.startDate, snapshot.trip.endDate)}
         </Text>
         <View style={s.row}>
-          <Text style={s.body}>기록 장소 {details.places}곳</Text>
-          <Text style={s.body}>사진 {details.photos.length}장</Text>
-          <Text style={s.body}>영수증 {details.receipts}장</Text>
+          <Text style={s.body}>
+            {t('기록 장소')} {details.places}
+            {t('곳')}
+          </Text>
+          <Text style={s.body}>
+            {t('사진')} {details.photos.length}
+            {t('장')}
+          </Text>
+          <Text style={s.body}>
+            {t('영수증')} {details.receipts}
+            {t('장')}
+          </Text>
         </View>
         {diaryCosts(snapshot.expenses).map((cost) => {
           // 실제 지출만 통화별로 요약한다.
@@ -64,7 +74,9 @@ export function renderDiaryContent({
           );
         })}
         <Text style={s.meta}>
-          원본은 나와 동행자만 볼 수 있어요. 직접 고른 내용만 발견에 공개돼요.
+          {t(
+            '원본은 나와 동행자만 볼 수 있어요. 직접 고른 내용만 발견에 공개돼요.',
+          )}
         </Text>
       </View>
       <View style={s.row}>
@@ -105,24 +117,30 @@ export function renderDiaryContent({
         })}
         {wide && (
           <View style={[s.tinted, { width: 280 }]}>
-            <Text style={s.section}>여행 기록 요약</Text>
+            <Text style={s.section}>{t('여행 기록 요약')}</Text>
             <Text style={s.body}>
-              {snapshot.days.length}일 · 일정 {snapshot.itinerary.length}개
+              {snapshot.days.length}
+              {t('일 · 일정')} {snapshot.itinerary.length}
+              {t('개')}
             </Text>
             <Text style={s.meta}>
-              사진 {details.photos.length}장 · 영수증 {details.receipts}장
+              {t('사진')} {details.photos.length}
+              {t('장 · 영수증')} {details.receipts}
+              {t('장')}
             </Text>
             <Text style={s.meta}>
               {snapshot.postId
-                ? '발견에 공개 사본이 있어요. 원본 수정은 자동 공개되지 않아요.'
-                : '아직 발견에 공개하지 않은 원본이에요.'}
+                ? t(
+                    '발견에 공개 사본이 있어요. 원본 수정은 자동 공개되지 않아요.',
+                  )
+                : t('아직 발견에 공개하지 않은 원본이에요.')}
             </Text>
           </View>
         )}
       </View>
       <View style={s.card}>
         <LedgerAction
-          label="여행 경비 요약"
+          label={t('여행 경비 요약')}
           onPress={() => {
             // 같은 여행의 실제 비용 화면을 연다.
             return router.push(`/trips/${snapshot.trip.id}?section=expenses`);
@@ -130,7 +148,7 @@ export function renderDiaryContent({
         />
         {canEdit && (
           <LedgerAction
-            label="일정·기록 보완"
+            label={t('일정·기록 보완')}
             onPress={() => {
               // 일정이 없으면 실제 일정 작성으로 연결한다.
               return router.push(`/trips/${snapshot.trip.id}`);
@@ -139,7 +157,7 @@ export function renderDiaryContent({
         )}
         {snapshot.myRole === 'owner' && snapshot.trip.status !== 'ARCHIVED' && (
           <LedgerAction
-            label="공유할 내용 선택"
+            label={t('공유할 내용 선택')}
             primary
             onPress={() => {
               // 공유는 기존 범위 선택/확정 절차를 유지한다.
@@ -192,13 +210,14 @@ export function renderDiaryTimeline({
                   DAY {day.dayNumber}
                 </Text>
                 <Text style={s.meta}>
-                  {day.tripDate} · {schedules.length}개 장소·일정
+                  {day.tripDate} · {schedules.length}
+                  {t('개 장소·일정')}
                 </Text>
               </View>
               {day.planTitle && <Text style={s.place}>{day.planTitle}</Text>}
               {day.planConcept && <Text style={s.body}>{day.planConcept}</Text>}
               {!schedules.length && (
-                <Text style={s.meta}>이날 등록한 일정이 없어요.</Text>
+                <Text style={s.meta}>{t('이날 등록한 일정이 없어요.')}</Text>
               )}
               {schedules.map((item) => {
                 // 기록 카드는 예약/메모/실제 비용의 원본 관계를 유지한다.
@@ -221,7 +240,7 @@ export function renderDiaryTimeline({
       {filter === 'photos' && (
         <>
           {!details.photos.length && (
-            <Text style={s.meta}>아직 등록한 여행 사진이 없어요.</Text>
+            <Text style={s.meta}>{t('아직 등록한 여행 사진이 없어요.')}</Text>
           )}
           <View style={s.row}>
             {details.photos.map((photo) => {
@@ -247,7 +266,7 @@ export function renderDiaryTimeline({
           {!snapshot.expenses.some((expense) => {
             // 예상 지출만 있으면 실제 지출 없음으로 표시한다.
             return expense.isActual;
-          }) && <Text style={s.meta}>기록한 실제 지출이 없어요.</Text>}
+          }) && <Text style={s.meta}>{t('기록한 실제 지출이 없어요.')}</Text>}
           {snapshot.expenses
             .filter((expense) => {
               // 결제 확정된 비용만 기록 필터에 포함한다.
@@ -292,7 +311,7 @@ export function renderDiaryStop({
 
   return (
     <View key={item.id} style={s.card}>
-      <Text style={s.eyebrow}>{item.timeSlot || '시간 미정'}</Text>
+      <Text style={s.eyebrow}>{item.timeSlot || t('시간 미정')}</Text>
       <Text accessibilityRole="header" style={s.section}>
         {item.title}
       </Text>
@@ -313,7 +332,7 @@ export function renderDiaryStop({
       </View>
       {item.memo && (
         <View style={s.private}>
-          <Text style={s.eyebrow}>나와 동행자만 보는 메모</Text>
+          <Text style={s.eyebrow}>{t('나와 동행자만 보는 메모')}</Text>
           <Text style={s.body}>{item.memo}</Text>
         </View>
       )}
@@ -340,7 +359,7 @@ export function renderDiaryStop({
         })}
       {canEdit && (
         <LedgerAction
-          label={`사진·메모 보완: ${item.title}`}
+          label={t('사진·메모 보완: {p0}', { p0: item.title })}
           onPress={() => {
             // 기록 전용 편집도 같은 일정 ID로 저장한다.
             return router.push(

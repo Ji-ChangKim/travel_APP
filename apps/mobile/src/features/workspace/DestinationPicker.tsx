@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { countryCities } from './destinationCatalog';
 import TextInput from '@/components/DesignInput';
 import Text from '@/components/AppText';
@@ -28,6 +30,7 @@ export default function DestinationPicker({
   onSelect,
   onClose,
 }: Props) {
+  useLocale();
   // 대륙과 지역은 목록 탐색 상태이며 선택한 여행지를 바꾸지 않는다.
   const [query, setQuery] = useState('');
   const [continent, setContinent] = useState('아시아');
@@ -73,15 +76,21 @@ export default function DestinationPicker({
       <SafeAreaView style={s.screen}>
         <ScreenHeader
           inset={false}
-          title={kind === 'country' ? '나라 선택' : `${country} · 도시 선택`}
-          backLabel="선택 닫기"
+          title={
+            kind === 'country'
+              ? t('나라 선택')
+              : t('{p0} · 도시 선택', { p0: country })
+          }
+          backLabel={t('선택 닫기')}
           onBack={onClose}
           disabled={locked}
         />
         <TextInput
           editable={!locked}
-          accessibilityLabel={`${kind === 'country' ? '나라' : '도시'} 직접 입력`}
-          placeholder="직접 입력하기"
+          accessibilityLabel={t('{p0} 직접 입력', {
+            p0: kind === 'country' ? '나라' : '도시',
+          })}
+          placeholder={t('직접 입력하기')}
           placeholderTextColor={colors.muted}
           style={styles.input}
           value={query}
@@ -118,7 +127,7 @@ export default function DestinationPicker({
               contentContainerStyle={{ gap: 8 }}
             >
               <Action
-                label="전체 지역"
+                label={t('전체 지역')}
                 size="chip"
                 selected={!region}
                 selectionStyle="fill"
@@ -145,7 +154,7 @@ export default function DestinationPicker({
         ) : null}
         {kind === 'city' ? (
           <Action
-            label="도시 없이 진행"
+            label={t('도시 없이 진행')}
             onPress={() => {
               // 도시가 없어도 국가와 여행 기간으로 계속 진행한다.
               return onSelect('');
@@ -189,7 +198,7 @@ export default function DestinationPicker({
           !(kind === 'country' ? visible.length : cities.length) &&
           !/^[ㄱ-ㅎ\s]+$/.test(query) ? (
             <Action
-              label="입력한 이름 적용"
+              label={t('입력한 이름 적용')}
               disabled={locked || Boolean(error)}
               variant="primary"
               onPress={() => {
@@ -200,12 +209,12 @@ export default function DestinationPicker({
           ) : null}
           {kind === 'city' && !cities.length && !query ? (
             <Text style={styles.subtitle}>
-              도시를 비워 두거나 위에 이름을 입력해 주세요.
+              {t('도시를 비워 두거나 위에 이름을 입력해 주세요.')}
             </Text>
           ) : null}
           {error ? (
             <Text accessibilityRole="alert" style={styles.error}>
-              {error}
+              {t(error)}
             </Text>
           ) : null}
         </ScrollView>

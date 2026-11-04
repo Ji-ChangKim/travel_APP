@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { useEffect, useRef, useState } from 'react';
 import { Linking, View } from 'react-native';
@@ -31,6 +33,7 @@ type Props = {
 
 // 여행 생성·일정 추가 모두 편명과 선택한 출발일을 기준으로 조회한다.
 export default function FlightLookup(props: Props) {
+  useLocale();
   // 공항·시각은 조회 후 확인하거나 사용자가 직접 입력을 선택할 때 펼친다.
   const [manual, setManual] = useState(false);
   const fields = useFormScope().feedback.fields;
@@ -47,7 +50,7 @@ export default function FlightLookup(props: Props) {
   return (
     <View style={{ gap: 12 }}>
       <Text style={styles.label}>
-        출발일 · {props.date || '여행 날짜를 먼저 선택해 주세요'}
+        {t('출발일 ·')} {props.date || t('여행 날짜를 먼저 선택해 주세요')}
       </Text>
       <Field
         label="항공 편명 (예: KE123)"
@@ -76,7 +79,7 @@ export default function FlightLookup(props: Props) {
       />
       {!editing && props.values.flightArrival && (
         <View style={styles.card}>
-          <Text style={styles.label}>선택한 항공편</Text>
+          <Text style={styles.label}>{t('선택한 항공편')}</Text>
           <FlightRoutePreview
             departure={props.values.flightDeparture || ''}
             arrival={props.values.flightArrival}
@@ -90,17 +93,17 @@ export default function FlightLookup(props: Props) {
             }
           />
           <Text style={styles.subtitle}>
-            각 공항 현지 시각 · 항공권과 비교해 확인해 주세요.
+            {t('각 공항 현지 시각 · 항공권과 비교해 확인해 주세요.')}
           </Text>
         </View>
       )}
       <Action
         label={
           editing
-            ? '항공편 상세 접기'
+            ? t('항공편 상세 접기')
             : props.values.flightArrival
-              ? '항공편 정보 수정'
-              : '직접 입력하기'
+              ? t('항공편 정보 수정')
+              : t('직접 입력하기')
         }
         disabled={props.disabled}
         onPress={() => {
@@ -111,7 +114,9 @@ export default function FlightLookup(props: Props) {
       {editing && (
         <View style={{ gap: 12 }}>
           <Text style={styles.subtitle}>
-            항공권과 비교해 확인해 주세요. 터미널과 운항 시각은 바뀔 수 있어요.
+            {t(
+              '항공권과 비교해 확인해 주세요. 터미널과 운항 시각은 바뀔 수 있어요.',
+            )}
           </Text>
           {Object.entries({
             flightDeparture: '출발 공항 코드',
@@ -154,6 +159,7 @@ export default function FlightLookup(props: Props) {
 function LookupResults(
   props: Props & { onSelect: (item: FlightLookupCandidate) => void },
 ) {
+  useLocale();
   // 입력 변경으로 컴포넌트가 교체되면 이전 조회를 취소한다.
   const controller = useRef<AbortController | null>(null);
   const [busy, setBusy] = useState(false);
@@ -227,7 +233,7 @@ function LookupResults(
   return (
     <View style={{ gap: 12 }}>
       <Action
-        label={busy ? '항공편 찾는 중…' : '항공편 찾기'}
+        label={busy ? t('항공편 찾는 중…') : t('항공편 찾기')}
         variant="primary"
         disabled={
           busy ||
@@ -239,15 +245,17 @@ function LookupResults(
       />
       {error ? (
         <Text accessibilityRole="alert" style={styles.error}>
-          {error}
+          {t(error)}
         </Text>
       ) : null}
       {result && !chosen && (
         <>
           <Text style={styles.subtitle}>
             {result.candidates.length
-              ? '항공권과 같은 구간을 선택해 주세요.'
-              : '해당 출발일의 항공편을 찾지 못했어요. 날짜와 편명을 확인하거나 직접 입력해 주세요.'}
+              ? t('항공권과 같은 구간을 선택해 주세요.')
+              : t(
+                  '해당 출발일의 항공편을 찾지 못했어요. 날짜와 편명을 확인하거나 직접 입력해 주세요.',
+                )}
           </Text>
           {result.candidates.map((item, index) => (
             <FlightLookupCandidateCard
@@ -267,7 +275,10 @@ function LookupResults(
       ) : null}
       {result && (
         <Action
-          label={`항공편 정보: ${result.source} · ${result.checkedAt.slice(0, 10)} 조회`}
+          label={t('항공편 정보: {p0} · {p1} 조회', {
+            p0: result.source,
+            p1: result.checkedAt.slice(0, 10),
+          })}
           variant="quiet"
           onPress={() => {
             // 조회 출처는 실제 공급자 웹사이트로 연결한다.

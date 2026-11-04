@@ -4,6 +4,7 @@ import type { RateLimit } from '@cloudflare/workers-types';
 export interface VerifiedSession {
   userId: string;
   token: string;
+  isAnonymous?: boolean;
 }
 
 // Bindings는 Wrangler가 생성한 Env를 사용하고 요청 상태만 별도로 선언한다.

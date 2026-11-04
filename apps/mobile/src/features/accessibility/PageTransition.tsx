@@ -8,6 +8,7 @@ import { useAppAccessibility } from './appAccessibility';
 export function PageTransition({ children }: { children: ReactNode }) {
   // 시작 연출이나 접근성 확인 도중 이미 보인 화면을 다시 숨기지 않는다.
   const [opacity] = useState(() => new Animated.Value(1));
+  const [translateY] = useState(() => new Animated.Value(0));
   const focused = useIsFocused();
   const last = useRef(false);
   const settings = useAppAccessibility();
@@ -15,27 +16,45 @@ export function PageTransition({ children }: { children: ReactNode }) {
   useLayoutEffect(() => {
     // 백그라운드·설정 변경은 새 페이지 진입으로 취급하지 않는다.
     opacity.stopAnimation();
+    translateY.stopAnimation();
     if (!focused || instant || last.current) {
       opacity.setValue(1);
+      translateY.setValue(0);
       last.current = focused;
       return;
     }
     last.current = true;
     opacity.setValue(0);
-    const animation = Animated.timing(opacity, {
-      toValue: 1,
-      duration: transitionTime.page,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: Platform.OS !== 'web',
-    });
+    translateY.setValue(Platform.OS === 'web' ? 0 : 8);
+    const animation = Animated.parallel([
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: transitionTime.page,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: Platform.OS !== 'web',
+      }),
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: transitionTime.page,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: Platform.OS !== 'web',
+      }),
+    ]);
     animation.start();
     return () => {
       // 화면을 떠나면 이전 페이지의 진행을 중단한다.
       animation.stop();
     };
-  }, [focused, instant, opacity]);
+  }, [focused, instant, opacity, translateY]);
   return (
-    <Animated.View testID="page-transition" style={{ flex: 1, opacity }}>
+    <Animated.View
+      testID="page-transition"
+      style={{
+        flex: 1,
+        opacity,
+        transform: Platform.OS === 'web' ? undefined : [{ translateY }],
+      }}
+    >
       {children}
     </Animated.View>
   );

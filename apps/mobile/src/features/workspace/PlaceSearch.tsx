@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { useState } from 'react';
 import { Linking, View } from 'react-native';
@@ -33,6 +35,7 @@ export default function PlaceSearch({
   simple?: boolean;
   startExpanded?: boolean;
 }) {
+  useLocale();
   // 검색 요청은 명시적으로 검색 버튼을 눌렀을 때만 실행한다.
   const [localQuery, setLocalQuery] = useState('');
   const query = value ?? localQuery;
@@ -47,7 +50,7 @@ export default function PlaceSearch({
     <View style={compact ? { gap: 12 } : styles.card}>
       {!compact && (
         <Text style={styles.title} numberOfLines={1}>
-          여행할 장소 찾기
+          {t('여행할 장소 찾기')}
         </Text>
       )}
       {compact ? (
@@ -56,7 +59,7 @@ export default function PlaceSearch({
           accessibilityLabel="제목"
           value={query}
           onChange={setQuery}
-          placeholder="어디에 가고 싶으세요?"
+          placeholder={t('어디에 가고 싶으세요?')}
         />
       ) : (
         <Field label="장소 검색어" value={query} onChange={setQuery} />
@@ -64,7 +67,9 @@ export default function PlaceSearch({
       {compact && !simple && (
         <ScheduleButton
           label={
-            expanded ? '지도 검색·링크 접기' : 'Google Maps로 찾거나 가져오기'
+            expanded
+              ? t('지도 검색·링크 접기')
+              : t('Google Maps로 찾거나 가져오기')
           }
           onPress={() => {
             // 직접 입력은 기본으로 두고 외부 지도 사용은 선택하게 한다.
@@ -84,7 +89,7 @@ export default function PlaceSearch({
             onSelect={onSelect}
           />
           <Button
-            label="Google Maps에서 찾기"
+            label={t('Google Maps에서 찾기')}
             disabled={disabled || !query.trim()}
             onPress={() => {
               // Maps URL은 앱의 Places API를 호출하지 않는다.
@@ -97,7 +102,9 @@ export default function PlaceSearch({
             }}
           />
           <Text style={compact ? schedule.meta : styles.subtitle}>
-            장소를 확인한 뒤 일정 제목을 입력하고 지도 위치를 선택해 주세요.
+            {t(
+              '장소를 확인한 뒤 일정 제목을 입력하고 지도 위치를 선택해 주세요.',
+            )}
           </Text>
           <SharedPlaceInput
             userId={userId}
@@ -111,7 +118,7 @@ export default function PlaceSearch({
       )}
       {error ? (
         <Text accessibilityRole="alert" style={styles.error}>
-          {error}
+          {t(error)}
         </Text>
       ) : null}
     </View>

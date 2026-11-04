@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { View } from 'react-native';
 import DesignButton from '@/components/DesignButton';
 import Text from '@/components/AppText';
@@ -13,14 +15,15 @@ export default function PublicPlanExecution({
   title: string;
   postId: string;
 }) {
+  useLocale();
   // 함께 편집하는 초대를 만들지 않고 선택 공개본만 전달한다.
   const share = usePublishedPlanShare(title, postId, false);
   return (
     <View style={timelinePlanStyles.publicExecutionBar}>
       <View style={timelinePlanStyles.publicAction}>
         <DesignButton
-          label="링크 공유"
-          accessibilityLabel="공유 링크 보내기"
+          label={t('링크 공유')}
+          accessibilityLabel={t('공유 링크 보내기')}
           disabled={share.busy}
           loading={share.busy}
           onPress={share.send}
@@ -33,9 +36,9 @@ export default function PublicPlanExecution({
           return (
             <View style={timelinePlanStyles.publicAction}>
               <DesignButton
-                label={saved ? '담은 일정 열기' : '내 여행에 담기'}
+                label={saved ? t('담은 일정 열기') : t('내 여행에 담기')}
                 accessibilityLabel={
-                  saved ? '담은 일정 열기' : '내 여행으로 일정 담기'
+                  saved ? t('담은 일정 열기') : t('내 여행으로 일정 담기')
                 }
                 variant="primary"
                 onPress={open}

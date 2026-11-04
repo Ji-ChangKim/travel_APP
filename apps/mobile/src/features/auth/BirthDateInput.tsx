@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
 import { useState, type Dispatch, type SetStateAction } from 'react';
@@ -15,6 +17,7 @@ type BirthDateProps = {
 
 // 생일 입력에 플랫폼에서 제공하는 실제 달력 선택기를 연결한다.
 export default function BirthDateInput(props: BirthDateProps) {
+  useLocale();
   // 날짜 선택기를 닫을 때 작성 중인 다른 프로필 항목은 유지한다.
   return <BirthDateField {...props} openState={useState(false)} />;
 }
@@ -34,12 +37,13 @@ function BirthDateField({
 }: BirthDateProps & {
   openState: [boolean, Dispatch<SetStateAction<boolean>>];
 }) {
+  useLocale();
   // 선택 취소는 기존 날짜를 보존하며 미래 날짜 선택은 막는다.
   return (
     <View style={styles.field}>
-      <Text style={styles.label}>생년월일 (선택)</Text>
+      <Text style={styles.label}>{t('생년월일 (선택)')}</Text>
       <Text style={styles.fieldHint}>
-        입력하지 않아도 여행을 시작할 수 있어요.
+        {t('입력하지 않아도 여행을 시작할 수 있어요.')}
       </Text>
       {Platform.OS === 'web' ? (
         <input
@@ -72,7 +76,7 @@ function BirthDateField({
         <>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="생년월일 선택"
+            accessibilityLabel={t('생년월일 선택')}
             accessibilityState={{ disabled, expanded: open }}
             disabled={disabled}
             onPress={() => {
@@ -86,7 +90,7 @@ function BirthDateField({
             ]}
           >
             <Text style={{ color: value ? loginTheme.text : loginTheme.muted }}>
-              {value || '생일 선택 (선택 사항)'}
+              {value || t('생일 선택 (선택 사항)')}
             </Text>
             <Ionicons
               name="calendar-outline"
@@ -114,7 +118,7 @@ function BirthDateField({
           ) : null}
           {open && !disabled && Platform.OS === 'ios' ? (
             <LoginButton
-              label="날짜 선택 완료"
+              label={t('날짜 선택 완료')}
               onPress={() => {
                 // 확정한 날짜를 유지하며 펼쳐진 달력만 닫는다.
                 return setOpen(false);
@@ -125,7 +129,7 @@ function BirthDateField({
       )}
       {value ? (
         <LoginButton
-          label="생년월일 지우기"
+          label={t('생년월일 지우기')}
           disabled={disabled}
           onPress={() => {
             // 선택한 생일을 지워도 다른 프로필 입력은 유지한다.

@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
@@ -15,12 +17,13 @@ import { Action } from './ui';
 
 // 실제 공개 여행만 도시별로 탐색하고 선택한 원본 게시물로 이동한다.
 export default function HomeExplore({ userId }: { userId: string }) {
+  useLocale();
   // 인증 계정의 차단 설정과 조회 취소 경계를 기존 서비스에 맡긴다.
   const query = useQuery({
-    queryKey: foundationQueryKey(userId || 'public', 'home-community'),
+    queryKey: foundationQueryKey(userId || 'public', 'home-community-records'),
     queryFn: ({ signal }) => {
       // 정적인 인기 여행이나 저장 수를 실제 응답에 섞지 않는다.
-      return loadCommunity(userId, 0, {}, signal);
+      return loadCommunity(userId, 0, { kind: 'record' }, signal);
     },
     retry: false,
   });
@@ -29,29 +32,31 @@ export default function HomeExplore({ userId }: { userId: string }) {
     <View style={s.section} testID="home-explore">
       <View style={s.header}>
         <Text accessibilityRole="header" style={s.title}>
-          어디로 떠나볼까요?
+          {t('다녀온 여행을 만나보세요')}
         </Text>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="공개 일정 더 둘러보기"
+          accessibilityLabel={t('공개 일정 더 둘러보기')}
           style={s.more}
           onPress={() => {
             // 전체 공개 목록으로 이동한다.
-            return router.push('/(tabs)/footprints');
+            return router.push({
+              pathname: '/(tabs)/footprints',
+              params: { kind: 'record' },
+            });
           }}
         >
-          <Text style={s.meta}>더보기</Text>
+          <Text style={s.meta}>{t('더보기')}</Text>
           <Ionicons name="chevron-forward" size={16} color={colors.muted} />
         </Pressable>
       </View>
-      <Text style={s.meta}>여행자들의 실제 일정에서 영감을 얻어보세요.</Text>
       {query.isPending ? (
-        <Text style={s.meta}>공개 여행 불러오는 중…</Text>
+        <Text style={s.meta}>{t('공개 여행 불러오는 중…')}</Text>
       ) : query.isError ? (
         <View style={s.notice}>
-          <Text style={s.meta}>다른 여행을 불러오지 못했어요.</Text>
+          <Text style={s.meta}>{t('다른 여행을 불러오지 못했어요.')}</Text>
           <Action
-            label="공개 여행 다시 불러오기"
+            label={t('공개 여행 다시 불러오기')}
             onPress={() => {
               // 실패한 공개 여행 조회만 재시도한다.
               return void query.refetch();
@@ -63,7 +68,7 @@ export default function HomeExplore({ userId }: { userId: string }) {
       ) : (
         <View style={s.notice}>
           <Text style={s.meta}>
-            아직 공개된 여행이 없어요. 나의 첫 여행을 계획해 보세요.
+            {t('아직 공개된 여행이 없어요. 나의 첫 여행을 계획해 보세요.')}
           </Text>
         </View>
       )}
@@ -73,6 +78,7 @@ export default function HomeExplore({ userId }: { userId: string }) {
 
 // 서버가 반환한 공개 도시를 필터로 만들고 최대 세 개의 카드를 보여준다.
 function ExploreTrips({ posts }: { posts: CommunityPost[] }) {
+  useLocale();
   // 조회 결과가 바뀌어 선택한 도시가 사라지면 전체 목록을 표시한다.
   const [city, setCity] = useState<string | null>(null);
   const cities = [
@@ -99,7 +105,7 @@ function ExploreTrips({ posts }: { posts: CommunityPost[] }) {
             <Pressable
               key={item ?? 'all'}
               accessibilityRole="button"
-              accessibilityLabel={`공개 여행 ${item ?? '전체'}`}
+              accessibilityLabel={t('공개 여행 {p0}', { p0: item ?? '전체' })}
               accessibilityState={{ selected: selected === item }}
               aria-selected={selected === item}
               onPress={() => {
@@ -111,7 +117,7 @@ function ExploreTrips({ posts }: { posts: CommunityPost[] }) {
               <Text
                 style={[s.chipText, selected === item && s.selectedChipText]}
               >
-                {item ?? '전체'}
+                {item ?? t('전체')}
               </Text>
             </Pressable>
           );
@@ -133,6 +139,7 @@ function ExploreTrips({ posts }: { posts: CommunityPost[] }) {
 
 // 사진과 기간·작성자를 공개 원본에서만 가져오는 일정 카드를 그린다.
 function ExploreCard({ post }: { post: CommunityPost }) {
+  useLocale();
   // 사진이 없으면 다른 도시 사진을 대신 쓰지 않고 가방 모티프를 표시한다.
   const router = useRouter();
   return (
@@ -163,7 +170,7 @@ function ExploreCard({ post }: { post: CommunityPost }) {
         <Text style={[s.meta, s.author]}>{post.author}</Text>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`${post.title} 공개 일정 보기`}
+          accessibilityLabel={t('{p0} 공개 일정 보기', { p0: post.title })}
           style={s.open}
           onPress={() => {
             // 공개 선택 범위를 보존하는 기존 상세 진입 경로를 사용한다.
@@ -173,7 +180,7 @@ function ExploreCard({ post }: { post: CommunityPost }) {
             });
           }}
         >
-          <Text style={s.openText}>일정 구경하기</Text>
+          <Text style={s.openText}>{t('일정 구경하기')}</Text>
           <Ionicons name="chevron-forward" size={16} color={colors.ink} />
         </Pressable>
       </View>

@@ -148,3 +148,5 @@ export * from './communityFeed';
 export * from './communityImport';
 export * from './planning';
 export { tripDestinationSchema, tripDestinationsSchema } from './foundation';
+
+export * from './homeData';

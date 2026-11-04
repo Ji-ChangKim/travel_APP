@@ -3,6 +3,8 @@ import { randomBytes, randomUUID } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { chromium, expect } from '@playwright/test';
+import { pickCalendarDate } from './calendar.mjs';
+import { signInPlanningMember } from './member-session.mjs';
 import {
   apiOrigin,
   planningRequest,
@@ -23,6 +25,7 @@ test(
       await runtime.mf.dispose();
     });
     const member = await createMember();
+    const recipient = await createMember();
     const browser = await chromium.launch({ channel: 'chrome' });
     t.after(() => browser.close());
     const context = await browser.newContext({
@@ -45,9 +48,13 @@ test(
     mkdirSync('outputs/triple-planning', { recursive: true });
     await login(page, member);
     await page
-      .getByRole('button', { name: '여행 만들기', exact: true })
+      .getByRole('button', {
+        name: '새 여행 만들기',
+        exact: true,
+      })
       .click();
-    await fill(page, { 시작일: '2026-11-10', 종료일: '2026-11-12' });
+    await pickCalendarDate(page, '2026-11-10');
+    await pickCalendarDate(page, '2026-11-12');
     await destination(page, '나라 선택', '나라 직접 입력', '일본');
     await destination(page, '도시 선택', '도시 직접 입력', '오사카');
     await fill(page, { '여행 이름 · 선택': '여행 생성·편집·공유 검증' });
@@ -118,7 +125,6 @@ test(
     await page
       .getByRole('button', { name: 'DAY 2 일정에 추가', exact: true })
       .click();
-    await page.getByRole('button', { name: 'DAY 2', exact: true }).click();
     await expect(
       page.getByLabel('15:00 · 오사카성 다시 걷기', { exact: true }),
     ).toBeVisible();
@@ -147,7 +153,6 @@ test(
     await page
       .getByRole('button', { name: '일정 수정 저장', exact: true })
       .click();
-    await page.getByRole('button', { name: 'DAY 3', exact: true }).click();
     await expect(
       page.getByLabel('15:00 · 오사카성 다시 걷기', { exact: true }),
     ).toBeVisible();
@@ -178,7 +183,10 @@ test(
       page.getByText('선택 일정 2개 · 사진 0장', { exact: true }),
     ).toBeVisible();
     assert.equal(
-      await page.getByText('예약 확인용 비공개 메모', { exact: true }).count(),
+      await page
+        .getByLabel('실제 공개 내용 미리보기', { exact: true })
+        .getByText('예약 확인용 비공개 메모', { exact: true })
+        .count(),
       0,
     );
     await page.screenshot({
@@ -196,6 +204,17 @@ test(
     ).toBeVisible();
     const shared = await savedPlan(runtime.db, tripId);
     assert.ok(shared.postId);
+    // 로컬 HTTP 주소는 외부 공유 주소로 허용하지 않는다. 실패 안내 뒤 공개본은 보존해야 한다.
+    await page
+      .getByRole('button', { name: '공유 링크 보내기', exact: true })
+      .click();
+    await expect(
+      page.getByText(
+        '공유 링크를 만들지 못했어요. 공개 화면에서 다시 시도해 주세요.',
+        { exact: true },
+      ),
+    ).toBeVisible();
+    assert.equal((await savedPlan(runtime.db, tripId)).postId, shared.postId);
     const publicResponse = await fetch(
       `${apiOrigin}/public/community/${shared.postId}`,
     );
@@ -279,8 +298,15 @@ test(
       document.documentElement.style.fontSize = '16px';
       window.dispatchEvent(new Event('resize'));
     });
-    await login(publicPage, member);
-    await publicPage.goto(`${webOrigin}/community/${shared.postId}`);
+    // 링크 수신자는 공유자와 다른 계정이며 담기 행동에서 로그인해 같은 공개본으로 복귀한다.
+    await publicPage
+      .getByRole('button', { name: '내 여행으로 일정 담기', exact: true })
+      .click();
+    await expect(publicPage).toHaveURL(/\/login\?/);
+    await signInPlanningMember(publicPage, recipient);
+    await expect(publicPage).toHaveURL(
+      `${webOrigin}/community/${shared.postId}`,
+    );
     await publicPage
       .getByRole('button', { name: '내 여행으로 일정 담기', exact: true })
       .click();
@@ -302,6 +328,72 @@ test(
     assert.equal(imported.expenses.length, 0);
     assert.equal(imported.receipts.length, 0);
     assert.equal(imported.media.length, 0);
+    const owners = await runtime.db
+      .prepare('SELECT id,owner_id FROM trips WHERE id IN (?,?)')
+      .bind(tripId, importedTripId)
+      .all();
+    assert.notEqual(owners.results[0].owner_id, owners.results[1].owner_id);
+    assert.equal(
+      (
+        await runtime.db
+          .prepare('SELECT count(*) AS count FROM trip_members WHERE trip_id=?')
+          .bind(tripId)
+          .first()
+      ).count,
+      1,
+    );
+    const inaccessibleOriginal = await fetch(
+      `${apiOrigin}/api/v1/trips/${tripId}/workspace`,
+      {
+        headers: {
+          Origin: webOrigin,
+          Authorization: `Bearer ${recipient.token}`,
+        },
+      },
+    );
+    assert.equal(inaccessibleOriginal.status, 404);
+    // 내 사본의 수정이 친구의 원본·공개본을 바꾸지 않는지 실제 화면과 DB로 확인한다.
+    await publicPage
+      .getByRole('button', { name: 'DAY 1', exact: true })
+      .click();
+    await publicPage
+      .getByRole('button', { name: '오사카성 일정 관리', exact: true })
+      .click();
+    await publicPage
+      .getByRole('button', { name: '일정 수정', exact: true })
+      .click();
+    await fill(publicPage, { 제목: '친구 계획에서 담아 수정한 장소' });
+    await publicPage
+      .getByRole('button', { name: '일정 수정 저장', exact: true })
+      .click();
+    await expect(
+      publicPage.getByLabel('10:00 · 친구 계획에서 담아 수정한 장소', {
+        exact: true,
+      }),
+    ).toBeVisible();
+    await publicPage.reload();
+    await expect(
+      publicPage.getByLabel('10:00 · 친구 계획에서 담아 수정한 장소', {
+        exact: true,
+      }),
+    ).toBeVisible();
+    assert.equal(
+      (await savedPlan(runtime.db, importedTripId)).itinerary.find(
+        (item) =>
+          item.id ===
+          imported.itinerary.find((original) => original.title === '오사카성')
+            .id,
+      ).title,
+      '친구 계획에서 담아 수정한 장소',
+    );
+    assert.equal(
+      JSON.stringify(
+        await (
+          await fetch(`${apiOrigin}/public/community/${shared.postId}`)
+        ).json(),
+      ).includes('친구 계획에서 담아 수정한 장소'),
+      false,
+    );
     assert.equal(
       JSON.stringify(imported).includes('예약 확인용 비공개 메모'),
       false,
@@ -399,6 +491,19 @@ test(
       (await fetch(`${apiOrigin}/public/community/${shared.postId}`)).status,
       404,
     );
+    await publicPage.goto(`${webOrigin}/community/${shared.postId}`);
+    await expect(
+      publicPage.getByText(
+        '공개가 중단됐거나 찾을 수 없는 여행이에요. 발자국에서 다른 여행을 살펴보세요.',
+        { exact: true },
+      ),
+    ).toBeVisible();
+    await publicPage.goto(`${webOrigin}/trips/${importedTripId}`);
+    await expect(
+      publicPage.getByLabel('10:00 · 친구 계획에서 담아 수정한 장소', {
+        exact: true,
+      }),
+    ).toBeVisible();
     const permissions = await verifyCompanions(member, tripId);
     const final = await savedPlan(runtime.db, tripId);
     assert.deepEqual(final.itinerary, updated.itinerary);
@@ -418,12 +523,18 @@ test(
           privateMemoExcluded: true,
           restoredInNewSession: true,
           publicReadWithoutToken: true,
+          localHttpShareRejectedWithoutChangingPublication: true,
           republishedAtSameUrl: true,
           withdrawReturns404: true,
           commands,
           permissions,
           importedTripId,
           importedWithoutPrivateRecords: true,
+          distinctRecipientLoginReturnsToSharedPlan: true,
+          recipientCannotReadPrivateOriginal: true,
+          recipientEditDoesNotChangeOriginal: true,
+          existingCopySurvivesWithdrawal: true,
+          externalGoogleAuthenticationVerified: false,
           androidBuildExecuted: false,
         },
         null,
@@ -454,28 +565,30 @@ async function createMember() {
   return { email, password, token };
 }
 
-// 기기 저장소에 토큰을 주입하지 않고 실제 로그인 폼을 사용한다.
+// 실제 로컬 인증 세션으로 사전 조건을 준비하며 외부 Google 인증은 별도로 검수한다.
 async function login(page, member) {
   // 앱이 서버 세션을 받아 원래 화면으로 복귀할 때까지 기다린다.
   await page.goto(`${webOrigin}/login`);
-  await page
-    .getByRole('button', {
-      name: '이메일 계정으로 로그인 / 회원가입',
-      exact: true,
-    })
-    .click();
-  await fill(page, { 이메일: member.email, 비밀번호: member.password });
-  await page
-    .getByRole('button', { name: '이메일 로그인', exact: true })
-    .click();
+  await signInPlanningMember(page, member);
   await expect(page).not.toHaveURL(/\/login(?:\?|$)/);
 }
 
 // 고객에게 보이는 입력 이름으로만 값을 바꾼다.
 async function fill(page, values) {
   // 화면과 DB를 연결하는 실제 이벤트를 실행한다.
-  for (const [label, value] of Object.entries(values))
+  for (const [label, value] of Object.entries(values)) {
+    if (
+      label === '계획 설명·추천 메뉴·팁' &&
+      !(await page.getByLabel(label, { exact: true }).isVisible())
+    )
+      await page
+        .getByRole('button', {
+          name: '+ 고급 옵션 열기 (동선 순서 · 지도 핀 · 후보 묶음)',
+          exact: true,
+        })
+        .click();
     await page.getByLabel(label, { exact: true }).fill(value);
+  }
 }
 
 // 국가·도시는 실제 선택 화면에서 지정한다.

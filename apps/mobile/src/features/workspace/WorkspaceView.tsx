@@ -1,7 +1,14 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import HaruState from '@/components/HaruState';
 import { colors } from '@/constants/theme';
-import { ActivityIndicator, ScrollView, View } from 'react-native';
+import {
+  ActivityIndicator,
+  RefreshControl,
+  ScrollView,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ModalBackground from '../accessibility/ModalBackground';
 import { authReturn } from '../auth/authReturn';
@@ -41,12 +48,14 @@ import type { useWorkspaceController } from './useWorkspaceController';
 export default function WorkspaceView(
   props: ReturnType<typeof useWorkspaceController>,
 ) {
+  useLocale();
   // 같은 화면 수명의 상태를 영역별 표현 함수에 전달한다.
   const {
     id,
     userId,
     form,
     busy,
+    setDraftSaving,
     scanning,
     confirmation,
     hasPending,
@@ -73,13 +82,14 @@ export default function WorkspaceView(
       />
     );
   // 홈에서 고른 목적지로 인증된 계정의 여행 생성을 시작한다.
-  if (creating && userId)
+  if (creating)
     return (
       <PlanEditor
         userId={userId}
         form={form}
         busy={busy}
         locked={busy || scanning || hasPending || Boolean(confirmation)}
+        onDraftPending={setDraftSaving}
         feedback={feedback}
         onInvalid={invalidForm}
         error={error}
@@ -139,15 +149,29 @@ function renderWorkspaceLayout(
           testID="trip-content"
           contentContainerStyle={hub.content}
           keyboardShouldPersistTaps="handled"
+          refreshControl={
+            <RefreshControl
+              refreshing={
+                Boolean(userId) &&
+                !workspace.isLoading &&
+                workspace.isFetching &&
+                !busy
+              }
+              onRefresh={reload}
+              tintColor={colors.primary}
+              colors={[colors.primary]}
+            />
+          }
         >
           {user?.authProvider === 'guest' && (
             <View style={styles.card}>
               <Text>
-                게스트 여행은 이 기기에만 저장돼요. 다른 기기에서는 볼 수 없으며
-                앱이나 저장 데이터를 삭제하면 복구할 수 없어요.
+                {t(
+                  '게스트 여행은 이 기기에만 저장돼요. 다른 기기에서는 볼 수 없으며 앱이나 저장 데이터를 삭제하면 복구할 수 없어요.',
+                )}
               </Text>
               <Action
-                label="로그인 / 회원가입"
+                label={t('로그인 / 회원가입')}
                 onPress={() => {
                   // 기기 여행을 자동 업로드하지 않고 회원 인증을 선택하게 한다.
                   return router.push('/login');
@@ -157,12 +181,14 @@ function renderWorkspaceLayout(
           )}
           {!userId ? (
             <View style={styles.card}>
-              <Text style={styles.title}>로그인하고 여행을 시작하세요</Text>
+              <Text style={styles.title}>
+                {t('로그인하고 여행을 시작하세요')}
+              </Text>
               <Text>
-                로그인하면 여행을 저장하고 친구와 함께 계획할 수 있어요.
+                {t('로그인하면 여행을 저장하고 친구와 함께 계획할 수 있어요.')}
               </Text>
               <Action
-                label="로그인 / 회원가입"
+                label={t('로그인 / 회원가입')}
                 onPress={() => {
                   // 실제 인증 화면으로 이동한다.
                   return router.push(
@@ -187,7 +213,7 @@ function renderWorkspaceLayout(
               {(trips.isLoading || workspace.isLoading) && (
                 <HaruState
                   kind="loading"
-                  title="여행을 불러오는 중입니다."
+                  title={t('여행을 불러오는 중입니다.')}
                   compact
                 />
               )}
@@ -203,8 +229,9 @@ function renderWorkspaceLayout(
                 <>
                   {importing && !writable && (
                     <Text accessibilityRole="alert" style={styles.error}>
-                      읽기 전용 또는 보관된 여행에는 장소를 추가할 수 없습니다.
-                      편집 가능한 여행을 선택해 주세요.
+                      {t(
+                        '읽기 전용 또는 보관된 여행에는 장소를 추가할 수 없습니다. 편집 가능한 여행을 선택해 주세요.',
+                      )}
                     </Text>
                   )}
                   {renderWorkspaceSummary({ ...props, snapshot })}
@@ -218,7 +245,9 @@ function renderWorkspaceLayout(
                       accessibilityLiveRegion="polite"
                     >
                       <ActivityIndicator color={colors.text} size="small" />
-                      <Text style={detail.meta}>여행에 반영하고 있어요…</Text>
+                      <Text style={detail.meta}>
+                        {t('여행에 반영하고 있어요…')}
+                      </Text>
                     </View>
                   )}
                   {renderWorkspaceMap({ ...props, snapshot })}
@@ -226,7 +255,7 @@ function renderWorkspaceLayout(
                   {renderWorkspaceCapture(props)}
                   {activeSection === 'itinerary' && (
                     <Action
-                      label="Google Maps 장소 가져오기"
+                      label={t('Google Maps 장소 가져오기')}
                       variant="quiet"
                       onPress={() => {
                         // 장소의 공유 링크를 가져오는 실제 도구를 연다.
@@ -245,12 +274,12 @@ function renderWorkspaceLayout(
           )}
           {error && !form && (
             <Text style={styles.error} accessibilityRole="alert">
-              {error}
+              {t(error)}
             </Text>
           )}
           {hasPending && !busy && (
             <Action
-              label="다시 저장하기"
+              label={t('다시 저장하기')}
               onPress={() => {
                 // 저장 여부가 불확실한 요청을 중복 생성하지 않는다.
                 return retrySave();
@@ -262,7 +291,7 @@ function renderWorkspaceLayout(
           )}
           {busy && form && (
             <Text style={detail.meta} accessibilityLiveRegion="polite">
-              여행에 반영하고 있어요…
+              {t('여행에 반영하고 있어요…')}
             </Text>
           )}
         </ScrollView>

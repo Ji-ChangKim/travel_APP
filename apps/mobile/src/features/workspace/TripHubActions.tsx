@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DesignButton from '@/components/DesignButton';
@@ -18,20 +20,21 @@ export default function TripHubActions({
   onLibrary: () => void;
   onMap: () => void;
 }) {
+  useLocale();
   // 큰 글꼴에서는 글자 버튼과 아이콘 버튼을 다른 줄에 배치한다.
   const { largeText } = useAppAccessibility();
   return (
     <View style={s.dock}>
       <View style={[s.action, largeText && s.large]}>
         <DesignButton
-          label="지도 보기"
-          accessibilityLabel="동선 지도 보기"
+          label={t('지도 보기')}
+          accessibilityLabel={t('동선 지도 보기')}
           onPress={onMap}
         />
       </View>
       <View style={[s.action, largeText && s.large]}>
         <DesignButton
-          label="일정 추가"
+          label={t('일정 추가')}
           variant="primary"
           disabled={disabled}
           onPress={onAdd}
@@ -40,7 +43,7 @@ export default function TripHubActions({
       <DesignButton
         label=""
         size="icon"
-        accessibilityLabel="영수증 촬영"
+        accessibilityLabel={t('영수증 촬영')}
         disabled={disabled}
         onPress={onCapture}
         icon={(color) => {
@@ -52,7 +55,7 @@ export default function TripHubActions({
       <DesignButton
         label=""
         size="icon"
-        accessibilityLabel="영수증 사진 선택"
+        accessibilityLabel={t('영수증 사진 선택')}
         disabled={disabled}
         onPress={onLibrary}
         icon={(color) => {

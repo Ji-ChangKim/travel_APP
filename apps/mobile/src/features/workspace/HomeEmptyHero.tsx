@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
@@ -18,6 +20,7 @@ export default function HomeEmptyHero({
   onCreateTrip,
   onExplore,
 }: Props) {
+  useLocale();
   // 기본 카드 비율을 따르되 글자가 커지면 내용 높이만큼 확장한다.
   const { width } = useWindowDimensions();
   const { largeText } = useAppAccessibility();
@@ -43,26 +46,29 @@ export default function HomeEmptyHero({
       <View style={styles.copy}>
         <Text
           accessibilityRole="header"
-          accessibilityLabel="다음 여행, 어디로 떠나볼까요?"
+          accessibilityLabel={t('다음 여행, 어디로 떠나볼까요?')}
           style={styles.title}
         >
-          다음 여행,
+          {t('다음 여행,')}
           {!largeText && (
             <Text aria-hidden style={styles.mark}>
               {' '}
               {' ///'}
             </Text>
           )}
-          {'\n'}어디로 떠나볼까요?
+          {'\n'}
+          {t('어디로 떠나볼까요?')}
         </Text>
         <Text style={styles.description}>
-          하루와 함께 가고 싶은 곳부터{'\n'}담아보세요.
+          {t('하루와 함께 가고 싶은 곳부터')}
+          {'\n'}
+          {t('담아보세요.')}
         </Text>
       </View>
       <View style={styles.actions}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="새 여행 만들기"
+          accessibilityLabel={t('새 여행 만들기')}
           accessibilityState={{ disabled }}
           disabled={disabled}
           onPress={onCreateTrip}
@@ -76,15 +82,17 @@ export default function HomeEmptyHero({
           }}
         >
           <Ionicons name="add" size={20} color={colors.surface} />
-          <Text style={styles.createText}>새 여행 만들기</Text>
+          <Text style={styles.createText}>{t('새 여행 만들기')}</Text>
         </Pressable>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="다른 여행자의 일정 둘러보기"
+          accessibilityLabel={t('다른 여행자의 일정 둘러보기')}
           onPress={onExplore}
           style={styles.explore}
         >
-          <Text style={styles.exploreText}>다른 여행자의 일정 둘러보기</Text>
+          <Text style={styles.exploreText}>
+            {t('다른 여행자의 일정 둘러보기')}
+          </Text>
           <Ionicons name="arrow-forward" size={16} color="#37474F" />
         </Pressable>
       </View>

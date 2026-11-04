@@ -1,3 +1,5 @@
+import { getLocale } from '@/features/localization/localeState';
+import { t } from '@/features/localization/translate';
 import Text from '@/components/AppText';
 import TripIcon from '@/components/icons/TripIcon';
 import { Ionicons } from '@expo/vector-icons';
@@ -78,12 +80,14 @@ export function renderTimelinePlace({
             size={14}
           />
           <Text style={s.badgeText}>
-            {scheduleFlight(item) ? '항공편' : scheduleKind(item.type).label}
+            {scheduleFlight(item)
+              ? t('항공편')
+              : t(scheduleKind(item.type).label)}
           </Text>
         </View>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={item.title + ' 일정 관리'}
+          accessibilityLabel={t('{p0} 일정 관리', { p0: item.title })}
           accessibilityState={{
             expanded: props.expanded[0] === item.id,
           }}
@@ -110,7 +114,7 @@ export function renderTimelinePlace({
       ) : (
         <Text
           accessibilityLabel={
-            (item.timeSlot || '시간 미정') + ' · ' + item.title
+            (item.timeSlot || t('시간 미정')) + ' · ' + item.title
           }
           style={s.placeTitle}
         >
@@ -141,12 +145,12 @@ export function renderTimelinePlace({
             mediaId={media.id}
           />
         ))}
-      <View style={shared.row}>
+      <View style={s.metaRow}>
         {item.durationMinutes ? (
-          <View style={shared.row}>
+          <View style={s.durationChip}>
             <TripIcon name="clock-outline" size={14} />
             <Text style={shared.meta}>
-              체류 {scheduleDuration(item.durationMinutes)}
+              {t('체류')} {scheduleDuration(item.durationMinutes)}
             </Text>
           </View>
         ) : null}
@@ -159,11 +163,11 @@ export function renderTimelinePlace({
           .map((expense) => (
             <View key={expense.id} style={s.spend}>
               <Text style={shared.meta}>
-                {expense.isActual ? '실제 지출' : '예상 비용'}
+                {expense.isActual ? t('실제 지출') : t('예상 비용')}
               </Text>
               <Text style={s.amount}>
                 {expense.currency}{' '}
-                {new Intl.NumberFormat('ko-KR', {
+                {new Intl.NumberFormat(getLocale(), {
                   maximumFractionDigits: 2,
                 }).format(Number(expense.amount))}
               </Text>
@@ -182,7 +186,7 @@ export function renderTimelinePlace({
       {props.arranging[0] && (
         <View style={shared.row}>
           <ScheduleButton
-            label={item.title + ' 위로 이동'}
+            label={t('{title} 위로 이동', { title: item.title })}
             disabled={props.disabled || index === 0}
             onPress={() => {
               triggerHaptic('medium');
@@ -192,7 +196,7 @@ export function renderTimelinePlace({
             }}
           />
           <ScheduleButton
-            label={item.title + ' 아래로 이동'}
+            label={t('{title} 아래로 이동', { title: item.title })}
             disabled={props.disabled || index === items.length - 1}
             onPress={() => {
               triggerHaptic('medium');
@@ -225,31 +229,31 @@ export function renderTimelineManagement({
 
   return (
     props.expanded[0] === item.id && (
-      <View style={{ gap: 8 }}>
-        <Text style={shared.meta}>일정 관리</Text>
+      <View style={s.managementPanel}>
+        <Text style={shared.meta}>{t('일정 관리')}</Text>
         <ScheduleButton
-          label="이 일정에서 사진 촬영"
+          label={t('이 일정에서 사진 촬영')}
           disabled={props.disabled}
           onPress={() => {
             /* 실제 카메라를 연다. */ return props.onCapture(item);
           }}
         />
         <ScheduleButton
-          label="이 일정에 사진 추가"
+          label={t('이 일정에 사진 추가')}
           disabled={props.disabled}
           onPress={() => {
             /* 실제 앨범을 연다. */ return props.onPhoto(item);
           }}
         />
         <ScheduleButton
-          label="일정 수정"
+          label={t('일정 수정')}
           disabled={props.disabled}
           onPress={() => {
             /* 원래 ID로 편집한다. */ return props.onEdit(item);
           }}
         />
         <ScheduleButton
-          label="일정 복사"
+          label={t('일정 복사')}
           disabled={props.disabled}
           onPress={() => {
             // 기존 사진·실제 지출을 옮기지 않는 새 작성 초안을 연다.
@@ -257,7 +261,7 @@ export function renderTimelineManagement({
           }}
         />
         <ScheduleButton
-          label="일정 삭제"
+          label={t('일정 삭제')}
           disabled={props.disabled}
           onPress={() => {
             /* 기존 삭제 보호를 적용한다. */ return props.onDelete(item);
@@ -289,7 +293,7 @@ export function renderTimelineActions({
       <View style={s.cardFooter}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={item.title + ' 사진 추가'}
+          accessibilityLabel={t('{title} 사진 추가', { title: item.title })}
           onPress={() => {
             triggerHaptic('light');
             /* 앨범 사진을 이 일정에 연결한다. */ return props.onPhoto(item);
@@ -297,11 +301,11 @@ export function renderTimelineActions({
           style={s.inlineAction}
         >
           <TripIcon name="camera-duotone" size={16} />
-          <Text style={s.link}>사진 추가</Text>
+          <Text style={s.link}>{t('사진 추가')}</Text>
         </Pressable>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={item.title + ' 비용 추가'}
+          accessibilityLabel={t('{title} 비용 추가', { title: item.title })}
           onPress={() => {
             triggerHaptic('light');
             /* 선택 일정의 비용 폼을 연다. */ return props.onExpense(item);
@@ -313,7 +317,7 @@ export function renderTimelineActions({
             size={16}
             color={theme.color.action.link}
           />
-          <Text style={s.link}>비용 추가</Text>
+          <Text style={s.link}>{t('비용 추가')}</Text>
         </Pressable>
       </View>
     )

@@ -195,9 +195,10 @@ export async function signOutCloud(): Promise<void> {
     notifySession(null);
   });
 }
-export async function clearRevokedCloudSession(): Promise<void> {
-  const token = await tokens.read();
-  await tokens.clearIfCurrent(token, () => {
+// 서버에서 철회한 요청 토큰만 정리한다.
+export function clearRevokedCloudSession(token: string): Promise<boolean> {
+  // 탈퇴 요청에 사용한 토큰만 지우고, 계정 반영은 인증 구독자에게 맡긴다.
+  return tokens.clearIfCurrent(token, () => {
     notifySession(null);
   });
 }

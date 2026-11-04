@@ -16,3 +16,5 @@ export function searchPlaces(
     { signal },
   );
 }
+
+export * from './homeData';

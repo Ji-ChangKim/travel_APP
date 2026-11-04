@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import React, { useState } from 'react';
 import { ScrollView, View, Pressable } from 'react-native';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
@@ -41,6 +43,7 @@ export default function PlanDetailTimelineView({
   extraContent,
   showTitle = true,
 }: PlanDetailTimelineViewProps) {
+  useLocale();
   // 선택된 DAY 탭 상태를 관리하며 기본값은 첫 번째 일차다.
   const [selectedDayTab, setSelectedDayTab] = useState<number | 'summary'>(
     data.days[0]?.dayNumber || 1,
@@ -129,6 +132,7 @@ function TripHeaderBanner({
   data: TimelinePlanModel;
   showTitle: boolean;
 }) {
+  useLocale();
   // 국가 및 도시 정보를 연결 문자열로 포맷팅한다.
   const destinationText = [data.country, data.city].filter(Boolean).join(' & ');
 
@@ -170,6 +174,7 @@ function DayTabSelector({
   selectedTab: number | 'summary';
   onSelectTab: (tab: number | 'summary') => void;
 }) {
+  useLocale();
   return (
     <View style={s.dayTabContainer}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -210,7 +215,7 @@ function DayTabSelector({
                 selectedTab === 'summary' && s.dayTabTextActive,
               ]}
             >
-              전체 요약
+              {t('전체 요약')}
             </Text>
           </Pressable>
         </View>
@@ -221,6 +226,7 @@ function DayTabSelector({
 
 // 3. DAY 서브 바 & 통계 렌더러
 function DaySectionBar({ dayGroup }: { dayGroup: TimelineDayGroup }) {
+  useLocale();
   return (
     <View style={s.subBar}>
       <View style={s.subBarLeft}>
@@ -236,7 +242,10 @@ function DaySectionBar({ dayGroup }: { dayGroup: TimelineDayGroup }) {
         </View>
       </View>
       <View style={s.countBadge}>
-        <Text style={s.countBadgeText}>일정 {dayGroup.schedules.length}개</Text>
+        <Text style={s.countBadgeText}>
+          {t('일정')} {dayGroup.schedules.length}
+          {t('개')}
+        </Text>
       </View>
     </View>
   );
@@ -257,6 +266,7 @@ function TimelineFlowSection({
     preview?: { tripId: string; userId: string };
   };
 }) {
+  useLocale();
   return (
     <View style={s.timelineContainer}>
       <View pointerEvents="none" style={s.verticalRail} />
@@ -304,6 +314,7 @@ function TimelineCardItem({
     preview?: { tripId: string; userId: string };
   };
 }) {
+  useLocale();
   // 일정 유형에 부합하는 마커 아이콘을 결정한다.
   const iconName = resolveTimelineIcon(item);
 
@@ -348,7 +359,7 @@ function TimelineCardItem({
         <View style={s.cardTopRow}>
           <View style={s.itemTypeBadge}>
             <Text style={s.itemTypeBadgeText}>
-              {item.badgeLabel || '방문 장소'}
+              {item.badgeLabel || t('방문 장소')}
             </Text>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
@@ -428,6 +439,7 @@ function QuickActionButtons({
   onAddSchedule?: (day: number) => void;
   onAddTransport?: (day: number) => void;
 }) {
+  useLocale();
   // 연결된 행동이 없으면 실행할 수 없는 버튼을 표시하지 않는다.
   if (!onAddSchedule && !onAddTransport) return null;
   // 모드별로 적합한 액션 텍스트를 구성한다.
@@ -471,6 +483,7 @@ function QuickActionButtons({
 
 // 6. 동선 요약 & 미니 지도 렌더러
 function RouteSummaryMiniMap({ dayGroup }: { dayGroup: TimelineDayGroup }) {
+  useLocale();
   const summary = dayGroup.routeSummary;
   if (!summary) return null;
 
@@ -478,24 +491,27 @@ function RouteSummaryMiniMap({ dayGroup }: { dayGroup: TimelineDayGroup }) {
     <View style={s.routeSummaryCard}>
       <View style={s.routeHeaderRow}>
         <Text style={s.routeTitle}>
-          DAY {dayGroup.dayNumber} 이동 동선 요약
+          DAY {dayGroup.dayNumber} {t('이동 동선 요약')}
         </Text>
       </View>
 
       <View style={s.statsRow}>
         <View style={s.statBox}>
-          <Text style={s.statLabel}>방문 장소</Text>
-          <Text style={s.statValue}>{summary.placeCount}곳</Text>
+          <Text style={s.statLabel}>{t('방문 장소')}</Text>
+          <Text style={s.statValue}>
+            {summary.placeCount}
+            {t('곳')}
+          </Text>
         </View>
         {summary.distanceKm !== undefined && (
           <View style={s.statBox}>
-            <Text style={s.statLabel}>예상 도보</Text>
+            <Text style={s.statLabel}>{t('예상 도보')}</Text>
             <Text style={s.statValue}>{summary.distanceKm} km</Text>
           </View>
         )}
         {summary.durationText && (
           <View style={s.statBox}>
-            <Text style={s.statLabel}>예상 소요</Text>
+            <Text style={s.statLabel}>{t('예상 소요')}</Text>
             <Text style={s.statValue}>{summary.durationText}</Text>
           </View>
         )}
@@ -514,13 +530,14 @@ function PlannerTipsBox({
   title?: string;
   description?: string;
 }) {
+  useLocale();
   // 원본에 작성하지 않은 추천·검증 팁을 만들어 표시하지 않는다.
   if (!description) return null;
   return (
     <View style={s.tipsBox}>
       <MaterialIcons name="tips-and-updates" size={22} color={c.primary} />
       <View style={s.tipsContent}>
-        <Text style={s.tipsTitle}>{title || 'TripPrint 플래너 팁'}</Text>
+        <Text style={s.tipsTitle}>{title || t('TripPrint 플래너 팁')}</Text>
         <Text style={s.tipsDescription}>{description}</Text>
       </View>
     </View>
@@ -529,9 +546,10 @@ function PlannerTipsBox({
 
 // 8. 전체 요약 종합 뷰 렌더러
 function PlanSummaryOverview({ days }: { days: TimelineDayGroup[] }) {
+  useLocale();
   return (
     <View style={{ paddingHorizontal: 20, paddingTop: 16, gap: 14 }}>
-      <Text style={s.routeTitle}>전체 여정 한눈에 보기</Text>
+      <Text style={s.routeTitle}>{t('전체 여정 한눈에 보기')}</Text>
       {days.map((day) => (
         <View key={day.id} style={s.routeSummaryCard}>
           <Text style={s.itemTitle}>
@@ -561,12 +579,13 @@ function BottomFloatingBar({
   onPressCta?: () => void;
   onPressPrint?: () => void;
 }) {
+  useLocale();
   return (
     <View style={s.bottomExecutionBar}>
       {onPressPrint && (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="일정 공유 및 인쇄"
+          accessibilityLabel={t('일정 공유 및 인쇄')}
           onPress={onPressPrint}
           style={s.printButton}
         >

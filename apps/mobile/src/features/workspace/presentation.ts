@@ -1,3 +1,4 @@
+import { t } from '@/features/localization/translate';
 import type { TripLifecycle } from '@wherego/domain';
 import { tripPhaseLabels } from './tripPresentation';
 
@@ -5,21 +6,21 @@ import { tripPhaseLabels } from './tripPresentation';
 export function tripStatusLabel(status: string): string {
   // 알 수 없는 내부 식별자는 그대로 노출하지 않는다.
   return status === 'ARCHIVED'
-    ? '보관한 여행'
-    : tripPhaseLabels[status as TripLifecycle] || '여행 상태 확인 중';
+    ? t('보관한 여행')
+    : t(tripPhaseLabels[status as TripLifecycle] || '여행 상태 확인 중');
 }
 
 // 동행의 역할을 할 수 있는 행동으로 설명한다.
 export function memberRoleLabel(role: string): string {
   // 내부 권한 코드 대신 여행자에게 필요한 권한 의미만 전달한다.
-  return (
+  return t(
     (
       {
         owner: '여행 만든 사람',
         editor: '함께 편집',
         viewer: '보기 전용',
       } as Record<string, string>
-    )[role] || '권한 확인 중'
+    )[role] || '권한 확인 중',
   );
 }
 

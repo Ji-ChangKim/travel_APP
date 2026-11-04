@@ -1,10 +1,13 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { tripListQueryOptions } from './tripQueries';
 import { useState } from 'react';
-import { FlatList, View } from 'react-native';
+import { FlatList, RefreshControl, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
+import { colors } from '@/constants/theme';
 
 import Text from '@/components/AppText';
 import HaruState from '@/components/HaruState';
@@ -27,6 +30,7 @@ import { onGnbScroll } from '@/components/navigationScroll';
 
 // 새 내 여행 화면을 전용 모듈에 두어 병행 수정하는 이전 화면과 분리한다.
 export default function MyTripsScreen() {
+  useLocale();
   // 계정 전환 때 이전 검색·여행 카드의 수명을 끝낸다.
   const user = useTripStore((state) => {
     /* 기존 인증 계정만 읽는다. */ return state.currentUser;
@@ -51,6 +55,7 @@ function useMyTripsQuery(userId: string, ready: boolean) {
 
 // 조회 상태와 실제 배열 길이를 화면의 빈 상태와 연결한다.
 function MyTripsContent({ userId, local }: { userId: string; local: boolean }) {
+  useLocale();
   // 여행 상태는 현지 날짜가 바뀌면 공통 규칙으로 다시 계산한다.
   useTripDateRefresh();
   const ready = useAuthReady((state) => {
@@ -79,7 +84,9 @@ function MyTripsContent({ userId, local }: { userId: string; local: boolean }) {
       <FlatList
         data={selected}
         accessibilityLabel={
-          loaded ? `내 여행 목록 ${selected.length}개` : '내 여행 목록'
+          loaded
+            ? t('내 여행 목록 {p0}개', { p0: selected.length })
+            : t('내 여행 목록')
         }
         keyExtractor={(trip) => {
           /* 저장된 여행 ID로만 카드 수명을 고정한다. */ return trip.id;
@@ -89,6 +96,18 @@ function MyTripsContent({ userId, local }: { userId: string; local: boolean }) {
         keyboardShouldPersistTaps="handled"
         onScroll={onGnbScroll}
         scrollEventThrottle={16}
+        refreshControl={
+          <RefreshControl
+            refreshing={
+              Boolean(userId) && !query.isPending && query.isRefetching
+            }
+            onRefresh={() => {
+              if (ready && userId) void query.refetch();
+            }}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
+          />
+        }
         initialNumToRender={4}
         maxToRenderPerBatch={4}
         windowSize={5}
@@ -97,7 +116,7 @@ function MyTripsContent({ userId, local }: { userId: string; local: boolean }) {
           <View style={s.section}>
             {local && (
               <Text style={s.caption}>
-                이 기기에서만 볼 수 있는 여행이에요.
+                {t('이 기기에서만 볼 수 있는 여행이에요.')}
               </Text>
             )}
             {loaded && (
@@ -117,14 +136,14 @@ function MyTripsContent({ userId, local }: { userId: string; local: boolean }) {
           !ready || (userId && query.isPending) ? (
             <HaruState
               kind="loading"
-              title="내 여행을 불러오는 중이에요"
+              title={t('내 여행을 불러오는 중이에요')}
               compact
             />
           ) : !userId ? (
             <View style={s.panel}>
-              <Text style={s.title}>나만의 여행을 시작해 보세요</Text>
+              <Text style={s.title}>{t('나만의 여행을 시작해 보세요')}</Text>
               <MyTripsButton
-                label="로그인 / 게스트로 시작"
+                label={t('로그인 / 게스트로 시작')}
                 style={s.action}
                 onPress={() => {
                   /* 실제 로그인·게스트 선택 화면을 연다. */ return router.push(
@@ -132,7 +151,7 @@ function MyTripsContent({ userId, local }: { userId: string; local: boolean }) {
                   );
                 }}
               >
-                <Text style={s.actionText}>로그인 / 게스트로 시작</Text>
+                <Text style={s.actionText}>{t('로그인 / 게스트로 시작')}</Text>
               </MyTripsButton>
             </View>
           ) : query.isError ? (
@@ -149,12 +168,12 @@ function MyTripsContent({ userId, local }: { userId: string; local: boolean }) {
           ) : (
             <View style={[s.empty, { paddingVertical: 32 }]}>
               <Ionicons name="search-outline" size={32} color={c.muted} />
-              <Text style={s.title}>검색된 여행이 없습니다</Text>
+              <Text style={s.title}>{t('검색된 여행이 없습니다')}</Text>
               <Text style={[s.body, s.centered]}>
-                다른 검색어나 상태 필터를 선택해 보세요.
+                {t('다른 검색어나 상태 필터를 선택해 보세요.')}
               </Text>
               <MyTripsButton
-                label="필터 초기화"
+                label={t('필터 초기화')}
                 style={s.action}
                 onPress={() => {
                   /* 정렬은 유지하고 검색·상태만 전체로 되돌린다. */ return setSelection(
@@ -162,7 +181,7 @@ function MyTripsContent({ userId, local }: { userId: string; local: boolean }) {
                   );
                 }}
               >
-                <Text style={s.actionText}>필터 초기화</Text>
+                <Text style={s.actionText}>{t('필터 초기화')}</Text>
               </MyTripsButton>
             </View>
           )
@@ -172,11 +191,13 @@ function MyTripsContent({ userId, local }: { userId: string; local: boolean }) {
             {loaded && trips.length > 0 && (
               <View style={s.banner}>
                 <View style={s.heading}>
-                  <Text style={s.strongCaption}>다음 여행 준비</Text>
-                  <Text style={s.title}>새로운 여행을 계획 중인가요?</Text>
+                  <Text style={s.strongCaption}>{t('다음 여행 준비')}</Text>
+                  <Text style={s.title}>
+                    {t('새로운 여행을 계획 중인가요?')}
+                  </Text>
                 </View>
                 <MyTripsButton
-                  label="새로운 여행 만들기"
+                  label={t('새로운 여행 만들기')}
                   style={[s.action, s.primary]}
                   onPress={() => {
                     /* 같은 여행 작성 화면으로 이동한다. */ return router.push(
@@ -184,18 +205,20 @@ function MyTripsContent({ userId, local }: { userId: string; local: boolean }) {
                     );
                   }}
                 >
-                  <Text style={[s.actionText, s.inverse]}>여행 만들기 →</Text>
+                  <Text style={[s.actionText, s.inverse]}>
+                    {t('여행 만들기 →')}
+                  </Text>
                 </MyTripsButton>
               </View>
             )}
             {loaded && (
               <View style={s.footer}>
-                <Text style={s.caption}>나의 여행을 한곳에</Text>
+                <Text style={s.caption}>{t('나의 여행을 한곳에')}</Text>
                 <Text style={[s.body, s.centered]}>
-                  여행을 계획하고 소중한 순간을 기록해요.
+                  {t('여행을 계획하고 소중한 순간을 기록해요.')}
                 </Text>
                 <MyTripsButton
-                  label="나의 여행 기록 보기"
+                  label={t('나의 여행 기록 보기')}
                   style={s.action}
                   onPress={() => {
                     /* 기존 개인 기록 보관함을 연다. */ return router.push(
@@ -203,7 +226,7 @@ function MyTripsContent({ userId, local }: { userId: string; local: boolean }) {
                     );
                   }}
                 >
-                  <Text style={s.actionText}>나의 여행 기록 보기</Text>
+                  <Text style={s.actionText}>{t('나의 여행 기록 보기')}</Text>
                 </MyTripsButton>
               </View>
             )}

@@ -217,6 +217,12 @@ function feed(
 }
 
 async function mutate(m: Mutation, name: string): Promise<unknown> {
+  // 공개 여행 담기도 새 여행 저장이므로 익명 세션으로 우회하지 못하게 한다.
+  if (
+    m.session.isAnonymous &&
+    (name === 'wherego_create_trip' || name === 'wherego_import_community')
+  )
+    rejectRequest('AUTH_REQUIRED');
   if (name === 'wherego_accept_invite') return accept(m);
   if (name === 'wherego_import_community') return importPublicTrip(m);
   if (name === 'wherego_create_trip') return createTripMutation(m);

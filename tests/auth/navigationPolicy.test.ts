@@ -13,7 +13,9 @@ test('GNB는 최상위 탐색 경로에만 표시한다', () => {
     '/trips/id',
     '/community/id',
     '/account',
+    '/settings',
     '/login',
+    '/welcome',
     '/unknown',
   ])
     assert.equal(hasGlobalNavigation(route), false);

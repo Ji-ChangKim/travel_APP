@@ -44,6 +44,7 @@ Thumbs.db
 .idea/
 outputs/
 scratch/
+_workspace/
 # 사용자 전달용으로 생성한 보고서 원본은 로컬에 보관한다.
 /output/
 

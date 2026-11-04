@@ -23,11 +23,14 @@ export function useDiscoveryController() {
   });
   const userId = user?.id || '';
   const router = useRouter();
-  const { postId } = useLocalSearchParams<{ postId?: string }>();
+  const { postId, kind } = useLocalSearchParams<{
+    postId?: string;
+    kind?: string;
+  }>();
   const cache = useQueryClient();
   const [filters, setFilters] = useState<CommunityFeedFilters>({
     q: '',
-    kind: 'all',
+    kind: kind === 'record' || kind === 'plan' ? kind : 'all',
     days: 'all',
   });
   const [search, setSearch] = useState('');

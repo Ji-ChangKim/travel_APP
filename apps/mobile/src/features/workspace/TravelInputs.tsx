@@ -1,5 +1,8 @@
+import { t } from '@/features/localization/translate';
+import { getLocale, useLocale } from '@/features/localization/localeState';
 import Modal from '@/components/AppModal';
 import Text from '@/components/AppText';
+import { appFontFamily } from '@/components/appFontFamily';
 import { colors } from '@/constants/theme';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 import { useRef, useState, type Dispatch, type SetStateAction } from 'react';
@@ -33,6 +36,7 @@ export function DateField({
   minimumDate?: string;
   maximumDate?: string;
 }) {
+  const language = useLocale();
   // 취소는 기존 값을 유지한다.
   const [open, setOpen] = useState(false);
   const locked = useFormScope().locked;
@@ -50,12 +54,12 @@ export function DateField({
             : setOpen(true);
       }}
     >
-      <Text style={styles.label}>{label}</Text>
+      <Text style={styles.label}>{t(label)}</Text>
       {Platform.OS === 'web' ? (
         <input
           ref={input}
           disabled={locked}
-          aria-label={label}
+          aria-label={t(label)}
           type={mode}
           value={value}
           min={minimumDate || undefined}
@@ -72,7 +76,7 @@ export function DateField({
             padding: 14,
             fontSize: 16 * fontScale,
             lineHeight: `${26 * fontScale}px`,
-            fontFamily: 'TripPrintRegular',
+            fontFamily: appFontFamily('TripPrintRegular', 'web', language),
             border: `1px solid ${colors.borderStrong}`,
             borderRadius: 12,
             minHeight: 48,
@@ -88,7 +92,7 @@ export function DateField({
       ) : (
         <>
           <Action
-            label={value || `${label} 선택`}
+            label={value || t('{p0} 선택', { p0: t(label) })}
             onPress={() => {
               // 날짜 선택기를 연다.
               setOpen(true);
@@ -96,6 +100,7 @@ export function DateField({
           />
           {open && !locked && (
             <DateTimePicker
+              locale={Platform.OS === 'ios' ? getLocale() : undefined}
               value={
                 value
                   ? new Date(
@@ -133,7 +138,7 @@ export function DateField({
           )}
           {open && !locked && Platform.OS === 'ios' && (
             <Action
-              label="날짜 선택 완료"
+              label={t('날짜 선택 완료')}
               onPress={() => {
                 // iOS 달력의 표시만 닫는다.
                 setOpen(false);
@@ -151,6 +156,7 @@ export function DestinationFields(props: {
   values: Record<string, string>;
   onChange: (key: string, value: string) => void;
 }) {
+  useLocale();
   // 선택창 종류만 보관하고 검색 중인 이름은 폼에 반영하지 않는다.
   return (
     <DestinationContent
@@ -173,16 +179,17 @@ function DestinationContent({
     Dispatch<SetStateAction<'country' | 'city' | null>>,
   ];
 }) {
+  useLocale();
   // 나라와 도시는 한 줄에서 같은 너비로 배치하고 나라 선택 후 도시를 활성화한다.
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>여행지 선택</Text>
+      <Text style={styles.title}>{t('여행지 선택')}</Text>
       <View style={{ flexDirection: 'row', gap: 12 }}>
         <View testID="trip-country" style={{ flex: 1, minWidth: 0, gap: 8 }}>
-          <Text style={styles.label}>나라</Text>
+          <Text style={styles.label}>{t('나라')}</Text>
           <FormAnchor name="나라">
             <Action
-              label={values.country || '나라 선택'}
+              label={values.country || t('나라 선택')}
               onPress={() => {
                 /* 나라 선택창을 연다. */ return setPicker('country');
               }}
@@ -190,10 +197,10 @@ function DestinationContent({
           </FormAnchor>
         </View>
         <View testID="trip-city" style={{ flex: 1, minWidth: 0, gap: 8 }}>
-          <Text style={styles.label}>도시</Text>
+          <Text style={styles.label}>{t('도시')}</Text>
           <FormAnchor name="도시">
             <Action
-              label={values.city || '도시 선택'}
+              label={values.city || t('도시 선택')}
               disabled={!values.country?.trim()}
               onPress={() => {
                 /* 선택 국가의 도시 선택창을 연다. */ return setPicker('city');
@@ -206,7 +213,7 @@ function DestinationContent({
         native
         visible={Boolean(picker)}
         animationType="slide"
-        accessibilityLabel={picker === 'city' ? '도시 선택' : '나라 선택'}
+        accessibilityLabel={picker === 'city' ? t('도시 선택') : t('나라 선택')}
         onRequestClose={() => {
           // 시스템 뒤로에서도 선택 전 값을 유지한다.
           setPicker(null);

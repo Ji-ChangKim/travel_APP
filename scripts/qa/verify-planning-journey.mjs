@@ -38,6 +38,16 @@ await run(['scripts/qa/prepare-schedule-preview.mjs'], {
   TRIPPRINT_PREVIEW_NAME: 'planning-v11-web',
   TRIPPRINT_PREVIEW_PORT: '8852',
 });
-await run(['--test', 'tests/planning/journey.test.mjs']);
-await run(['--test', 'tests/planning/triple-flow.test.mjs']);
-await run(['--test', 'tests/planning/multicity-flow.test.mjs']);
+if (process.argv.includes('--device-records')) {
+  await run([
+    'node_modules/@playwright/test/cli.js',
+    'test',
+    '--config',
+    'tests/config/playwright.trail.config.ts',
+  ]);
+} else {
+  await run(['--test', 'tests/planning/journey.test.mjs']);
+  await run(['--test', 'tests/planning/core-flow.test.mjs']);
+  await run(['--test', 'tests/planning/triple-flow.test.mjs']);
+  await run(['--test', 'tests/planning/multicity-flow.test.mjs']);
+}

@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Modal from '@/components/AppModal';
 import Text from '@/components/AppText';
 import ScreenHeader from '@/components/ScreenHeader';
@@ -30,6 +32,7 @@ import type { DiscoveryDestination } from '@wherego/domain';
 
 // 도시 상세를 홈의 작은 팝업 대신 독립된 페이지에서 읽는다.
 export default function CityGuideScreen() {
+  useLocale();
   // 직접 링크 진입에서도 검증한 도시와 공개 소개만 읽는다.
   return (
     <GuideContent
@@ -49,17 +52,9 @@ export default function CityGuideScreen() {
 }
 
 // 선택한 도시에서 같은 목적지의 여행 생성으로 이어간다.
-function planCity(
-  router: ReturnType<typeof useRouter>,
-  key: string,
-  userId?: string,
-): void {
+function planCity(router: ReturnType<typeof useRouter>, key: string): void {
   // 로그인하지 않았다면 인증 이후에도 선택한 도시를 보존한다.
-  return router.push(
-    userId
-      ? { pathname: '/new-trip', params: { destination: key } }
-      : { pathname: '/login', params: { next: 'new-trip', destination: key } },
-  );
+  return router.push({ pathname: '/new-trip', params: { destination: key } });
 }
 
 // 직접 진입 시에도 홈으로 돌아갈 수 있게 한다.
@@ -85,12 +80,15 @@ function GuideContent(
   },
   city = guideDestination(cityKey),
 ) {
+  useLocale();
   // 알 수 없는 경로에서는 다른 도시의 가이드를 보여주지 않는다.
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={styles.screen}>
       <ScreenHeader
-        title={city ? `${city.city} 여행 가이드` : '여행지 안내'}
-        backLabel="여행지 목록으로 돌아가기"
+        title={
+          city ? t('{p0} 여행 가이드', { p0: city.city }) : t('여행지 안내')
+        }
+        backLabel={t('여행지 목록으로 돌아가기')}
         onBack={() => {
           // 기존 도시 가이드의 복귀 경로를 유지한다.
           return closeGuide(router);
@@ -107,10 +105,12 @@ function GuideContent(
       ) : (
         <View style={styles.content}>
           <Text style={s.supporting}>
-            찾는 여행지가 없어요. 목록으로 돌아가 다른 도시를 선택해 주세요.
+            {t(
+              '찾는 여행지가 없어요. 목록으로 돌아가 다른 도시를 선택해 주세요.',
+            )}
           </Text>
           <Action
-            label="여행지 목록으로 돌아가기"
+            label={t('여행지 목록으로 돌아가기')}
             onPress={() => {
               /* 잘못된 주소에서 홈으로 이동한다. */ return router.replace(
                 '/(tabs)',
@@ -131,6 +131,7 @@ function GuideItems({
   title: string;
   items: CityGuide['places'];
 }) {
+  useLocale();
   // 항목 목록은 선택 도시의 편집 가이드만 사용한다.
   return (
     <View style={styles.card}>
@@ -154,7 +155,6 @@ function GuideItems({
 function GuideBody({
   city,
   router,
-  userId,
   query,
 }: {
   city: DiscoveryDestination;
@@ -162,6 +162,7 @@ function GuideBody({
   userId?: string;
   query: ReturnType<typeof useQuery<Awaited<ReturnType<typeof loadDiscovery>>>>;
 }) {
+  useLocale();
   // 새 도시에서는 모달·사진 오류가 이전 도시에서 이어지지 않는다.
   const [sourcesOpen, setSourcesOpen] = useState(false);
   // 탐색 화면이 뒤에 남아 있어도 출처 창은 현재 화면에만 표시한다.
@@ -195,13 +196,16 @@ function GuideBody({
           <Text style={s.supporting}>{cityGuides[city.key].intro}</Text>
         </View>
         <GuideItems
-          title="추천 여행지·관광지"
+          title={t('추천 여행지·관광지')}
           items={cityGuides[city.key].places}
         />
-        <GuideItems title="추천 먹거리" items={cityGuides[city.key].foods} />
+        <GuideItems
+          title={t('추천 먹거리')}
+          items={cityGuides[city.key].foods}
+        />
         <View style={styles.card}>
           <Text accessibilityRole="header" style={s.title}>
-            언제 가면 좋을까요?
+            {t('언제 가면 좋을까요?')}
           </Text>
           {cityGuides[city.key].seasons.map((season) => {
             // 계절의 일반적인 볼거리를 월 범위와 함께 표시한다.
@@ -213,38 +217,38 @@ function GuideBody({
             );
           })}
           <Text style={s.caption}>
-            꽃과 단풍 시기는 해마다 달라요. 행사 날짜와 운영 시간은 여행 전에
-            공식 안내에서 확인해 주세요.
+            {t(
+              '꽃과 단풍 시기는 해마다 달라요. 행사 날짜와 운영 시간은 여행 전에 공식 안내에서 확인해 주세요.',
+            )}
           </Text>
         </View>
         <Action
           variant="primary"
-          label={`${city.city} 여행 계획하기`}
+          label={t('{p0} 여행 계획하기', { p0: city.city })}
           onPress={() => {
             /* 현재 도시로 여행 생성을 시작한다. */ return planCity(
               router,
               city.key,
-              userId,
             );
           }}
         />
         {story && (
           <View style={styles.card}>
-            <Text style={s.title}>도시 이야기</Text>
+            <Text style={s.title}>{t('도시 이야기')}</Text>
             <Text style={s.supporting}>{story.excerpt}</Text>
             <Text style={s.caption}>
-              한국어 위키백과 기여자 · CC BY-SA 4.0 · 소개 일부 발췌
+              {t('한국어 위키백과 기여자 · CC BY-SA 4.0 · 소개 일부 발췌')}
             </Text>
           </View>
         )}
         <View style={{ gap: 6 }}>
-          <Text style={s.title}>여행 정보·사진 출처</Text>
+          <Text style={s.title}>{t('여행 정보·사진 출처')}</Text>
           <Text style={s.caption}>
-            사진: {cityPhotoCredit(city.key).author} ·{' '}
+            {t('사진:')} {cityPhotoCredit(city.key).author} ·{' '}
             {cityPhotoCredit(city.key).license}
           </Text>
           <Action
-            label="정보·사진 출처 보기"
+            label={t('정보·사진 출처 보기')}
             onPress={() => {
               // 외부 이동 없이 현재 도시의 출처부터 읽는다.
               return setSourcesOpen(true);
@@ -256,7 +260,7 @@ function GuideBody({
         native
         transparent
         visible={sourcesOpen && focused}
-        accessibilityLabel={`${city.city} 정보·사진 출처`}
+        accessibilityLabel={t('{p0} 정보·사진 출처', { p0: city.city })}
         onRequestClose={() => {
           // 원문 창만 닫고 가이드의 읽던 위치를 유지한다.
           setSourcesOpen(false);

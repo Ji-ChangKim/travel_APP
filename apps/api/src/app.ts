@@ -1,3 +1,4 @@
+import { registerHomeDataRoutes } from './features/planning/homeData';
 import { Hono, type Context, type MiddlewareHandler, type Next } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import { cors } from 'hono/cors';
@@ -211,6 +212,8 @@ function getTrip(fetcher: typeof fetch, c: ApiContext): Promise<Response> {
 
 // 여행 생성 명령 하나를 실행한다.
 function createTrip(fetcher: typeof fetch, c: ApiContext): Promise<Response> {
+  // 게스트의 기존 자료 조회는 유지하지만 새 계정 여행은 회원만 저장한다.
+  if (c.get('session').isAnonymous) rejectRequest('AUTH_REQUIRED');
   // 폼과 같은 서버 검증 후 DB 원자 생성으로 연결한다.
   return readBody(c)
     .then((body) => {
@@ -294,93 +297,105 @@ function notReady(): never {
 // 인증·입력 제한·오류 처리·M1 라우트를 결합한다.
 export function createApp(fetcher: typeof fetch = fetch): Hono<ApiEnvironment> {
   // 요청별 상태는 문맥에만 저장하고 모듈 전역 세션을 두지 않는다.
-  return registerPlanningRoutes(
-    registerDiscoveryRoutes(
-      registerSocialRoutes(
-        registerProfileRoutes(
-          registerMediaRoutes(
-            registerWorkspaceRoutes(
-              new Hono<ApiEnvironment>()
-                .use('*', initializeRequest)
-                .use(
-                  '*',
-                  cors({
-                    origin: allowedOrigin,
-                    allowHeaders: [
-                      'Authorization',
-                      'Content-Type',
-                      'Idempotency-Key',
-                      'If-Match',
-                    ],
-                    allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-                    exposeHeaders: ['set-auth-token'],
-                  }),
-                )
-                .use('*', applySecurityHeaders)
-                .use(
-                  '/api/*',
-                  bodyLimit({
-                    maxSize: 16384,
-                    onError: () => {
-                      // 과도한 요청은 JSON 파싱 전에 거부한다.
-                      return rejectRequest('PAYLOAD_TOO_LARGE');
-                    },
-                  }),
-                )
-                .use('/api/v1/*', sessionMiddleware(fetcher))
-                .on(['GET', 'POST'], '/api/auth/*', (c) => {
-                  // 인증 공급자가 D1 세션과 비밀번호 해시를 직접 관리한다.
-                  return cloudAuth(c.env, c.req.query('state')).handler(
-                    c.req.raw,
-                  );
-                })
-                .get('/health', health)
-                .get('/public/startup', startupManifest)
-                .get('/public/app-config', appConfig)
-                .get(
-                  '/public/community/:postId/places/:scheduleId/photo',
-                  publicPlanPhoto.bind(null, fetcher),
-                )
-                .get('/api/v1/me', getMe.bind(null, fetcher))
-                .get(
-                  '/api/v1/flights/lookup',
-                  lookupFlights.bind(null, fetcher),
-                )
-                .get('/api/v1/places/search', searchPlaces.bind(null, fetcher))
-                .get(
-                  '/api/v1/places/import',
-                  importMapsShare.bind(null, fetcher),
-                )
-                .get(
-                  '/api/v1/places/:placeId',
-                  getGooglePlace.bind(null, fetcher),
-                )
-                .get('/api/v1/trips', listTrips.bind(null, fetcher))
-                .get(
-                  '/api/v1/trips/:tripId/places/:scheduleId/photo',
-                  previewPlanPhoto.bind(null, fetcher),
-                )
-                .post('/api/v1/trips', createTrip.bind(null, fetcher))
-                .get('/api/v1/trips/:tripId', getTrip.bind(null, fetcher))
-                .post(
-                  '/api/v1/trips/:tripId/checklists',
-                  addChecklist.bind(null, fetcher),
-                )
-                .patch(
-                  '/api/v1/checklists/:itemId',
-                  setChecklist.bind(null, fetcher),
-                )
-                .all('/api/places/search', notReady)
-                .all('/api/share/link', notReady)
-                .all('/api/receipt/ocr', notReady)
-                .onError(renderError),
-              fetcher,
+  return registerHomeDataRoutes(
+    registerPlanningRoutes(
+      registerDiscoveryRoutes(
+        registerSocialRoutes(
+          registerProfileRoutes(
+            registerMediaRoutes(
+              registerWorkspaceRoutes(
+                new Hono<ApiEnvironment>()
+                  .use('*', initializeRequest)
+                  .use(
+                    '*',
+                    cors({
+                      origin: allowedOrigin,
+                      allowHeaders: [
+                        'Authorization',
+                        'Content-Type',
+                        'Idempotency-Key',
+                        'If-Match',
+                      ],
+                      allowMethods: [
+                        'GET',
+                        'POST',
+                        'PUT',
+                        'PATCH',
+                        'DELETE',
+                        'OPTIONS',
+                      ],
+                      exposeHeaders: ['set-auth-token'],
+                    }),
+                  )
+                  .use('*', applySecurityHeaders)
+                  .use(
+                    '/api/*',
+                    bodyLimit({
+                      maxSize: 16384,
+                      onError: () => {
+                        // 과도한 요청은 JSON 파싱 전에 거부한다.
+                        return rejectRequest('PAYLOAD_TOO_LARGE');
+                      },
+                    }),
+                  )
+                  .use('/api/v1/*', sessionMiddleware(fetcher))
+                  .on(['GET', 'POST'], '/api/auth/*', (c) => {
+                    // 인증 공급자가 D1 세션과 비밀번호 해시를 직접 관리한다.
+                    return cloudAuth(c.env, c.req.query('state')).handler(
+                      c.req.raw,
+                    );
+                  })
+                  .get('/health', health)
+                  .get('/public/startup', startupManifest)
+                  .get('/public/app-config', appConfig)
+                  .get(
+                    '/public/community/:postId/places/:scheduleId/photo',
+                    publicPlanPhoto.bind(null, fetcher),
+                  )
+                  .get('/api/v1/me', getMe.bind(null, fetcher))
+                  .get(
+                    '/api/v1/flights/lookup',
+                    lookupFlights.bind(null, fetcher),
+                  )
+                  .get(
+                    '/api/v1/places/search',
+                    searchPlaces.bind(null, fetcher),
+                  )
+                  .get(
+                    '/api/v1/places/import',
+                    importMapsShare.bind(null, fetcher),
+                  )
+                  .get(
+                    '/api/v1/places/:placeId',
+                    getGooglePlace.bind(null, fetcher),
+                  )
+                  .get('/api/v1/trips', listTrips.bind(null, fetcher))
+                  .get(
+                    '/api/v1/trips/:tripId/places/:scheduleId/photo',
+                    previewPlanPhoto.bind(null, fetcher),
+                  )
+                  .post('/api/v1/trips', createTrip.bind(null, fetcher))
+                  .get('/api/v1/trips/:tripId', getTrip.bind(null, fetcher))
+                  .post(
+                    '/api/v1/trips/:tripId/checklists',
+                    addChecklist.bind(null, fetcher),
+                  )
+                  .patch(
+                    '/api/v1/checklists/:itemId',
+                    setChecklist.bind(null, fetcher),
+                  )
+                  .all('/api/places/search', notReady)
+                  .all('/api/share/link', notReady)
+                  .all('/api/receipt/ocr', notReady)
+                  .onError(renderError),
+                fetcher,
+              ),
             ),
           ),
         ),
+        fetcher,
       ),
       fetcher,
     ),
-    fetcher,
   );
 }

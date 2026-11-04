@@ -1,14 +1,26 @@
 import { Platform, Share } from 'react-native';
-import { UserFacingError } from '../../services/userFacingError';
-import { publicPlanUrl } from './publicPlanLink';
+import {
+  copyWebPublicPlanUrl,
+  publicPlanUrl,
+  shareWebPublicPlanUrl,
+} from './publicPlanLink';
 
 // 이미 공개한 여행 사본의 링크만 시스템 공유로 전달한다.
-export function sharePublicPlan(title: string, postId: string) {
+export function sharePublicPlan(
+  title: string,
+  postId: string,
+  redirectUrl = process.env.EXPO_PUBLIC_AUTH_WEB_REDIRECT_URL,
+) {
   // 비공개 원본이나 초대 권한을 전달하지 않는다.
-  return deliverPublicLink(
-    title,
-    publicPlanUrl(process.env.EXPO_PUBLIC_AUTH_WEB_REDIRECT_URL, postId),
-  );
+  return deliverPublicLink(title, publicPlanUrl(redirectUrl, postId));
+}
+
+// 공유 시트가 거절되거나 지원되지 않을 때 공개 링크만 클립보드에 복사한다.
+export function copyPublicPlan(
+  postId: string,
+  redirectUrl = process.env.EXPO_PUBLIC_AUTH_WEB_REDIRECT_URL,
+): Promise<'copied'> {
+  return copyWebPublicPlanUrl(publicPlanUrl(redirectUrl, postId));
 }
 
 // 플랫폼에서 실제 지원하는 공유 또는 링크 복사를 실행한다.
@@ -21,21 +33,5 @@ async function deliverPublicLink(
     const result = await Share.share({ title, message: `${title}\n${url}` });
     return result.action === Share.dismissedAction ? 'dismissed' : 'shared';
   }
-  if (typeof navigator !== 'undefined' && navigator.share) {
-    try {
-      await navigator.share({ title, url });
-      return 'shared';
-    } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError')
-        return 'dismissed';
-      throw error;
-    }
-  }
-  if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(url);
-    return 'copied';
-  }
-  throw new UserFacingError(
-    '이 브라우저에서는 링크를 보내지 못했어요. 공개 화면의 주소를 복사해 주세요.',
-  );
+  return shareWebPublicPlanUrl(title, url);
 }

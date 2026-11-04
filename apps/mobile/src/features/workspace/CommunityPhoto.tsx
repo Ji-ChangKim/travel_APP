@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { useState } from 'react';
 import { Image, View } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
@@ -26,6 +28,7 @@ export default function CommunityPhoto({
   coverHeight?: number;
   edgeToEdge?: boolean;
 }) {
+  useLocale();
   // 목록과 단건 읽기 모두 원본 대신 같은 공개 서명 경로를 사용한다.
   const focused = useIsFocused();
   const foreground = useAppAccessibility().foreground;
@@ -54,7 +57,7 @@ export default function CommunityPhoto({
           ? { height: coverHeight, aspectRatio: undefined }
           : undefined,
       ]}
-      accessibilityLabel="작성자가 공개한 여행 사진"
+      accessibilityLabel={t('작성자가 공개한 여행 사진')}
       onError={() => {
         // 실패한 이미지 주소를 정상 사진처럼 계속 노출하지 않는다.
         return setFailedUrl(query.data || '');
@@ -70,12 +73,12 @@ export default function CommunityPhoto({
     >
       <Text style={s.meta}>
         {query.isError || failedUrl
-          ? '사진을 불러오지 못했어요.'
-          : '사진을 불러오는 중이에요.'}
+          ? t('사진을 불러오지 못했어요.')
+          : t('사진을 불러오는 중이에요.')}
       </Text>
       {(query.isError || failedUrl) && (
         <Action
-          label="사진 다시 불러오기"
+          label={t('사진 다시 불러오기')}
           loading={query.isFetching}
           onPress={() => {
             // 같은 공개 경로의 권한을 새로 확인한 뒤 다운로드한다.

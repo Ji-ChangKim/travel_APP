@@ -35,6 +35,9 @@ export function authReturn(
       : next === 'new-trip'
         ? {
             next,
+            ...(z.string().uuid().safeParse(tripId).success
+              ? { tripId: tripId as string }
+              : {}),
             destination:
               homeDestination(
                 typeof destination === 'string' ? destination : undefined,
@@ -57,13 +60,15 @@ export function returnFromPath(
   destination?: unknown,
 ): AuthReturn {
   // 상세 경로의 전체 형식이 일치해야 원래 여행 ID를 보존한다.
-  return /^\/(trips|diary|record)\/[^/]+$/.test(path)
+  return /^\/(trips|diary|record|community)\/[^/]+$/.test(path)
     ? authReturn(
         path.startsWith('/trips/')
           ? 'trip'
           : path.startsWith('/record/')
             ? 'record'
-            : 'diary',
+            : path.startsWith('/community/')
+              ? 'community'
+              : 'diary',
         undefined,
         path.split('/')[2],
       )
@@ -79,11 +84,16 @@ export function authReturnPath(
   pending: '/invite' | '/import-place' | '/(tabs)' = '/(tabs)',
 ) {
   // 호출자가 만든 객체도 이동 직전에 다시 검사한다.
-  return pending !== '/(tabs)'
-    ? pending
-    : verifiedReturnPath(
+  return params.next === 'new-trip' &&
+    z.string().uuid().safeParse(params.tripId).success
+    ? verifiedReturnPath(
         authReturn(params.next, params.destination, params.tripId),
-      );
+      )
+    : pending !== '/(tabs)'
+      ? pending
+      : verifiedReturnPath(
+          authReturn(params.next, params.destination, params.tripId),
+        );
 }
 
 // 검증한 목적을 Expo Router가 받을 고정 내부 경로로 변환한다.
@@ -98,7 +108,10 @@ function verifiedReturnPath(params: AuthReturn) {
         : params.next === 'new-trip'
           ? {
               pathname: '/new-trip' as const,
-              params: { destination: params.destination || '' },
+              params: {
+                destination: params.destination || '',
+                ...(params.tripId ? { handoff: params.tripId } : {}),
+              },
             }
           : params.next === 'community'
             ? params.tripId

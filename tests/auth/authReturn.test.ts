@@ -91,6 +91,13 @@ test('R06 초대·공유가 내 여행·상세 복귀보다 우선한다', () =>
   );
 });
 
+test('새 여행 기본 입력만 로그인 전에 허용하고 저장된 여행은 보호한다', () => {
+  assert.equal(isPublicBrowsePath('/new-trip'), true);
+  assert.equal(isPublicBrowsePath(`/trips/${tripId}`), false);
+  assert.equal(isPublicBrowsePath('/new-trip/private'), false);
+  assert.equal(isPublicBrowsePath('/my'), false);
+});
+
 test('R06 새 여행 카탈로그와 기존 공개·초대 목적을 유지한다', () => {
   // 생소한 목적지 문자열이 새 여행 기본값을 주입할 수 없다.
   return assert.deepEqual(
@@ -183,9 +190,9 @@ test('G11 계정 관리 공개 안내는 로그인 후 같은 안전한 내부 �
   assert.deepEqual(authReturn('https://evil.test/account'), {});
 });
 
-test('공개 발자국과 개인 여행 보관함의 접근·로그인 복귀를 분리한다', () => {
-  // 공개 추천을 보려고 로그인시키거나 개인 보관함을 익명에게 공개하지 않는다.
-  assert.equal(isPublicBrowsePath('/footprints'), true);
+test('공개 발자국과 개인 여행 보관함 모두 로그인(구글·게스트) 후 원래 경로로 복귀한다', () => {
+  // 비로그인 탐색을 제거하고 모든 앱 탭은 로그인 후 복귀하도록 보장한다.
+  assert.equal(isPublicBrowsePath('/footprints'), false);
   assert.equal(isPublicBrowsePath('/my-footprints'), false);
   assert.equal(isPublicBrowsePath('/footprints/private'), false);
   assert.equal(
@@ -196,4 +203,19 @@ test('공개 발자국과 개인 여행 보관함의 접근·로그인 복귀를
     authReturnPath(returnFromPath('/footprints')),
     '/(tabs)/footprints',
   );
+});
+
+test('G01 공개 여행 상세 경로는 설정 중 재진입 후에도 같은 공개 ID로 복귀한다', () => {
+  assert.deepEqual(returnFromPath(`/community/${tripId}`), {
+    next: 'community',
+    tripId,
+  });
+  assert.equal(
+    authReturnPath(returnFromPath(`/community/${tripId}`)),
+    `/community/${tripId}`,
+  );
+  assert.deepEqual(returnFromPath('/community/not-a-uuid'), {
+    next: 'community',
+  });
+  assert.deepEqual(returnFromPath(`/community/${tripId}/extra`), {});
 });

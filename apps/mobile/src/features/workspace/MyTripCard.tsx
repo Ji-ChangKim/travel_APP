@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { useState } from 'react';
 import { Image, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,6 +23,7 @@ export default function MyTripCard({
   trip: PersistedTrip;
   userId: string;
 }) {
+  useLocale();
   // 권한 오류가 나면 이전 원본의 사진·건수·공개 상태를 표시하지 않는다.
   const query = useMyTripDetails(userId, trip.id);
   const router = useRouter();
@@ -42,16 +45,21 @@ export default function MyTripCard({
           </View>
           <Text style={s.strongCaption}>
             {timing.phase === 'IN_PROGRESS' && timing.total
-              ? `${timing.total}일 중 ${timing.day}일차`
+              ? t('{p0}일 중 {p1}일차', { p0: timing.total, p1: timing.day })
               : snapshot
-                ? `등록 장소 ${myTripFacts(snapshot).placeCount}곳`
+                ? t('등록 장소 {p0}곳', {
+                    p0: myTripFacts(snapshot).placeCount,
+                  })
                 : ''}
           </Text>
         </View>
         {timing.phase === 'IN_PROGRESS' && timing.total > 0 && (
           <View
             style={s.progress}
-            accessibilityLabel={`여행 ${timing.total}일 중 ${timing.day}일차`}
+            accessibilityLabel={t('여행 {p0}일 중 {p1}일차', {
+              p0: timing.total,
+              p1: timing.day,
+            })}
           >
             <View
               style={[s.progressFill, { width: `${timing.progress * 100}%` }]}
@@ -64,18 +72,18 @@ export default function MyTripCard({
           <View style={s.panel}>
             <Text style={s.body}>
               {query.isError
-                ? '여행 정보를 불러오지 못했어요.'
-                : '여행 정보를 불러오는 중이에요.'}
+                ? t('여행 정보를 불러오지 못했어요.')
+                : t('여행 정보를 불러오는 중이에요.')}
             </Text>
             {query.isError && (
               <MyTripsButton
-                label={`${trip.title} 정보 다시 불러오기`}
+                label={t('{p0} 정보 다시 불러오기', { p0: trip.title })}
                 onPress={() => {
                   /* 같은 계정으로 실패한 조회만 다시 실행한다. */ return void query.refetch();
                 }}
                 style={s.action}
               >
-                <Text style={s.actionText}>다시 불러오기</Text>
+                <Text style={s.actionText}>{t('다시 불러오기')}</Text>
               </MyTripsButton>
             )}
           </View>
@@ -115,7 +123,7 @@ export default function MyTripCard({
           </MyTripsButton>
           {timing.phase === 'IN_PROGRESS' && (
             <MyTripsButton
-              label={`${trip.title} 비용 보기`}
+              label={t('{p0} 비용 보기', { p0: trip.title })}
               onPress={() => {
                 /* 실제 비용 탭을 연다. */ return router.push(
                   `/trips/${trip.id}?section=expenses`,
@@ -124,11 +132,11 @@ export default function MyTripCard({
               style={s.action}
             >
               <Ionicons name="receipt-outline" size={17} color={c.ink} />
-              <Text style={s.actionText}>비용</Text>
+              <Text style={s.actionText}>{t('비용')}</Text>
             </MyTripsButton>
           )}
           <MyTripsButton
-            label={`${trip.title} 메뉴 더보기`}
+            label={t('{p0} 메뉴 더보기', { p0: trip.title })}
             onPress={() => {
               /* 선택한 여행의 기존 기능만 메뉴로 연다. */ return setMenu(true);
             }}
@@ -146,17 +154,17 @@ export default function MyTripCard({
         }}
       >
         <MyTripsButton
-          label="여행 일정 보기"
+          label={t('여행 일정 보기')}
           onPress={() => {
             /* 메뉴를 닫고 일정 원본을 연다. */ return void (setMenu(false),
             router.push(`/trips/${trip.id}`));
           }}
           style={s.action}
         >
-          <Text style={s.actionText}>여행 일정 보기</Text>
+          <Text style={s.actionText}>{t('여행 일정 보기')}</Text>
         </MyTripsButton>
         <MyTripsButton
-          label="여행 비용 보기"
+          label={t('여행 비용 보기')}
           onPress={() => {
             /* 메뉴를 닫고 여행에 연결된 실제 비용을 연다. */ return void (setMenu(
               false,
@@ -165,10 +173,10 @@ export default function MyTripCard({
           }}
           style={s.action}
         >
-          <Text style={s.actionText}>여행 비용 보기</Text>
+          <Text style={s.actionText}>{t('여행 비용 보기')}</Text>
         </MyTripsButton>
         <MyTripsButton
-          label="공개 범위 관리"
+          label={t('공개 범위 관리')}
           onPress={() => {
             /* 메뉴를 닫고 확인 절차가 있는 기존 공유 화면을 연다. */ return void (setMenu(
               false,
@@ -177,7 +185,7 @@ export default function MyTripCard({
           }}
           style={s.action}
         >
-          <Text style={s.actionText}>공개 범위 관리</Text>
+          <Text style={s.actionText}>{t('공개 범위 관리')}</Text>
         </MyTripsButton>
       </ActionSheet>
     </View>
@@ -194,6 +202,7 @@ function MyTripCover({
   userId: string;
   snapshot?: WorkspaceSnapshot;
 }) {
+  useLocale();
   // 영수증을 대표 사진으로 선택하지 않는다.
   const facts = snapshot ? myTripFacts(snapshot) : undefined;
   const timing = myTripTiming(trip);
@@ -251,7 +260,9 @@ function MyTripCover({
         {facts && (
           <View
             style={s.badge}
-            accessibilityLabel={facts.published ? '공개한 여행' : '비공개 여행'}
+            accessibilityLabel={
+              facts.published ? t('공개한 여행') : t('비공개 여행')
+            }
           >
             <Ionicons
               name={facts.published ? 'globe-outline' : 'lock-closed-outline'}
@@ -279,7 +290,10 @@ function MyTripCover({
           >
             {[trip.country, trip.city].filter(Boolean).join(' · ')}
             {timing.total > 0
-              ? ` · ${timing.total - 1}박 ${timing.total}일`
+              ? t(' · {p0}박 {p1}일', {
+                  p0: timing.total - 1,
+                  p1: timing.total,
+                })
               : ''}
           </Text>
         </View>
@@ -304,12 +318,13 @@ function MyTripPhoto({
   tripId: string;
   mediaId: string;
 }) {
+  useLocale();
   // 실제 다운로드 실패도 다른 사진으로 대체하지 않는다.
   const query = usePrivatePhotoQuery(userId, tripId, mediaId);
   const [failed, setFailed] = useState('');
   return query.data && !query.isError && failed !== query.data ? (
     <Image
-      accessibilityLabel="여행에 등록한 표지 사진"
+      accessibilityLabel={t('여행에 등록한 표지 사진')}
       source={{ uri: query.data }}
       style={s.coverImage}
       resizeMode="cover"
@@ -323,12 +338,12 @@ function MyTripPhoto({
     <View style={{ zIndex: 1, alignSelf: 'center', paddingTop: 40 }}>
       <Text style={s.caption}>
         {query.isError || failed
-          ? '사진을 불러오지 못했어요'
-          : '사진 불러오는 중…'}
+          ? t('사진을 불러오지 못했어요')
+          : t('사진 불러오는 중…')}
       </Text>
       {(query.isError || failed) && (
         <MyTripsButton
-          label="표지 사진 다시 불러오기"
+          label={t('표지 사진 다시 불러오기')}
           style={s.action}
           onPress={() => {
             /* 같은 원본의 권한과 다운로드를 다시 확인한다. */ return void (setFailed(
@@ -337,7 +352,7 @@ function MyTripPhoto({
             query.refetch());
           }}
         >
-          <Text style={s.actionText}>사진 다시 불러오기</Text>
+          <Text style={s.actionText}>{t('사진 다시 불러오기')}</Text>
         </MyTripsButton>
       )}
     </View>
@@ -346,49 +361,55 @@ function MyTripPhoto({
 
 // 다음 일정·항공·숙소·공개 상태는 준비된 원본 값으로만 표시한다.
 function MyTripFactsView({ snapshot }: { snapshot: WorkspaceSnapshot }) {
+  useLocale();
   // 상태 문구와 진행 여부는 모든 카드에서 같은 날짜 판별을 쓴다.
   const facts = myTripFacts(snapshot);
   const timing = myTripTiming(snapshot.trip);
   return timing.phase === 'IN_PROGRESS' ? (
     <View style={s.panel}>
       <View style={s.wrapRow}>
-        <Text style={s.strongCaption}>오늘의 다음 일정</Text>
+        <Text style={s.strongCaption}>{t('오늘의 다음 일정')}</Text>
         <Text style={s.caption}>{facts.next?.timeSlot || ''}</Text>
       </View>
       <Text style={s.body}>
-        {facts.next?.title || '남은 일정이 없어요. 여행 일정을 확인해 보세요.'}
+        {facts.next?.title ||
+          t('남은 일정이 없어요. 여행 일정을 확인해 보세요.')}
       </Text>
     </View>
   ) : timing.phase === 'COMPLETED' ? (
     <View style={s.panel}>
       <Text style={s.body}>
         {facts.published
-          ? '발자국에 공개한 여행이에요'
-          : '나만의 비공개 아카이브'}
+          ? t('발자국에 공개한 여행이에요')
+          : t('나만의 비공개 아카이브')}
       </Text>
       <Text style={s.caption}>
-        사진 {facts.photoCount}장 · 영수증 {facts.receiptCount}건
+        {t('사진')} {facts.photoCount}
+        {t('장 · 영수증')} {facts.receiptCount}
+        {t('건')}
       </Text>
     </View>
   ) : (
     <View style={s.panelGrid}>
       <View style={s.panelCell}>
-        <Text style={s.caption}>항공편</Text>
+        <Text style={s.caption}>{t('항공편')}</Text>
         <Text style={s.body}>
           {facts.flight
             ? `${facts.flight.departure} → ${facts.flight.arrival}`
-            : '등록한 항공편이 없어요'}
+            : t('등록한 항공편이 없어요')}
         </Text>
       </View>
       <View style={s.panelCell}>
-        <Text style={s.caption}>숙소</Text>
+        <Text style={s.caption}>{t('숙소')}</Text>
         <Text style={s.body}>
-          {facts.stay?.title || '등록한 숙소가 없어요'}
+          {facts.stay?.title || t('등록한 숙소가 없어요')}
         </Text>
       </View>
       {facts.checklistTotal > 0 && (
         <Text style={s.caption}>
-          준비물 {facts.checklistTotal}개 중 {facts.checklistDone}개 준비
+          {t('준비물')} {facts.checklistTotal}
+          {t('개 중')} {facts.checklistDone}
+          {t('개 준비')}
         </Text>
       )}
     </View>

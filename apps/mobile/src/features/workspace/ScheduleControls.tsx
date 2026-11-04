@@ -1,4 +1,6 @@
 import Text from '@/components/AppText';
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import DesignButton from '@/components/DesignButton';
 import DesignInput from '@/components/DesignInput';
 import { TextInput, View, type KeyboardTypeOptions } from 'react-native';
@@ -95,6 +97,7 @@ function BoundScheduleField({
   accessibilityLabel: string;
   input: React.RefObject<TextInput | null>;
 }) {
+  useLocale();
   // 스키마 오류의 이름은 기존 접근성 라벨과 일치시킨다.
   return (
     <FormAnchor
@@ -105,12 +108,12 @@ function BoundScheduleField({
         );
       }}
     >
-      <Text style={s.label}>{props.label}</Text>
+      <Text style={s.label}>{t(props.label)}</Text>
       <DesignInput
         inputRef={input}
         editable={!props.disabled}
         accessibilityState={{ disabled: props.disabled }}
-        accessibilityLabel={props.accessibilityLabel}
+        accessibilityLabel={t(props.accessibilityLabel)}
         value={props.value}
         onChangeText={props.onChange}
         multiline={props.multiline}
@@ -139,8 +142,21 @@ export function ScheduleSection({
   // 제목과 내용의 읽는 순서를 유지한다.
   return (
     <View style={s.card}>
-      <View style={s.row}>
-        {icon && <TripIcon name={icon} size={20} />}
+      <View style={[s.row, { gap: 10, alignItems: 'center' }]}>
+        {icon && (
+          <View
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 10,
+              backgroundColor: '#FFF1EE',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <TripIcon name={icon} size={18} color="#FF6B4A" />
+          </View>
+        )}
         <Text style={s.title}>{title}</Text>
       </View>
       {children}

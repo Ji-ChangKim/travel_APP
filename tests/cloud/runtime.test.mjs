@@ -848,6 +848,7 @@ before(() => {
         '0006_unique_nicknames.sql',
         '0007_account_retirements.sql',
         '0009_receipt_cleanup_jobs.sql',
+        '0010_home_server_data.sql',
       ]
         .map((file) => {
           /* 배포 마이그레이션을 순서대로 읽는다. */ return readFileSync(
@@ -2620,8 +2621,8 @@ test('D1 인증 요청 제한은 여러 Worker 요청에서도 유지된다', ()
     });
 });
 
-// 서버 발급 게스트로 저장한 여행은 계정 연결 후에도 같은 ID로 이어져야 한다.
-test('게스트 회원 저장 → 프로필 검증 → 이메일 연결 → 여행 소유권 이전 및 이전 토큰 철회', () => {
+// 정책 변경 전에 남은 게스트 여행도 계정 연결 후 같은 ID로 이어져야 한다.
+test('기존 게스트 여행 → 프로필 검증 → 이메일 연결 → 여행 소유권 이전 및 이전 토큰 철회', () => {
   // 실제 인증 HTTP와 D1 원자 이전을 하나의 인수 흐름으로 검사한다.
   return guestAccount().then((guest) =>
     guestTravel(guest).then((tripId) =>
@@ -2789,7 +2790,7 @@ function seedMemberCollision(guest, trip, role) {
   );
 }
 
-// 게스트도 인증된 일반 여행 생성 경로를 사용할 수 있어야 한다.
+// 새 게스트 저장을 허용하지 않고 이전 정책의 여행 자료만 검수 DB에 구성한다.
 function guestTravel(guest) {
   // 동행 권한과 여행 원본은 서버의 실제 UUID를 사용한다.
   return request(
@@ -2803,15 +2804,155 @@ function guestTravel(guest) {
       endDate: '2026-11-12',
       timezone: 'Asia/Seoul',
     },
-    guest,
+    state.users[0],
     { 'Idempotency-Key': randomUUID() },
   )
     .then((response) => json(response, 201))
-    .then((body) => {
-      // 같은 여행 ID가 연결 후에도 보존되어야 한다.
-      return body.data.tripId;
+    .then(async (body) => {
+      const tripId = body.data.tripId;
+      const db = await mf.getD1Database('DB');
+      await db.batch([
+        db
+          .prepare(
+            'UPDATE trip_members SET user_id=? WHERE trip_id=? AND user_id=?',
+          )
+          .bind(guest.id, tripId, state.users[0].id),
+        db
+          .prepare(
+            "UPDATE trips SET owner_id=?,snapshot=json_set(snapshot,'$.trip.ownerId',?,'$.members[0].userId',?) WHERE id=?",
+          )
+          .bind(guest.id, guest.id, guest.id, tripId),
+      ]);
+      return tripId;
     });
 }
+
+test('DEV01 익명 세션은 신규 여행·초안 쓰기를 거부하고 회원 저장·재조회는 허용한다', async () => {
+  const guest = await guestAccount();
+  assert.equal(
+    (
+      await request(
+        `/api/v1/community/${randomUUID()}/import`,
+        'POST',
+        {
+          startDate: '2026-11-10',
+          timezone: 'Asia/Seoul',
+          defaultCurrency: 'KRW',
+        },
+        guest,
+        { 'Idempotency-Key': randomUUID() },
+      )
+    ).status,
+    401,
+  );
+  const tripInput = {
+    country: '대한민국',
+    startDate: '2026-11-10',
+    endDate: '2026-11-12',
+    timezone: 'Asia/Seoul',
+  };
+  const draftId = randomUUID();
+  const draft = {
+    step: 'basics',
+    values: { country: '대한민국' },
+    revision: 0,
+  };
+  for (const actor of [undefined, guest]) {
+    assert.equal(
+      (
+        await request('/api/v1/trips', 'POST', tripInput, actor, {
+          'Idempotency-Key': randomUUID(),
+        })
+      ).status,
+      401,
+    );
+    assert.equal(
+      (await request(`/api/v1/plan-drafts/${draftId}`, 'PUT', draft, actor))
+        .status,
+      401,
+    );
+    assert.equal(
+      (
+        await request(
+          `/api/v1/plan-drafts/${draftId}`,
+          'DELETE',
+          undefined,
+          actor,
+          {
+            'If-Match': '1',
+          },
+        )
+      ).status,
+      401,
+    );
+  }
+  assert.equal(
+    (await request('/api/v1/profile', 'GET', undefined, guest)).status,
+    200,
+  );
+  assert.equal(
+    (await request('/api/v1/trips', 'GET', undefined, guest)).status,
+    200,
+  );
+  const db = await mf.getD1Database('DB');
+  assert.equal(
+    (
+      await db
+        .prepare('SELECT count(*) AS total FROM trips WHERE owner_id=?')
+        .bind(guest.id)
+        .first()
+    ).total,
+    0,
+  );
+  assert.equal(
+    (
+      await db
+        .prepare('SELECT count(*) AS total FROM plan_drafts WHERE owner_id=?')
+        .bind(guest.id)
+        .first()
+    ).total,
+    0,
+  );
+  const member = await accountResponse(
+    await request(
+      '/api/auth/sign-up/email',
+      'POST',
+      {
+        name: `회원${randomUUID().slice(0, 8)}`,
+        email: `${randomUUID()}@example.test`,
+        password: 'member-only-test-password!',
+      },
+      undefined,
+      { 'CF-Connecting-IP': '203.0.113.240' },
+    ),
+  );
+  assert.equal(
+    (await request(`/api/v1/plan-drafts/${draftId}`, 'PUT', draft, member))
+      .status,
+    200,
+  );
+  assert.equal(
+    (await json(await request('/api/v1/plan-drafts', 'GET', undefined, member)))
+      .data[0].id,
+    draftId,
+  );
+  const created = await json(
+    await request('/api/v1/trips', 'POST', tripInput, member, {
+      'Idempotency-Key': randomUUID(),
+    }),
+    201,
+  );
+  const saved = await json(
+    await request(
+      `/api/v1/trips/${created.data.tripId}/workspace`,
+      'GET',
+      undefined,
+      member,
+    ),
+  );
+  assert.equal(saved.data.trip.ownerId, member.id);
+  assert.equal(saved.data.trip.country, tripInput.country);
+});
 
 // 연결한 회원의 정보·권한·개인정보 입력을 실제 API로 검증한다.
 function verifyLinkedTravel(guest, member, tripId) {
@@ -3584,4 +3725,201 @@ test('G11 탈퇴 유예·재로그인 복구·90일 익명화는 동행 권한�
   );
   // 로컬 공개 fixture가 다른 피드 검사에 섞이지 않게 정확한 행만 제거한다.
   await db.prepare('DELETE FROM posts WHERE id=?').bind(postId).run();
+});
+
+// 실제 D1과 인증 세션으로 홈 초안과 발행 팁의 원본을 검증한다.
+test('서버 홈: 초안 격리·충돌·재시도·여행 전환·팁 발행', async () => {
+  const owner = await accountResponse(
+    await request(
+      '/api/auth/sign-up/email',
+      'POST',
+      {
+        name: '서버홈검수',
+        email: `${randomUUID()}@example.test`,
+        password: 'server-home-strong-password!',
+      },
+      undefined,
+      { 'CF-Connecting-IP': '203.0.113.231' },
+    ),
+  );
+  const other = await accountResponse(
+    await request(
+      '/api/auth/sign-up/email',
+      'POST',
+      {
+        name: '다른계정',
+        email: `${randomUUID()}@example.test`,
+        password: 'server-home-strong-password!',
+      },
+      undefined,
+      { 'CF-Connecting-IP': '203.0.113.232' },
+    ),
+  );
+  const id = randomUUID();
+  const input = {
+    step: 'basics',
+    values: { title: '서버에 저장한 날짜 미정 계획' },
+    revision: 0,
+  };
+  assert.equal((await request('/api/v1/plan-drafts')).status, 401);
+  const first = (
+    await json(await request(`/api/v1/plan-drafts/${id}`, 'PUT', input, owner))
+  ).data;
+  assert.equal(first.revision, 1);
+  assert.equal(first.ownerId, owner.id);
+  assert.equal(
+    (
+      await json(
+        await request(`/api/v1/plan-drafts/${id}`, 'PUT', input, owner),
+      )
+    ).data.revision,
+    1,
+  );
+  assert.deepEqual(
+    (await json(await request('/api/v1/plan-drafts', 'GET', undefined, other)))
+      .data,
+    [],
+  );
+  const second = {
+    ...input,
+    revision: 1,
+    values: { title: '다른 기기에서 변경' },
+  };
+  assert.equal(
+    (
+      await json(
+        await request(`/api/v1/plan-drafts/${id}`, 'PUT', second, owner),
+      )
+    ).data.revision,
+    2,
+  );
+  assert.equal(
+    (
+      await request(
+        `/api/v1/plan-drafts/${id}`,
+        'PUT',
+        { ...input, values: { title: '오래된 화면' } },
+        owner,
+      )
+    ).status,
+    409,
+  );
+  assert.equal(
+    (
+      await request(`/api/v1/plan-drafts/${id}`, 'DELETE', undefined, owner, {
+        'If-Match': '1',
+      })
+    ).status,
+    409,
+  );
+  const creation = {
+    country: '일본',
+    city: '도쿄',
+    startDate: '2026-11-01',
+    endDate: '2026-11-02',
+    timezone: 'Asia/Tokyo',
+  };
+  assert.equal(
+    (
+      await request(
+        '/api/v1/trips',
+        'POST',
+        { ...creation, draftRevision: 1 },
+        owner,
+        { 'Idempotency-Key': id },
+      )
+    ).status,
+    409,
+  );
+  assert.equal(
+    (await json(await request('/api/v1/plan-drafts', 'GET', undefined, owner)))
+      .data[0].revision,
+    2,
+  );
+  const created = (
+    await json(
+      await request(
+        '/api/v1/trips',
+        'POST',
+        {
+          draftRevision: 2,
+          country: '일본',
+          city: '도쿄',
+          startDate: '2026-11-01',
+          endDate: '2026-11-02',
+          timezone: 'Asia/Tokyo',
+        },
+        owner,
+        { 'Idempotency-Key': id },
+      ),
+      201,
+    )
+  ).data;
+  assert.ok(created.tripId);
+  assert.deepEqual(
+    (await json(await request('/api/v1/plan-drafts', 'GET', undefined, owner)))
+      .data,
+    [],
+  );
+  assert.equal(
+    (await request(`/api/v1/plan-drafts/${id}`, 'PUT', input, owner)).status,
+    409,
+  );
+  const deleteId = randomUUID();
+  await json(
+    await request(`/api/v1/plan-drafts/${deleteId}`, 'PUT', input, owner),
+  );
+  await json(
+    await request(
+      `/api/v1/plan-drafts/${deleteId}`,
+      'DELETE',
+      undefined,
+      other,
+      { 'If-Match': '1' },
+    ),
+  );
+  assert.equal(
+    (await json(await request('/api/v1/plan-drafts', 'GET', undefined, owner)))
+      .data.length,
+    1,
+  );
+  await json(
+    await request(
+      `/api/v1/plan-drafts/${deleteId}`,
+      'DELETE',
+      undefined,
+      owner,
+      { 'If-Match': '1' },
+    ),
+  );
+  assert.deepEqual(
+    (await json(await request('/public/travel-tips?language=ko'))).data,
+    [],
+  );
+  const db = await mf.getD1Database('DB');
+  await db.batch([
+    db
+      .prepare(
+        'INSERT INTO travel_tips(id,locale,body,published) VALUES(?,?,?,1)',
+      )
+      .bind('verified', 'ko', 'DB에서 발행한 검수 팁'),
+    db
+      .prepare(
+        'INSERT INTO travel_tips(id,locale,body,published) VALUES(?,?,?,0)',
+      )
+      .bind('unpublished', 'ko', '표시 금지'),
+    db
+      .prepare(
+        'INSERT INTO travel_tips(id,locale,body,published,ends_at) VALUES(?,?,?,1,1)',
+      )
+      .bind('expired', 'ko', '만료 팁'),
+  ]);
+  assert.deepEqual(
+    (await json(await request('/public/travel-tips?language=ko'))).data,
+    [{ id: 'verified', text: 'DB에서 발행한 검수 팁' }],
+  );
+  assert.deepEqual(
+    (await json(await request('/public/travel-tips?language=en'))).data,
+    [],
+  );
 });

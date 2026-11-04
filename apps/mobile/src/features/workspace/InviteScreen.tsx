@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import ScreenHeader from '@/components/ScreenHeader';
 import { useEffect, useRef, useState } from 'react';
@@ -21,6 +23,7 @@ import { styles } from './workspaceStyles';
 
 // 받은 링크를 확인하고 로그인 계정으로 명시적으로 참여한다.
 export default function InviteScreen() {
+  useLocale();
   // 수락 요청의 동일 키를 화면 재시도에서 유지한다.
   const requestKey = useRef(Crypto.randomUUID());
   const [value, setValue] = useState('');
@@ -114,8 +117,8 @@ export default function InviteScreen() {
   return (
     <SafeAreaView style={styles.screen}>
       <ScreenHeader
-        title="여행 초대"
-        backLabel="내 여행으로"
+        title={t('여행 초대')}
+        backLabel={t('내 여행으로')}
         disabled={busy}
         onBack={() => {
           // 참여하지 않는 토큰은 명시적으로 폐기한다.
@@ -127,8 +130,9 @@ export default function InviteScreen() {
       />
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.subtitle}>
-          친구가 보낸 링크로 여행에 참여해 보세요. 함께 일정을 확인하고 여행을
-          준비할 수 있어요.
+          {t(
+            '친구가 보낸 링크로 여행에 참여해 보세요. 함께 일정을 확인하고 여행을 준비할 수 있어요.',
+          )}
         </Text>
         <Field
           label="초대 링크"
@@ -143,14 +147,18 @@ export default function InviteScreen() {
         />
         <Action
           label={
-            busy ? '확인 중…' : user ? '초대 확인하고 참여' : '로그인하고 참여'
+            busy
+              ? t('확인 중…')
+              : user
+                ? t('초대 확인하고 참여')
+                : t('로그인하고 참여')
           }
           disabled={busy}
           onPress={accept}
         />
         {error && (
           <Text style={styles.error} accessibilityRole="alert">
-            {error}
+            {t(error)}
           </Text>
         )}
       </ScrollView>

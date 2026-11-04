@@ -1,0 +1,56 @@
+{
+  "capturedAt": "2026-10-26",
+  "source": "https://seed.line.me/index_en.html",
+  "license": "SIL Open Font License 1.1",
+  "licenseFile": "OFL.txt",
+  "files": [
+    {
+      "filename": "line-seed-ko-regular.ttf",
+      "language": "ko",
+      "weight": 400,
+      "bytes": 3422600,
+      "sha256": "52fdbf502f57c2652461eee99c8c71a9f85850f93ed411e5ed08e24327e33003",
+      "archivePath": "LINE_SeedKR_2023.09.06/TTF/LINESeedKR-Rg.ttf"
+    },
+    {
+      "filename": "line-seed-ko-bold.ttf",
+      "language": "ko",
+      "weight": 700,
+      "bytes": 3421604,
+      "sha256": "df6d817f60814528922a0e2911b76a1252db0697c2de78a7283ea7a3c8e70e21",
+      "archivePath": "LINE_SeedKR_2023.09.06/TTF/LINESeedKR-Bd.ttf"
+    },
+    {
+      "filename": "line-seed-en-regular.ttf",
+      "language": "en",
+      "weight": 400,
+      "bytes": 35484,
+      "sha256": "9d08720606fa3b834ebcacb83978036138a19037b4e98450b5321bb4cb1b0fb0",
+      "archivePath": "LINE_Seed_Sans_V1.003/App/TTF/LINESeedSans_A_Rg.ttf"
+    },
+    {
+      "filename": "line-seed-en-bold.ttf",
+      "language": "en",
+      "weight": 700,
+      "bytes": 35424,
+      "sha256": "d3ceca29da5ccfcbc4d73e072fca72f59cfaff2e23f1dcd99e619056d7292854",
+      "archivePath": "LINE_Seed_Sans_V1.003/App/TTF/LINESeedSans_A_Bd.ttf"
+    },
+    {
+      "filename": "line-seed-ja-regular.ttf",
+      "language": "ja",
+      "weight": 400,
+      "bytes": 3682632,
+      "sha256": "6839a7f29e24114bc338f11c546fe60f2ce16b9159da6aa638fcd9f035039e32",
+      "archivePath": "LINESeedJP_20241105/App/TTF/LINESeedJP_A_TTF_Rg.ttf"
+    },
+    {
+      "filename": "line-seed-ja-bold.ttf",
+      "language": "ja",
+      "weight": 700,
+      "bytes": 3524924,
+      "sha256": "8a866291ba955a6f7dab8745c32d15255f42adb1d932d531d2567a4dcfcc5879",
+      "archivePath": "LINESeedJP_20241105/App/TTF/LINESeedJP_A_TTF_Bd.ttf"
+    }
+  ]
+}

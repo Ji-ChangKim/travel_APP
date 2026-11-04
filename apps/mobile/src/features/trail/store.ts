@@ -1,7 +1,14 @@
 import { UserFacingError, userFacingMessage } from '@/services/userFacingError';
 import { create } from 'zustand';
-import type { TrailJourney } from '@wherego/domain';
-import { readTrailWorkspace, writeTrailWorkspace } from './storage';
+import { trailAttachmentReferences } from './trailAttachmentReferences';
+import type { TrailJourney, TrailReceipt } from '@wherego/domain';
+import {
+  cleanupTrailAttachment,
+  readTrailWorkspace,
+  writeTrailWorkspace,
+} from './storage';
+
+const pendingSaves = new Map<string, Promise<void>>();
 
 interface TrailState {
   scope: string;
@@ -19,6 +26,13 @@ export const useTrailStore = create<TrailState>(() => {
 
 // 현재 계정의 콘텐츠를 새로 불러온다.
 export function loadTrailWorkspace(scope: string): Promise<void> {
+  const current = useTrailStore.getState();
+  // 같은 기기 문서를 읽거나 저장하는 중에는 재마운트로 잠금과 원본을 초기화하지 않는다.
+  if (
+    current.scope === scope &&
+    (current.saving || (current.loading && !current.error))
+  )
+    return Promise.resolve();
   // 계정 전환 시 먼저 이전 화면 데이터를 비운다.
   return Promise.resolve(
     useTrailStore.setState({
@@ -57,15 +71,52 @@ export function saveTrailJourney(
   journey: TrailJourney,
 ): Promise<void> {
   // 같은 화면의 중복 저장과 읽기 오류 상태를 거부한다.
-  return useTrailStore.getState().scope === scope &&
-    !useTrailStore.getState().loading &&
-    !useTrailStore.getState().saving
-    ? persistJourney(scope, journey, useTrailStore.getState().journeys)
-    : Promise.reject(
-        new UserFacingError(
-          '기록을 불러오는 중이거나 저장 중입니다. 잠시 후 다시 시도해 주세요.',
+  const state = useTrailStore.getState();
+  if (
+    state.scope !== scope ||
+    state.loading ||
+    state.saving ||
+    pendingSaves.has(scope)
+  )
+    return Promise.reject(
+      new UserFacingError(
+        '기록을 불러오는 중이거나 저장 중입니다. 잠시 후 다시 시도해 주세요.',
+      ),
+    );
+  const pending = persistJourney(scope, journey, state.journeys);
+  pendingSaves.set(scope, pending);
+  const settled = () => {
+    if (pendingSaves.get(scope) === pending) pendingSaves.delete(scope);
+  };
+  void pending.then(settled, settled);
+  return pending;
+}
+
+// 화면을 떠난 뒤에는 진행 중 저장을 기다려 실제로 연결되지 않은 원본만 정리한다.
+export async function releaseTrailEditorAttachment(
+  scope: string,
+  attachment: TrailReceipt['attachment'] | null,
+): Promise<void> {
+  if (!attachment) return;
+  try {
+    // 저장 실패도 종료를 기다리며 저장 중인 영수증의 원본을 먼저 지우지 않는다.
+    await pendingSaves.get(scope)?.catch(() => undefined);
+    const state = useTrailStore.getState();
+    const referenced = await trailAttachmentReferences(
+      state,
+      scope,
+      readTrailWorkspace,
+    );
+    await cleanupTrailAttachment(attachment, referenced);
+  } catch (error: unknown) {
+    if (useTrailStore.getState().scope === scope)
+      useTrailStore.setState({
+        error: userFacingMessage(
+          error,
+          '첨부 파일을 정리하지 못했어요. 앱을 다시 열어 확인해 주세요.',
         ),
-      );
+      });
+  }
 }
 
 // 여행 하나를 기존 콘텐츠에서 교체한다.

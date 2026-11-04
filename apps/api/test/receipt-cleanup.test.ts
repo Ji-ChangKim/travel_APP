@@ -30,6 +30,7 @@ test('P05 실제 D1/R2: 정리 실패·동일 요청 재생·앱 종료 후 예�
       '0003_upload_deletion.sql',
       '0004_receipt_scans.sql',
       '0009_receipt_cleanup_jobs.sql',
+      '0010_home_server_data.sql',
     ]) {
       const sql = readFileSync(
         new URL('../migrations/' + file, import.meta.url),

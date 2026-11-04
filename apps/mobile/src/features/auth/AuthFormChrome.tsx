@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import ScreenHeader from '@/components/ScreenHeader';
 import { colors } from '@/constants/theme';
@@ -17,16 +19,17 @@ export function AuthNavigation({
   onBack: () => void;
   onClose?: () => void;
 }) {
+  useLocale();
   // 처리 중에는 화면을 닫아 인증 요청을 중복으로 시작하지 못하게 한다.
   return (
     <ScreenHeader
       title={title}
-      backLabel="로그인 화면으로 돌아가기"
+      backLabel={t('로그인 화면으로 돌아가기')}
       onBack={onBack}
       disabled={disabled}
       actions={
         onClose
-          ? [{ icon: 'close', label: '이메일 인증 닫기', onPress: onClose }]
+          ? [{ icon: 'close', label: t('이메일 인증 닫기'), onPress: onClose }]
           : undefined
       }
     />
@@ -35,19 +38,20 @@ export function AuthNavigation({
 
 // 실제 가입 흐름의 계정 생성과 프로필 설정 두 단계를 안내한다.
 export function SignupProgress({ step }: { step: 1 | 2 }) {
+  useLocale();
   // 완료 전에는 계정 생성 단계를 전체 가입 완료로 표현하지 않는다.
   return (
     <View style={styles.progressSection}>
       <View style={styles.progressHeading}>
         <Text style={styles.progressTitle}>
-          {step === 1 ? '계정 만들기' : '프로필 설정'}
+          {step === 1 ? t('계정 만들기') : t('프로필 설정')}
         </Text>
         <Text style={styles.progressCount}>{step} / 2</Text>
       </View>
       <View
         style={styles.progressTrack}
         accessibilityRole="progressbar"
-        accessibilityLabel="회원가입 진행"
+        accessibilityLabel={t('회원가입 진행')}
         accessibilityValue={{ min: 0, max: 2, now: step }}
       >
         <View
@@ -60,6 +64,7 @@ export function SignupProgress({ step }: { step: 1 | 2 }) {
 
 // 개인정보 입력 전에 필요한 공개 범위만 짧게 알려준다.
 export function ProfilePrivacy() {
+  useLocale();
   // 닉네임을 제외한 성별과 생일은 공개하지 않는 현재 동작을 안내한다.
   return (
     <View style={styles.privacyCard}>
@@ -67,9 +72,11 @@ export function ProfilePrivacy() {
         <Ionicons name="lock-closed" size={18} color={loginTheme.coral} />
       </View>
       <View style={styles.guestCopy}>
-        <Text style={styles.privacyTitle}>나를 소개하는 여행 프로필</Text>
+        <Text style={styles.privacyTitle}>
+          {t('나를 소개하는 여행 프로필')}
+        </Text>
         <Text style={styles.privacyDescription}>
-          닉네임만 보여요. 성별과 생일은 공개하지 않아요.
+          {t('닉네임만 보여요. 성별과 생일은 공개하지 않아요.')}
         </Text>
       </View>
     </View>
@@ -78,6 +85,7 @@ export function ProfilePrivacy() {
 
 // 프로필 설정 시안의 여행자 이미지를 편집 버튼 없이 표시한다.
 export function TravelerPortrait() {
+  useLocale();
   // 프로필 사진 저장 기능으로 오해하지 않도록 장식 이미지만 렌더링한다.
   return (
     <View style={styles.profilePortrait} accessible={false}>

@@ -1,3 +1,5 @@
+import { useLocale } from '@/features/localization/localeState';
+import { t } from '@/features/localization/translate';
 import Text from '@/components/AppText';
 import ActionSheet from '@/components/ActionSheet';
 import { Action } from './ui';
@@ -18,13 +20,14 @@ export default function WorkspaceConfirmDialog({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  useLocale();
   // 취소·시스템 뒤로는 명령을 보내지 않고 확인 화면만 닫는다.
   return (
     <ActionSheet
       variant="confirm"
       priority={2}
       visible={Boolean(confirmation)}
-      title={confirmation?.title || '여행 내용 확인'}
+      title={confirmation?.title || t('여행 내용 확인')}
       onClose={onCancel}
     >
       {confirmation && (
@@ -40,8 +43,8 @@ export default function WorkspaceConfirmDialog({
           <Action
             label={
               confirmation.command.operation === 'community.publish'
-                ? '미리보기로 돌아가기'
-                : '변경하지 않기'
+                ? t('미리보기로 돌아가기')
+                : t('변경하지 않기')
             }
             onPress={onCancel}
           />

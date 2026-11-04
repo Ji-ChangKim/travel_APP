@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
 import type { WorkspaceSchedule } from '@wherego/domain';
@@ -13,6 +15,7 @@ export default function ScheduleConflictNotice({
 }: {
   items: WorkspaceSchedule[];
 }) {
+  useLocale();
   // 같은 장소가 포함된 긴 일정도 요약 후 개수를 알린다.
   const messages = scheduleConflicts(items);
   const [expanded, setExpanded] = useState(false);
@@ -28,7 +31,7 @@ export default function ScheduleConflictNotice({
     >
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="시간 경고 자세히"
+        accessibilityLabel={t('시간 경고 자세히')}
         accessibilityState={{ expanded }}
         style={{ minHeight: 48, justifyContent: 'center' }}
         onPress={() => {
@@ -37,7 +40,8 @@ export default function ScheduleConflictNotice({
         }}
       >
         <Text style={s.label}>
-          방문 시간 {messages.length}건 확인 · {expanded ? '접기' : '자세히'}
+          {t('방문 시간')} {messages.length}
+          {t('건 확인 ·')} {expanded ? t('접기') : t('자세히')}
         </Text>
       </Pressable>
       {expanded && (
@@ -49,12 +53,14 @@ export default function ScheduleConflictNotice({
           ))}
           {messages.length > 3 && (
             <Text style={s.meta}>
-              추가로 {messages.length - 3}건의 시간이 겹치거나 순서와 달라요.
+              {t('추가로')} {messages.length - 3}
+              {t('건의 시간이 겹치거나 순서와 달라요.')}
             </Text>
           )}
           <Text style={s.meta}>
-            예정 시각은 자동으로 바뀌지 않아요. 시간이나 방문 순서를 수정할 수
-            있어요.
+            {t(
+              '예정 시각은 자동으로 바뀌지 않아요. 시간이나 방문 순서를 수정할 수 있어요.',
+            )}
           </Text>
         </>
       )}

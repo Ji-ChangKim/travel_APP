@@ -1,0 +1,43 @@
+2026-10-26 홈 서버 데이터 전환 검수
+
+변경 범위
+- 회원 여행·일정·동행·사진의 기존 서버 경로 유지.
+- 작성 중인 계획을 D1 plan_drafts로 전환. 인증 계정 기준 조회·저장·삭제, 계정당 5개, 버전 충돌 방지, 동일 입력 재시도 지원.
+- 정식 여행 생성과 초안 삭제를 하나의 DB batch로 처리. 완료된 생성 키로 초안을 다시 쓰지 못하게 제한.
+- 계정 탈퇴 익명화 시 해당 계정 초안 삭제.
+- 하루의 팁은 travel_tips의 언어·발행 여부·기간 조건을 만족하는 내용만 사용. 빈 데이터는 숨김, 오류는 재시도.
+- 기존 기기 초안은 전체보기에서 사용자가 선택해 가져오기. 서버 확인 전 원본 보존. 게스트 자료 자동 업로드 없음.
+- 공통 헤더·GNB·카드 디자인 변경 없음. 정적 HTML은 이전 레이아웃 검토 자료로 보존.
+
+구현 파일
+API: apps/api/src/features/planning/homeData.ts, app.ts, infrastructure/storage/cloudStore.ts, features/accounts/accountRetirementPolicy.ts.
+DB: apps/api/migrations/0010_home_server_data.sql.
+계약: packages/validation/src/homeData.ts, packages/api-client/src/homeData.ts 및 각 index.ts.
+앱: creationDraftStorage.ts, legacyCreationDraftStorage.ts, creationDraftModel.ts, SaveCreationDraft.tsx, LegacyDraftImport.tsx, HomeDraftResume.tsx, HomeTravelCard.tsx, PlanningStartScreen.tsx, HaruDailyTip.tsx, localization/messages.json.
+검사: tests/cloud/runtime.test.mjs, apps/api/test/receipt-cleanup.test.ts의 마이그레이션 목록.
+문서: DB_객체사전.txt, 홈온보딩_화면규격.md, 홈_여행목록_기능기획.txt, 본 검수 기록.
+
+확인한 결과
+- API 빌드(dry-run): 통과. 배포 아님.
+- 로컬 D1 전체 통합 검사: 21개 통과. 실제 Better Auth 로그인과 D1 쓰기/읽기를 사용하며 HTTP 응답 모킹이 아님.
+- 신규 서버 홈 검사: 미인증 거절, 계정 격리, 저장/재조회, 동일 입력 재시도, 오래된 수정/삭제 거절, 여행 전환 후 초안 제거, 완료 초안 재저장 거절, 다른 계정 삭제 차단, 팁 발행/언어/기간 필터 확인.
+- 초안·홈 분류·번역 단위 검사: 9개 통과.
+- 최종 프로젝트 검사와 API 회귀 결과는 아래 추가 기록.
+
+아직 확인하지 않은 범위와 적용 순서
+- 원격 서버/DB는 변경하지 않았다. 기존 배포 보류 지시 유지.
+- DB 백업과 마이그레이션 이력 확인 후 0010을 먼저 적용하고 API, 앱 순서로 배포해야 한다. 새 API를 구형 DB에 먼저 배포하면 여행 생성도 실패할 수 있다.
+- 예시 여행이나 팁은 넣지 않는다. 운영 팁은 실제 편집 콘텐츠를 별도로 발행해야 한다.
+- 실서버 계정 로그인, 두 기기 간 초안 재조회, 오프라인 오류/복구, 구형 기기 초안 가져오기, 실제 화면 캡처 대조는 배포 후 검수 필요.
+- 이번 DB 통합 검사를 실제 모바일 화면 검수 또는 운영 DB 검수로 간주하지 않는다.
+- 복구 시 API/앱을 이전 버전으로 되돌리되 새 테이블과 저장 데이터는 삭제하지 않는다.
+추가 검토 반영: 여행 생성 요청에 optional draftRevision(positive integer)을 전달한다. 같은 DB batch에서 현재 초안 버전을 비교해 오래된 화면의 생성은 409로 거절한다. 복원 초안이 삭제됐거나 버전이 바뀌었을 때 최신 자료를 덮어쓰거나 제거하지 않는다. 앱의 별도 생성 후 초안 삭제 호출은 제거했다.
+추가 변경 파일: packages/validation/src/foundation.ts, apps/mobile/src/features/workspace/tripCreation.ts, workspaceFormActions.ts.
+
+최종 가져오기 정책: 이전 앱 탭의 동시 수정을 보호하기 위해 서버 가져오기 성공 후에도 기기 원본은 삭제하지 않는다. 홈 목록의 원본은 서버 데이터이며 기기 원본은 복구용으로만 보존한다. 앞선 가져오기 후 기기 삭제 설명을 대체한다.
+최종 검증 결과
+- 생성 버전 충돌 보완 후 로컬 D1 통합 21/21 통과(outputs/server-home-final-runtime.log).
+- API 회귀 131/131 통과(outputs/server-home-final-foundation.log).
+- 읽기 전용 검토에서 발견한 최신 초안 삭제 문제는 원자 버전 검사로 수정. 1차 재검토 완료.
+- 레거시 원본 동시 수정 위험은 원본을 삭제하지 않는 방식으로 해소.
+- 최종 npm run check: 종료 코드 0. 타입·린트·서식·문서·구조·이동/헤더 경계 검사 통과(outputs/server-home-verified-check.log).

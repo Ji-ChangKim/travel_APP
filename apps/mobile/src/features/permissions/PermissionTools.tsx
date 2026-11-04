@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
 import { useEffect, useRef, useState } from 'react';
@@ -11,12 +13,14 @@ import LocationFeedback from './LocationFeedback';
 
 // 네이티브 홈에서 권한 재설정과 실제 현재 위치 지도를 제공한다.
 export default function PermissionTools() {
+  useLocale();
   // 웹 홈에는 운영체제 권한 도구를 표시하지 않는다.
   return Platform.OS === 'web' ? null : <NativeTools />;
 }
 
 // 일정 편집과 같은 일회 위치 서비스로 외부 지도를 연다.
 function NativeTools() {
+  useLocale();
   // 같은 위치 결과로 외부 지도를 반복 실행하지 않는다.
   const current = useCurrentLocation(true);
   const opened = useRef<typeof current.result>(undefined);
@@ -42,7 +46,7 @@ function NativeTools() {
     <>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="현재 위치 지도에서 보기"
+        accessibilityLabel={t('현재 위치 지도에서 보기')}
         disabled={current.busy}
         accessibilityState={{ disabled: current.busy }}
         style={s.linkRow}
@@ -55,7 +59,9 @@ function NativeTools() {
       >
         <Ionicons name="locate-outline" size={20} color={colors.muted} />
         <Text style={[s.linkText, s.linkCopy]} numberOfLines={1}>
-          {current.busy ? '현재 위치 확인 중…' : '현재 위치 지도에서 보기'}
+          {current.busy
+            ? t('현재 위치 확인 중…')
+            : t('현재 위치 지도에서 보기')}
         </Text>
       </Pressable>
       <LocationFeedback
@@ -69,18 +75,18 @@ function NativeTools() {
           accessibilityRole="alert"
           style={{ color: colors.selected, padding: 12 }}
         >
-          {error}
+          {t(error)}
         </Text>
       ) : null}
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="앱 권한 설정"
+        accessibilityLabel={t('앱 권한 설정')}
         style={s.linkRow}
         onPress={openPermissionGuide}
       >
         <Ionicons name="options-outline" size={20} color={colors.muted} />
         <Text style={[s.linkText, s.linkCopy]} numberOfLines={1}>
-          앱 권한 설정
+          {t('앱 권한 설정')}
         </Text>
       </Pressable>
     </>

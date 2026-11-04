@@ -1,10 +1,13 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Stack, useSegments } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationBar } from 'expo-navigation-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { View } from 'react-native';
+import { BackHandler, Platform, ToastAndroid, View } from 'react-native';
 import { pageLayout } from '@/features/accessibility/PageTransition';
+import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
+import { instantMotion } from '@/features/accessibility/motionPolicy';
+import { t } from '@/features/localization/translate';
 import GlobalNavigation from '@/components/GlobalNavigation';
 import AppFontProvider from '@/components/AppFontProvider';
 import ScheduleExitDialog from '@/features/workspace/scheduleExitGuard';
@@ -13,10 +16,11 @@ import AuthRecoveryBoundary from '@/features/auth/AuthRecoveryBoundary';
 import NotificationPermission from '@/features/notifications/NotificationPermission';
 
 import { colors } from '@/constants/theme';
+import LanguageProvider from '@/features/localization/LanguageProvider';
 import AuthBridge from '@/features/auth/AuthBridge';
 import StartupPolicyGate from '@/features/startup/StartupPolicyGate';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import {
   nativeFrameReady,
   skipLaunchIntro,
@@ -51,7 +55,50 @@ function LaunchBridge() {
     // 메타데이터가 아닌 영상 프레임·이미지·실제 복귀 레이아웃으로 판정한다.
     if (session.nativeReady) revealApp();
   }, [session.nativeReady]);
-  return direct || session.biDone ? <AuthBridge /> : null;
+  return <AuthBridge />;
+}
+
+// Android 하드웨어 뒤로가기 버튼을 탭 복귀 및 두 번 눌러 종료로 연결한다.
+function AndroidBackGuard() {
+  const segments = useSegments();
+  const router = useRouter();
+  const lastBackPress = useRef(0);
+  const route = segments.join('/');
+  useEffect(() => {
+    if (Platform.OS !== 'android') return undefined;
+    const subscription = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => {
+        if (
+          route === '(tabs)/plans' ||
+          route === '(tabs)/footprints' ||
+          route === '(tabs)/community' ||
+          route === '(tabs)/my'
+        ) {
+          router.replace('/(tabs)');
+          return true;
+        }
+        if (route === '(tabs)' || route === 'login') {
+          const now = Date.now();
+          if (now - lastBackPress.current < 2000) {
+            BackHandler.exitApp();
+            return true;
+          }
+          lastBackPress.current = now;
+          ToastAndroid.show(
+            t('뒤로 버튼을 한 번 더 누르면 앱이 종료됩니다.'),
+            ToastAndroid.SHORT,
+          );
+          return true;
+        }
+        return false;
+      },
+    );
+    return () => {
+      subscription.remove();
+    };
+  }, [route, router]);
+  return null;
 }
 
 // 시작 연출을 마친 첫 화면에서 선택 권한 안내를 시작한다.
@@ -60,6 +107,7 @@ function JourneyNotifications() {
   const route = useSegments().join('/');
   // 프로필 입력·인증 콜백에서도 권한 안내를 뒤로 미룬다.
   return route !== '' &&
+    route !== 'welcome' &&
     route !== 'auth/callback' &&
     route !== 'profile-setup' ? (
     <NotificationPermission />
@@ -80,39 +128,62 @@ const queryClient = new QueryClient({
 export default function RootLayout() {
   // 공통 글꼴 준비 뒤 기존 인증과 화면 이동을 그대로 연결한다.
   const direct = useSegments().join('/') !== '';
+  const accessibility = useAppAccessibility();
+  const disableNativeSlide =
+    Platform.OS === 'web' || instantMotion(accessibility);
   return (
-    <AppFontProvider>
-      <QueryClientProvider client={queryClient}>
-        <LaunchBridge />
-        <SafeAreaProvider>
-          <StartupPolicyGate>
-            <AuthRecoveryBoundary>
-              <AuthGate />
-              <View
-                testID="app-page-content"
-                style={{ flex: 1 }}
-                onLayout={direct ? nativeFrameReady : undefined}
-              >
-                <Stack
-                  screenLayout={pageLayout}
-                  screenOptions={{
-                    animation: 'none',
-                    headerShown: false,
-                    contentStyle: { backgroundColor: colors.background },
-                  }}
+    <LanguageProvider>
+      <AppFontProvider>
+        <QueryClientProvider client={queryClient}>
+          <LaunchBridge />
+          <SafeAreaProvider>
+            <StartupPolicyGate>
+              <AuthRecoveryBoundary>
+                <AuthGate />
+                <AndroidBackGuard />
+                <View
+                  testID="app-page-content"
+                  style={{ flex: 1 }}
+                  onLayout={direct ? nativeFrameReady : undefined}
                 >
-                  <Stack.Screen name="login" options={{ animation: 'none' }} />
-                </Stack>
-                <JourneyNotifications />
-              </View>
-              <GlobalNavigation />
-              <ScheduleExitDialog />
-            </AuthRecoveryBoundary>
-            <StatusBar style="dark" />
-            <NavigationBar hidden />
-          </StartupPolicyGate>
-        </SafeAreaProvider>
-      </QueryClientProvider>
-    </AppFontProvider>
+                  <Stack
+                    screenLayout={pageLayout}
+                    screenOptions={{
+                      animation: disableNativeSlide
+                        ? 'none'
+                        : 'slide_from_right',
+                      headerShown: false,
+                      contentStyle: { backgroundColor: colors.background },
+                    }}
+                  >
+                    <Stack.Screen
+                      name="index"
+                      options={{ animation: 'none' }}
+                    />
+                    <Stack.Screen
+                      name="(tabs)"
+                      options={{ animation: 'none' }}
+                    />
+                    <Stack.Screen
+                      name="login"
+                      options={{ animation: 'none' }}
+                    />
+                    <Stack.Screen
+                      name="welcome"
+                      options={{ animation: 'none' }}
+                    />
+                  </Stack>
+                  <JourneyNotifications />
+                </View>
+                <GlobalNavigation />
+                <ScheduleExitDialog />
+              </AuthRecoveryBoundary>
+              <StatusBar style="dark" />
+              <NavigationBar hidden />
+            </StartupPolicyGate>
+          </SafeAreaProvider>
+        </QueryClientProvider>
+      </AppFontProvider>
+    </LanguageProvider>
   );
 }

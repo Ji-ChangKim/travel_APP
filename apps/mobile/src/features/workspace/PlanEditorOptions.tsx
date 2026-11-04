@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import type { WorkspaceSnapshot } from '@wherego/domain';
 import { View } from 'react-native';
@@ -20,11 +22,12 @@ export function ScheduleOptions({
   busy: boolean;
   snapshot: WorkspaceSnapshot | undefined;
 }) {
+  useLocale();
   return (
     <>
       {form.kind === 'schedule' && (
         <View style={styles.card}>
-          <Text style={styles.title}>여행 날짜 선택</Text>
+          <Text style={styles.title}>{t('여행 날짜 선택')}</Text>
           {snapshot?.days.map((day) => (
             <Action
               key={day.id}
@@ -46,7 +49,7 @@ export function ScheduleOptions({
             (type) => (
               <Action
                 key={type}
-                label={`${form.values.type === type ? '✓ ' : ''}${{ PLACE: '장소', TRANSPORT: '이동', STAY: '숙소', RESERVATION: '예약', TODO: '할 일', MEMO: '메모' }[type]}`}
+                label={`${form.values.type === type ? '✓ ' : ''}${t({ PLACE: '장소', TRANSPORT: '이동', STAY: '숙소', RESERVATION: '예약', TODO: '할 일', MEMO: '메모' }[type] || '')}`}
                 disabled={busy}
                 onPress={() => {
                   // 일정 유형을 하나 선택한다.
@@ -62,12 +65,13 @@ export function ScheduleOptions({
 }
 
 export function ExpenseOptions({ form, onChange }: EditorOptionProps) {
+  useLocale();
   return (
     <>
       {form.kind === 'expense' && (
         <View style={styles.row}>
           <Action
-            label="실제 지출"
+            label={t('실제 지출')}
             selected={form.values.isActual === 'true'}
             onPress={() => {
               // 실제 지출로 명시한다.
@@ -75,7 +79,7 @@ export function ExpenseOptions({ form, onChange }: EditorOptionProps) {
             }}
           />
           <Action
-            label="예상 비용"
+            label={t('예상 비용')}
             selected={form.values.isActual === 'false'}
             onPress={() => {
               // 예상 비용과 실제 지출은 합계를 분리한다.
@@ -89,6 +93,7 @@ export function ExpenseOptions({ form, onChange }: EditorOptionProps) {
 }
 
 export function MetadataOptions({ form, onChange }: EditorOptionProps) {
+  useLocale();
   return (
     <>
       {form.kind === 'metadata' && (
@@ -97,15 +102,18 @@ export function MetadataOptions({ form, onChange }: EditorOptionProps) {
       {form.kind === 'metadata' && (
         <View>
           <Text>
-            여행 단계는 날짜에 맞춰 바뀌어요. 공개할 기록의 정리 여부를 선택해
-            주세요.
+            {t(
+              '여행 단계는 날짜에 맞춰 바뀌어요. 공개할 기록의 정리 여부를 선택해 주세요.',
+            )}
           </Text>
           <View style={styles.row}>
             {['PLANNED', 'COMPLETED'].map((status) => (
               <Action
                 key={status}
                 label={
-                  status === 'COMPLETED' ? '기록 정리 완료' : '기록 정리 중'
+                  status === 'COMPLETED'
+                    ? t('기록 정리 완료')
+                    : t('기록 정리 중')
                 }
                 selected={
                   status === 'COMPLETED'

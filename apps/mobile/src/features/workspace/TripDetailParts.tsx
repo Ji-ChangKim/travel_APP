@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import HaruState from '@/components/HaruState';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
@@ -15,6 +17,7 @@ export function TripCostSummary({
 }: {
   expenses: WorkspaceExpense[];
 }) {
+  useLocale();
   // 조회에 있는 금액만 계산하며 환율이나 가짜 예산을 추가하지 않는다.
   const [showEstimates, setShowEstimates] = useState(false);
   const actualCosts = diaryCosts(expenses);
@@ -22,9 +25,9 @@ export function TripCostSummary({
   return (
     <View style={s.summary}>
       <View style={[s.card, s.actual]}>
-        <Text style={s.cardTitle}>실제 지출</Text>
+        <Text style={s.cardTitle}>{t('실제 지출')}</Text>
         {!actualCosts.length && (
-          <Text style={s.meta}>아직 기록한 지출이 없어요.</Text>
+          <Text style={s.meta}>{t('아직 기록한 지출이 없어요.')}</Text>
         )}
         {actualCosts.map((cost) => (
           <View key={cost.currency} style={s.currencyRow}>
@@ -35,7 +38,7 @@ export function TripCostSummary({
       </View>
       {estimatedCosts.length > 0 && (
         <Action
-          label={showEstimates ? '예상 비용 접기' : '예상 비용 보기'}
+          label={showEstimates ? t('예상 비용 접기') : t('예상 비용 보기')}
           onPress={() => {
             // 실제 지출을 먼저 읽고 필요한 경우에만 예상 비용을 펼친다.
             return setShowEstimates(!showEstimates);
@@ -44,7 +47,7 @@ export function TripCostSummary({
       )}
       {showEstimates && estimatedCosts.length > 0 && (
         <View style={s.card}>
-          <Text style={s.cardTitle}>예상 비용</Text>
+          <Text style={s.cardTitle}>{t('예상 비용')}</Text>
           {estimatedCosts.map((cost) => (
             <View key={cost.currency} style={s.currencyRow}>
               <Text style={s.meta}>{cost.currency}</Text>
@@ -54,7 +57,7 @@ export function TripCostSummary({
         </View>
       )}
       <Text style={s.meta}>
-        통화별로 모았어요. 서로 다른 통화는 합산하지 않아요.
+        {t('통화별로 모았어요. 서로 다른 통화는 합산하지 않아요.')}
       </Text>
     </View>
   );
@@ -68,17 +71,18 @@ export function TripExpenseHeading({
   item: WorkspaceExpense;
   scheduleTitle?: string;
 }) {
+  useLocale();
   // 영수증 비용과 직접 입력한 비용의 차이를 실제 출처로 안내한다.
   return (
     <View style={{ gap: 8 }}>
       <View style={s.heading}>
         <View style={s.badge}>
           <Text style={s.badgeText}>
-            {item.isActual ? '실제 지출' : '예상 비용'}
+            {item.isActual ? t('실제 지출') : t('예상 비용')}
           </Text>
         </View>
         <Text style={s.meta}>
-          {item.source === 'manual' ? '직접 기록' : '영수증에서 기록'}
+          {item.source === 'manual' ? t('직접 기록') : t('영수증에서 기록')}
         </Text>
       </View>
       <Text style={s.cardTitle}>{item.title}</Text>
@@ -86,7 +90,9 @@ export function TripExpenseHeading({
         {item.currency} {item.amount}
       </Text>
       {scheduleTitle ? (
-        <Text style={s.meta}>연결한 일정 · {scheduleTitle}</Text>
+        <Text style={s.meta}>
+          {t('연결한 일정 ·')} {scheduleTitle}
+        </Text>
       ) : null}
     </View>
   );
@@ -98,17 +104,19 @@ export function TripChecklistProgress({
 }: {
   items: WorkspaceSnapshot['checklists'];
 }) {
+  useLocale();
   // 빈 목록을 준비 완료로 표시하지 않는다.
   return (
     <View style={s.card}>
-      <Text style={s.cardTitle}>준비물</Text>
+      <Text style={s.cardTitle}>{t('준비물')}</Text>
       <Text style={s.meta} accessibilityLiveRegion="polite">
         {
           items.filter((item) => {
             /* 저장된 완료 상태만 센다. */ return item.isCompleted;
           }).length
         }{' '}
-        / {items.length}개 준비했어요
+        / {items.length}
+        {t('개 준비했어요')}
       </Text>
       <View accessible={false} style={s.progressTrack}>
         <View
@@ -138,6 +146,7 @@ export function TripMemberHeading({
 }: {
   member: WorkspaceSnapshot['members'][number];
 }) {
+  useLocale();
   const { largeText } = useAppAccessibility();
   // 접속 상태나 사진을 임의로 만들지 않고 닉네임 첫 글자를 사용한다.
   return (
@@ -148,12 +157,14 @@ export function TripMemberHeading({
       ]}
     >
       <View accessible={false} style={[s.avatar, { alignSelf: 'flex-start' }]}>
-        <Text style={s.initial}>{[...member.nickname.trim()][0] || '여'}</Text>
+        <Text style={s.initial}>
+          {[...member.nickname.trim()][0] || t('여')}
+        </Text>
       </View>
       <View style={s.memberInfo}>
         <Text style={s.cardTitle}>
           {member.nickname}
-          {member.isMe ? ' (나)' : ''}
+          {member.isMe ? t(' (나)') : ''}
         </Text>
         <Text style={s.meta}>{memberRoleLabel(member.role)}</Text>
       </View>
@@ -169,6 +180,7 @@ export function TripDetailEmpty({
   title: string;
   description: string;
 }) {
+  useLocale();
   // 예시 데이터를 채우지 않고 현재 조회 결과만 설명한다.
   return (
     <HaruState kind="empty" title={title} description={description} compact />

@@ -1,3 +1,5 @@
+import { getLocale } from '@/features/localization/localeState';
+import { t } from '@/features/localization/translate';
 import type { WorkspaceSchedule } from '@wherego/domain';
 import type { TripIconName } from '@/components/icons/TripIcon';
 
@@ -26,7 +28,7 @@ export function scheduleKind(type: WorkspaceSchedule['type']) {
 // 현지 달력 날짜를 짧은 한국어 날짜로 표현한다.
 export function scheduleDate(date: string): string {
   // 기기의 시간대가 여행 날짜를 바꾸지 않게 UTC로 표시한다.
-  return new Intl.DateTimeFormat('ko-KR', {
+  return new Intl.DateTimeFormat(getLocale(), {
     month: 'long',
     day: 'numeric',
     weekday: 'short',
@@ -38,8 +40,8 @@ export function scheduleDate(date: string): string {
 export function scheduleDuration(minutes: number): string {
   // 입력하지 않은 시간이나 이동시간을 추정하지 않는다.
   return [
-    minutes >= 60 ? `${Math.floor(minutes / 60)}시간` : '',
-    minutes % 60 ? `${minutes % 60}분` : '',
+    minutes >= 60 ? t('{count}시간', { count: Math.floor(minutes / 60) }) : '',
+    minutes % 60 ? t('{count}분', { count: minutes % 60 }) : '',
   ]
     .filter(Boolean)
     .join(' ');

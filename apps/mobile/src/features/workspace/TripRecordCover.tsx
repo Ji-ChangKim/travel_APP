@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { workspaceQueryOptions } from './tripQueries';
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
@@ -18,6 +20,7 @@ export default function TripRecordCover({
   tripId: string;
   city: string;
 }) {
+  useLocale();
   // 상세 화면과 같은 조회 키를 사용해 원본과 권한 검사를 공유한다.
   return (
     <CoverContent
@@ -44,6 +47,7 @@ function CoverContent({
   city: string;
   query: { data?: Awaited<ReturnType<typeof getWorkspace>>; isError: boolean };
 }) {
+  useLocale();
   // 영수증을 여행 사진으로 사용하거나 권한 오류의 이전 사진을 노출하지 않는다.
   const photo =
     !query.isError &&
@@ -63,8 +67,8 @@ function CoverContent({
         <View style={s.dashes} />
         <Ionicons name="airplane-outline" size={28} color={colors.text} />
       </View>
-      <Text style={s.city}>{city || '나의 여행'}</Text>
-      <Text style={s.caption}>한 장씩 쌓이는 여행의 기억</Text>
+      <Text style={s.city}>{city || t('나의 여행')}</Text>
+      <Text style={s.caption}>{t('한 장씩 쌓이는 여행의 기억')}</Text>
     </View>
   );
 }

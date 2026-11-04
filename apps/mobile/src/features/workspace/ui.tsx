@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { styles } from './workspaceStyles';
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
@@ -33,6 +35,7 @@ export function Action({
   loading?: boolean;
   size?: 'default' | 'chip' | 'icon' | 'day' | 'header';
 }) {
+  useLocale();
   // 처리 중 중복 클릭을 실제 disabled 상태로 차단한다.
   return (
     <DesignButton
@@ -54,6 +57,7 @@ export function Action({
 // 접근성 이름을 가진 입력 필드 하나를 표시한다.
 export function Field({
   label,
+  displayLabel,
   value,
   onChange,
   multiline = false,
@@ -63,6 +67,7 @@ export function Field({
   inputRef,
 }: {
   label: string;
+  displayLabel?: string;
   value: string;
   onChange: (value: string) => void;
   multiline?: boolean;
@@ -71,11 +76,13 @@ export function Field({
   inputMode?: 'text' | 'numeric';
   inputRef?: React.RefObject<TextInput | null>;
 }) {
+  useLocale();
   const fallbackInput = useRef<TextInput>(null);
   // 화면의 라벨과 테스트·스크린리더 이름을 일치시킨다.
   return (
     <BoundField
       label={label}
+      displayLabel={displayLabel}
       value={value}
       onChange={onChange}
       multiline={multiline}
@@ -90,6 +97,7 @@ export function Field({
 // 입력값과 오류 표시를 같은 초점 대상에 연결한다.
 function BoundField({
   label,
+  displayLabel,
   value,
   onChange,
   multiline,
@@ -99,6 +107,7 @@ function BoundField({
   inputMode,
 }: {
   label: string;
+  displayLabel?: string;
   value: string;
   onChange: (value: string) => void;
   multiline: boolean;
@@ -107,6 +116,7 @@ function BoundField({
   placeholder?: string;
   inputMode: 'text' | 'numeric';
 }) {
+  useLocale();
   // 저장 중에는 실제 입력창도 편집할 수 없게 한다.
   return (
     <FormAnchor
@@ -115,12 +125,12 @@ function BoundField({
         /* 오류 이동 시에만 입력 참조를 읽는다. */ return focusFormInput(input);
       }}
     >
-      <Text style={styles.label}>{label}</Text>
+      <Text style={styles.label}>{displayLabel ?? t(label)}</Text>
       <DesignInput
         inputRef={input}
         editable={!disabled}
         accessibilityState={{ disabled }}
-        accessibilityLabel={label}
+        accessibilityLabel={displayLabel ?? t(label)}
         value={value}
         onChangeText={onChange}
         multiline={multiline}

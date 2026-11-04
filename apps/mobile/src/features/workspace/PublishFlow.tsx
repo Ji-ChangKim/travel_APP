@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { type RefObject } from 'react';
 import PublishSummary from './PublishSummary';
 import { usePublishNavigation } from './usePublishNavigation';
@@ -45,6 +47,7 @@ export default function PublishFlow({
   onClose: () => void;
   backActionRef?: RefObject<(() => void) | null>;
 }) {
+  useLocale();
   const { preview, step, goBack } = usePublishNavigation({
     locked,
     scroll,
@@ -58,9 +61,9 @@ export default function PublishFlow({
       style={[styles.modal, { backgroundColor: ledgerColors.canvas }]}
     >
       <ScreenHeader
-        title={preview ? snapshot.trip.title : '공유할 내용 선택'}
+        title={preview ? snapshot.trip.title : t('공유할 내용 선택')}
         inlineTitle={preview}
-        backLabel={preview ? '공유 항목 선택으로' : '공유 화면 닫기'}
+        backLabel={preview ? t('공유 항목 선택으로') : t('공유 화면 닫기')}
         disabled={locked}
         onBack={goBack}
       />
@@ -71,17 +74,22 @@ export default function PublishFlow({
         keyboardShouldPersistTaps="handled"
       >
         <Text style={l.eyebrow}>
-          {preview ? '2 / 2 · 공개 화면 미리보기' : '1 / 2 · 공개 항목 선택'}
+          {preview
+            ? t('2 / 2 · 공개 화면 미리보기')
+            : t('1 / 2 · 공개 항목 선택')}
         </Text>
         <View style={l.private}>
           <Text style={l.body}>
-            개인 메모·예약번호·동행 정보·영수증 원본과 품목은 공개하지 않아요.
+            {t(
+              '개인 메모·예약번호·동행 정보·영수증 원본과 품목은 공개하지 않아요.',
+            )}
           </Text>
         </View>
         {snapshot.postId && (
           <Text style={styles.subtitle}>
-            다시 공개하면 기존 링크의 내용이 이번 선택으로 바뀌어요. 내 여행
-            원본은 그대로 남아요.
+            {t(
+              '다시 공개하면 기존 링크의 내용이 이번 선택으로 바뀌어요. 내 여행 원본은 그대로 남아요.',
+            )}
           </Text>
         )}
         <View
@@ -121,12 +129,12 @@ export default function PublishFlow({
               <Action
                 label={
                   busy
-                    ? '공개 중…'
+                    ? t('공개 중…')
                     : locked && !conflicted
-                      ? '다시 공개하기'
+                      ? t('다시 공개하기')
                       : preview
-                        ? '공개 범위 확인'
-                        : '미리보기'
+                        ? t('공개 범위 확인')
+                        : t('미리보기')
                 }
                 variant="primary"
                 loading={busy}
@@ -139,7 +147,7 @@ export default function PublishFlow({
               />
               {conflicted && (
                 <Action
-                  label="최신 내용 불러오기"
+                  label={t('최신 내용 불러오기')}
                   allowWhileLocked
                   disabled={busy}
                   onPress={onReload}
@@ -147,7 +155,7 @@ export default function PublishFlow({
               )}
               {preview && (
                 <Action
-                  label="선택 내용 수정"
+                  label={t('선택 내용 수정')}
                   disabled={locked}
                   onPress={() => {
                     // 미리보기에서 선택을 바꿔도 원본이나 이전 공개 사본은 수정하지 않는다.

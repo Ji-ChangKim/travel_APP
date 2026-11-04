@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import ScreenHeader from '@/components/ScreenHeader';
 import { returnToScreen } from '@/components/navigationModel';
 import { ScrollView } from 'react-native';
@@ -9,17 +11,19 @@ import { styles } from '@/features/workspace/workspaceStyles';
 
 // 존재하지 않는 주소에서도 서비스의 시작점으로 돌아가도록 안내한다.
 export default function NotFoundScreen() {
+  useLocale();
   // 잘못된 주소를 노출하지 않고 고정된 홈 복귀 행동을 제공한다.
   return <NotFoundContent router={useRouter()} />;
 }
 
 // 작은 화면에서도 오류 설명과 홈 버튼을 스크롤할 수 있게 배치한다.
 function NotFoundContent({ router }: { router: ReturnType<typeof useRouter> }) {
+  useLocale();
   // 하루의 길 찾기 안내와 안전한 복귀 버튼을 보여준다.
   return (
     <SafeAreaView style={styles.screen}>
       <ScreenHeader
-        title="페이지를 찾을 수 없어요"
+        title={t('페이지를 찾을 수 없어요')}
         inlineTitle
         onBack={() => {
           // 잘못된 주소는 이전 화면이나 홈으로 안전하게 돌아간다.
@@ -34,11 +38,13 @@ function NotFoundContent({ router }: { router: ReturnType<typeof useRouter> }) {
       >
         <HaruState
           kind="error"
-          title="길을 조금 벗어났어요"
-          description="찾는 페이지가 없거나 주소가 바뀌었어요. 홈에서 여행을 이어가 주세요."
+          title={t('길을 조금 벗어났어요')}
+          description={t(
+            '찾는 페이지가 없거나 주소가 바뀌었어요. 홈에서 여행을 이어가 주세요.',
+          )}
         >
           <Action
-            label="홈으로 돌아가기"
+            label={t('홈으로 돌아가기')}
             variant="primary"
             onPress={() => {
               // 입력을 만들지 않고 여행 홈으로 복귀한다.

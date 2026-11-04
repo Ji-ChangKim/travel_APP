@@ -1,12 +1,9 @@
-// 로그인 없이 읽을 수 있는 홈과 공개 여행 목록만 허용한다.
+// 기본 여행 입력과 스토어 계정 안내·외부 공유 상세만 비인증 상태에서 허용한다.
 export function isPublicBrowsePath(path: string): boolean {
-  // 비공개 여행·다이어리·프로필 경로는 공개 탐색에 포함하지 않는다.
+  // 기본 입력의 공개 여부와 서버 초안·여행 생성의 정식 회원 검사는 별개다.
   return (
-    path === '/' ||
+    path === '/new-trip' ||
     path === '/account' ||
-    path === '/community' ||
-    path === '/footprints' ||
-    /^\/community\/[0-9a-f-]{36}$/i.test(path) ||
-    /^\/destinations\/[^/]+$/.test(path)
+    /^\/community\/[0-9a-f-]{36}$/i.test(path)
   );
 }

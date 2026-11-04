@@ -1,3 +1,5 @@
+import { useLocale } from '@/features/localization/localeState';
+import { t } from '@/features/localization/translate';
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
 import {
@@ -33,6 +35,7 @@ export function FormFeedback(props: {
   scroll: RefObject<ScrollView | null>;
   children: ReactNode;
 }) {
+  useLocale();
   // 다른 폼이나 화면의 입력 참조를 공유하지 않는다.
   return (
     <FeedbackScope
@@ -55,6 +58,7 @@ function FeedbackScope({
   targets: RefObject<Record<string, Target>>;
   seen: RefObject<number>;
 }) {
+  useLocale();
   // 필드를 고칠 때마다 초점을 빼앗지 않고 제출 시에만 이동한다.
   return (
     useEffect(() => {
@@ -176,6 +180,7 @@ export function FormAnchor({
   focus?: () => void;
   children: ReactNode;
 }) {
+  useLocale();
   // 날짜·국가처럼 텍스트 입력이 아닌 선택 영역도 대상으로 등록한다.
   return (
     <AnchorContent name={name} focus={focus} scope={useFormScope()}>
@@ -196,6 +201,7 @@ function AnchorContent({
   children: ReactNode;
   scope: Scope;
 }) {
+  useLocale();
   // 오류는 읽을 수 있는 문구로 남기고 기존 화면의 전체 오류 안내를 유지한다.
   return (
     <View
@@ -215,7 +221,7 @@ function AnchorContent({
           accessibilityLiveRegion="polite"
           style={{ color: colors.danger, lineHeight: 22 }}
         >
-          {scope.feedback.fields[name]}
+          {t(scope.feedback.fields[name])}
         </Text>
       ) : null}
     </View>

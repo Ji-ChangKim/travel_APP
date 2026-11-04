@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
 import { useState } from 'react';
@@ -18,6 +20,7 @@ type Props = {
 
 // 항공편의 두 상세 영역을 서로 독립적으로 펼친다.
 export default function FlightCard(props: Props) {
+  useLocale();
   // 조회 가능 정보만 표시하며 기존 일정의 저장·권한 흐름을 변경하지 않는다.
   return (
     <FlightCardContent
@@ -41,11 +44,12 @@ function Airport({
   terminal?: string;
   arrival?: boolean;
 }) {
+  useLocale();
   // 없는 도착 시각과 터미널은 기본값으로 채우지 않는다.
   return (
     <View style={[s.airport, arrival && s.arrival]}>
-      <Text style={s.note}>{arrival ? '도착 예정' : '출발 예정'}</Text>
-      <Text style={time ? s.time : s.missing}>{time || '항공권 확인'}</Text>
+      <Text style={s.note}>{arrival ? t('도착 예정') : t('출발 예정')}</Text>
+      <Text style={time ? s.time : s.missing}>{time || t('항공권 확인')}</Text>
       <Text style={s.code}>{code}</Text>
       <Text style={[s.airportName, arrival && s.right]}>
         {flightAirportName(code)}
@@ -65,6 +69,7 @@ function Expand({
   expanded: boolean;
   onPress: () => void;
 }) {
+  useLocale();
   // 펼침 여부는 아이콘과 접근성 상태로 함께 알린다.
   return (
     <Pressable
@@ -108,6 +113,7 @@ function FlightCardContent({
   baggage: [boolean, (value: boolean) => void];
   failure: [string, (value: string) => void];
 }) {
+  useLocale();
   // 카드 가운데는 화살표만 두고 시간 값은 하단 한 줄로 표시한다.
   return (
     <View style={s.content}>
@@ -137,25 +143,29 @@ function FlightCardContent({
       <View style={s.footer}>
         {flight.arrivalDate && flight.arrivalDate !== date && (
           <Text style={s.note}>
-            도착 {flight.arrivalDate.replaceAll('-', '.')}
+            {t('도착')} {flight.arrivalDate.replaceAll('-', '.')}
           </Text>
         )}
         {flight.durationMinutes !== undefined && (
           <Text
             style={s.duration}
             numberOfLines={1}
-            accessibilityLabel={`비행시간 ${flightDuration(flight.durationMinutes)}`}
+            accessibilityLabel={t('비행시간 {p0}', {
+              p0: flightDuration(flight.durationMinutes),
+            })}
           >
             {flightDuration(flight.durationMinutes)}
           </Text>
         )}
-        <Text style={s.note}>출발·도착 모두 현지 시각</Text>
+        <Text style={s.note}>{t('출발·도착 모두 현지 시각')}</Text>
         {!flight.arrivalTime ? (
-          <Text style={s.note}>도착 시각은 항공권에서 확인해 주세요.</Text>
+          <Text style={s.note}>
+            {t('도착 시각은 항공권에서 확인해 주세요.')}
+          </Text>
         ) : null}
       </View>
       <Expand
-        label="항공편 정보 보기"
+        label={t('항공편 정보 보기')}
         expanded={search[0]}
         onPress={() => {
           // 외부 검색 선택지만 펼치며 요청은 사용자 선택 후에만 보낸다.
@@ -165,14 +175,16 @@ function FlightCardContent({
       {search[0] && (
         <View style={s.details}>
           {flight.aircraftType ? (
-            <Text style={s.note}>기종 {flight.aircraftType}</Text>
+            <Text style={s.note}>
+              {t('기종')} {flight.aircraftType}
+            </Text>
           ) : null}
           {flight.aircraftRegistration ? (
             <Text style={s.note}>
-              항공기 등록번호 {flight.aircraftRegistration}
+              {t('항공기 등록번호')} {flight.aircraftRegistration}
             </Text>
           ) : null}
-          <Text style={s.note}>편명과 날짜로 검색해요.</Text>
+          <Text style={s.note}>{t('편명과 날짜로 검색해요.')}</Text>
           <View style={s.links}>
             {(['naver', 'google'] as const).map((provider) => (
               /* 선택 날짜의 실제 편명만 외부 검색어로 전달한다. */
@@ -180,7 +192,7 @@ function FlightCardContent({
                 key={provider}
                 accessibilityRole="button"
                 accessibilityLabel={
-                  provider === 'naver' ? '네이버 검색' : '구글 검색'
+                  provider === 'naver' ? t('네이버 검색') : t('구글 검색')
                 }
                 style={s.link}
                 onPress={() => {
@@ -192,7 +204,7 @@ function FlightCardContent({
                 }}
               >
                 <Text style={s.linkText}>
-                  {provider === 'naver' ? '네이버 검색' : '구글 검색'}
+                  {provider === 'naver' ? t('네이버 검색') : t('구글 검색')}
                 </Text>
                 <Ionicons name="open-outline" size={13} color={colors.text} />
               </Pressable>
@@ -206,7 +218,7 @@ function FlightCardContent({
         </View>
       )}
       <Expand
-        label="수하물 · 좌석 정보"
+        label={t('수하물 · 좌석 정보')}
         expanded={baggage[0]}
         onPress={() => {
           // 검색 펼침 상태와 독립적으로 수하물 정보를 여닫는다.
@@ -217,20 +229,21 @@ function FlightCardContent({
         <View style={s.details}>
           {flight.baggageKg !== undefined && (
             <View style={s.detailRow}>
-              <Text style={s.note}>무료 위탁수하물</Text>
+              <Text style={s.note}>{t('무료 위탁수하물')}</Text>
               <Text style={s.detailValue}>{flight.baggageKg}kg</Text>
             </View>
           )}
           {flight.cabin ? (
             <View style={s.detailRow}>
-              <Text style={s.note}>좌석 등급</Text>
+              <Text style={s.note}>{t('좌석 등급')}</Text>
               <Text style={s.detailValue}>{flight.cabin}</Text>
             </View>
           ) : null}
           {flight.baggageKg === undefined && !flight.cabin && (
             <Text style={s.note}>
-              아직 입력한 정보가 없어요. 일정 수정에서 항공권 내용을 추가할 수
-              있어요.
+              {t(
+                '아직 입력한 정보가 없어요. 일정 수정에서 항공권 내용을 추가할 수 있어요.',
+              )}
             </Text>
           )}
         </View>

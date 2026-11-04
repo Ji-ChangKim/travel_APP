@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { returnToScreen } from '@/components/navigationModel';
 import { workspaceQueryOptions } from './tripQueries';
 import Text from '@/components/AppText';
@@ -24,6 +26,7 @@ import { requestScheduleExit } from './scheduleExitGuard';
 
 // 실제 여행/일정 원본을 읽은 뒤 기록 편집기를 연다.
 export default function RecordEditorScreen() {
+  useLocale();
   // 계정 전환 시 이전 사진/메모 초안을 재사용하지 않는다.
   const userId = useTripStore((state) => {
     // 인증 계정과 기기 게스트를 기존 소유 ID로 구분한다.
@@ -53,6 +56,7 @@ function RecordPage({
   id: string;
   scheduleId: string;
 }) {
+  useLocale();
   // 최초 인증 복원이 끝나야 실제 원본을 조회한다.
   const ready = useAuthReady((state) => {
     // 복원 중 로그인 안내 깜박임을 막는다.
@@ -81,7 +85,7 @@ function RecordPage({
   });
   return (
     <LedgerScreen
-      title="여행기록 추가"
+      title={t('여행기록 추가')}
       onBack={() => {
         // 변경이 있으면 기존 공통 이탈 확인을 거친다.
         return requestScheduleExit(() =>
@@ -90,16 +94,16 @@ function RecordPage({
       }}
     >
       {!ready || (valid && userId && query.isPending) ? (
-        <HaruState kind="loading" title="여행 기록을 불러오고 있어요" />
+        <HaruState kind="loading" title={t('여행 기록을 불러오고 있어요')} />
       ) : null}
       {ready && !valid && (
         <Text style={s.body}>
-          여행을 찾을 수 없어요. 내 여행에서 다시 열어 주세요.
+          {t('여행을 찾을 수 없어요. 내 여행에서 다시 열어 주세요.')}
         </Text>
       )}
       {ready && !userId && (
         <LedgerAction
-          label="로그인하고 기록 편집"
+          label={t('로그인하고 기록 편집')}
           onPress={() => {
             // 같은 여행의 원본으로 인증 복귀한다.
             return router.push({
@@ -125,7 +129,7 @@ function RecordPage({
       )}
       {snapshot &&
         (snapshot.myRole === 'viewer' || snapshot.trip.status === 'ARCHIVED' ? (
-          <Text style={s.body}>이 여행은 읽기만 할 수 있어요.</Text>
+          <Text style={s.body}>{t('이 여행은 읽기만 할 수 있어요.')}</Text>
         ) : item ? (
           <RecordFields
             key={item.id}
@@ -140,7 +144,7 @@ function RecordPage({
           />
         ) : (
           <ScrollView contentContainerStyle={s.content}>
-            <Text style={s.section}>기록할 장소 선택</Text>
+            <Text style={s.section}>{t('기록할 장소 선택')}</Text>
             {snapshot.itinerary.map((entry) => {
               // 실제 저장한 일정만 선택지로 제공한다.
               return (
@@ -156,7 +160,7 @@ function RecordPage({
             })}
             {!snapshot.itinerary.length && (
               <LedgerAction
-                label="일정 추가하러 가기"
+                label={t('일정 추가하러 가기')}
                 onPress={() => {
                   // 장소가 없으면 실제 여행 일정에서 먼저 추가한다.
                   return router.replace(`/trips/${id}`);

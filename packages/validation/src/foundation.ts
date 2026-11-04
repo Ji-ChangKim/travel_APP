@@ -76,6 +76,7 @@ export const tripDestinationsSchema = z
 
 export const persistedTripCreateSchema = z
   .object({
+    draftRevision: z.number().int().positive().optional(),
     destinations: tripDestinationsSchema.optional(),
     title: z.string().trim().max(50).optional(),
     country: z.string().trim().min(1).max(50),

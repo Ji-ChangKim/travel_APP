@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { useRef, useState, useEffect, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSegments } from 'expo-router';
@@ -18,6 +20,7 @@ export default function StartupPolicyGate({
 }: {
   children: ReactNode;
 }) {
+  useLocale();
   // 다른 플랫폼에는 Android Play 정책을 적용하지 않는다.
   return Platform.OS === 'android' ? (
     <AndroidPolicyGate>{children}</AndroidPolicyGate>
@@ -28,6 +31,7 @@ export default function StartupPolicyGate({
 
 // 라우터를 유지한 채 필수 정책의 사용자 조작만 앞에 표시한다.
 function AndroidPolicyGate({ children }: { children: ReactNode }) {
+  useLocale();
   // 루트 시작 화면과 같은 쿼리 키로 실제 점검을 공유한다.
   const root = useSegments().join('/') === '';
   const biDone = useLaunchSession((state) => {
@@ -111,73 +115,73 @@ function AndroidPolicyGate({ children }: { children: ReactNode }) {
             });
           }));
   }
+  const playRefetch = play.refetch;
+  const policyRefetch = policy.refetch;
+  useEffect(() => {
+    // 직접 링크 위에 열린 외부 스토어에서 돌아오는 경우만 확인한다.
+    const subscription = AppState.addEventListener('change', (state) => {
+      // 자동 업데이트 반복 없이 버전만 다시 읽는다.
+      return void (state === 'active' && opened.current && !locked.current
+        ? ((opened.current = false), playRefetch().then(() => policyRefetch()))
+        : undefined);
+    });
+    return () => {
+      // 전역 화면이 종료되면 구독도 정리한다.
+      return subscription.remove();
+    };
+  }, [playRefetch, policyRefetch]);
   return (
-    useEffect(() => {
-      // 직접 링크 위에 열린 외부 스토어에서 돌아오는 경우만 확인한다.
-      const subscription = AppState.addEventListener('change', (state) => {
-        // 자동 업데이트 반복 없이 버전만 다시 읽는다.
-        return void (state === 'active' && opened.current && !locked.current
-          ? ((opened.current = false), refresh())
-          : undefined);
-      });
-      return () => {
-        // 전역 화면이 종료되면 구독도 정리한다.
-        return subscription.remove();
-      };
-    }),
-    (
-      <View style={{ flex: 1 }}>
-        <View
-          style={{ flex: 1 }}
-          pointerEvents={blocked ? 'none' : 'auto'}
-          importantForAccessibility={blocked ? 'no-hide-descendants' : 'auto'}
-        >
-          {children}
-        </View>
-        {blocked && (
-          <View
-            accessibilityViewIsModal
-            style={{
-              position: 'absolute',
-              inset: 0,
-              zIndex: 10000,
-              elevation: 100,
-              backgroundColor: colors.background,
-              justifyContent: 'center',
-              padding: 24,
-            }}
-          >
-            <Text accessibilityRole="alert" style={styles.caption}>
-              {pending || busy
-                ? '업데이트를 확인하고 있어요'
-                : decision.kind === 'blocked'
-                  ? '업데이트를 확인하지 못했어요. 잠시 후 다시 확인해 주세요.'
-                  : '새 버전으로 업데이트해 주세요.'}
-            </Text>
-            {!pending &&
-              !busy &&
-              (decision.kind === 'blocked' ? (
-                <LoginButton
-                  label="다시 확인"
-                  onPress={() => {
-                    /* Play·정책만 다시 확인한다. */ return void refresh();
-                  }}
-                />
-              ) : (
-                <LoginButton
-                  label="Google Play에서 업데이트"
-                  onPress={update}
-                />
-              ))}
-            <LoginButton label="앱 닫기" onPress={BackHandler.exitApp} />
-            {error && (
-              <Text accessibilityRole="alert" style={styles.error}>
-                {error}
-              </Text>
-            )}
-          </View>
-        )}
+    <View style={{ flex: 1 }}>
+      <View
+        style={{ flex: 1 }}
+        pointerEvents={blocked ? 'none' : 'auto'}
+        importantForAccessibility={blocked ? 'no-hide-descendants' : 'auto'}
+      >
+        {children}
       </View>
-    )
+      {blocked && (
+        <View
+          accessibilityViewIsModal
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 10000,
+            elevation: 100,
+            backgroundColor: colors.background,
+            justifyContent: 'center',
+            padding: 24,
+          }}
+        >
+          <Text accessibilityRole="alert" style={styles.caption}>
+            {pending || busy
+              ? t('업데이트를 확인하고 있어요')
+              : decision.kind === 'blocked'
+                ? t('업데이트를 확인하지 못했어요. 잠시 후 다시 확인해 주세요.')
+                : t('새 버전으로 업데이트해 주세요.')}
+          </Text>
+          {!pending &&
+            !busy &&
+            (decision.kind === 'blocked' ? (
+              <LoginButton
+                label={t('다시 확인')}
+                onPress={() => {
+                  /* Play·정책만 다시 확인한다. */ return void refresh();
+                }}
+              />
+            ) : (
+              <LoginButton
+                label={t('Google Play에서 업데이트')}
+                onPress={update}
+              />
+            ))}
+          <LoginButton label={t('앱 닫기')} onPress={BackHandler.exitApp} />
+          {error && (
+            <Text accessibilityRole="alert" style={styles.error}>
+              {t(error)}
+            </Text>
+          )}
+        </View>
+      )}
+    </View>
   );
 }

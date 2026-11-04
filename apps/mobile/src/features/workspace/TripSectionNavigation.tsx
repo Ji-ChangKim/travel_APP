@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useState } from 'react';
 import DesignButton from '@/components/DesignButton';
@@ -14,17 +16,18 @@ export function TripSectionNavigation({
   selected: string;
   onSelect: (section: string) => void;
 }) {
+  useLocale();
   // 보조 영역을 열었을 때 핵심 탭을 선택한 것처럼 표시하지 않는다.
   return (
     <View
-      accessibilityLabel="여행 작업 영역"
+      accessibilityLabel={t('여행 작업 영역')}
       testID="trip-section-navigation"
       style={s.nav}
     >
       {workspaceSections.slice(0, 3).map(([key, label]) => (
         <SectionButton
           key={key}
-          label={label}
+          label={t(label)}
           selected={selected === key}
           onPress={() => {
             /* 실제 영역 하나만 연다. */ return onSelect(key);
@@ -47,6 +50,7 @@ function SectionButton({
   selected: boolean;
   onPress: () => void;
 }) {
+  useLocale();
   // 일반 버튼과 같은 눌림·초점 토큰을 사용한다.
   const [focused, setFocused] = useState(false);
   return (
@@ -71,7 +75,7 @@ function SectionButton({
         ];
       }}
     >
-      <Text style={s.label}>{label}</Text>
+      <Text style={s.label}>{t(label)}</Text>
     </Pressable>
   );
 }
@@ -98,9 +102,10 @@ export function TripMoreMenu({
   onEditDestinations: () => void;
   disabled: boolean;
 }) {
+  useLocale();
   // 기존 소유자 권한에 맞는 항목만 표시한다.
   return (
-    <ActionSheet title="여행 더보기" visible={visible} onClose={onClose}>
+    <ActionSheet title={t('여행 더보기')} visible={visible} onClose={onClose}>
       {workspaceSections
         .slice(3)
         .filter(([key]) => {
@@ -111,7 +116,7 @@ export function TripMoreMenu({
         .map(([key, label]) => (
           <DesignButton
             key={key}
-            label={label}
+            label={t(label)}
             selected={key === selected}
             onPress={() => {
               /* 선택한 보조 화면으로 이동한다. */ return onSelect(key);
@@ -121,27 +126,27 @@ export function TripMoreMenu({
       {owner && (
         <>
           <Text accessibilityRole="header" style={s.label}>
-            여행 관리
+            {t('여행 관리')}
           </Text>
           <DesignButton
-            label="여행 정보 / 기록 정리"
+            label={t('여행 정보 / 기록 정리')}
             disabled={disabled}
             onPress={onEditInfo}
           />
           <DesignButton
-            label="여행 기간 변경"
+            label={t('여행 기간 변경')}
             disabled={disabled}
             onPress={onEditPeriod}
           />
           <DesignButton
-            label="여행 도시 관리"
+            label={t('여행 도시 관리')}
             disabled={disabled}
             onPress={onEditDestinations}
           />
         </>
       )}
       <DesignButton
-        label="닫기"
+        label={t('닫기')}
         size="chip"
         variant="quiet"
         onPress={onClose}

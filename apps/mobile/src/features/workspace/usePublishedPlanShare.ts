@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { UserFacingError } from '../../services/userFacingError';
-import { sharePublicPlan } from './publicPlanShare';
+import { copyPublicPlan, sharePublicPlan } from './publicPlanShare';
 
 // 공개 링크 전달의 잠금·화면 수명·결과 안내를 관리한다.
 export function usePublishedPlanShare(
@@ -45,5 +45,27 @@ export function usePublishedPlanShare(
       if (active.current) setBusy(false);
     }
   }
-  return { busy, message, send };
+  async function copy(): Promise<void> {
+    // 공유 창이 거절된 환경에서도 별도 버튼으로 링크만 복사할 수 있다.
+    if (running.current || disabled) return;
+    running.current = true;
+    setBusy(true);
+    setMessage('');
+    try {
+      await copyPublicPlan(postId);
+      if (active.current)
+        setMessage('공유 링크를 복사했어요. 원하는 곳에 붙여넣어 보내세요.');
+    } catch (error) {
+      if (active.current)
+        setMessage(
+          error instanceof UserFacingError
+            ? error.message
+            : '링크를 복사하지 못했어요. 공개 화면의 주소를 직접 복사해 주세요.',
+        );
+    } finally {
+      running.current = false;
+      if (active.current) setBusy(false);
+    }
+  }
+  return { busy, message, send, copy };
 }

@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import LoadingIndicator from '@/components/LoadingIndicator';
 import {
@@ -18,6 +20,7 @@ function StartupStatus({
 }: {
   controller: ReturnType<typeof useStartupController>;
 }) {
+  useLocale();
   // 끝난 연출은 유지하고 준비 중에는 중복 재시도를 막는다.
   return controller.introDone &&
     controller.error &&
@@ -25,27 +28,27 @@ function StartupStatus({
     controller.decision.kind !== 'blocked' ? (
     <View style={styles.actions}>
       <Text accessibilityRole="alert" style={styles.error}>
-        {controller.error}
+        {t(controller.error)}
       </Text>
       <LoginButton
-        label="다시 시도"
+        label={t('다시 시도')}
         variant="primary"
         disabled={controller.pending}
         onPress={controller.retry}
       />
       {controller.canLogin && (
-        <LoginButton label="로그인으로 이동" onPress={controller.login} />
+        <LoginButton label={t('로그인으로 이동')} onPress={controller.login} />
       )}
       {controller.error.includes('업데이트') && Platform.OS === 'android' && (
         <LoginButton
-          label="Google Play에서 업데이트"
+          label={t('Google Play에서 업데이트')}
           disabled={controller.pending}
           onPress={controller.update}
         />
       )}
       {controller.storeError && (
         <Text accessibilityRole="alert" style={styles.error}>
-          {controller.storeError}
+          {t(controller.storeError)}
         </Text>
       )}
     </View>
@@ -58,21 +61,21 @@ function StartupStatus({
         style={styles.caption}
       >
         {controller.decision.kind === 'blocked'
-          ? '업데이트를 확인하지 못했어요. 잠시 후 다시 확인해 주세요.'
+          ? t('업데이트를 확인하지 못했어요. 잠시 후 다시 확인해 주세요.')
           : controller.decision.kind === 'required'
-            ? '새 버전으로 업데이트해 주세요.'
-            : '새로운 TripPrint가 준비됐어요.'}
+            ? t('새 버전으로 업데이트해 주세요.')
+            : t('새로운 TripPrint가 준비됐어요.')}
       </Text>
       {controller.decision.kind === 'blocked' ? (
         <LoginButton
-          label="다시 확인"
+          label={t('다시 확인')}
           variant="primary"
           disabled={controller.pending}
           onPress={controller.retryUpdate}
         />
       ) : (
         <LoginButton
-          label="Google Play에서 업데이트"
+          label={t('Google Play에서 업데이트')}
           variant="primary"
           disabled={controller.pending}
           onPress={controller.update}
@@ -80,18 +83,18 @@ function StartupStatus({
       )}
       {controller.decision.kind === 'optional' ? (
         <LoginButton
-          label="현재 버전으로 시작"
+          label={t('현재 버전으로 시작')}
           disabled={controller.pending}
           onPress={controller.acceptUpdate}
         />
       ) : (
         Platform.OS === 'android' && (
-          <LoginButton label="앱 닫기" onPress={BackHandler.exitApp} />
+          <LoginButton label={t('앱 닫기')} onPress={BackHandler.exitApp} />
         )
       )}
       {controller.storeError && (
         <Text accessibilityRole="alert" style={styles.error}>
-          {controller.storeError}
+          {t(controller.storeError)}
         </Text>
       )}
     </View>
@@ -99,7 +102,9 @@ function StartupStatus({
     <>
       <LoadingIndicator />
       <Text accessibilityLiveRegion="polite" style={styles.caption}>
-        {controller.slow ? '연결을 확인하고 있어요' : '여행을 준비하고 있어요'}
+        {controller.slow
+          ? t('연결을 확인하고 있어요')
+          : t('여행을 준비하고 있어요')}
       </Text>
     </>
   );
@@ -107,6 +112,7 @@ function StartupStatus({
 
 // 첫 발자국 연출과 실제 점검 결과를 연결한다.
 function CheckedStartup({ settings }: { settings: AppAccessibility }) {
+  useLocale();
   // 01의 첫 화면부터 점검과 두 구간의 표시를 병렬로 시작한다.
   const controller = useStartupController(settings.foreground);
   return (
@@ -122,6 +128,7 @@ function CheckedStartup({ settings }: { settings: AppAccessibility }) {
 
 // BI와 로딩 사이에도 같은 접근성 구독을 유지한다.
 export default function StartScreen() {
+  useLocale();
   // 인증 복귀와 앱 복귀에서는 완료한 00을 다시 표시하지 않는다.
   const settings = useAppAccessibility();
   const biDone = useLaunchSession((state) => {

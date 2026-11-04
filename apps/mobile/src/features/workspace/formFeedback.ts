@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { t } from '@/features/localization/translate';
 import { scheduleLocationSchema } from '@wherego/validation';
 import type { WorkspaceSnapshot } from '@wherego/domain';
 import { tripPeriodImpact, periodBlockedMessage } from './tripPeriod';
@@ -141,15 +142,32 @@ function addFieldError(
         ...fields,
         [label]:
           issue.code === 'too_big' && issue.maximum !== undefined
-            ? `${label} 입력은 ${issue.maximum}${issue.type === 'string' ? '자' : ''} 이하로 입력해 주세요.`
+            ? t(
+                issue.type === 'string'
+                  ? '{label} 입력은 {maximum}자 이하로 입력해 주세요.'
+                  : '{label} 입력은 {maximum} 이하로 입력해 주세요.',
+                { label: translatedFieldLabel(label), maximum: issue.maximum },
+              )
             : issue.code === 'too_small' && issue.minimum === 1
-              ? `${label} 항목을 입력해 주세요.`
+              ? t('{label} 항목을 입력해 주세요.', {
+                  label: translatedFieldLabel(label),
+                })
               : /시간|시각/.test(label) && issue.code === 'invalid_string'
                 ? '시간은 00:00~23:59의 HH:mm 형식으로 입력해 주세요.'
                 : /[가-힣]/.test(issue.message)
                   ? issue.message
-                  : `${label} 항목을 확인해 주세요.`,
+                  : t('{label} 항목을 확인해 주세요.', {
+                      label: translatedFieldLabel(label),
+                    }),
       };
+}
+
+// 오류 연결에 쓰는 원문 필드 이름은 유지하고 안내 문장 안의 이름만 번역한다.
+function translatedFieldLabel(label: string): string {
+  const item = /^(\d+)번 메뉴 (이름|수량|단가|금액)$/.exec(label);
+  return item
+    ? t('{count}번 메뉴 {field}', { count: item[1]!, field: t(item[2]!) })
+    : t(label);
 }
 
 // 변환 전에 국가 정책과 좌표 JSON의 유효성을 검사한다.

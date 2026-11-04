@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import type { CommunityPost } from '@wherego/domain';
@@ -24,6 +26,7 @@ export default function CommunityPlanView({
   showTitle?: boolean;
   photoPreview?: { tripId: string; userId: string };
 }) {
+  useLocale();
   // 선택한 DAY의 소개와 장소만 바꾸며 원문/날짜는 저장값을 유지한다.
   const days = post.snapshot.days || [];
   const [selected, setSelected] = useState(days[0]?.dayNumber || 1);
@@ -48,28 +51,33 @@ export default function CommunityPlanView({
     });
   return (
     <View style={{ gap: 20 }}>
-      <Text style={s.eyebrow}>공개된 여행계획</Text>
+      <Text style={s.eyebrow}>{t('공개된 여행계획')}</Text>
       {showTitle && (
         <Text accessibilityRole="header" style={s.title}>
           {post.title}
         </Text>
       )}
       <Text style={s.meta}>
-        {post.snapshot.country} · {post.snapshot.city} · {duration}일 여행
-        {days.length !== duration ? ` 중 ${days.length}일 공개` : ''}
+        {post.snapshot.country} · {post.snapshot.city} · {duration}
+        {t('일 여행')}
+        {days.length !== duration
+          ? t(' 중 {p0}일 공개', { p0: days.length })
+          : ''}
       </Text>
       {post.author && (
         <View style={s.row}>
           <Text style={s.body}>{post.author}</Text>
           {post.publishedAt && (
-            <Text style={s.meta}>{post.publishedAt.slice(0, 10)} 공유</Text>
+            <Text style={s.meta}>
+              {post.publishedAt.slice(0, 10)} {t('공유')}
+            </Text>
           )}
         </View>
       )}
       {post.body && <Text style={s.body}>{post.body}</Text>}
       {Object.keys(post.snapshot.costs).length > 0 && (
         <View style={s.tinted}>
-          <Text style={s.meta}>선택 공개한 여행 전체 실제 지출</Text>
+          <Text style={s.meta}>{t('선택 공개한 여행 전체 실제 지출')}</Text>
           {Object.entries(post.snapshot.costs).map(([currency, amount]) => {
             // 통화를 임의 환산하거나 시안의 금액으로 채우지 않는다.
             return (
@@ -78,7 +86,9 @@ export default function CommunityPlanView({
               </Text>
             );
           })}
-          <Text style={s.meta}>영수증 원본과 상세 품목은 공개하지 않아요.</Text>
+          <Text style={s.meta}>
+            {t('영수증 원본과 상세 품목은 공개하지 않아요.')}
+          </Text>
         </View>
       )}
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -89,7 +99,9 @@ export default function CommunityPlanView({
               <LedgerAction
                 key={entry.dayNumber}
                 label={`DAY ${entry.dayNumber}`}
-                accessibilityLabel={`DAY ${entry.dayNumber} 여행계획`}
+                accessibilityLabel={t('DAY {p0} 여행계획', {
+                  p0: entry.dayNumber,
+                })}
                 selected={entry.dayNumber === selected}
                 onPress={() => {
                   // 현재 읽는 날짜만 바꾼다.
@@ -103,7 +115,7 @@ export default function CommunityPlanView({
       <View style={s.card}>
         <Text style={s.eyebrow}>DAY {selected} THEME</Text>
         <Text accessibilityRole="header" style={s.section}>
-          {day?.planTitle || `DAY ${selected} 여행계획`}
+          {day?.planTitle || t('DAY {p0} 여행계획', { p0: selected })}
         </Text>
         {day?.planConcept && <Text style={s.body}>{day.planConcept}</Text>}
       </View>
@@ -122,7 +134,8 @@ export default function CommunityPlanView({
       {Boolean(post.photoPaths?.length) && (
         <View style={s.card}>
           <Text style={s.section}>
-            여행 갤러리 · {post.photoPaths!.length}장
+            {t('여행 갤러리 ·')} {post.photoPaths!.length}
+            {t('장')}
           </Text>
           {post.photoPaths!.map((path) => {
             // 장소 연결 정보가 없는 공개 사진을 임의 장소에 배정하지 않는다.
@@ -132,9 +145,9 @@ export default function CommunityPlanView({
       )}
       <View style={s.tinted}>
         <Text style={s.meta}>
-          개인 메모·예약번호·동행 정보·영수증 원본과 품목은 공개하지 않아요.
-          장소 설명은 작성자의 원문이며 가격과 영업시간은 방문 전에 확인해
-          주세요.
+          {t(
+            '개인 메모·예약번호·동행 정보·영수증 원본과 품목은 공개하지 않아요. 장소 설명은 작성자의 원문이며 가격과 영업시간은 방문 전에 확인해 주세요.',
+          )}
         </Text>
       </View>
     </View>
@@ -153,6 +166,7 @@ function PlanPlace({
   postId?: string;
   photoPreview?: { tripId: string; userId: string };
 }) {
+  useLocale();
   // 큰 글자에서는 좁은 타임라인 열을 제거한다.
   const large = useAppAccessibility().largeText;
   return (
@@ -183,7 +197,7 @@ function PlanPlace({
       )}
       <View style={[s.card, { flex: 1, minWidth: 0 }]}>
         <Text style={s.meta}>
-          {index + 1} · {place.timeSlot || '시간 미정'}
+          {index + 1} · {place.timeSlot || t('시간 미정')}
         </Text>
         <Text accessibilityRole="header" style={s.section}>
           {place.title}

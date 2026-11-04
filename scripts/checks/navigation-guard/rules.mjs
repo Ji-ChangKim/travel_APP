@@ -40,6 +40,7 @@ export const structuralRoutes = new Set([
 ]);
 export const headerKinds = new Set([
   'launch',
+  'entry',
   'brand',
   'root',
   'task',

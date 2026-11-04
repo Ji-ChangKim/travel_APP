@@ -74,8 +74,15 @@ export function inspectRoutePolicies(routes, policies, hasHeader) {
         line: 1,
         rule: '시작 BI 외 페이지에서 헤더를 생략할 수 없음',
       });
+    if (policy.header === 'entry' && policy.file !== 'welcome.tsx')
+      findings.push({
+        file,
+        line: 1,
+        rule: '간단 시작 화면 외 페이지는 entry 헤더 예외를 사용할 수 없음',
+      });
     if (
       policy.header !== 'launch' &&
+      !(policy.header === 'entry' && policy.file === 'welcome.tsx') &&
       !hasHeader(
         file,
         policy.header === 'brand' ? 'HomeHeader' : 'ScreenHeader',

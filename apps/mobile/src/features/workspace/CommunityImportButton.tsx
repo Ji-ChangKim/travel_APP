@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { useRef, type ReactNode } from 'react';
 import { ScrollView, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,6 +27,7 @@ export default function CommunityImportButton({
   compact?: boolean;
   renderTrigger?: (open: () => void, saved: boolean) => ReactNode;
 }) {
+  useLocale();
   // 계정이 바뀌면 이전 계정의 저장 키와 완료 표시를 재사용하지 않는다.
   const userId = useTripStore((state) => {
     // 화면의 실제 인증·기기 계정만 읽는다.
@@ -53,6 +56,7 @@ function ImportContent({
   compact?: boolean;
   renderTrigger?: (open: () => void, saved: boolean) => ReactNode;
 }) {
+  useLocale();
   // 날짜 입력에도 저장 중 잠금과 접근성 규격을 공통 적용한다.
   const model = useCommunityImport(postId, userId);
   const scroll = useRef<ScrollView>(null);
@@ -62,7 +66,7 @@ function ImportContent({
         renderTrigger(model.open, Boolean(model.savedTrip))
       ) : compact ? (
         <PublicFeedButton
-          label={model.savedTrip ? '담은 일정 열기' : '일정 담기'}
+          label={model.savedTrip ? t('담은 일정 열기') : t('일정 담기')}
           onPress={model.open}
           style={feedStyles.actionButton}
         >
@@ -77,18 +81,18 @@ function ImportContent({
               !model.savedTrip && { color: feedColors.muted },
             ]}
           >
-            {model.savedTrip ? '담김' : '저장'}
+            {model.savedTrip ? t('담김') : t('저장')}
           </Text>
         </PublicFeedButton>
       ) : (
         <Action
-          label={model.savedTrip ? '내 여행에서 열기' : '일정 담기'}
+          label={model.savedTrip ? t('내 여행에서 열기') : t('일정 담기')}
           onPress={model.open}
         />
       )}
       <ActionSheet
         visible={model.opened}
-        title="내 여행에 일정 담기"
+        title={t('내 여행에 일정 담기')}
         dismissDisabled={model.busy}
         onClose={() => {
           // 취소나 닫기는 새 여행을 만들지 않는다.
@@ -105,9 +109,9 @@ function ImportContent({
               <>
                 <Text style={s.section}>{model.post.title}</Text>
                 <Text style={s.body}>
-                  공개된 장소·시간·설명을 내 여행으로 담아요. 원본은 그대로 두고
-                  내가 자유롭게 수정할 수 있어요. 항공권·사진·지출·개인 메모는
-                  담지 않아요.
+                  {t(
+                    '공개된 장소·시간·설명을 내 여행으로 담아요. 원본은 그대로 두고 내가 자유롭게 수정할 수 있어요. 항공권·사진·지출·개인 메모는 담지 않아요.',
+                  )}
                 </Text>
                 <Field
                   label="담을 여행 이름 · 선택"
@@ -122,22 +126,24 @@ function ImportContent({
                 />
                 {model.endDate && (
                   <Text style={s.meta}>
-                    여행 기간 {model.startDate} ~ {model.endDate}
+                    {t('여행 기간')} {model.startDate} ~ {model.endDate}
                   </Text>
                 )}
                 {!model.post.snapshot.itinerary.length && (
-                  <Text style={s.body}>담을 수 있는 공개 일정이 없어요.</Text>
+                  <Text style={s.body}>
+                    {t('담을 수 있는 공개 일정이 없어요.')}
+                  </Text>
                 )}
                 {model.error && (
                   <Text accessibilityRole="alert" style={s.body}>
-                    {model.error}
+                    {t(model.error)}
                   </Text>
                 )}
                 <Action
                   label={
                     model.retryOnly
-                      ? '같은 요청 다시 확인'
-                      : '담고 일정 수정하기'
+                      ? t('같은 요청 다시 확인')
+                      : t('담고 일정 수정하기')
                   }
                   variant="primary"
                   loading={model.busy}
@@ -152,11 +158,12 @@ function ImportContent({
             ) : model.query.isError ? (
               <>
                 <Text accessibilityRole="alert" style={s.body}>
-                  공개 일정을 불러오지 못했어요. 다시 불러오거나 다른 일정을
-                  선택해 주세요.
+                  {t(
+                    '공개 일정을 불러오지 못했어요. 다시 불러오거나 다른 일정을 선택해 주세요.',
+                  )}
                 </Text>
                 <Action
-                  label="다시 불러오기"
+                  label={t('다시 불러오기')}
                   loading={model.query.isFetching}
                   onPress={() => {
                     // 실패한 공개 원본 조회만 재시도한다.
@@ -165,7 +172,7 @@ function ImportContent({
                 />
               </>
             ) : (
-              <Text style={s.body}>담을 일정을 불러오는 중이에요.</Text>
+              <Text style={s.body}>{t('담을 일정을 불러오는 중이에요.')}</Text>
             )}
           </View>
         </FormFeedback>

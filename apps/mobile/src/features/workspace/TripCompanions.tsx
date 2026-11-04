@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
 import { StyleSheet, View } from 'react-native';
@@ -12,6 +14,7 @@ export default function TripCompanions({
   members: WorkspaceSnapshot['members'];
   onOpen: () => void;
 }) {
+  useLocale();
   // 실시간 접속이나 임의의 인원 수를 만들지 않는다.
   return (
     <View style={s.row}>
@@ -24,18 +27,21 @@ export default function TripCompanions({
               style={[s.avatar, index === 0 && s.first]}
             >
               <Text style={s.initial}>
-                {[...member.nickname.trim()][0] || '여'}
+                {[...member.nickname.trim()][0] || t('여')}
               </Text>
             </View>
           );
         })}
       </View>
-      <Text style={s.meta}>함께하는 {members.length}명</Text>
+      <Text style={s.meta}>
+        {t('함께하는')} {members.length}
+        {t('명')}
+      </Text>
       <DesignButton
-        label="동행 보기 →"
+        label={t('동행 보기 →')}
         size="chip"
         variant="quiet"
-        accessibilityLabel="동행 보기"
+        accessibilityLabel={t('동행 보기')}
         onPress={onOpen}
       />
     </View>

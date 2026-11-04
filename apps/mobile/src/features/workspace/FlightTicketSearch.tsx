@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { FoundationClientError, requestFoundation } from '@wherego/api-client';
 import {
@@ -32,6 +34,7 @@ export function TicketSearch({
   locked: boolean;
   onSelect: (item: FlightLookupCandidate | null) => void;
 }) {
+  useLocale();
   // 입력 변경과 페이지 이탈 시 늦은 조회 결과를 버린다.
   const controller = useRef<AbortController | null>(null);
   const [busy, setBusy] = useState(false);
@@ -107,7 +110,7 @@ export function TicketSearch({
   return (
     <View style={{ gap: 12 }}>
       <Action
-        label={busy ? '조회 중…' : '조회하기'}
+        label={busy ? t('조회 중…') : t('조회하기')}
         variant="primary"
         disabled={locked || !enabled}
         loading={busy}
@@ -115,13 +118,14 @@ export function TicketSearch({
       />
       {error ? (
         <Text accessibilityRole="alert" style={styles.error}>
-          {error}
+          {t(error)}
         </Text>
       ) : null}
       {candidates?.length === 0 ? (
         <Text style={styles.subtitle}>
-          해당 날짜의 항공편을 찾지 못했어요. 항공권의 날짜와 편명을 확인한 뒤
-          다시 조회해 주세요.
+          {t(
+            '해당 날짜의 항공편을 찾지 못했어요. 항공권의 날짜와 편명을 확인한 뒤 다시 조회해 주세요.',
+          )}
         </Text>
       ) : null}
       {candidates?.map((item, index) => (
@@ -139,13 +143,17 @@ export function TicketSearch({
             }
           />
           <Text style={styles.subtitle}>
-            출발 터미널 · {item.departureTerminal || '정보 없음'}
+            {t('출발 터미널 ·')} {item.departureTerminal || t('정보 없음')}
           </Text>
           <Text style={styles.subtitle}>
-            도착 터미널 · {item.arrivalTerminal || '정보 없음'}
+            {t('도착 터미널 ·')} {item.arrivalTerminal || t('정보 없음')}
           </Text>
           <Action
-            label={`${item.departure} → ${item.arrival} ${item.departureTime} 항공편 선택`}
+            label={t('{p0} → {p1} {p2} 항공편 선택', {
+              p0: item.departure,
+              p1: item.arrival,
+              p2: item.departureTime,
+            })}
             selected={chosen === `${index}`}
             onPress={() => {
               // 사용자가 확인한 구간만 상단 완료 버튼에 연결한다.

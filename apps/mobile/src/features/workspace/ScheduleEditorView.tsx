@@ -1,4 +1,6 @@
+import { t } from '@/features/localization/translate';
 import Text from '@/components/AppText';
+import { colors } from '@/constants/theme';
 import type { WorkspaceSnapshot } from '@wherego/domain';
 import { destinationForDay } from '@wherego/domain';
 import { View } from 'react-native';
@@ -35,7 +37,7 @@ export function renderScheduleDetails({ props }: RenderScheduleDetailsProps) {
   // 전달받은 값과 행동을 기존 화면 규격으로 표시한다.
 
   return (
-    <ScheduleSection title="일정 세부 설정" icon="sliders-outline">
+    <ScheduleSection title={t('일정 세부 설정')} icon="sliders-outline">
       <DateField
         label="일정 시간 (HH:mm)"
         mode="time"
@@ -45,13 +47,29 @@ export function renderScheduleDetails({ props }: RenderScheduleDetailsProps) {
           return props.onChange('timeSlot', value);
         }}
       />
+      <View style={s.row}>
+        {['09:00', '12:00', '15:00', '18:00', '20:00'].map((slot) => (
+          <ScheduleButton
+            key={slot}
+            label={slot}
+            selected={props.form.values.timeSlot === slot}
+            disabled={props.busy || props.locked}
+            onPress={() => {
+              return props.onChange(
+                'timeSlot',
+                props.form.values.timeSlot === slot ? '' : slot,
+              );
+            }}
+          />
+        ))}
+      </View>
       {(!['TODO', 'MEMO'].includes(props.form.values.type || '') ||
         Boolean(props.form.values.durationMinutes)) && (
         <ScheduleField
           label="체류 예정 시간 (분)"
           value={props.form.values.durationMinutes || ''}
           keyboardType="number-pad"
-          placeholder="예: 60"
+          placeholder={t('예: 60')}
           onChange={(value) => {
             // 이동시간을 자동으로 계산한 값처럼 표시하지 않는다.
             return props.onChange('durationMinutes', value);
@@ -74,7 +92,7 @@ export function renderScheduleDetails({ props }: RenderScheduleDetailsProps) {
             label="예상 지출 금액"
             value={props.form.values.estimatedAmount || ''}
             keyboardType="decimal-pad"
-            placeholder="금액을 입력해 주세요"
+            placeholder={t('금액을 입력해 주세요')}
             onChange={(value) => {
               // 예상 금액은 실제 지출과 구분해서 저장한다.
               return props.onChange('estimatedAmount', value);
@@ -124,8 +142,8 @@ export function renderSchedulePlace({ props }: RenderSchedulePlaceProps) {
     <ScheduleSection
       title={
         ['TODO', 'MEMO'].includes(props.form.values.type || '')
-          ? '일정 내용'
-          : '방문할 장소'
+          ? t('일정 내용')
+          : t('방문할 장소')
       }
       icon="map-pin-duotone"
     >
@@ -173,7 +191,7 @@ export function renderSchedulePlace({ props }: RenderSchedulePlaceProps) {
             label={props.form.values.title || ''}
           />
           <ScheduleButton
-            label="선택한 구글 장소 연결 해제"
+            label={t('선택한 구글 장소 연결 해제')}
             disabled={props.busy || props.locked}
             onPress={() => {
               // 작성한 제목과 주소는 유지한다.
@@ -205,55 +223,68 @@ type RenderScheduleHeadingProps = {
 // 선택 날짜와 일정 작성 제목을 표시한다.
 export function renderScheduleHeading({ props }: RenderScheduleHeadingProps) {
   // 전달받은 값과 행동을 기존 화면 규격으로 표시한다.
+  const activeDay = props.snapshot.days.find((day) => {
+    return day.id === props.form.values.dayId;
+  });
+  const currentCity = destinationForDay(
+    props.snapshot,
+    props.form.values.dayId || '',
+  ).city;
 
   return (
-    <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
+    <View
+      style={{
+        flexDirection: 'row',
+        gap: 14,
+        alignItems: 'center',
+        padding: 16,
+        backgroundColor: theme.color.surface.card,
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: theme.color.border.subtle,
+      }}
+    >
       <View
         style={{
-          width: 36,
-          height: 36,
-          borderRadius: 18,
-          backgroundColor: theme.color.selection.surface,
-          borderWidth: 1,
-          borderColor: theme.color.selection.border,
+          width: 44,
+          height: 44,
+          borderRadius: 22,
+          backgroundColor: theme.color.brand.coral,
           alignItems: 'center',
           justifyContent: 'center',
+          shadowColor: theme.color.brand.coral,
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.25,
+          shadowRadius: 4,
+          elevation: 3,
         }}
       >
-        <Text style={[s.label, { color: theme.color.selection.text }]}>
-          {
-            props.snapshot.days.find((day) => {
-              // 사용자가 선택한 일차를 강조한다.
-              return day.id === props.form.values.dayId;
-            })?.dayNumber
-          }
+        <Text
+          style={{
+            fontFamily: theme.font.bold,
+            fontSize: 16,
+            color: colors.actionForeground,
+          }}
+        >
+          D{activeDay?.dayNumber || 1}
         </Text>
       </View>
       <View style={{ gap: 4, flex: 1, minWidth: 0 }}>
-        <Text style={s.title}>
+        <Text style={[s.title, { fontSize: 19, lineHeight: 26 }]}>
           {props.snapshot.itinerary.some((item) => {
             // 기존 ID를 편집할 때 새 일정처럼 안내하지 않는다.
             return item.id === props.form.id;
           })
-            ? '일정 수정'
+            ? t('일정 수정')
             : props.form.values.type === 'MEMO'
-              ? '메모를 남겨요'
+              ? t('메모를 남겨요')
               : props.form.values.type === 'TODO'
-                ? '할 일을 추가해요'
-                : '방문할 장소를 추가해요'}
+                ? t('할 일을 추가해요')
+                : t('방문할 장소를 추가해요')}
         </Text>
-        <Text style={s.meta}>
-          {
-            destinationForDay(props.snapshot, props.form.values.dayId || '')
-              .city
-          }{' '}
-          ·{' '}
-          {scheduleDate(
-            props.snapshot.days.find((day) => {
-              // 선택 날짜의 현지 달력 날짜를 표시한다.
-              return day.id === props.form.values.dayId;
-            })?.tripDate || props.snapshot.trip.startDate,
-          )}
+        <Text style={[s.meta, { fontSize: 14 }]}>
+          📍 {currentCity} ·{' '}
+          {scheduleDate(activeDay?.tripDate || props.snapshot.trip.startDate)}
         </Text>
       </View>
     </View>

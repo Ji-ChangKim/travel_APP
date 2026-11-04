@@ -1,3 +1,5 @@
+import { t } from '@/features/localization/translate';
+import { useLocale } from '@/features/localization/localeState';
 import { tripListQueryOptions } from './tripQueries';
 import Text from '@/components/AppText';
 import ScreenHeader from '@/components/ScreenHeader';
@@ -36,6 +38,7 @@ function useImportUser(): string {
 
 // 공유 입력은 로그인 전후에 동일한 화면에서 편집한다.
 export default function ImportPlaceScreen() {
+  useLocale();
   // 계정이 바뀌면 이전 요청과 폼을 초기화한다.
   return <ImportContent key={useImportUser()} />;
 }
@@ -161,12 +164,13 @@ function proceed(
 
 // 장소 입력과 여행 선택을 같은 화면에서 안내한다.
 function ImportView({ controller }: { controller: Controller }) {
+  useLocale();
   // 장소 후보는 저장 전에 사용자가 제목·날짜를 확인한다.
   return (
     <SafeAreaView style={styles.screen}>
       <ScreenHeader
-        title="저장한 장소를 여행으로"
-        backLabel="가져오기 취소"
+        title={t('저장한 장소를 여행으로')}
+        backLabel={t('가져오기 취소')}
         disabled={controller.state.busy}
         onBack={() => {
           // 취소 후보를 지우고 여행 허브로 돌아간다.
@@ -190,8 +194,9 @@ function ImportView({ controller }: { controller: Controller }) {
         keyboardShouldPersistTaps="handled"
       >
         <Text style={styles.subtitle}>
-          Google Maps에서 찾은 장소를 내 일정에 추가하세요. 장소와 날짜를 확인한
-          뒤 직접 저장합니다.
+          {t(
+            'Google Maps에서 찾은 장소를 내 일정에 추가하세요. 장소와 날짜를 확인한 뒤 직접 저장합니다.',
+          )}
         </Text>
         <Field
           label="받은 Google Maps 링크"
@@ -208,7 +213,7 @@ function ImportView({ controller }: { controller: Controller }) {
         )}
         {!controller.userId ? (
           <Action
-            label="로그인하고 장소 가져오기"
+            label={t('로그인하고 장소 가져오기')}
             disabled={controller.state.busy}
             onPress={() => {
               // 공유 입력을 보관한 뒤 실제 인증으로 이동한다.
@@ -217,15 +222,17 @@ function ImportView({ controller }: { controller: Controller }) {
           />
         ) : (
           <>
-            <Text style={styles.title}>추가할 여행 선택</Text>
+            <Text style={styles.title}>{t('추가할 여행 선택')}</Text>
             {controller.trips.isLoading && (
-              <Text>여행 목록을 불러오는 중입니다.</Text>
+              <Text>{t('여행 목록을 불러오는 중입니다.')}</Text>
             )}
             {controller.trips.isError && (
               <>
-                <Text style={styles.error}>여행을 불러오지 못했습니다.</Text>
+                <Text style={styles.error}>
+                  {t('여행을 불러오지 못했습니다.')}
+                </Text>
                 <Action
-                  label="다시 불러오기"
+                  label={t('다시 불러오기')}
                   onPress={() => {
                     // 여행 목록 조회만 재시도한다.
                     return void controller.trips.refetch();
@@ -246,8 +253,10 @@ function ImportView({ controller }: { controller: Controller }) {
                     {travelDateRange(trip.startDate, trip.endDate)}
                   </Text>
                   <Action
-                    label="이 여행에 장소 추가"
-                    accessibilityLabel={`이 여행에 추가: ${trip.title}`}
+                    label={t('이 여행에 장소 추가')}
+                    accessibilityLabel={t('이 여행에 추가: {p0}', {
+                      p0: trip.title,
+                    })}
                     disabled={controller.state.busy}
                     onPress={() => {
                       // 일정 편집 폼에서 날짜와 장소를 확인한다.
@@ -260,7 +269,7 @@ function ImportView({ controller }: { controller: Controller }) {
                 </View>
               ))}
             <Action
-              label="새 여행 만들기"
+              label={t('새 여행 만들기')}
               disabled={controller.state.busy}
               onPress={() => {
                 // 생성 완료 후 동일 공유 후보로 일정 편집을 이어간다.
@@ -276,6 +285,7 @@ function ImportView({ controller }: { controller: Controller }) {
 
 // 계정별 컨트롤러를 가져오기 화면에 전달한다.
 function ImportContent() {
+  useLocale();
   // 조회와 상태는 현재 화면 계정에만 연결한다.
   return <ImportView controller={useImportController()} />;
 }

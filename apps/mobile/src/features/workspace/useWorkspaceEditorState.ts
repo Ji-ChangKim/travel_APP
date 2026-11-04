@@ -10,15 +10,20 @@ export function useWorkspaceEditorState({
   creating,
   destination,
   mode,
+  initialForm,
 }: {
   creating: boolean;
   destination?: string;
   mode?: string;
+  initialForm?: PlanForm;
 }) {
   const [form, setForm] = useState<PlanForm | null>(
-    creating ? () => newTripForm(destination, mode === 'record') : null,
+    creating
+      ? () => initialForm || newTripForm(destination, mode === 'record')
+      : null,
   );
   const [busy, setBusy] = useState(false);
+  const [draftSaving, setDraftSaving] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [confirmation, setConfirmation] =
     useState<WorkspaceConfirmation | null>(null);
@@ -33,7 +38,7 @@ export function useWorkspaceEditorState({
   const [hasPending, setHasPending] = useState(false);
   useScheduleExitGuard(
     form,
-    busy || scanning || hasPending || Boolean(confirmation),
+    busy || draftSaving || scanning || hasPending || Boolean(confirmation),
     setForm,
   );
   const [error, setError] = useState('');
@@ -57,6 +62,8 @@ export function useWorkspaceEditorState({
     setForm,
     busy,
     setBusy,
+    draftSaving,
+    setDraftSaving,
     scanning,
     setScanning,
     confirmation,
