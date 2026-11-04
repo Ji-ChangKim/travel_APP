@@ -4,8 +4,8 @@ import { useRef, type ReactNode } from 'react';
 import { View } from 'react-native';
 import { usePathname, useRouter } from 'expo-router';
 import { useQueryClient } from '@tanstack/react-query';
-import DesignButton from '@/components/DesignButton';
-import CenteredNoticeModal from '@/components/CenteredNoticeModal';
+import DesignButton from '@/components/ui/DesignButton';
+import CenteredNoticeModal from '@/components/ui/CenteredNoticeModal';
 
 import {
   clearAccountQueries,
@@ -42,6 +42,7 @@ export default function AuthRecoveryBoundary({
   const blocked = Boolean(
     !ready &&
     startupError &&
+    path !== '/' &&
     (!isPublicBrowsePath(path) || path === '/new-trip') &&
     path !== '/login' &&
     path !== '/auth/callback',
@@ -65,10 +66,17 @@ export default function AuthRecoveryBoundary({
         visible={blocked}
         priority={110}
         title={t('로그인 정보 확인 안내')}
-        paragraphs={[t('로그인 정보를 확인하지 못했어요.'), t('연결을 확인하고 다시 시도해 주세요.')]}
+        paragraphs={[
+          t('로그인 정보를 확인하지 못했어요.'),
+          t('연결을 확인하고 다시 시도해 주세요.'),
+        ]}
         onClose={browse}
       >
-        <DesignButton label={t('로그인 정보 다시 확인')} variant="primary" onPress={retry} />
+        <DesignButton
+          label={t('로그인 정보 다시 확인')}
+          variant="primary"
+          onPress={retry}
+        />
         <DesignButton label={t('로그인으로 돌아가기')} onPress={browse} />
       </CenteredNoticeModal>
     </>

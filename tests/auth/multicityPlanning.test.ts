@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { test } from 'node:test';
 import { destinationForDay, tripDestinations } from '@wherego/domain';
-import { destinationForm } from '../../apps/mobile/src/features/workspace/destinationForms';
+import { destinationForm } from '../../apps/mobile/src/features/workspace/planning/model/destinationForms';
 import {
   newTrip,
   transform,

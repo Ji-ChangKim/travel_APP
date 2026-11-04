@@ -1,8 +1,8 @@
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import DesignButton from '@/components/DesignButton';
-import DesignInput from '@/components/DesignInput';
+import DesignButton from '@/components/ui/DesignButton';
+import DesignInput from '@/components/ui/DesignInput';
 import {
   ScrollView,
   TextInput,
@@ -10,7 +10,11 @@ import {
   type KeyboardTypeOptions,
 } from 'react-native';
 import { useRef, type ReactNode } from 'react';
-import { FormAnchor, focusFormInput, useFormScope } from '../../InputFeedback';
+import {
+  FormAnchor,
+  focusFormInput,
+  useFormScope,
+} from '../../shared/ui/InputFeedback';
 import TripIcon, { type TripIconName } from '@/components/icons/TripIcon';
 import {
   scheduleStyles as s,

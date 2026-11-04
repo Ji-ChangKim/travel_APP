@@ -1,7 +1,7 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import Text from '@/components/AppText';
-import HaruState from '@/components/HaruState';
+import Text from '@/components/ui/AppText';
+import HaruState from '@/components/feedback/HaruState';
 import { colors } from '@/constants/theme';
 import { useEffect, useRef, useState } from 'react';
 import { Platform, Pressable, StyleSheet, View } from 'react-native';

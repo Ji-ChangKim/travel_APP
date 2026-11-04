@@ -5,7 +5,7 @@ import {
   myTripFacts,
   myTripTiming,
   selectMyTrips,
-} from '../../apps/mobile/src/features/workspace/myTripsModel';
+} from '../../apps/mobile/src/features/workspace/my-trips/model/myTripsModel';
 
 const now = new Date('2026-10-20T15:30:00Z');
 const trip: PersistedTrip = {

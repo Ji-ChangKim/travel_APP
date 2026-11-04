@@ -1,4 +1,4 @@
-import CityGuideScreen from '@/features/workspace/CityGuideScreen';
+import CityGuideScreen from '@/features/workspace/community/ui/CityGuideScreen';
 import { discoveryDestinations } from '@wherego/domain';
 
 // 웹에서도 도시 상세 주소를 새로 열거나 새로고침할 수 있게 미리 생성한다.

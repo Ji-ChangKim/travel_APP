@@ -1,7 +1,7 @@
 import { t } from '@/features/localization/translate';
 
-import Text from '@/components/AppText';
-import DesignButton from '@/components/DesignButton';
+import Text from '@/components/ui/AppText';
+import DesignButton from '@/components/ui/DesignButton';
 
 import { Ionicons } from '@expo/vector-icons';
 
@@ -9,11 +9,14 @@ import type { WorkspaceSnapshot } from '@wherego/domain';
 
 import { View } from 'react-native';
 
-import { TripChecklistProgress, TripDetailEmpty } from '../../TripDetailParts';
+import {
+  TripChecklistProgress,
+  TripDetailEmpty,
+} from '../../my-trips/ui/TripDetailParts';
 
-import { tripDetailStyles as detail } from '../../tripDetailStyles';
+import { tripDetailStyles as detail } from '../../my-trips/styles/tripDetailStyles';
 
-import { Action, Field } from '../../ui';
+import { Action, Field } from '../../shared/ui/ui';
 
 import { styles } from '../styles/workspaceStyles';
 

@@ -7,13 +7,13 @@ import ScheduleAdvancedFields from '../ui/ScheduleAdvancedFields';
 import ScheduleEditorActions from '../ui/ScheduleEditorActions';
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import Text from '@/components/AppText';
-import ScreenHeader from '@/components/ScreenHeader';
+import Text from '@/components/ui/AppText';
+import ScreenHeader from '@/components/navigation/ScreenHeader';
 
 import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
-import ScheduleFlightFields from '../../FlightEntryFields';
+import ScheduleFlightFields from '../../planning/ui/FlightEntryFields';
 
 import {
   renderScheduleDetails,

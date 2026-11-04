@@ -7,12 +7,12 @@ import {
   transform,
   workspaceCommandSchema,
 } from '@wherego/validation';
-import { countryChangeValues } from '../../apps/mobile/src/features/workspace/tripMetadata';
+import { countryChangeValues } from '../../apps/mobile/src/features/workspace/planning/model/tripMetadata';
 import {
   tripPeriodImpact,
   periodBlockedMessage,
-} from '../../apps/mobile/src/features/workspace/tripPeriod';
-import { formInputFields } from '../../apps/mobile/src/features/workspace/formFeedback';
+} from '../../apps/mobile/src/features/workspace/planning/model/tripPeriod';
+import { formInputFields } from '../../apps/mobile/src/features/workspace/shared/model/formFeedback';
 
 const base = newTrip(
   {

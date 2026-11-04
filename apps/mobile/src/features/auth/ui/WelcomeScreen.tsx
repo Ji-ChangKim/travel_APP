@@ -2,7 +2,7 @@ import { Animated, Image, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
 import { useAuthReady } from '../manager/AuthBridge';
@@ -50,6 +50,7 @@ export default function WelcomeScreen() {
           <View style={styles.brand} testID="welcome-brand">
             <View
               ref={onTargetMount}
+              testID="welcome-logo-target"
               collapsable={false}
               style={{ opacity: done ? 1 : 0 }}
             >
@@ -137,7 +138,10 @@ export default function WelcomeScreen() {
           </View>
         </View>
       )}
-      <AuthFailureNotice controller={controller} onAlternative={() => router.push('/login')} />
+      <AuthFailureNotice
+        controller={controller}
+        onAlternative={() => router.push('/login')}
+      />
     </View>
   );
 }

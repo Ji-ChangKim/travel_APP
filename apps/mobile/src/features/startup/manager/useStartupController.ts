@@ -117,14 +117,23 @@ export function useStartupController(foreground: boolean) {
     Object.values(queries).some((query) => {
       // 재확인 중 이전 성공 결과만 보고 화면을 떠나지 않는다.
       return query.isFetching;
-    }) ||
-    !auth.startupReady;
+    }) || !auth.startupReady;
   const error =
     auth.startupError ||
     local.error?.message ||
     common.error?.message ||
     (destination.error ? '여행을 열지 못했어요. 다시 시도해 주세요.' : null);
-  const failure = local.error ? 'local' : common.error instanceof StartupCompatibilityError ? 'incompatible' : common.error ? 'common' : auth.startupError ? 'auth' : destination.error ? 'destination' : null;
+  const failure = local.error
+    ? 'local'
+    : common.error instanceof StartupCompatibilityError
+      ? 'incompatible'
+      : common.error
+        ? 'common'
+        : auth.startupError
+          ? 'auth'
+          : destination.error
+            ? 'destination'
+            : null;
   // 사용자가 재확인을 선택한 경우에 설치 버전과 정책만 다시 읽는다.
   function refreshUpdate(): Promise<unknown> {
     // 채널은 설치 경로에서 다시 읽고 정책은 현재 채널에서 재조회한다.
@@ -153,7 +162,10 @@ export function useStartupController(foreground: boolean) {
     pending,
     updateAvailable,
     failure,
-    installedVersion: play.data && 'installedVersionName' in play.data ? play.data.installedVersionName : undefined,
+    installedVersion:
+      play.data && 'installedVersionName' in play.data
+        ? play.data.installedVersionName
+        : undefined,
     decision,
     slow,
     retry: () => {

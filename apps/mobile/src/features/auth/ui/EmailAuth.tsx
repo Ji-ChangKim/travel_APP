@@ -1,9 +1,9 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
 import { userFacingMessage } from '@/services/userFacingError';
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 import { colors } from '@/constants/theme';
-import Modal from '@/components/AppModal';
+import Modal from '@/components/ui/AppModal';
 import {
   useRef,
   useState,

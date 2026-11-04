@@ -4,7 +4,7 @@ import {
   rememberCreation,
   restoreCreation,
   clearCreationHandoff,
-} from '../../apps/mobile/src/features/workspace/creationAuthHandoff';
+} from '../../apps/mobile/src/features/workspace/planning/model/creationAuthHandoff';
 import {
   authReturn,
   authReturnPath,

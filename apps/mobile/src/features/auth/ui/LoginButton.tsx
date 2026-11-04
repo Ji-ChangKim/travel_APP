@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
-import DesignButton from '@/components/DesignButton';
+import DesignButton from '@/components/ui/DesignButton';
 
 // 인증 화면의 버튼을 터치 상태와 접근성 정보에 맞춰 표시한다.
 export default function LoginButton({

@@ -2,11 +2,11 @@ import { type QueryClient } from '@tanstack/react-query';
 import { foundationQueryKey } from '@wherego/api-client';
 import type { WorkspaceSnapshot } from '@wherego/domain';
 import { type Dispatch, type RefObject, type SetStateAction } from 'react';
-import { type PlanForm } from '../../forms';
+import { type PlanForm } from '../../shared/model/forms';
 import {
   canReviseWorkspaceRequest,
   isWorkspaceVersionConflict,
-} from '../../saveRecovery';
+} from '../../shared/model/saveRecovery';
 import { workspaceError } from '../model/workspaceFailure';
 
 // 저장 결과·재시도·충돌 복구의 요청 수명을 구성한다.

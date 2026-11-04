@@ -5,10 +5,10 @@ import { useWorkspaceData } from './useWorkspaceData';
 import { useTripStore } from '@/stores/useTripStore';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { scheduleForm, type PlanForm } from '../../forms';
-import { savedReceiptForm } from '../../receiptFlow';
+import { scheduleForm, type PlanForm } from '../../shared/model/forms';
+import { savedReceiptForm } from '../../receipt/model/receiptFlow';
 import { useSharedSchedule } from '../../schedule/manager/useSharedSchedule';
-import { useTripDateRefresh } from '../../useTripDateRefresh';
+import { useTripDateRefresh } from '../../shared/manager/useTripDateRefresh';
 import { useWorkspaceScreenActions } from '../model/workspaceScreenActions';
 
 // 여행 조회·명령·충돌·폼 상태를 관리하며 화면을 그리지 않는다.

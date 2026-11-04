@@ -1,5 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { tripListQueryOptions, workspaceQueryOptions } from '../../tripQueries';
+import {
+  tripListQueryOptions,
+  workspaceQueryOptions,
+} from '../../shared/manager/tripQueries';
 
 // 계정별 캐시 키와 조회 조건을 함께 관리해 다른 여행의 원본을 섞지 않는다.
 export function useWorkspaceData(

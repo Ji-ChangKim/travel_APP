@@ -1,5 +1,5 @@
 import { useTripStore } from '@/stores/useTripStore';
-import { clearCreationHandoff } from '../../creationAuthHandoff';
+import { clearCreationHandoff } from '../../planning/model/creationAuthHandoff';
 import {
   createFoundationTrip,
   sendWorkspaceCommand,
@@ -12,23 +12,23 @@ import {
 import { type ImperativeRouter } from 'expo-router';
 import { type Dispatch, type RefObject, type SetStateAction } from 'react';
 import { z } from 'zod';
-import { cityTimezones } from '../../destinationCatalog';
+import { cityTimezones } from '../../planning/model/destinationCatalog';
 import {
   formFailureFields,
   formInputFields,
   revisedFormFeedback,
   type FieldErrors,
   type FormFeedbackState,
-} from '../../formFeedback';
-import { formCommand, type PlanForm } from '../../forms';
+} from '../../shared/model/formFeedback';
+import { formCommand, type PlanForm } from '../../shared/model/forms';
 import {
   receiptConfirmationValues,
   receiptDateValues,
-} from '../../receiptFlow';
+} from '../../receipt/model/receiptFlow';
 import { completeFormExit } from '../../schedule/ui/scheduleExitGuard';
-import { serverOptions } from '../../service';
-import { tripCreationInput } from '../../tripCreation';
-import { countryChangeValues } from '../../tripMetadata';
+import { serverOptions } from '../../shared/manager/service';
+import { tripCreationInput } from '../../planning/model/tripCreation';
+import { countryChangeValues } from '../../planning/model/tripMetadata';
 import { type WorkspaceConfirmation } from '../model/workspaceConfirmation';
 import { workspaceError } from '../model/workspaceFailure';
 

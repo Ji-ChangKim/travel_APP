@@ -6,8 +6,8 @@ import {
   transform,
   workspaceCommandSchema,
 } from '@wherego/validation';
-import { formCommandValue } from '../../apps/mobile/src/features/workspace/formCommands';
-import type { PlanForm } from '../../apps/mobile/src/features/workspace/forms';
+import { formCommandValue } from '../../apps/mobile/src/features/workspace/shared/model/formCommands';
+import type { PlanForm } from '../../apps/mobile/src/features/workspace/shared/model/forms';
 
 const trip = newTrip(
   {

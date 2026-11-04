@@ -3,14 +3,14 @@ import { useLocale } from '@/features/localization/localeState';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { z } from 'zod';
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 import type { WorkspaceSnapshot } from '@wherego/domain';
 import { destinationForDay } from '@wherego/domain';
 import { recommendationResultSchema } from '@wherego/validation';
 import { GoogleAttribution } from './GooglePlace';
-import { requestRecommendations } from '../../planningService';
-import { usePlanningRequest } from '../../usePlanningRequest';
-import { Action } from '../../ui';
+import { requestRecommendations } from '../../planning/manager/planningService';
+import { usePlanningRequest } from '../../planning/manager/usePlanningRequest';
+import { Action } from '../../shared/ui/ui';
 import { styles } from '../../hub/styles/workspaceStyles';
 
 export type RecommendedPlace = z.infer<

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { prepareImageBytes } from '../../apps/mobile/src/features/workspace/imagePreparation';
+import { prepareImageBytes } from '../../apps/mobile/src/features/workspace/shared/model/imagePreparation';
 
 test('8MiB PNG는 원본 전체 버퍼 없이 헤더 검사 후 압축한다', async () => {
   // 원본 arrayBuffer 읽기를 실패시켜 압축 이전의 전체 복사를 검출한다.

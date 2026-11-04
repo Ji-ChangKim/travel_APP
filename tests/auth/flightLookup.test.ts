@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { flightLookupValues } from '../../apps/mobile/src/features/workspace/flightLookupModel';
+import { flightLookupValues } from '../../apps/mobile/src/features/workspace/planning/model/flightLookupModel';
 import {
   flightFormValues,
   flightFromValues,
-} from '../../apps/mobile/src/features/workspace/flightModel';
+} from '../../apps/mobile/src/features/workspace/planning/model/flightModel';
 import { flightLookupQuerySchema } from '@wherego/validation';
 
 const candidate = {

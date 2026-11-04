@@ -17,12 +17,12 @@ import {
 import {
   canDiscardRecordAttempt,
   recordFailureMessage,
-} from '../../apps/mobile/src/features/workspace/recordFailure';
+} from '../../apps/mobile/src/features/workspace/my-trips/model/recordFailure';
 import { workspaceDraft } from '../../apps/mobile/src/features/workspace/hub/model/workspaceDrafts';
 import {
   ledgerActionContainer,
   ledgerActionForeground,
-} from '../../apps/mobile/src/features/workspace/ledgerActionAppearance';
+} from '../../apps/mobile/src/features/workspace/my-trips/model/ledgerActionAppearance';
 import ledgerTokens from '../../docs/02. 디자인/00. 공통규격/ledger-tokens.json';
 
 test('로그인·프로필·기기 기록의 공통 안내도 미확인 예외 원문을 숨긴다', () => {

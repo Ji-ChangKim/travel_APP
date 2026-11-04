@@ -11,7 +11,7 @@ import ScheduleCoursePicker from '../../schedule/ui/ScheduleCoursePicker';
 
 import TripMapCanvas from './TripMapCanvas';
 import { tripMapStops } from '../model/tripMapModel';
-import { triggerHaptic } from '@/components/haptics';
+import { triggerHaptic } from '@/components/ui/haptics';
 import TripTimeline, {
   TripDayStrip,
 } from '../../schedule/manager/TripTimeline';

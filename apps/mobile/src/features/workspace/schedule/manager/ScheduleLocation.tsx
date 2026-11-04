@@ -2,7 +2,7 @@ import type { WorkspaceSnapshot } from '@wherego/domain';
 import { renderLocationEditor } from '../ui/ScheduleLocationView';
 import { useScheduleLocationController } from './useScheduleLocationController';
 
-import type { PlanForm } from '../../forms';
+import type { PlanForm } from '../../shared/model/forms';
 
 // 장소 이름을 자동 조회하지 않고 사용자가 선택한 지도 위치만 기록한다.
 export default function ScheduleLocation(props: {

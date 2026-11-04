@@ -6,7 +6,7 @@ import {
   signedPhotoPolicy,
 } from '@wherego/api-client';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
-import { serverOptions } from '../../service';
+import { serverOptions } from '../../shared/manager/service';
 
 // 계정·화면 수명에 맞춰 사진 접근 주소를 조회하며 표시 규격은 다루지 않는다.
 export function usePrivatePhotoQuery(

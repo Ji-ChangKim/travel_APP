@@ -4,7 +4,7 @@ import type { PersistedTrip } from '@wherego/domain';
 import {
   selectTravelPlans,
   travelPlanPath,
-} from '../../apps/mobile/src/features/workspace/travelPlans';
+} from '../../apps/mobile/src/features/workspace/shared/model/travelPlans';
 
 // 테스트 자료는 제품 목록에 주입하지 않고 순수 선택 규칙만 검증한다.
 function trip(

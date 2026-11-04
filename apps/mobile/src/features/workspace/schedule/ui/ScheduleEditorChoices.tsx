@@ -1,7 +1,7 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import Text from '@/components/AppText';
-import DesignButton from '@/components/DesignButton';
+import Text from '@/components/ui/AppText';
+import DesignButton from '@/components/ui/DesignButton';
 import { Pressable } from 'react-native';
 import { ScheduleChoiceStrip } from './ScheduleControls';
 import {

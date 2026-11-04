@@ -27,7 +27,7 @@
 | 지출      | 영수증과 같은 ID의 실제 지출 동시 생성                    | 재시도·충돌·삭제 정합성 검증                         |
 | 중복      | 동일 mediaId/영수증 ID 방지 존재                          | 재업로드와 수동 지출의 유사 중복 안내 보완           |
 
-코드 근거: [ReceiptReview](../../../apps/mobile/src/features/workspace/ReceiptReview.tsx), [PlanEditorView](../../../apps/mobile/src/features/workspace/PlanEditorView.tsx), [receiptFlow](../../../apps/mobile/src/features/workspace/receiptFlow.ts), [workspaceModel](../../../packages/validation/src/workspaceModel.ts).
+코드 근거: [ReceiptReview](../../../apps/mobile/src/features/workspace/receipt/manager/ReceiptReview.tsx), [PlanEditorView](../../../apps/mobile/src/features/workspace/my-trips/ui/PlanEditorView.tsx), [receiptFlow](../../../apps/mobile/src/features/workspace/receipt/model/receiptFlow.ts), [workspaceModel](../../../packages/validation/src/workspaceModel.ts).
 
 위 상대 경로는 문서 검사에서 확인한다. [과거 P0 인수 기록](<../../05. 검수/02. 검수보고/Stitch_P0인수검수.txt>)에는 합성 영수증의 실제 OCR·기존 일정 확정·재로그인 복원 기록이 있다. 이번 기획에서는 앱 실행·실제 영수증·카메라·현재 배포본을 재검증하지 않았다. 오래된 기기 초안 문서와 현재 코드가 다르면 문서만으로 미구현을 단정하지 않는다.
 

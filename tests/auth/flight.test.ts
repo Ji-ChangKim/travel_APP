@@ -13,7 +13,7 @@ import {
   flightFromValues,
   flightSearchUrl,
   scheduleFlight,
-} from '../../apps/mobile/src/features/workspace/flightModel';
+} from '../../apps/mobile/src/features/workspace/planning/model/flightModel';
 
 const details = {
   number: 'RS0715',

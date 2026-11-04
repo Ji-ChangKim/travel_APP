@@ -1,6 +1,6 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 import { useState } from 'react';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 import { View } from 'react-native';

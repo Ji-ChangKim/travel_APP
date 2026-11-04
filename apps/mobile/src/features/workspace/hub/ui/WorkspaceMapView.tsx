@@ -5,7 +5,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import TripMap from './TripMap';
 
 import { TripDayStrip } from '../../schedule/manager/TripTimeline';
-import { type PlanForm } from '../../forms';
+import { type PlanForm } from '../../shared/model/forms';
 
 import type { WorkspaceScreenActions } from '../model/workspaceScreenActions';
 import { workspaceDaySelection } from '../model/workspaceDaySelection';

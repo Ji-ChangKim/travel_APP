@@ -4,7 +4,7 @@ import { FoundationClientError, requestFoundation } from '@wherego/api-client';
 import {
   canReviseWorkspaceRequest,
   isWorkspaceVersionConflict,
-} from '../../apps/mobile/src/features/workspace/saveRecovery';
+} from '../../apps/mobile/src/features/workspace/shared/model/saveRecovery';
 
 // 게이트웨이의 HTML 오류도 HTTP 상태를 유지해야 수정·재시도 경로를 고를 수 있다.
 test('비JSON 오류 응답의 HTTP 상태와 안전한 오류 객체를 보존한다', () => {

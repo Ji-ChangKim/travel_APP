@@ -2,7 +2,7 @@ import {
   startupManifestSchema,
   type StartupManifest,
 } from '@wherego/validation';
-import { apiBaseUrl } from '@/features/workspace/service';
+import { apiBaseUrl } from '@/features/workspace/shared/manager/service';
 import { loadStoredGuestSession } from '@/services/guestAuthService';
 import { readGuestWorkspace } from '@/services/guestWorkspaceStorage';
 import { checkPlayUpdate } from './playUpdate';

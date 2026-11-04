@@ -1,8 +1,8 @@
 import { t } from '@/features/localization/translate';
-import { clearCreationHandoff } from '../../creationAuthHandoff';
+import { clearCreationHandoff } from '../../planning/model/creationAuthHandoff';
 import { useLocale } from '@/features/localization/localeState';
-import ActionSheet from '@/components/ActionSheet';
-import Text from '@/components/AppText';
+import ActionSheet from '@/components/ui/ActionSheet';
+import Text from '@/components/ui/AppText';
 import { useEffect, useId, useLayoutEffect, useRef } from 'react';
 import { Platform } from 'react-native';
 import { useIsFocused, useNavigation } from 'expo-router';
@@ -10,7 +10,7 @@ import { usePreventRemove } from 'expo-router/react-navigation';
 import { create } from 'zustand';
 import { ScheduleButton } from './ScheduleControls';
 import { scheduleStyles as s } from '../styles/scheduleTheme';
-import { connectBrowserHistoryGuard } from '../../browserHistoryEvents';
+import { connectBrowserHistoryGuard } from '../../shared/manager/browserHistoryEvents';
 
 // 모든 작성 폼은 화면 전용 값만 비교하며 서버 계약을 변경하지 않는다.
 type EditableForm = {

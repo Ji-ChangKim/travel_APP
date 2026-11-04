@@ -1,19 +1,19 @@
 import { t } from '@/features/localization/translate';
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 import { type Dispatch, type SetStateAction } from 'react';
 import { Platform, View } from 'react-native';
 import LocationFeedback from '../../../permissions/LocationFeedback';
 import type { LocationResult } from '../../../permissions/currentLocation';
-import { FormAnchor } from '../../InputFeedback';
+import { FormAnchor } from '../../shared/ui/InputFeedback';
 import TripMapCanvas from '../../hub/ui/TripMapCanvas';
-import type { PlanForm } from '../../forms';
+import type { PlanForm } from '../../shared/model/forms';
 import { scheduleStyles as schedule } from '../styles/scheduleTheme';
 import {
   enteredMapLocation,
   type MapCoordinate,
   type MapStop,
 } from '../../hub/model/tripMapModel';
-import { Action, Field } from '../../ui';
+import { Action, Field } from '../../shared/ui/ui';
 import { styles } from '../../hub/styles/workspaceStyles';
 // renderLocationEditor이 읽는 값과 실행 가능한 행동의 계약이다.
 type RenderLocationEditorProps = {

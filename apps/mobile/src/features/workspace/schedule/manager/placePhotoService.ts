@@ -1,6 +1,6 @@
 import { requestSignal } from '@wherego/api-client';
 import { z } from 'zod';
-import { apiBaseUrl, serverOptions } from '../../service';
+import { apiBaseUrl, serverOptions } from '../../shared/manager/service';
 
 export type PlacePhotoRequest = {
   postId?: string;

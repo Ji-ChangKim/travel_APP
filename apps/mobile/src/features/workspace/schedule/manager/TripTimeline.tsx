@@ -1,7 +1,7 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import Text from '@/components/AppText';
-import DesignButton from '@/components/DesignButton';
+import Text from '@/components/ui/AppText';
+import DesignButton from '@/components/ui/DesignButton';
 import TripIcon from '@/components/icons/TripIcon';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
@@ -18,8 +18,8 @@ import { renderTimelinePlace, s } from '../ui/TripTimelineView';
 import TripScheduleEmpty, {
   type EmptyScheduleCategory,
 } from '../ui/TripScheduleEmpty';
-import type { CityGuidePlace } from '../../cityGuides';
-import { scheduleFlight } from '../../flightModel';
+import type { CityGuidePlace } from '../../community/model/cityGuides';
+import { scheduleFlight } from '../../planning/model/flightModel';
 import ScheduleConflictNotice from '../ui/scheduleConflicts';
 import {
   formatDayChipLabel,
@@ -34,7 +34,7 @@ import {
 import DayRecommendations, {
   type RecommendedPlace,
 } from '../ui/DayRecommendations';
-import TravelRoute from '../../TravelRoute';
+import TravelRoute from '../../planning/ui/TravelRoute';
 import { useTripStore } from '@/stores/useTripStore';
 
 type Day = WorkspaceSnapshot['days'][number];

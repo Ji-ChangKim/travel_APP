@@ -1,4 +1,4 @@
-import type { PlanForm } from '../../forms';
+import type { PlanForm } from '../../shared/model/forms';
 
 // 원본 일정과 별개로 저장할 복사 초안을 만든다.
 export function copiedScheduleForm(

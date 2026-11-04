@@ -5,8 +5,8 @@ import type {
   TravelLeg,
 } from '@wherego/domain';
 import type { WorkspaceCommand } from '@wherego/validation';
-import type { PlanForm, scheduleForm } from '../../forms';
-import type { savedReceiptForm } from '../../receiptFlow';
+import type { PlanForm, scheduleForm } from '../../shared/model/forms';
+import type { savedReceiptForm } from '../../receipt/model/receiptFlow';
 import { copiedScheduleForm } from '../../schedule/model/scheduleCopy';
 import type { RecommendedPlace } from '../../schedule/ui/DayRecommendations';
 

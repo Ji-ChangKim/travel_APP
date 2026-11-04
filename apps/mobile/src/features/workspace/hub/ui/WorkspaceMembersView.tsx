@@ -1,18 +1,18 @@
 import { t } from '@/features/localization/translate';
 
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 
 import type { WorkspaceSnapshot } from '@wherego/domain';
 
 import { View } from 'react-native';
 
-import { TripMemberHeading } from '../../TripDetailParts';
+import { TripMemberHeading } from '../../my-trips/ui/TripDetailParts';
 
-import { memberRoleLabel } from '../../presentation';
+import { memberRoleLabel } from '../../shared/model/presentation';
 
-import { tripDetailStyles as detail } from '../../tripDetailStyles';
+import { tripDetailStyles as detail } from '../../my-trips/styles/tripDetailStyles';
 
-import { Action } from '../../ui';
+import { Action } from '../../shared/ui/ui';
 
 import type { WorkspaceScreenActions } from '../model/workspaceScreenActions';
 import { styles } from '../styles/workspaceStyles';

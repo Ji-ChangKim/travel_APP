@@ -8,9 +8,9 @@ import {
   View,
 } from 'react-native';
 import { colors } from '@/constants/theme';
-import Text from '@/components/AppText';
-import { communityStyles as s } from '../../communityStyles';
-import { Action } from '../../ui';
+import Text from '@/components/ui/AppText';
+import { communityStyles as s } from '../../community/styles/communityStyles';
+import { Action } from '../../shared/ui/ui';
 import { GoogleAttribution } from './GooglePlace';
 import { usePlacePhoto } from '../manager/usePlacePhoto';
 

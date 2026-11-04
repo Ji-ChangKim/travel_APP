@@ -1,4 +1,4 @@
-import { tripListQueryOptions } from '../workspace/tripQueries';
+import { tripListQueryOptions } from '../workspace/shared/manager/tripQueries';
 import { useEffect } from 'react';
 import { AppState, Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';

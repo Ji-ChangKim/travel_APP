@@ -4,13 +4,10 @@ import type { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSegments } from 'expo-router';
 import { Platform, View } from 'react-native';
-import Text from '@/components/AppText';
-import LoadingIndicator from '@/components/LoadingIndicator';
+import Text from '@/components/ui/AppText';
+import LoadingIndicator from '@/components/feedback/LoadingIndicator';
 import Constants from 'expo-constants';
-import {
-  checkPlayUpdate,
-  refreshPlayAndPolicy,
-} from '../manager/playUpdate';
+import { checkPlayUpdate, refreshPlayAndPolicy } from '../manager/playUpdate';
 import { checkAppPolicy } from '../model/appPolicy';
 import { decideUpdate } from '../model/updatePolicy';
 import { introStyles as styles } from '../styles/introStyles';
@@ -67,9 +64,7 @@ function AndroidPolicyGate({ children }: { children: ReactNode }) {
     play.isFetching || policy.isFetching || play.isPending || policy.isPending;
   const blocked =
     !root &&
-    (pending ||
-      decision.kind === 'required' ||
-      decision.kind === 'blocked');
+    (pending || decision.kind === 'required' || decision.kind === 'blocked');
   // 복귀 때 설치 버전과 현재 정책만 재조회한다.
   function refresh(): Promise<unknown> {
     // 계정·기기 여행 데이터는 다시 실행하지 않는다.
@@ -85,16 +80,33 @@ function AndroidPolicyGate({ children }: { children: ReactNode }) {
         {children}
       </View>
       {blocked && pending && (
-        <View style={{ position: 'absolute', inset: 0, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center', gap: 12 }}>
+        <View
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundColor: colors.background,
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 12,
+          }}
+        >
           <LoadingIndicator />
-          <Text accessibilityLiveRegion="polite" style={styles.caption}>{t('업데이트를 확인하고 있어요')}</Text>
+          <Text accessibilityLiveRegion="polite" style={styles.caption}>
+            {t('업데이트를 확인하고 있어요')}
+          </Text>
         </View>
       )}
       <StartupUpdateNotice
         visible={blocked && !pending}
         decision={decision}
-        currentVersion={play.data && 'installedVersionName' in play.data ? play.data.installedVersionName : Constants.expoConfig?.version}
-        onRetry={() => { void refresh(); }}
+        currentVersion={
+          play.data && 'installedVersionName' in play.data
+            ? play.data.installedVersionName
+            : Constants.expoConfig?.version
+        }
+        onRetry={() => {
+          void refresh();
+        }}
       />
     </View>
   );

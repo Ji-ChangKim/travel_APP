@@ -3,10 +3,10 @@ import { useLocale } from '@/features/localization/localeState';
 import React, { useState } from 'react';
 import { ScrollView, View, Pressable } from 'react-native';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 import PlacePhoto from './PlacePhoto';
-import TravelRoute from '../../TravelRoute';
-import PlanDescription from '../../PlanDescription';
+import TravelRoute from '../../planning/ui/TravelRoute';
+import PlanDescription from '../../my-trips/ui/PlanDescription';
 import type {
   TimelinePlanModel,
   TimelineScheduleItem,

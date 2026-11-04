@@ -1,12 +1,12 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 import { View } from 'react-native';
 import { useState } from 'react';
 import ScheduleConflictNotice from './scheduleConflicts';
 import type { WorkspaceSchedule, WorkspaceSnapshot } from '@wherego/domain';
 import TripIcon from '@/components/icons/TripIcon';
-import type { PlanForm } from '../../forms';
+import type { PlanForm } from '../../shared/model/forms';
 import { ScheduleButton, ScheduleSection } from './ScheduleControls';
 import {
   scheduleStyles as s,

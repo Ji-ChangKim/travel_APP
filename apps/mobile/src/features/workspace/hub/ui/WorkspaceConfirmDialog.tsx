@@ -1,8 +1,8 @@
 import { useLocale } from '@/features/localization/localeState';
 import { t } from '@/features/localization/translate';
-import Text from '@/components/AppText';
-import ActionSheet from '@/components/ActionSheet';
-import { Action } from '../../ui';
+import Text from '@/components/ui/AppText';
+import ActionSheet from '@/components/ui/ActionSheet';
+import { Action } from '../../shared/ui/ui';
 import ServerPhoto from '../../schedule/ui/ServerPhoto';
 import { styles } from '../styles/workspaceStyles';
 

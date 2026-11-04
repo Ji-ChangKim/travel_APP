@@ -4,11 +4,11 @@ import { test } from 'node:test';
 import {
   tripBasicsError,
   tripCreationInput,
-} from '../../apps/mobile/src/features/workspace/tripCreation';
+} from '../../apps/mobile/src/features/workspace/planning/model/tripCreation';
 import {
   calendarCells,
   calendarSelection,
-} from '../../apps/mobile/src/features/workspace/calendarModel';
+} from '../../apps/mobile/src/features/workspace/planning/model/calendarModel';
 import { isSupportedTimezone } from '../../packages/validation/src/foundation';
 import {
   newTrip,
@@ -17,11 +17,11 @@ import {
   workspaceCommandSchema,
 } from '@wherego/validation';
 import { randomUUID } from 'node:crypto';
-import { countryRegion } from '../../apps/mobile/src/features/workspace/countryRegions';
+import { countryRegion } from '../../apps/mobile/src/features/workspace/planning/model/countryRegions';
 import {
   searchCountries,
   travelCountries,
-} from '../../apps/mobile/src/features/workspace/countries';
+} from '../../apps/mobile/src/features/workspace/planning/model/countries';
 
 const supportedValuesOf = Intl.supportedValuesOf;
 const basics = {

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { FoundationClientError } from '@wherego/api-client';
-import { homeDestination } from '../../workspace/homeDestinations';
+import { homeDestination } from '../../workspace/home/model/homeDestinations';
 
 export type AuthReturn = {
   next?:

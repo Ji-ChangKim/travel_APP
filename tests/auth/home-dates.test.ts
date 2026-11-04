@@ -3,7 +3,7 @@ import test from 'node:test';
 import {
   departureReminder,
   localToday,
-} from '../../apps/mobile/src/features/workspace/homeDates';
+} from '../../apps/mobile/src/features/workspace/home/model/homeDates';
 
 test('홈 출발 안내는 윤년과 연도 경계를 달력 날짜로 계산한다', () => {
   // 윤일을 포함한 여행의 남은 날짜와 여행 중 상태를 검증한다.

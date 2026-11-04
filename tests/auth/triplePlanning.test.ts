@@ -8,17 +8,17 @@ import {
   publicSelection,
 } from '@wherego/validation';
 import { copiedScheduleForm } from '../../apps/mobile/src/features/workspace/schedule/model/scheduleCopy';
-import { formCommandValue } from '../../apps/mobile/src/features/workspace/formCommands';
+import { formCommandValue } from '../../apps/mobile/src/features/workspace/shared/model/formCommands';
 import {
   copyWebPublicPlanUrl,
   publicPlanUrl,
   shareWebPublicPlanUrl,
-} from '../../apps/mobile/src/features/workspace/publicPlanLink';
+} from '../../apps/mobile/src/features/workspace/community/model/publicPlanLink';
 import {
   publicationIssue,
   togglePublicationDay,
-} from '../../apps/mobile/src/features/workspace/publication';
-import type { PlanForm } from '../../apps/mobile/src/features/workspace/forms';
+} from '../../apps/mobile/src/features/workspace/community/model/publication';
+import type { PlanForm } from '../../apps/mobile/src/features/workspace/shared/model/forms';
 import {
   adaptCommunityPostToTimeline,
   adaptWorkspaceSnapshotToTimeline,

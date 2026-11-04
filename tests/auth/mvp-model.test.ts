@@ -8,7 +8,7 @@ import {
 import {
   diaryCosts,
   diarySchedules,
-} from '../../apps/mobile/src/features/workspace/diary';
+} from '../../apps/mobile/src/features/workspace/my-trips/model/diary';
 
 // 합계 검증에 필요한 최소 지출 원본을 만든다.
 function expense(

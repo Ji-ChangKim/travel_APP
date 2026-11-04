@@ -1,11 +1,11 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 import { colors } from '@/constants/theme';
 import { useEffect, useRef, useState } from 'react';
 import { Linking, Platform, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { homeStyles as s } from '../workspace/homeStyles';
+import { homeStyles as s } from '../workspace/home/styles/homeStyles';
 import { currentLocationUrl } from './permissionModel';
 import { openPermissionGuide } from './permissionService';
 import { useCurrentLocation } from './useCurrentLocation';

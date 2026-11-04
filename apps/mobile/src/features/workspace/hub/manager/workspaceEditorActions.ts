@@ -2,9 +2,9 @@ import { useTripStore } from '@/stores/useTripStore';
 import type { WorkspaceSchedule, WorkspaceSnapshot } from '@wherego/domain';
 import * as Crypto from 'expo-crypto';
 import type { ImperativeRouter } from 'expo-router';
-import type { PlanForm } from '../../forms';
+import type { PlanForm } from '../../shared/model/forms';
 import { requestScheduleExit } from '../../schedule/ui/scheduleExitGuard';
-import { shareInvite } from '../../service';
+import { shareInvite } from '../../shared/manager/service';
 import {
   workspaceDraft,
   type WorkspaceDraftKind,

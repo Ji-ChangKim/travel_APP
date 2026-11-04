@@ -7,7 +7,7 @@ import {
   type WorkspaceCommand,
 } from '@wherego/validation';
 import { createWorkspaceScreenActions } from '../../apps/mobile/src/features/workspace/hub/model/workspaceScreenActions';
-import type { PlanForm } from '../../apps/mobile/src/features/workspace/forms';
+import type { PlanForm } from '../../apps/mobile/src/features/workspace/shared/model/forms';
 
 function setup() {
   // 제품 자료와 분리한 실제 도메인 객체로 화면 행동의 계약을 검사한다.

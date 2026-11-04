@@ -13983,7 +13983,49 @@ test('헤더 복귀: 상세 진입 전 검색 조건·직접 링크 오류·브�
   await expect(page.getByTestId('brand-header')).toBeVisible();
 });
 
-// 실제 인증 요청을 지연·실패시켜 준비 화면과 오류 레이어의 공통 헤더를 확인한다.
+// 중앙 오류창에는 페이지 헤더를 복제하지 않는다. 뒤쪽 공통 헤더 규격과 입력 차단을 함께 확인한다.
+async function inspectEntryRecovery(
+  page: Page,
+  title: string,
+  width: number,
+  scale: number,
+  testInfo: import('@playwright/test').TestInfo,
+) {
+  await page.evaluate((size) => {
+    document.documentElement.style.fontSize = `${16 * size}px`;
+    window.dispatchEvent(new Event('resize'));
+  }, scale);
+  const header = page.getByTestId('screen-title');
+  await expect(header).toHaveText(title);
+  await expect(header).toHaveCSS('font-size', `${26 * scale}px`);
+  await expect(header).toHaveCSS('line-height', `${36 * scale}px`);
+  await expect(header).toHaveCSS('font-weight', '700');
+  await expect(header).toHaveCSS('text-align', 'left');
+  expect(
+    await header.evaluate((element) =>
+      Boolean(element.closest('[aria-hidden="true"], [inert]')),
+    ),
+  ).toBe(true);
+  const card = page.getByTestId('entry-notice-card');
+  await expect(
+    card.getByRole('heading', { name: '로그인 정보 확인 안내', exact: true }),
+  ).toBeVisible();
+  const box = (await card.boundingBox())!;
+  expect(Math.abs(box.x + box.width / 2 - width / 2)).toBeLessThan(1);
+  expect(Math.abs(box.y + box.height / 2 - 422)).toBeLessThan(1);
+  expect(box.height).toBeLessThanOrEqual(804);
+  expect(
+    await card.evaluate(
+      (element) => element.scrollWidth <= element.clientWidth + 1,
+    ),
+  ).toBe(true);
+  await testInfo.attach('centered-auth-recovery', {
+    body: await page.screenshot(),
+    contentType: 'image/png',
+  });
+}
+
+// 실제 인증 요청을 지연·실패시켜 준비 화면·중앙 오류 안내·복구 후 공통 헤더를 확인한다.
 for (const width of [320, 390, 430]) {
   for (const scale of [1, 2]) {
     test(`헤더 규격 ${width} ${scale * 100}%: MY 인증 대기·오류·복구`, async ({
@@ -14012,13 +14054,13 @@ for (const width of [320, 390, 430]) {
       ).toBeVisible();
       await inspectHeader(page, 'my-auth-pending', width, scale, testInfo);
       release();
-      const recovery = page.getByTestId('auth-recovery-screen');
+      const recovery = page.getByTestId('entry-notice-card');
       await expect(recovery).toBeVisible();
-      await expect(recovery.getByTestId('screen-title')).toHaveText('MY');
+      await expect(page.getByTestId('screen-title')).toHaveText('MY');
       await expect(
         page.getByRole('button', { name: 'MY 탭', exact: true }),
       ).toHaveCount(0);
-      await inspectHeader(page, 'my-auth-error', width, scale, testInfo);
+      await inspectEntryRecovery(page, 'MY', width, scale, testInfo);
       fail = false;
       await page
         .getByRole('button', { name: '로그인 정보 다시 확인', exact: true })
@@ -14054,12 +14096,18 @@ for (const [width, scale] of [
       route.fulfill({ status: 503, json: {} }),
     );
     await page.goto('/new-trip');
-    const recovery = page.getByTestId('auth-recovery-screen');
+    const recovery = page.getByTestId('entry-notice-card');
     await expect(recovery).toBeVisible();
-    await expect(recovery.getByTestId('screen-title')).toHaveText(
+    await expect(page.getByTestId('screen-title')).toHaveText(
       '여행 계획 만들기',
     );
-    await inspectHeader(page, 'task-auth-error', width, scale, testInfo);
+    await inspectEntryRecovery(
+      page,
+      '여행 계획 만들기',
+      width,
+      scale,
+      testInfo,
+    );
     await recovery
       .getByRole('button', { name: '로그인으로 돌아가기', exact: true })
       .first()

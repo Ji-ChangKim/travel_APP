@@ -1,13 +1,13 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
 import { useRouter } from 'expo-router';
-import HaruState from '@/components/HaruState';
+import HaruState from '@/components/feedback/HaruState';
 import {
   tripAccessFailure,
   type AuthReturn,
 } from '../../../auth/model/authReturn';
 import { requestScheduleExit } from '../../schedule/ui/scheduleExitGuard';
-import { Action } from '../../ui';
+import { Action } from '../../shared/ui/ui';
 
 // 여행 조회 실패 원인에 맞춰 재인증·목록·재시도 행동을 제공한다.
 export default function TripAccessFeedback({

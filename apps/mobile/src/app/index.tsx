@@ -1,7 +1,7 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import Text from '@/components/AppText';
-import LoadingIndicator from '@/components/LoadingIndicator';
+import Text from '@/components/ui/AppText';
+import LoadingIndicator from '@/components/feedback/LoadingIndicator';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 import StartupFailureNotice from '@/features/startup/ui/StartupFailureNotice';
 import { introStyles as styles } from '@/features/startup/styles/introStyles';
@@ -10,11 +10,7 @@ import {
   completeBi,
   useLaunchSession,
 } from '@/features/startup/model/launchSession';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   useStartupController,
@@ -41,11 +37,15 @@ export default function StartScreen() {
     <View style={layout.screen}>
       <LaunchIntro onComplete={finishBrandIntro} settings={settings} handoff />
       {biDone &&
-        controller.slow && !controller.error && !controller.updateAvailable && (
+        controller.slow &&
+        !controller.error &&
+        !controller.updateAvailable && (
           <SafeAreaView style={layout.status} pointerEvents="box-none">
             <ScrollView contentContainerStyle={layout.message}>
               <LoadingIndicator />
-              <Text accessibilityLiveRegion="polite" style={styles.caption}>{t('연결을 확인하고 있어요')}</Text>
+              <Text accessibilityLiveRegion="polite" style={styles.caption}>
+                {t('연결을 확인하고 있어요')}
+              </Text>
             </ScrollView>
           </SafeAreaView>
         )}

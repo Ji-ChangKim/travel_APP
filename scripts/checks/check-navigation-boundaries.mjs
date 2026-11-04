@@ -241,12 +241,12 @@ export function auditNavigation() {
       path.relative(path.join(sourceRoot, 'app'), file).replaceAll('\\', '/'),
     )
     .filter((file) => !file.startsWith('../') && !structuralRoutes.has(file));
-  const policies = JSON.parse(
-    fs.readFileSync(
-      path.join(sourceRoot, 'components/screenNavigationPolicy.json'),
-      'utf8',
-    ),
-  );
+  const policyFile = fs.existsSync(
+    path.join(sourceRoot, 'components/navigation/screenNavigationPolicy.json'),
+  )
+    ? path.join(sourceRoot, 'components/navigation/screenNavigationPolicy.json')
+    : path.join(sourceRoot, 'components/screenNavigationPolicy.json');
+  const policies = JSON.parse(fs.readFileSync(policyFile, 'utf8'));
   findings.push(...inspectRoutePolicies(routes, policies, hasHeader));
   if (sites.filter((site) => site.name === 'GlobalNavigation').length !== 1)
     findings.push({

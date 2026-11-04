@@ -8,7 +8,7 @@ import {
   applyTrailReceipt,
   removeTrailPlan,
   flightSearchUrl,
-} from '../../mobile/src/features/trail/model';
+} from '../../mobile/src/features/trail/model/model';
 
 // 항공편과 계획 날짜의 경계 검증용 여행을 정의한다.
 const journey: TrailJourney = {

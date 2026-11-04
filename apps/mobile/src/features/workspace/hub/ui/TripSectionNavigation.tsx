@@ -2,11 +2,11 @@ import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useState } from 'react';
-import DesignButton from '@/components/DesignButton';
-import ActionSheet from '@/components/ActionSheet';
-import Text from '@/components/AppText';
+import DesignButton from '@/components/ui/DesignButton';
+import ActionSheet from '@/components/ui/ActionSheet';
+import Text from '@/components/ui/AppText';
 import { colors } from '@/constants/theme';
-import { workspaceSections } from '../../presentation';
+import { workspaceSections } from '../../shared/model/presentation';
 
 // 핵심 세 영역만 고정하고 부가 기능은 헤더 메뉴에서 연다.
 export function TripSectionNavigation({

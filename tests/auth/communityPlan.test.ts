@@ -6,7 +6,7 @@ import type { WorkspaceSnapshot } from '@wherego/domain';
 import {
   communityFeedCard,
   communityFeedPeriod,
-} from '../../apps/mobile/src/features/workspace/communityFeedCard';
+} from '../../apps/mobile/src/features/workspace/community/model/communityFeedCard';
 import {
   communityPostSchema,
   newTrip,

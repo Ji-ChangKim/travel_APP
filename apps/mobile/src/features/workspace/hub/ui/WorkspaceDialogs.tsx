@@ -1,14 +1,17 @@
 import { t } from '@/features/localization/translate';
-import DesignButton from '@/components/DesignButton';
+import DesignButton from '@/components/ui/DesignButton';
 import { Ionicons } from '@expo/vector-icons';
 import type { WorkspaceSchedule, WorkspaceSnapshot } from '@wherego/domain';
 import type { Dispatch, SetStateAction } from 'react';
 import { View } from 'react-native';
-import PlanEditor from '../../PlanEditor';
-import ReceiptCapture from '../../ReceiptCapture';
+import PlanEditor from '../../my-trips/manager/PlanEditor';
+import ReceiptCapture from '../../receipt/ui/ReceiptCapture';
 import { TripMoreMenu } from './TripSectionNavigation';
-import type { FieldErrors, FormFeedbackState } from '../../formFeedback';
-import { type PlanForm } from '../../forms';
+import type {
+  FieldErrors,
+  FormFeedbackState,
+} from '../../shared/model/formFeedback';
+import { type PlanForm } from '../../shared/model/forms';
 import { requestScheduleExit } from '../../schedule/ui/scheduleExitGuard';
 import { tripHubStyles as hub } from '../styles/tripHubStyles';
 import type { WorkspaceConfirmation } from '../model/workspaceConfirmation';

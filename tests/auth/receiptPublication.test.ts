@@ -12,12 +12,12 @@ import {
   receiptCanSave,
   receiptConfirmationValues,
   receiptCurrencyIssue,
-} from '../../apps/mobile/src/features/workspace/receiptChecks';
+} from '../../apps/mobile/src/features/workspace/receipt/model/receiptChecks';
 import {
   publicationIssue,
   publicationPreview,
-} from '../../apps/mobile/src/features/workspace/publication';
-import type { PlanForm } from '../../apps/mobile/src/features/workspace/forms';
+} from '../../apps/mobile/src/features/workspace/community/model/publication';
+import type { PlanForm } from '../../apps/mobile/src/features/workspace/shared/model/forms';
 
 // 소수 비교와 정보 확인에 사용하는 미저장 폼을 만든다.
 function receiptForm(amount = '0.31'): PlanForm {

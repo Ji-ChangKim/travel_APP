@@ -1,11 +1,11 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import Text from '@/components/AppText';
-import ActionSheet from '@/components/ActionSheet';
+import Text from '@/components/ui/AppText';
+import ActionSheet from '@/components/ui/ActionSheet';
 import { colors } from '@/constants/theme';
 import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Action } from '../workspace/ui';
+import { Action } from '../workspace/shared/ui/ui';
 import {
   permissionAction,
   type PermissionKind,

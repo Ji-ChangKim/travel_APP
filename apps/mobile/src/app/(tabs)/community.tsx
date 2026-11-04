@@ -1,1 +1,1 @@
-export { default } from '@/features/workspace/CommunityScreen';
+export { default } from '@/features/workspace/community/ui/CommunityScreen';

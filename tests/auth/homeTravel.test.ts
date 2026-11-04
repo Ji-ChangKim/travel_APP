@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { PersistedTrip } from '../../packages/domain/src/foundation';
-import { homeTravelGroups } from '../../apps/mobile/src/features/workspace/homeTravelModel';
-import type { CreationDraft } from '../../apps/mobile/src/features/workspace/creationDraftModel';
+import { homeTravelGroups } from '../../apps/mobile/src/features/workspace/home/model/homeTravelModel';
+import type { CreationDraft } from '../../apps/mobile/src/features/workspace/planning/model/creationDraftModel';
 const now = new Date('2026-10-26T00:00:00Z');
 function trip(id: string, startDate: string): PersistedTrip {
   return {

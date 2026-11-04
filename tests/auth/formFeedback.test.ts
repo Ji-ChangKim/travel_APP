@@ -9,9 +9,9 @@ import {
   formFailureFields,
   formInputFields,
   revisedFormFeedback,
-} from '../../apps/mobile/src/features/workspace/formFeedback';
-import { countryInputError } from '../../apps/mobile/src/features/workspace/countries';
-import { tripCreationInput } from '../../apps/mobile/src/features/workspace/tripCreation';
+} from '../../apps/mobile/src/features/workspace/shared/model/formFeedback';
+import { countryInputError } from '../../apps/mobile/src/features/workspace/planning/model/countries';
+import { tripCreationInput } from '../../apps/mobile/src/features/workspace/planning/model/tripCreation';
 import { submitOnce } from '../../apps/mobile/src/features/forms/submissionLock';
 
 const id = '00000000-0000-4000-8000-000000000001';

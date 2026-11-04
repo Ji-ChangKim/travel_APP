@@ -1,10 +1,10 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
 import { colors } from '@/constants/theme';
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 import { Linking, View } from 'react-native';
 import { z } from 'zod';
-import { Action } from '../../ui';
+import { Action } from '../../shared/ui/ui';
 
 export const googlePlaceSchema = z.object({
   id: z.string(),

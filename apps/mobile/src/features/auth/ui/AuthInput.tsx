@@ -1,9 +1,9 @@
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
 import { useState, type Dispatch, type SetStateAction } from 'react';
 import { Pressable, View } from 'react-native';
-import DesignInput from '@/components/DesignInput';
+import DesignInput from '@/components/ui/DesignInput';
 import { Ionicons } from '@expo/vector-icons';
 import { loginStyles as styles, loginTheme } from '../styles/loginStyles';
 

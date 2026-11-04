@@ -12,8 +12,8 @@ import {
 import {
   manualTripFlight,
   manualTicketIssue,
-} from '../../apps/mobile/src/features/workspace/flightTicketDraft';
-import { diaryCosts } from '../../apps/mobile/src/features/workspace/diary';
+} from '../../apps/mobile/src/features/workspace/planning/model/flightTicketDraft';
+import { diaryCosts } from '../../apps/mobile/src/features/workspace/my-trips/model/diary';
 
 // 과거 여행도 현재 시간과 무관하게 같은 생성 계약을 따른다.
 function pastTrip(): WorkspaceSnapshot {

@@ -1,4 +1,4 @@
-import { apiBaseUrl } from '@/features/workspace/service';
+import { apiBaseUrl } from '@/features/workspace/shared/manager/service';
 import { readAppPolicy, saveAppPolicy } from '../manager/startupStorage';
 import { loadAppPolicy } from '../manager/policyClient';
 import type { PolicyResult } from './updatePolicy';

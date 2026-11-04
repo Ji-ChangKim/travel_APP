@@ -1,9 +1,9 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 import { useState } from 'react';
 import { Linking, View } from 'react-native';
-import { Action, Field } from '../../ui';
+import { Action, Field } from '../../shared/ui/ui';
 import { styles } from '../../hub/styles/workspaceStyles';
 
 import SharedPlaceInput from './SharedPlaceInput';

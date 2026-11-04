@@ -1,8 +1,8 @@
 import type { WorkspaceSnapshot } from '@wherego/domain';
 import { useMemo, useState } from 'react';
 import { useCurrentLocation } from '../../../permissions/useCurrentLocation';
-import { useFormScope } from '../../InputFeedback';
-import type { PlanForm } from '../../forms';
+import { useFormScope } from '../../shared/ui/InputFeedback';
+import type { PlanForm } from '../../shared/model/forms';
 import {
   savedMapLocation,
   tripMapStops,

@@ -1,12 +1,12 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import ScreenHeader from '@/components/ScreenHeader';
+import ScreenHeader from '@/components/navigation/ScreenHeader';
 import { useEffect, useState } from 'react';
 import { Platform, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import HaruState from '@/components/HaruState';
-import DesignButton from '@/components/DesignButton';
-import CenteredNoticeModal from '@/components/CenteredNoticeModal';
+import HaruState from '@/components/feedback/HaruState';
+import DesignButton from '@/components/ui/DesignButton';
+import CenteredNoticeModal from '@/components/ui/CenteredNoticeModal';
 import { styles } from '@/features/workspace/hub/styles/workspaceStyles';
 
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -107,20 +107,28 @@ export default function AuthCallbackScreen() {
       <CenteredNoticeModal
         visible={failed}
         title={t('로그인 안내')}
-        paragraphs={[t('로그인 정보가 만료됐거나 확인을 마치지 못했어요.'), t('다시 로그인하고 여행을 이어가요.')]}
-        onClose={() => router.replace({ pathname: '/login', params: { ...target, reauth: '1' } })}
+        paragraphs={[
+          t('로그인 정보가 만료됐거나 확인을 마치지 못했어요.'),
+          t('다시 로그인하고 여행을 이어가요.'),
+        ]}
+        onClose={() =>
+          router.replace({
+            pathname: '/login',
+            params: { ...target, reauth: '1' },
+          })
+        }
       >
-            <DesignButton
-              label={t('로그인으로 돌아가기')}
-              variant="primary"
-              onPress={() => {
-                // 만료된 코드 재사용 대신 새 로그인을 시작한다.
-                return router.replace({
-                  pathname: '/login',
-                  params: { ...target, reauth: '1' },
-                });
-              }}
-            />
+        <DesignButton
+          label={t('로그인으로 돌아가기')}
+          variant="primary"
+          onPress={() => {
+            // 만료된 코드 재사용 대신 새 로그인을 시작한다.
+            return router.replace({
+              pathname: '/login',
+              params: { ...target, reauth: '1' },
+            });
+          }}
+        />
       </CenteredNoticeModal>
     </SafeAreaView>
   );

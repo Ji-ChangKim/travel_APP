@@ -6,9 +6,9 @@ import {
   tripPresentation,
   tripToday,
   homeResumeTrips,
-} from '../../apps/mobile/src/features/workspace/tripLifecycle';
-import { selectTravelPlans } from '../../apps/mobile/src/features/workspace/travelPlans';
-import { tripOpenPath } from '../../apps/mobile/src/features/workspace/tripPresentation';
+} from '../../apps/mobile/src/features/workspace/shared/model/tripLifecycle';
+import { selectTravelPlans } from '../../apps/mobile/src/features/workspace/shared/model/travelPlans';
+import { tripOpenPath } from '../../apps/mobile/src/features/workspace/shared/model/tripPresentation';
 
 const trip = {
   id: 'wakayama',

@@ -159,7 +159,9 @@ export function inspectNavigationSource(file, text, resolveComponent) {
           ) &&
           ![
             'features/workspace/DestinationPicker.tsx',
+            'features/workspace/planning/ui/DestinationPicker.tsx',
             'features/profile/ProfileEditor.tsx',
+            'features/profile/ui/ProfileEditor.tsx',
           ].includes(file)
         )
           add(attr, 'inset 생략은 부모 여백을 확인한 기존 시트에서만 허용');

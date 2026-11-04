@@ -6,7 +6,7 @@ import type { WorkspaceSnapshot } from '@wherego/domain';
 import { type WorkspaceCommand } from '@wherego/validation';
 import * as Crypto from 'expo-crypto';
 import { type Dispatch, type RefObject, type SetStateAction } from 'react';
-import { removeImage, serverOptions } from '../../service';
+import { removeImage, serverOptions } from '../../shared/manager/service';
 import {
   canConfirmWorkspaceAction,
   workspaceConfirmation,

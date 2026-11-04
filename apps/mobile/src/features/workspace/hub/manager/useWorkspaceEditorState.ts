@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import type { sendWorkspaceCommand } from '@wherego/api-client';
-import { newTripForm, type PlanForm } from '../../forms';
-import type { FormFeedbackState } from '../../formFeedback';
+import { newTripForm, type PlanForm } from '../../shared/model/forms';
+import type { FormFeedbackState } from '../../shared/model/formFeedback';
 import type { WorkspaceConfirmation } from '../model/workspaceConfirmation';
 import { useScheduleExitGuard } from '../../schedule/ui/scheduleExitGuard';
 

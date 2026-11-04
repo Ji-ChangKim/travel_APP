@@ -4,9 +4,9 @@ import { tripLifecycle, type PersistedTrip } from '@wherego/domain';
 import {
   tripPresentation,
   tripOpenPath,
-} from '../../apps/mobile/src/features/workspace/tripPresentation';
-import { tripPhase } from '../../apps/mobile/src/features/workspace/tripLifecycle';
-import { hasGlobalNavigation } from '../../apps/mobile/src/components/navigationPolicy';
+} from '../../apps/mobile/src/features/workspace/shared/model/tripPresentation';
+import { tripPhase } from '../../apps/mobile/src/features/workspace/shared/model/tripLifecycle';
+import { hasGlobalNavigation } from '../../apps/mobile/src/components/navigation/navigationPolicy';
 
 const trip = Object.freeze({
   id: 'travel',

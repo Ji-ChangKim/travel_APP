@@ -1,15 +1,15 @@
 import { t } from '@/features/localization/translate';
 
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 
 import type { WorkspaceSchedule, WorkspaceSnapshot } from '@wherego/domain';
 import type { ImperativeRouter } from 'expo-router';
 
 import { View } from 'react-native';
-import PublishReadiness from '../../PublishReadiness';
-import PublishedPlanActions from '../../PublishedPlanActions';
+import PublishReadiness from '../../community/ui/PublishReadiness';
+import PublishedPlanActions from '../../community/ui/PublishedPlanActions';
 
-import { Action } from '../../ui';
+import { Action } from '../../shared/ui/ui';
 import type { WorkspaceDraftKind } from '../model/workspaceDrafts';
 import type { WorkspaceScreenActions } from '../model/workspaceScreenActions';
 import { styles } from '../styles/workspaceStyles';

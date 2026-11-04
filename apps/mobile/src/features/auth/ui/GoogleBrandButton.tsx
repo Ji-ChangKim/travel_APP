@@ -7,7 +7,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { AppFontsReady } from '@/components/AppFontProvider';
+import { AppFontsReady } from '@/components/ui/AppFontProvider';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 import { useLocale } from '@/features/localization/localeState';
 import { t } from '@/features/localization/translate';

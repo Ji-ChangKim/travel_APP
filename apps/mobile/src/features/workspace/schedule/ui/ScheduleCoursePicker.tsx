@@ -1,11 +1,11 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
 import { View, StyleSheet } from 'react-native';
-import Text from '@/components/AppText';
-import ActionSheet from '@/components/ActionSheet';
-import DesignButton from '@/components/DesignButton';
+import Text from '@/components/ui/AppText';
+import ActionSheet from '@/components/ui/ActionSheet';
+import DesignButton from '@/components/ui/DesignButton';
 import { colors } from '@/constants/theme';
-import { guideForTrip, type CityGuide } from '../../cityGuides';
+import { guideForTrip, type CityGuide } from '../../community/model/cityGuides';
 
 // 코스를 미리 읽고 원하는 장소 하나를 저장 전 일정 작성으로 넘긴다.
 export default function ScheduleCoursePicker({

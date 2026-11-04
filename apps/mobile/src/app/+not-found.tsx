@@ -1,12 +1,12 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import ScreenHeader from '@/components/ScreenHeader';
-import { returnToScreen } from '@/components/navigationModel';
+import ScreenHeader from '@/components/navigation/ScreenHeader';
+import { returnToScreen } from '@/components/navigation/navigationModel';
 import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import HaruState from '@/components/HaruState';
-import { Action } from '@/features/workspace/ui';
+import HaruState from '@/components/feedback/HaruState';
+import { Action } from '@/features/workspace/shared/ui/ui';
 import { styles } from '@/features/workspace/hub/styles/workspaceStyles';
 
 // 존재하지 않는 주소에서도 서비스의 시작점으로 돌아가도록 안내한다.

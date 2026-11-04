@@ -2,7 +2,7 @@ import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
 import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import DesignButton from '@/components/DesignButton';
+import DesignButton from '@/components/ui/DesignButton';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 import { colors } from '@/constants/theme';
 

@@ -1,6 +1,6 @@
 import type { WorkspaceSnapshot, WorkspaceSchedule } from '@wherego/domain';
-import type { PlanForm } from '../../forms';
-import { destinationForm } from '../../destinationForms';
+import type { PlanForm } from '../../shared/model/forms';
+import { destinationForm } from '../../planning/model/destinationForms';
 
 export type WorkspaceDraftKind =
   | 'expense'

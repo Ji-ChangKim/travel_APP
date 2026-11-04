@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { WorkspaceSchedule } from '@wherego/domain';
-import { nextTripSchedule } from '../../apps/mobile/src/features/workspace/homeBriefing';
+import { nextTripSchedule } from '../../apps/mobile/src/features/workspace/home/model/homeBriefing';
 
 // 실제 저장 계약을 만족하는 시간별 일정 원본을 만든다.
 function item(

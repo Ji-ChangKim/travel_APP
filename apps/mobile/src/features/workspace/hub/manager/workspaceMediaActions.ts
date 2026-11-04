@@ -12,14 +12,14 @@ import {
   type RefObject,
   type SetStateAction,
 } from 'react';
-import { type PlanForm } from '../../forms';
-import { receiptForm } from '../../receiptFlow';
+import { type PlanForm } from '../../shared/model/forms';
+import { receiptForm } from '../../receipt/model/receiptFlow';
 import {
   scanServerReceipt,
   selectImage,
   serverOptions,
   uploadImage,
-} from '../../service';
+} from '../../shared/manager/service';
 import { workspaceError } from '../model/workspaceFailure';
 
 export function receiptScanFailure(

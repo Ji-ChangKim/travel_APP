@@ -1,9 +1,9 @@
 import { t } from '@/features/localization/translate';
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 import type { WorkspaceSnapshot } from '@wherego/domain';
 import { destinationForDay } from '@wherego/domain';
 import { View } from 'react-native';
-import type { PlanForm } from '../../forms';
+import type { PlanForm } from '../../shared/model/forms';
 import GooglePlace from './GooglePlace';
 import PlaceSearch from './PlaceSearch';
 import {
@@ -18,7 +18,7 @@ import {
   scheduleTimePresets,
 } from '../model/schedulePresentation';
 import { scheduleStyles as s } from '../styles/scheduleTheme';
-import { DateField } from '../../TravelInputs';
+import { DateField } from '../../planning/ui/TravelInputs';
 
 // 일정 작성·수정 섹션이 공통으로 읽는 값과 실행 가능한 행동의 계약이다.
 type ScheduleEditorSectionProps = {

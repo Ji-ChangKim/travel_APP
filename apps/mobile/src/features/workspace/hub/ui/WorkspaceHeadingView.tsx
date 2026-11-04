@@ -1,9 +1,9 @@
 import { t } from '@/features/localization/translate';
-import { returnToScreen } from '@/components/navigationModel';
-import Text from '@/components/AppText';
+import { returnToScreen } from '@/components/navigation/navigationModel';
+import Text from '@/components/ui/AppText';
 
-import ScreenHeader from '@/components/ScreenHeader';
-import ScreenTitle from '@/components/ScreenTitle';
+import ScreenHeader from '@/components/navigation/ScreenHeader';
+import ScreenTitle from '@/components/navigation/ScreenTitle';
 import TripIcon from '@/components/icons/TripIcon';
 
 import type { UseQueryResult } from '@tanstack/react-query';
@@ -12,13 +12,13 @@ import type { ImperativeRouter } from 'expo-router';
 import type { Dispatch, SetStateAction } from 'react';
 import { View } from 'react-native';
 
-import { memberRoleLabel } from '../../presentation';
+import { memberRoleLabel } from '../../shared/model/presentation';
 import { requestScheduleExit } from '../../schedule/ui/scheduleExitGuard';
-import { travelDateRange } from '../../travelDateRange';
+import { travelDateRange } from '../../planning/model/travelDateRange';
 
 import { tripHubStyles as hub } from '../styles/tripHubStyles';
-import { tripPresentation } from '../../tripLifecycle';
-import { Action } from '../../ui';
+import { tripPresentation } from '../../shared/model/tripLifecycle';
+import { Action } from '../../shared/ui/ui';
 
 type RenderWorkspaceSummaryProps = {
   snapshot: WorkspaceSnapshot;

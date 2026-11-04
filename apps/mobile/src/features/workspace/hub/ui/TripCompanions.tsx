@@ -1,9 +1,9 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 import { colors } from '@/constants/theme';
 import { StyleSheet, View } from 'react-native';
-import DesignButton from '@/components/DesignButton';
+import DesignButton from '@/components/ui/DesignButton';
 import type { WorkspaceSnapshot } from '@wherego/domain';
 
 // 함께 계획 중인 실제 멤버와 기존 동행 관리 화면의 진입점을 표시한다.

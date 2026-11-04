@@ -1,7 +1,7 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import Text from '@/components/AppText';
-import ScreenHeader from '@/components/ScreenHeader';
+import Text from '@/components/ui/AppText';
+import ScreenHeader from '@/components/navigation/ScreenHeader';
 import { useEffect, useRef, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,7 +10,7 @@ import * as Crypto from 'expo-crypto';
 import * as Linking from 'expo-linking';
 import { acceptServerInvite } from '@wherego/api-client';
 import { useTripStore } from '@/stores/useTripStore';
-import { serverOptions } from '../../service';
+import { serverOptions } from '../../shared/manager/service';
 import {
   readInvite,
   pendingInvite,
@@ -18,7 +18,7 @@ import {
   clearPendingInvite,
 } from '../model/invite';
 import { workspaceError } from '../model/workspaceFailure';
-import { Action, Field } from '../../ui';
+import { Action, Field } from '../../shared/ui/ui';
 import { styles } from '../styles/workspaceStyles';
 
 // 받은 링크를 확인하고 로그인 계정으로 명시적으로 참여한다.

@@ -1,9 +1,9 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import { tripListQueryOptions } from '../../tripQueries';
-import Text from '@/components/AppText';
-import ScreenHeader from '@/components/ScreenHeader';
-import { travelDateRange } from '../../travelDateRange';
+import { tripListQueryOptions } from '../../shared/manager/tripQueries';
+import Text from '@/components/ui/AppText';
+import ScreenHeader from '@/components/navigation/ScreenHeader';
+import { travelDateRange } from '../../planning/model/travelDateRange';
 import { useEffect, useState, type Dispatch, type SetStateAction } from 'react';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,7 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { useTripStore } from '@/stores/useTripStore';
 
-import { Action, Field } from '../../ui';
+import { Action, Field } from '../../shared/ui/ui';
 import { styles } from '../../hub/styles/workspaceStyles';
 
 import {

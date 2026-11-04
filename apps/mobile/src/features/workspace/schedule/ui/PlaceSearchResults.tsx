@@ -1,13 +1,13 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 import { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { FoundationClientError, searchPlaces } from '@wherego/api-client';
 import { z } from 'zod';
 import { GoogleAttribution, googlePlaceSchema } from './GooglePlace';
-import { serverOptions } from '../../service';
-import { Action } from '../../ui';
+import { serverOptions } from '../../shared/manager/service';
+import { Action } from '../../shared/ui/ui';
 import { styles } from '../../hub/styles/workspaceStyles';
 
 import { ScheduleButton } from './ScheduleControls';

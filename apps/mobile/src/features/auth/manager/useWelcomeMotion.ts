@@ -38,7 +38,8 @@ export function useWelcomeMotion() {
   }, [pending]);
 
   useEffect(() => {
-    if (!pending || done || geometry || !settings.ready || !settings.foreground) return;
+    if (!pending || done || geometry || !settings.ready || !settings.foreground)
+      return;
     // 위치 측정 실패는 사용자가 해결할 수 없으므로 팝업 대신 최종 배치로 복구한다.
     const timeout = setTimeout(() => {
       clock.stopAnimation(() => {

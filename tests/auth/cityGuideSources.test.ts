@@ -9,7 +9,7 @@ import {
   photoAttribution,
   requireGuideUrl,
   storyAttribution,
-} from '../../apps/mobile/src/features/workspace/cityGuideSources';
+} from '../../apps/mobile/src/features/workspace/community/model/cityGuideSources';
 import credits from '../../apps/mobile/assets/destinations/credits.json';
 
 const expected = {

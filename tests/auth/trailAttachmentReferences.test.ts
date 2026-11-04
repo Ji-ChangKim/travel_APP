@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { TrailJourney } from '@wherego/domain';
-import { trailAttachmentReferences } from '../../apps/mobile/src/features/trail/trailAttachmentReferences';
+import { trailAttachmentReferences } from '../../apps/mobile/src/features/trail/model/trailAttachmentReferences';
 
 const journey = {
   receipts: [{ attachment: { uri: 'saved-original.png' } }],

@@ -1,8 +1,8 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
 import { Image, View, StyleSheet } from 'react-native';
-import Text from '@/components/AppText';
-import { Action } from '../../ui';
+import Text from '@/components/ui/AppText';
+import { Action } from '../../shared/ui/ui';
 
 // 준비된 이미지·상태·행동만 표시하고 인증·조회·캐시를 변경하지 않는다.
 export default function PrivatePhotoView({

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import type { WorkspaceSnapshot } from '@wherego/domain';
-import { sharedScheduleForm, type PlanForm } from '../../forms';
+import { sharedScheduleForm, type PlanForm } from '../../shared/model/forms';
 import {
   pendingMapsShare,
   clearPendingMapsShare,

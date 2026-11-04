@@ -1,9 +1,9 @@
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 import { t } from '@/features/localization/translate';
 import type { WorkspaceSnapshot } from '@wherego/domain';
 import { View } from 'react-native';
-import ReceiptDetails from '../../ReceiptDetails';
-import { Action } from '../../ui';
+import ReceiptDetails from '../../receipt/ui/ReceiptDetails';
+import { Action } from '../../shared/ui/ui';
 import type { WorkspaceScreenActions } from '../model/workspaceScreenActions';
 import { styles } from '../styles/workspaceStyles';
 

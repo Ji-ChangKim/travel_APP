@@ -4556,14 +4556,8 @@
   ],
   "Google 계정으로 계속": ["Continue with Google", "Google で続行"],
   "버전 {version}": ["Version {version}", "バージョン {version}"],
-  "앱 업데이트 안내": [
-    "App update",
-    "アプリのアップデート"
-  ],
-  "업데이트 확인 안내": [
-    "Check for an update",
-    "アップデートの確認"
-  ],
+  "앱 업데이트 안내": ["App update", "アプリのアップデート"],
+  "업데이트 확인 안내": ["Check for an update", "アップデートの確認"],
   "설치할 수 있는 버전을 확인하지 못했어요.": [
     "We couldn't check which update is available for your device.",
     "この端末にインストールできるバージョンを確認できませんでした。"
@@ -4584,26 +4578,11 @@
     "please update to the latest version.",
     "最新バージョンへのアップデートが必要です。"
   ],
-  "현재 버전": [
-    "Current version",
-    "現在のバージョン"
-  ],
-  "최신 버전": [
-    "Latest version",
-    "最新バージョン"
-  ],
-  "Google Play 스토어로 이동": [
-    "Go to Google Play",
-    "Google Play ストアへ"
-  ],
-  "로그인 정보 확인 안내": [
-    "Check your sign-in",
-    "ログイン情報の確認"
-  ],
-  "여행 시작 안내": [
-    "Starting your journey",
-    "旅行の開始について"
-  ],
+  "현재 버전": ["Current version", "現在のバージョン"],
+  "최신 버전": ["Latest version", "最新バージョン"],
+  "Google Play 스토어로 이동": ["Go to Google Play", "Google Play ストアへ"],
+  "로그인 정보 확인 안내": ["Check your sign-in", "ログイン情報の確認"],
+  "여행 시작 안내": ["Starting your journey", "旅行の開始について"],
   "이 기기의 여행 기록을 열지 못했어요.": [
     "We couldn't open the travel records on this device.",
     "この端末の旅行記録を開けませんでした。"
@@ -4628,22 +4607,10 @@
     "We couldn't get your journey ready.",
     "旅行の準備ができませんでした。"
   ],
-  "게스트 시작 안내": [
-    "Starting as a guest",
-    "ゲスト利用について"
-  ],
-  "여행 열기 안내": [
-    "Opening your journey",
-    "旅行を開く"
-  ],
-  "로그아웃 안내": [
-    "Signing out",
-    "ログアウトについて"
-  ],
-  "로그인 안내": [
-    "Signing in",
-    "ログインについて"
-  ],
+  "게스트 시작 안내": ["Starting as a guest", "ゲスト利用について"],
+  "여행 열기 안내": ["Opening your journey", "旅行を開く"],
+  "로그아웃 안내": ["Signing out", "ログアウトについて"],
+  "로그인 안내": ["Signing in", "ログインについて"],
   "게스트를 시작하지 못했어요.": [
     "We couldn't start your guest session.",
     "ゲスト利用を開始できませんでした。"
@@ -4675,5 +4642,6 @@
   "로그인 정보가 만료됐거나 확인을 마치지 못했어요.": [
     "Your sign-in may have expired, or verification could not be completed.",
     "ログイン情報の有効期限が切れたか、確認を完了できませんでした。"
-  ]
+  ],
+  "로그인하고 있어요": ["Signing you in", "ログインしています"]
 }

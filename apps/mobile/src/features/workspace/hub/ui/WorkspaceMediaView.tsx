@@ -2,7 +2,7 @@ import WorkspaceReceiptCard from './WorkspaceReceiptCard';
 import { workspaceMediaSelection } from '../model/workspaceMediaSelection';
 import { t } from '@/features/localization/translate';
 
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 
 import type { WorkspaceSchedule, WorkspaceSnapshot } from '@wherego/domain';
 
@@ -11,7 +11,7 @@ import { View } from 'react-native';
 
 import ServerPhoto from '../../schedule/ui/ServerPhoto';
 
-import { Action } from '../../ui';
+import { Action } from '../../shared/ui/ui';
 import type { WorkspaceDraftKind } from '../model/workspaceDrafts';
 import type { WorkspaceScreenActions } from '../model/workspaceScreenActions';
 import { styles } from '../styles/workspaceStyles';

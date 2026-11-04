@@ -1,7 +1,7 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import Text from '@/components/AppText';
-import HaruState from '@/components/HaruState';
+import Text from '@/components/ui/AppText';
+import HaruState from '@/components/feedback/HaruState';
 import { colors } from '@/constants/theme';
 import {
   ActivityIndicator,
@@ -12,8 +12,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ModalBackground from '../../../accessibility/ModalBackground';
 import { authReturn } from '../../../auth/model/authReturn';
-import HomeScreen from '../../HomeScreen';
-import PlanEditor from '../../PlanEditor';
+import HomeScreen from '../../home/ui/HomeScreen';
+import PlanEditor from '../../my-trips/manager/PlanEditor';
 import TripAccessFeedback from './TripAccessFeedback';
 import { TripSectionNavigation } from './TripSectionNavigation';
 import WorkspaceConfirmDialog from './WorkspaceConfirmDialog';
@@ -36,9 +36,9 @@ import {
   renderWorkspaceSharing,
   renderWorkspaceSummary,
 } from './WorkspaceSections';
-import { tripDetailStyles as detail } from '../../tripDetailStyles';
+import { tripDetailStyles as detail } from '../../my-trips/styles/tripDetailStyles';
 import { tripHubStyles as hub } from '../styles/tripHubStyles';
-import { Action } from '../../ui';
+import { Action } from '../../shared/ui/ui';
 import { workspaceError } from '../model/workspaceFailure';
 import { styles } from '../styles/workspaceStyles';
 

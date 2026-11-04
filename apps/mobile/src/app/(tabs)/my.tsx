@@ -1,13 +1,13 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
-import { renderAccountContent } from '../../features/profile/MyAccountView';
-import { useMyAccountController } from '../../features/profile/useMyAccountController';
+import { renderAccountContent } from '../../features/profile/ui/MyAccountView';
+import { useMyAccountController } from '../../features/profile/manager/useMyAccountController';
 
-import TripPrintLoading from '@/components/TripPrintLoading';
-import ScreenHeader from '@/components/ScreenHeader';
+import TripPrintLoading from '@/components/feedback/TripPrintLoading';
+import ScreenHeader from '@/components/navigation/ScreenHeader';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { styles } from '@/features/profile/myAccountStyles';
+import { styles } from '@/features/profile/styles/myAccountStyles';
 import { useAuthReady } from '@/features/auth/manager/AuthBridge';
 import { useTripStore } from '@/stores/useTripStore';
 
@@ -51,4 +51,4 @@ function MyContent() {
   });
 }
 
-export { useMyAccountController } from '../../features/profile/useMyAccountController';
+export { useMyAccountController } from '../../features/profile/manager/useMyAccountController';

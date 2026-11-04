@@ -9,7 +9,7 @@ import {
   communityFeedSearch,
 } from '@wherego/validation';
 import { schedulePlanInput } from '../../apps/mobile/src/features/workspace/schedule/model/schedulePlanInput';
-import { tripPeriodImpact } from '../../apps/mobile/src/features/workspace/tripPeriod';
+import { tripPeriodImpact } from '../../apps/mobile/src/features/workspace/planning/model/tripPeriod';
 import {
   workspaceConfirmation,
   canConfirmWorkspaceAction,

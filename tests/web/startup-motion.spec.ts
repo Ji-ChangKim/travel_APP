@@ -491,20 +491,23 @@ test('시작 연출: Google 실패와 게스트 재시도는 기존 인증 경�
     .click();
   await expect(google).toBeEnabled();
   await google.click();
-  await expect(page.getByRole('alert')).toContainText(
+  await expect(page.getByTestId('entry-notice-card')).toContainText(
     'Google 로그인을 완료하지',
   );
   expect(state.socialRequests).toBe(1);
+  await page.getByRole('button', { name: '닫기', exact: true }).click();
   state.guestFailure = true;
   const guest = page.getByRole('button', {
     name: '게스트로 시작하기',
     exact: true,
   });
   await guest.click();
-  await expect(page.getByRole('alert')).toContainText('게스트를 시작하지');
+  await expect(page.getByTestId('entry-notice-card')).toContainText(
+    '게스트를 시작하지',
+  );
   await expect(page).toHaveURL(/\/welcome$/);
   state.guestFailure = false;
-  await guest.click();
+  await page.getByRole('button', { name: '다시 시도', exact: true }).click();
   await expect(
     page.getByRole('button', { name: '홈 탭', exact: true }),
   ).toBeVisible();
@@ -545,3 +548,236 @@ for (const width of [320, 430])
       fullPage: true,
     });
   });
+
+const noticePreview = '/community/00000000-0000-4000-8000-00000000eeee';
+
+for (const scenario of [
+  {
+    width: 390,
+    height: 844,
+    language: 'ko',
+    scale: 1,
+    label: 'Google Play 스토어로 이동',
+  },
+  {
+    width: 320,
+    height: 568,
+    language: 'en',
+    scale: 2,
+    label: 'Go to Google Play',
+  },
+  {
+    width: 430,
+    height: 932,
+    language: 'ja',
+    scale: 2,
+    label: 'Google Play ストアへ',
+  },
+  {
+    width: 844,
+    height: 390,
+    language: 'en',
+    scale: 2,
+    label: 'Go to Google Play',
+  },
+  {
+    width: 1024,
+    height: 1366,
+    language: 'ko',
+    scale: 1,
+    label: 'Google Play 스토어로 이동',
+  },
+]) {
+  test(`중앙 팝업: ${scenario.width}×${scenario.height} ${scenario.language} ${scenario.scale * 100}% 업데이트 안내·클릭 로그`, async ({
+    page,
+  }) => {
+    await network(page);
+    await page.setViewportSize({
+      width: scenario.width,
+      height: scenario.height,
+    });
+    await page.addInitScript(
+      (language) => localStorage.setItem('tripprint.language.v1', language),
+      scenario.language,
+    );
+    const clicks: string[] = [];
+    const popups: string[] = [];
+    page.on('console', (message) => {
+      if (message.text().startsWith('클릭 시 이동'))
+        clicks.push(message.text());
+    });
+    page.on('popup', (popup) => popups.push(popup.url()));
+    await page.goto(noticePreview);
+    await page.evaluate((scale) => {
+      document.documentElement.style.fontSize = `${scale * 16}px`;
+      window.dispatchEvent(new Event('resize'));
+    }, scenario.scale);
+    const card = page.getByTestId('entry-notice-card');
+    await expect(card).toBeVisible();
+    const button = page.getByRole('button', {
+      name: scenario.label,
+      exact: true,
+    });
+    await expect(button).toBeVisible();
+    const box = (await card.boundingBox())!;
+    expect(Math.abs(box.x + box.width / 2 - scenario.width / 2)).toBeLessThan(
+      1,
+    );
+    expect(Math.abs(box.y + box.height / 2 - scenario.height / 2)).toBeLessThan(
+      1,
+    );
+    expect(box.height).toBeLessThanOrEqual(scenario.height - 40);
+    expect(
+      await card.evaluate(
+        (element) => element.scrollWidth <= element.clientWidth + 1,
+      ),
+    ).toBe(true);
+    const before = page.url();
+    const versionLines = await page
+      .getByTestId('entry-version-comparison')
+      .evaluate((element) => {
+        const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+        const range = document.createRange();
+        const lines: { left: number; right: number }[] = [];
+        let node: Node | null;
+        while ((node = walker.nextNode())) {
+          if (!node.textContent?.trim()) continue;
+          range.selectNodeContents(node);
+          lines.push(
+            ...Array.from(range.getClientRects(), (rect) => ({
+              left: rect.left,
+              right: rect.right,
+            })),
+          );
+        }
+        return lines;
+      });
+    for (const line of versionLines) {
+      expect(line.left).toBeGreaterThanOrEqual(box.x + 23);
+      expect(line.right).toBeLessThanOrEqual(box.x + box.width - 23);
+    }
+    await button.click();
+    await expect.poll(() => clicks.length).toBe(1);
+    expect(clicks[0]).toContain('google-play-store');
+    expect(popups).toEqual([]);
+    expect(page.url()).toBe(before);
+    await expect(card).toBeVisible();
+    await page.keyboard.press('Escape');
+    await page.mouse.click(2, 2);
+    await expect(card).toBeVisible();
+    await page.keyboard.press('Tab');
+    expect(
+      await page.evaluate(() =>
+        Boolean(
+          document.activeElement?.closest('[data-testid="entry-notice-card"]'),
+        ),
+      ),
+    ).toBe(true);
+    await page.screenshot({
+      path: `outputs/startup-motion-app/update-notice-${scenario.width}-${scenario.language}-${scenario.scale}.png`,
+      fullPage: true,
+    });
+  });
+}
+
+test('중앙 팝업: 선택 업데이트는 현재 버전으로 계속하고 설치 불가는 다시 확인한다', async ({
+  page,
+}) => {
+  await network(page);
+  await page.goto(`${noticePreview}?kind=optional`);
+  await page
+    .getByRole('button', { name: '현재 버전으로 시작', exact: true })
+    .click();
+  await expect(page.getByTestId('entry-notice-card')).toHaveCount(0);
+  await expect(page.getByTestId('notice-preview-result')).toHaveText(
+    'continued',
+  );
+  await page.goto(`${noticePreview}?kind=blocked`);
+  await expect(
+    page.getByRole('button', {
+      name: 'Google Play 스토어로 이동',
+      exact: true,
+    }),
+  ).toHaveCount(0);
+  await page.getByRole('button', { name: '다시 확인', exact: true }).click();
+  await expect(page.getByTestId('notice-preview-result')).toHaveText(
+    'retries:1',
+  );
+  await page.keyboard.press('Escape');
+  await expect(page.getByTestId('entry-notice-card')).toBeVisible();
+});
+
+test('중앙 팝업: 시작 오류는 배경 클릭으로 우회하지 않고 재시도한다', async ({
+  page,
+}) => {
+  const state = await network(page);
+  state.startupFailure = true;
+  await page.goto('/');
+  const card = page.getByTestId('entry-notice-card');
+  await expect(card).toContainText('여행을 준비하지 못했어요.');
+  await page.keyboard.press('Escape');
+  await page.mouse.click(2, 2);
+  await expect(card).toBeVisible();
+  const box = (await card.boundingBox())!;
+  expect(Math.abs(box.y + box.height / 2 - 422)).toBeLessThan(1);
+  await page.screenshot({
+    path: 'outputs/startup-motion-app/startup-error-notice.png',
+    fullPage: true,
+  });
+  state.startupFailure = false;
+  await page.getByRole('button', { name: '다시 시도', exact: true }).click();
+  await expect(page).toHaveURL(/\/welcome$/);
+  await expect(card).toHaveCount(0);
+});
+
+test('중앙 팝업: 인증 콜백 실패는 새 로그인으로 돌아간다', async ({ page }) => {
+  await network(page);
+  await page.goto('/auth/callback?error=access_denied');
+  await expect(page.getByTestId('entry-notice-card')).toContainText(
+    '로그인 정보가 만료됐거나',
+  );
+  await page
+    .getByRole('button', { name: '로그인으로 돌아가기', exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/login\?reauth=1$/);
+  await expect(page.getByTestId('entry-notice-card')).toHaveCount(0);
+});
+
+test('자동 복구: 로고 위치를 측정하지 못해도 팝업 없이 로그인 버튼을 연다', async ({
+  page,
+}) => {
+  await network(page);
+  await page.addInitScript(() => {
+    const original = Element.prototype.getBoundingClientRect;
+    Element.prototype.getBoundingClientRect = function () {
+      const box = original.call(this);
+      return this.getAttribute('data-testid') === 'welcome-logo-target'
+        ? new DOMRect(box.x, box.y, 0, 0)
+        : box;
+    };
+  });
+  await page.goto('/');
+  await expect(
+    page.getByRole('button', { name: 'Google 계정으로 계속', exact: true }),
+  ).toBeEnabled();
+  await expect(page.getByTestId('welcome-moving-logo')).toHaveCount(0);
+  await expect(page.getByTestId('entry-notice-card')).toHaveCount(0);
+});
+
+test('중앙 팝업: 최초 계정 복원 실패는 하나의 안내만 표시하고 재확인한다', async ({
+  page,
+}) => {
+  const state = await network(page, true);
+  state.sessionFailure = true;
+  await page.goto('/');
+  await expect(page.getByTestId('entry-notice-card')).toHaveCount(1);
+  await expect(page.getByTestId('entry-notice-card')).toContainText(
+    '로그인 정보를 확인하지 못했어요.',
+  );
+  state.sessionFailure = false;
+  await page.getByRole('button', { name: '다시 시도', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: '홈 탭', exact: true }),
+  ).toBeVisible();
+  await expect(page.getByTestId('entry-notice-card')).toHaveCount(0);
+});

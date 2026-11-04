@@ -1,7 +1,7 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import Text from '@/components/AppText';
-import ScreenHeader from '@/components/ScreenHeader';
+import Text from '@/components/ui/AppText';
+import ScreenHeader from '@/components/navigation/ScreenHeader';
 import { colors } from '@/constants/theme';
 import { Image, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';

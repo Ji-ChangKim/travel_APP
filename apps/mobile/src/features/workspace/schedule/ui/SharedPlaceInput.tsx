@@ -1,6 +1,6 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 import {
   useState,
   useEffect,
@@ -12,8 +12,8 @@ import {
 import { View } from 'react-native';
 import { mapsSharePreviewSchema, sharedMapsUrl } from '@wherego/validation';
 import { requestFoundation } from '@wherego/api-client';
-import { serverOptions } from '../../service';
-import { Action, Field } from '../../ui';
+import { serverOptions } from '../../shared/manager/service';
+import { Action, Field } from '../../shared/ui/ui';
 import { styles } from '../../hub/styles/workspaceStyles';
 
 import { ScheduleButton, ScheduleField } from './ScheduleControls';

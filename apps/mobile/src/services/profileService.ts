@@ -2,7 +2,7 @@ import { UserFacingError } from './userFacingError';
 import type { Profile, ProfileUpdate } from '@wherego/domain';
 import { z } from 'zod';
 import { requestFoundation, FoundationClientError } from '@wherego/api-client';
-import { serverOptions } from '@/features/workspace/service';
+import { serverOptions } from '@/features/workspace/shared/manager/service';
 import { useTripStore } from '@/stores/useTripStore';
 import { saveGuestSession } from './guestAuthService';
 const profileSchema = z.object({

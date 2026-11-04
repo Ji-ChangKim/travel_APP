@@ -3,7 +3,7 @@ import { useLocale } from '@/features/localization/localeState';
 import type { ReactNode } from 'react';
 import { Animated, Platform, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import LoadingBrand from '@/components/LoadingBrand';
+import LoadingBrand from '@/components/feedback/LoadingBrand';
 import { colors } from '@/constants/theme';
 import type { AppAccessibility } from '../../accessibility/appAccessibility';
 import { nativeFrameReady } from '../model/launchSession';

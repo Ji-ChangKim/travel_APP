@@ -4,7 +4,7 @@ import {
   makeCreationDraft,
   parseCreationDrafts,
   creationDraftForm,
-} from '../../apps/mobile/src/features/workspace/creationDraftModel';
+} from '../../apps/mobile/src/features/workspace/planning/model/creationDraftModel';
 const id = '12345678-1234-4234-8234-123456789012';
 const draft = makeCreationDraft(
   'owner',

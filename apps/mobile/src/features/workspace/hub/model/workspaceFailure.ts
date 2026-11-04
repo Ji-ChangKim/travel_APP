@@ -3,7 +3,7 @@ import {
   foundationErrorCode,
 } from '@wherego/api-client';
 import { UserFacingError } from '../../../../services/userFacingError';
-import { isWorkspaceVersionConflict } from '../../saveRecovery';
+import { isWorkspaceVersionConflict } from '../../shared/model/saveRecovery';
 
 const httpMessages: Readonly<Record<number, string>> = {
   401: '로그인이 만료되었습니다. 다시 로그인해 주세요.',

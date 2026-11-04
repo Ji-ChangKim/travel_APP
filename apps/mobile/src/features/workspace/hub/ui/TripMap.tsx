@@ -1,14 +1,14 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 import { colors } from '@/constants/theme';
 import { useMemo, useState } from 'react';
 import { Linking, StyleSheet, View } from 'react-native';
-import DesignButton from '@/components/DesignButton';
+import DesignButton from '@/components/ui/DesignButton';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
-import { TripDetailEmpty } from '../../TripDetailParts';
+import { TripDetailEmpty } from '../../my-trips/ui/TripDetailParts';
 import type { WorkspaceSchedule, WorkspaceSnapshot } from '@wherego/domain';
-import { Action } from '../../ui';
+import { Action } from '../../shared/ui/ui';
 import TripMapCanvas from './TripMapCanvas';
 import { stopMapsUrl, tripMapStops } from '../model/tripMapModel';
 

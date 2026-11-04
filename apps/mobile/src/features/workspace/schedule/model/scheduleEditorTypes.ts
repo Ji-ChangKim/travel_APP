@@ -1,7 +1,7 @@
 import type { RefObject } from 'react';
 import type { ScrollView } from 'react-native';
 import type { WorkspaceSnapshot } from '@wherego/domain';
-import type { PlanForm } from '../../forms';
+import type { PlanForm } from '../../shared/model/forms';
 export type ScheduleEditorProps = {
   userId: string;
   form: PlanForm;

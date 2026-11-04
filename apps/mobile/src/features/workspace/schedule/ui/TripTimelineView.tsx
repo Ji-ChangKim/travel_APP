@@ -1,23 +1,23 @@
 import { getLocale } from '@/features/localization/localeState';
 import { t } from '@/features/localization/translate';
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 import TripIcon from '@/components/icons/TripIcon';
 import { Ionicons } from '@expo/vector-icons';
 import type { WorkspaceSchedule } from '@wherego/domain';
 import { Pressable, View } from 'react-native';
-import FlightCard from '../../FlightCard';
+import FlightCard from '../../planning/ui/FlightCard';
 import GooglePlace from './GooglePlace';
-import PlanDescription from '../../PlanDescription';
+import PlanDescription from '../../my-trips/ui/PlanDescription';
 import { ScheduleButton } from './ScheduleControls';
 import ServerPhoto from './ServerPhoto';
-import { scheduleFlight } from '../../flightModel';
+import { scheduleFlight } from '../../planning/model/flightModel';
 import { scheduleDuration, scheduleKind } from '../model/schedulePresentation';
 import {
   scheduleStyles as shared,
   scheduleTheme as theme,
 } from '../styles/scheduleTheme';
 import { tripTimelineStyles } from '../styles/tripTimelineStyles';
-import { triggerHaptic } from '@/components/haptics';
+import { triggerHaptic } from '@/components/ui/haptics';
 
 import type { Props } from '../manager/TripTimeline';
 

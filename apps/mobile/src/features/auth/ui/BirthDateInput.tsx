@@ -1,6 +1,6 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import Text from '@/components/AppText';
+import Text from '@/components/ui/AppText';
 import { colors } from '@/constants/theme';
 import { useState, type Dispatch, type SetStateAction } from 'react';
 import { Platform, Pressable, View } from 'react-native';

@@ -2,12 +2,15 @@ import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
 import { Image, Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Text from '@/components/AppText';
-import HaruState from '@/components/HaruState';
-import { triggerHaptic } from '@/components/haptics';
+import Text from '@/components/ui/AppText';
+import HaruState from '@/components/feedback/HaruState';
+import { triggerHaptic } from '@/components/ui/haptics';
 import { colors } from '@/constants/theme';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
-import { guideForTrip, type CityGuidePlace } from '../../cityGuides';
+import {
+  guideForTrip,
+  type CityGuidePlace,
+} from '../../community/model/cityGuides';
 import {
   emptyScheduleCategories,
   type EmptyScheduleCategory,

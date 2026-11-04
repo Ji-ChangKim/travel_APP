@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   hasGlobalNavigation,
   recoveryHeaderPolicy,
-} from '../../apps/mobile/src/components/navigationPolicy';
+} from '../../apps/mobile/src/components/navigation/navigationPolicy';
 
 test('GNB는 최상위 탐색 경로에만 표시한다', () => {
   for (const route of ['/', '/plans', '/my', '/community', '/footprints'])

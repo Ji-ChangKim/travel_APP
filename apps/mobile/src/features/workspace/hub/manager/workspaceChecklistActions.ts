@@ -6,7 +6,7 @@ import {
 import type { WorkspaceSnapshot } from '@wherego/domain';
 import { checklistAddSchema } from '@wherego/validation';
 import { type Dispatch, type RefObject, type SetStateAction } from 'react';
-import { serverOptions } from '../../service';
+import { serverOptions } from '../../shared/manager/service';
 import { type WorkspaceConfirmation } from '../model/workspaceConfirmation';
 
 // 준비물 등록과 완료 요청 행동을 구성한다.

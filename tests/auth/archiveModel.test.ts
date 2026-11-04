@@ -6,7 +6,7 @@ import {
   completedArchive,
   archiveSummary,
   archiveDetails,
-} from '../../apps/mobile/src/features/workspace/archiveModel';
+} from '../../apps/mobile/src/features/workspace/my-trips/model/archiveModel';
 
 // 예시 화면 자료가 아닌 격리된 실제 도메인 객체로 경계를 검증한다.
 function workspace() {
