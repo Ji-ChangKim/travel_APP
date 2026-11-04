@@ -4549,5 +4549,11 @@
     "Jot down packing items or special travel notes for this day",
     "この日の持ち物や特別な旅行メモを書いてみましょう"
   ],
-  "지도 보며 동선 짜기": ["Plan route with map", "地図を見ながら動線を作る"]
+  "지도 보며 동선 짜기": ["Plan route with map", "地図を見ながら動線を作る"],
+  "Google 로그인을 지금 이용할 수 없어요. 다시 확인해 주세요.": [
+    "Google sign-in is unavailable. Please check again.",
+    "現在 Google ログインを利用できません。もう一度確認してください。"
+  ],
+  "Google 계정으로 계속": ["Continue with Google", "Google で続行"],
+  "버전 {version}": ["Version {version}", "バージョン {version}"]
 }

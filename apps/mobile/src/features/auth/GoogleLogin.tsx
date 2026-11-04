@@ -1,12 +1,12 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
-import { ActivityIndicator, Image, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { socialAvailability } from './oauth';
 import LoginButton from './LoginButton';
-import { loginStyles as styles, loginTheme } from './loginStyles';
+import { loginStyles as styles } from './loginStyles';
+import GoogleBrandButton from './GoogleBrandButton';
 
 // 현재 제공하는 Google 로그인만 서버 상태에 맞춰 표시한다.
 export default function GoogleLogin({
@@ -30,32 +30,10 @@ export default function GoogleLogin({
   // 공식 Google G 원본을 색상 변경 없이 사용한다.
   return (
     <View style={{ gap: 8 }}>
-      <LoginButton
-        label={
-          presentation === 'welcome'
-            ? t('Google로 계속하기')
-            : t('Google 계정으로 계속하기')
-        }
-        variant="google"
+      <GoogleBrandButton
         disabled={disabled || busy || !providers.data?.google}
         busy={busy || providers.isFetching}
         onPress={onPress}
-        icon={
-          <Image
-            source={require('../../../assets/brand/tripprint-v1/Google_G.png')}
-            style={styles.googleIcon}
-            resizeMode="contain"
-            accessible={false}
-          />
-        }
-        trailing={
-          presentation === 'welcome' ? undefined : busy ||
-            providers.isFetching ? (
-            <ActivityIndicator size="small" color={loginTheme.secondary} />
-          ) : (
-            <Ionicons name="arrow-forward" size={18} color={loginTheme.muted} />
-          )
-        }
       />
       {busy ? (
         <Text accessibilityLiveRegion="polite" style={styles.status}>
@@ -68,9 +46,7 @@ export default function GoogleLogin({
             ? t(
                 'Google 로그인을 지금 이용할 수 없어요. 다시 확인하거나 게스트로 시작해 주세요.',
               )
-            : t(
-                'Google 로그인을 지금 이용할 수 없어요. 이메일로 계속하거나 다시 시도해 주세요.',
-              )}
+            : t('Google 로그인을 지금 이용할 수 없어요. 다시 확인해 주세요.')}
         </Text>
       ) : null}
       {!providers.isPending && !providers.data?.google ? (

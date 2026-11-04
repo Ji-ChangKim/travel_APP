@@ -78,7 +78,7 @@ function AndroidBackGuard() {
           router.replace('/(tabs)');
           return true;
         }
-        if (route === '(tabs)' || route === 'login') {
+        if (route === '(tabs)' || route === 'login' || route === 'welcome') {
           const now = Date.now();
           if (now - lastBackPress.current < 2000) {
             BackHandler.exitApp();

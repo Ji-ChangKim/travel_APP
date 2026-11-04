@@ -24,6 +24,9 @@ export default function AppFontProvider({ children }: { children: ReactNode }) {
         TripPrintSemiboldJP: require('../../assets/fonts/line-seed/line-seed-ja-bold.ttf'),
         TripPrintBoldJP: require('../../assets/fonts/line-seed/line-seed-ja-bold.ttf'),
         TripPrintLogo: require('../../assets/brand/tripprint-v1/fonts/Poppins-Bold.ttf'),
+        GoogleSignInMedium: require('../../assets/fonts/google-sign-in/google-sans-medium.ttf'),
+        GoogleSignInKorean: require('../../assets/fonts/google-sign-in/noto-sans-kr-medium.ttf'),
+        GoogleSignInJapanese: require('../../assets/fonts/google-sign-in/noto-sans-jp-medium.ttf'),
       })}
     >
       {children}

@@ -1,0 +1,36 @@
+{
+  "capturedAt": "2026-11-04",
+  "source": "https://fonts.google.com/",
+  "license": "SIL Open Font License 1.1",
+  "licenseFile": "OFL-google-sans.txt",
+  "additionalLicenseFiles": ["OFL-noto-sans-kr.txt", "OFL-noto-sans-jp.txt"],
+  "files": [
+    {
+      "filename": "google-sans-medium.ttf",
+      "language": "en",
+      "weight": 500,
+      "bytes": 4408,
+      "sha256": "24c0b2ea107cc38e1ee12180d9fdf2fc22011a2a6c60c0c203a78da491b9aeaa",
+      "sourceUrl": "https://fonts.gstatic.com/l/font?kit=4Ua_rENHsxJlGDuGo1OIlJfC6l_24rlCK1Yo_Iqcsih3SAyH6cAwhX9RFD48TE63OOYKtrw2IKlitSLKUGVrMuykW6v8GTlw7Q&skey=c30756b8cf584a60&v=v76",
+      "subset": "Google Fonts text API, fixed Google button labels only"
+    },
+    {
+      "filename": "noto-sans-kr-medium.ttf",
+      "language": "ko",
+      "weight": 500,
+      "bytes": 59104,
+      "sha256": "eeea1628d01eaa813bd5bf57afe7201715e112de5aa8731e34062bfac7763e0a",
+      "sourceUrl": "https://fonts.gstatic.com/l/font?kit=PbyxFmXiEBPT4ITbgNA5Cgms3VYcOA-vvnIzztgyeLTyKHMAIoWfDDupM852QDgdrBqaGZlZdoCDxPIGUb21loSo-tL_LMYD500DLatzryk99nUv-pZ-8VSqmI6cqUNc_oqsD3smCdqWtZmg9y9ZtrFD0D7bfQHG5E63N_4DZ3RTfrYukU2LfUip3vmAWTCFGoX9jx4njbFfeuD3ua__EgKzf5wv17QjUkgWbME6l-fvQQ4kG17f8wiKB6BaPvoWm_ehtNLgy0TND9HOrjyLwZiy-VyAuIoMMVQ7NuEGKjdEDcXBOUQ7m8J_97o1Q2ee6dMeLgwZvdphqp_eXaqFcjpj8Aiz7hhO-TKLhEfYDucDZ2I9gQC5GO2lwLJc5Aq0QWWaeBRXBKbzZYuCsTztre4BKYhsQIzZl6iwBJEw39VZCriRWWyKx_81OeMZJwyqkIZDzDEPGvBwtJi8NTs5v2gwKUm88CkEoWxgWvqh4hqaI1mdHDNLgvSmqJcoJe0X1YhFFORgXF2DM3NiSSQ3nM-vBZc7RG0PY2zSp8aM1la_qYH2iq7_GH1XiYFILxZ6ZPLxfPiemuqTwQ3sZScHJCViNUl153fysqTtum6OlYZphlFhEPotD97i54thsucri7q0ccL3cR1T0sSsYllve0x2oBkJr9Q4PUIKmdKh4apVdaU0Kk56MTiXiDYCmOregMhrwemp6H9NF3njEbH99zuXf_UnjHgLi1FQeCwVU4MczzLZZNZKM5-wSRUAbBa0VY-qgXx3fl22yBy972oixmDtnROXu6nEAVTCLGLPH27xThsbSrsz2t2LMGxGqCK_juSaTcad0mlQWYGNCFZ8vyTxnW-GFh6jd4raLnxHVYxUyrZ4vimF2JVCa2_mfpBYstlSzzIUIlhgR-tad4L8b_lwtuJevSmGx4gVo3wKnVCbYDA_pAC1-3SZ05_u7sV8h8hO4xx3lybidj1LkI0AxaYsQpXYqtVO7Qg1uWi-Cq0Yq14zf89_U7iXqU2jX9w&skey=87e7ee645936e2c7&v=v40",
+      "subset": "Google Fonts text API, fixed Google button labels only"
+    },
+    {
+      "filename": "noto-sans-jp-medium.ttf",
+      "language": "ja",
+      "weight": 500,
+      "bytes": 4248,
+      "sha256": "7b54af292cbacb7b9b630eb132a61acb96633ad0a36d67bf30207ab4c99a4fc0",
+      "sourceUrl": "https://fonts.gstatic.com/l/font?kit=-F6jfjtqLzI2JPCgQBnw7HFyzSD-AsregP8VFCMj75vAw5R43af7Dl3n40TMh7-SxYv4Z5OBSw&skey=72472b0eb8793570&v=v57",
+      "subset": "Google Fonts text API, fixed Japanese Google button label only"
+    }
+  ]
+}

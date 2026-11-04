@@ -5,9 +5,15 @@ export const useLaunchSession = create<{
   biDone: boolean;
   introDone: boolean;
   nativeReady: boolean;
+  welcomeIntroPending: boolean;
 }>(() => {
   // 기기 저장·회원 계정과 무관한 현재 실행의 표시 상태다.
-  return { biDone: false, introDone: false, nativeReady: false };
+  return {
+    biDone: false,
+    introDone: false,
+    nativeReady: false,
+    welcomeIntroPending: false,
+  };
 });
 
 // BI 완료를 한 번 확정해 01의 점검을 허용한다.

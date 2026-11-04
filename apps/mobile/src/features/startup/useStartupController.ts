@@ -40,13 +40,13 @@ import { AppState, Linking } from 'react-native';
 
 // 복원 완료한 실제 프로필로 다음 화면을 결정한다.
 export function restoredDestination(): Promise<Href> {
-  // 비로그인 상태는 로그인 화면으로, 게스트 및 온보딩 완료 회원은 메인으로 이동한다.
+  // 게스트는 기기 기록을 선택해서 이어가고, 설정을 마친 회원은 홈으로 바로 이동한다.
   const currentUser = useTripStore.getState().currentUser;
-  return !currentUser
-    ? Promise.resolve('/login')
-    : currentUser.authProvider === 'guest' || currentUser.onboardingCompleted
-      ? completedDestination()
-      : Promise.resolve('/profile-setup');
+  if (!currentUser || currentUser.authProvider === 'guest')
+    return Promise.resolve('/welcome');
+  if (!currentUser.onboardingCompleted)
+    return Promise.resolve('/profile-setup');
+  return completedDestination();
 }
 
 // 인트로 동안 각 점검을 독립적으로 실행한다.
@@ -326,6 +326,9 @@ export function useStartupLifecycle({
     ) {
       // 같은 목적지로 중복 이동하지 않고 BI를 뒤로 기록하지 않는다.
       navigatedRef.current = true;
+      useLaunchSession.setState({
+        welcomeIntroPending: destination.data === '/welcome',
+      });
       router.replace(destination.data);
     }
   }, [

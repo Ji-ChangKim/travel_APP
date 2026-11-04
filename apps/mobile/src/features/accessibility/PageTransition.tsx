@@ -69,7 +69,9 @@ export function pageLayout({
   route: { name: string };
 }) {
   // 실제 콘텐츠 페이지와 각 탭에 전환을 한 번만 적용한다.
-  return route.name === '(tabs)' || route.name === 'index' ? (
+  return route.name === '(tabs)' ||
+    route.name === 'index' ||
+    route.name === 'welcome' ? (
     <>{children}</>
   ) : (
     <PageTransition>{children}</PageTransition>

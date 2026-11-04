@@ -2,17 +2,23 @@ import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import LoadingIndicator from '@/components/LoadingIndicator';
-import {
-  useAppAccessibility,
-  type AppAccessibility,
-} from '@/features/accessibility/appAccessibility';
+import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 import LoginButton from '@/features/auth/LoginButton';
 import { introStyles as styles } from '@/features/startup/introStyles';
 import LaunchIntro from '@/features/startup/LaunchIntro';
 import { completeBi, useLaunchSession } from '@/features/startup/launchSession';
-import StartupLoading from '@/features/startup/StartupLoading';
-import { BackHandler, Platform, View } from 'react-native';
-import { useStartupController } from '../features/startup/useStartupController';
+import {
+  BackHandler,
+  Platform,
+  View,
+  StyleSheet,
+  ScrollView,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  useStartupController,
+  completeStartupLoading,
+} from '../features/startup/useStartupController';
 
 // 점검 실패와 선택·필수 업데이트에 맞는 실제 행동을 제공한다.
 function StartupStatus({
@@ -110,34 +116,50 @@ function StartupStatus({
   );
 }
 
-// 첫 발자국 연출과 실제 점검 결과를 연결한다.
-function CheckedStartup({ settings }: { settings: AppAccessibility }) {
-  useLocale();
-  // 01의 첫 화면부터 점검과 두 구간의 표시를 병렬로 시작한다.
-  const controller = useStartupController(settings.foreground);
-  return (
-    <StartupLoading
-      settings={settings}
-      complete={controller.completeIntro}
-      alreadyDone={controller.introDone}
-    >
-      <StartupStatus controller={controller} />
-    </StartupLoading>
-  );
+// 심볼을 유지한 채 실제 시작 점검이 끝나면 다음 화면을 허용한다.
+function finishBrandIntro() {
+  completeBi();
+  completeStartupLoading();
 }
 
-// BI와 로딩 사이에도 같은 접근성 구독을 유지한다.
+// 정상 시작은 별도 로딩 화면 없이 BI에서 로그인·회원 목적지로 이어진다.
 export default function StartScreen() {
   useLocale();
   // 인증 복귀와 앱 복귀에서는 완료한 00을 다시 표시하지 않는다.
   const settings = useAppAccessibility();
+  const controller = useStartupController(settings.foreground);
   const biDone = useLaunchSession((state) => {
     // 현재 실행의 완료 신호만 구독한다.
     return state.biDone;
   });
-  return biDone ? (
-    <CheckedStartup settings={settings} />
-  ) : (
-    <LaunchIntro onComplete={completeBi} settings={settings} />
+  return (
+    <View style={layout.screen}>
+      <LaunchIntro onComplete={finishBrandIntro} settings={settings} handoff />
+      {biDone &&
+        (controller.error || controller.updateAvailable || controller.slow) && (
+          <SafeAreaView style={layout.status} pointerEvents="box-none">
+            <ScrollView contentContainerStyle={layout.message}>
+              <StartupStatus controller={controller} />
+            </ScrollView>
+          </SafeAreaView>
+        )}
+    </View>
   );
 }
+
+const layout = StyleSheet.create({
+  screen: { flex: 1 },
+  status: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    maxHeight: '48%',
+  },
+  message: {
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+    gap: 12,
+  },
+});

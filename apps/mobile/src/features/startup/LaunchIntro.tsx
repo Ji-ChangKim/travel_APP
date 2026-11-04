@@ -14,6 +14,8 @@ import type { AppAccessibility } from '../accessibility/appAccessibility';
 import { bundledBiVideo } from './biAsset';
 import { nativeFrameReady } from './launchSession';
 import { useBiMotion } from './useLaunchMotion';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { colors } from '@/constants/theme';
 
 const Video = lazy(() => {
   // 영상이 없거나 움직임을 줄인 경우 네이티브 재생 모듈을 실행하지 않는다.
@@ -44,9 +46,11 @@ class VideoBoundary extends Component<
 export default function LaunchIntro({
   onComplete,
   settings,
+  handoff = false,
 }: {
   onComplete: () => void;
   settings: AppAccessibility;
+  handoff?: boolean;
 }) {
   useLocale();
   // 프레임 준비 전에는 기본 스플래시와 같은 정적 자산을 유지한다.
@@ -57,8 +61,9 @@ export default function LaunchIntro({
     // 실제 영상 프레임 또는 대체 화면 준비 뒤에만 OS 스플래시를 닫는다.
     if (state.frame || (state.phase === 'poster' && posterReady))
       nativeFrameReady();
-    if (state.phase === 'done') onComplete();
-  }, [state.frame, state.phase, posterReady, onComplete]);
+    if (state.phase === 'done' || (handoff && state.phase === 'fade'))
+      onComplete();
+  }, [state.frame, state.phase, posterReady, onComplete, handoff]);
   useLayoutEffect(() => {
     // OS 스플래시가 끝나기 전에 대체 이미지 시간을 소진하지 않는다.
     if (posterReady) timeline.posterReady();
@@ -81,7 +86,7 @@ export default function LaunchIntro({
           }
         : {})}
       accessibilityLabel={t('TripPrint 시작')}
-      style={[s.screen, { opacity }]}
+      style={[s.screen, { opacity: handoff ? 1 : opacity }]}
     >
       {video && (
         <VideoBoundary failed={timeline.failed}>
@@ -107,10 +112,10 @@ export default function LaunchIntro({
             <Text style={s.brand}>TripPrint</Text>
           </View>
         ) : (
-          <View key="poster-image" style={s.wordmark}>
+          <SafeAreaView key="poster-image" style={s.wordmark}>
             <Image
               testID="startup-bi-poster"
-              source={require('../../../assets/brand/tripprint-v1/TripPrint_symbol-coral-clean_1024x1024.png')}
+              source={require('../../../assets/brand/tripprint-v1/tripprint-app-icon-source.png')}
               resizeMode="contain"
               style={s.icon}
               accessible={false}
@@ -123,14 +128,14 @@ export default function LaunchIntro({
                 setPosterFailed(true);
               }}
             />
-          </View>
+          </SafeAreaView>
         ))}
     </Animated.View>
   );
 }
 const s = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#FFFFFF' },
-  icon: { width: 240, height: 240 },
+  screen: { flex: 1, backgroundColor: colors.background },
+  icon: { width: 160, height: (160 * 216) / 337 },
   wordmark: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   brand: { fontSize: 32, fontWeight: '800' },
 });
