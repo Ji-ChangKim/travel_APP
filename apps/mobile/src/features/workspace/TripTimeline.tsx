@@ -244,7 +244,10 @@ function TimelineContent(
             <View aria-hidden>
               <Ionicons name="sunny-outline" size={18} color="#A43E31" />
             </View>
-            <Text style={s.memoBannerText} numberOfLines={1}>
+            <Text
+              style={s.memoBannerText}
+              numberOfLines={props.largeText ? 2 : 1}
+            >
               {props.day.planTitle
                 ? t('이날의 여행 메모 · 계획 수정하기')
                 : t('이날의 준비물이나 특별한 여행 메모를 적어보세요')}

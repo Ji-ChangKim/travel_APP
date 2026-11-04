@@ -4,7 +4,9 @@ import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Text from '@/components/AppText';
 import HaruState from '@/components/HaruState';
+import { triggerHaptic } from '@/components/haptics';
 import { colors } from '@/constants/theme';
+import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 import { guideForTrip, type CityGuidePlace } from './cityGuides';
 
 export interface EmptyScheduleCategory {
@@ -51,6 +53,7 @@ export default function TripScheduleEmpty({
   onOpenMap?: () => void;
 }) {
   useLocale();
+  const { largeText } = useAppAccessibility();
   const guide = guideForTrip(country, city);
 
   // 읽기 전용에서는 작성 행동을 숨기고 아직 일정이 없다는 결과만 알린다.
@@ -93,8 +96,15 @@ export default function TripScheduleEmpty({
             accessibilityRole="button"
             accessibilityLabel={t('장소 검색으로 추가')}
             disabled={disabled}
-            onPress={onSearch}
-            style={[s.primaryPillBtn, disabled && s.disabledBtn]}
+            onPress={() => {
+              triggerHaptic('light');
+              return onSearch();
+            }}
+            style={({ pressed }) => [
+              s.primaryPillBtn,
+              pressed && s.pressedBtn,
+              disabled && s.disabledBtn,
+            ]}
           >
             <Text style={[s.primaryPillText, disabled && s.disabledText]}>
               + {t('장소 추가하기')}
@@ -104,8 +114,15 @@ export default function TripScheduleEmpty({
             accessibilityRole="button"
             accessibilityLabel={t('추천 코스 불러오기')}
             disabled={disabled}
-            onPress={onCourse}
-            style={[s.secondaryPillBtn, disabled && s.disabledBtn]}
+            onPress={() => {
+              triggerHaptic('light');
+              return onCourse();
+            }}
+            style={({ pressed }) => [
+              s.secondaryPillBtn,
+              pressed && s.pressedSecondaryBtn,
+              disabled && s.disabledBtn,
+            ]}
           >
             <Text style={[s.secondaryPillText, disabled && s.disabledText]}>
               {t('추천 코스 불러오기')}
@@ -125,6 +142,7 @@ export default function TripScheduleEmpty({
                 })}
                 disabled={disabled}
                 onPress={() => {
+                  triggerHaptic('light');
                   return onSelectCategory
                     ? onSelectCategory({
                         label: item.label,
@@ -133,7 +151,10 @@ export default function TripScheduleEmpty({
                       })
                     : onSearch();
                 }}
-                style={s.categoryChip}
+                style={({ pressed }) => [
+                  s.categoryChip,
+                  pressed && s.pressedSecondaryBtn,
+                ]}
               >
                 <Text style={s.chipEmoji} aria-hidden>
                   {item.emoji}
@@ -146,68 +167,16 @@ export default function TripScheduleEmpty({
       </View>
 
       {guide && (
-        <View style={s.curatedSection}>
-          <View style={s.curatedHeader}>
-            <View style={s.curatedTitleRow}>
-              <View style={s.thumbBadge} aria-hidden>
-                <Ionicons name="thumbs-up" size={13} color="#FFFFFF" />
-              </View>
-              <Text style={s.curatedHeading}>
-                {city.trim()} {t('필수 명소 바로 담기')}
-              </Text>
-            </View>
-            {onOpenMap && (
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={t('추천 명소 지도에서 보기')}
-                disabled={disabled}
-                onPress={onOpenMap}
-                style={s.mapLinkBtn}
-              >
-                <Text style={s.mapLinkText}>{t('지도에서 보기')} ›</Text>
-              </Pressable>
-            )}
-          </View>
-
-          <View style={s.spotList}>
-            {guide.places.map((place) => {
-              const added = existingTitles.includes(place.title);
-              return (
-                <View key={place.title} style={s.spotCard}>
-                  <Image
-                    source={guide.photo}
-                    style={s.spotThumb}
-                    accessibilityIgnoresInvertColors
-                  />
-                  <View style={s.spotInfo}>
-                    <Text style={s.spotTag}>
-                      {place.areaTag ? t(place.areaTag) : t('추천 명소')}
-                    </Text>
-                    <Text style={s.spotTitle}>{place.title}</Text>
-                    <Text style={s.spotDesc} numberOfLines={2}>
-                      {place.description}
-                    </Text>
-                  </View>
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel={t('{p0} 바로 담기', {
-                      p0: place.title,
-                    })}
-                    disabled={disabled}
-                    onPress={() => {
-                      return onSelectSpot ? onSelectSpot(place) : onCourse();
-                    }}
-                    style={[s.addSpotBtn, added && s.addedSpotBtn]}
-                  >
-                    <Text style={[s.addSpotText, added && s.addedSpotText]}>
-                      {added ? t('담김') : '+ ' + t('담기')}
-                    </Text>
-                  </Pressable>
-                </View>
-              );
-            })}
-          </View>
-        </View>
+        <CuratedSpotsSection
+          city={city}
+          guide={guide}
+          disabled={disabled}
+          largeText={largeText}
+          existingTitles={existingTitles}
+          onOpenMap={onOpenMap}
+          onSelectSpot={onSelectSpot}
+          onCourse={onCourse}
+        />
       )}
 
       <View style={s.tipCard}>
@@ -216,7 +185,7 @@ export default function TripScheduleEmpty({
         </View>
         <View style={s.tipContent}>
           <Text style={s.tipTitle}>{t('여행 팁')}</Text>
-          <Text style={s.tipBody} numberOfLines={2}>
+          <Text style={s.tipBody} numberOfLines={largeText ? 4 : 2}>
             {guide?.seasons[0]?.description ||
               guide?.intro ||
               t(
@@ -224,6 +193,104 @@ export default function TripScheduleEmpty({
               )}
           </Text>
         </View>
+      </View>
+    </View>
+  );
+}
+
+function CuratedSpotsSection({
+  city,
+  guide,
+  disabled,
+  largeText,
+  existingTitles,
+  onOpenMap,
+  onSelectSpot,
+  onCourse,
+}: {
+  city: string;
+  guide: NonNullable<ReturnType<typeof guideForTrip>>;
+  disabled: boolean;
+  largeText: boolean;
+  existingTitles: string[];
+  onOpenMap?: () => void;
+  onSelectSpot?: (spot: CityGuidePlace) => void;
+  onCourse: () => void;
+}) {
+  useLocale();
+  return (
+    <View style={s.curatedSection}>
+      <View style={s.curatedHeader}>
+        <View style={s.curatedTitleRow}>
+          <View style={s.thumbBadge} aria-hidden>
+            <Ionicons name="thumbs-up" size={13} color="#FFFFFF" />
+          </View>
+          <Text style={s.curatedHeading}>
+            {city.trim()} {t('필수 명소 바로 담기')}
+          </Text>
+        </View>
+        {onOpenMap && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('추천 명소 지도에서 보기')}
+            disabled={disabled}
+            onPress={() => {
+              triggerHaptic('light');
+              return onOpenMap();
+            }}
+            style={s.mapLinkBtn}
+          >
+            <Text style={s.mapLinkText}>{t('지도에서 보기')} ›</Text>
+          </Pressable>
+        )}
+      </View>
+
+      <View style={s.spotList}>
+        {guide.places.map((place) => {
+          const added = existingTitles.includes(place.title);
+          return (
+            <View
+              key={place.title}
+              style={[s.spotCard, largeText && s.spotCardLarge]}
+            >
+              <Image
+                source={guide.photo}
+                style={s.spotThumb}
+                accessibilityIgnoresInvertColors
+              />
+              <View style={s.spotInfo}>
+                <Text style={s.spotTag}>
+                  {place.areaTag ? t(place.areaTag) : t('추천 명소')}
+                </Text>
+                <Text style={s.spotTitle}>{place.title}</Text>
+                <Text style={s.spotDesc} numberOfLines={largeText ? 3 : 2}>
+                  {place.description}
+                </Text>
+              </View>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={t('{p0} 바로 담기', {
+                  p0: place.title,
+                })}
+                disabled={disabled}
+                onPress={() => {
+                  triggerHaptic('light');
+                  return onSelectSpot ? onSelectSpot(place) : onCourse();
+                }}
+                style={({ pressed }) => [
+                  s.addSpotBtn,
+                  largeText && s.addSpotBtnLarge,
+                  added && s.addedSpotBtn,
+                  pressed && s.pressedSecondaryBtn,
+                ]}
+              >
+                <Text style={[s.addSpotText, added && s.addedSpotText]}>
+                  {added ? t('담김') : '+ ' + t('담기')}
+                </Text>
+              </Pressable>
+            </View>
+          );
+        })}
       </View>
     </View>
   );
@@ -337,6 +404,12 @@ const s = StyleSheet.create({
     backgroundColor: '#EEE8E2',
     borderColor: '#EEE8E2',
   },
+  pressedBtn: {
+    backgroundColor: '#8B3328',
+  },
+  pressedSecondaryBtn: {
+    backgroundColor: '#E2E8F0',
+  },
   disabledText: {
     color: '#596574',
   },
@@ -390,12 +463,14 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 8,
+    flexWrap: 'wrap',
   },
   curatedTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     flex: 1,
+    minWidth: 180,
   },
   thumbBadge: {
     width: 24,
@@ -435,6 +510,10 @@ const s = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.surface,
+    flexWrap: 'wrap',
+  },
+  spotCardLarge: {
+    alignItems: 'flex-start',
   },
   spotThumb: {
     width: 64,
@@ -444,7 +523,7 @@ const s = StyleSheet.create({
   },
   spotInfo: {
     flex: 1,
-    minWidth: 0,
+    minWidth: 140,
     gap: 2,
   },
   spotTag: {
@@ -473,6 +552,10 @@ const s = StyleSheet.create({
     borderColor: '#A43E31',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  addSpotBtnLarge: {
+    width: '100%',
+    marginTop: 4,
   },
   addedSpotBtn: {
     backgroundColor: '#F1F4FA',

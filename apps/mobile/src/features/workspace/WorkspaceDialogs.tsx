@@ -232,10 +232,18 @@ export function renderWorkspaceAddSchedule({
 
   return (
     <View
-      style={[hub.primaryBar, { flexDirection: 'row', gap: 10 }]}
+      style={[
+        hub.primaryBar,
+        {
+          flexDirection: 'row',
+          justifyContent: 'center',
+          gap: 10,
+          flexWrap: 'wrap',
+        },
+      ]}
       testID="trip-primary-action"
     >
-      <View style={[hub.primaryButton, { flex: 1 }]}>
+      <View style={[hub.primaryButton, { flex: 1, minWidth: 140 }]}>
         <DesignButton
           label={t('지도 보며 동선 짜기')}
           variant="secondary"
@@ -249,7 +257,7 @@ export function renderWorkspaceAddSchedule({
           }}
         />
       </View>
-      <View style={[hub.primaryButton, { flex: 1.15 }]}>
+      <View style={[hub.primaryButton, { flex: 1.15, minWidth: 140 }]}>
         <DesignButton
           label={t('일정 추가')}
           accessibilityLabel={t('일정 추가')}
