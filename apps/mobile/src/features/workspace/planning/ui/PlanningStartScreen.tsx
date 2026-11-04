@@ -1,19 +1,8 @@
-import HomeJourneyStart from '../../home/ui/HomeJourneyStart';
-import LegacyDraftImport from './LegacyDraftImport';
 import { useCallback, useState } from 'react';
-import {
-  Image,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
-import { discoveryDestinations, type PersistedTrip } from '@wherego/domain';
-import ActionSheet from '@/components/ui/ActionSheet';
 import HomeHeader from '@/components/navigation/HomeHeader';
 import Text from '@/components/ui/AppText';
 import DesignButton from '@/components/ui/DesignButton';
@@ -24,42 +13,82 @@ import { useLocale } from '@/features/localization/localeState';
 import { t } from '@/features/localization/translate';
 import { useTripStore } from '@/stores/useTripStore';
 import { useAuthReady } from '@/features/auth/manager/AuthBridge';
-import { cityGuides } from '../../community/model/cityGuides';
 import { tripListQueryOptions } from '../../shared/manager/tripQueries';
+import { useTripDateRefresh } from '../../shared/manager/useTripDateRefresh';
 import { readCreationDrafts } from '../manager/creationDraftStorage';
 import {
   homeDaysLeft,
   homeTravelGroups,
 } from '../../home/model/homeTravelModel';
 import { homeTravelStyles as s } from '../../home/styles/homeTravelStyles';
-import { useTripDateRefresh } from '../../shared/manager/useTripDateRefresh';
 import HaruDailyTip from '../../home/ui/HaruDailyTip';
+import HomeActionSheets from '../../home/ui/HomeActionSheets';
+import {
+  HomeCoreToolsGrid,
+  HomeEmptySection,
+  HomeGreetingSection,
+  HomeVerifiedCoursesSection,
+} from '../../home/ui/HomeConciergeSections';
+import HomeJourneyStart from '../../home/ui/HomeJourneyStart';
 import HomeTravelCard from '../../home/ui/HomeTravelCard';
-import HomeDraftResume from '../../home/ui/HomeDraftResume';
 
 // 계정 변경 시 이전 사용자의 펼침·조회 상태를 새 화면으로 교체한다.
 export default function PlanningStartScreen() {
-  const userId = useTripStore((state) => state.currentUser?.id || '');
-  const isGuest = useTripStore(
-    (state) => state.currentUser?.authProvider === 'guest',
+  // 현재 로그인한 사용자 ID와 게스트 여부, 표시 이름을 구독한다.
+  const userId = useTripStore((state) => {
+    // 사용자 식별자가 없으면 빈 문자열로 처리한다.
+    return state.currentUser?.id || '';
+  });
+  const isGuest = useTripStore((state) => {
+    // 게스트 세션인지 확인한다.
+    return state.currentUser?.authProvider === 'guest';
+  });
+  const nickname = useTripStore((state) => {
+    // 정식 프로필의 닉네임을 인사말에 사용한다.
+    return state.currentUser?.nickname || '';
+  });
+  return (
+    <TravelHome
+      key={userId}
+      userId={userId}
+      isGuest={isGuest}
+      nickname={nickname}
+    />
   );
-  return <TravelHome key={userId} userId={userId} isGuest={isGuest} />;
 }
 
-function TravelHome({ userId, isGuest }: { userId: string; isGuest: boolean }) {
+// 사용자의 여행 생애주기(여행 전·중·후 및 빈 상태)에 맞춰 동적으로 변모하는 컨시어지 홈을 렌더링한다.
+function TravelHome({
+  userId,
+  isGuest,
+  nickname,
+}: {
+  userId: string;
+  isGuest: boolean;
+  nickname: string;
+}) {
   useLocale();
   useTripDateRefresh();
+  // 라우터·인증 준비 상태·바텀시트 열림 상태·여행/초안 쿼리를 준비한다.
   const router = useRouter();
-  const ready = useAuthReady((state) => state.ready);
+  const ready = useAuthReady((state) => {
+    // 인증 브리지 초기화 완료 여부를 읽는다.
+    return state.ready;
+  });
   const [expanded, setExpanded] = useState(false);
   const [receiptSelection, setReceiptSelection] = useState(false);
+  const [checklistSelection, setChecklistSelection] = useState(false);
+  const [safetySheetOpen, setSafetySheetOpen] = useState(false);
   const trips = useQuery({
     ...tripListQueryOptions(userId),
     enabled: Boolean(ready && userId),
   });
   const drafts = useQuery({
     queryKey: ['creation-drafts', userId],
-    queryFn: () => readCreationDrafts(userId),
+    queryFn: () => {
+      // 계정에 저장된 작성 중 초안 목록을 조회한다.
+      return readCreationDrafts(userId);
+    },
     enabled: Boolean(ready && userId && !isGuest),
     retry: false,
   });
@@ -67,6 +96,7 @@ function TravelHome({ userId, isGuest }: { userId: string; isGuest: boolean }) {
   const refreshDrafts = drafts.refetch;
   useFocusEffect(
     useCallback(() => {
+      // 홈 화면 포커스 시 서버 여행과 임시 초안을 최신 상태로 갱신한다.
       if (ready && userId) {
         void refreshTrips();
         if (!isGuest) void refreshDrafts();
@@ -85,9 +115,25 @@ function TravelHome({ userId, isGuest }: { userId: string; isGuest: boolean }) {
     !groups.active.length &&
     !groups.undated.length &&
     !groups.scheduled.length;
+  const showEmptyPlanner =
+    !loading && empty && !trips.isError && !drafts.isError;
+  const leadTrip = groups.active[0] || groups.upcoming || groups.undated[0];
+
+  // 새 여행 생성 페이지로 이동한다.
   function create() {
+    // 기본 생성 경로로 이동한다.
     router.push('/new-trip');
   }
+
+  // 특정 추천 도시가 선택된 상태로 새 여행 생성 페이지를 연다.
+  function createWithDestination(destinationKey: string) {
+    // 선택한 도시 키를 쿼리 파라미터로 전달해 첫 입력 단계를 단축한다.
+    router.push({
+      pathname: '/new-trip',
+      params: { destination: destinationKey },
+    });
+  }
+
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={s.screen}>
       <HomeHeader
@@ -107,6 +153,7 @@ function TravelHome({ userId, isGuest }: { userId: string; isGuest: boolean }) {
               (trips.isRefetching || (!isGuest && drafts.isRefetching))
             }
             onRefresh={() => {
+              // 당겨서 새로고침 시 여행 목록과 초안 목록을 다시 불러온다.
               if (ready && userId) {
                 void refreshTrips();
                 if (!isGuest) void refreshDrafts();
@@ -117,114 +164,132 @@ function TravelHome({ userId, isGuest }: { userId: string; isGuest: boolean }) {
           />
         }
       >
-        <HomeJourneyStart
-          ready={ready}
-          onCreate={create}
-          onReceipts={() => setReceiptSelection(true)}
+        <HomeGreetingSection
+          nickname={nickname}
+          leadTrip={leadTrip}
+          activeCount={groups.active.length}
+          hasCompleted={Boolean(trips.data?.length)}
         />
-        {loading ? (
-          <HaruState kind="loading" title={t('내 여행 불러오는 중…')} compact />
-        ) : (
-          <>
-            {trips.isError && (
-              <View style={s.section}>
-                <Text accessibilityRole="alert">
-                  {t('내 여행을 불러오지 못했어요')}
-                </Text>
-                <DesignButton
-                  label={t('내 여행 다시 불러오기')}
-                  onPress={() => void trips.refetch()}
-                />
-              </View>
-            )}
-            {drafts.isError && (
-              <View style={s.section}>
-                <Text accessibilityRole="alert">
-                  {t('임시 계획을 불러오지 못했어요.')}
-                </Text>
-                <DesignButton
-                  label={t('임시 계획 다시 불러오기')}
-                  onPress={() => void drafts.refetch()}
-                />
-              </View>
-            )}
-            {groups.active.length > 0 && (
-              <View style={s.section}>
-                <Text accessibilityRole="header" style={s.title}>
-                  {t('여행 중')}
-                </Text>
-                {groups.active.map((item) => (
-                  <HomeTravelCard
-                    key={item.id}
-                    item={item}
-                    userId={userId}
-                    inTrip
-                  />
-                ))}
-              </View>
-            )}
-            {groups.upcoming && (
-              <View testID="home-upcoming" style={s.section}>
-                <View style={s.heading}>
-                  <Text accessibilityRole="header" style={s.title}>
-                    {t('다가오는 여행')}
-                  </Text>
-                  <Text style={s.badge}>
-                    {homeDaysLeft(groups.upcoming) === 0
-                      ? 'D-Day'
-                      : `D-${homeDaysLeft(groups.upcoming)}`}
-                  </Text>
-                </View>
-                <HomeTravelCard item={groups.upcoming} userId={userId} hero />
-              </View>
-            )}
-            {empty && !trips.isError && !drafts.isError && (
-              <HomeEmptySection
-                hasCompleted={Boolean(trips.data?.length)}
-                onCreate={create}
-                onOpenGuide={(key) => router.push(`/destinations/${key}`)}
-              />
-            )}
-            {groups.scheduled.length > 0 && (
-              <View testID="home-scheduled" style={s.section}>
-                <View style={s.heading}>
-                  <Text accessibilityRole="header" style={s.title}>
-                    {t('예정된 여행')} {groups.scheduled.length}
-                  </Text>
-                  <DesignButton
-                    label={t('전체보기')}
-                    variant="quiet"
-                    onPress={() => router.push('/plans')}
-                  />
-                </View>
-                {groups.scheduled.slice(0, 3).map((item) => (
-                  <HomeTravelCard key={item.id} item={item} userId={userId} />
-                ))}
-              </View>
-            )}
-            {groups.undated.length > 0 && (
-              <View testID="home-undated" style={s.section}>
-                <Text accessibilityRole="header" style={s.title}>
-                  {t('작성 중인 일정')}
-                </Text>
-                {groups.undated.map((item) => (
-                  <HomeTravelCard key={item.id} item={item} userId={userId} />
-                ))}
-              </View>
-            )}
-          </>
+
+        <HomeConciergeMainBody
+          userId={userId}
+          ready={ready}
+          loading={loading}
+          tripsError={trips.isError}
+          draftsError={drafts.isError}
+          hasCompleted={Boolean(trips.data?.length)}
+          showEmptyPlanner={showEmptyPlanner}
+          groups={groups}
+          onRefetchTrips={() => {
+            // 여행 목록 조회 실패 시 재시도한다.
+            void trips.refetch();
+          }}
+          onRefetchDrafts={() => {
+            // 초안 목록 조회 실패 시 재시도한다.
+            void drafts.refetch();
+          }}
+          onCreate={create}
+          onBrowseCourses={() => {
+            // 인기 여행 코스 둘러보기 클릭 시 발자국 화면으로 이동한다.
+            router.push('/community');
+          }}
+          onOpenGuide={(key) => {
+            // 공식 도시 가이드 상세 화면으로 이동한다.
+            router.push(`/destinations/${key}`);
+          }}
+        />
+
+        {!showEmptyPlanner && (
+          <HomeJourneyStart
+            ready={ready}
+            onCreate={create}
+            onReceipts={() => {
+              // 영수증 기록 대상 여행 선택 시트를 연다.
+              setReceiptSelection(true);
+            }}
+            subtitle={t('추천: 도쿄 3박 4일 일정 만들기')}
+          />
         )}
+
+        {!loading && groups.scheduled.length > 0 && (
+          <View testID="home-scheduled" style={s.section}>
+            <View style={s.heading}>
+              <Text accessibilityRole="header" style={s.title}>
+                {t('예정된 여행')} {groups.scheduled.length}
+              </Text>
+              <DesignButton
+                label={t('전체보기')}
+                variant="quiet"
+                onPress={() => {
+                  // 내 여행 전체 목록 화면으로 이동한다.
+                  router.push('/plans');
+                }}
+              />
+            </View>
+            {groups.scheduled.slice(0, 3).map((item) => {
+              // 최대 3개의 추가 예정 여행 카드를 표시한다.
+              return (
+                <HomeTravelCard key={item.id} item={item} userId={userId} />
+              );
+            })}
+          </View>
+        )}
+
+        {!loading && groups.undated.length > 0 && (
+          <View testID="home-undated" style={s.section}>
+            <Text accessibilityRole="header" style={s.title}>
+              {t('작성 중인 일정')}
+            </Text>
+            {groups.undated.map((item) => {
+              // 출발일 미정 여행이나 서버 초안을 이어쓰기 카드로 표시한다.
+              return (
+                <HomeTravelCard key={item.id} item={item} userId={userId} />
+              );
+            })}
+          </View>
+        )}
+
+        <HomeVerifiedCoursesSection
+          onStartCourse={createWithDestination}
+          onOpenGuide={(key) => {
+            // 선택한 코스의 공식 도시 가이드를 연다.
+            router.push(`/destinations/${key}`);
+          }}
+        />
+
+        <HomeCoreToolsGrid
+          ready={ready}
+          onOpenReceipts={() => {
+            // 가계부/영수증 기록 시트를 연다.
+            setReceiptSelection(true);
+          }}
+          onOpenChecklist={() => {
+            // 필수 준비물 체크리스트 시트를 연다.
+            setChecklistSelection(true);
+          }}
+          onOpenSafetyGuide={() => {
+            // 현지 비상/교통 공식 안내 시트를 연다.
+            setSafetySheetOpen(true);
+          }}
+        />
+
         <View style={s.section}>
           <DesignButton
             label={t('전체 여행 관리')}
             variant="quiet"
-            onPress={() => router.push('/plans')}
+            onPress={() => {
+              // 내 여행 탭으로 이동한다.
+              router.push('/plans');
+            }}
           />
           {Boolean(userId) && (
             <DesignButton
               label={t('작성 중인 계획 관리')}
               variant="quiet"
-              onPress={() => setExpanded(true)}
+              onPress={() => {
+                // 작성 중인 계획 관리 시트를 연다.
+                setExpanded(true);
+              }}
             />
           )}
         </View>
@@ -236,9 +301,16 @@ function TravelHome({ userId, isGuest }: { userId: string; isGuest: boolean }) {
         loading={loading}
         tripsError={trips.isError}
         tripsData={trips.data || []}
-        onRefetchTrips={() => void trips.refetch()}
+        onRefetchTrips={() => {
+          // 시트 내부에서 여행 목록 재조회를 실행한다.
+          void trips.refetch();
+        }}
         receiptSelection={receiptSelection}
         setReceiptSelection={setReceiptSelection}
+        checklistSelection={checklistSelection}
+        setChecklistSelection={setChecklistSelection}
+        safetySheetOpen={safetySheetOpen}
+        setSafetySheetOpen={setSafetySheetOpen}
         expanded={expanded}
         setExpanded={setExpanded}
         onCreate={create}
@@ -247,183 +319,108 @@ function TravelHome({ userId, isGuest }: { userId: string; isGuest: boolean }) {
   );
 }
 
-function HomeEmptySection({
-  hasCompleted,
-  onCreate,
-  onOpenGuide,
-}: {
-  hasCompleted: boolean;
-  onCreate: () => void;
-  onOpenGuide: (key: string) => void;
-}) {
-  return (
-    <View style={s.section}>
-      <View testID="home-empty" style={s.emptyHero}>
-        <View style={s.emptyIconBadge} accessible={false}>
-          <Text style={{ fontSize: 24 }}>🧭</Text>
-        </View>
-        <Text accessibilityRole="header" style={s.emptyTitle}>
-          {t(hasCompleted ? '다음 여행을 계획해 보세요' : '어디로 떠나시나요?')}
-        </Text>
-        <Text style={s.emptyDesc}>
-          {t(
-            '일정을 등록하고 영수증을 모아보세요.\n나만의 여행 노트가 완성됩니다.',
-          )}
-        </Text>
-        <DesignButton
-          label={t('새 여행 시작하기')}
-          variant="primary"
-          onPress={onCreate}
-        />
-      </View>
-      <View style={s.section}>
-        <View style={s.subHeaderRow}>
-          <Text style={s.subHeaderTitle}>{t('추천 여행지 가이드')}</Text>
-          <Text style={s.subHeaderLink}>{t('관광청 공식 정보')}</Text>
-        </View>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={s.destScroll}
-        >
-          {discoveryDestinations.slice(0, 4).map((dest) => {
-            const guide = cityGuides[dest.key];
-            return (
-              <Pressable
-                key={dest.key}
-                accessibilityRole="link"
-                accessibilityLabel={`${dest.city} ${dest.country}`}
-                style={s.destCard}
-                onPress={() => onOpenGuide(dest.key)}
-              >
-                <Image
-                  source={guide.photo}
-                  style={StyleSheet.absoluteFill}
-                  resizeMode="cover"
-                  accessible={false}
-                />
-                <View style={s.heroScrim} pointerEvents="none" />
-                <View style={{ zIndex: 1, gap: 2 }} accessible={false}>
-                  {guide.seasons[0]?.months ? (
-                    <View style={s.destTag}>
-                      <Text style={s.destTagText}>
-                        {guide.seasons[0].months}
-                      </Text>
-                    </View>
-                  ) : null}
-                  <Text style={s.destName}>{dest.city}</Text>
-                  <Text style={s.destDesc} numberOfLines={1}>
-                    {dest.country} · {guide.places[0]?.title || ''}
-                  </Text>
-                </View>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
-      </View>
-    </View>
-  );
-}
-
-function HomeActionSheets({
+// 퍼스트 폴드 컨시어지 영역(로딩·오류·여행 중·다가오는 여행·빈 상태 플래너)을 상태에 맞춰 분기한다.
+function HomeConciergeMainBody({
   userId,
   ready,
   loading,
   tripsError,
-  tripsData,
+  draftsError,
+  hasCompleted,
+  showEmptyPlanner,
+  groups,
   onRefetchTrips,
-  receiptSelection,
-  setReceiptSelection,
-  expanded,
-  setExpanded,
+  onRefetchDrafts,
   onCreate,
+  onBrowseCourses,
+  onOpenGuide,
 }: {
   userId: string;
   ready: boolean;
   loading: boolean;
   tripsError: boolean;
-  tripsData: PersistedTrip[];
+  draftsError: boolean;
+  hasCompleted: boolean;
+  showEmptyPlanner: boolean;
+  groups: ReturnType<typeof homeTravelGroups>;
   onRefetchTrips: () => void;
-  receiptSelection: boolean;
-  setReceiptSelection: (value: boolean) => void;
-  expanded: boolean;
-  setExpanded: (value: boolean) => void;
+  onRefetchDrafts: () => void;
   onCreate: () => void;
+  onBrowseCourses: () => void;
+  onOpenGuide: (key: string) => void;
 }) {
-  const router = useRouter();
-  const activeTrips = tripsData.filter((trip) => trip.status !== 'ARCHIVED');
+  // 로딩 중에는 스켈레톤 상태를, 완료 후에는 활성 여행 또는 빈 상태 플래너를 렌더링한다.
+  if (loading) {
+    return (
+      <HaruState kind="loading" title={t('내 여행 불러오는 중…')} compact />
+    );
+  }
   return (
     <>
-      <ActionSheet
-        visible={receiptSelection}
-        title={t('기록할 여행 선택')}
-        onClose={() => setReceiptSelection(false)}
-      >
-        <Text style={s.body}>
-          {t(
-            '여행의 비용 화면에서 영수증을 등록하고 방문 기록을 확인할 수 있어요.',
-          )}
-        </Text>
-        {!userId && ready ? (
-          <DesignButton
-            label={t('로그인하고 내 여행 찾기')}
-            onPress={() => {
-              setReceiptSelection(false);
-              router.push({ pathname: '/login', params: { next: 'plans' } });
-            }}
-          />
-        ) : loading ? (
-          <HaruState kind="loading" title={t('내 여행 불러오는 중…')} compact />
-        ) : tripsError ? (
+      {tripsError && (
+        <View style={s.section}>
+          <Text accessibilityRole="alert">
+            {t('내 여행을 불러오지 못했어요')}
+          </Text>
           <DesignButton
             label={t('내 여행 다시 불러오기')}
             onPress={onRefetchTrips}
           />
-        ) : activeTrips.length ? (
-          activeTrips.map((trip) => (
-            <DesignButton
-              key={trip.id}
-              label={trip.title || t('새 여행 계획')}
-              onPress={() => {
-                setReceiptSelection(false);
-                router.push({
-                  pathname: '/trips/[id]',
-                  params: { id: trip.id, section: 'expenses' },
-                });
-              }}
-            />
-          ))
-        ) : (
-          <HaruState
-            kind="empty"
-            title={t('먼저 여행을 만들어 주세요')}
-            compact
-          >
-            <DesignButton
-              label={t('새 여행 만들기')}
-              onPress={() => {
-                setReceiptSelection(false);
-                onCreate();
-              }}
-            />
-          </HaruState>
-        )}
-      </ActionSheet>
-      <ActionSheet
-        visible={expanded}
-        title={t('작성 중인 계획 관리')}
-        onClose={() => setExpanded(false)}
-      >
-        <LegacyDraftImport userId={userId} />
-        <HomeDraftResume userId={userId} onOpen={() => setExpanded(false)} />
-        <DesignButton
-          label={t('전체 여행 관리')}
-          onPress={() => {
-            setExpanded(false);
-            router.push('/plans');
-          }}
+        </View>
+      )}
+      {draftsError && (
+        <View style={s.section}>
+          <Text accessibilityRole="alert">
+            {t('임시 계획을 불러오지 못했어요.')}
+          </Text>
+          <DesignButton
+            label={t('임시 계획 다시 불러오기')}
+            onPress={onRefetchDrafts}
+          />
+        </View>
+      )}
+      {groups.active.length > 0 && (
+        <View style={s.section}>
+          <Text accessibilityRole="header" style={s.title}>
+            {t('여행 중')}
+          </Text>
+          {groups.active.map((item) => {
+            // 현재 진행 중인 각 여행을 실시간 컨시어지 카드로 표시한다.
+            return (
+              <HomeTravelCard
+                key={item.id}
+                item={item}
+                userId={userId}
+                inTrip
+              />
+            );
+          })}
+        </View>
+      )}
+      {groups.upcoming && (
+        <View testID="home-upcoming" style={s.section}>
+          <View style={s.heading}>
+            <Text accessibilityRole="header" style={s.title}>
+              {t('다가오는 여행')}
+            </Text>
+            <Text style={s.badge}>
+              {homeDaysLeft(groups.upcoming) === 0
+                ? 'D-Day'
+                : `D-${homeDaysLeft(groups.upcoming)}`}
+            </Text>
+          </View>
+          <HomeTravelCard item={groups.upcoming} userId={userId} hero />
+        </View>
+      )}
+      {showEmptyPlanner && (
+        <HomeEmptySection
+          ready={ready}
+          hasCompleted={hasCompleted}
+          onCreate={onCreate}
+          onBrowseCourses={onBrowseCourses}
+          onOpenGuide={onOpenGuide}
         />
-      </ActionSheet>
+      )}
     </>
   );
 }

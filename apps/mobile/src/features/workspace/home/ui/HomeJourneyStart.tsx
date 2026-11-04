@@ -1,84 +1,65 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, View } from 'react-native';
 import Text from '@/components/ui/AppText';
-import { colors } from '@/constants/theme';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 import { t } from '@/features/localization/translate';
-import { homeTravelStyles as s } from '../styles/homeTravelStyles';
+import { homePalette, homeTravelStyles as s } from '../styles/homeTravelStyles';
 
-// 홈 상단에서 언제든 즉시 실행할 수 있는 핵심 액션을 2열 퀵 카드로 제공한다.
+// 홈 퍼스트 폴드에서 즉시 새 여행 생성으로 진입하는 콤팩트 시작 바를 렌더링한다.
 export default function HomeJourneyStart({
   ready,
   onCreate,
-  onReceipts,
+  subtitle,
 }: {
   ready: boolean;
   onCreate: () => void;
-  onReceipts: () => void;
+  onReceipts?: () => void;
+  subtitle?: string;
 }) {
+  // 큰 글자 모드에서는 좌우 요소를 세로로 쌓아 320px 화면에서도 줄바꿈 잘림을 막는다.
   const large = useAppAccessibility().largeText;
   return (
     <View
-      style={[s.quickGrid, large && { flexDirection: 'column' }]}
+      style={[
+        s.compactCreateBar,
+        large && { flexDirection: 'column', alignItems: 'stretch' },
+      ]}
       testID="home-journey-start"
     >
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={t('기록할 여행 선택')}
-        style={({ pressed }) => [
-          s.quickCard,
-          { minHeight: 48 },
-          pressed && { opacity: 0.85 },
-        ]}
-        onPress={onReceipts}
-        disabled={!ready}
-      >
-        <View
-          style={[s.quickIconWrap, { backgroundColor: colors.selectedSurface }]}
-          accessible={false}
-        >
+      <View style={s.compactCreateLeft}>
+        <View style={s.compactCreateIcon} accessible={false}>
           <Ionicons
-            name="receipt-outline"
+            name="globe-outline"
             size={20}
-            color={colors.actionPrimary}
+            color={homePalette.coralDeep}
             accessible={false}
           />
         </View>
-        <View style={{ minWidth: 0 }} accessible={false}>
-          <Text style={s.quickTitle}>{t('영수증 등록')}</Text>
-          <Text style={s.quickDesc}>{t('방문 장소·비용 정리')}</Text>
+        <View style={s.compactCreateCopy}>
+          <Text style={s.compactCreateTitle}>{t('어디로 떠나시나요?')}</Text>
+          <Text style={s.compactCreateSub}>
+            {subtitle || t('추천: 도쿄 3박 4일 일정 만들기')}
+          </Text>
         </View>
-      </Pressable>
+      </View>
 
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={t('새 여행 만들기')}
         style={({ pressed }) => [
-          s.quickCard,
-          { minHeight: 48 },
-          pressed && { opacity: 0.85 },
+          s.compactCreateBtn,
+          pressed && { opacity: 0.88 },
         ]}
-        onPress={onCreate}
+        onPress={() => {
+          // 새 여행 생성 화면으로 즉시 이동한다.
+          onCreate();
+        }}
         disabled={!ready}
       >
-        <View
-          style={[
-            s.quickIconWrap,
-            { backgroundColor: colors.brandCoral + '1A' },
-          ]}
-          accessible={false}
-        >
-          <Ionicons
-            name="airplane-outline"
-            size={20}
-            color={colors.brandCoral}
-            accessible={false}
-          />
-        </View>
-        <View style={{ minWidth: 0 }} accessible={false}>
-          <Text style={s.quickTitle}>{t('새 여행 만들기')}</Text>
-          <Text style={s.quickDesc}>{t('날짜·여행지 추가')}</Text>
-        </View>
+        <Ionicons name="add" size={16} color="#FFFFFF" accessible={false} />
+        <Text style={s.compactCreateBtnText} accessible={false}>
+          {t('새 여행 시작')}
+        </Text>
       </Pressable>
     </View>
   );

@@ -4643,5 +4643,161 @@
     "Your sign-in may have expired, or verification could not be completed.",
     "ログイン情報の有効期限が切れたか、確認を完了できませんでした。"
   ],
-  "로그인하고 있어요": ["Signing you in", "ログインしています"]
+  "로그인하고 있어요": ["Signing you in", "ログインしています"],
+  "추천: 도쿄 3박 4일 일정 만들기": [
+    "Suggested: Create a 4-day Tokyo itinerary",
+    "おすすめ：東京3泊4日の旅程を作成"
+  ],
+  "새 여행 시작": ["Start trip", "旅を始める"],
+  "동선 준비 완료": ["Route ready", "ルート準備完了"],
+  "일정 0개 · 첫 장소를 추가해 보세요": [
+    "0 stops · Add your first place",
+    "予定0件・最初の場所を追加しましょう"
+  ],
+  "다음 일정 컨시어지": ["Next Trip Concierge", "次の旅程コンシェルジュ"],
+  "첫 일정 추가하기": ["Add first stop", "最初の予定を追加"],
+  "Day 1 · 첫 일정 비어 있음": [
+    "Day 1 · No stops yet",
+    "Day 1・最初の予定が未登録です"
+  ],
+  "첫 동선": ["First stop", "最初の移動"],
+  "일정 비어 있음": ["No stops yet", "予定未登録"],
+  "도착 공항이나 첫 방문 장소를 추가해 나만의 동선을 시작해 보세요": [
+    "Add your arrival airport or first stop to start building your route",
+    "到着空港や最初の訪問先を追加して、自分だけのルートを始めましょう"
+  ],
+  "첫 일정 채우기": ["Add first stop", "最初の予定を追加"],
+  "내 일정 전체보기": ["View full itinerary", "旅程をすべて見る"],
+  "오프라인 티켓/동선": ["Tickets & route", "チケット・ルート"],
+  "동행자와 실시간으로 일정·가계부를 함께 볼 수 있어요": [
+    "Share your itinerary and expenses in real time with companions",
+    "同行者とリアルタイムで旅程・家計簿を共有できます"
+  ],
+  "현지 동행 컨시어지": ["Live Trip Concierge", "現地同行コンシェルジュ"],
+  "{p0}일차 진행 중": ["Day {p0} in progress", "{p0}日目を進行中"],
+  "진행 동선": ["Active route", "進行ルート"],
+  "영수증 기록": ["Receipt log", "レシート記録"],
+  "방금 결제한 영수증을 찍어 방문 장소와 지출 내역을 정리해 보세요": [
+    "Snap a receipt you just paid to organize visited places and expenses",
+    "支払ったばかりのレシートを撮って訪問先と支出を整理しましょう"
+  ],
+  "다음 여정도 날짜·도시만 고르면 바로 시작돼요": [
+    "Pick dates and a city to start your next journey right away",
+    "次の旅も日付と都市を選ぶだけですぐに始められます"
+  ],
+  "여행": ["Trip", "旅行"],
+  "작성 중인 여행": ["Draft trip", "作成中の旅行"],
+  "다음 여정 탐색": ["Explore next trip", "次の旅を探す"],
+  "첫 여행 준비": ["Ready for first trip", "最初の旅の準備"],
+  "출발일을 선택하면 D-Day가 계산돼요": [
+    "Select a departure date to see your D-Day countdown",
+    "出発日を選ぶとD-Dayが計算されます"
+  ],
+  "떠나고 싶은 날짜를 골라보세요": [
+    "Pick the dates you'd like to travel",
+    "出発したい日付を選んでみましょう"
+  ],
+  "추천 시기": ["Best season", "おすすめ時期"],
+  "맞춤 동선 준비 중": ["Preparing custom route", "カスタムルート準備中"],
+  "8개 인기 도시 공식 가이드": [
+    "Official guides for 8 popular cities",
+    "人気8都市の公式ガイド"
+  ],
+  "안녕하세요": ["Hello", "こんにちは"],
+  "첫 여행 컨시어지": ["First Trip Concierge", "最初の旅コンシェルジュ"],
+  "도시·날짜만 고르면 준비 완료": [
+    "Ready as soon as you pick a city & dates",
+    "都市と日付を選ぶだけで準備完了"
+  ],
+  "아직 예정된 여행이 없어요. 도시를 선택하면 DAY별 동선과 체크리스트·가계부가 바로 생성됩니다.": [
+    "No upcoming trips yet. Pick a city to generate day-by-day routes, a checklist, and expenses.",
+    "まだ予定された旅行がありません。都市を選ぶと日別ルート・持ち物・家計簿がすぐ作成されます。"
+  ],
+  "Step 1 · 인기 도시로 바로 시작": [
+    "Step 1 · Quick start with a popular city",
+    "Step 1・人気都市ですぐ始める"
+  ],
+  "추천 루트": ["Suggested route", "おすすめルート"],
+  "일정을 등록하고 영수증을 모아보세요. 나만의 여행 노트가 완성됩니다.": [
+    "Add your stops and collect receipts to complete your travel notebook.",
+    "予定を登録してレシートを集めましょう。自分だけの旅ノートが完成します。"
+  ],
+  "여행 시작": ["Start trip", "旅を始める"],
+  "실제 여행자 검증 코스": [
+    "Verified Traveler Routes",
+    "旅行者・公式検証コース"
+  ],
+  "★ 공식 관광청 동선": ["★ Official tourism routes", "★ 観光局公式ルート"],
+  "가이드 보기": ["View guide", "ガイドを見る"],
+  "내 일정에 담기": ["Start with this route", "自分の旅程に追加"],
+  "여행 전·중 핵심 도구": [
+    "Essential Pre & In-Trip Tools",
+    "旅行前・旅行中の必須ツール"
+  ],
+  "가계부 / 환율": ["Expenses / FX", "家計簿・換算"],
+  "영수증·지출 정리": ["Receipts & spending", "レシート・支出整理"],
+  "필수 준비물 체크리스트": [
+    "Essential packing checklist",
+    "必須持ち物チェックリスト"
+  ],
+  "체크리스트": ["Checklist", "チェックリスト"],
+  "필수 준비물": ["Packing essentials", "必須の持ち物"],
+  "현지 비상/교통 안내": [
+    "Local transit & emergency guide",
+    "現地交通・緊急案内"
+  ],
+  "현지 비상/교통": ["Transit / Safety", "現地交通・緊急"],
+  "공식 안내 연결": ["Official guides", "公式案内リンク"],
+  "여권·로밍(eSIM)·교통패스·돼지코 어댑터 등 출국 전 필수 준비물을 여행별로 점검할 수 있어요.": [
+    "Check off passports, eSIM/roaming, transit passes, and adapters for each trip before departure.",
+    "パスポート・eSIM・交通パス・変換プラグなど出発前の必須持ち物を旅行ごとに確認できます。"
+  ],
+  "체크리스트 열기": ["Open checklist", "チェックリストを開く"],
+  "새 여행을 생성하면 도시·일정에 맞는 준비물 체크리스트가 함께 준비됩니다.": [
+    "Create a new trip to get a packing checklist tailored to your destination and dates.",
+    "新しい旅行を作成すると、都市や日程に合わせた持ち物チェックリストが用意されます。"
+  ],
+  "현지 비상/교통 공식 안내": [
+    "Official Local Transit & Safety Guides",
+    "現地交通・安全の公式案内"
+  ],
+  "여행지 대중교통 패스, 현지 차량 호출 앱, 관광청 안전 가이드를 공식 출처에서 바로 확인하세요.": [
+    "Check transit passes, local ride-hailing apps, and tourism safety guides directly from official sources.",
+    "現地の交通パス、配車アプリ、観光局の安全ガイドを公式情報からすぐ確認できます。"
+  ],
+  "첫 여정 준비하기": ["Ready for first trip", "最初の旅の準備"],
+  "님!": ["!", "さん！"],
+  "어디로 떠나볼까요? 목적지만 정하면 일정이 완성돼요.": [
+    "Where to next? Just pick a destination to build your itinerary.",
+    "どこへ出かけましょう？目的地を決めるだけで旅程が完成します。"
+  ],
+  "1분 완성 여행 플래너": ["1-Min Trip Planner", "1分で完成・旅行プランナー"],
+  "초간편 생성": ["Quick start", "かんたん作成"],
+  "나만의 맞춤 여행 일정 만들기": [
+    "Create your custom itinerary",
+    "自分だけのカスタム旅程を作成"
+  ],
+  "가고 싶은 도시와 날짜를 선택하면 최적 동선과 추천 장소가 자동으로 정리됩니다.": [
+    "Pick your city and dates to organize your route and recommended places.",
+    "行きたい都市と日付を選ぶだけで、最適なルートとおすすめスポットを整理します。"
+  ],
+  "어디로 떠나시나요? 여행지 선택": [
+    "Where are you heading? Choose destination",
+    "どこへ出かけますか？目的地を選択"
+  ],
+  "추천: 오사카 2박 3일, 다낭 3박 4일": [
+    "Suggested: Osaka 3 days, Da Nang 4 days",
+    "おすすめ：大阪2泊3日、ダナン3泊4日"
+  ],
+  "인기 여행 코스 둘러보기": [
+    "Browse popular travel routes",
+    "人気の旅行コースを見る"
+  ],
+  "오프라인 지원": ["Offline ready", "オフライン対応"],
+  "실시간 계산": ["Live calculation", "リアルタイム計算"],
+  "안내센터 연결": ["Official help links", "案内センター接続"],
+  "작성된 여행 계획은 언제든 비공개로 유지할 수 있으며, 준비가 완료되었을 때만 공개할 수 있어요.": [
+    "Your trip plans stay private by default and are only shared when you choose to publish them.",
+    "作成した旅行計画はいつでも非公開のまま保たれ、準備ができたときだけ公開できます。"
+  ]
 }
