@@ -9,7 +9,11 @@ import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
 import { useAuthReady } from '../../../auth/manager/AuthBridge';
 import HaruState from '@/components/feedback/HaruState';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter, useLocalSearchParams, usePathname } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import RecoveryHeader from '@/components/navigation/RecoveryHeader';
+import { colors } from '@/constants/theme';
+import { returnFromPath } from '@/features/auth/model/authReturn';
 import { useTripStore } from '@/stores/useTripStore';
 import WorkspaceView from './WorkspaceView';
 import { useWorkspaceController } from '../manager/useWorkspaceController';
@@ -42,7 +46,7 @@ export default function WorkspaceScreen({
   // 글꼴은 상위 AppFontProvider가 준비하며, 상세 직접 진입에서 중복 로딩을 기다리지 않는다.
   // React key로 이전 계정의 입력·요청 클로저를 남기지 않는다.
   return !authReady ? (
-    <HaruState kind="loading" title={t('여행을 불러오는 중입니다.')} compact />
+    <WorkspaceAuthPending />
   ) : (
     <WorkspaceEntry
       key={`${userId}:${creating ? `new:${destination || ''}:${mode || ''}:${resume || ''}:${handoff || ''}` : id || 'list'}:${importPlace || ''}`}
@@ -52,6 +56,28 @@ export default function WorkspaceScreen({
       creating={creating}
       importing={importPlace === '1'}
     />
+  );
+}
+
+// 오류 안내가 중앙 카드로 열려도 인증 대기 페이지의 공통 헤더는 원래 위치에 남긴다.
+function WorkspaceAuthPending() {
+  useLocale();
+  const path = usePathname();
+  const router = useRouter();
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      <RecoveryHeader
+        path={path}
+        onBack={() =>
+          router.replace({ pathname: '/login', params: returnFromPath(path) })
+        }
+      />
+      <HaruState
+        kind="loading"
+        title={t('여행을 불러오는 중입니다.')}
+        compact
+      />
+    </SafeAreaView>
   );
 }
 // 계정·여행별 컨트롤러를 같은 수명의 표현 화면에 연결한다.
