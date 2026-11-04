@@ -232,18 +232,10 @@ export function renderWorkspaceAddSchedule({
 
   return (
     <View
-      style={[
-        hub.primaryBar,
-        {
-          flexDirection: 'row',
-          justifyContent: 'center',
-          gap: 10,
-          flexWrap: 'wrap',
-        },
-      ]}
+      style={[hub.primaryBar, hub.primaryActionRow]}
       testID="trip-primary-action"
     >
-      <View style={[hub.primaryButton, { flex: 1, minWidth: 140 }]}>
+      <View style={hub.secondaryActionWrap}>
         <DesignButton
           label={t('지도 보며 동선 짜기')}
           variant="secondary"
@@ -253,11 +245,12 @@ export function renderWorkspaceAddSchedule({
             return <Ionicons name="map-outline" size={18} color={color} />;
           }}
           onPress={() => {
+            // 지도 영역으로 전환해 전체 방문 핀과 이동 경로를 보여준다.
             return setActiveSection('map');
           }}
         />
       </View>
-      <View style={[hub.primaryButton, { flex: 1.15, minWidth: 140 }]}>
+      <View style={hub.primaryActionWrap}>
         <DesignButton
           label={t('일정 추가')}
           accessibilityLabel={t('일정 추가')}

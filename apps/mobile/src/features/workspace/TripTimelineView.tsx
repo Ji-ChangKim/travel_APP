@@ -20,14 +20,19 @@ import { tripTimelineStyles } from './tripTimelineStyles';
 import { triggerHaptic } from '@/components/haptics';
 
 import type { Props } from './TripTimeline';
-// renderTimelinePlace이 읽는 값과 실행 가능한 행동의 계약이다.
-type RenderTimelinePlaceProps = {
-  item: WorkspaceSchedule;
+
+// 타임라인 장소 카드와 하위 액션 영역이 공유하는 입력 계약이다.
+type TimelineItemScopeProps = {
   props: Props & {
     expanded: [string, (id: string) => void];
     arranging: [boolean, (value: boolean) => void];
     largeText: boolean;
   };
+  item: WorkspaceSchedule;
+};
+
+// renderTimelinePlace이 읽는 값과 실행 가능한 행동의 계약이다.
+type RenderTimelinePlaceProps = TimelineItemScopeProps & {
   index: number;
   items: WorkspaceSchedule[];
 };
@@ -40,16 +45,17 @@ export function renderTimelinePlace({
   items,
 }: RenderTimelinePlaceProps) {
   // 전달받은 값과 행동을 기존 화면 규격으로 표시한다.
-
   const isSelected = props.selectedScheduleId === item.id;
   const isArranging = props.arranging[0];
 
   return (
     <Pressable
       onPress={() => {
-        props.onSelectSchedule?.(item.id);
+        // 선택한 장소를 상단 미니맵 핀과 함께 강조한다.
+        return props.onSelectSchedule?.(item.id);
       }}
       onLongPress={() => {
+        // 두 개 이상의 일정이 있을 때 길게 누르면 순서 편집을 시작한다.
         if (!props.disabled && items.length > 1) {
           triggerHaptic('medium');
           props.arranging[1](true);
@@ -57,16 +63,8 @@ export function renderTimelinePlace({
       }}
       style={[
         s.placeCard,
-        isSelected && {
-          borderColor: '#2563eb',
-          borderWidth: 2,
-          backgroundColor: '#f0f7ff',
-        },
-        isArranging && {
-          borderColor: '#94a3b8',
-          borderWidth: 1.5,
-          borderStyle: 'dashed',
-        },
+        isSelected && s.selectedPlaceCard,
+        isArranging && s.arrangingPlaceCard,
       ]}
     >
       <View style={s.cardTop}>
@@ -137,14 +135,17 @@ export function renderTimelinePlace({
             media.scheduleId === item.id && media.purpose === 'photo'
           );
         })
-        .map((media) => (
-          <ServerPhoto
-            key={media.id}
-            userId={props.userId}
-            tripId={props.snapshot.trip.id}
-            mediaId={media.id}
-          />
-        ))}
+        .map((media) => {
+          // 해당 방문 일정에 첨부된 사진을 순서대로 렌더링한다.
+          return (
+            <ServerPhoto
+              key={media.id}
+              userId={props.userId}
+              tripId={props.snapshot.trip.id}
+              mediaId={media.id}
+            />
+          );
+        })}
       <View style={s.metaRow}>
         {item.durationMinutes ? (
           <View style={s.durationChip}>
@@ -160,19 +161,22 @@ export function renderTimelinePlace({
               expense.scheduleId === item.id
             );
           })
-          .map((expense) => (
-            <View key={expense.id} style={s.spend}>
-              <Text style={shared.meta}>
-                {expense.isActual ? t('실제 지출') : t('예상 비용')}
-              </Text>
-              <Text style={s.amount}>
-                {expense.currency}{' '}
-                {new Intl.NumberFormat(getLocale(), {
-                  maximumFractionDigits: 2,
-                }).format(Number(expense.amount))}
-              </Text>
-            </View>
-          ))}
+          .map((expense) => {
+            // 선택한 통화와 금액을 현지 숫자 서식으로 표시한다.
+            return (
+              <View key={expense.id} style={s.spend}>
+                <Text style={shared.meta}>
+                  {expense.isActual ? t('실제 지출') : t('예상 비용')}
+                </Text>
+                <Text style={s.amount}>
+                  {expense.currency}{' '}
+                  {new Intl.NumberFormat(getLocale(), {
+                    maximumFractionDigits: 2,
+                  }).format(Number(expense.amount))}
+                </Text>
+              </View>
+            );
+          })}
       </View>
       {item.googlePlaceId && (
         <GooglePlace
@@ -210,23 +214,13 @@ export function renderTimelinePlace({
     </Pressable>
   );
 }
-// renderTimelineManagement이 읽는 값과 실행 가능한 행동의 계약이다.
-type RenderTimelineManagementProps = {
-  props: Props & {
-    expanded: [string, (id: string) => void];
-    arranging: [boolean, (value: boolean) => void];
-    largeText: boolean;
-  };
-  item: WorkspaceSchedule;
-};
 
 // 일정의 순서·수정·삭제 행동을 표시한다.
 export function renderTimelineManagement({
   props,
   item,
-}: RenderTimelineManagementProps): import('react').ReactNode {
+}: TimelineItemScopeProps): import('react').ReactNode {
   // 전달받은 값과 행동을 기존 화면 규격으로 표시한다.
-
   return (
     props.expanded[0] === item.id && (
       <View style={s.managementPanel}>
@@ -271,23 +265,13 @@ export function renderTimelineManagement({
     )
   );
 }
-// renderTimelineActions이 읽는 값과 실행 가능한 행동의 계약이다.
-type RenderTimelineActionsProps = {
-  props: Props & {
-    expanded: [string, (id: string) => void];
-    arranging: [boolean, (value: boolean) => void];
-    largeText: boolean;
-  };
-  item: WorkspaceSchedule;
-};
 
 // 선택 장소의 기록·지출 행동을 표시한다.
 export function renderTimelineActions({
   props,
   item,
-}: RenderTimelineActionsProps): import('react').ReactNode {
+}: TimelineItemScopeProps): import('react').ReactNode {
   // 전달받은 값과 행동을 기존 화면 규격으로 표시한다.
-
   return (
     !props.disabled && (
       <View style={s.cardFooter}>

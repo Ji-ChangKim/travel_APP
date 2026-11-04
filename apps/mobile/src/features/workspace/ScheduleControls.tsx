@@ -3,11 +3,16 @@ import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
 import DesignButton from '@/components/DesignButton';
 import DesignInput from '@/components/DesignInput';
-import { TextInput, View, type KeyboardTypeOptions } from 'react-native';
+import {
+  ScrollView,
+  TextInput,
+  View,
+  type KeyboardTypeOptions,
+} from 'react-native';
 import { useRef, type ReactNode } from 'react';
 import { FormAnchor, focusFormInput, useFormScope } from './InputFeedback';
 import TripIcon, { type TripIconName } from '@/components/icons/TripIcon';
-import { scheduleStyles as s } from './scheduleTheme';
+import { scheduleStyles as s, scheduleTheme as theme } from './scheduleTheme';
 
 // 일정 화면의 행동 하나를 충분한 터치 영역과 함께 제공한다.
 export function ScheduleButton({
@@ -120,12 +125,32 @@ function BoundScheduleField({
         keyboardType={props.keyboardType}
         placeholder={props.placeholder}
         autoCapitalize="none"
-        style={[
-          s.input,
-          props.multiline && { minHeight: 88, textAlignVertical: 'top' },
-        ]}
+        style={[s.input, props.multiline && s.multilineInput]}
       />
     </FormAnchor>
+  );
+}
+
+// 가로 스크롤 선택 칩 묶음을 동일한 제목·간격 규격으로 표시한다.
+export function ScheduleChoiceStrip({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
+  // 일차 선택과 일정 유형 선택이 같은 가로 탐색 규격을 공유한다.
+  return (
+    <View style={s.choiceGroup}>
+      <Text style={s.choiceLabel}>{label}</Text>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={s.choiceStrip}
+      >
+        {children}
+      </ScrollView>
+    </View>
   );
 }
 
@@ -142,19 +167,10 @@ export function ScheduleSection({
   // 제목과 내용의 읽는 순서를 유지한다.
   return (
     <View style={s.card}>
-      <View style={[s.row, { gap: 10, alignItems: 'center' }]}>
+      <View style={s.sectionHeaderRow}>
         {icon && (
-          <View
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 10,
-              backgroundColor: '#FFF1EE',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <TripIcon name={icon} size={18} color="#FF6B4A" />
+          <View style={s.sectionIconBadge}>
+            <TripIcon name={icon} size={18} color={theme.color.brand.coral} />
           </View>
         )}
         <Text style={s.title}>{title}</Text>

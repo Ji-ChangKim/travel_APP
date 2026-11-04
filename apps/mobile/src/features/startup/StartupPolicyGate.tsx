@@ -7,7 +7,11 @@ import { AppState, BackHandler, Linking, Platform, View } from 'react-native';
 import Text from '@/components/AppText';
 import LoginButton from '@/features/auth/LoginButton';
 import { playStoreUrl } from '@wherego/validation';
-import { checkPlayUpdate, startImmediateUpdate } from './playUpdate';
+import {
+  checkPlayUpdate,
+  refreshPlayAndPolicy,
+  startImmediateUpdate,
+} from './playUpdate';
 import { checkAppPolicy } from './appPolicy';
 import { decideUpdate } from './updatePolicy';
 import { introStyles as styles } from './introStyles';
@@ -74,7 +78,7 @@ function AndroidPolicyGate({ children }: { children: ReactNode }) {
   // 복귀 때 설치 버전과 현재 정책만 재조회한다.
   function refresh(): Promise<unknown> {
     // 계정·기기 여행 데이터는 다시 실행하지 않는다.
-    return play.refetch().then(() => policy.refetch());
+    return refreshPlayAndPolicy(play.refetch, policy.refetch);
   }
   // 직접 링크에서도 한 번의 버튼 동작만 업데이트를 실행한다.
   function update(): void {
@@ -122,7 +126,8 @@ function AndroidPolicyGate({ children }: { children: ReactNode }) {
     const subscription = AppState.addEventListener('change', (state) => {
       // 자동 업데이트 반복 없이 버전만 다시 읽는다.
       return void (state === 'active' && opened.current && !locked.current
-        ? ((opened.current = false), playRefetch().then(() => policyRefetch()))
+        ? ((opened.current = false),
+          refreshPlayAndPolicy(playRefetch, policyRefetch))
         : undefined);
     });
     return () => {

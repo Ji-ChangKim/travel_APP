@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { designTokens as tokens } from '@/constants/theme';
+import { colors, designTokens as tokens } from '@/constants/theme';
 
 // 일정 화면은 준비한 디자인 토큰을 직접 참조한다.
 export const scheduleTheme = {
@@ -31,6 +31,101 @@ export const scheduleStyles = StyleSheet.create({
     boxShadow: tokens.shadow.card,
   },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    flexWrap: 'wrap',
+  },
+  sectionIconBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: c.selection.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  choiceGroup: {
+    gap: 8,
+  },
+  choiceLabel: {
+    fontFamily: scheduleTheme.font.bold,
+    fontSize: 14,
+    lineHeight: 20,
+    color: colors.textSecondary,
+  },
+  choiceStrip: {
+    gap: 8,
+    paddingVertical: 2,
+  },
+  kindChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 16,
+    backgroundColor: colors.surface,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    minHeight: tokens.control.small.touchHeight,
+  },
+  kindChipSelected: {
+    backgroundColor: colors.selectedSurface,
+    borderColor: colors.brandCoral,
+  },
+  kindEmoji: {
+    fontSize: 16,
+  },
+  kindLabel: {
+    fontFamily: scheduleTheme.font.bold,
+    fontSize: 14,
+    lineHeight: 20,
+    color: colors.text,
+  },
+  kindLabelSelected: {
+    color: colors.selected,
+  },
+  headingCard: {
+    flexDirection: 'row',
+    gap: 14,
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: c.surface.card,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: c.border.subtle,
+  },
+  dayBadgeCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: c.brand.coral,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: c.brand.coral,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  dayBadgeText: {
+    fontFamily: scheduleTheme.font.bold,
+    fontSize: 16,
+    lineHeight: 22,
+    color: colors.actionForeground,
+  },
+  headingCopy: {
+    gap: 4,
+    flex: 1,
+    minWidth: 0,
+  },
+  headingMainTitle: {
+    fontFamily: scheduleTheme.font.bold,
+    fontSize: 19,
+    lineHeight: 26,
+    color: c.text.primary,
+  },
   title: {
     fontFamily: scheduleTheme.font.bold,
     fontSize: 18,
@@ -72,6 +167,10 @@ export const scheduleStyles = StyleSheet.create({
     fontFamily: scheduleTheme.font.regular,
     fontSize: tokens.typography.bodyMedium.size,
     lineHeight: tokens.typography.bodyMedium.lineHeight,
+  },
+  multilineInput: {
+    minHeight: 88,
+    textAlignVertical: 'top',
   },
   dock: {
     padding: 16,

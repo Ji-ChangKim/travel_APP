@@ -11,6 +11,7 @@ import {
 } from '@/features/startup/launchSession';
 import {
   checkPlayUpdate,
+  refreshPlayAndPolicy,
   startImmediateUpdate,
   type PlayUpdate,
 } from '@/features/startup/playUpdate';
@@ -132,7 +133,7 @@ export function useStartupController(foreground: boolean) {
   // 사용자가 업데이트 화면을 열고 돌아온 경우에만 설치 버전을 다시 확인한다.
   function refreshUpdate(): Promise<unknown> {
     // 채널은 설치 경로에서 다시 읽고 정책은 현재 채널에서 재조회한다.
-    return play.refetch().then(() => policy.refetch());
+    return refreshPlayAndPolicy(play.refetch, policy.refetch);
   }
   useStartupLifecycle({
     common,
@@ -299,7 +300,7 @@ export function useStartupLifecycle({
       storeOpened.current &&
       !updateLock.current
         ? ((storeOpened.current = false),
-          playRefetch().then(() => policyRefetch()))
+          refreshPlayAndPolicy(playRefetch, policyRefetch))
         : undefined);
     });
     return () => {

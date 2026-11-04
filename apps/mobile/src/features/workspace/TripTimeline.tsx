@@ -21,8 +21,16 @@ import TripScheduleEmpty, {
 import type { CityGuidePlace } from './cityGuides';
 import { scheduleFlight } from './flightModel';
 import ScheduleConflictNotice from './scheduleConflicts';
-import { scheduleDate, schedulesForDay } from './schedulePresentation';
-import { scheduleStyles as shared } from './scheduleTheme';
+import {
+  formatDayChipLabel,
+  scheduleDate,
+  schedulesForDay,
+  travelLegForStop,
+} from './schedulePresentation';
+import {
+  scheduleStyles as shared,
+  scheduleTheme as theme,
+} from './scheduleTheme';
 import DayRecommendations, {
   type RecommendedPlace,
 } from './DayRecommendations';
@@ -110,19 +118,22 @@ export function TripDayStrip({
           }}
         />
       )}
-      {days.map((day) => (
-        <DesignButton
-          label={`DAY ${day.dayNumber} ${Number(day.tripDate.slice(5, 7))}/${Number(day.tripDate.slice(8))}`}
-          size="chip"
-          key={day.id}
-          accessibilityLabel={'DAY ' + day.dayNumber}
-          selected={selected === day.id}
-          selectionStyle="fill"
-          onPress={() => {
-            /* 실제 DAY만 선택한다. */ return onSelect(day.id);
-          }}
-        />
-      ))}
+      {days.map((day) => {
+        // 선택한 날짜를 채움형 칩으로 강조해 표시한다.
+        return (
+          <DesignButton
+            label={formatDayChipLabel(day, 'slash')}
+            size="chip"
+            key={day.id}
+            accessibilityLabel={'DAY ' + day.dayNumber}
+            selected={selected === day.id}
+            selectionStyle="fill"
+            onPress={() => {
+              /* 실제 DAY만 선택한다. */ return onSelect(day.id);
+            }}
+          />
+        );
+      })}
     </ScrollView>
   );
 }
@@ -141,6 +152,7 @@ export default function TripTimeline(props: Props) {
   );
 }
 
+// 선택 날짜의 DAY 번호·도시 배지·일정 개수와 순서 편집 진입을 표시한다.
 function TimelineDayHeading({
   props,
   city,
@@ -155,9 +167,10 @@ function TimelineDayHeading({
   itemCount: number;
 }) {
   useLocale();
+  // 두 개 이상의 방문 일정이 있을 때만 순서 편집 버튼을 노출한다.
   return (
     <View style={s.heading}>
-      <View style={{ flex: 1, gap: 4 }}>
+      <View style={s.headingMain}>
         <View style={shared.row}>
           <Text style={s.dayAccentLabel}>DAY {props.day.dayNumber}</Text>
           <Text style={s.headingText}>
@@ -217,13 +230,20 @@ function TimelineContent(
 ) {
   useLocale();
   // 순서 변경은 상위 화면의 버전·재시도 계약으로 저장한다.
-  const remote = useTripStore(
-    (state) =>
+  const remote = useTripStore((state) => {
+    // 게스트가 아닌 인증 회원의 원격 여행인지 확인한다.
+    return (
       state.currentUser?.id === props.userId &&
-      state.currentUser.authProvider !== 'guest',
-  );
+      state.currentUser.authProvider !== 'guest'
+    );
+  });
   const dayDest = destinationForDay(props.snapshot, props.day.id);
   const dayItems = schedulesForDay(props.snapshot.itinerary, props.day.id);
+  const existingTitles = props.snapshot.itinerary.map((item) => {
+    // 추천 명소 카드에서 이미 담긴 장소 제목을 식별한다.
+    return item.title;
+  });
+
   return (
     <View style={s.timeline}>
       <TimelineDayHeading
@@ -242,7 +262,11 @@ function TimelineContent(
         >
           <View style={s.memoBannerLeft}>
             <View aria-hidden>
-              <Ionicons name="sunny-outline" size={18} color="#A43E31" />
+              <Ionicons
+                name="sunny-outline"
+                size={18}
+                color={theme.color.brand.coralPressed}
+              />
             </View>
             <Text
               style={s.memoBannerText}
@@ -254,7 +278,11 @@ function TimelineContent(
             </Text>
           </View>
           <View aria-hidden>
-            <Ionicons name="chevron-forward" size={16} color="#596574" />
+            <Ionicons
+              name="chevron-forward"
+              size={16}
+              color={theme.color.text.secondary}
+            />
           </View>
         </Pressable>
       )}
@@ -281,14 +309,24 @@ function TimelineContent(
           onCourse={props.onCourse}
           country={dayDest.country}
           city={dayDest.city}
-          existingTitles={props.snapshot.itinerary.map((item) => item.title)}
+          existingTitles={existingTitles}
           onSelectCategory={props.onSelectCategory}
           onSelectSpot={props.onSelectSpot}
           onOpenMap={props.onOpenMap}
         />
       )}
-      {schedulesForDay(props.snapshot.itinerary, props.day.id).map(
-        (item, index, items) => (
+      {dayItems.map((item, index, items) => {
+        // 각 방문 번호와 다음 장소까지의 이동 구간을 순서대로 표시한다.
+        const nextItem = items[index + 1];
+        const routeState = nextItem
+          ? travelLegForStop(
+              props.snapshot.travelLegs,
+              props.day.id,
+              item.id,
+              nextItem.id,
+            )
+          : null;
+        return (
           <View key={item.id} style={[s.stop, props.largeText && s.largeStop]}>
             <View style={[s.rail, props.largeText && s.largeRail]}>
               <View
@@ -310,7 +348,7 @@ function TimelineContent(
                 </Text>
               </View>
               <Text style={s.time}>{item.timeSlot || t('미정')}</Text>
-              <View style={[s.line, props.largeText && { display: 'none' }]} />
+              <View style={[s.line, props.largeText && s.hiddenLine]} />
             </View>
             <View style={s.stopContent}>
               {scheduleFlight(item) ? (
@@ -320,59 +358,39 @@ function TimelineContent(
               ) : null}
               {renderTimelinePlace({ item, props, index, items })}
               {remote &&
-                index < items.length - 1 &&
-                (props.canCreate ||
-                  props.snapshot.travelLegs?.some(
-                    (leg) =>
-                      leg.fromScheduleId === item.id &&
-                      leg.toScheduleId === items[index + 1]!.id,
-                  )) &&
+                nextItem &&
+                routeState &&
+                (props.canCreate || routeState.saved) &&
                 (item.googlePlaceId || item.location) &&
-                (items[index + 1]?.googlePlaceId ||
-                  items[index + 1]?.location) && (
+                (nextItem.googlePlaceId || nextItem.location) && (
                   <TravelRoute
-                    key={`${props.userId}:${props.snapshot.trip.version}:${item.id}:${items[index + 1]!.id}`}
+                    key={`${props.userId}:${props.snapshot.trip.version}:${item.id}:${nextItem.id}`}
                     source={{
                       preview: {
                         tripId: props.snapshot.trip.id,
                         userId: props.userId,
                       },
                     }}
-                    leg={
-                      props.snapshot.travelLegs?.find(
-                        (leg) =>
-                          leg.fromScheduleId === item.id &&
-                          leg.toScheduleId === items[index + 1]!.id,
-                      ) || {
-                        dayId: props.day.id,
-                        fromScheduleId: item.id,
-                        toScheduleId: items[index + 1]!.id,
-                        mode: 'WALK',
-                      }
-                    }
-                    saved={Boolean(
-                      props.snapshot.travelLegs?.some(
-                        (leg) =>
-                          leg.fromScheduleId === item.id &&
-                          leg.toScheduleId === items[index + 1]!.id,
-                      ),
-                    )}
+                    leg={routeState.leg}
+                    saved={routeState.saved}
                     disabled={props.disabled && props.canCreate}
                     onSelect={
                       props.canCreate
-                        ? (mode) =>
-                            props.onRoute({
+                        ? (mode) => {
+                            // 선택한 이동수단을 두 방문 장소 구간에 저장한다.
+                            return props.onRoute({
                               dayId: props.day.id,
                               fromScheduleId: item.id,
-                              toScheduleId: items[index + 1]!.id,
+                              toScheduleId: nextItem.id,
                               mode,
-                            })
+                            });
+                          }
                         : undefined
                     }
                   />
                 )}
               {scheduleFlight(item) && index === items.length - 1 && (
-                <View style={{ gap: 6, paddingVertical: 12 }}>
+                <View style={s.flightFollowup}>
                   <Text style={s.sectionTitle}>{t('다음 일정')}</Text>
                   <Text style={shared.meta}>
                     {t('도착 후 이어질 일정을 추가해 보세요.')}
@@ -381,10 +399,8 @@ function TimelineContent(
               )}
             </View>
           </View>
-        ),
-      )}
+        );
+      })}
     </View>
   );
 }
-
-export { tripTimelineStyles } from './TripTimelineView';

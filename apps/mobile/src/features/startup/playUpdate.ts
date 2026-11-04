@@ -109,3 +109,15 @@ export function checkPlayUpdate(): Promise<PlayUpdate> {
     ? boundedPlayUpdate()
     : Promise.resolve({ status: 'not-applicable' });
 }
+
+// 설치된 앱 버전과 현재 채널의 업데이트 정책을 순서대로 다시 조회한다.
+export function refreshPlayAndPolicy(
+  playRefetch: () => Promise<unknown>,
+  policyRefetch: () => Promise<unknown>,
+): Promise<unknown> {
+  // 설치 채널을 먼저 갱신한 뒤 해당 채널에 맞는 서버 정책을 이어서 조회한다.
+  return playRefetch().then(() => {
+    // 갱신된 설치 정보를 바탕으로 정책 판정을 다시 실행한다.
+    return policyRefetch();
+  });
+}

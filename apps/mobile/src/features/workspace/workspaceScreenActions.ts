@@ -36,6 +36,22 @@ export function createWorkspaceScreenActions(options: Options) {
     createSchedule,
     createReceiptEdit,
   } = options;
+
+  // 선택 날짜의 새 일정 초안을 생성하고 진입 경로별 초기 입력값을 합쳐 연다.
+  function openScheduleDraft(
+    dayId: string,
+    overrides?: Record<string, string>,
+  ): void {
+    // 저장 전까지 같은 초안 ID와 날짜를 보존하며 추가 초기값만 덮어쓴다.
+    if (!snapshot) return;
+    const draft = createSchedule(snapshot, undefined, dayId);
+    return edit(
+      overrides
+        ? { ...draft, values: { ...draft.values, ...overrides } }
+        : draft,
+    );
+  }
+
   return {
     saveTravelLeg: (input: TravelLeg) => {
       // 이동수단만 기존 원자 저장 경로에 전달한다.
@@ -43,15 +59,9 @@ export function createWorkspaceScreenActions(options: Options) {
     },
     chooseRecommendation: (dayId: string, item: RecommendedPlace) => {
       // 추천 선택은 새 일정의 작성 초안이며 저장 버튼을 눌러야 확정된다.
-      if (!snapshot) return;
-      const form = createSchedule(snapshot, undefined, dayId);
-      edit({
-        ...form,
-        values: {
-          ...form.values,
-          title: item.title,
-          googlePlaceId: item.placeId,
-        },
+      return openScheduleDraft(dayId, {
+        title: item.title,
+        googlePlaceId: item.placeId,
       });
     },
     completeTrip: () => {
@@ -144,49 +154,30 @@ export function createWorkspaceScreenActions(options: Options) {
     },
     addSchedule: (dayId: string) => {
       // 한 번 생성한 일정 ID와 선택 DAY를 같은 작성 폼에 유지한다.
-      if (!snapshot) return;
-      const draft = createSchedule(snapshot, undefined, dayId);
-      return edit({
-        ...draft,
-        values: { ...draft.values, placeSearchExpanded: 'true' },
-      });
+      return openScheduleDraft(dayId, { placeSearchExpanded: 'true' });
     },
     addScheduleByCategory: (
       dayId: string,
       category: { label: string; type: 'PLACE' | 'STAY'; query: string },
     ) => {
       // 선택한 카테고리 유형과 검색 펼침 상태를 작성 초안에 반영한다.
-      if (!snapshot) return;
-      const draft = createSchedule(snapshot, undefined, dayId);
-      return edit({
-        ...draft,
-        values: {
-          ...draft.values,
-          type: category.type,
-          placeSearchExpanded: 'true',
-        },
+      return openScheduleDraft(dayId, {
+        type: category.type,
+        placeSearchExpanded: 'true',
       });
     },
     startSchedule: (dayId: string) => {
       // 하단 추가 버튼은 검색을 강제로 펼치지 않는 기존 작성 진입을 유지한다.
-      return snapshot
-        ? edit(createSchedule(snapshot, undefined, dayId))
-        : undefined;
+      return openScheduleDraft(dayId);
     },
     chooseCoursePlace: (
       dayId: string,
       place: { title: string; description: string; locationLabel?: string },
     ) => {
       // 코스에서 고른 설명과 새 일정 ID를 한 번 만든 초안에 채운다.
-      if (!snapshot) return;
-      const draft = createSchedule(snapshot, undefined, dayId);
-      return edit({
-        ...draft,
-        values: {
-          ...draft.values,
-          title: place.title,
-          memo: place.description,
-        },
+      return openScheduleDraft(dayId, {
+        title: place.title,
+        memo: place.description,
       });
     },
     reorderSchedules: (dayId: string, ids: string[]) => {

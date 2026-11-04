@@ -13,7 +13,31 @@ export const tripHubStyles = StyleSheet.create({
     backgroundColor: colors.background,
     alignItems: 'center',
   },
+  primaryActionRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 10,
+    flexWrap: 'wrap',
+  },
   primaryButton: { width: '100%', maxWidth: 320 },
+  secondaryActionWrap: {
+    width: '100%',
+    maxWidth: 320,
+    flex: 1,
+    minWidth: 140,
+  },
+  primaryActionWrap: {
+    width: '100%',
+    maxWidth: 320,
+    flex: 1.15,
+    minWidth: 140,
+  },
+  mapPreviewCard: {
+    marginBottom: 16,
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: colors.surface,
+  },
   content: {
     padding: 20,
     gap: 12,

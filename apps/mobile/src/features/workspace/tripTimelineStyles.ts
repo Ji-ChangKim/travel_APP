@@ -3,6 +3,7 @@ import { scheduleTheme as theme } from './scheduleTheme';
 
 export const c = theme.color;
 
+// 일정 타임라인의 탭·날짜·번호 레일·장소 카드 스타일을 정규화한다.
 export const tripTimelineStyles = StyleSheet.create({
   tab: {
     paddingHorizontal: 8,
@@ -39,6 +40,10 @@ export const tripTimelineStyles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     flexWrap: 'wrap',
+  },
+  headingMain: {
+    flex: 1,
+    gap: 4,
   },
   dayAccentLabel: {
     fontFamily: theme.font.bold,
@@ -173,6 +178,13 @@ export const tripTimelineStyles = StyleSheet.create({
     marginTop: 6,
     marginBottom: -16,
   },
+  hiddenLine: {
+    display: 'none',
+  },
+  flightFollowup: {
+    gap: 6,
+    paddingVertical: 12,
+  },
   stopContent: { flex: 1, minWidth: 0, gap: 10 },
   sectionTitle: {
     fontFamily: theme.font.bold,
@@ -187,6 +199,16 @@ export const tripTimelineStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: c.border.subtle,
     boxShadow: '0 2px 10px rgba(32,50,71,0.05)',
+  },
+  selectedPlaceCard: {
+    borderColor: '#2563eb',
+    borderWidth: 2,
+    backgroundColor: '#f0f7ff',
+  },
+  arrangingPlaceCard: {
+    borderColor: '#94a3b8',
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
   },
   cardTop: {
     flexDirection: 'row',

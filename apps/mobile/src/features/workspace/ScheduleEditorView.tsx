@@ -1,6 +1,5 @@
 import { t } from '@/features/localization/translate';
 import Text from '@/components/AppText';
-import { colors } from '@/constants/theme';
 import type { WorkspaceSnapshot } from '@wherego/domain';
 import { destinationForDay } from '@wherego/domain';
 import { View } from 'react-native';
@@ -12,11 +11,17 @@ import {
   ScheduleField,
   ScheduleSection,
 } from './ScheduleControls';
-import { scheduleDate } from './schedulePresentation';
-import { scheduleStyles as s, scheduleTheme as theme } from './scheduleTheme';
+import {
+  scheduleCurrencies,
+  scheduleDate,
+  scheduleEditorHeadingTitle,
+  scheduleTimePresets,
+} from './schedulePresentation';
+import { scheduleStyles as s } from './scheduleTheme';
 import { DateField } from './TravelInputs';
-// renderScheduleDetails이 읽는 값과 실행 가능한 행동의 계약이다.
-type RenderScheduleDetailsProps = {
+
+// 일정 작성·수정 섹션이 공통으로 읽는 값과 실행 가능한 행동의 계약이다.
+type ScheduleEditorSectionProps = {
   props: {
     userId: string;
     form: PlanForm;
@@ -33,9 +38,8 @@ type RenderScheduleDetailsProps = {
 };
 
 // 방문 시간과 예상 지출 등 세부 입력을 표시한다.
-export function renderScheduleDetails({ props }: RenderScheduleDetailsProps) {
+export function renderScheduleDetails({ props }: ScheduleEditorSectionProps) {
   // 전달받은 값과 행동을 기존 화면 규격으로 표시한다.
-
   return (
     <ScheduleSection title={t('일정 세부 설정')} icon="sliders-outline">
       <DateField
@@ -48,20 +52,24 @@ export function renderScheduleDetails({ props }: RenderScheduleDetailsProps) {
         }}
       />
       <View style={s.row}>
-        {['09:00', '12:00', '15:00', '18:00', '20:00'].map((slot) => (
-          <ScheduleButton
-            key={slot}
-            label={slot}
-            selected={props.form.values.timeSlot === slot}
-            disabled={props.busy || props.locked}
-            onPress={() => {
-              return props.onChange(
-                'timeSlot',
-                props.form.values.timeSlot === slot ? '' : slot,
-              );
-            }}
-          />
-        ))}
+        {scheduleTimePresets.map((slot) => {
+          // 자주 쓰는 대표 시간대를 한 번의 터치로 선택하거나 해제한다.
+          return (
+            <ScheduleButton
+              key={slot}
+              label={slot}
+              selected={props.form.values.timeSlot === slot}
+              disabled={props.busy || props.locked}
+              onPress={() => {
+                // 이미 선택된 시간 칩을 다시 누르면 시간 미정 상태로 비운다.
+                return props.onChange(
+                  'timeSlot',
+                  props.form.values.timeSlot === slot ? '' : slot,
+                );
+              }}
+            />
+          );
+        })}
       </View>
       {(!['TODO', 'MEMO'].includes(props.form.values.type || '') ||
         Boolean(props.form.values.durationMinutes)) && (
@@ -99,45 +107,31 @@ export function renderScheduleDetails({ props }: RenderScheduleDetailsProps) {
             }}
           />
           <View style={s.row}>
-            {['KRW', 'JPY', 'USD'].map((currency) => (
-              <ScheduleButton
-                key={currency}
-                label={currency}
-                selected={props.form.values.estimatedCurrency === currency}
-                disabled={props.busy || props.locked}
-                onPress={() => {
-                  // 환율 없이 사용자가 선택한 원래 통화로 보관한다.
-                  return props.onChange('estimatedCurrency', currency);
-                }}
-              />
-            ))}
+            {scheduleCurrencies.map((currency) => {
+              // 여행지 통화와 결제 통화를 구분해 선택한다.
+              return (
+                <ScheduleButton
+                  key={currency}
+                  label={currency}
+                  selected={props.form.values.estimatedCurrency === currency}
+                  disabled={props.busy || props.locked}
+                  onPress={() => {
+                    // 환율 없이 사용자가 선택한 원래 통화로 보관한다.
+                    return props.onChange('estimatedCurrency', currency);
+                  }}
+                />
+              );
+            })}
           </View>
         </>
       )}
     </ScheduleSection>
   );
 }
-// renderSchedulePlace이 읽는 값과 실행 가능한 행동의 계약이다.
-type RenderSchedulePlaceProps = {
-  props: {
-    userId: string;
-    form: PlanForm;
-    snapshot: WorkspaceSnapshot;
-    busy: boolean;
-    locked: boolean;
-    error: string;
-    onChange: (key: string, value: string) => void;
-    onSave: () => void;
-    onReload: () => void;
-    onClose: () => void;
-    onReceipt: (camera: boolean) => void;
-  };
-};
 
 // 일정의 내용과 장소 검색 영역을 표시한다.
-export function renderSchedulePlace({ props }: RenderSchedulePlaceProps) {
+export function renderSchedulePlace({ props }: ScheduleEditorSectionProps) {
   // 전달받은 값과 행동을 기존 화면 규격으로 표시한다.
-
   return (
     <ScheduleSection
       title={
@@ -203,27 +197,12 @@ export function renderSchedulePlace({ props }: RenderSchedulePlaceProps) {
     </ScheduleSection>
   );
 }
-// renderScheduleHeading이 읽는 값과 실행 가능한 행동의 계약이다.
-type RenderScheduleHeadingProps = {
-  props: {
-    userId: string;
-    form: PlanForm;
-    snapshot: WorkspaceSnapshot;
-    busy: boolean;
-    locked: boolean;
-    error: string;
-    onChange: (key: string, value: string) => void;
-    onSave: () => void;
-    onReload: () => void;
-    onClose: () => void;
-    onReceipt: (camera: boolean) => void;
-  };
-};
 
 // 선택 날짜와 일정 작성 제목을 표시한다.
-export function renderScheduleHeading({ props }: RenderScheduleHeadingProps) {
+export function renderScheduleHeading({ props }: ScheduleEditorSectionProps) {
   // 전달받은 값과 행동을 기존 화면 규격으로 표시한다.
   const activeDay = props.snapshot.days.find((day) => {
+    // 폼에 지정된 날짜 ID에 해당하는 여행 일차를 찾는다.
     return day.id === props.form.values.dayId;
   });
   const currentCity = destinationForDay(
@@ -232,57 +211,19 @@ export function renderScheduleHeading({ props }: RenderScheduleHeadingProps) {
   ).city;
 
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        gap: 14,
-        alignItems: 'center',
-        padding: 16,
-        backgroundColor: theme.color.surface.card,
-        borderRadius: 16,
-        borderWidth: 1,
-        borderColor: theme.color.border.subtle,
-      }}
-    >
-      <View
-        style={{
-          width: 44,
-          height: 44,
-          borderRadius: 22,
-          backgroundColor: theme.color.brand.coral,
-          alignItems: 'center',
-          justifyContent: 'center',
-          shadowColor: theme.color.brand.coral,
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.25,
-          shadowRadius: 4,
-          elevation: 3,
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: theme.font.bold,
-            fontSize: 16,
-            color: colors.actionForeground,
-          }}
-        >
-          D{activeDay?.dayNumber || 1}
-        </Text>
+    <View style={s.headingCard}>
+      <View style={s.dayBadgeCircle}>
+        <Text style={s.dayBadgeText}>D{activeDay?.dayNumber || 1}</Text>
       </View>
-      <View style={{ gap: 4, flex: 1, minWidth: 0 }}>
-        <Text style={[s.title, { fontSize: 19, lineHeight: 26 }]}>
-          {props.snapshot.itinerary.some((item) => {
-            // 기존 ID를 편집할 때 새 일정처럼 안내하지 않는다.
-            return item.id === props.form.id;
-          })
-            ? t('일정 수정')
-            : props.form.values.type === 'MEMO'
-              ? t('메모를 남겨요')
-              : props.form.values.type === 'TODO'
-                ? t('할 일을 추가해요')
-                : t('방문할 장소를 추가해요')}
+      <View style={s.headingCopy}>
+        <Text style={s.headingMainTitle}>
+          {scheduleEditorHeadingTitle(
+            props.snapshot,
+            props.form.id,
+            props.form.values.type,
+          )}
         </Text>
-        <Text style={[s.meta, { fontSize: 14 }]}>
+        <Text style={s.meta}>
           📍 {currentCity} ·{' '}
           {scheduleDate(activeDay?.tripDate || props.snapshot.trip.startDate)}
         </Text>

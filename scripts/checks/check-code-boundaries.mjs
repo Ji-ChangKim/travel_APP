@@ -67,6 +67,7 @@ const views = new Set([
   'ScheduleEditorView.tsx',
   'ScheduleLocationView.tsx',
   'TripPlanningFlowView.tsx',
+  'TripScheduleEmpty.tsx',
   'TripTimelineView.tsx',
   'WorkspaceSections.tsx',
   'WorkspaceDialogs.tsx',
@@ -139,6 +140,8 @@ const styles = new Set([
   'ledgerTheme.ts',
   'ledgerShellStyles.ts',
   'myAccountStyles.ts',
+  'tripHubStyles.ts',
+  'tripScheduleEmptyStyles.ts',
   'tripTimelineStyles.ts',
 ]);
 
