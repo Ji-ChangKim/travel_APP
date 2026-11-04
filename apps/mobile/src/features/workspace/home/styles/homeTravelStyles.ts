@@ -326,7 +326,7 @@ export const homeTravelStyles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderRadius: 10,
-    backgroundColor: homePalette.coralPrimary,
+    backgroundColor: homePalette.coralDeep,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -552,7 +552,7 @@ export const homeTravelStyles = StyleSheet.create({
   courseBudgetSub: {
     fontSize: 11,
     lineHeight: 15,
-    color: homePalette.outline,
+    color: homePalette.onSurfaceVariant,
   },
   courseActionBtn: {
     minHeight: 40,

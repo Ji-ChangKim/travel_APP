@@ -94,4 +94,3 @@ export const OFFICIAL_TRANSPORT_GUIDES = [
     url: 'https://www.japan.travel/en/responsible-travel-guide/features/traveling-comfortably/',
   },
 ] as const;
-
