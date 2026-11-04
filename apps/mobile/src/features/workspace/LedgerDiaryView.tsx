@@ -11,7 +11,7 @@ import { View } from 'react-native';
 import { LedgerAction } from './LedgerUI';
 import PlanDescription from './PlanDescription';
 import ReceiptDetails from './ReceiptDetails';
-import ServerPhoto from './ServerPhoto';
+import ServerPhoto from './schedule/ui/ServerPhoto';
 import { diaryCosts, diarySchedules } from './diary';
 import { ledgerStyles as s } from './ledgerTheme';
 import { travelDateRange } from './travelDateRange';

@@ -4,7 +4,7 @@ import type { WorkspaceExpense, WorkspaceSchedule } from '@wherego/domain';
 import {
   emailLoginSchema,
   emailSignupSchema,
-} from '../../apps/mobile/src/features/auth/email';
+} from '../../apps/mobile/src/features/auth/model/email';
 import {
   diaryCosts,
   diarySchedules,

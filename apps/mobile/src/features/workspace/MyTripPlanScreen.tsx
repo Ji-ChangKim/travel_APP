@@ -6,8 +6,8 @@ import { useTripStore } from '@/stores/useTripStore';
 import HaruState from '@/components/HaruState';
 import { Action } from './ui';
 import { useMyTripDetails } from './useMyTripDetails';
-import { adaptWorkspaceSnapshotToTimeline } from './timelinePlanAdapters';
-import PlanDetailTimelineView from './PlanDetailTimelineView';
+import { adaptWorkspaceSnapshotToTimeline } from './schedule/model/timelinePlanAdapters';
+import PlanDetailTimelineView from './schedule/ui/PlanDetailTimelineView';
 
 // 실제 내 여행 DB 스냅샷을 조회해 확정 일정 타임라인으로 렌더링한다.
 export default function MyTripPlanScreen() {

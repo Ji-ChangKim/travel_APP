@@ -1,7 +1,7 @@
 import type { ImperativeRouter } from 'expo-router';
 import type { PlanForm } from './forms';
 import { rememberCreation } from './creationAuthHandoff';
-import { continueFormAfterPreserving } from './scheduleExitGuard';
+import { continueFormAfterPreserving } from './schedule/ui/scheduleExitGuard';
 
 export function requestCreationLogin(
   router: ImperativeRouter,

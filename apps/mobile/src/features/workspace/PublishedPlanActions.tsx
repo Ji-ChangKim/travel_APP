@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import Text from '@/components/AppText';
 import { usePublishedPlanShare } from './usePublishedPlanShare';
 import { Action } from './ui';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 
 // 공개본을 보는 행동과 외부로 전달하는 행동을 구분한다.
 export default function PublishedPlanActions({

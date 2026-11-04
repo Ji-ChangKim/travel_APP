@@ -2,7 +2,7 @@ import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
 import { View } from 'react-native';
 import Text from '@/components/AppText';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 
 import { periodBlockedMessage, type TripPeriodImpact } from './tripPeriod';
 

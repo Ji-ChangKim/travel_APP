@@ -1,5 +1,6 @@
 import type { ExpoConfig } from 'expo/config';
 import { readAppVersion } from '../../scripts/shared/app-version.cjs';
+import designTokens from '../../docs/02. 디자인/00. 공통규격/design-tokens.json';
 
 // 공개 설정에는 키 원문 대신 지도 표시 가능 여부만 넣는다.
 import { readMapsAndroidKey } from './plugins/mapsBuildConfig.cjs';
@@ -92,7 +93,8 @@ const config: ExpoConfig = {
     [
       'expo-splash-screen',
       {
-        backgroundColor: '#FFFFFF',
+        // OS 스플래시는 단색을 쓰고 React BI에서 같은 계열의 그라데이션으로 잇는다.
+        backgroundColor: designTokens.startup.bi.backgroundTop,
         image:
           './assets/brand/tripprint-v1/TripPrint_symbol-coral-clean_1024x1024.png',
         imageWidth: 240,

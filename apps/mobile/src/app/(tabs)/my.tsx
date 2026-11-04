@@ -8,7 +8,7 @@ import TripPrintLoading from '@/components/TripPrintLoading';
 import ScreenHeader from '@/components/ScreenHeader';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from '@/features/profile/myAccountStyles';
-import { useAuthReady } from '@/features/auth/AuthBridge';
+import { useAuthReady } from '@/features/auth/manager/AuthBridge';
 import { useTripStore } from '@/stores/useTripStore';
 
 // [마이] 프로필 및 앱 환경 설정 화면을 렌더링한다.

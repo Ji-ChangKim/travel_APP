@@ -11,13 +11,13 @@ import { ledgerStyles } from './ledgerTheme';
 import HaruState from '@/components/HaruState';
 import CommunityRecordView from './CommunityRecordView';
 import CommunityImportButton from './CommunityImportButton';
-import PlanDetailTimelineView from './PlanDetailTimelineView';
-import { adaptCommunityPostToTimeline } from './timelinePlanAdapters';
+import PlanDetailTimelineView from './schedule/ui/PlanDetailTimelineView';
+import { adaptCommunityPostToTimeline } from './schedule/model/timelinePlanAdapters';
 import PublicPlanExecution from './PublicPlanExecution';
 import PlanAttachments from './PlanAttachments';
 import { Action } from './ui';
 import { apiBaseUrl } from './service';
-import { useAuthReady } from '@/features/auth/AuthBridge';
+import { useAuthReady } from '@/features/auth/manager/AuthBridge';
 import { useTripStore } from '@/stores/useTripStore';
 import { requestSignal } from '@wherego/api-client';
 

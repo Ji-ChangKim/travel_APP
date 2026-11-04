@@ -342,7 +342,7 @@ function putImage(
   });
 }
 // 영수증 통신은 화면·사진 선택과 독립된 계약으로 유지한다.
-export { scanServerReceipt } from './workspaceReceipts';
+export { scanServerReceipt } from './hub/model/workspaceReceipts';
 // 설치된 메시지 앱의 공유 시트로 초대 링크를 전달한다.
 export function shareInvite(title: string, token: string): Promise<unknown> {
   // 실제 웹 복귀 기본 경로를 사용하는 HTTPS 링크를 만든다.

@@ -8,7 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import type { DiscoveryDestination } from '@wherego/domain';
 import type { DiscoveryCity } from '@wherego/validation';
 import { Action } from './ui';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 
 import { discoveryStyles as s } from './discoveryStyles';
 import {

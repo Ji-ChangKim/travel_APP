@@ -12,7 +12,7 @@ import MyTripsButton from './MyTripsButton';
 import { myTripsStyles as s, myTripsColors as c } from './myTripsStyles';
 import { myTripFacts, myTripTiming } from './myTripsModel';
 import { useMyTripDetails } from './useMyTripDetails';
-import { usePrivatePhotoQuery } from './usePrivatePhoto';
+import { usePrivatePhotoQuery } from './schedule/manager/usePrivatePhoto';
 import { travelPlanPath } from './travelPlans';
 
 // 실제 여행 요약과 현재 계정이 읽을 수 있는 개인 원본을 카드에 연결한다.

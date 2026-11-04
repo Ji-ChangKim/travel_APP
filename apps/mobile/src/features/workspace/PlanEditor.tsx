@@ -8,7 +8,7 @@ import { Action } from './ui';
 
 import { FormFeedback } from './InputFeedback';
 import { LedgerAction, useLedgerWide } from './LedgerUI';
-import ScheduleEditor from './ScheduleEditor';
+import ScheduleEditor from './schedule/manager/ScheduleEditor';
 import DestinationEditor from './DestinationEditor';
 import TripPlanningFlow from './TripPlanningFlow';
 import { type FieldErrors, type FormFeedbackState } from './formFeedback';

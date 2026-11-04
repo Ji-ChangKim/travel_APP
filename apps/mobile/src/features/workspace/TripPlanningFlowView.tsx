@@ -12,7 +12,7 @@ import ModalBackground from '../accessibility/ModalBackground';
 
 import SaveCreationDraft from './SaveCreationDraft';
 
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 
 // 여행 기본 정보와 항공권 단계의 입력을 배치한다.
 export function renderTripPlanning({

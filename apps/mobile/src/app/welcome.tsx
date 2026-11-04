@@ -1,1 +1,1 @@
-export { default } from '@/features/auth/WelcomeScreen';
+export { default } from '@/features/auth/ui/WelcomeScreen';

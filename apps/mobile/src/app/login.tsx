@@ -9,10 +9,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import GoogleLogin from '@/features/auth/GoogleLogin';
-import LoginButton from '@/features/auth/LoginButton';
-import useLoginController from '@/features/auth/useLoginController';
-import { loginStyles as styles } from '@/features/auth/loginStyles';
+import GoogleLogin from '@/features/auth/ui/GoogleLogin';
+import LoginButton from '@/features/auth/ui/LoginButton';
+import useLoginController from '@/features/auth/manager/useLoginController';
+import AuthFailureNotice from '@/features/auth/ui/AuthFailureNotice';
+import { loginStyles as styles } from '@/features/auth/styles/loginStyles';
 import { homeDestination } from '@/features/workspace/homeDestinations';
 
 // 제공한 여행 이미지와 문구로 앱의 첫 인증 화면을 표시한다.
@@ -201,13 +202,9 @@ export default function LoginScreen() {
               <GuestStart controller={controller} />
             </>
           )}
-          {controller.error ? (
-            <Text accessibilityRole="alert" style={styles.error}>
-              {t(controller.error)}
-            </Text>
-          ) : null}
         </View>
       </ScrollView>
+      <AuthFailureNotice controller={controller} />
     </SafeAreaView>
   );
 }

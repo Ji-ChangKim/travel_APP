@@ -8,8 +8,8 @@ import {
   requestPolicy,
 } from '@wherego/api-client';
 import { newTrip, persistedTripCreateSchema } from '@wherego/validation';
-import { scanServerReceipt } from '../../apps/mobile/src/features/workspace/workspaceReceipts';
-import { workspaceError } from '../../apps/mobile/src/features/workspace/workspaceFailure';
+import { scanServerReceipt } from '../../apps/mobile/src/features/workspace/hub/model/workspaceReceipts';
+import { workspaceError } from '../../apps/mobile/src/features/workspace/hub/model/workspaceFailure';
 import {
   UserFacingError,
   userFacingMessage,
@@ -18,7 +18,7 @@ import {
   canDiscardRecordAttempt,
   recordFailureMessage,
 } from '../../apps/mobile/src/features/workspace/recordFailure';
-import { workspaceDraft } from '../../apps/mobile/src/features/workspace/workspaceDrafts';
+import { workspaceDraft } from '../../apps/mobile/src/features/workspace/hub/model/workspaceDrafts';
 import {
   ledgerActionContainer,
   ledgerActionForeground,

@@ -8,7 +8,7 @@ import {
   workspaceSnapshotSchema,
 } from '@wherego/validation';
 import type { WorkspaceSnapshot } from '@wherego/domain';
-import { scheduleConflicts } from '../../apps/mobile/src/features/workspace/scheduleTimeConflicts';
+import { scheduleConflicts } from '../../apps/mobile/src/features/workspace/schedule/model/scheduleTimeConflicts';
 
 const base = newTrip(
   {

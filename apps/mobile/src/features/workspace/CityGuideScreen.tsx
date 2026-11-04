@@ -22,7 +22,7 @@ import {
 } from './cityGuides';
 import { discoveryStyles as s } from './discoveryStyles';
 import { Action } from './ui';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 
 import { loadDiscovery } from './discoveryService';
 import CityGuidePhoto from './CityGuidePhoto';

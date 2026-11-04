@@ -17,7 +17,10 @@ import {
   recordFieldErrors,
 } from './recordFailure';
 import { useRecordPersistence } from './recordPersistence';
-import { completeFormExit, useScheduleExitGuard } from './scheduleExitGuard';
+import {
+  completeFormExit,
+  useScheduleExitGuard,
+} from './schedule/ui/scheduleExitGuard';
 import { selectImage, serverOptions, uploadImage } from './service';
 
 import type { PendingRecord } from './RecordEditorScreen';

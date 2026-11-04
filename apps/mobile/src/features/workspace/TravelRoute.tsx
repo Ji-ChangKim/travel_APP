@@ -7,11 +7,11 @@ import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
 import type { TravelLeg, TravelMode } from '@wherego/domain';
 import { routeEstimateSchema } from '@wherego/validation';
-import { GoogleAttribution } from './GooglePlace';
+import { GoogleAttribution } from './schedule/ui/GooglePlace';
 import { requestTravelRoute, type RouteSource } from './planningService';
 import { usePlanningRequest } from './usePlanningRequest';
 import { Action } from './ui';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 
 const routeStyles = StyleSheet.create({
   connector: {

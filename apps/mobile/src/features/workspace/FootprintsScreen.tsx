@@ -13,9 +13,9 @@ import HaruState from '@/components/HaruState';
 import { useTripStore } from '@/stores/useTripStore';
 
 import { Field } from './ui';
-import ServerPhoto from './ServerPhoto';
+import ServerPhoto from './schedule/ui/ServerPhoto';
 
-import TripAccessFeedback from './TripAccessFeedback';
+import TripAccessFeedback from './hub/ui/TripAccessFeedback';
 import { travelDateRange } from './travelDateRange';
 import { diaryCosts } from './diary';
 import { useTripDateRefresh } from './useTripDateRefresh';

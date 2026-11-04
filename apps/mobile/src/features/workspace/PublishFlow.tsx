@@ -10,7 +10,7 @@ import Text from '@/components/AppText';
 import ScreenHeader from '@/components/ScreenHeader';
 import type { PlanForm } from './forms';
 import { Field } from './ui';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 
 import PublishSelection from './PublishSelection';
 import { publicationIssue } from './publication';

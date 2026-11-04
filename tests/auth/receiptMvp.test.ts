@@ -16,7 +16,7 @@ import {
 import { formCommandValue } from '../../apps/mobile/src/features/workspace/formCommands';
 import type { PlanForm } from '../../apps/mobile/src/features/workspace/forms';
 import { FoundationClientError } from '@wherego/api-client';
-import { workspaceError } from '../../apps/mobile/src/features/workspace/workspaceFailure';
+import { workspaceError } from '../../apps/mobile/src/features/workspace/hub/model/workspaceFailure';
 import { canReviseWorkspaceRequest } from '../../apps/mobile/src/features/workspace/saveRecovery';
 
 function fixture() {

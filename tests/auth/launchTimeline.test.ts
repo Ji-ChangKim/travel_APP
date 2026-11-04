@@ -3,11 +3,11 @@ import { test } from 'node:test';
 import {
   ForegroundTimer,
   type TimerClock,
-} from '../../apps/mobile/src/features/startup/foregroundTimer';
+} from '../../apps/mobile/src/features/startup/manager/foregroundTimer';
 import {
   BiTimeline,
   LoadingTimeline,
-} from '../../apps/mobile/src/features/startup/launchTimeline';
+} from '../../apps/mobile/src/features/startup/model/launchTimeline';
 
 // 취소된 콜백도 보관해 OS가 늦게 전달하는 상황까지 재현한다.
 class Clock implements TimerClock {

@@ -5,7 +5,7 @@ import DesignButton from '@/components/DesignButton';
 import Text from '@/components/AppText';
 import CommunityImportButton from './CommunityImportButton';
 import { usePublishedPlanShare } from './usePublishedPlanShare';
-import { timelinePlanStyles } from './timelinePlanStyles';
+import { timelinePlanStyles } from './schedule/styles/timelinePlanStyles';
 
 // 공개 계획의 담기와 외부 공유를 실제 저장·기기 기능에 연결한다.
 export default function PublicPlanExecution({

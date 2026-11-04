@@ -3,9 +3,9 @@ import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { useState } from 'react';
 import { Image, ScrollView, View } from 'react-native';
-import { usePrivatePhotoQuery } from './usePrivatePhoto';
+import { usePrivatePhotoQuery } from './schedule/manager/usePrivatePhoto';
 import { LedgerAction } from './LedgerUI';
-import ServerPhoto from './ServerPhoto';
+import ServerPhoto from './schedule/ui/ServerPhoto';
 import { ledgerStyles as l } from './ledgerTheme';
 
 // 같은 폼 안에서 원본을 확대해도 입력과 이탈 보호 수명을 유지한다.

@@ -15,7 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Text from '@/components/AppText';
 import { designTokens, colors } from '@/constants/theme';
 import { useTopModal } from '@/features/accessibility/modalLayers';
-import { requestScheduleExit } from '@/features/workspace/scheduleExitGuard';
+import { requestScheduleExit } from '@/features/workspace/schedule/ui/scheduleExitGuard';
 import { navigationScroll } from './navigationScroll';
 import { hasGlobalNavigation } from './navigationPolicy';
 import {

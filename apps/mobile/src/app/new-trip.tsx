@@ -1,4 +1,4 @@
-import WorkspaceScreen from '@/features/workspace/WorkspaceScreen';
+import WorkspaceScreen from '@/features/workspace/hub/ui/WorkspaceScreen';
 
 // 새 여행 작성은 탭의 팝업 대신 독립된 페이지에서 진행한다.
 export default function NewTripScreen() {

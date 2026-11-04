@@ -12,13 +12,13 @@ import {
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ScheduleFlightFields from './FlightEntryFields';
-import GooglePlace from './GooglePlace';
-import PlaceSearch from './PlaceSearch';
+import GooglePlace from './schedule/ui/GooglePlace';
+import PlaceSearch from './schedule/ui/PlaceSearch';
 import ReceiptConfirmation from './ReceiptConfirmation';
 import ReceiptDuplicates from './ReceiptDuplicates';
 import ReceiptMenuEditor from './ReceiptMenuEditor';
 import ReceiptReview from './ReceiptReview';
-import ScheduleLocation from './ScheduleLocation';
+import ScheduleLocation from './schedule/manager/ScheduleLocation';
 import ReceiptOriginal from './ReceiptOriginal';
 import { DateField } from './TravelInputs';
 import TripPeriodSummary from './TripPeriodSummary';
@@ -28,7 +28,7 @@ import { publicationIssue } from './publication';
 import { receiptCanSave } from './receiptFlow';
 import { type TripPeriodImpact } from './tripPeriod';
 import { Action, Field } from './ui';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 
 export const labels: Record<string, string> = {
   title: '제목',

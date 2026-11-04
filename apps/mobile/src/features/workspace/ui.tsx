@@ -1,6 +1,6 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
 import DesignButton from '@/components/DesignButton';

@@ -4,7 +4,7 @@ import { Pressable, View } from 'react-native';
 import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
 import { Field, Action } from './ui';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import DesignInput from '@/components/DesignInput';

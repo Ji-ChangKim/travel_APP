@@ -10,12 +10,12 @@ import { foundationUuidSchema } from '@wherego/validation';
 import Text from '@/components/AppText';
 import HaruState from '@/components/HaruState';
 import { useTripStore } from '@/stores/useTripStore';
-import { useAuthReady } from '@/features/auth/AuthBridge';
+import { useAuthReady } from '@/features/auth/manager/AuthBridge';
 
 import { tripPhase } from './tripLifecycle';
 import { useTripDateRefresh } from './useTripDateRefresh';
-import { authReturn } from '../auth/authReturn';
-import TripAccessFeedback from './TripAccessFeedback';
+import { authReturn } from '../auth/model/authReturn';
+import TripAccessFeedback from './hub/ui/TripAccessFeedback';
 import { LedgerAction, LedgerScreen, useLedgerWide } from './LedgerUI';
 import { ledgerStyles as s } from './ledgerTheme';
 import LedgerDiary from './LedgerDiary';

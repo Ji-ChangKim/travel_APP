@@ -11,8 +11,8 @@ import {
   policyLifetime,
   usablePolicyCache,
   type PolicyCache,
-} from '../../apps/mobile/src/features/startup/updatePolicy';
-import { loadAppPolicy } from '../../apps/mobile/src/features/startup/policyClient';
+} from '../../apps/mobile/src/features/startup/model/updatePolicy';
+import { loadAppPolicy } from '../../apps/mobile/src/features/startup/manager/policyClient';
 
 const policy: AppConfig = {
   platform: 'android',

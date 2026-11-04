@@ -23,7 +23,7 @@ import { onGnbScroll } from '@/components/navigationScroll';
 import { useLocale } from '@/features/localization/localeState';
 import { t } from '@/features/localization/translate';
 import { useTripStore } from '@/stores/useTripStore';
-import { useAuthReady } from '@/features/auth/AuthBridge';
+import { useAuthReady } from '@/features/auth/manager/AuthBridge';
 import { cityGuides } from './cityGuides';
 import { tripListQueryOptions } from './tripQueries';
 import { readCreationDrafts } from './creationDraftStorage';

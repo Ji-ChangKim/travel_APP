@@ -1,8 +1,8 @@
 import {
   connectProfileSaveScope,
   type ProfileSaveScope,
-} from '@/features/auth/profileSave';
-import { useScheduleExitGuard } from '@/features/workspace/scheduleExitGuard';
+} from '@/features/auth/manager/profileSave';
+import { useScheduleExitGuard } from '@/features/workspace/schedule/ui/scheduleExitGuard';
 import { tripListQueryOptions } from '../workspace/tripQueries';
 
 import { useTripDateRefresh } from '@/features/workspace/useTripDateRefresh';

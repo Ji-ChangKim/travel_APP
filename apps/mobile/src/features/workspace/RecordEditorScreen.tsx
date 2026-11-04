@@ -4,7 +4,7 @@ import { returnToScreen } from '@/components/navigationModel';
 import { workspaceQueryOptions } from './tripQueries';
 import Text from '@/components/AppText';
 import HaruState from '@/components/HaruState';
-import { useAuthReady } from '@/features/auth/AuthBridge';
+import { useAuthReady } from '@/features/auth/manager/AuthBridge';
 import { useTripStore } from '@/stores/useTripStore';
 import { useQuery } from '@tanstack/react-query';
 import { FoundationClientError } from '@wherego/api-client';
@@ -20,9 +20,9 @@ import { renderRecordEditor } from './RecordEditorScreenView';
 import { ledgerStyles as s } from './ledgerTheme';
 import { useRecordEditorController } from './useRecordEditorController';
 
-import { authReturn } from '../auth/authReturn';
-import TripAccessFeedback from './TripAccessFeedback';
-import { requestScheduleExit } from './scheduleExitGuard';
+import { authReturn } from '../auth/model/authReturn';
+import TripAccessFeedback from './hub/ui/TripAccessFeedback';
+import { requestScheduleExit } from './schedule/ui/scheduleExitGuard';
 
 // 실제 여행/일정 원본을 읽은 뒤 기록 편집기를 연다.
 export default function RecordEditorScreen() {

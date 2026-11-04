@@ -8,7 +8,7 @@ import {
   readOAuthCode,
   readOAuthFlowId,
   requireAuthConfiguration,
-} from '../../apps/mobile/src/features/auth/model';
+} from '../../apps/mobile/src/features/auth/model/model';
 
 // 토큰 없이 인증 서비스 응답 형태의 최소 사용자 데이터를 생성한다.
 function user(

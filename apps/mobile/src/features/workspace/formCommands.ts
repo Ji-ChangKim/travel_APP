@@ -4,7 +4,7 @@ import type { PlanForm } from './forms';
 import { flightFromValues } from './flightModel';
 import { publicationInput } from './publication';
 import { receiptItems } from './receiptChecks';
-import { schedulePlanInput } from './schedulePlanInput';
+import { schedulePlanInput } from './schedule/model/schedulePlanInput';
 import { destinationCommandInput } from './destinationForms';
 
 export function formCommandValue(form: PlanForm, snapshot: WorkspaceSnapshot) {

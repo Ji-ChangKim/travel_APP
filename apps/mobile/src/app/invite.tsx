@@ -1,1 +1,1 @@
-export { default } from '@/features/workspace/InviteScreen';
+export { default } from '@/features/workspace/hub/ui/InviteScreen';

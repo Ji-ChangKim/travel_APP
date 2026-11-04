@@ -6,7 +6,7 @@ import { View } from 'react-native';
 import type { PlanForm } from './forms';
 import { DestinationFields } from './TravelInputs';
 import { Action } from './ui';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 
 type EditorOptionProps = {
   form: PlanForm;

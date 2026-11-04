@@ -5,7 +5,7 @@ import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import type { listServerTrips } from '@wherego/api-client';
-import { useAuthReady } from '@/features/auth/AuthBridge';
+import { useAuthReady } from '@/features/auth/manager/AuthBridge';
 import { Action } from './ui';
 import HomeTripList, { continuingTrips } from './HomeTripList';
 import { homeStyles as s } from './homeStyles';

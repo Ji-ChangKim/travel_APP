@@ -1,4 +1,4 @@
-import { isPublicBrowsePath } from '../../apps/mobile/src/features/auth/publicRoutes';
+import { isPublicBrowsePath } from '../../apps/mobile/src/features/auth/model/publicRoutes';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { FoundationClientError } from '@wherego/api-client';
@@ -8,7 +8,7 @@ import {
   returnFromPath,
   storedAuthReturn,
   tripAccessFailure,
-} from '../../apps/mobile/src/features/auth/authReturn';
+} from '../../apps/mobile/src/features/auth/model/authReturn';
 
 const tripId = '00000000-0000-4000-8000-000000000010';
 

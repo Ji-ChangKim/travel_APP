@@ -4,7 +4,7 @@ import type { WorkspaceSnapshot } from '@wherego/domain';
 import {
   workspaceConfirmation,
   canConfirmWorkspaceAction,
-} from '../../apps/mobile/src/features/workspace/workspaceConfirmation';
+} from '../../apps/mobile/src/features/workspace/hub/model/workspaceConfirmation';
 
 const snapshot: WorkspaceSnapshot = {
   trip: {

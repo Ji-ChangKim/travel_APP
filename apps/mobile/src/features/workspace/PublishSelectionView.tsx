@@ -7,11 +7,11 @@ import type {
   WorkspaceSnapshot,
 } from '@wherego/domain';
 import { View } from 'react-native';
-import PlanDetailTimelineView from './PlanDetailTimelineView';
+import PlanDetailTimelineView from './schedule/ui/PlanDetailTimelineView';
 import PlanAttachments from './PlanAttachments';
-import { adaptCommunityPostToTimeline } from './timelinePlanAdapters';
+import { adaptCommunityPostToTimeline } from './schedule/model/timelinePlanAdapters';
 import { LedgerAction } from './LedgerUI';
-import ServerPhoto from './ServerPhoto';
+import ServerPhoto from './schedule/ui/ServerPhoto';
 import type { PlanForm } from './forms';
 import { ledgerStyles as l } from './ledgerTheme';
 import {
@@ -20,7 +20,7 @@ import {
   togglePublicationDay,
 } from './publication';
 import { travelDateRange } from './travelDateRange';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 // renderPublicationSelection이 읽는 값과 실행 가능한 행동의 계약이다.
 type RenderPublicationSelectionProps = {
   mode: string;

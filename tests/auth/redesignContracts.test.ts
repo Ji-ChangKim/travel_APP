@@ -8,12 +8,12 @@ import {
   communityFeedQuerySchema,
   communityFeedSearch,
 } from '@wherego/validation';
-import { schedulePlanInput } from '../../apps/mobile/src/features/workspace/schedulePlanInput';
+import { schedulePlanInput } from '../../apps/mobile/src/features/workspace/schedule/model/schedulePlanInput';
 import { tripPeriodImpact } from '../../apps/mobile/src/features/workspace/tripPeriod';
 import {
   workspaceConfirmation,
   canConfirmWorkspaceAction,
-} from '../../apps/mobile/src/features/workspace/workspaceConfirmation';
+} from '../../apps/mobile/src/features/workspace/hub/model/workspaceConfirmation';
 
 test('후보 묶음만 새로 입력해도 저장되고 명시적인 묶음 해제는 숨은 안내를 제외한다', () => {
   // 설명을 먼저 입력해야만 후보 관계가 저장되는 의존을 만들지 않는다.

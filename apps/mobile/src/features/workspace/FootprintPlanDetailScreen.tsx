@@ -9,8 +9,8 @@ import { requestSignal } from '@wherego/api-client';
 import HaruState from '@/components/HaruState';
 import { Action } from './ui';
 import { apiBaseUrl } from './service';
-import { adaptCommunityPostToTimeline } from './timelinePlanAdapters';
-import PlanDetailTimelineView from './PlanDetailTimelineView';
+import { adaptCommunityPostToTimeline } from './schedule/model/timelinePlanAdapters';
+import PlanDetailTimelineView from './schedule/ui/PlanDetailTimelineView';
 import PublicPlanExecution from './PublicPlanExecution';
 import PlanAttachments from './PlanAttachments';
 

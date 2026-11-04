@@ -8,7 +8,7 @@ import TripFlightList from './TripFlightList';
 import { travelDateRange } from './travelDateRange';
 
 import { Action } from './ui';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 import type { RenderTripPlanningProps } from './tripPlanningViewTypes';
 // 선택 항공편을 확인하고 기존 생성·재시도 행동으로 연결한다.
 export default function TripPlanningFlights({

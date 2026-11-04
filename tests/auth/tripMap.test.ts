@@ -13,7 +13,7 @@ import {
   tripMapStops,
   tripMapLines,
   stopMapsUrl,
-} from '../../apps/mobile/src/features/workspace/tripMapModel';
+} from '../../apps/mobile/src/features/workspace/hub/model/tripMapModel';
 
 // 좌표 없는 일정도 기존 저장 형태 그대로 테스트에 포함한다.
 function item(

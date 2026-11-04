@@ -6,7 +6,7 @@ import { useState, type Dispatch, type SetStateAction } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DesignButton from '@/components/DesignButton';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 
 import { FormAnchor, useFormScope } from './InputFeedback';
 

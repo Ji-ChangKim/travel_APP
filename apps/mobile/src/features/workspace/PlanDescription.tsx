@@ -6,9 +6,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import type { SchedulePlanContent } from '@wherego/domain';
 import Text from '@/components/AppText';
 import { Action } from './ui';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 
-import { scheduleStyles as s } from './scheduleTheme';
+import { scheduleStyles as s } from './schedule/styles/scheduleTheme';
 import AppModal from '@/components/AppModal';
 import ScreenHeader from '@/components/ScreenHeader';
 import { communityStyles } from './communityStyles';

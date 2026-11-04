@@ -5,7 +5,7 @@ import { View } from 'react-native';
 import Text from '@/components/AppText';
 import ActionSheet from '@/components/ActionSheet';
 import { Action } from './ui';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 
 // 개인 기록의 정리 완료와 커뮤니티 게시를 별도 행동으로 연결한다.
 export default function PublishReadiness({

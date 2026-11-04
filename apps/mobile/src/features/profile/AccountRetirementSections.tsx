@@ -8,7 +8,7 @@ import type { AccountRetirementController } from './useAccountRetirement';
 
 import { getLocale } from '@/features/localization/localeState';
 import { Action } from '@/features/workspace/ui';
-import { styles } from '@/features/workspace/workspaceStyles';
+import { styles } from '@/features/workspace/hub/styles/workspaceStyles';
 
 // 탈퇴 완료 상태와 요청 전 정책 안내 중 현재 필요한 내용을 선택한다.
 export default function AccountRetirementSection(

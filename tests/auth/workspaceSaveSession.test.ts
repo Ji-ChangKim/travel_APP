@@ -5,7 +5,7 @@ import { QueryClient } from '@tanstack/react-query';
 import { FoundationClientError, foundationQueryKey } from '@wherego/api-client';
 import { newTrip } from '@wherego/validation';
 import type { PlanForm } from '../../apps/mobile/src/features/workspace/forms';
-import { createWorkspaceSaveSession } from '../../apps/mobile/src/features/workspace/workspaceSaveSession';
+import { createWorkspaceSaveSession } from '../../apps/mobile/src/features/workspace/hub/manager/workspaceSaveSession';
 
 function fixture() {
   const cache = new QueryClient();

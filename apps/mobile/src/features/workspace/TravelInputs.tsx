@@ -10,7 +10,7 @@ import { FormAnchor, useFormScope } from './InputFeedback';
 import { Platform, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Action } from './ui';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 
 import DestinationPicker from './DestinationPicker';
 

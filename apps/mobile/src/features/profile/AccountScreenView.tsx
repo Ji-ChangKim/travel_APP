@@ -1,6 +1,6 @@
 import ScreenHeader from '@/components/ScreenHeader';
 import { t } from '@/features/localization/translate';
-import { styles } from '@/features/workspace/workspaceStyles';
+import { styles } from '@/features/workspace/hub/styles/workspaceStyles';
 import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AccountConnectionCard from './AccountConnectionCard';

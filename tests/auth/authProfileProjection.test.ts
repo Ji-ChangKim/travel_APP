@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { Profile } from '@wherego/domain';
-import { restoredProfile } from '../../apps/mobile/src/features/auth/authProfileProjection';
+import { restoredProfile } from '../../apps/mobile/src/features/auth/model/authProfileProjection';
 
 function profile(id: string): Profile {
   return {

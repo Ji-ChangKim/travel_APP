@@ -3,7 +3,7 @@ import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/AppText';
 import { View } from 'react-native';
 import { Action } from './ui';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 
 import FlightRoutePreview from './FlightRoutePreview';
 import type { FlightSlot, TripFlight } from './tripFlightModel';

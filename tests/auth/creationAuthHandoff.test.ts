@@ -9,8 +9,8 @@ import {
   authReturn,
   authReturnPath,
   storedAuthReturn,
-} from '../../apps/mobile/src/features/auth/authReturn';
-import { isPublicBrowsePath } from '../../apps/mobile/src/features/auth/publicRoutes';
+} from '../../apps/mobile/src/features/auth/model/authReturn';
+import { isPublicBrowsePath } from '../../apps/mobile/src/features/auth/model/publicRoutes';
 
 const id = '00000000-0000-4000-8000-000000000011';
 test('DEV01 네이티브의 window 전역만 있어도 브라우저 저장소를 요구하지 않는다', () => {

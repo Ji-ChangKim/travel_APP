@@ -10,9 +10,9 @@ import { t } from '@/features/localization/translate';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 import { cityGuides } from './cityGuides';
 import { scheduleFlight } from './flightModel';
-import { scheduleKind } from './schedulePresentation';
+import { scheduleKind } from './schedule/model/schedulePresentation';
 import { useMyTripDetails } from './useMyTripDetails';
-import { usePrivatePhotoQuery } from './usePrivatePhoto';
+import { usePrivatePhotoQuery } from './schedule/manager/usePrivatePhoto';
 import { homeTravelStyles as s } from './homeTravelStyles';
 import { homeDaysLeft, type HomeTravel } from './homeTravelModel';
 

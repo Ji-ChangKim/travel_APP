@@ -472,6 +472,12 @@
       "actionOffset": -14
     }
   },
+  "startup": {
+    "bi": {
+      "backgroundTop": "#FFF9F6",
+      "backgroundBottom": "#FFF0EC"
+    }
+  },
   "format": {
     "dateRangeSeparator": " – "
   },

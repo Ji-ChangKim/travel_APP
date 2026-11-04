@@ -15,7 +15,10 @@ import {
   saveGuestSession,
 } from '@/services/guestAuthService';
 import { signOutUser } from '@/services/authService';
-import { accountChangeState, profileUpdateState } from '@/features/auth/model';
+import {
+  accountChangeState,
+  profileUpdateState,
+} from '@/features/auth/model/model';
 import { guestSession } from '@/services/guestSession';
 import { cloudProfile } from '@/services/cloudAuth';
 

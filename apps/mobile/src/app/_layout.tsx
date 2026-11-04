@@ -10,22 +10,22 @@ import { instantMotion } from '@/features/accessibility/motionPolicy';
 import { t } from '@/features/localization/translate';
 import GlobalNavigation from '@/components/GlobalNavigation';
 import AppFontProvider from '@/components/AppFontProvider';
-import ScheduleExitDialog from '@/features/workspace/scheduleExitGuard';
-import AuthGate from '@/features/auth/AuthGate';
-import AuthRecoveryBoundary from '@/features/auth/AuthRecoveryBoundary';
+import ScheduleExitDialog from '@/features/workspace/schedule/ui/scheduleExitGuard';
+import AuthGate from '@/features/auth/manager/AuthGate';
+import AuthRecoveryBoundary from '@/features/auth/ui/AuthRecoveryBoundary';
 import NotificationPermission from '@/features/notifications/NotificationPermission';
 
 import { colors } from '@/constants/theme';
 import LanguageProvider from '@/features/localization/LanguageProvider';
-import AuthBridge from '@/features/auth/AuthBridge';
-import StartupPolicyGate from '@/features/startup/StartupPolicyGate';
+import AuthBridge from '@/features/auth/manager/AuthBridge';
+import StartupPolicyGate from '@/features/startup/ui/StartupPolicyGate';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import {
   nativeFrameReady,
   skipLaunchIntro,
   useLaunchSession,
-} from '@/features/startup/launchSession';
+} from '@/features/startup/model/launchSession';
 
 // React 인트로가 준비되기 전까지 같은 배경의 기본 스플래시를 유지한다.
 void SplashScreen.preventAutoHideAsync().catch(() => {

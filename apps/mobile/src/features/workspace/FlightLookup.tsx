@@ -10,7 +10,7 @@ import {
 } from '@wherego/validation';
 import { serverOptions } from './service';
 import { Action, Field } from './ui';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 
 import { FlightExtraFields } from './FlightManualFields';
 import FlightLookupCandidateCard from './FlightLookupCandidateCard';

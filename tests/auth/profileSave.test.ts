@@ -4,8 +4,8 @@ import type { Profile } from '@wherego/domain';
 import {
   saveScopedProfile,
   type ProfileSaveScope,
-} from '../../apps/mobile/src/features/auth/profileSave';
-import { profileUpdateState } from '../../apps/mobile/src/features/auth/model';
+} from '../../apps/mobile/src/features/auth/manager/profileSave';
+import { profileUpdateState } from '../../apps/mobile/src/features/auth/model/model';
 
 const accountA = 'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa';
 const accountB = 'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb';

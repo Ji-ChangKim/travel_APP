@@ -12,7 +12,7 @@ import FlightRoutePreview from './FlightRoutePreview';
 import type { FlightLookupCandidate } from './flightLookupModel';
 import { serverOptions } from './service';
 import { Action } from './ui';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 
 // 한 편명·날짜의 요청과 취소 수명을 분리한다.
 export function TicketSearch({

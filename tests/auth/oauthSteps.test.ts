@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { oauthStep } from '../../apps/mobile/src/features/auth/oauthSteps';
+import { oauthStep } from '../../apps/mobile/src/features/auth/manager/oauthSteps';
 
 test('OAuth 동기·비동기 실패 진단에 자격 증명·오류 원문·임의 오류 이름을 넣지 않는다', async () => {
   // 민감한 표식이 포함된 실패도 허용한 단계와 오류 종류만 기록한다.

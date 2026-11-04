@@ -3,7 +3,7 @@ import { useLocale } from '@/features/localization/localeState';
 import { Platform, View } from 'react-native';
 import Text from '@/components/AppText';
 import { Action } from '../workspace/ui';
-import { styles } from '../workspace/workspaceStyles';
+import { styles } from '../workspace/hub/styles/workspaceStyles';
 
 import type { LocationResult } from './currentLocation';
 

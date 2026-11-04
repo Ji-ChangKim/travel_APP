@@ -12,10 +12,10 @@ import { colors } from '@/constants/theme';
 import Text from '@/components/AppText';
 import HaruState from '@/components/HaruState';
 import { useTripStore } from '@/stores/useTripStore';
-import { useAuthReady } from '@/features/auth/AuthBridge';
+import { useAuthReady } from '@/features/auth/manager/AuthBridge';
 import { useTripDateRefresh } from './useTripDateRefresh';
 
-import TripAccessFeedback from './TripAccessFeedback';
+import TripAccessFeedback from './hub/ui/TripAccessFeedback';
 import MyTripsButton from './MyTripsButton';
 import MyTripCard from './MyTripCard';
 import MyTripsEmpty from './MyTripsEmpty';

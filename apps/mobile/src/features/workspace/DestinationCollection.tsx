@@ -10,7 +10,7 @@ import { DestinationFields } from './TravelInputs';
 import { countryDefaults } from './countries';
 import { cityTimezones } from './destinationCatalog';
 import { Field, Action } from './ui';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 
 // 도시 선택·시간대 편집은 같은 폼 값에 남겨 이탈·실패 보호를 공유한다.
 export default function DestinationCollection({

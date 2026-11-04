@@ -9,7 +9,7 @@ import type { PlanForm } from './forms';
 import DestinationCollection from './DestinationCollection';
 import { destinationDraftItems } from './destinationForms';
 import { Action } from './ui';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 
 // 도시 입력과 DAY 배정만 편집하며 공통 헤더와 저장 보호를 따른다.
 export default function DestinationEditor({

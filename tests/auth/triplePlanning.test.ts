@@ -7,7 +7,7 @@ import {
   workspaceCommandSchema,
   publicSelection,
 } from '@wherego/validation';
-import { copiedScheduleForm } from '../../apps/mobile/src/features/workspace/scheduleCopy';
+import { copiedScheduleForm } from '../../apps/mobile/src/features/workspace/schedule/model/scheduleCopy';
 import { formCommandValue } from '../../apps/mobile/src/features/workspace/formCommands';
 import {
   copyWebPublicPlanUrl,
@@ -22,7 +22,7 @@ import type { PlanForm } from '../../apps/mobile/src/features/workspace/forms';
 import {
   adaptCommunityPostToTimeline,
   adaptWorkspaceSnapshotToTimeline,
-} from '../../apps/mobile/src/features/workspace/timelinePlanAdapters';
+} from '../../apps/mobile/src/features/workspace/schedule/model/timelinePlanAdapters';
 
 const base = newTrip(
   {

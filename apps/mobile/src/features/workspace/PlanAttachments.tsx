@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import type { CommunityPost } from '@wherego/domain';
 import Text from '@/components/AppText';
 import CommunityPhoto from './CommunityPhoto';
-import ServerPhoto from './ServerPhoto';
+import ServerPhoto from './schedule/ui/ServerPhoto';
 import { ledgerStyles } from './ledgerTheme';
 
 // 미리보기와 실제 공개본에서 같은 선택 사진·통화별 합계를 표시한다.

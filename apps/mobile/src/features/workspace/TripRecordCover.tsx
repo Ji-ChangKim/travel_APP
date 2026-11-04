@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import { getWorkspace } from '@wherego/api-client';
 
-import ServerPhoto from './ServerPhoto';
+import ServerPhoto from './schedule/ui/ServerPhoto';
 
 // 홈과 발자국 표지는 해당 계정이 볼 수 있는 여행 사진만 사용한다.
 export default function TripRecordCover({

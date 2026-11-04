@@ -11,7 +11,7 @@ import {
 import {
   authReturn,
   authReturnPath,
-} from '../../apps/mobile/src/features/auth/authReturn';
+} from '../../apps/mobile/src/features/auth/model/authReturn';
 import {
   emptyGuestWorkspace,
   guestWorkspaceRequest,

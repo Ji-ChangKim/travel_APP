@@ -20,18 +20,18 @@ import { StatusBar } from 'expo-status-bar';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTripStore } from '@/stores/useTripStore';
 import { updateUserProfile } from '@/services/profileService';
-import { completedDestination } from '@/features/auth/destination';
-import AuthInput from '@/features/auth/AuthInput';
-import BirthDateInput from '@/features/auth/BirthDateInput';
-import LoginButton from '@/features/auth/LoginButton';
+import { completedDestination } from '@/features/auth/model/destination';
+import AuthInput from '@/features/auth/ui/AuthInput';
+import BirthDateInput from '@/features/auth/ui/BirthDateInput';
+import LoginButton from '@/features/auth/ui/LoginButton';
 import {
   AuthNavigation,
   ProfilePrivacy,
   SignupProgress,
   TravelerPortrait,
-} from '@/features/auth/AuthFormChrome';
-import { loginStyles as styles } from '@/features/auth/loginStyles';
-import { workspaceError } from '@/features/workspace/workspaceFailure';
+} from '@/features/auth/ui/AuthFormChrome';
+import { loginStyles as styles } from '@/features/auth/styles/loginStyles';
+import { workspaceError } from '@/features/workspace/hub/model/workspaceFailure';
 import type { Profile } from '@wherego/domain';
 import { useQueryClient } from '@tanstack/react-query';
 import {

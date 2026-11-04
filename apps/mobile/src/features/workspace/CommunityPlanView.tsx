@@ -5,7 +5,7 @@ import { ScrollView, View } from 'react-native';
 import type { CommunityPost } from '@wherego/domain';
 import Text from '@/components/AppText';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
-import PlacePhoto from './PlacePhoto';
+import PlacePhoto from './schedule/ui/PlacePhoto';
 import PlanDescription from './PlanDescription';
 import CommunityPhoto from './CommunityPhoto';
 import { LedgerAction } from './LedgerUI';

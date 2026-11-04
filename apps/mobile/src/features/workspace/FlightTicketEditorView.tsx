@@ -10,7 +10,7 @@ import { DateField } from './TravelInputs';
 import { ticketManualValues } from './flightTicketDraft';
 import { selectedTripFlight } from './tripFlightModel';
 import { Action, Field } from './ui';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 
 import type { Props } from './FlightTicketEditor';
 // renderFlightEditor이 읽는 값과 실행 가능한 행동의 계약이다.

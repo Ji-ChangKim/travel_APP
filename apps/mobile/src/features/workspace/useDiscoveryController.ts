@@ -12,7 +12,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { communityFeedCard } from './communityFeedCard';
 import { loadCommunity } from './communityService';
 import { serverOptions } from './service';
-import { workspaceError } from './workspaceFailure';
+import { workspaceError } from './hub/model/workspaceFailure';
 
 // 현재 계정과 편집 요청의 수명을 관리하고 표시용 상태·행동을 반환한다.
 export function useDiscoveryController() {

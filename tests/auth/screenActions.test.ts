@@ -6,7 +6,7 @@ import {
   persistedTripCreateSchema,
   type WorkspaceCommand,
 } from '@wherego/validation';
-import { createWorkspaceScreenActions } from '../../apps/mobile/src/features/workspace/workspaceScreenActions';
+import { createWorkspaceScreenActions } from '../../apps/mobile/src/features/workspace/hub/model/workspaceScreenActions';
 import type { PlanForm } from '../../apps/mobile/src/features/workspace/forms';
 
 function setup() {

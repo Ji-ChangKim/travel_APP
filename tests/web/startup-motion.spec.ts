@@ -104,6 +104,168 @@ async function network(page: Page, member = false) {
   return state;
 }
 
+for (const viewport of [
+  { width: 320, height: 568 },
+  { width: 390, height: 844 },
+  { width: 430, height: 932 },
+  { width: 844, height: 390 },
+  { width: 1024, height: 1366 },
+]) {
+  test(`BI 배경·중앙: ${viewport.width}×${viewport.height} 비대칭 안전 영역에서도 중앙을 유지한다`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    await network(page);
+    let releaseStartup!: () => void;
+    const startupGate = new Promise<void>((resolve) => {
+      releaseStartup = resolve;
+    });
+    await page.route('**/public/startup', async (route) => {
+      await startupGate;
+      return route.fulfill({
+        json: {
+          data: {
+            protocolVersion: 1,
+            commonDataVersion: 'a'.repeat(64),
+            guestDataVersion: 1,
+          },
+        },
+      });
+    });
+    await page.addInitScript(() => {
+      const frames: { x: number; y: number; width: number; height: number }[] =
+        [];
+      (
+        window as typeof window & { centeredLogoFrames: typeof frames }
+      ).centeredLogoFrames = frames;
+      function record() {
+        const logo = document.querySelector(
+          '[data-testid="welcome-moving-logo"]',
+        );
+        if (logo && frames.length < 120) {
+          const { x, y, width, height } = logo.getBoundingClientRect();
+          frames.push({ x, y, width, height });
+        }
+        requestAnimationFrame(record);
+      }
+      requestAnimationFrame(record);
+    });
+    await page.goto('/');
+    const poster = page.getByTestId('startup-bi-poster');
+    await expect(poster).toBeVisible();
+    // 웹 안전 영역 측정의 CSS 경계만 모사한다. 실기기 검증과 구분한다.
+    await page.addStyleTag({
+      content:
+        'div[style*="safe-area-inset-top"] { padding-top: 59px !important; padding-bottom: 34px !important; padding-left: 44px !important; padding-right: 0px !important; }',
+    });
+    const measure = page.locator('div[style*="safe-area-inset-top"]');
+    await expect(measure).not.toHaveCount(0);
+    await expect
+      .poll(() =>
+        measure.evaluateAll((elements) =>
+          elements.every(
+            (element) => getComputedStyle(element).paddingTop === '59px',
+          ),
+        ),
+      )
+      .toBe(true);
+    await measure.evaluateAll((elements) => {
+      for (const element of elements) {
+        element.dispatchEvent(new Event('transitionend'));
+        element.dispatchEvent(new Event('webkitTransitionEnd'));
+      }
+    });
+    const background = page.getByTestId('startup-bi-background');
+    await expect(background.locator('stop').nth(0)).toHaveAttribute(
+      'stop-color',
+      '#FFF9F6',
+    );
+    await expect(background.locator('stop').nth(1)).toHaveAttribute(
+      'stop-color',
+      '#FFF0EC',
+    );
+    const box = (await poster.boundingBox())!;
+    expect(Math.abs(box.x + box.width / 2 - viewport.width / 2)).toBeLessThan(
+      1,
+    );
+    expect(Math.abs(box.y + box.height / 2 - viewport.height / 2)).toBeLessThan(
+      1,
+    );
+    const backdrop = (await background.boundingBox())!;
+    expect(backdrop).toEqual({ x: 0, y: 0, ...viewport });
+    await page.screenshot({
+      path: `outputs/startup-motion-app/bi-${viewport.width}x${viewport.height}.png`,
+    });
+    releaseStartup();
+    await expect(
+      page.getByRole('button', { name: 'Google 계정으로 계속', exact: true }),
+    ).toBeEnabled();
+    await expect(page.getByTestId('welcome-safe-content')).toHaveCSS(
+      'padding-top',
+      '59px',
+    );
+    const first = await page.evaluate(
+      () =>
+        (
+          window as typeof window & {
+            centeredLogoFrames: {
+              x: number;
+              y: number;
+              width: number;
+              height: number;
+            }[];
+          }
+        ).centeredLogoFrames[0],
+    );
+    expect(first).toBeDefined();
+    if (!first)
+      throw new Error('로그인 이동 심볼의 첫 프레임을 기록하지 못했습니다.');
+    expect(
+      Math.abs(first.x + first.width / 2 - viewport.width / 2),
+    ).toBeLessThan(8);
+    expect(
+      Math.abs(first.y + first.height / 2 - viewport.height / 2),
+    ).toBeLessThan(8);
+    await expect(page.getByTestId('startup-bi-background')).toHaveCount(0);
+    await expect(page.getByTestId('welcome-stage')).toHaveCSS(
+      'background-color',
+      'rgb(248, 249, 255)',
+    );
+  });
+}
+
+test('BI 배경·중앙: 창 크기 변경과 원본 이미지 실패에도 중앙을 유지한다', async ({
+  page,
+}) => {
+  const state = await network(page);
+  state.startupFailure = true;
+  await page.route('**/*tripprint-app-icon-source*', (route) => route.abort());
+  await page.goto('/');
+  const brand = page
+    .getByTestId('startup-bi')
+    .getByText('TripPrint', { exact: true });
+  await expect(brand).toBeVisible();
+  for (const viewport of [
+    { width: 320, height: 568 },
+    { width: 844, height: 390 },
+    { width: 1024, height: 1366 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await expect
+      .poll(async () => {
+        const box = (await brand.boundingBox())!;
+        return Math.max(
+          Math.abs(box.x + box.width / 2 - viewport.width / 2),
+          Math.abs(box.y + box.height / 2 - viewport.height / 2),
+        );
+      })
+      .toBeLessThan(1);
+  }
+  await expect(
+    page.getByRole('button', { name: '다시 시도', exact: true }),
+  ).toBeVisible();
+});
+
 test('시작 연출: 중앙 심볼을 상단으로 잇고 버튼을 제자리 아래에서 올린다', async ({
   page,
 }) => {

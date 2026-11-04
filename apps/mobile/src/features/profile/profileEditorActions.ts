@@ -1,8 +1,8 @@
 import {
   saveScopedProfile,
   type ProfileSaveScope,
-} from '@/features/auth/profileSave';
-import { requestScheduleExit } from '@/features/workspace/scheduleExitGuard';
+} from '@/features/auth/manager/profileSave';
+import { requestScheduleExit } from '@/features/workspace/schedule/ui/scheduleExitGuard';
 import { updateUserProfile } from '@/services/profileService';
 import { userFacingMessage } from '@/services/userFacingError';
 import { useTripStore } from '@/stores/useTripStore';

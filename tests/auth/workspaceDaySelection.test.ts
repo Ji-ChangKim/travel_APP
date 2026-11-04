@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { workspaceDaySelection } from '../../apps/mobile/src/features/workspace/workspaceDaySelection';
+import { workspaceDaySelection } from '../../apps/mobile/src/features/workspace/hub/model/workspaceDaySelection';
 
 const days = [
   { id: 'first', tripDate: '2026-11-10' },

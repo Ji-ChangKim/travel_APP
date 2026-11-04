@@ -5,7 +5,7 @@ import Text from '@/components/AppText';
 import { colors } from '@/constants/theme';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 import { useTripStore } from '@/stores/useTripStore';
 import { ledgerColors as c } from './ledgerTheme';
 

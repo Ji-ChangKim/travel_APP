@@ -12,11 +12,11 @@ import { type Dispatch, type RefObject, type SetStateAction } from 'react';
 import { ScrollView, View } from 'react-native';
 import { FormFeedback } from './InputFeedback';
 import { LedgerAction } from './LedgerUI';
-import ServerPhoto from './ServerPhoto';
+import ServerPhoto from './schedule/ui/ServerPhoto';
 import type { FormFeedbackState } from './formFeedback';
 import { type PlanForm } from './forms';
 import { ledgerStyles as s } from './ledgerTheme';
-import { requestScheduleExit } from './scheduleExitGuard';
+import { requestScheduleExit } from './schedule/ui/scheduleExitGuard';
 import { Field } from './ui';
 // renderRecordEditor이 읽는 값과 실행 가능한 행동의 계약이다.
 type RenderRecordEditorProps = {

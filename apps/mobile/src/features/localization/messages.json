@@ -4555,5 +4555,125 @@
     "現在 Google ログインを利用できません。もう一度確認してください。"
   ],
   "Google 계정으로 계속": ["Continue with Google", "Google で続行"],
-  "버전 {version}": ["Version {version}", "バージョン {version}"]
+  "버전 {version}": ["Version {version}", "バージョン {version}"],
+  "앱 업데이트 안내": [
+    "App update",
+    "アプリのアップデート"
+  ],
+  "업데이트 확인 안내": [
+    "Check for an update",
+    "アップデートの確認"
+  ],
+  "설치할 수 있는 버전을 확인하지 못했어요.": [
+    "We couldn't check which update is available for your device.",
+    "この端末にインストールできるバージョンを確認できませんでした。"
+  ],
+  "잠시 후 다시 확인해 주세요.": [
+    "Please check again in a moment.",
+    "しばらくしてからもう一度確認してください。"
+  ],
+  "업데이트하거나 현재 버전으로 시작할 수 있어요.": [
+    "You can update or continue with your current version.",
+    "アップデートするか、現在のバージョンで始められます。"
+  ],
+  "안정적인 서비스 이용을 위해": [
+    "To keep TripPrint running smoothly,",
+    "安心してサービスをご利用いただくため、"
+  ],
+  "최신 버전으로 업데이트가 필요해요.": [
+    "please update to the latest version.",
+    "最新バージョンへのアップデートが必要です。"
+  ],
+  "현재 버전": [
+    "Current version",
+    "現在のバージョン"
+  ],
+  "최신 버전": [
+    "Latest version",
+    "最新バージョン"
+  ],
+  "Google Play 스토어로 이동": [
+    "Go to Google Play",
+    "Google Play ストアへ"
+  ],
+  "로그인 정보 확인 안내": [
+    "Check your sign-in",
+    "ログイン情報の確認"
+  ],
+  "여행 시작 안내": [
+    "Starting your journey",
+    "旅行の開始について"
+  ],
+  "이 기기의 여행 기록을 열지 못했어요.": [
+    "We couldn't open the travel records on this device.",
+    "この端末の旅行記録を開けませんでした。"
+  ],
+  "기록을 지우지 말고 앱을 업데이트한 뒤 다시 시도해 주세요.": [
+    "Keep your records, update the app, and try again.",
+    "記録は削除せず、アプリをアップデートしてからもう一度お試しください。"
+  ],
+  "로그인 정보를 확인하지 못했어요.": [
+    "We couldn't verify your sign-in.",
+    "ログイン情報を確認できませんでした。"
+  ],
+  "새로운 여행을 이어가려면 업데이트가 필요해요.": [
+    "Please update the app to continue your journey.",
+    "旅行を続けるにはアップデートが必要です。"
+  ],
+  "새 버전으로 업데이트한 뒤 다시 시도해 주세요.": [
+    "Update to the new version and try again.",
+    "新しいバージョンにアップデートしてからもう一度お試しください。"
+  ],
+  "여행을 준비하지 못했어요.": [
+    "We couldn't get your journey ready.",
+    "旅行の準備ができませんでした。"
+  ],
+  "게스트 시작 안내": [
+    "Starting as a guest",
+    "ゲスト利用について"
+  ],
+  "여행 열기 안내": [
+    "Opening your journey",
+    "旅行を開く"
+  ],
+  "로그아웃 안내": [
+    "Signing out",
+    "ログアウトについて"
+  ],
+  "로그인 안내": [
+    "Signing in",
+    "ログインについて"
+  ],
+  "게스트를 시작하지 못했어요.": [
+    "We couldn't start your guest session.",
+    "ゲスト利用を開始できませんでした。"
+  ],
+  "처음 시작할 때는 인터넷 연결을 확인해 주세요.": [
+    "Check your internet connection when starting for the first time.",
+    "初めて利用するときはインターネット接続を確認してください。"
+  ],
+  "계정을 확인하지 못했어요.": [
+    "We couldn't verify your account.",
+    "アカウントを確認できませんでした。"
+  ],
+  "다시 시도하고 여행을 이어가세요.": [
+    "Try again to continue your journey.",
+    "もう一度試して旅行を続けてください。"
+  ],
+  "로그아웃하지 못했어요.": [
+    "We couldn't sign you out.",
+    "ログアウトできませんでした。"
+  ],
+  "Google 로그인을 완료하지 못했어요.": [
+    "We couldn't complete Google sign-in.",
+    "Google ログインを完了できませんでした。"
+  ],
+  "다시 시도하거나 다른 방법으로 시작해 주세요.": [
+    "Try again or choose another way to start.",
+    "もう一度試すか、別の方法で始めてください。"
+  ],
+  "로그인 정보가 만료됐거나 확인을 마치지 못했어요.": [
+    "Your sign-in may have expired, or verification could not be completed.",
+    "ログイン情報の有効期限が切れたか、確認を完了できませんでした。"
+  ]
 }

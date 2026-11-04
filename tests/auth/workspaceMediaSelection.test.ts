@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { workspaceMediaSelection } from '../../apps/mobile/src/features/workspace/workspaceMediaSelection';
+import { workspaceMediaSelection } from '../../apps/mobile/src/features/workspace/hub/model/workspaceMediaSelection';
 
 test('원본 없이 보관한 영수증도 표시하고 원본이 있는 기록은 해당 사진에 연결한다', () => {
   const records = [

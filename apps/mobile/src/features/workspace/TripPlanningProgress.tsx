@@ -5,7 +5,7 @@ import { colors } from '@/constants/theme';
 
 import { View } from 'react-native';
 
-import { styles } from './workspaceStyles';
+import { styles } from './hub/styles/workspaceStyles';
 import type { RenderTripPlanningProps } from './tripPlanningViewTypes';
 // 현재 작성 단계와 진행률만 표시하며 입력·저장은 변경하지 않는다.
 export default function TripPlanningProgress({

@@ -1,23 +1,26 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
 import ScreenHeader from '@/components/ScreenHeader';
-import { userFacingMessage } from '@/services/userFacingError';
 import { useEffect, useState } from 'react';
 import { Platform, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import HaruState from '@/components/HaruState';
-import { Action } from '@/features/workspace/ui';
-import { styles } from '@/features/workspace/workspaceStyles';
+import DesignButton from '@/components/DesignButton';
+import CenteredNoticeModal from '@/components/CenteredNoticeModal';
+import { styles } from '@/features/workspace/hub/styles/workspaceStyles';
 
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
-import { completeSocialAuth, socialRedirectUrl } from '@/features/auth/oauth';
+import {
+  completeSocialAuth,
+  socialRedirectUrl,
+} from '@/features/auth/manager/oauth';
 import {
   readSocialReturn,
   clearSocialReturn,
-} from '@/features/auth/socialReturn';
-import type { AuthReturn } from '@/features/auth/authReturn';
-import { authenticatedDestination } from '@/features/auth/destination';
+} from '@/features/auth/manager/socialReturn';
+import type { AuthReturn } from '@/features/auth/model/authReturn';
+import { authenticatedDestination } from '@/features/auth/model/destination';
 
 // 웹 및 모바일 OAuth의 공통 복귀 화면을 제공한다.
 export default function AuthCallbackScreen() {
@@ -30,7 +33,6 @@ export default function AuthCallbackScreen() {
     sb_flow_id?: string;
   }>();
   const router = useRouter();
-  const [message, setMessage] = useState('로그인하고 있어요');
   const [target, setTarget] = useState<AuthReturn>({});
   const [failed, setFailed] = useState(false);
 
@@ -73,15 +75,9 @@ export default function AuthCallbackScreen() {
             })
           : undefined;
       })
-      .catch((error: unknown) => {
+      .catch(() => {
         // 공급자 원문 대신 서비스의 안전한 메시지를 보여준다.
         if (active) {
-          setMessage(
-            userFacingMessage(
-              error,
-              '로그인을 완료하지 못했어요. 다시 시도해 주세요.',
-            ),
-          );
           setFailed(true);
         }
       });
@@ -103,14 +99,18 @@ export default function AuthCallbackScreen() {
         ]}
       >
         <HaruState
-          kind={failed ? 'error' : 'loading'}
-          title={failed ? t('로그인을 마치지 못했어요') : message}
-          description={
-            failed ? message : t('확인이 끝나면 여행으로 안내할게요.')
-          }
-        >
-          {failed && (
-            <Action
+          kind="loading"
+          title={t('로그인하고 있어요')}
+          description={t('확인이 끝나면 여행으로 안내할게요.')}
+        />
+      </ScrollView>
+      <CenteredNoticeModal
+        visible={failed}
+        title={t('로그인 안내')}
+        paragraphs={[t('로그인 정보가 만료됐거나 확인을 마치지 못했어요.'), t('다시 로그인하고 여행을 이어가요.')]}
+        onClose={() => router.replace({ pathname: '/login', params: { ...target, reauth: '1' } })}
+      >
+            <DesignButton
               label={t('로그인으로 돌아가기')}
               variant="primary"
               onPress={() => {
@@ -121,9 +121,7 @@ export default function AuthCallbackScreen() {
                 });
               }}
             />
-          )}
-        </HaruState>
-      </ScrollView>
+      </CenteredNoticeModal>
     </SafeAreaView>
   );
 }
