@@ -51,11 +51,8 @@ export function useWorkspaceController({
     initialForm,
   });
   const navigation = useWorkspaceNavigationState(section);
-  const { trips, workspace, snapshot, writable, owner } = useWorkspaceData(
-    userId,
-    id,
-    creating,
-  );
+  const { trips, workspace, snapshot, writable, owner, offline } =
+    useWorkspaceData(userId, id, creating);
   const setSelectedDay = navigation.setSelectedDay;
   const restoredDay = useRef('');
   useEffect(() => {
@@ -192,11 +189,14 @@ export function useWorkspaceController({
     setCourseDay: navigation.setCourseDay,
     showTripMore: navigation.showTripMore,
     setShowTripMore: navigation.setShowTripMore,
+    orderingDay: navigation.orderingDay,
+    setOrderingDay: navigation.setOrderingDay,
     trips,
     workspace,
     snapshot,
     writable,
     owner,
+    offline,
     reload: operations.reload,
     command: operations.command,
     cancelConfirmation: operations.cancelConfirmation,

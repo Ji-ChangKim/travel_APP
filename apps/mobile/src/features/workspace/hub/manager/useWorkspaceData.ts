@@ -1,4 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
+import { onlineManager, useQuery } from '@tanstack/react-query';
+import { useSyncExternalStore } from 'react';
+import { useTripStore } from '@/stores/useTripStore';
 import {
   tripListQueryOptions,
   workspaceQueryOptions,
@@ -10,6 +12,14 @@ export function useWorkspaceData(
   id: string | undefined,
   creating: boolean,
 ) {
+  const online = useSyncExternalStore(
+    (notify) => onlineManager.subscribe(notify),
+    () => onlineManager.isOnline(),
+    () => true,
+  );
+  const guest = useTripStore(
+    (state) => state.currentUser?.authProvider === 'guest',
+  );
   const trips = useQuery({
     ...tripListQueryOptions(userId),
     enabled: Boolean(userId && !id && !creating),
@@ -21,10 +31,18 @@ export function useWorkspaceData(
   const snapshot = workspace.data;
   const writable = Boolean(
     snapshot &&
+    (guest || online) &&
     snapshot.myRole !== 'viewer' &&
     snapshot.trip.status !== 'ARCHIVED',
   );
   const owner = snapshot?.myRole === 'owner';
 
-  return { trips, workspace, snapshot, writable, owner };
+  return {
+    trips,
+    workspace,
+    snapshot,
+    writable,
+    owner,
+    offline: !guest && !online,
+  };
 }

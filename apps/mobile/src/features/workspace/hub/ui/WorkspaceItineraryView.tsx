@@ -5,17 +5,13 @@ import {
 } from '@wherego/domain';
 
 import type { Dispatch, SetStateAction } from 'react';
-import { View } from 'react-native';
 
 import ScheduleCoursePicker from '../../schedule/ui/ScheduleCoursePicker';
 
-import TripMapCanvas from './TripMapCanvas';
-import { tripMapStops } from '../model/tripMapModel';
 import { triggerHaptic } from '@/components/ui/haptics';
 import TripTimeline, {
   TripDayStrip,
 } from '../../schedule/manager/TripTimeline';
-import { tripHubStyles as hub } from '../styles/tripHubStyles';
 
 import type { WorkspaceDraftKind } from '../model/workspaceDrafts';
 import type { WorkspaceScreenActions } from '../model/workspaceScreenActions';
@@ -26,6 +22,9 @@ type RenderWorkspaceCourseProps = {
   courseDay: string;
   setCourseDay: Dispatch<SetStateAction<string>>;
   actions: WorkspaceScreenActions;
+  error: string;
+  retrySave: () => void;
+  reload: () => void;
 };
 
 // 선택 날짜에 넣을 추천 코스 선택을 표시한다.
@@ -89,6 +88,9 @@ type RenderWorkspaceItineraryProps = {
     scheduleId?: string,
   ) => void;
   actions: WorkspaceScreenActions;
+  error: string;
+  retrySave: () => void;
+  reload: () => void;
 };
 
 // 선택 날짜의 일정과 편집 행동을 표시한다.
@@ -109,33 +111,24 @@ export function renderWorkspaceItinerary({
   openDraft,
   photo,
   actions,
+  error,
+  retrySave,
+  reload,
 }: RenderWorkspaceItineraryProps) {
   // 유효한 선택 날짜와 해당 날짜의 지도 방문 핀 목록을 계산한다.
-  const daySelection = workspaceDaySelection(snapshot.days, selectedDay, true);
-  const currentStops = tripMapStops(
-    snapshot.itinerary,
-    daySelection.currentDayId,
-  );
+  const daySelection = workspaceDaySelection(snapshot.days, selectedDay);
 
   return (
     activeSection === 'itinerary' && (
       <>
-        {currentStops.length > 0 && (
-          <View style={hub.mapPreviewCard}>
-            <TripMapCanvas
-              stops={currentStops}
-              selectedId={selectedScheduleId}
-              onSelect={(id) => {
-                // 미니맵에서 고른 핀을 아래 타임라인 카드와 연동한다.
-                triggerHaptic('selection');
-                setSelectedScheduleId?.(id);
-              }}
-            />
-          </View>
-        )}
         <TripDayStrip
-          allowAll
           days={snapshot.days}
+          counts={Object.fromEntries(
+            snapshot.days.map((day) => [
+              day.id,
+              snapshot.itinerary.filter((item) => item.dayId === day.id).length,
+            ]),
+          )}
           selected={daySelection.selected}
           onSelect={(dayId) => {
             // 선택한 일차 또는 전체 일정을 즉시 전환한다.
@@ -149,6 +142,17 @@ export function renderWorkspaceItinerary({
             <TripTimeline
               key={day.id}
               snapshot={snapshot}
+              busy={busy}
+              pending={hasPending}
+              error={error}
+              onRetry={retrySave}
+              onReload={reload}
+              onMove={(item, dayId, done) =>
+                actions.moveSchedule(item, dayId, () => {
+                  done();
+                  setSelectedDay(dayId);
+                })
+              }
               userId={userId}
               day={day}
               selectedScheduleId={selectedScheduleId}

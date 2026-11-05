@@ -4,11 +4,19 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { useState } from 'react';
 import DesignButton from '@/components/ui/DesignButton';
 import ActionSheet from '@/components/ui/ActionSheet';
+import TripIcon, { type TripIconName } from '@/components/icons/TripIcon';
 import Text from '@/components/ui/AppText';
 import { colors } from '@/constants/theme';
+import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 import { workspaceSections } from '../../shared/model/presentation';
 
-// 핵심 세 영역만 고정하고 부가 기능은 헤더 메뉴에서 연다.
+const sectionIcons: Record<string, TripIconName> = {
+  itinerary: 'checklist-outline',
+  map: 'map-outline',
+  expenses: 'receipt-scan-outline',
+};
+
+// 핵심 세 영역(일정·지도·비용)을 세그먼트 탭으로 고정하고 부가 기능은 더보기에서 연다.
 export function TripSectionNavigation({
   selected,
   onSelect,
@@ -27,6 +35,7 @@ export function TripSectionNavigation({
       {workspaceSections.slice(0, 3).map(([key, label]) => (
         <SectionButton
           key={key}
+          icon={sectionIcons[key] || 'checklist-outline'}
           label={t(label)}
           selected={selected === key}
           onPress={() => {
@@ -38,19 +47,22 @@ export function TripSectionNavigation({
   );
 }
 
-// 고정 내비게이션은 체크 아이콘 대신 밑줄로 선택을 표시한다.
+// 세그먼트 트랙 안에서 활성 탭을 입체 카드로 강조해 표시한다.
 function SectionButton({
+  icon,
   label,
   accessibilityLabel = label,
   selected,
   onPress,
 }: {
+  icon: TripIconName;
   label: string;
   accessibilityLabel?: string;
   selected: boolean;
   onPress: () => void;
 }) {
   useLocale();
+  const { largeText } = useAppAccessibility();
   // 일반 버튼과 같은 눌림·초점 토큰을 사용한다.
   const [focused, setFocused] = useState(false);
   return (
@@ -75,7 +87,14 @@ function SectionButton({
         ];
       }}
     >
-      <Text style={s.label}>{t(label)}</Text>
+      {!largeText && (
+        <TripIcon
+          name={icon}
+          size={16}
+          color={selected ? colors.brandCoral : colors.muted}
+        />
+      )}
+      <Text style={[s.label, selected && s.selectedLabel]}>{t(label)}</Text>
     </Pressable>
   );
 }
@@ -156,29 +175,45 @@ export function TripMoreMenu({
 }
 
 const s = StyleSheet.create({
-  nav: { flexDirection: 'row', gap: 6, width: '100%' },
+  nav: {
+    flexDirection: 'row',
+    gap: 4,
+    width: '100%',
+    padding: 4,
+    borderRadius: 14,
+    backgroundColor: colors.surfaceMuted,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
   tab: {
     flex: 1,
     minWidth: 0,
     minHeight: 48,
-    paddingHorizontal: 4,
+    paddingHorizontal: 6,
     paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'transparent',
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
+    gap: 6,
   },
   selected: {
-    backgroundColor: colors.selectedSurface,
-    borderBottomColor: colors.text,
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
   },
-  pressed: { backgroundColor: colors.surfaceMuted },
+  pressed: { backgroundColor: colors.selectedSurface },
   focused: { outlineColor: colors.focus, outlineWidth: 2, outlineOffset: 2 },
   label: {
-    color: colors.text,
+    color: colors.muted,
     fontSize: 14,
     lineHeight: 22,
     fontWeight: '600',
     textAlign: 'center',
+  },
+  selectedLabel: {
+    color: colors.text,
+    fontWeight: '700',
   },
 });

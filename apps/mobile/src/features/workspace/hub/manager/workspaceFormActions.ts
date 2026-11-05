@@ -1,4 +1,5 @@
 import { useTripStore } from '@/stores/useTripStore';
+import { workspaceConnectionAvailable } from '../../shared/manager/workspaceConnectivity';
 import { clearCreationHandoff } from '../../planning/model/creationAuthHandoff';
 import {
   createFoundationTrip,
@@ -105,6 +106,12 @@ export function useWorkspaceFormActions({
   };
   // 새 여행 또는 기존 여행 폼을 확정한다.
   const save = function save(): void {
+    if (!workspaceConnectionAvailable()) {
+      setError(
+        '인터넷에 연결한 뒤 다시 저장해 주세요. 작성한 내용은 그대로 남아요.',
+      );
+      return;
+    }
     // 렌더링 전 연타와 사진 인식 중 저장도 기존 동기 잠금으로 차단한다.
     if (running.current || scanning || confirming.current) return;
     // 실패한 모달에서도 동일 본문·요청 키의 저장을 재개한다.

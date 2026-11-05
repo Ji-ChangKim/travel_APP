@@ -2,12 +2,15 @@ import { colors } from '@/constants/theme';
 import { StyleSheet } from 'react-native';
 import { scheduleTheme as theme } from '../../schedule/styles/scheduleTheme';
 
-// 여행 상세의 설명 영역을 줄여 첫 화면에서 날짜와 일정을 읽게 한다.
+// 여행 상세의 상단 요약 벤토 카드와 본문·하단 고정 행동 바 스타일을 정의한다.
 export const tripHubStyles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.color.surface.canvas },
   primaryBar: {
+    width: '100%',
+    maxWidth: 640,
+    alignSelf: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 8,
+    paddingVertical: 10,
     borderTopWidth: 1,
     borderTopColor: colors.border,
     backgroundColor: colors.background,
@@ -19,18 +22,14 @@ export const tripHubStyles = StyleSheet.create({
     gap: 10,
     flexWrap: 'wrap',
   },
-  primaryButton: { width: '100%', maxWidth: 320 },
+  primaryButton: { width: '100%', maxWidth: 600 },
   secondaryActionWrap: {
-    width: '100%',
-    maxWidth: 320,
     flex: 1,
-    minWidth: 140,
+    minWidth: 120,
   },
   primaryActionWrap: {
-    width: '100%',
-    maxWidth: 320,
-    flex: 1.15,
-    minWidth: 140,
+    flex: 1.4,
+    minWidth: 160,
   },
   mapPreviewCard: {
     marginBottom: 16,
@@ -40,17 +39,77 @@ export const tripHubStyles = StyleSheet.create({
   },
   content: {
     padding: 20,
-    gap: 12,
+    gap: 14,
     maxWidth: 640,
     width: '100%',
     alignSelf: 'center',
     paddingBottom: 32,
   },
   tripHeader: {
-    gap: 6,
-    paddingBottom: 12,
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    gap: 10,
   },
-  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  badgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  dateBadge: {
+    alignSelf: 'flex-start',
+    borderRadius: 9999,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    backgroundColor: colors.selectedSurface,
+  },
+  dateBadgeText: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: colors.text,
+    fontFamily: theme.font.semibold,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  titleColumn: {
+    flex: 1,
+    minWidth: 0,
+    gap: 8,
+  },
+  metaInlineRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  metaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  metaDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: colors.muted,
+  },
+  thumbnail: {
+    width: 56,
+    height: 56,
+    borderRadius: 14,
+    backgroundColor: colors.selectedSurface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   settings: {
     minWidth: 44,
     minHeight: 44,
@@ -76,6 +135,6 @@ export const tripHubStyles = StyleSheet.create({
     fontSize: 14,
     color: theme.color.text.secondary,
     lineHeight: 22,
-    fontFamily: theme.font.regular,
+    fontFamily: theme.font.semibold,
   },
 });

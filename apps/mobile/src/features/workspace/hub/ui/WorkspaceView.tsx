@@ -17,6 +17,7 @@ import PlanEditor from '../../my-trips/manager/PlanEditor';
 import TripAccessFeedback from './TripAccessFeedback';
 import { TripSectionNavigation } from './TripSectionNavigation';
 import WorkspaceConfirmDialog from './WorkspaceConfirmDialog';
+import ScheduleOrderEditor from '../../schedule/manager/ScheduleOrderEditor';
 import {
   renderWorkspaceAddSchedule,
   renderWorkspaceEditDialog,
@@ -163,22 +164,6 @@ function renderWorkspaceLayout(
             />
           }
         >
-          {user?.authProvider === 'guest' && (
-            <View style={styles.card}>
-              <Text>
-                {t(
-                  '게스트 여행은 이 기기에만 저장돼요. 다른 기기에서는 볼 수 없으며 앱이나 저장 데이터를 삭제하면 복구할 수 없어요.',
-                )}
-              </Text>
-              <Action
-                label={t('로그인 / 회원가입')}
-                onPress={() => {
-                  // 기기 여행을 자동 업로드하지 않고 회원 인증을 선택하게 한다.
-                  return props.login();
-                }}
-              />
-            </View>
-          )}
           {!userId ? (
             <View style={styles.card}>
               <Text style={styles.title}>
@@ -225,7 +210,23 @@ function renderWorkspaceLayout(
                   busy={trips.isFetching || workspace.isFetching}
                 />
               )}
-              {snapshot && !workspace.isError && (
+              {props.offline && (
+                <Text style={detail.meta} accessibilityLiveRegion="polite">
+                  {snapshot
+                    ? t(
+                        '오프라인이에요. 마지막으로 불러온 일정만 볼 수 있어요. 마지막 확인: {p0}',
+                        {
+                          p0: new Date(
+                            workspace.dataUpdatedAt,
+                          ).toLocaleString(),
+                        },
+                      )
+                    : t(
+                        '저장된 일정이 없어요. 인터넷에 연결한 뒤 다시 불러와 주세요.',
+                      )}
+                </Text>
+              )}
+              {snapshot && (!workspace.isError || props.offline) && (
                 <>
                   {importing && !writable && (
                     <Text accessibilityRole="alert" style={styles.error}>
@@ -253,16 +254,6 @@ function renderWorkspaceLayout(
                   {renderWorkspaceMap({ ...props, snapshot })}
                   {renderWorkspaceItinerary({ ...props, snapshot })}
                   {renderWorkspaceCapture(props)}
-                  {activeSection === 'itinerary' && (
-                    <Action
-                      label={t('Google Maps 장소 가져오기')}
-                      variant="quiet"
-                      onPress={() => {
-                        // 장소의 공유 링크를 가져오는 실제 도구를 연다.
-                        return router.push('/import-place');
-                      }}
-                    />
-                  )}
                   {renderWorkspaceExpenses({ ...props, snapshot })}
                   {renderWorkspacePhotos({ ...props, snapshot })}
                   {renderWorkspaceChecklist({ ...props, snapshot })}
@@ -271,6 +262,13 @@ function renderWorkspaceLayout(
                 </>
               )}
             </>
+          )}
+          {user?.authProvider === 'guest' && (
+            <Text style={detail.meta}>
+              {t(
+                '이 여행은 이 기기에만 저장돼요. 앱이나 저장 데이터를 삭제하면 복구할 수 없어요.',
+              )}
+            </Text>
           )}
           {error && !form && (
             <Text style={styles.error} accessibilityRole="alert">
@@ -302,6 +300,21 @@ function renderWorkspaceLayout(
           !form &&
           renderWorkspaceAddSchedule(props)}
       </ModalBackground>
+      {props.orderingDay && snapshot && (
+        <ScheduleOrderEditor
+          snapshot={snapshot}
+          dayId={props.orderingDay}
+          busy={busy}
+          pending={hasPending}
+          error={error}
+          onClose={() => props.setOrderingDay('')}
+          onSave={(ids, done) =>
+            props.actions.reorderSchedules(props.orderingDay, ids, done)
+          }
+          onRetry={retrySave}
+          onReload={reload}
+        />
+      )}
       {renderWorkspaceMoreMenu(props)}
       {renderWorkspaceCourse({ ...props, snapshot })}
       {renderWorkspaceReceiptCapture(props)}

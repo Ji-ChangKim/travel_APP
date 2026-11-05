@@ -1,4 +1,5 @@
 import { useTripStore } from '@/stores/useTripStore';
+import { workspaceConnectionAvailable } from '../../shared/manager/workspaceConnectivity';
 import type { WorkspaceSchedule, WorkspaceSnapshot } from '@wherego/domain';
 import * as Crypto from 'expo-crypto';
 import type { ImperativeRouter } from 'expo-router';
@@ -95,6 +96,12 @@ export function createWorkspaceEditorActions({
   }
   // 결과 미확인 저장은 원래 요청과 키로만 재개한다.
   function retrySave(): void {
+    if (!workspaceConnectionAvailable()) {
+      setError(
+        '인터넷에 연결한 뒤 다시 저장해 주세요. 작성한 내용은 그대로 남아요.',
+      );
+      return;
+    }
     // 표현 계층에 저장 클로저나 잠금 참조를 노출하지 않는다.
     if (pending.current) execute(pending.current);
   }

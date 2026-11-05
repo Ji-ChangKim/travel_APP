@@ -14,6 +14,7 @@ import ScheduleExitDialog from '@/features/workspace/schedule/ui/scheduleExitGua
 import AuthGate from '@/features/auth/manager/AuthGate';
 import AuthRecoveryBoundary from '@/features/auth/ui/AuthRecoveryBoundary';
 import NotificationPermission from '@/features/notifications/NotificationPermission';
+import { useWorkspaceConnectivity } from '@/features/workspace/shared/manager/workspaceConnectivity';
 
 import { colors } from '@/constants/theme';
 import LanguageProvider from '@/features/localization/LanguageProvider';
@@ -44,6 +45,7 @@ function revealApp(): void {
 
 // 실제 첫 프레임까지 기본 스플래시를 유지하고 인증 복귀는 바로 복원한다.
 function LaunchBridge() {
+  useWorkspaceConnectivity();
   // 직접 링크에서는 BI 대신 해당 화면의 레이아웃을 기다린다.
   const direct = useSegments().join('/') !== '';
   const session = useLaunchSession();

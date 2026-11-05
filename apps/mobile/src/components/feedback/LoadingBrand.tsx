@@ -15,16 +15,32 @@ export default function LoadingBrand() {
       {failed ? (
         <Text style={s.wordmark}>TripPrint</Text>
       ) : (
-        <Image
-          source={require('../../../assets/brand/tripprint-v1/TripPrint_logo-horizontal_1024x320.png')}
-          style={s.logo}
-          resizeMode="contain"
+        <View
+          style={s.brandRow}
+          accessible
           accessibilityLabel={t('TripPrint 트립프린트')}
-          onError={() => {
-            // 같은 공간에 브랜드 글자로 대체한다.
-            return setFailed(true);
-          }}
-        />
+        >
+          <Image
+            source={require('../../../assets/brand/tripprint-v1/tripprint-app-icon-source.png')}
+            style={s.symbol}
+            resizeMode="contain"
+            accessible={false}
+            onError={() => {
+              // 같은 공간에 브랜드 글자로 대체한다.
+              return setFailed(true);
+            }}
+          />
+          <Image
+            source={require('../../../assets/brand/tripprint-v1/tripprint-wordmark-en.png')}
+            style={s.logo}
+            resizeMode="contain"
+            accessible={false}
+            onError={() => {
+              // 같은 공간에 브랜드 글자로 대체한다.
+              return setFailed(true);
+            }}
+          />
+        </View>
       )}
     </View>
   );
@@ -32,7 +48,9 @@ export default function LoadingBrand() {
 
 const s = StyleSheet.create({
   slot: { minHeight: 52, alignItems: 'center', justifyContent: 'center' },
-  logo: { width: 164, height: 52 },
+  brandRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  symbol: { width: 50, height: 32 },
+  logo: { width: 120, height: 28 },
   wordmark: {
     fontSize: 26,
     lineHeight: 36,

@@ -6,6 +6,16 @@ import {
 import { countryDefaults, countryInputError } from './countries';
 import { flightFromValues } from './flightModel';
 import { createdDestinations } from './destinationForms';
+import { periodError } from './calendarPeriod';
+
+// 신규 폼의 30일 상한은 기존 여행 기간 변경 계약과 분리한다.
+const creationPeriodSchema = persistedTripCreateSchema.refine(
+  (input) => !periodError(input.startDate, input.endDate),
+  {
+    path: ['endDate'],
+    message: '여행 기간은 최대 30일까지 선택할 수 있어요.',
+  },
+);
 
 // 첫 단계는 여행지와 유효한 기간만 확인하며 제목·항공편은 요구하지 않는다.
 export function tripBasicsError(values: Record<string, string>): string {
@@ -19,11 +29,7 @@ export function tripBasicsError(values: Record<string, string>): string {
         ? '달력에서 출발일과 도착일을 선택해 주세요.'
         : values.startDate! > values.endDate!
           ? '도착일은 출발일과 같거나 이후여야 해요.'
-          : (Date.parse(values.endDate!) - Date.parse(values.startDate!)) /
-                86400000 >=
-              90
-            ? '여행 기간은 최대 90일까지 선택할 수 있어요.'
-            : '';
+          : periodError(values.startDate!, values.endDate!);
 }
 
 // 숨겨진 기본값과 선택 항공편을 저장 계약에 맞게 조합한다.
@@ -32,7 +38,7 @@ export function tripCreationInput(values: Record<string, string>) {
   const timezone =
     values.timezone || countryDefaults(values.country || '').timezone;
   const destinations = createdDestinations(values, timezone);
-  return persistedTripCreateSchema.parse({
+  return creationPeriodSchema.parse({
     ...(Number(values._draftRevision) > 0
       ? { draftRevision: Number(values._draftRevision) }
       : {}),

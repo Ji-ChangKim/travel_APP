@@ -3076,3 +3076,35 @@ created_at: INTEGER NOT NULL, 서버 생성 UTC epoch ms.
 - originId: UUID string|null, guest: boolean, postId: UUID string, reason: string 최대500자, createdAt: epoch milliseconds number.
 - 같은 계정 또는 명시적인 게스트 전환에서만 해당 게시물의 입력을 복원한다. 다른 계정·미래 시각·1시간 만료·손상 값은 복원하지 않고 다음 조회에서 정리한다.
 - 저장·조회·정리는 한 큐에서 순서대로 실행한다. 실제 복원한 초안의 생성 시각·대상·원래 계정이 같을 때만 정리한다. 로그인이나 복원 성공만으로 신고를 자동 제출하지 않는다.
+
+
+[2026-11-05 신규 여행 기간·DAY 일정 화면 임시 객체]
+DB명: 해당 없음. 화면 메모리이며 물리 테이블·마이그레이션은 추가하지 않음.
+테이블명: 해당 없음. 아래 객체는 임시 선택·표시용이며 기존 WorkspaceSnapshot과 명령 계약을 재사용함.
+
+객체명: PeriodDraft (planning/model/calendarPeriod.ts)
+컬럼/속성 | 타입 | 제약조건·기본값 | 설명
+startDate | string | 빈 문자열 또는 실제 YYYY-MM-DD | 폼에서 복사한 임시 출발일. 적용 전 상위 폼 변경 없음
+endDate | string | 빈 문자열 또는 실제 YYYY-MM-DD | 임시 도착일. 역전·포함 31일 이상 선택은 이전값 유지
+activeEndpoint | PeriodEndpoint = startDate / endDate | 호출 입력 또는 미입력 날짜 | 다음 날짜 선택 대상
+presetDays | PeriodPreset = 1 / 3 / 4 / 5 / 7 / null | 기본 null | 출발일 없이도 빠른 선택을 보존하며 날짜 자동 확정 없음
+error | string | 기본 빈 문자열 | 사용자 수정 안내. 기존 날짜값과 분리
+계산값 calendarPeriodDays | number / null | 유효한 달력 날짜만 계산 | 윤년·월·연도 경계의 달력 순번 차이+1. 신규 폼 적용·생성은 1~30일
+currentTripDate(timezone) | YYYY-MM-DD string | IANA 시간대 필수 | 신규 선택창의 현재 월. 저장 날짜를 UTC 시각으로 변환하지 않음
+적용 위치: 상위 생성 폼의 startDate/endDate 두 속성. 적용만으로 trips·DAY·작업 결과를 저장하지 않음.
+기존 persistedTripCreateSchema·trip.period 저장 계약의 90일 상한은 그대로 두며 신규 폼 최종 조합에 30일 상한을 추가함.
+
+객체명: ScheduleOrderEditor 화면 상태
+ids | string[] | 같은 DAY의 일정 ID를 한 번씩 포함 | 화살표 조작으로 바꾸는 임시 순서. 원본 WorkspaceSnapshot을 직접 변경하지 않음
+baseVersion | number | 진입 당시 trip.version 고정 | 원본 개정이 바뀌면 이 초안으로 저장하지 않음
+저장 명령: schedule.reorder { dayId, ids }. 기존 If-Match·Idempotency-Key 계약 재사용. 성공 응답 후 편집창 종료·전체 재조회.
+
+객체명: useWorkspaceNavigationState 추가 속성
+orderingDay | string | 기본 빈 문자열 | 순서 편집 중인 DAY ID. 빈값은 편집창 닫힘. 영구 저장 없음
+
+객체명: useWorkspaceData 추가 표시 속성
+offline | boolean | 회원이며 연결 감지값 false일 때 true | 회원 캐시 열람·편집 제한. 게스트는 기기 조회/저장을 계속 허용
+캐시 갱신 시각 | workspace.dataUpdatedAt number | TanStack Query 관리 | 현재 실행의 계정별 캐시 마지막 조회 시각. 영구 오프라인 DB를 추가한 것이 아님
+게스트 쿼리 networkMode | always | 현재 사용자 ID가 같은 게스트인 경우만 | 네트워크 없이 기기 저장 문서를 다시 조회. 회원 쿼리는 online 유지
+
+기존 데이터 보호: 영수증 연결 일정의 다른 결제일 이동·삭제 거부, 일정 삭제 시 사진·수동 지출의 연결 해제, schedule-plan 예상 비용 삭제를 유지함.

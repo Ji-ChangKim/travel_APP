@@ -24,13 +24,16 @@ export const homeHeaderStyles = StyleSheet.create({
   },
   brandSymbolFrame: {
     flexShrink: 0,
-    width: 36,
-    height: 36,
-    overflow: 'hidden',
+    width: 38,
+    height: 26,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  brandSymbol: { width: 64, height: 64 },
+  brandSymbol: { width: 38, height: 24 },
+  brandWordmark: {
+    width: 96,
+    height: 22,
+  },
   brandTitle: {
     flexShrink: 1,
     fontSize: designTokens.navigation.brandTitleSize,

@@ -163,6 +163,7 @@ export function renderWorkspaceMoreMenu({
   setShowTripMore,
   openDraft,
   setActiveSection,
+  offline,
 }: {
   showTripMore: boolean;
   owner: boolean;
@@ -174,6 +175,7 @@ export function renderWorkspaceMoreMenu({
   setShowTripMore: Dispatch<SetStateAction<boolean>>;
   openDraft: (kind: WorkspaceDraftKind, schedule?: WorkspaceSchedule) => void;
   setActiveSection: Dispatch<SetStateAction<string>>;
+  offline: boolean;
 }) {
   // 전달받은 값과 행동을 기존 화면 규격으로 표시한다.
 
@@ -182,7 +184,7 @@ export function renderWorkspaceMoreMenu({
       visible={showTripMore}
       owner={owner}
       selected={activeSection}
-      disabled={busy || scanning || hasPending}
+      disabled={busy || scanning || hasPending || offline}
       onEditDestinations={() => {
         // 도시 편집도 기존 초안과 이탈 보호를 거친다.
         if (!snapshot) return;
@@ -214,59 +216,52 @@ export function renderWorkspaceMoreMenu({
   );
 }
 
-// 지도 동선 확인과 일정 직접 추가의 하단 주요 행동을 분리해 표시한다.
+// 선택 DAY에 맞는 작성·순서 편집을 하단에서 제공한다.
 export function renderWorkspaceAddSchedule({
   busy,
   scanning,
   hasPending,
   actions,
   selectedDay,
-  setActiveSection,
+  snapshot,
+  setOrderingDay,
 }: {
   busy: boolean;
   scanning: boolean;
   hasPending: boolean;
   actions: WorkspaceScreenActions;
   selectedDay: string;
-  setActiveSection: Dispatch<SetStateAction<string>>;
-  setShowReceiptCapture?: Dispatch<SetStateAction<boolean>>;
+  snapshot: WorkspaceSnapshot | undefined;
+  setOrderingDay: Dispatch<SetStateAction<string>>;
 }): import('react').ReactNode {
-  // 전달받은 값과 행동을 기존 화면 규격으로 표시한다.
-
+  const dayId =
+    snapshot?.days.find((day) => day.id === selectedDay)?.id ||
+    snapshot?.days[0]?.id ||
+    '';
+  const count =
+    snapshot?.itinerary.filter((item) => item.dayId === dayId).length || 0;
+  const locked = busy || scanning || hasPending;
   return (
     <View
       style={[hub.primaryBar, hub.primaryActionRow]}
       testID="trip-primary-action"
     >
-      <View style={hub.secondaryActionWrap}>
-        <DesignButton
-          label={t('지도 보며 동선 짜기')}
-          variant="secondary"
-          disabled={busy || scanning || hasPending}
-          icon={(color) => {
-            // 등록한 일정과 도시 동선을 지도 탭에서 바로 확인한다.
-            return <Ionicons name="map-outline" size={18} color={color} />;
-          }}
-          onPress={() => {
-            // 지도 영역으로 전환해 전체 방문 핀과 이동 경로를 보여준다.
-            return setActiveSection('map');
-          }}
-        />
-      </View>
+      {count > 0 && (
+        <View style={hub.secondaryActionWrap}>
+          <DesignButton
+            label={t('순서 편집')}
+            disabled={locked || count < 2}
+            onPress={() => setOrderingDay(dayId)}
+          />
+        </View>
+      )}
       <View style={hub.primaryActionWrap}>
         <DesignButton
-          label={t('일정 추가')}
-          accessibilityLabel={t('일정 추가')}
+          label={t('장소 추가')}
           variant="primary"
-          disabled={busy || scanning || hasPending}
-          icon={(color) => {
-            // 장소 검색 기반 일정 추가 버튼을 표시한다.
-            return <Ionicons name="add" size={22} color={color} />;
-          }}
-          onPress={() => {
-            // 전체 날짜에서는 기존 규칙대로 첫 날짜의 작성 화면을 연다.
-            return actions.startSchedule(selectedDay);
-          }}
+          disabled={locked}
+          icon={(color) => <Ionicons name="add" size={24} color={color} />}
+          onPress={() => actions.addSchedule(dayId)}
         />
       </View>
     </View>

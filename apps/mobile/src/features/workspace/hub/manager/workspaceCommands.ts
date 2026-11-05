@@ -1,5 +1,6 @@
 import { UserFacingError } from '@/services/userFacingError';
 import { useTripStore } from '@/stores/useTripStore';
+import { workspaceConnectionAvailable } from '../../shared/manager/workspaceConnectivity';
 import { type QueryClient } from '@tanstack/react-query';
 import { foundationQueryKey, sendWorkspaceCommand } from '@wherego/api-client';
 import type { WorkspaceSnapshot } from '@wherego/domain';
@@ -61,6 +62,12 @@ export function useWorkspaceCommands({
     fromForm = false,
   ): void {
     // 파괴적 명령은 실제 요청을 만들기 전에 명시적 확인을 받는다.
+    if (!workspaceConnectionAvailable()) {
+      setError(
+        '인터넷에 연결한 뒤 다시 저장해 주세요. 작성한 내용은 그대로 남아요.',
+      );
+      return;
+    }
     return !snapshot || running.current || pending.current || confirming.current
       ? undefined
       : prepareCommand(value, after, fromForm);
@@ -89,6 +96,13 @@ export function useWorkspaceCommands({
   };
   // 확인 당시와 같은 계정·버전·대상일 때만 삭제를 진행한다.
   const confirmCommand = function confirmCommand(): void {
+    if (!workspaceConnectionAvailable()) {
+      cancelConfirmation();
+      setError(
+        '인터넷에 연결한 뒤 다시 저장해 주세요. 작성한 내용은 그대로 남아요.',
+      );
+      return;
+    }
     // 중복 확인 탭은 참조를 먼저 비워 차단한다.
     return applyConfirmedCommand(
       confirming.current,

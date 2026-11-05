@@ -1,6 +1,5 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import Text from '@/components/ui/AppText';
 import { Image, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import HeaderAction from '@/components/navigation/HeaderAction';
@@ -35,13 +34,17 @@ export default function HomeHeader({
           <View style={s.brandSymbolFrame}>
             <Image
               accessible={false}
-              source={require('../../../assets/brand/tripprint-v1/TripPrint_symbol-coral-clean_1024x1024.png')}
+              resizeMode="contain"
+              source={require('../../../assets/brand/tripprint-v1/tripprint-app-icon-source.png')}
               style={s.brandSymbol}
             />
           </View>
-          <Text style={s.brandTitle}>
-            Trip<Text style={s.brandAccent}>Print</Text>
-          </Text>
+          <Image
+            accessible={false}
+            resizeMode="contain"
+            source={require('../../../assets/brand/tripprint-v1/tripprint-wordmark-en.png')}
+            style={s.brandWordmark}
+          />
         </View>
         <View style={s.topRightActions}>
           {signedIn && ready && variant !== 'travel-home' && (

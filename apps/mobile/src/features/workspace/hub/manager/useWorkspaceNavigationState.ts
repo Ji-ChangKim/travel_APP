@@ -17,6 +17,7 @@ export function useWorkspaceNavigationState(section: string | undefined) {
   const [selectedScheduleId, setSelectedScheduleId] = useState('');
   const [courseDay, setCourseDay] = useState('');
   const [showTripMore, setShowTripMore] = useState(false);
+  const [orderingDay, setOrderingDay] = useState('');
 
   return {
     activeSection,
@@ -29,5 +30,7 @@ export function useWorkspaceNavigationState(section: string | undefined) {
     setCourseDay,
     showTripMore,
     setShowTripMore,
+    orderingDay,
+    setOrderingDay,
   };
 }

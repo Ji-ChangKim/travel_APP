@@ -180,9 +180,43 @@ export function createWorkspaceScreenActions(options: Options) {
         memo: place.description,
       });
     },
-    reorderSchedules: (dayId: string, ids: string[]) => {
+    reorderSchedules: (dayId: string, ids: string[], done?: () => void) => {
       // 해당 날짜의 방문 순서를 하나의 버전 명령으로 반영한다.
-      return command({ operation: 'schedule.reorder', input: { dayId, ids } });
+      return command(
+        { operation: 'schedule.reorder', input: { dayId, ids } },
+        async () => {
+          done?.();
+        },
+        true,
+      );
+    },
+    moveSchedule: (
+      item: WorkspaceSchedule,
+      dayId: string,
+      done: () => void,
+    ) => {
+      if (!snapshot || item.dayId === dayId) return;
+      const target = snapshot.itinerary
+        .filter((other) => other.dayId === dayId)
+        .sort((a, b) => a.sortOrder - b.sortOrder);
+      return command(
+        {
+          operation: 'schedule.save',
+          input: {
+            ...item,
+            timeSlot: item.timeSlot || '',
+            memo: item.memo || '',
+            address: item.address || '',
+            dayId,
+            sortOrder: target.length + 1,
+            afterScheduleId: target.at(-1)?.id ?? null,
+          },
+        },
+        async () => {
+          done();
+        },
+        true,
+      );
     },
     editSchedule: (item: WorkspaceSchedule) => {
       // 기존 위치·항공·설명과 같은 일정 ID를 유지한다.

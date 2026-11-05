@@ -95,9 +95,8 @@ const config: ExpoConfig = {
       {
         // OS 스플래시는 단색을 쓰고 React BI에서 같은 계열의 그라데이션으로 잇는다.
         backgroundColor: designTokens.startup.bi.backgroundTop,
-        image:
-          './assets/brand/tripprint-v1/TripPrint_symbol-coral-clean_1024x1024.png',
-        imageWidth: 240,
+        image: './assets/brand/tripprint-v1/tripprint-app-icon-source.png',
+        imageWidth: 160,
       },
     ],
   ],

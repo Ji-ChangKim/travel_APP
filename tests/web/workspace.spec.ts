@@ -5895,14 +5895,39 @@ test('폐기한 DB 코드만 정리하고 로그인 세션과 프로필 편집�
   ]);
 });
 // 실제 폼을 작성하는 테스트 헬퍼를 제공한다.
-function fields(page: Page, values: Record<string, string>): Promise<void> {
-  // 폼 종류에 맞는 실제 사용자 입력만 순서대로 실행한다.
-  return testSteps(
-    Object.entries(values).map(([label, value]) => {
-      // 국가·도시는 선택창에서, 여행 날짜는 표시된 달력에서 선택한다.
-      return () => fillEditorField(page, label, value);
-    }),
+async function fields(
+  page: Page,
+  values: Record<string, string>,
+): Promise<void> {
+  const periodPicker = page.getByRole('button', {
+    name: '출발일 선택',
+    exact: true,
+  });
+  const dateEntries = Object.entries(values).filter(([key]) =>
+    ['시작일', '종료일'].includes(key),
   );
+  if (dateEntries.length && (await periodPicker.count())) {
+    for (const [label, value] of Object.entries(values).filter(
+      ([key]) => !['시작일', '종료일'].includes(key),
+    ))
+      await fillEditorField(page, label, value);
+    await periodPicker.click();
+    for (const [label, value] of dateEntries) {
+      const endpoint = label === '시작일' ? '출발일' : '도착일';
+      const input = page.getByLabel(endpoint, { exact: true });
+      if (await input.count()) await input.fill(value);
+      else {
+        await page
+          .getByRole('button', { name: `${endpoint} 편집`, exact: true })
+          .click();
+        await selectCalendarDay(page, value);
+      }
+    }
+    await page.getByRole('button', { name: /^기간 적용/ }).click();
+    return;
+  }
+  for (const [label, value] of Object.entries(values))
+    await fillEditorField(page, label, value);
 }
 
 // 여행지 모달과 기존 편집 필드를 같은 사용자 입력 도우미로 연결한다.
@@ -9921,7 +9946,7 @@ test('R13 정적 로고 읽기 실패도 흰 배경·브랜드 글자로 시작�
   // 로컬 이미지 디코딩 실패를 네트워크 경계로 재현한다.
   await network(page);
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.route('**/*TripPrint_symbol-coral-clean*', (route) => {
+  await page.route('**/*tripprint-app-icon-source*', (route) => {
     // 브랜드 정적 로고 한 개만 실패시킨다.
     return route.abort();
   });
@@ -11542,6 +11567,10 @@ for (const width of [320, 390, 430]) {
       .getByRole('button', { name: '내 여행 목록', exact: true })
       .focus();
     await page.keyboard.press('Tab');
+    await expect(
+      page.getByRole('button', { name: '공유', exact: true }),
+    ).toBeFocused();
+    await page.keyboard.press('Tab');
     await expect(more).toBeFocused();
     await expect(more).toHaveCSS('outline-width', '2px');
     await page.keyboard.press('Enter');
@@ -11556,7 +11585,7 @@ for (const width of [320, 390, 430]) {
     ).toBe(true);
     await page.keyboard.press('Escape');
     await expect(more).toBeFocused();
-    const add = page.getByRole('button', { name: '일정 추가', exact: true });
+    const add = page.getByRole('button', { name: '장소 추가', exact: true });
     const box = await add.boundingBox();
     await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
     await page.mouse.down();
@@ -11584,7 +11613,9 @@ for (const width of [320, 390, 430]) {
       await expect(
         route === '/my'
           ? page.getByRole('button', { name: title!, exact: true })
-          : page.getByText(title!, { exact: true }),
+          : title === 'TripPrint'
+            ? page.getByRole('heading', { name: title, exact: true })
+            : page.getByText(title!, { exact: true }),
       ).toBeVisible();
       await expect.poll(() => haruReadingAudit(page)).toEqual([]);
     }
@@ -12125,7 +12156,7 @@ for (const width of [320, 390, 430]) {
         .click();
       await openTripSection(page, '일정');
       await page
-        .getByRole('button', { name: '일정 추가', exact: true })
+        .getByRole('button', { name: '장소 추가', exact: true })
         .click();
       await expect(page.getByLabel('제목', { exact: true })).toBeVisible();
       await inspectHeader(page, 'schedule-editor', width, scale, testInfo);
@@ -12158,7 +12189,10 @@ for (const width of [320, 390, 430]) {
         // 직접 진입한 화면도 같은 제목 토큰을 유지한다.
         await page.goto(route!);
         await expect(
-          page.getByText(title!, { exact: true }).first(),
+          (title === 'TripPrint'
+            ? page.getByRole('heading', { name: title, exact: true })
+            : page.getByText(title!, { exact: true })
+          ).first(),
         ).toBeVisible();
         await inspectHeader(page, file!, width, scale, testInfo);
       }
@@ -13149,7 +13183,7 @@ test('CP-13 개인 일정과 일정 작성도 DAY 배경 채움과 같은 크기
   await page.getByRole('button', { name: 'DAY 2', exact: true }).click();
   expect(await selectionGeometry(strip)).toEqual(before);
   await expectFilledDaySelection(strip, 1);
-  await page.getByRole('button', { name: '일정 추가', exact: true }).click();
+  await page.getByRole('button', { name: '장소 추가', exact: true }).click();
   const choices = page.getByRole('button', { name: /^DAY [1-3] · / });
   const formBefore = await selectionGeometry(choices);
   await page.getByRole('button', { name: /^DAY 1 · / }).click();

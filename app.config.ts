@@ -13,7 +13,7 @@ const config: ExpoConfig = {
   orientation: 'portrait',
   userInterfaceStyle: 'light',
   backgroundColor: '#F8F9FF',
-  icon: './apps/mobile/assets/brand/tripprint-v1/TripPrint_app-icon_1024x1024.png',
+  icon: './apps/mobile/assets/brand/tripprint-v1/tripprint-launcher-icon.png',
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.travelapp.mobile',
@@ -25,11 +25,11 @@ const config: ExpoConfig = {
     // 업로드 번호는 프로젝트 루트의 ver.text 한 곳에서 수정한다.
     versionCode: appVersion.versionCode,
     adaptiveIcon: {
-      backgroundColor: '#FF6B57',
+      backgroundColor: '#FC5041',
       foregroundImage:
-        './apps/mobile/assets/brand/tripprint-v1/TripPrint_android-foreground_1024x1024.png',
+        './apps/mobile/assets/brand/tripprint-v1/tripprint-launcher-adaptive.png',
       monochromeImage:
-        './apps/mobile/assets/brand/tripprint-v1/TripPrint_android-monochrome_1024x1024.png',
+        './apps/mobile/assets/brand/tripprint-v1/tripprint-launcher-adaptive.png',
     },
   },
   web: {
@@ -73,8 +73,8 @@ const config: ExpoConfig = {
       {
         backgroundColor: '#FFFFFF',
         image:
-          './apps/mobile/assets/brand/tripprint-v1/TripPrint_symbol-coral-clean_1024x1024.png',
-        imageWidth: 240,
+          './apps/mobile/assets/brand/tripprint-v1/tripprint-app-icon-source.png',
+        imageWidth: 160,
       },
     ],
   ],

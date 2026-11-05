@@ -4924,5 +4924,111 @@
     "Connect this trip to your account to continue.",
     "この操作を続けるには対象の旅行をアカウントに連携してください。"
   ],
-  "홈으로 이동": ["Go to home", "ホームに移動"]
+  "홈으로 이동": ["Go to home", "ホームに移動"],
+  "장소 추가": ["Add a place", "場所を追加"],
+  "오프라인이에요. 마지막으로 불러온 일정만 볼 수 있어요. 마지막 확인: {p0}": [
+    "You are offline. Only previously loaded plans are available. Last checked: {p0}",
+    "オフラインです。前回読み込んだ予定のみ表示します。最終確認：{p0}"
+  ],
+  "저장된 일정이 없어요. 인터넷에 연결한 뒤 다시 불러와 주세요.": [
+    "No saved plans are available. Connect to the internet and reload.",
+    "保存済みの予定がありません。インターネットに接続して再読み込みしてください。"
+  ],
+  "날짜 선택": ["Choose a date", "日付を選択"],
+  "출발일 선택": ["Choose departure date", "出発日を選択"],
+  "도착일 선택": ["Choose return date", "到着日を選択"],
+  "당일": ["Same day", "日帰り"],
+  "캘린더 전체보기": ["Open calendar", "カレンダーを開く"],
+  "여행 기간 선택": ["Choose trip dates", "旅行期間を選択"],
+  "기간 선택 닫기": ["Close trip dates", "期間の選択を閉じる"],
+  "여행 날짜를 선택해 주세요": [
+    "Choose your trip dates",
+    "旅行の日付を選んでください"
+  ],
+  "출발일을 선택해 주세요.": [
+    "Choose a departure date.",
+    "出発日を選んでください。"
+  ],
+  "도착일을 선택해 주세요.": [
+    "Choose a return date.",
+    "到着日を選んでください。"
+  ],
+  "출발일 편집": ["Edit departure date", "出発日を変更"],
+  "도착일 편집": ["Edit return date", "到着日を変更"],
+  "여행 기간은 최대 30일까지 선택할 수 있어요.": [
+    "Trips can be up to 30 days long.",
+    "旅行期間は最大30日まで選べます。"
+  ],
+  "기간을 적용하면 여행 만들기에 선택한 날짜가 반영돼요.": [
+    "Apply these dates to your new trip.",
+    "適用すると、選んだ日付が旅行作成フォームに反映されます。"
+  ],
+  "기간 적용": ["Apply dates", "期間を適用"],
+  "위치 정보가 없어요. 일정 수정에서 주소를 입력해 주세요.": [
+    "No location is available. Edit the plan to add an address.",
+    "位置情報がありません。予定を編集して住所を入力してください。"
+  ],
+  "지도를 열지 못했어요. 길찾기를 다시 눌러 주세요.": [
+    "Could not open the map. Try directions again.",
+    "地図を開けませんでした。もう一度ルート案内を押してください。"
+  ],
+  "DAY {p0} 일정": ["DAY {p0} plans", "DAY {p0}の予定"],
+  "장소 {p0}개": ["{p0} places", "{p0}か所"],
+  "아직 등록된 장소가 없어요.": [
+    "No places added yet.",
+    "まだ場所が登録されていません。"
+  ],
+  "DAY {p0}에 방문할 첫 장소를 추가해 보세요.": [
+    "Add your first place for DAY {p0}.",
+    "DAY {p0}に訪れる最初の場所を追加しましょう。"
+  ],
+  "등록한 장소는 여기에서 확인할 수 있어요.": [
+    "Added places appear here.",
+    "登録した場所はここに表示されます。"
+  ],
+  "다른 DAY로 이동": ["Move to another day", "別のDAYへ移動"],
+  "선택한 DAY의 마지막 순서로 옮겨요. 예정 시간과 메모는 유지돼요.": [
+    "Move to the end of the selected day. Time and notes stay the same.",
+    "選んだDAYの最後に移動します。予定時刻とメモはそのまま残ります。"
+  ],
+  "이동 확인": ["Confirm move", "移動を確認"],
+  "일정 상세": ["Plan details", "予定の詳細"],
+  "길찾기": ["Directions", "ルート案内"],
+  "화살표로 방문 순서를 바꾼 뒤 순서 저장을 눌러 주세요. 예정 시간은 그대로 유지돼요.": [
+    "Use the arrows to reorder visits, then save the order. Planned times stay the same.",
+    "矢印で訪問順を変えてから順序を保存してください。予定時刻は変わりません。"
+  ],
+  "일정이 바뀌었어요. 취소한 뒤 최신 목록에서 순서를 다시 정해 주세요.": [
+    "The plans have changed. Cancel and reorder the latest list.",
+    "予定が変更されました。キャンセルして最新の一覧で順序を決め直してください。"
+  ],
+  "순서 저장": ["Save order", "順序を保存"],
+  "{p0} 일정 상세": ["{p0} plan details", "{p0}の予定詳細"],
+  "{p0} 길찾기": ["Directions to {p0}", "{p0}へのルート案内"],
+  "{p0} 여행지 사진": ["{p0} destination photo", "{p0}の旅行先の写真"],
+  "이 여행은 이 기기에만 저장돼요. 앱이나 저장 데이터를 삭제하면 복구할 수 없어요.": [
+    "This trip is saved only on this device. Deleting the app or its data will remove it permanently.",
+    "この旅行はこの端末にのみ保存されます。アプリや保存データを削除すると復元できません。"
+  ],
+  "{p0}박 {p1}일": ["{p0} nights, {p1} days", "{p0}泊{p1}日"],
+  "2박 3일": ["2 nights, 3 days", "2泊3日"],
+  "3박 4일": ["3 nights, 4 days", "3泊4日"],
+  "4박 5일": ["4 nights, 5 days", "4泊5日"],
+  "일주일": ["One week", "1週間"],
+  "출발일과 도착일을 선택해 주세요.": [
+    "Choose departure and return dates.",
+    "出発日と到着日を選んでください。"
+  ],
+  "도착일은 출발일과 같거나 이후로 선택해 주세요.": [
+    "Choose a return date on or after departure.",
+    "到着日は出発日と同じ日か、それ以降を選んでください。"
+  ],
+  "올바른 날짜를 선택해 주세요.": [
+    "Choose a valid date.",
+    "有効な日付を選んでください。"
+  ],
+  "출발일을 먼저 선택해 주세요.": [
+    "Choose a departure date first.",
+    "先に出発日を選んでください。"
+  ]
 }
