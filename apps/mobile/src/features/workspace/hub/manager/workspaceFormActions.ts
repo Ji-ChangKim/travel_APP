@@ -105,7 +105,7 @@ export function useWorkspaceFormActions({
     return Promise.resolve();
   };
   // 새 여행 또는 기존 여행 폼을 확정한다.
-  const save = function save(): void {
+  const save = function save(overrides?: Record<string, string>): void {
     if (!workspaceConnectionAvailable()) {
       setError(
         '인터넷에 연결한 뒤 다시 저장해 주세요. 작성한 내용은 그대로 남아요.',
@@ -123,20 +123,30 @@ export function useWorkspaceFormActions({
     try {
       // 기존 여행은 공통 명령 계약으로 저장한다.
       if (!form || busy || pending.current) return;
-      if (Object.keys(formInputFields(form.kind, form.values, snapshot)).length)
-        return invalidForm(formInputFields(form.kind, form.values, snapshot));
-      if (form.kind !== 'trip') {
+      const activeForm = overrides
+        ? { ...form, values: { ...form.values, ...overrides } }
+        : form;
+      if (overrides) setForm(activeForm);
+      if (
+        Object.keys(
+          formInputFields(activeForm.kind, activeForm.values, snapshot),
+        ).length
+      )
+        return invalidForm(
+          formInputFields(activeForm.kind, activeForm.values, snapshot),
+        );
+      if (activeForm.kind !== 'trip') {
         // 화면 폼이 선택한 일정·날짜를 검증한다.
         if (snapshot)
           command(
-            formCommand(form, snapshot),
-            form.kind === 'receipt'
-              ? scheduleRegistered.bind(null, form.values.dayId || '', '')
-              : form.kind === 'schedule'
+            formCommand(activeForm, snapshot),
+            activeForm.kind === 'receipt'
+              ? scheduleRegistered.bind(null, activeForm.values.dayId || '', '')
+              : activeForm.kind === 'schedule'
                 ? scheduleRegistered.bind(
                     null,
-                    form.values.dayId || '',
-                    form.id,
+                    activeForm.values.dayId || '',
+                    activeForm.id,
                   )
                 : undefined,
             true,
@@ -145,12 +155,12 @@ export function useWorkspaceFormActions({
       }
       // 선택 여행지와 기간, 두 번째 단계의 항공편만 저장 계약으로 검증한다.
       const member = useTripStore.getState().currentUser;
-      if (!member || member.id !== userId || member.authProvider === 'guest') {
+      if (!member || member.id !== userId) {
         setError('로그인하고 여행을 저장해 주세요.');
         return;
       }
-      const input = tripCreationInput(form.values);
-      const key = form.id;
+      const input = tripCreationInput(activeForm.values);
+      const key = activeForm.id;
       execute(() => {
         // 여행과 DAY와 소유자 생성은 서버에서 원자적으로 수행한다.
         return serverOptions(userId)

@@ -182,8 +182,13 @@ function DestinationContent({
   useLocale();
   // 나라와 도시는 한 줄에서 같은 너비로 배치하고 나라 선택 후 도시를 활성화한다.
   return (
-    <View style={styles.card}>
+    <View style={styles.card} testID="direct-destination-banner">
       <Text style={styles.title}>{t('여행지 선택')}</Text>
+      <Text style={styles.subtitle}>
+        {t(
+          '찾으시는 도시가 없나요? 나라와 목적지를 직접 선택하거나 입력할 수 있어요.',
+        )}
+      </Text>
       <View style={{ flexDirection: 'row', gap: 12 }}>
         <View testID="trip-country" style={{ flex: 1, minWidth: 0, gap: 8 }}>
           <Text style={styles.label}>{t('나라')}</Text>

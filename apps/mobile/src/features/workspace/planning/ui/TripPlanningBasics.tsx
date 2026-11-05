@@ -25,6 +25,12 @@ export default function TripPlanningBasics({
           setBasicsError('');
           props.onChange(key, value);
         }}
+        onApplyPeriod={(startDate, endDate) => {
+          // 여행지가 선택된 상태에서 기간을 적용하면 바로 여행을 생성하고 상세 페이지로 이동한다.
+          if (props.form.values.country?.trim()) {
+            create({ startDate, endDate });
+          }
+        }}
       />
       <Action
         label={
@@ -37,7 +43,7 @@ export default function TripPlanningBasics({
         variant="primary"
         loading={props.busy}
         disabled={props.locked}
-        onPress={create}
+        onPress={() => create()}
       />
       <Action
         label={t('항공편 추가 및 확인 (선택)')}

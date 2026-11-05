@@ -30,7 +30,7 @@ type Props = {
   scroll: RefObject<ScrollView | null>;
   onChange: (key: string, value: string) => void;
   onInvalid: (fields: FieldErrors) => void;
-  onSave: () => void;
+  onSave: (overrides?: Record<string, string>) => void;
   onDraftPending?: (pending: boolean) => void;
   onClose: () => void;
 };
@@ -46,8 +46,8 @@ export default function TripPlanningFlow({ scroll, ...inputProps }: Props) {
     onChange: (key: string, value: string) => {
       if (!draftBusy) inputProps.onChange(key, value);
     },
-    onSave: () => {
-      if (!draftBusy) inputProps.onSave();
+    onSave: (overrides?: Record<string, string>) => {
+      if (!draftBusy) inputProps.onSave(overrides);
     },
     onDraftPending: (pending: boolean) => {
       setDraftBusy(pending);
@@ -75,27 +75,40 @@ export default function TripPlanningFlow({ scroll, ...inputProps }: Props) {
       props.form.values.endDate <
         tripToday(props.form.values.timezone || 'Asia/Seoul'),
     );
-  function proceed(onValid: () => void): void {
+  function proceed(
+    onValid: () => void,
+    overrides?: Record<string, string>,
+  ): void {
     // 첫 단계에서는 등록한 항공편과 별개로 여행지·기간만 검사한다.
     try {
       if (props.locked) return;
-      const fields = formInputFields('trip', props.form.values);
+      const mergedValues = overrides
+        ? { ...props.form.values, ...overrides }
+        : props.form.values;
+      const fields = formInputFields('trip', mergedValues);
       if (Object.keys(fields).length)
         return void (props.onInvalid(fields),
-        setBasicsError(tripBasicsError(props.form.values)));
-      tripCreationInput({ ...props.form.values, flights: '[]' });
+        setBasicsError(tripBasicsError(mergedValues)));
+      tripCreationInput({ ...mergedValues, flights: '[]' });
       const user = useTripStore.getState().currentUser;
-      if (!user || user.authProvider === 'guest') {
-        requestCreationLogin(router, props.form, 'basics');
+      if (!user) {
+        requestCreationLogin(
+          router,
+          overrides ? { ...props.form, values: mergedValues } : props.form,
+          'basics',
+        );
         return;
       }
       setBasicsError('');
       onValid();
     } catch (failure) {
       // 작성값은 유지하고 현재 화면에서 고칠 항목만 알려준다.
+      const mergedValues = overrides
+        ? { ...props.form.values, ...overrides }
+        : props.form.values;
       return void (props.onInvalid(formFailureFields(failure, 'trip')),
       setBasicsError(
-        tripBasicsError(props.form.values) || '입력한 항목을 확인해 주세요.',
+        tripBasicsError(mergedValues) || '입력한 항목을 확인해 주세요.',
       ));
     }
   }
@@ -158,7 +171,7 @@ export default function TripPlanningFlow({ scroll, ...inputProps }: Props) {
     back,
     props,
     next,
-    create: () => proceed(props.onSave),
+    create: (overrides) => proceed(() => props.onSave(overrides), overrides),
     scroll,
     setBasicsError,
     items,

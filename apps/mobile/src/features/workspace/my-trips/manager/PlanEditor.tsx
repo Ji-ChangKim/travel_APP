@@ -100,7 +100,7 @@ type EditorProps = {
   error: string;
   conflicted?: boolean;
   onChange: (key: string, value: string) => void;
-  onSave: () => void;
+  onSave: (overrides?: Record<string, string>) => void;
   onDraftPending?: (pending: boolean) => void;
   onReload: () => void;
   onClose: () => void;

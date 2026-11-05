@@ -257,7 +257,8 @@ export function renderWorkspaceAddSchedule({
       )}
       <View style={hub.primaryActionWrap}>
         <DesignButton
-          label={t('장소 추가')}
+          label={count === 0 ? t('장소 검색') : t('장소 추가')}
+          accessibilityLabel={t('장소 추가')}
           variant="primary"
           disabled={locked}
           icon={(color) => <Ionicons name="add" size={24} color={color} />}

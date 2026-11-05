@@ -103,10 +103,14 @@ for (const width of [320, 390, 430]) {
     await setup(page, originalTrip(true));
     await expect(page.getByTestId('trip-overview-card')).toBeVisible();
     await expect(page.getByTestId('trip-overview-thumbnail')).toBeVisible();
+    await expect(page.getByTestId('trip-companion-badge')).toBeVisible();
+    await expect(page.getByTestId('trip-flight-card')).toBeVisible();
     await expect(page.getByTestId('trip-section-navigation')).toBeVisible();
     await expect(page.getByTestId('trip-day-card-1')).toBeVisible();
     await expect(page.getByTestId('schedule-timeline-header')).toBeVisible();
     await expect(page.getByTestId('schedule-timeline-dot')).toBeVisible();
+    await expect(page.getByTestId('schedule-place-count')).toBeVisible();
+    await expect(page.getByTestId('schedule-timeline-date')).toBeVisible();
     await expect(page.getByText('00:00', { exact: true })).toBeVisible();
     await expect(page.getByText('시간 미정', { exact: true })).toBeVisible();
     await expect(
@@ -114,12 +118,13 @@ for (const width of [320, 390, 430]) {
     ).toBeVisible();
     await page.screenshot({
       path: `outputs/notion-planning-20261105/filled-${width}.png`,
-      fullPage: true,
     });
     await page.getByRole('button', { name: /DAY 2.*장소 0개/ }).click();
     await expect(
-      page.getByText('아직 등록된 장소가 없어요.', { exact: true }),
+      page.getByText('아직 등록된 일정이 없어요', { exact: true }),
     ).toBeVisible();
+    await expect(page.getByTestId('schedule-empty-keywords')).toBeVisible();
+    await expect(page.getByTestId('schedule-empty-template')).toBeVisible();
     await expect(
       page.getByRole('button', { name: '장소 추가', exact: true }),
     ).toHaveCount(1);
@@ -205,7 +210,7 @@ test('기획서 화면: 순서 취소·저장·재진입과 다른 DAY 이동·�
     .getByRole('button', { name: '일정 삭제하기', exact: true })
     .click();
   await expect(
-    page.getByText('아직 등록된 장소가 없어요.', { exact: true }),
+    page.getByText('아직 등록된 일정이 없어요', { exact: true }),
   ).toBeVisible();
   expect((await documentTrip(page)).itinerary).toHaveLength(1);
   await page.reload();

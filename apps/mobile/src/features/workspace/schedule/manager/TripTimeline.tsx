@@ -47,7 +47,7 @@ export interface Props {
   onSelectSchedule?: (id: string) => void;
 }
 
-// 날짜 문자열(YYYY-MM-DD)을 DAY 카드 상단의 월.일 요일(예: 11.15 일) 형식으로 변환한다.
+// 날짜 문자열(YYYY-MM-DD)을 DAY 카드 하단의 월.일(요일)(예: 11.15(일)) 형식으로 변환한다.
 function formatDayCardDate(date: string, locale: string): string {
   // 기기 시간대 영향을 받지 않도록 UTC 정오 시각으로 요일을 계산한다.
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
@@ -57,10 +57,10 @@ function formatDayCardDate(date: string, locale: string): string {
     weekday: 'short',
     timeZone: 'UTC',
   }).format(new Date(`${date}T12:00:00Z`));
-  return `${month}.${day} ${weekday}`;
+  return `${month}.${day}(${weekday})`;
 }
 
-// 가로 스크롤 바에 날짜·DAY 번호·장소 수를 3줄 세로형 카드로 배치한다.
+// 가로 스크롤 바에 DAY 번호와 날짜(요일)를 2줄 세로형 카드로 배치한다.
 export function TripDayStrip({
   days,
   selected,
@@ -77,7 +77,7 @@ export function TripDayStrip({
   useLocale();
   const locale = getLocale();
   const [focusedId, setFocusedId] = useState('');
-  // 긴 여행도 한 줄에서 날짜와 장소 수를 함께 탐색한다.
+  // 긴 여행도 한 줄에서 일차와 날짜를 직관적으로 탐색한다.
   return (
     <ScrollView
       horizontal
@@ -102,7 +102,7 @@ export function TripDayStrip({
         const countLabel = counts
           ? t('장소 {p0}개', { p0: counts[day.id] ?? 0 })
           : '';
-        // 선택한 날짜를 채움형 3줄 카드로 강조해 표시한다.
+        // 선택한 날짜를 코랄 채움형 2줄 카드로 강조해 표시한다.
         return (
           <Pressable
             key={day.id}
@@ -135,25 +135,15 @@ export function TripDayStrip({
             }}
           >
             <Text
-              style={[s.dayCardDateText, isSelected && s.dayCardTextSelected]}
-            >
-              {formatDayCardDate(day.tripDate, locale)}
-            </Text>
-            <Text
               style={[s.dayCardTitleText, isSelected && s.dayCardTextSelected]}
             >
               {`DAY ${day.dayNumber}`}
             </Text>
-            {countLabel ? (
-              <Text
-                style={[
-                  s.dayCardCountText,
-                  isSelected && s.dayCardTextSelected,
-                ]}
-              >
-                {countLabel}
-              </Text>
-            ) : null}
+            <Text
+              style={[s.dayCardDateText, isSelected && s.dayCardTextSelected]}
+            >
+              {formatDayCardDate(day.tripDate, locale)}
+            </Text>
           </Pressable>
         );
       })}

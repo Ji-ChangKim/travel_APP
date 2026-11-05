@@ -399,11 +399,11 @@ export default function TripPeriodPicker({
                             style={[
                               s.dayNumber,
                               weekdayIndex === 0 &&
-                              !isSelected &&
-                              s.dayNumberSunday,
+                                !isSelected &&
+                                s.dayNumberSunday,
                               weekdayIndex === 6 &&
-                              !isSelected &&
-                              s.dayNumberSaturday,
+                                !isSelected &&
+                                s.dayNumberSaturday,
                               isSelected && s.dayNumberSelected,
                             ]}
                           >

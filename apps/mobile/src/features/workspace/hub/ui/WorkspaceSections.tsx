@@ -14,5 +14,6 @@ export { renderWorkspaceMembers } from './WorkspaceMembersView';
 export { renderWorkspaceChecklist } from './WorkspaceChecklistView';
 export {
   renderWorkspaceSummary,
+  renderWorkspaceFlightPrompt,
   renderWorkspaceHeader,
 } from './WorkspaceHeadingView';

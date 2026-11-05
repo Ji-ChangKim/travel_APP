@@ -18,9 +18,11 @@ import { periodPickerStyles as s } from '../styles/periodPickerStyles';
 export default function TripCalendar({
   values,
   onChange,
+  onApplyPeriod,
 }: {
   values: Record<string, string>;
   onChange: (key: string, value: string) => void;
+  onApplyPeriod?: (startDate: string, endDate: string) => void;
 }) {
   useLocale();
   const [endpoint, setEndpoint] = useState<PeriodEndpoint | null>(null);
@@ -70,7 +72,8 @@ export default function TripCalendar({
         </Text>
       ) : null}
       <DesignButton
-        label={t('캘린더 전체보기')}
+        label={t('여행 기간 선택')}
+        accessibilityLabel={t('캘린더 전체보기')}
         variant="quiet"
         disabled={locked}
         onPress={() => {
@@ -106,6 +109,7 @@ export default function TripCalendar({
               onChange('startDate', startDate);
               onChange('endDate', endDate);
               setEndpoint(null);
+              onApplyPeriod?.(startDate, endDate);
             }}
           />
         )}

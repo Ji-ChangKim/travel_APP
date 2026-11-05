@@ -156,13 +156,21 @@ export function createWorkspaceScreenActions(options: Options) {
       // 한 번 생성한 일정 ID와 선택 DAY를 같은 작성 폼에 유지한다.
       return openScheduleDraft(dayId, { placeSearchExpanded: 'true' });
     },
+    addFlightSchedule: (dayId: string) => {
+      // 항공권 추가 카드에서 진입하면 이동 유형과 항공편 입력을 바로 활성화한 초안을 연다.
+      return openScheduleDraft(dayId, {
+        type: 'TRANSPORT',
+        flightEnabled: 'true',
+      });
+    },
     addScheduleByCategory: (
       dayId: string,
       category: { label: string; type: 'PLACE' | 'STAY'; query: string },
     ) => {
-      // 선택한 카테고리 유형과 검색 펼침 상태를 작성 초안에 반영한다.
+      // 선택한 카테고리 유형과 추천 키워드·검색 펼침 상태를 작성 초안에 반영한다.
       return openScheduleDraft(dayId, {
         type: category.type,
+        ...(category.query ? { title: category.query } : {}),
         placeSearchExpanded: 'true',
       });
     },

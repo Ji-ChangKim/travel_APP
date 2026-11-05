@@ -1,7 +1,8 @@
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
-import { Pressable, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import Text from '@/components/ui/AppText';
+import TripIcon from '@/components/icons/TripIcon';
 import { colors } from '@/constants/theme';
 import { Field, Action } from '../../shared/ui/ui';
 import { styles } from '../../hub/styles/workspaceStyles';
@@ -14,65 +15,117 @@ import TripCalendar from './TripCalendar';
 import DestinationCollection from './DestinationCollection';
 import { destinationDraftItems } from '../model/destinationForms';
 
-const POPULAR_DESTINATIONS = [
-  { country: '일본', city: '오사카', en: 'Osaka', flag: '🇯🇵', tag: '간사이' },
-  { country: '일본', city: '도쿄', en: 'Tokyo', flag: '🇯🇵', tag: '도심·야경' },
+const CITY_CATALOG = [
+  {
+    country: '일본',
+    city: '오사카',
+    en: 'Osaka',
+    region: '일본 · 오사카부',
+    group: '오사카',
+  },
+  {
+    country: '일본',
+    city: '사카이',
+    en: 'Sakai',
+    region: '일본 · 오사카부 남부',
+    group: '오사카',
+  },
+  {
+    country: '일본',
+    city: '히가시오사카',
+    en: 'Higashiosaka',
+    region: '일본 · 오사카부 동부',
+    group: '오사카',
+  },
+  {
+    country: '일본',
+    city: '도쿄',
+    en: 'Tokyo',
+    region: '일본 · 도쿄도',
+    group: '도쿄',
+  },
   {
     country: '일본',
     city: '후쿠오카',
     en: 'Fukuoka',
-    flag: '🇯🇵',
-    tag: '온천·미식',
+    region: '일본 · 후쿠오카현',
+    group: '후쿠오카',
+  },
+  {
+    country: '일본',
+    city: '삿포로',
+    en: 'Sapporo',
+    region: '일본 · 홋카이도',
+    group: '삿포로',
+  },
+  {
+    country: '일본',
+    city: '교토',
+    en: 'Kyoto',
+    region: '일본 · 교토부',
+    group: '교토',
   },
   {
     country: '베트남',
     city: '다낭',
     en: 'Da Nang',
-    flag: '🇻🇳',
-    tag: '휴양·해변',
-  },
-  {
-    country: '태국',
-    city: '방콕',
-    en: 'Bangkok',
-    flag: '🇹🇭',
-    tag: '미식·쇼핑',
+    region: '베트남 · 중부 해안',
+    group: '다낭',
   },
   {
     country: '대만',
     city: '타이베이',
     en: 'Taipei',
-    flag: '🇹🇼',
-    tag: '야시장',
+    region: '대만 · 북부',
+    group: '타이베이',
+  },
+  {
+    country: '태국',
+    city: '방콕',
+    en: 'Bangkok',
+    region: '태국 · 수도권',
+    group: '방콕',
   },
   {
     country: '싱가포르',
     city: '싱가포르',
     en: 'Singapore',
-    flag: '🇸🇬',
-    tag: '시티',
+    region: '싱가포르 · 시티',
+    group: '싱가포르',
   },
   {
     country: '대한민국',
     city: '제주',
     en: 'Jeju',
-    flag: '🇰🇷',
-    tag: '자연·힐링',
+    region: '대한민국 · 제주특별자치도',
+    group: '제주',
   },
 ];
 
-// 구매한 항공권의 날짜를 먼저 정하고 여행지와 선택 제목을 입력한다.
+const RECOMMENDED_CHIPS = [
+  '도쿄',
+  '후쿠오카',
+  '삿포로',
+  '교토',
+  '다낭',
+  '타이베이',
+];
+
+// 1단계 국가·도시(Where) 선택 후 2단계 여행 기간(When) 선택으로 자연스럽게 이어진다.
 export default function TripFields({
   values,
   onChange,
+  onApplyPeriod,
 }: {
   values: Record<string, string>;
   onChange: (key: string, value: string) => void;
+  onApplyPeriod?: (startDate: string, endDate: string) => void;
 }) {
   useLocale();
   const [query, setQuery] = useState('');
 
-  function pickPopular(dest: (typeof POPULAR_DESTINATIONS)[number]) {
+  // 대표 도시 카드나 추천 여행지 칩을 누르면 국가·도시·기본 여행명을 반영한다.
+  function pickDestination(dest: (typeof CITY_CATALOG)[number]) {
     onChange('country', dest.country);
     onChange('city', dest.city);
     if (!values.title) {
@@ -80,159 +133,159 @@ export default function TripFields({
     }
   }
 
-  const filtered = query.trim()
-    ? POPULAR_DESTINATIONS.filter(
+  const trimmed = query.trim();
+  const filtered = trimmed
+    ? CITY_CATALOG.filter(
         (item) =>
-          item.city.includes(query.trim()) ||
-          item.en.toLowerCase().includes(query.trim().toLowerCase()) ||
-          item.country.includes(query.trim()),
+          item.city.includes(trimmed) ||
+          item.group.includes(trimmed) ||
+          item.en.toLowerCase().includes(trimmed.toLowerCase()) ||
+          item.country.includes(trimmed) ||
+          item.region.includes(trimmed),
       )
-    : POPULAR_DESTINATIONS;
+    : CITY_CATALOG.slice(0, 6);
 
-  // 빈 제목은 저장 시 자동 생성하고 추가 설정 없이 다음 단계로 이어진다.
+  // 1단계 도시 선택 → 2단계 기간 선택 → 3단계 일정 생성 흐름을 순서대로 제공한다.
   return (
     <>
-      <TripCalendar values={values} onChange={onChange} />
-      <View style={[styles.card, { gap: 14 }]}>
-        <View style={{ gap: 4 }}>
-          <Text style={styles.title}>{t('어디로 떠나시나요?')}</Text>
-          <Text style={{ fontSize: 13, color: colors.muted, lineHeight: 18 }}>
-            {t('가고 싶은 도시를 선택하거나 검색해 보세요.')}
+      <View
+        style={[styles.card, s.whereCard]}
+        testID="destination-intro-section"
+      >
+        <View style={s.introHeader}>
+          <Text style={s.introTitle}>{t('어디로 떠나시나요?')}</Text>
+          <Text style={s.introSubtitle}>
+            {t('여행의 대표 도시를 선택해 주세요.')}
           </Text>
         </View>
 
-        {/* 트리플 감성의 간결한 도시 검색 인풋 */}
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            backgroundColor: colors.surface,
-            borderRadius: 12,
-            borderWidth: 1,
-            borderColor: colors.border,
-            paddingHorizontal: 12,
-            gap: 8,
-          }}
-        >
-          <Ionicons name="search-outline" size={18} color={colors.muted} />
+        <View style={s.searchPanel} testID="destination-search-panel">
+          <Ionicons name="search-outline" size={20} color={colors.muted} />
           <DesignInput
-            placeholder={t('도시나 국가명을 검색해 보세요 (예: 오사카, 도쿄)')}
+            testID="destination-search-input"
+            placeholder={t('도시명을 입력해 주세요')}
             value={query}
             onChangeText={setQuery}
-            style={{
-              flex: 1,
-              borderWidth: 0,
-              backgroundColor: 'transparent',
-              paddingVertical: 12,
-              paddingHorizontal: 0,
-            }}
+            style={s.searchInput}
           />
           {Boolean(query) && (
             <Pressable
+              testID="clear-search-btn"
               accessibilityRole="button"
-              accessibilityLabel={t('검색어 지우기')}
+              accessibilityLabel={t('입력 내용 지우기')}
               onPress={() => setQuery('')}
+              style={s.clearButton}
             >
               <Ionicons name="close-circle" size={18} color={colors.muted} />
             </Pressable>
           )}
         </View>
 
-        {/* 선택된 여행지 상단 하이라이트 요약 뱃지 */}
-        {Boolean(values.city) && (
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              backgroundColor: colors.selectedSurface,
-              paddingVertical: 8,
-              paddingHorizontal: 12,
-              borderRadius: 12,
-              borderWidth: 1,
-              borderColor: colors.brandCoral,
-              gap: 8,
-            }}
-          >
-            <Ionicons name="location" size={16} color={colors.brandCoral} />
-            <Text
-              style={{
-                fontSize: 13,
-                fontWeight: '700',
-                color: colors.brandCoral,
-              }}
-            >
-              {t('선택된 여행지')}:
-            </Text>
-            <Text
-              style={{ fontSize: 13, color: colors.text, fontWeight: '600' }}
-            >
-              {[values.country, values.city].filter(Boolean).join(' · ')}
-            </Text>
+        <View style={s.resultsSection} testID="city-results-list">
+          <View style={s.resultsHeaderRow}>
+            <Text style={s.resultsHeaderLabel}>{t('검색 결과')}</Text>
+            <View style={s.resultsCountPill}>
+              <Text style={s.resultsCountText}>{filtered.length}</Text>
+            </View>
           </View>
-        )}
+          <View style={s.resultsList}>
+            {filtered.map((dest) => {
+              const selected = values.city === dest.city;
+              return (
+                <Pressable
+                  key={`${dest.country}:${dest.city}`}
+                  testID={`city-result-${dest.city}`}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${dest.city} ${dest.country}`}
+                  accessibilityState={{ selected }}
+                  onPress={() => pickDestination(dest)}
+                  style={[s.cityCard, selected && s.cityCardSelected]}
+                >
+                  <View style={s.cityCardLeft}>
+                    <View
+                      style={[
+                        s.cityIconWrap,
+                        selected && s.cityIconWrapSelected,
+                      ]}
+                      aria-hidden
+                    >
+                      <TripIcon
+                        name={selected ? 'map-pin-outline' : 'landmark-duotone'}
+                        size={22}
+                        color={selected ? colors.brandCoral : colors.muted}
+                      />
+                    </View>
+                    <View style={s.cityTextCol}>
+                      <View style={s.cityNameRow}>
+                        <Text style={s.cityNameText}>{t(dest.city)}</Text>
+                        <Text style={s.cityEnText}>{`(${dest.en})`}</Text>
+                      </View>
+                      <Text style={s.cityRegionText}>{t(dest.region)}</Text>
+                    </View>
+                  </View>
+                  <View
+                    style={[s.radioCircle, selected && s.radioCircleSelected]}
+                    aria-hidden
+                  >
+                    {selected ? (
+                      <Ionicons
+                        name="checkmark"
+                        size={16}
+                        color={colors.surface}
+                      />
+                    ) : null}
+                  </View>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
 
-        {/* 트리플 시그니처 2열 인기 도시 그리드 */}
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-          {filtered.map((dest) => {
-            const selected = values.city === dest.city;
-            return (
-              <Pressable
-                key={`${dest.country}:${dest.city}`}
-                accessibilityRole="button"
-                accessibilityLabel={`${dest.city} ${dest.country}`}
-                onPress={() => pickPopular(dest)}
-                style={{
-                  flexBasis: '48%',
-                  flexGrow: 1,
-                  minWidth: 140,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  paddingVertical: 12,
-                  paddingHorizontal: 14,
-                  borderRadius: 14,
-                  borderWidth: 1.5,
-                  borderColor: selected ? colors.brandCoral : colors.border,
-                  backgroundColor: selected
-                    ? colors.selectedSurface
-                    : colors.surface,
-                  gap: 10,
-                }}
-              >
-                <Text style={{ fontSize: 24 }}>{dest.flag}</Text>
-                <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+        <View
+          style={s.recommendedSection}
+          testID="recommended-destinations-section"
+        >
+          <View style={s.recommendedHeaderRow}>
+            <Ionicons name="flame" size={16} color={colors.brandCoral} />
+            <Text style={s.recommendedHeaderText}>{t('추천 여행지')}</Text>
+          </View>
+          <View style={s.recommendedChipRow}>
+            {RECOMMENDED_CHIPS.map((cityName) => {
+              const found = CITY_CATALOG.find((item) => item.city === cityName);
+              const selected = values.city === cityName;
+              return (
+                <Pressable
+                  key={cityName}
+                  testID={`recommended-chip-${cityName}`}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('{p0} 추천 여행지 선택', {
+                    p0: cityName,
+                  })}
+                  accessibilityState={{ selected }}
+                  onPress={() => {
+                    // 추천 여행지 알약 칩을 누르면 해당 도시를 즉시 대표 도시로 선택한다.
+                    if (found) {
+                      pickDestination(found);
+                      setQuery(cityName);
+                    }
+                  }}
+                  style={[
+                    s.recommendedChip,
+                    selected && s.recommendedChipSelected,
+                  ]}
+                >
                   <Text
-                    style={{
-                      fontSize: 15,
-                      fontWeight: selected ? '700' : '600',
-                      color: selected ? colors.brandCoral : colors.text,
-                    }}
-                    numberOfLines={1}
+                    style={[
+                      s.recommendedChipText,
+                      selected && s.recommendedChipTextSelected,
+                    ]}
                   >
-                    {dest.city}
+                    {t(cityName)}
                   </Text>
-                  <Text
-                    style={{ fontSize: 11, color: colors.muted }}
-                    numberOfLines={1}
-                  >
-                    {dest.en} · {dest.tag}
-                  </Text>
-                </View>
-                {selected ? (
-                  <Ionicons
-                    name="checkmark-circle"
-                    size={18}
-                    color={colors.brandCoral}
-                  />
-                ) : (
-                  <Ionicons
-                    name="chevron-forward"
-                    size={14}
-                    color={colors.muted}
-                  />
-                )}
-              </Pressable>
-            );
-          })}
+                </Pressable>
+              );
+            })}
+          </View>
         </View>
       </View>
 
@@ -259,6 +312,13 @@ export default function TripFields({
           }}
         />
       )}
+
+      <TripCalendar
+        values={values}
+        onChange={onChange}
+        onApplyPeriod={onApplyPeriod}
+      />
+
       <View style={styles.card}>
         <Field
           label="여행 이름 · 선택"
@@ -272,3 +332,194 @@ export default function TripFields({
     </>
   );
 }
+
+const s = StyleSheet.create({
+  whereCard: {
+    gap: 16,
+  },
+  introHeader: {
+    gap: 4,
+  },
+  introTitle: {
+    color: colors.text,
+    fontSize: 22,
+    lineHeight: 30,
+    fontWeight: '700',
+  },
+  introSubtitle: {
+    color: colors.muted,
+    fontSize: 14,
+    lineHeight: 22,
+  },
+  searchPanel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.borderStrong,
+    paddingHorizontal: 12,
+    gap: 8,
+  },
+  searchInput: {
+    flex: 1,
+    borderWidth: 0,
+    backgroundColor: 'transparent',
+    paddingVertical: 12,
+    paddingHorizontal: 0,
+  },
+  clearButton: {
+    minWidth: 36,
+    minHeight: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  resultsSection: {
+    gap: 10,
+  },
+  resultsHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  resultsHeaderLabel: {
+    color: colors.muted,
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: '600',
+  },
+  resultsCountPill: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 9999,
+    backgroundColor: colors.selectedSurface,
+  },
+  resultsCountText: {
+    color: colors.secondary,
+    fontSize: 14,
+    lineHeight: 18,
+    fontWeight: '700',
+  },
+  resultsList: {
+    gap: 8,
+  },
+  cityCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    gap: 10,
+  },
+  cityCardSelected: {
+    borderWidth: 2,
+    borderColor: colors.secondary,
+    backgroundColor: colors.selectedSurface,
+  },
+  cityCardLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+    minWidth: 0,
+  },
+  cityIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: colors.surfaceMuted,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cityIconWrapSelected: {
+    backgroundColor: colors.surface,
+  },
+  cityTextCol: {
+    flex: 1,
+    minWidth: 0,
+    gap: 2,
+  },
+  cityNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 4,
+  },
+  cityNameText: {
+    color: colors.text,
+    fontSize: 16,
+    lineHeight: 24,
+    fontWeight: '700',
+  },
+  cityEnText: {
+    color: colors.muted,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  cityRegionText: {
+    color: colors.muted,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  radioCircle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: colors.borderStrong,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radioCircleSelected: {
+    borderColor: colors.secondary,
+    backgroundColor: colors.secondary,
+  },
+  recommendedSection: {
+    gap: 8,
+    paddingTop: 4,
+  },
+  recommendedHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  recommendedHeaderText: {
+    color: colors.text,
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: '700',
+  },
+  recommendedChipRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  recommendedChip: {
+    minHeight: 40,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 9999,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  recommendedChipSelected: {
+    borderColor: colors.secondary,
+    backgroundColor: colors.selectedSurface,
+  },
+  recommendedChipText: {
+    color: colors.text,
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: '600',
+  },
+  recommendedChipTextSelected: {
+    color: colors.secondary,
+    fontWeight: '700',
+  },
+});

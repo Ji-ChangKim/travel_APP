@@ -21,11 +21,11 @@ export const tripTimelineStyles = StyleSheet.create({
   activeTab: { color: c.text.primary, fontFamily: theme.font.bold },
   days: { gap: 8, paddingVertical: 4 },
   dayCard: {
-    minWidth: 86,
-    minHeight: 74,
+    minWidth: 84,
+    minHeight: 68,
     paddingHorizontal: 14,
     paddingVertical: 10,
-    borderRadius: 14,
+    borderRadius: 16,
     borderWidth: 1.5,
     borderColor: c.border.subtle,
     backgroundColor: c.surface.card,
@@ -34,8 +34,8 @@ export const tripTimelineStyles = StyleSheet.create({
     gap: 2,
   },
   dayCardSelected: {
-    backgroundColor: c.selection.text,
-    borderColor: c.selection.text,
+    backgroundColor: c.brand.coralPressed,
+    borderColor: c.brand.coralPressed,
   },
   dayCardPressed: {
     backgroundColor: c.surface.low,
@@ -54,8 +54,8 @@ export const tripTimelineStyles = StyleSheet.create({
   },
   dayCardTitleText: {
     fontFamily: theme.font.bold,
-    fontSize: 16,
-    lineHeight: 22,
+    fontSize: 18,
+    lineHeight: 24,
     color: c.text.primary,
     textAlign: 'center',
   },

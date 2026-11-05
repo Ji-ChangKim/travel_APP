@@ -20,11 +20,11 @@ export type RenderTripPlanningProps = {
     error: string;
     onChange: (key: string, value: string) => void;
     onInvalid: (fields: FieldErrors) => void;
-    onSave: () => void;
+    onSave: (overrides?: Record<string, string>) => void;
     onClose: () => void;
   };
   next: () => void;
-  create: () => void;
+  create: (overrides?: Record<string, string>) => void;
   scroll: RefObject<ScrollView | null>;
   setBasicsError: Dispatch<SetStateAction<string>>;
   items: {

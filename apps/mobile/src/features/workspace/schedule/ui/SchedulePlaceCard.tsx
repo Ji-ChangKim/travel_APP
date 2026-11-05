@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import type { WorkspaceSchedule } from '@wherego/domain';
+import type {
+  WorkspaceExpense,
+  WorkspaceMedia,
+  WorkspaceSchedule,
+} from '@wherego/domain';
 import Text from '@/components/ui/AppText';
 import DesignButton from '@/components/ui/DesignButton';
 import TripIcon from '@/components/icons/TripIcon';
@@ -11,7 +15,7 @@ import { useLocale } from '@/features/localization/localeState';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 import { schedulePageStyles as s } from '../styles/schedulePageStyles';
 
-// 방문 순서 번호 레일과 시간 배지·장소명·주소·메모·길찾기 카드를 렌더링한다.
+// 방문 순서 번호 레일과 시간 배지·항공편명·장소명·주소·메모·비용/사진 기록·길찾기 카드를 렌더링한다.
 export default function SchedulePlaceCard({
   item,
   index,
@@ -19,9 +23,13 @@ export default function SchedulePlaceCard({
   selected,
   editable,
   disabled,
+  expenses = [],
+  photos = [],
   onOpen,
   onMore,
   onDirections,
+  onExpense,
+  onPhoto,
 }: {
   item: WorkspaceSchedule;
   index: number;
@@ -29,13 +37,28 @@ export default function SchedulePlaceCard({
   selected: boolean;
   editable: boolean;
   disabled: boolean;
+  expenses?: WorkspaceExpense[];
+  photos?: WorkspaceMedia[];
   onOpen: () => void;
   onMore: () => void;
   onDirections: () => void;
+  onExpense?: () => void;
+  onPhoto?: () => void;
 }) {
   useLocale();
   const { largeText } = useAppAccessibility();
   const [focused, setFocused] = useState(false);
+  const flightInfo = item.flight?.number
+    ? [
+        item.flight.number,
+        item.flight.departure && item.flight.arrival
+          ? `${item.flight.departure} → ${item.flight.arrival}`
+          : '',
+      ]
+        .filter(Boolean)
+        .join(' · ')
+    : '';
+
   return (
     <View style={s.stop} testID={`schedule-card-${item.id}`}>
       <View style={s.rail} aria-hidden>
@@ -46,9 +69,21 @@ export default function SchedulePlaceCard({
       </View>
       <View style={[s.card, selected && s.selected]}>
         <View style={s.row}>
-          <View style={s.timePill}>
-            <TripIcon name="clock-outline" size={14} color={colors.primary} />
-            <Text style={s.timeText}>{item.timeSlot || t('시간 미정')}</Text>
+          <View style={s.badgeGroup}>
+            <View style={s.timePill}>
+              <TripIcon name="clock-outline" size={14} color={colors.primary} />
+              <Text style={s.timeText}>{item.timeSlot || t('시간 미정')}</Text>
+            </View>
+            {flightInfo ? (
+              <View style={s.flightPill} testID={`schedule-flight-${item.id}`}>
+                <TripIcon
+                  name="flight-outline"
+                  size={14}
+                  color={colors.secondary}
+                />
+                <Text style={s.flightPillText}>{flightInfo}</Text>
+              </View>
+            ) : null}
           </View>
           {editable && (
             <DesignButton
@@ -110,6 +145,45 @@ export default function SchedulePlaceCard({
               </Text>
             </View>
           ) : null}
+          {(expenses.length > 0 || photos.length > 0) && (
+            <View style={s.recordBadgeRow}>
+              {expenses.map((expense) => (
+                <View
+                  key={expense.id}
+                  style={s.recordBadge}
+                  testID={`schedule-expense-badge-${expense.id}`}
+                >
+                  <TripIcon
+                    name="receipt-scan-outline"
+                    size={14}
+                    color={colors.secondary}
+                  />
+                  <Text style={s.recordBadgeText}>
+                    {`${expense.currency} ${expense.amount}${
+                      expense.title && expense.title !== item.title
+                        ? ` · ${expense.title}`
+                        : ''
+                    }`}
+                  </Text>
+                </View>
+              ))}
+              {photos.length > 0 && (
+                <View
+                  style={s.recordBadge}
+                  testID={`schedule-photo-badge-${item.id}`}
+                >
+                  <Ionicons
+                    name="camera-outline"
+                    size={14}
+                    color={colors.primary}
+                  />
+                  <Text style={s.recordBadgeText}>
+                    {t('사진 {p0}장', { p0: photos.length })}
+                  </Text>
+                </View>
+              )}
+            </View>
+          )}
         </Pressable>
         <View style={s.cardFooter}>
           <DesignButton
@@ -128,6 +202,44 @@ export default function SchedulePlaceCard({
               );
             }}
           />
+          {editable && onExpense ? (
+            <DesignButton
+              label={t('비용 기록')}
+              accessibilityLabel={t('{p0} 비용 기록', { p0: item.title })}
+              variant="quiet"
+              disabled={disabled}
+              onPress={onExpense}
+              icon={(color) => {
+                // 방문 장소의 식사·구매 비용 기록 아이콘을 표시한다.
+                return (
+                  <Ionicons
+                    name="wallet-outline"
+                    size={18}
+                    color={color || colors.text}
+                  />
+                );
+              }}
+            />
+          ) : null}
+          {editable && onPhoto ? (
+            <DesignButton
+              label={t('사진 공유')}
+              accessibilityLabel={t('{p0} 사진 추가', { p0: item.title })}
+              variant="quiet"
+              disabled={disabled}
+              onPress={onPhoto}
+              icon={(color) => {
+                // 방문 장소에서 찍은 사진 공유 아이콘을 표시한다.
+                return (
+                  <Ionicons
+                    name="camera-outline"
+                    size={18}
+                    color={color || colors.text}
+                  />
+                );
+              }}
+            />
+          ) : null}
         </View>
       </View>
     </View>

@@ -29,6 +29,7 @@ import {
   renderWorkspaceChecklist,
   renderWorkspaceCourse,
   renderWorkspaceExpenses,
+  renderWorkspaceFlightPrompt,
   renderWorkspaceHeader,
   renderWorkspaceItinerary,
   renderWorkspaceMap,
@@ -236,6 +237,8 @@ function renderWorkspaceLayout(
                     </Text>
                   )}
                   {renderWorkspaceSummary({ ...props, snapshot })}
+                  {activeSection === 'itinerary' &&
+                    renderWorkspaceFlightPrompt({ ...props, snapshot })}
                   <TripSectionNavigation
                     selected={activeSection}
                     onSelect={setActiveSection}

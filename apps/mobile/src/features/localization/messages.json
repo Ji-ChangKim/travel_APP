@@ -5030,5 +5030,77 @@
   "출발일을 먼저 선택해 주세요.": [
     "Choose a departure date first.",
     "先に出発日を選んでください。"
-  ]
+  ],
+  "여행 준비 중": ["Preparing trip", "旅行準備中"],
+  "여행 기본 정보 수정": ["Edit trip details", "旅行の基本情報を編集"],
+  "항공편 정보": ["Flight info", "フライト情報"],
+  " · {p0}건 등록": [" · {p0} registered", " · {p0}件登録"],
+  " · 미등록": [" · Not registered", " · 未登録"],
+  "등록된 왕복 항공권이 없어요": [
+    "No round-trip flight registered yet",
+    "登録された往復航空券がありません"
+  ],
+  "항공권 추가": ["Add flight", "航空券を追加"],
+  "{p0}개 장소": ["{p0} places", "{p0}か所のスポット"],
+  "가고 싶은 {p0} 명소, 카페, 맛집을 검색하거나\n영수증 사진으로 빠르게 일정을 채워보세요!": [
+    "Search {p0} attractions, cafes, and restaurants,\nor fill your itinerary quickly with receipt photos!",
+    "行きたい{p0}の名所、カフェ、グルメを検索するか、\nレシート写真で素早く予定を埋めましょう！"
+  ],
+  "추천 키워드로 바로 찾기": [
+    "Quick search by suggested keywords",
+    "おすすめキーワードですぐ探す"
+  ],
+  "키요스미 시라카와 카페": ["Kiyosumi-Shirakawa Cafe", "清澄白河カフェ"],
+  "시부야 라멘 맛집": ["Shibuya Ramen", "渋谷ラーメン"],
+  "롯폰기 힐즈 전망대": ["Roppongi Hills Observatory", "六本木ヒルズ展望台"],
+  "{p0} 감성 카페": ["{p0} Cafe", "{p0} カフェ"],
+  "{p0} 로컬 맛집": ["{p0} Local Food", "{p0} グルメ"],
+  "{p0} 대표 명소": ["{p0} Top Spot", "{p0} 名所"],
+  "추천 {p0} {p1} 템플릿 불러오기": [
+    "Load suggested {p0} ({p1}) template",
+    "おすすめ{p0}（{p1}）テンプレートを読み込む"
+  ],
+  "직접 장소 검색으로 채우기": [
+    "Search and add places directly",
+    "スポットを直接検索して追加"
+  ],
+  "여행지": ["Destination", "旅行先"],
+  "여행의 대표 도시를 선택해 주세요.": [
+    "Choose the main city for your trip.",
+    "旅行の代表都市を選んでください。"
+  ],
+  "도시명을 입력해 주세요": ["Enter a city name", "都市名を入力してください"],
+  "입력 내용 지우기": ["Clear input", "入力を消去"],
+  "검색 결과": ["Search results", "検索結果"],
+  "추천 여행지": ["Recommended destinations", "おすすめの旅行先"],
+  "{p0} 추천 여행지 선택": [
+    "Select recommended destination {p0}",
+    "おすすめの旅行先 {p0} を選択"
+  ],
+  "찾으시는 도시가 없나요? 나라와 목적지를 직접 선택하거나 입력할 수 있어요.": [
+    "Cannot find your city? You can select or enter the country and city directly.",
+    "お探しの都市がありませんか？国と目的地を直接選択または入力できます。"
+  ],
+  "사카이": ["Sakai", "堺"],
+  "히가시오사카": ["Higashiosaka", "東大阪"],
+  "일본 · 오사카부": ["Japan · Osaka Prefecture", "日本 · 大阪府"],
+  "일본 · 오사카부 남부": ["Japan · Southern Osaka", "日本 · 大阪府南部"],
+  "일본 · 오사카부 동부": ["Japan · Eastern Osaka", "日本 · 大阪府東部"],
+  "일본 · 도쿄도": ["Japan · Tokyo", "日本 · 東京都"],
+  "일본 · 후쿠오카현": ["Japan · Fukuoka Prefecture", "日本 · 福岡県"],
+  "일본 · 홋카이도": ["Japan · Hokkaido", "日本 · 北海道"],
+  "일본 · 교토부": ["Japan · Kyoto Prefecture", "日本 · 京都府"],
+  "베트남 · 중부 해안": ["Vietnam · Central Coast", "ベトナム · 中部海岸"],
+  "대만 · 북부": ["Taiwan · Northern Taiwan", "台湾 · 北部"],
+  "태국 · 수도권": ["Thailand · Greater Bangkok", "タイ · 首都圏"],
+  "싱가포르 · 시티": ["Singapore · City", "シンガポール · シティ"],
+  "대한민국 · 제주특별자치도": ["Korea · Jeju", "韓国 · 済州特別自治道"],
+  "사진 {p0}장": ["{p0} photos", "写真 {p0}枚"],
+  "{p0} 비용 기록": ["Record expense for {p0}", "{p0}の費用を記録"],
+  "사진 공유": ["Share photo", "写真を共有"],
+  "{p0} 사진 추가": ["Add photo for {p0}", "{p0}の写真を追加"],
+  "사용 비용 기록": ["Record spent amount", "使用した費用を記録"],
+  "찍은 사진 추가": ["Add taken photo", "撮影した写真を追加"],
+  "영수증 촬영으로 추가": ["Add by taking receipt photo", "レシート撮影で追加"],
+  "영수증 사진으로 추가": ["Add from receipt photo", "レシート写真から追加"]
 }

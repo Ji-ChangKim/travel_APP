@@ -167,15 +167,37 @@ export function renderSchedulePlace({ props }: ScheduleEditorSectionProps) {
         }}
       />
       {!['TODO', 'MEMO'].includes(props.form.values.type || '') && (
-        <ScheduleField
-          label="주소 또는 위치 메모"
-          accessibilityLabel="지역명·주소"
-          value={props.form.values.address || ''}
-          onChange={(value) => {
-            // 주소만으로 지도 좌표를 추정하지 않는다.
-            return props.onChange('address', value);
-          }}
-        />
+        <>
+          <ScheduleField
+            label="주소 또는 위치 메모"
+            accessibilityLabel="지역명·주소"
+            value={props.form.values.address || ''}
+            onChange={(value) => {
+              // 주소만으로 지도 좌표를 추정하지 않는다.
+              return props.onChange('address', value);
+            }}
+          />
+          {!props.form.id && (
+            <View style={s.row}>
+              <ScheduleButton
+                label={t('영수증 촬영으로 추가')}
+                disabled={props.busy || props.locked}
+                onPress={() => {
+                  // 카메라로 영수증을 촬영해 상호명·시간·비용과 함께 새 장소 기록으로 전환한다.
+                  return props.onReceipt(true);
+                }}
+              />
+              <ScheduleButton
+                label={t('영수증 사진으로 추가')}
+                disabled={props.busy || props.locked}
+                onPress={() => {
+                  // 앨범에서 영수증 사진을 선택해 상호명·시간·비용과 함께 새 장소 기록으로 전환한다.
+                  return props.onReceipt(false);
+                }}
+              />
+            </View>
+          )}
+        </>
       )}
       {props.form.values.googlePlaceId && (
         <>

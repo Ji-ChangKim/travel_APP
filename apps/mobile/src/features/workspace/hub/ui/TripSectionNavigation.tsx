@@ -213,7 +213,7 @@ const s = StyleSheet.create({
     textAlign: 'center',
   },
   selectedLabel: {
-    color: colors.text,
+    color: colors.secondary,
     fontWeight: '700',
   },
 });
