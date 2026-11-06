@@ -144,7 +144,7 @@ function renderWorkspaceLayout(
     importing,
   } = props;
   return (
-    <SafeAreaView style={hub.screen}>
+    <SafeAreaView edges={['top', 'left', 'right']} style={hub.screen}>
       <ModalBackground>
         {renderWorkspaceHeader({ ...props, snapshot })}
         <ScrollView

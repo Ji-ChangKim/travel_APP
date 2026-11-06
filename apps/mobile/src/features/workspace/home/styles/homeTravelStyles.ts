@@ -27,7 +27,7 @@ export const homeTravelStyles = StyleSheet.create({
     alignSelf: 'center',
     paddingHorizontal: 20,
     paddingTop: 12,
-    paddingBottom: 96,
+    paddingBottom: 76,
     gap: 18,
   },
   // Section 1: 상단 인사 & 실시간 컨텍스트 바

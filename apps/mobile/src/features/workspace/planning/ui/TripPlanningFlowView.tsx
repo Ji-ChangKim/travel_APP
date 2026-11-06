@@ -29,7 +29,7 @@ export function renderTripPlanning({
   basicsError,
 }: RenderTripPlanningProps) {
   return (
-    <SafeAreaView style={styles.modal}>
+    <SafeAreaView edges={['top', 'left', 'right']} style={styles.modal}>
       <ModalBackground>
         <ScreenHeader
           title={

@@ -18,7 +18,7 @@ export const styles = StyleSheet.create({
     alignSelf: 'center',
     paddingHorizontal: 20,
     paddingTop: 20,
-    paddingBottom: 96,
+    paddingBottom: 76,
   },
   profileCard: {
     backgroundColor: colors.surface,

@@ -145,7 +145,7 @@ export default function TripPeriodPicker({
   }
 
   return (
-    <SafeAreaView style={s.screen}>
+    <SafeAreaView edges={['top', 'left', 'right']} style={s.screen}>
       <ScreenHeader
         title={t('여행 기간 선택')}
         backLabel={t('기간 선택 닫기')}

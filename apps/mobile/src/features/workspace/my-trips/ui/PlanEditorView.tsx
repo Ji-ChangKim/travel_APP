@@ -101,6 +101,7 @@ export function renderPlanEditor({
   return (
     <>
       <SafeAreaView
+        edges={['top', 'left', 'right']}
         style={[
           styles.modal,
           form?.kind === 'receipt' && { backgroundColor: ledgerColors.canvas },

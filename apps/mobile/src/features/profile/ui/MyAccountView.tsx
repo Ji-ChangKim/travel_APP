@@ -39,7 +39,7 @@ export function renderAccountContent({
   handleSaveProfile,
 }: MyAccountViewProps) {
   return (
-    <SafeAreaView style={styles.screen}>
+    <SafeAreaView edges={['top', 'left', 'right']} style={styles.screen}>
       <ModalBackground>
         <ScreenHeader
           title="MY"
