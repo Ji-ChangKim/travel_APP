@@ -7,8 +7,9 @@ import { colors } from '@/constants/theme';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 import { useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { FormAnchor, useFormScope } from '../../shared/ui/InputFeedback';
-import { Platform, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { Ionicons } from '@expo/vector-icons';
 import { Action } from '../../shared/ui/ui';
 import { styles } from '../../hub/styles/workspaceStyles';
 
@@ -180,40 +181,70 @@ function DestinationContent({
   ];
 }) {
   useLocale();
-  // 나라와 도시는 한 줄에서 같은 너비로 배치하고 나라 선택 후 도시를 활성화한다.
+  const [expanded, setExpanded] = useState(false);
+
+  // 배너를 눌렀을 때만 나라·도시 직접 선택 영역을 펼친다.
   return (
-    <View style={styles.card} testID="direct-destination-banner">
-      <Text style={styles.title}>{t('여행지 선택')}</Text>
-      <Text style={styles.subtitle}>
-        {t(
-          '찾으시는 도시가 없나요? 나라와 목적지를 직접 선택하거나 입력할 수 있어요.',
-        )}
-      </Text>
-      <View style={{ flexDirection: 'row', gap: 12 }}>
-        <View testID="trip-country" style={{ flex: 1, minWidth: 0, gap: 8 }}>
-          <Text style={styles.label}>{t('나라')}</Text>
-          <FormAnchor name="나라">
-            <Action
-              label={values.country || t('나라 선택')}
-              onPress={() => {
-                /* 나라 선택창을 연다. */ return setPicker('country');
-              }}
-            />
-          </FormAnchor>
+    <View style={directStyles.container} testID="direct-destination-banner">
+      <Pressable
+        testID="direct-destination-toggle"
+        accessibilityRole="button"
+        accessibilityLabel={t('목적지 직접 입력하기')}
+        accessibilityState={{ expanded }}
+        onPress={() => {
+          // 직접 입력 영역을 열거나 닫는다.
+          return setExpanded((prev) => !prev);
+        }}
+        style={directStyles.bannerButton}
+      >
+        <View style={directStyles.bannerTextCol}>
+          <Text style={directStyles.bannerCaption}>
+            {t('찾으시는 도시가 없나요?')}
+          </Text>
+          <Text style={directStyles.bannerActionText}>
+            {t('목적지 직접 입력하기')}
+          </Text>
         </View>
-        <View testID="trip-city" style={{ flex: 1, minWidth: 0, gap: 8 }}>
-          <Text style={styles.label}>{t('도시')}</Text>
-          <FormAnchor name="도시">
-            <Action
-              label={values.city || t('도시 선택')}
-              disabled={!values.country?.trim()}
-              onPress={() => {
-                /* 선택 국가의 도시 선택창을 연다. */ return setPicker('city');
-              }}
-            />
-          </FormAnchor>
+        <Ionicons
+          name={expanded ? 'chevron-up' : 'chevron-forward'}
+          size={18}
+          color={colors.text}
+        />
+      </Pressable>
+      {expanded && (
+        <View style={directStyles.expandedPanel}>
+          <View style={{ flexDirection: 'row', gap: 12 }}>
+            <View
+              testID="trip-country"
+              style={{ flex: 1, minWidth: 0, gap: 8 }}
+            >
+              <Text style={styles.label}>{t('나라')}</Text>
+              <FormAnchor name="나라">
+                <Action
+                  label={values.country || t('나라 선택')}
+                  onPress={() => {
+                    /* 나라 선택창을 연다. */ return setPicker('country');
+                  }}
+                />
+              </FormAnchor>
+            </View>
+            <View testID="trip-city" style={{ flex: 1, minWidth: 0, gap: 8 }}>
+              <Text style={styles.label}>{t('도시')}</Text>
+              <FormAnchor name="도시">
+                <Action
+                  label={values.city || t('도시 선택')}
+                  disabled={!values.country?.trim()}
+                  onPress={() => {
+                    /* 선택 국가의 도시 선택창을 연다. */ return setPicker(
+                      'city',
+                    );
+                  }}
+                />
+              </FormAnchor>
+            </View>
+          </View>
         </View>
-      </View>
+      )}
       <Modal
         native
         visible={Boolean(picker)}
@@ -244,3 +275,46 @@ function DestinationContent({
     </View>
   );
 }
+
+const directStyles = StyleSheet.create({
+  container: {
+    borderRadius: 14,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.surfaceMuted,
+    overflow: 'hidden',
+  },
+  bannerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    minHeight: 56,
+    gap: 12,
+  },
+  bannerTextCol: {
+    flex: 1,
+    gap: 2,
+  },
+  bannerCaption: {
+    color: colors.muted,
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  bannerActionText: {
+    color: colors.text,
+    fontSize: 15,
+    lineHeight: 22,
+    fontWeight: '700',
+  },
+  expandedPanel: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    backgroundColor: colors.surface,
+  },
+});

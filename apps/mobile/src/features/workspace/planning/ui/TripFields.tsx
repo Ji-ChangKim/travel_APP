@@ -4,7 +4,6 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import Text from '@/components/ui/AppText';
 import TripIcon from '@/components/icons/TripIcon';
 import { colors } from '@/constants/theme';
-import { Field, Action } from '../../shared/ui/ui';
 import { styles } from '../../hub/styles/workspaceStyles';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
@@ -12,8 +11,6 @@ import DesignInput from '@/components/ui/DesignInput';
 
 import { DestinationFields } from './TravelInputs';
 import TripCalendar from './TripCalendar';
-import DestinationCollection from './DestinationCollection';
-import { destinationDraftItems } from '../model/destinationForms';
 
 const CITY_CATALOG = [
   {
@@ -124,13 +121,10 @@ export default function TripFields({
   useLocale();
   const [query, setQuery] = useState('');
 
-  // 대표 도시 카드나 추천 여행지 칩을 누르면 국가·도시·기본 여행명을 반영한다.
+  // 대표 도시 카드나 추천 여행지 칩을 누르면 국가·도시를 반영한다.
   function pickDestination(dest: (typeof CITY_CATALOG)[number]) {
     onChange('country', dest.country);
     onChange('city', dest.city);
-    if (!values.title) {
-      onChange('title', `${dest.city} 여행`);
-    }
   }
 
   const trimmed = query.trim();
@@ -241,6 +235,8 @@ export default function TripFields({
           </View>
         </View>
 
+        <DestinationFields values={values} onChange={onChange} />
+
         <View
           style={s.recommendedSection}
           testID="recommended-destinations-section"
@@ -289,46 +285,11 @@ export default function TripFields({
         </View>
       </View>
 
-      <DestinationFields values={values} onChange={onChange} />
-      {values.expandDestinations === 'true' ? (
-        <DestinationCollection
-          maxItems={19}
-          disabled={false}
-          items={destinationDraftItems(values.additionalDestinations)}
-          values={values}
-          onChange={onChange}
-          onItemsChange={(items) => {
-            // 추가 도시만 초안에 담고 대표 여행지는 위 입력을 유지한다.
-            onChange('additionalDestinations', JSON.stringify(items));
-          }}
-        />
-      ) : (
-        <Action
-          label={t('여러 도시 여행하기')}
-          disabled={!values.city?.trim()}
-          onPress={() => {
-            // 필요한 사람만 추가 도시 입력을 연다.
-            onChange('expandDestinations', 'true');
-          }}
-        />
-      )}
-
       <TripCalendar
         values={values}
         onChange={onChange}
         onApplyPeriod={onApplyPeriod}
       />
-
-      <View style={styles.card}>
-        <Field
-          label="여행 이름 · 선택"
-          placeholder={t('예: 가을 골목을 걷는 교토 여행')}
-          value={values.title || ''}
-          onChange={(value) => {
-            /* 선택 제목 하나만 갱신한다. */ return onChange('title', value);
-          }}
-        />
-      </View>
     </>
   );
 }

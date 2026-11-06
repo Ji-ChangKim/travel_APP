@@ -221,7 +221,9 @@ test('기획서 화면: 320px 기간 임시 선택·취소·프리셋 적용', a
   await page.setViewportSize({ width: 320, height: 844 });
   await setup(page);
   await page.goto('/new-trip');
-  await page.getByRole('button', { name: '출발일 선택', exact: true }).click();
+  await page
+    .getByRole('button', { name: '여행 기간 선택', exact: true })
+    .click();
   await expect(page.getByRole('button', { name: /기간 적용/ })).toBeDisabled();
   await page.getByRole('button', { name: '3박 4일', exact: true }).click();
   await expect(page.getByRole('button', { name: /기간 적용/ })).toBeDisabled();
@@ -236,19 +238,18 @@ test('기획서 화면: 320px 기간 임시 선택·취소·프리셋 적용', a
   await page
     .getByRole('button', { name: '기간 선택 닫기', exact: true })
     .click();
-  await page.getByRole('button', { name: '출발일 선택', exact: true }).click();
+  await page
+    .getByRole('button', { name: '여행 기간 선택', exact: true })
+    .click();
   await expect(page.getByLabel('출발일', { exact: true })).toHaveValue('');
   await page.getByRole('button', { name: '3박 4일', exact: true }).click();
   await page.getByLabel('출발일', { exact: true }).fill('2026-12-30');
   await page
     .getByRole('button', { name: '기간 적용 · 3박 4일', exact: true })
     .click();
-  await expect(
-    page.getByRole('button', { name: '출발일 선택', exact: true }),
-  ).toContainText('2026-12-30');
-  await expect(
-    page.getByRole('button', { name: '도착일 선택', exact: true }),
-  ).toContainText('2027-01-02');
+  await expect(page.getByTestId('selected-period-summary')).toContainText(
+    '2026-12-30 ~ 2027-01-02',
+  );
   expect((await documentTrip(page)).trip.id).toBe(tripId);
 });
 
@@ -261,7 +262,7 @@ for (const width of [390, 430]) {
     await setup(page);
     await page.goto('/new-trip');
     await page
-      .getByRole('button', { name: '출발일 선택', exact: true })
+      .getByRole('button', { name: '여행 기간 선택', exact: true })
       .click();
     const dialog = page.getByRole('dialog');
     await expect(dialog.getByTestId('period-summary-card')).toBeVisible();

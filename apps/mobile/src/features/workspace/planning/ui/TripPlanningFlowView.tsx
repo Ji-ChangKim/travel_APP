@@ -36,7 +36,7 @@ export function renderTripPlanning({
             step === 'basics'
               ? recording
                 ? t('다녀온 여행 기록하기')
-                : t('여행 계획 만들기')
+                : t('새 여행 만들기')
               : t('여행 내용 확인')
           }
           backLabel={
@@ -46,11 +46,6 @@ export function renderTripPlanning({
           }
           onBack={back}
           disabled={props.locked}
-          actions={
-            step === 'basics'
-              ? [{ label: t('다음'), onPress: next }]
-              : undefined
-          }
         />
         <ScrollView
           ref={scroll}
@@ -60,7 +55,9 @@ export function renderTripPlanning({
           ]}
           keyboardShouldPersistTaps="handled"
         >
-          <TripPlanningProgress step={step} recording={recording} />
+          {step !== 'basics' && (
+            <TripPlanningProgress step={step} recording={recording} />
+          )}
           {step === 'basics' ? (
             <TripPlanningBasics
               props={props}
@@ -77,14 +74,16 @@ export function renderTripPlanning({
               recording={recording}
             />
           )}
-          <SaveCreationDraft
-            onPending={props.onDraftPending}
-            onSaved={props.onDraftSaved}
-            userId={props.userId}
-            form={props.form}
-            step={step}
-            locked={props.locked}
-          />
+          {step !== 'basics' && (
+            <SaveCreationDraft
+              onPending={props.onDraftPending}
+              onSaved={props.onDraftSaved}
+              userId={props.userId}
+              form={props.form}
+              step={step}
+              locked={props.locked}
+            />
+          )}
           {basicsError || props.error ? (
             <Text accessibilityRole="alert" style={styles.error}>
               {basicsError || props.error}

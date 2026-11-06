@@ -1,15 +1,13 @@
 import { t } from '@/features/localization/translate';
+import { calendarPeriodDays } from '../model/calendarPeriod';
 
 import TripFields from './TripFields';
 
-import { Action } from '../../shared/ui/ui';
-
 import type { RenderTripPlanningProps } from '../model/tripPlanningViewTypes';
-// 기본 입력과 공통 검증을 사용하는 두 생성 경로를 표시한다.
+
+// 1단계 국가·도시(Where) 선택과 2단계 여행 기간(When) 모달을 통해 즉시 3단계 일정 상세로 연결한다.
 export default function TripPlanningBasics({
   props,
-  recording,
-  next,
   create,
   setBasicsError,
 }: Pick<
@@ -17,39 +15,31 @@ export default function TripPlanningBasics({
   'props' | 'recording' | 'next' | 'create' | 'setBasicsError'
 >) {
   return (
-    <>
-      <TripFields
-        values={props.form.values}
-        onChange={(key, value) => {
-          // 입력을 고치면 이전 첫 단계 안내만 지운다.
-          setBasicsError('');
-          props.onChange(key, value);
-        }}
-        onApplyPeriod={(startDate, endDate) => {
-          // 여행지가 선택된 상태에서 기간을 적용하면 바로 여행을 생성하고 상세 페이지로 이동한다.
-          if (props.form.values.country?.trim()) {
-            create({ startDate, endDate });
-          }
-        }}
-      />
-      <Action
-        label={
-          props.busy
-            ? t('저장 중…')
-            : recording
-              ? t('바로 여행 기록 만들기')
-              : t('바로 여행 만들기')
+    <TripFields
+      values={props.form.values}
+      onChange={(key, value) => {
+        // 입력을 고치면 이전 첫 단계 안내만 지운다.
+        setBasicsError('');
+        props.onChange(key, value);
+      }}
+      onApplyPeriod={(startDate, endDate) => {
+        // 여행지가 선택된 상태에서 기간을 적용하면 박수 포함 기본 제목과 함께 바로 여행을 생성하고 상세 페이지로 이동한다.
+        if (props.form.values.country?.trim()) {
+          const days = calendarPeriodDays(startDate, endDate);
+          const place =
+            props.form.values.city?.trim() || props.form.values.country.trim();
+          const periodLabel =
+            days && days > 1
+              ? t('{p0}박 {p1}일', { p0: days - 1, p1: days })
+              : t('당일치기');
+          const defaultTitle = `${place} ${periodLabel} 여행`;
+          create({
+            startDate,
+            endDate,
+            title: props.form.values.title?.trim() || defaultTitle,
+          });
         }
-        variant="primary"
-        loading={props.busy}
-        disabled={props.locked}
-        onPress={() => create()}
-      />
-      <Action
-        label={t('항공편 추가 및 확인 (선택)')}
-        disabled={props.locked}
-        onPress={next}
-      />
-    </>
+      }}
+    />
   );
 }

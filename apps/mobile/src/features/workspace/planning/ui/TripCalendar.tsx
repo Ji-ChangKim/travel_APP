@@ -3,10 +3,10 @@ import { View } from 'react-native';
 import Text from '@/components/ui/AppText';
 import AppModal from '@/components/ui/AppModal';
 import DesignButton from '@/components/ui/DesignButton';
+import TripIcon from '@/components/icons/TripIcon';
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
 import { FormAnchor, useFormScope } from '../../shared/ui/InputFeedback';
-import { styles } from '../../hub/styles/workspaceStyles';
 import {
   calendarPeriodDays,
   type PeriodEndpoint,
@@ -14,7 +14,7 @@ import {
 import TripPeriodPicker from './TripPeriodPicker';
 import { periodPickerStyles as s } from '../styles/periodPickerStyles';
 
-// 여행 만들기 화면에서 출발일·도착일 요약과 기간 선택 모달 진입점을 제공한다.
+// 1단계 도시 선택 하단에서 2단계 여행 기간 선택 모달을 여는 메인 CTA 버튼을 제공한다.
 export default function TripCalendar({
   values,
   onChange,
@@ -40,49 +40,44 @@ export default function TripCalendar({
   }
 
   return (
-    <View style={styles.card}>
-      <Text style={styles.title}>{t('여행 날짜')}</Text>
-      <View style={s.endpointRow}>
-        {(['startDate', 'endDate'] as const).map((key) => (
-          <View key={key} style={s.endpointColumn}>
-            <FormAnchor name={key === 'startDate' ? '시작일' : '종료일'}>
-              <Text style={s.meta}>
-                {key === 'startDate' ? t('출발일') : t('도착일')}
-              </Text>
-              <DesignButton
-                label={values[key] || t('날짜 선택')}
-                accessibilityLabel={
-                  key === 'startDate' ? t('출발일 선택') : t('도착일 선택')
-                }
-                disabled={locked}
-                onPress={() => {
-                  // 선택한 기준점(출발일/도착일)으로 기간 선택 모달을 연다.
-                  return open(key);
-                }}
-              />
-            </FormAnchor>
+    <View testID="confirm-destination-section">
+      <FormAnchor name="시작일">
+        <FormAnchor name="종료일">
+          <View testID="confirm-destination-btn">
+            <DesignButton
+              label={t('여행 기간 선택')}
+              accessibilityLabel={t('여행 기간 선택')}
+              variant="primary"
+              disabled={locked}
+              icon={(color) => {
+                // 기간 선택 CTA 좌측에 달력 아이콘을 표시한다.
+                return (
+                  <TripIcon name="calendar-outline" size={18} color={color} />
+                );
+              }}
+              onPress={() => {
+                // 출발일만 지정된 상태면 도착일 기준점으로, 아니면 출발일 기준점으로 모달을 연다.
+                return open(
+                  values.startDate && !values.endDate ? 'endDate' : 'startDate',
+                );
+              }}
+            />
           </View>
-        ))}
-      </View>
-      {days && days >= 1 && days <= 30 ? (
-        <Text style={s.meta}>
-          {days === 1
-            ? t('당일')
-            : t('{p0}박 {p1}일', { p0: days - 1, p1: days })}
+        </FormAnchor>
+      </FormAnchor>
+      {values.startDate && values.endDate ? (
+        <Text style={s.meta} testID="selected-period-summary">
+          {`${values.startDate} ~ ${values.endDate}${
+            days && days >= 1 && days <= 30
+              ? ` · ${
+                  days === 1
+                    ? t('당일')
+                    : t('{p0}박 {p1}일', { p0: days - 1, p1: days })
+                }`
+              : ''
+          }`}
         </Text>
       ) : null}
-      <DesignButton
-        label={t('여행 기간 선택')}
-        accessibilityLabel={t('캘린더 전체보기')}
-        variant="quiet"
-        disabled={locked}
-        onPress={() => {
-          // 출발일만 지정된 상태면 도착일 기준점으로, 아니면 출발일 기준점으로 모달을 연다.
-          return open(
-            values.startDate && !values.endDate ? 'endDate' : 'startDate',
-          );
-        }}
-      />
       <AppModal
         native
         visible={endpoint !== null}

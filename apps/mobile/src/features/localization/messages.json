@@ -5102,5 +5102,10 @@
   "사용 비용 기록": ["Record spent amount", "使用した費用を記録"],
   "찍은 사진 추가": ["Add taken photo", "撮影した写真を追加"],
   "영수증 촬영으로 추가": ["Add by taking receipt photo", "レシート撮影で追加"],
-  "영수증 사진으로 추가": ["Add from receipt photo", "レシート写真から追加"]
+  "영수증 사진으로 추가": ["Add from receipt photo", "レシート写真から追加"],
+  "찾으시는 도시가 없나요?": [
+    "Can't find the city you're looking for?",
+    "お探しの都市がありませんか？"
+  ],
+  "목적지 직접 입력하기": ["Enter destination manually", "目的地を直接入力する"]
 }
