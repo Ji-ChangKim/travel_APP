@@ -11,6 +11,7 @@ import {
   decimalExpenseSchema,
   foundationUuidSchema,
   isAllowedTripPeriod,
+  tripTitleInputSchema,
 } from './foundation';
 
 // 일정·사진·지출 입력에서 UUID 부모를 재사용한다.
@@ -226,7 +227,7 @@ export const workspaceCommandSchema = z.discriminatedUnion('operation', [
       operation: z.literal('trip.update'),
       input: z
         .object({
-          title: z.string().trim().min(1).max(50),
+          title: tripTitleInputSchema,
           country: z.string().trim().min(1).max(50),
           city: z.string().trim().max(50),
           status: z.enum(['DRAFT', 'PLANNED', 'IN_PROGRESS', 'COMPLETED']),

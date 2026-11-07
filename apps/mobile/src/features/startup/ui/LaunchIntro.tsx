@@ -100,7 +100,7 @@ export default function LaunchIntro({
           </Suspense>
         </VideoBoundary>
       )}
-      {!state.frame &&
+      {(!state.frame || state.phase === 'done') &&
         (posterFailed ? (
           <View
             key="fallback-wordmark"
@@ -116,7 +116,7 @@ export default function LaunchIntro({
           <View key="poster-image" style={s.wordmark}>
             <Image
               testID="startup-bi-poster"
-              source={require('../../../../assets/brand/tripprint-v1/tripprint-app-icon-source.png')}
+              source={require('../../../../assets/brand/tripprint-v1/tripprint_bi_poster.png')}
               resizeMode="contain"
               style={s.icon}
               accessible={false}
@@ -139,7 +139,8 @@ const s = StyleSheet.create({
     flex: 1,
     backgroundColor: designTokens.startup.bi.backgroundTop,
   },
-  icon: { width: 160, height: (160 * 216) / 337 },
+  // 영상과 같은 16:9 원본을 contain으로 맞춰 첫 프레임에서 크기가 바뀌지 않는다.
+  icon: { width: '100%', height: '100%' },
   // 장식 로고는 안전 영역의 비대칭 여백과 무관하게 앱 표시 영역의 중앙에 둔다.
   wordmark: {
     position: 'absolute',

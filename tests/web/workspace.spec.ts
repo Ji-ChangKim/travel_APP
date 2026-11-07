@@ -10,7 +10,7 @@ import receiptScan from '../fixtures/kagerou-receipt-analysis.json';
 import kacDomestic from '../fixtures/kac-rs901-normalized.json';
 import kacInternational from '../fixtures/kac-ze781a-normalized.json';
 import osakaPlan from '../fixtures/osaka-community-plan.json';
-import kyushuPlan from '../../docs/08. 여행콘텐츠/00. 공개여행계획/02. kyushu-onsen-yatai-4d-v1/plan.json';
+import kyushuPlan from '../fixtures/kyushu-community-plan.json';
 import {
   test,
   expect,
@@ -6515,6 +6515,180 @@ async function login(page: Page): Promise<void> {
   await expect(page.getByTestId('travel-home')).toBeVisible();
 }
 
+// CDP의 IME 경로로 조합 이벤트와 실제 입력 DOM의 수명을 함께 검사한다.
+async function composeKorean(page: Page, input: Locator, text: string) {
+  await input.focus();
+  const session = await page.context().newCDPSession(page);
+  for (const value of ['ㅎ', '하', '한', '한ㄱ', '한그', '한글']) {
+    await session.send('Input.imeSetComposition', {
+      text: value,
+      selectionStart: value.length,
+      selectionEnd: value.length,
+    });
+    await expect(input).toBeFocused();
+    await expect(input).toHaveValue(value);
+  }
+  await session.send('Input.insertText', { text });
+  await expect(input).toHaveValue(text);
+  await session.detach();
+}
+
+test('입력 정책 검수: 프로필 한글 조합·경계·오류 종류·입력 보존', async ({
+  page,
+}) => {
+  await network(page);
+  await login(page);
+  await page.goto('/my');
+  await page.getByRole('button', { name: '프로필 수정', exact: true }).click();
+  const input = page.getByLabel('닉네임', { exact: true });
+  await input.fill('');
+  await composeKorean(page, input, '한글여행자');
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  await input.blur();
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  for (const [value, message] of [
+    ['가', '닉네임은 2~10자로 입력해 주세요.'],
+    ['가'.repeat(11), '닉네임은 2~10자로 입력해 주세요.'],
+    ['여행😀', '한글, 영문, 숫자만 사용할 수 있어요.'],
+    ['여행 자', '한글, 영문, 숫자만 사용할 수 있어요.'],
+  ]) {
+    await input.fill(value!);
+    await expect(page.getByRole('alert')).toHaveCount(0);
+    // Android처럼 저장 행동이 입력 초점을 옮기지 않는 조건도 검사한다.
+    await page
+      .getByRole('button', { name: '프로필 저장하기', exact: true })
+      .evaluate((element: HTMLElement) => element.click());
+    await expect(input).toBeFocused();
+    await expect(page.getByRole('alert')).toHaveText(message!);
+    await input.blur();
+    await expect(input).toHaveValue(value!);
+    await expect(page.getByRole('alert')).toHaveText(message!);
+    await page
+      .getByRole('button', { name: '프로필 저장하기', exact: true })
+      .click();
+    await expect(input).toHaveValue(value!);
+  }
+  await input.fill('가나다라마바사아자차');
+  await input.blur();
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  await page.screenshot({
+    path: 'outputs/input-policy/profile-korean.png',
+    fullPage: true,
+  });
+  await page
+    .getByRole('button', { name: '프로필 저장하기', exact: true })
+    .click();
+  await expect(
+    page.getByRole('dialog', { name: '개인 프로필 수정', exact: true }),
+  ).toHaveCount(0);
+  await page.reload();
+  await page.getByRole('button', { name: '프로필 수정', exact: true }).click();
+  await expect(page.getByLabel('닉네임', { exact: true })).toHaveValue(
+    '가나다라마바사아자차',
+  );
+});
+
+test('입력 정책 검수: 조합 취소 Escape는 프로필 창을 닫지 않는다', async ({
+  page,
+}) => {
+  await network(page);
+  await login(page);
+  await page.goto('/my');
+  await page.getByRole('button', { name: '프로필 수정', exact: true }).click();
+  const input = page.getByLabel('닉네임', { exact: true });
+  await input.focus();
+  // 일부 IME는 Escape keydown 뒤 조합을 끝내고 isComposing=false인 keyup을 보낸다.
+  await input.evaluate((element) => {
+    element.dispatchEvent(
+      new CompositionEvent('compositionstart', { bubbles: true }),
+    );
+    element.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'Escape',
+        keyCode: 229,
+        isComposing: true,
+        bubbles: true,
+      }),
+    );
+    element.dispatchEvent(
+      new CompositionEvent('compositionend', { bubbles: true }),
+    );
+    element.dispatchEvent(
+      new KeyboardEvent('keyup', { key: 'Escape', bubbles: true }),
+    );
+  });
+  await expect(
+    page.getByRole('dialog', { name: '개인 프로필 수정', exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('dialog', {
+      name: '작성 중인 내용을 버릴까요?',
+      exact: true,
+    }),
+  ).toHaveCount(0);
+  await page.keyboard.press('Escape');
+  await expect(
+    page.getByRole('dialog', { name: '개인 프로필 수정', exact: true }),
+  ).toHaveCount(0);
+});
+
+for (const scenario of [
+  { language: 'ko', width: 320, scale: 2, fontFailure: false },
+  { language: 'en', width: 390, scale: 1, fontFailure: false },
+  { language: 'ja', width: 430, scale: 1, fontFailure: false },
+  { language: 'ko', width: 390, scale: 1, fontFailure: true },
+] as const) {
+  test(`입력 정책 검수: 도시 검색 ${scenario.language} ${scenario.width}px 글꼴실패=${scenario.fontFailure}`, async ({
+    page,
+  }) => {
+    await network(page);
+    if (scenario.fontFailure)
+      await page.route('**/*.ttf', (route) => route.abort());
+    await page.setViewportSize({ width: scenario.width, height: 844 });
+    await login(page);
+    await page.evaluate(
+      (language) => localStorage.setItem('tripprint.language.v1', language),
+      scenario.language,
+    );
+    await page.reload();
+    await page
+      .getByRole('button', {
+        name: localized(scenario.language, '새 여행 만들기'),
+        exact: true,
+      })
+      .click();
+    if (scenario.scale === 2)
+      await page.evaluate(() => {
+        document.documentElement.style.fontSize = '32px';
+      });
+    const input = page.getByTestId('destination-search-input');
+    await composeKorean(page, input, '오사카');
+    await expect(page.getByTestId('city-result-오사카')).toBeVisible();
+    await expect(input).toHaveCSS('font-size', `${16 * scenario.scale}px`);
+    if (!scenario.fontFailure)
+      await expect(input).toHaveCSS('font-family', /TripPrintRegular/);
+    await input.press('Backspace');
+    await expect(input).toHaveValue('오사');
+    await input.press('Home');
+    await input.press('ArrowRight');
+    await page.keyboard.insertText('한');
+    await expect(input).toHaveValue('오한사');
+    await input.fill('서울 日本語');
+    await expect(input).toHaveValue('서울 日本語');
+    await input.fill('오사카');
+    await input.blur();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth + 1,
+      ),
+    ).toBe(true);
+    await page.screenshot({
+      path: `outputs/input-policy/city-${scenario.language}-${scenario.width}-${scenario.fontFailure}.png`,
+      fullPage: true,
+    });
+  });
+}
+
 // 화면 회귀의 인증 사전조건만 기존 HTTP 응답 대역으로 준비한다. 실제 Google 인증 검사가 아니다.
 async function emailLogin(page: Page): Promise<void> {
   await page.evaluate(async () => {
@@ -11557,6 +11731,9 @@ for (const width of [320, 390, 430]) {
       page.getByRole('button', { name: '새 여행 만들기', exact: true }),
     ).toBeFocused();
     await page.keyboard.press('Enter');
+    await page
+      .getByRole('button', { name: '목적지 직접 입력하기', exact: true })
+      .click();
     await expect(page.getByTestId('trip-country')).toBeVisible();
     await expect.poll(() => haruReadingAudit(page)).toEqual([]);
     await page.screenshot({ path: `outputs/haru-wcag-aa/create-${width}.png` });
@@ -12076,9 +12253,11 @@ for (const width of [320, 390, 430]) {
       page,
     }, testInfo) => {
       // HTTP 응답만 격리하고 제품 화면과 사용자 입력으로 이동한다.
+      const runtimeErrors: string[] = [];
+      page.on('pageerror', (error) => runtimeErrors.push(error.message));
       const snapshot = haruDetailFixture();
       snapshot.trip.title = '도쿄 골목과 바다를 함께 걷는 긴 이름의 여행';
-      await r07Network(page, snapshot);
+      const state = await r07Network(page, snapshot);
       await page.route('**/api/v1/trips', (route) => {
         // 여행 목록도 상세와 같은 제목을 반환한다.
         return route.fulfill({ json: { data: [snapshot.trip] } });
@@ -12101,6 +12280,12 @@ for (const width of [320, 390, 430]) {
       await page
         .getByRole('button', { name: '새 여행 만들기', exact: true })
         .click();
+      await page
+        .getByRole('button', { name: '도쿄 추천 여행지 선택', exact: true })
+        .click();
+      await page
+        .getByRole('button', { name: '목적지 직접 입력하기', exact: true })
+        .click();
       await expect(page.getByTestId('trip-country')).toBeVisible();
       await inspectHeader(page, 'create', width, scale, testInfo);
       await page.getByTestId('trip-country').getByRole('button').click();
@@ -12108,29 +12293,31 @@ for (const width of [320, 390, 430]) {
       await page
         .getByRole('button', { name: '선택 닫기', exact: true })
         .click();
-      await fields(page, {
-        '나라 검색': '일본',
-        '도시 검색': '도쿄',
-        시작일: '2026-11-10',
-        종료일: '2026-11-12',
-      });
       await page.getByTestId('trip-city').getByRole('button').click();
       await inspectHeader(page, 'city', width, scale, testInfo);
       await page
         .getByRole('button', { name: '선택 닫기', exact: true })
         .click();
-      await page.getByRole('button', { name: '다음', exact: true }).click();
-      await expect(
-        page.getByRole('button', { name: '출발 항공편 추가하기', exact: true }),
-      ).toBeVisible();
+      await page
+        .getByRole('button', { name: '여행 기간 선택', exact: true })
+        .click();
+      await inspectHeader(page, 'creation-period', width, scale, testInfo);
+      await page
+        .getByRole('button', { name: '기간 선택 닫기', exact: true })
+        .click();
+      await page.goto(`/trips/${trip}`);
+      await expect(page.getByTestId('trip-flight-card')).toBeVisible();
       await inspectHeader(page, 'flights', width, scale, testInfo);
       await page
-        .getByRole('button', { name: '출발 항공편 추가하기', exact: true })
+        .getByRole('button', { name: '항공권 추가', exact: true })
         .click();
       await inspectHeader(page, 'ticket', width, scale, testInfo);
-      await expect(
-        page.getByRole('button', { name: '완료', exact: true }),
-      ).toBeDisabled();
+      await page
+        .getByRole('button', { name: 'DAY 1 일정에 추가', exact: true })
+        .click();
+      expect(runtimeErrors).toEqual([]);
+      await expect(page.getByRole('alert').first()).toBeVisible();
+      expect(state.writes).toHaveLength(0);
       await page.goto(`/trips/${trip}`);
       await expect(page.getByTestId('trip-section-navigation')).toBeVisible();
       for (const section of [
@@ -13483,7 +13670,7 @@ for (const [width, scale] of [
     await page.route('**/kyushu-cover.png', (route) => {
       // DB 업로드 성공으로 가장하지 않고 로컬 원본만 이미지 응답으로 제공한다.
       return route.fulfill({
-        path: 'docs/08. 여행콘텐츠/00. 공개여행계획/02. kyushu-onsen-yatai-4d-v1/cover.png',
+        path: 'tests/fixtures/kyushu-cover.png',
         contentType: 'image/png',
       });
     });
@@ -13768,7 +13955,7 @@ test('FH-04 로그인 전에도 GNB 다섯 메뉴를 유지하고 개인 화면�
   await page.route('**/kyushu-cover.png', (route) => {
     // 원격 쓰기 없이 기존 첨부 썸네일을 제공한다.
     return route.fulfill({
-      path: 'docs/08. 여행콘텐츠/00. 공개여행계획/02. kyushu-onsen-yatai-4d-v1/cover.png',
+      path: 'tests/fixtures/kyushu-cover.png',
       contentType: 'image/png',
     });
   });
@@ -13936,8 +14123,11 @@ for (const width of [320, 390, 430]) {
       .click();
     await expect(nav).toHaveCount(0);
     await page
-      .getByLabel('여행 이름 · 선택', { exact: true })
-      .fill('버리기 전 보호');
+      .getByRole('button', { name: '도쿄 추천 여행지 선택', exact: true })
+      .click();
+    await page
+      .getByRole('button', { name: '목적지 직접 입력하기', exact: true })
+      .click();
     const back = page.getByRole('button', {
       name: '내 여행으로 돌아가기',
       exact: true,
@@ -13948,18 +14138,31 @@ for (const width of [320, 390, 430]) {
     ).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(
-      page.getByLabel('여행 이름 · 선택', { exact: true }),
-    ).toHaveValue('버리기 전 보호');
+      page.getByTestId('trip-country').getByRole('button'),
+    ).toHaveText('일본');
     await back.click();
     await page
       .getByRole('button', { name: '내용 버리고 이동', exact: true })
       .click();
     await expect(nav).toBeVisible();
-    await expect(
-      page.getByLabel('여행 이름 · 선택', { exact: true }),
-    ).toHaveCount(0);
+    await expect(page.getByTestId('destination-search-input')).toHaveCount(0);
   });
 }
+
+test('헤더 복귀: 홈 체크리스트 링크와 준비물 내부 링크의 재진입', async ({
+  page,
+}) => {
+  const state = await r07Network(page, haruDetailFixture());
+  await login(page);
+  for (const section of ['checklist', 'preparation']) {
+    await page.goto(`/trips/${trip}?section=${section}`);
+    await expect(page.getByTestId('trip-checklist-panel')).toBeVisible();
+    await expect(page.getByLabel('새 준비물', { exact: true })).toBeVisible();
+    await page.reload();
+    await expect(page.getByTestId('trip-checklist-panel')).toBeVisible();
+  }
+  expect(state.writes).toHaveLength(0);
+});
 
 test('헤더 복귀: 상세 진입 전 검색 조건·직접 링크 오류·브라우저 뒤로가기', async ({
   page,

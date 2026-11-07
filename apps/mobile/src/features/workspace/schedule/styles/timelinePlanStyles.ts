@@ -1,23 +1,24 @@
 import { StyleSheet } from 'react-native';
+import { colors, designTokens } from '@/constants/theme';
 
-// 계획 세우기 화면 3종에 적용하는 공통 컬러 팔레트다.
+// 계획 세우기 화면 3종에 적용하는 공통 컬러 팔레트를 디자인 토큰으로 연결한다.
 export const timelineColors = {
-  background: '#F8F9FF',
-  surface: '#FFFFFF',
-  ink: '#0B1C30',
-  muted: '#45464D',
-  primary: '#B3261E',
-  secondary: '#AE3115',
-  fixedDim: '#FFDAD2',
-  fixedDark: '#3D0600',
-  low: '#EFF4FF',
-  high: '#DCE9FF',
-  soft: '#E5EEFF',
-  border: 'rgba(198, 198, 205, 0.4)',
-  borderLight: 'rgba(198, 198, 205, 0.3)',
-  borderDivider: 'rgba(198, 198, 205, 0.2)',
-  rail: 'rgba(198, 198, 205, 0.4)',
-};
+  background: colors.background,
+  surface: colors.surface,
+  ink: colors.text,
+  muted: colors.muted,
+  primary: colors.actionPressed,
+  secondary: colors.actionPressed,
+  fixedDim: colors.selectedSurface,
+  fixedDark: colors.text,
+  low: colors.surfaceMuted,
+  high: designTokens.color.surface.raised,
+  soft: colors.surfaceMuted,
+  border: colors.border,
+  borderLight: colors.border,
+  borderDivider: colors.divider,
+  rail: colors.border,
+} as const;
 
 const c = timelineColors;
 
@@ -410,7 +411,7 @@ export const timelinePlanStyles = StyleSheet.create({
   mapPathText: {
     fontSize: 11,
     lineHeight: 16,
-    color: '#FFFFFF',
+    color: colors.textLight,
     fontWeight: '600',
     flex: 1,
   },
@@ -491,6 +492,6 @@ export const timelinePlanStyles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: colors.textLight,
   },
 });

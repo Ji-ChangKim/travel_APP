@@ -6,26 +6,54 @@ import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 import { View } from 'react-native';
 import { useState } from 'react';
 import { Action } from '../../shared/ui/ui';
+import { trackWorkspaceEvent } from '../../shared/model/workspaceAnalytics';
 import { diaryCosts } from '../model/diary';
 import type { WorkspaceExpense, WorkspaceSnapshot } from '@wherego/domain';
 import { memberRoleLabel } from '../../shared/model/presentation';
 import { tripDetailStyles as s } from '../styles/tripDetailStyles';
 
-// 실제 지출과 예상 비용을 통화별로 나란히 읽을 수 있게 표시한다.
+const EXPENSE_CATEGORY_LABELS: Record<string, string> = {
+  food: '식비',
+  transport: '교통',
+  stay: '숙박',
+  activity: '관광·액티비티',
+  shopping: '쇼핑',
+  etc: '기타',
+};
+
+// 실제 지출과 예상 비용, 분류별 지출 현황을 가계부 대시보드로 표시한다.
 export function TripCostSummary({
   expenses,
+  selectedCategory = 'all',
+  onSelectCategory,
 }: {
   expenses: WorkspaceExpense[];
+  selectedCategory?: string;
+  onSelectCategory?: (category: string) => void;
 }) {
   useLocale();
   // 조회에 있는 금액만 계산하며 환율이나 가짜 예산을 추가하지 않는다.
   const [showEstimates, setShowEstimates] = useState(false);
   const actualCosts = diaryCosts(expenses);
   const estimatedCosts = diaryCosts(expenses, false);
+  const actualCount = expenses.filter((item) => item.isActual).length;
+  const categoryCounts = Object.keys(EXPENSE_CATEGORY_LABELS).map((key) => ({
+    key,
+    label: EXPENSE_CATEGORY_LABELS[key] || '기타',
+    count: expenses.filter((item) => (item.category || 'etc') === key).length,
+  }));
+
   return (
-    <View style={s.summary}>
+    <View style={s.summary} testID="trip-expense-dashboard">
       <View style={[s.card, s.actual]}>
-        <Text style={s.cardTitle}>{t('실제 지출')}</Text>
+        <View style={s.heading}>
+          <Text style={s.cardTitle}>{t('여행 내 사용한 금액')}</Text>
+          <View style={s.badge}>
+            <Text style={s.badgeText}>
+              {t('실제 지출 {p0}건', { p0: actualCount })}
+            </Text>
+          </View>
+        </View>
         {!actualCosts.length && (
           <Text style={s.meta}>{t('아직 기록한 지출이 없어요.')}</Text>
         )}
@@ -36,6 +64,42 @@ export function TripCostSummary({
           </View>
         ))}
       </View>
+
+      {onSelectCategory ? (
+        <View
+          style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}
+          testID="expense-category-filters"
+        >
+          <Action
+            label={`${t('전체')} (${expenses.length})`}
+            size="chip"
+            selected={selectedCategory === 'all'}
+            onPress={() => {
+              trackWorkspaceEvent('expense_category_filter_click', {
+                category: 'all',
+              });
+              onSelectCategory('all');
+            }}
+          />
+          {categoryCounts.map((cat) => (
+            <Action
+              key={cat.key}
+              label={
+                cat.count > 0 ? `${t(cat.label)} (${cat.count})` : t(cat.label)
+              }
+              size="chip"
+              selected={selectedCategory === cat.key}
+              onPress={() => {
+                trackWorkspaceEvent('expense_category_filter_click', {
+                  category: cat.key,
+                });
+                onSelectCategory(cat.key);
+              }}
+            />
+          ))}
+        </View>
+      ) : null}
+
       {estimatedCosts.length > 0 && (
         <Action
           label={showEstimates ? t('예상 비용 접기') : t('예상 비용 보기')}
@@ -63,7 +127,7 @@ export function TripCostSummary({
   );
 }
 
-// 비용 이름·금액·기록 출처를 서로 다른 글자 역할로 표시한다.
+// 비용 이름·분류·금액·기록 출처를 서로 다른 글자 역할로 표시한다.
 export function TripExpenseHeading({
   item,
   scheduleTitle,
@@ -72,14 +136,21 @@ export function TripExpenseHeading({
   scheduleTitle?: string;
 }) {
   useLocale();
+  const categoryLabel =
+    EXPENSE_CATEGORY_LABELS[item.category || 'etc'] || '기타';
   // 영수증 비용과 직접 입력한 비용의 차이를 실제 출처로 안내한다.
   return (
     <View style={{ gap: 8 }}>
       <View style={s.heading}>
-        <View style={s.badge}>
-          <Text style={s.badgeText}>
-            {item.isActual ? t('실제 지출') : t('예상 비용')}
-          </Text>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+          <View style={s.badge}>
+            <Text style={s.badgeText}>
+              {item.isActual ? t('실제 지출') : t('예상 비용')}
+            </Text>
+          </View>
+          <View style={s.badge}>
+            <Text style={s.badgeText}>{t(categoryLabel)}</Text>
+          </View>
         </View>
         <Text style={s.meta}>
           {item.source === 'manual' ? t('직접 기록') : t('영수증에서 기록')}

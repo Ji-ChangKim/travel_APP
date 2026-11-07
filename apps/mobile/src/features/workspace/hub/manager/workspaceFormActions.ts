@@ -1,3 +1,4 @@
+import { stringFormOverrides } from '../../shared/model/formOverrides';
 import { useTripStore } from '@/stores/useTripStore';
 import { workspaceConnectionAvailable } from '../../shared/manager/workspaceConnectivity';
 import { clearCreationHandoff } from '../../planning/model/creationAuthHandoff';
@@ -105,7 +106,7 @@ export function useWorkspaceFormActions({
     return Promise.resolve();
   };
   // 새 여행 또는 기존 여행 폼을 확정한다.
-  const save = function save(overrides?: Record<string, string>): void {
+  const save = function save(suppliedValues?: Record<string, string>): void {
     if (!workspaceConnectionAvailable()) {
       setError(
         '인터넷에 연결한 뒤 다시 저장해 주세요. 작성한 내용은 그대로 남아요.',
@@ -123,6 +124,7 @@ export function useWorkspaceFormActions({
     try {
       // 기존 여행은 공통 명령 계약으로 저장한다.
       if (!form || busy || pending.current) return;
+      const overrides = stringFormOverrides(suppliedValues);
       const activeForm = overrides
         ? { ...form, values: { ...form.values, ...overrides } }
         : form;

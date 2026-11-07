@@ -12,6 +12,7 @@ import { rejectRequest } from '../../shared/errors';
 import { mediaBucket } from '../media/cloudMedia';
 import { publicImage } from '../media/publicImage';
 import { importedSnapshot, type ImportMedia } from './guestImportModel';
+import { checkAccountFileWrite } from '../accounts/accountFileWrite';
 
 type Ctx = Context<ApiEnvironment>;
 type ImportRow = {
@@ -38,13 +39,10 @@ async function member(c: Ctx): Promise<string> {
   const session = c.get('session');
   if (!session || session.isAnonymous) return rejectRequest('ROLE_FORBIDDEN');
   const row = await database(c.env)
-    .prepare(
-      'SELECT u.name,p.onboarding_completed_at FROM user u JOIN profiles p ON p.user_id=u.id WHERE u.id=?',
-    )
+    .prepare('SELECT name FROM user WHERE id=?')
     .bind(session.userId)
-    .first<{ name: string; onboarding_completed_at: number | null }>();
-  if (!row?.onboarding_completed_at)
-    return rejectRequest('ONBOARDING_REQUIRED');
+    .first<{ name: string }>();
+  if (!row) return rejectRequest('SESSION_EXPIRED');
   return row.name;
 }
 
@@ -264,6 +262,7 @@ async function upload(c: Ctx): Promise<Response> {
     )
       return rejectRequest('REQUEST_KEY_REUSED');
   }
+  await checkAccountFileWrite(c.env, actor(c), path, 'guest-import');
   await database(c.env)
     .prepare(
       'INSERT OR IGNORE INTO guest_import_files(actor_id,operation_id,local_media_id,path,mime,size,content_hash,created_at) VALUES(?,?,?,?,?,?,?,?)',
@@ -278,7 +277,12 @@ async function upload(c: Ctx): Promise<Response> {
       hash,
       Date.now(),
     )
-    .run();
+    .run()
+    .catch(async (error: unknown) => {
+      await checkAccountFileWrite(c.env, actor(c), path, 'guest-import');
+      throw error;
+    });
+  await checkAccountFileWrite(c.env, actor(c), path, 'guest-import');
   const saved = (await readFiles(c, row)).find(
     (file) => file.local_media_id === id,
   );

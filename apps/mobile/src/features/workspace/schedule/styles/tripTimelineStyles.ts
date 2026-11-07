@@ -193,7 +193,7 @@ export const tripTimelineStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   coralMarker: {
-    backgroundColor: '#FFF5F2',
+    backgroundColor: c.selection.surface,
     borderColor: c.brand.coralPressed,
   },
   selectedMarker: {
@@ -250,12 +250,12 @@ export const tripTimelineStyles = StyleSheet.create({
     boxShadow: '0 2px 10px rgba(32,50,71,0.05)',
   },
   selectedPlaceCard: {
-    borderColor: '#2563eb',
+    borderColor: c.action.link,
     borderWidth: 2,
-    backgroundColor: '#f0f7ff',
+    backgroundColor: c.surface.low,
   },
   arrangingPlaceCard: {
-    borderColor: '#94a3b8',
+    borderColor: c.border.strong,
     borderWidth: 1.5,
     borderStyle: 'dashed',
   },

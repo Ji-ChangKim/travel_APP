@@ -25,7 +25,6 @@ export function releaseSourceManifest() {
     'apps/mobile/assets',
     'apps/mobile/public',
     'docs/02. 디자인/00. 공통규격/design-tokens.json',
-    'docs/02. 디자인/00. 공통규격/ledger-tokens.json',
     'apps/mobile/modules',
     'apps/mobile/plugins',
     'apps/mobile/android/app/src',

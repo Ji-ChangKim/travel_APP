@@ -1,24 +1,25 @@
 import { StyleSheet } from 'react-native';
+import { colors, designTokens } from '@/constants/theme';
 
-// 사용자 제공 발자국 HTML의 범위 전용 값이며 다른 화면 토큰을 덮지 않는다.
+// 발자국(공개 여행 피드) 화면의 색상을 공통 디자인 토큰으로 연결한다.
 export const publicFeedColors = {
-  background: '#F8F9FF',
-  card: '#FFFFFF',
-  ink: '#0B1C30',
-  muted: '#45464D',
-  primary: '#B3261E',
-  pin: '#FFB4A3',
-  low: '#EFF4FF',
-  badge: '#DCE9FF',
-  soft: '#E5EEFF',
-  warm: '#FFDAD6',
-  border: 'rgba(198, 198, 205, 0.4)',
-  borderLight: 'rgba(198, 198, 205, 0.3)',
-  borderDivider: 'rgba(198, 198, 205, 0.2)',
-  outline: '#76777D',
+  background: colors.background,
+  card: colors.surface,
+  ink: colors.text,
+  muted: colors.muted,
+  primary: colors.actionPressed,
+  pin: colors.brandCoral,
+  low: colors.surfaceMuted,
+  badge: designTokens.color.surface.raised,
+  soft: colors.surfaceMuted,
+  warm: colors.selectedSurface,
+  border: colors.border,
+  borderLight: colors.border,
+  borderDivider: colors.divider,
+  outline: colors.borderStrong,
   // 사진 오버레이와 별개로 밝은 표지에서도 흰 지역명을 충분히 읽게 한다.
-  location: 'rgba(0, 0, 0, 0.56)',
-};
+  location: 'rgba(32, 50, 71, 0.78)',
+} as const;
 const c = publicFeedColors;
 
 // 표지 비율과 여백은 시안을 따르고 텍스트·터치 영역은 공통 읽기 기준을 따른다.
@@ -245,9 +246,9 @@ export const publicFeedStyles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   actionButton: {
-    minHeight: 36,
-    paddingHorizontal: 6,
-    paddingVertical: 4,
+    minHeight: designTokens.layout.minimumTouchTarget,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,

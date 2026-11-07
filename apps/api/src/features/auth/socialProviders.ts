@@ -20,6 +20,9 @@ export function socialProviders(env: Env) {
           google: {
             clientId: env.GOOGLE_CLIENT_ID,
             clientSecret: env.GOOGLE_CLIENT_SECRET!,
+            disableDefaultScope: true,
+            scope: ['openid', 'email'],
+            mapProfileToUser: () => ({ name: '여행자', image: undefined }),
           },
         }
       : {}),
@@ -28,6 +31,7 @@ export function socialProviders(env: Env) {
           kakao: {
             clientId: env.KAKAO_CLIENT_ID,
             clientSecret: env.KAKAO_CLIENT_SECRET!,
+            disableSignUp: true,
           },
         }
       : {}),
@@ -92,6 +96,7 @@ export function naverOAuth(env: Env, state?: string) {
       ? [
           {
             providerId: 'naver',
+            disableSignUp: true,
             clientId: env.NAVER_CLIENT_ID,
             clientSecret: env.NAVER_CLIENT_SECRET,
             authorizationUrl: 'https://nid.naver.com/oauth2.0/authorize',

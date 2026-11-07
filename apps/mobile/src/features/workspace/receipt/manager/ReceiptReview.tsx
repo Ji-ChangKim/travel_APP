@@ -68,7 +68,7 @@ export default function ReceiptReview({
   ) : (
     <>
       {renderReceiptSummary({ form, snapshot, busy, onChange, onRetry })}
-      {renderReceiptItems({ form, onChange })}
+      {renderReceiptItems({ form, snapshot, busy, onChange })}
     </>
   );
 }

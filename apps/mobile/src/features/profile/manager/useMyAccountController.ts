@@ -88,6 +88,11 @@ export function useMyAccountController() {
     updateProfile,
   });
 
+  const changeNickname: typeof setEditNickname = (value) => {
+    // 새 입력에 이전 제출의 오류가 다시 나타나지 않게 한다.
+    setProfileError('');
+    setEditNickname(value);
+  };
   // 화면에는 요청 원문과 잠금 참조 대신 준비된 상태와 행동을 전달한다.
   return {
     profileNotice,
@@ -100,7 +105,7 @@ export function useMyAccountController() {
     isProfileEditModalOpen,
     closeProfileEditModal,
     editNickname,
-    setEditNickname,
+    setEditNickname: changeNickname,
     editBio,
     setEditBio,
     editTravelStyles,

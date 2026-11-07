@@ -103,6 +103,8 @@ for (const name of (await readdir(repositoryPath('apps/api/migrations')))
   ]);
 }
 await mf.ready;
+// 한 번 실행 도구는 DB 준비가 끝난 뒤에만 앱을 연결한다.
+process.send?.({ type: 'studio-api-ready' });
 console.log(
   'Android Studio 로컬 API: http://127.0.0.1:8787 (로컬 DB·파일 저장소, ' +
     (process.env.TRIPPRINT_STUDIO_GOOGLE_CLIENT_ID &&

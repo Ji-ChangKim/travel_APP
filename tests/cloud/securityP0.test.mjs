@@ -4,6 +4,7 @@ import { randomUUID, createHash } from 'node:crypto';
 import { Buffer } from 'node:buffer';
 import { fileURLToPath } from 'node:url';
 import { before, after, test } from 'node:test';
+import { seedLegacyAccount } from '../fixtures/cloudAccount.mjs';
 import {
   Miniflare,
   convertV4MiniflareOptions,
@@ -59,7 +60,7 @@ before(async () => {
     })
     .join('\n')
     .replace(/--[^\n]*/g, '')
-    .split(';')
+    .split(/;\s*(?:\r?\n|$)/)
     .filter((value) => {
       // 비어 있는 문장을 제외한다.
       return value.trim();
@@ -72,7 +73,7 @@ before(async () => {
   );
   for (let i = 0; i < 4; i++) {
     const email = `security${i}@example.test`;
-    const response = await request('/api/auth/sign-up/email', 'POST', {
+    const response = await seedLegacyAccount(mf, {
       email,
       name: `보안 검수 ${i}`,
       password: 'isolated-security-password!',

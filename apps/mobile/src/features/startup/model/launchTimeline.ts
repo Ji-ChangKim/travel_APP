@@ -6,7 +6,7 @@ export const launchTime = {
   fade: 500,
   thumbnail: 180,
   copy: 120,
-  playbackLimit: 3500,
+  playbackLimit: 4500,
 } as const;
 export type LaunchEnvironment = {
   foreground: boolean;
@@ -113,7 +113,7 @@ export class BiTimeline {
     if (
       this.active &&
       ['waiting', 'video'].includes(this.state.phase) &&
-      (!Number.isFinite(duration) || duration < 1 || duration > 3)
+      (!Number.isFinite(duration) || duration < 1 || duration > 4)
     )
       this.fail('duration');
   };

@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import {
   nicknameBytes,
   nicknameSchema,
+  profileNicknameError,
   validProfileNickname,
   validProfileBirthDate,
 } from '../../packages/validation/src/profile';
@@ -40,6 +41,26 @@ test('기존 이름은 보존하고 실제 이름 변경에는 새 제한을 적
     false,
   );
   assert.equal(nicknameSchema.parse(' 여행자01 '), '여행자01');
+  assert.equal(
+    profileNicknameError('여행😀'),
+    '한글, 영문, 숫자만 사용할 수 있어요.',
+  );
+  assert.equal(
+    profileNicknameError('가'.repeat(11)),
+    '닉네임은 2~10자로 입력해 주세요.',
+  );
+  assert.equal(
+    profileNicknameError(' 오래된 여행자의 이름 ', ' 오래된 여행자의 이름 '),
+    null,
+  );
+  assert.equal(profileNicknameError('하루01'), null);
+  const invalid = nicknameSchema.safeParse('여행😀');
+  assert.equal(invalid.success, false);
+  if (!invalid.success)
+    assert.equal(
+      invalid.error.issues[0]?.message,
+      '한글, 영문, 숫자만 사용할 수 있어요.',
+    );
 });
 test('생일은 실제 날짜만 허용하고 윤년·미래·1900년 이전을 검증한다', () => {
   // 빈 생일은 요청에서 null로 보내며 날짜 검사를 생략한다.

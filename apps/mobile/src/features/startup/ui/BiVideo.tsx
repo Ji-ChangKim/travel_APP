@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { VideoView, useVideoPlayer } from 'expo-video';
 import type { BiTimeline } from '../model/launchTimeline';
@@ -49,14 +49,12 @@ export default function BiVideo({
       player.pause();
     };
   }, [player, timeline]);
-  useLayoutEffect(() => {
+  useEffect(() => {
+    // 웹 VideoView가 플레이어에 연결된 뒤 재생해야 첫 프레임에서 멈추지 않는다.
     // 돌아오면 처음부터 재생하지 않고 현재 위치를 이어간다.
     if (foreground) player.play();
     else player.pause();
-    return () => {
-      // 앱 이탈과 해제에서 재생을 확실히 중단한다.
-      player.pause();
-    };
+    // 화면 해제 시 중단은 위 layout 정리가 맡아 네이티브 객체 해제보다 먼저 실행한다.
   }, [player, foreground]);
   return (
     <View
@@ -69,13 +67,19 @@ export default function BiVideo({
       <VideoView
         player={player}
         nativeControls={false}
+        playsInline
         contentFit="contain"
         surfaceType="textureView"
         fullscreenOptions={{ enable: false }}
         allowsPictureInPicture={false}
         onFirstFrameRender={timeline.firstFrame}
-        style={StyleSheet.absoluteFill}
+        style={[StyleSheet.absoluteFill, styles.video]}
       />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  // 웹의 video는 상하좌우 0만으로 원본 크기가 줄지 않아 명시적으로 화면에 맞춘다.
+  video: { width: '100%', height: '100%' },
+});

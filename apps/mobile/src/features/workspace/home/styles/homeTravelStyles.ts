@@ -1,21 +1,21 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '@/constants/theme';
+import { colors, designTokens } from '@/constants/theme';
 
-// 시안(TripPrint 컨시어지 홈 및 빈 상태 플래너)의 표면 위계와 여백·타이포그래피 토큰을 정의한다.
+// 컨시어지 홈 및 빈 상태 플래너의 표면 위계와 여백·타이포그래피를 공통 디자인 토큰으로 정의한다.
 export const homePalette = {
-  surface: '#F8F9FF',
-  surfaceLowest: '#FFFFFF',
-  surfaceLow: '#EFF4FF',
-  surfaceContainer: '#E5EEFF',
-  surfaceHigh: '#DCE9FF',
-  onSurface: '#0B1C30',
-  onSurfaceVariant: '#45464D',
-  outline: '#76777D',
-  outlineVariant: '#C6C6CD',
-  coralPrimary: '#FD6A49',
-  coralDeep: '#AE3115',
-  coralFixed: '#FFDAD2',
-  onCoralFixed: '#3D0600',
+  surface: colors.background,
+  surfaceLowest: colors.surface,
+  surfaceLow: colors.surfaceMuted,
+  surfaceContainer: designTokens.color.surface.raised,
+  surfaceHigh: designTokens.color.surface.raised,
+  onSurface: colors.text,
+  onSurfaceVariant: colors.muted,
+  outline: colors.borderStrong,
+  outlineVariant: colors.border,
+  coralPrimary: colors.actionPrimary,
+  coralDeep: colors.actionPressed,
+  coralFixed: colors.selectedSurface,
+  onCoralFixed: colors.text,
 } as const;
 
 // 여행 시작·컨시어지·검증 코스·핵심 도구를 같은 간격과 읽기 위계로 구성한다.
@@ -178,7 +178,7 @@ export const homeTravelStyles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 12,
-    backgroundColor: homePalette.coralPrimary,
+    backgroundColor: homePalette.coralDeep,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -188,7 +188,7 @@ export const homeTravelStyles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 20,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: colors.textLight,
   },
   emptySecondaryLink: {
     minHeight: 40,
@@ -336,7 +336,7 @@ export const homeTravelStyles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: colors.textLight,
   },
   conciergeSecondaryBtn: {
     flex: 1,
@@ -425,7 +425,7 @@ export const homeTravelStyles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: colors.textLight,
   },
   // Section 4: 검증 코스 가로 캐러셀
   courseSection: {
@@ -532,7 +532,7 @@ export const homeTravelStyles = StyleSheet.create({
     fontSize: 11,
     lineHeight: 15,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: colors.textLight,
   },
   courseBadgeValueBox: {
     flexDirection: 'row',
@@ -850,7 +850,7 @@ export const homeTravelStyles = StyleSheet.create({
     position: 'relative',
     justifyContent: 'flex-end',
     padding: 12,
-    backgroundColor: '#1E293B',
+    backgroundColor: colors.primary,
   },
   destTag: {
     alignSelf: 'flex-start',
@@ -864,13 +864,13 @@ export const homeTravelStyles = StyleSheet.create({
     fontSize: 10,
     lineHeight: 14,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: colors.textLight,
   },
   destName: {
     fontSize: 15,
     lineHeight: 20,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: colors.textLight,
   },
   destDesc: {
     fontSize: 11,

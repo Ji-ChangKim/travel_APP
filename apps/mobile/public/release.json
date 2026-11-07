@@ -1,7 +1,7 @@
 {
-  "version": "0.0.2",
-  "versionCode": 15,
-  "release": "internal-0.0.2-v15-trip-planning-20261104",
+  "version": "0.0.1",
+  "versionCode": 16,
+  "release": "internal-0.0.1-v16-trip-planning-20261104",
   "environment": "staging",
   "releaseDate": "2026-11-04",
   "webOrigin": "https://tripprint-staging.pages.dev",

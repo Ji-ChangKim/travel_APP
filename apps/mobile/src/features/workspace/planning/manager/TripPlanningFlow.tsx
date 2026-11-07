@@ -1,3 +1,4 @@
+import { stringFormOverrides } from '../../shared/model/formOverrides';
 import { useState, type RefObject } from 'react';
 import { ScrollView } from 'react-native';
 import { renderTripPlanning } from '../ui/TripPlanningFlowView';
@@ -47,7 +48,7 @@ export default function TripPlanningFlow({ scroll, ...inputProps }: Props) {
       if (!draftBusy) inputProps.onChange(key, value);
     },
     onSave: (overrides?: Record<string, string>) => {
-      if (!draftBusy) inputProps.onSave(overrides);
+      if (!draftBusy) inputProps.onSave(stringFormOverrides(overrides));
     },
     onDraftPending: (pending: boolean) => {
       setDraftBusy(pending);
@@ -77,8 +78,9 @@ export default function TripPlanningFlow({ scroll, ...inputProps }: Props) {
     );
   function proceed(
     onValid: () => void,
-    overrides?: Record<string, string>,
+    suppliedValues?: Record<string, string>,
   ): void {
+    const overrides = stringFormOverrides(suppliedValues);
     // 첫 단계에서는 등록한 항공편과 별개로 여행지·기간만 검사한다.
     try {
       if (props.locked) return;

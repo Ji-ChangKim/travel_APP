@@ -1,4 +1,10 @@
+import { canRestoreOnLogin, loginProvider } from './loginRestoration';
 import { betterAuth } from 'better-auth';
+import {
+  APIError,
+  createAuthMiddleware,
+  getAuthoritativeSessionFromCtx,
+} from 'better-auth/api';
 import { anonymous, bearer } from 'better-auth/plugins';
 import { naverOAuth, socialProviders } from './socialProviders';
 import { rejectRequest } from '../../shared/errors';
@@ -8,68 +14,113 @@ import {
 } from '../accounts/accountRetirementPolicy';
 import type { VerifiedSession } from '../../shared/types';
 import {
-  availableGuestNickname,
-  checkedSignupNickname,
-  checkedSocialNickname,
-  checkedUpdatedNickname,
-} from '../accounts/nicknames';
+  assertLegacyPasswordAllowed,
+  clearLinkedPassword,
+  recordGoogleLogin,
+  withoutProviderTokens,
+} from './googleAccountPolicy';
 
-// 요청의 D1 연결로 표준 이메일 인증과 서명된 세션을 구성한다.
+const disabledPaths = [
+  '/sign-up/email',
+  '/sign-in/anonymous',
+  '/delete-anonymous-user',
+  '/get-access-token',
+  '/refresh-token',
+  '/account-info',
+  '/update-user',
+  '/delete-user',
+  '/delete-user/callback',
+  '/unlink-account',
+  '/change-email',
+  '/change-password',
+  '/request-password-reset',
+  '/reset-password',
+];
+
+// Google 인증과 이전 이메일 계정의 로그인 호환을 같은 D1 세션으로 관리한다.
 export function cloudAuth(env: Env, callbackState?: string) {
   // 클라이언트에 관리자 비밀을 전달하지 않고 서버에서만 인증한다.
   return betterAuth({
     database: env.DB || rejectRequest('CONFIGURATION_REQUIRED'),
     secret: env.AUTH_SECRET || rejectRequest('CONFIGURATION_REQUIRED'),
     baseURL: env.AUTH_BASE_URL,
+    disabledPaths,
     socialProviders: socialProviders(env),
-    account: { accountLinking: { enabled: false } },
+    account: {
+      accountLinking: {
+        enabled: true,
+        disableImplicitLinking: true,
+        trustedProviders: ['google'],
+        allowDifferentEmails: false,
+      },
+    },
     trustedOrigins: [
       ...(env.ALLOWED_ORIGINS || '').split(',').filter(Boolean),
       'travelapp://',
       env.AUTH_BASE_URL,
     ],
     emailAndPassword: { enabled: true, minPasswordLength: 8 },
+    hooks: {
+      before: createAuthMiddleware(async (context) => {
+        if (context.path !== '/link-social') return;
+        if (context.body?.provider !== 'google')
+          throw new APIError('FORBIDDEN', { code: 'GOOGLE_LINK_REQUIRED' });
+        const session = await getAuthoritativeSessionFromCtx(context);
+        if (!session || session.user.isAnonymous)
+          throw new APIError('UNAUTHORIZED', { code: 'AUTH_REQUIRED' });
+        await assertActiveAccount(env, session.user.id);
+        // Google 연결은 계정 소유자가 방금 로그인한 세션에서 명시적으로 시작한다.
+        if (
+          Date.now() - new Date(session.session.createdAt).getTime() >=
+          600000
+        )
+          throw new APIError('FORBIDDEN', { code: 'SESSION_NOT_FRESH' });
+      }),
+    },
     databaseHooks: {
       session: {
         create: {
-          before: async (session) => {
-            // 탈퇴·제한 계정은 명시적인 복원 절차 없이 새 세션을 발급하지 않는다.
-            await assertLoginAllowed(env, session.userId);
-            return { data: session };
+          before: async (session, context) => {
+            if (context?.path === '/sign-in/email')
+              await assertLegacyPasswordAllowed(env, session.userId);
+            // 검증된 새 로그인에서만 유예 중인 본인 계정을 복구한다.
+            await assertLoginAllowed(
+              env,
+              session.userId,
+              canRestoreOnLogin(context),
+            );
+            return { data: { ...session, ipAddress: null, userAgent: null } };
           },
+          after: async (session, context) => {
+            if (loginProvider(context) === 'google') {
+              await clearLinkedPassword(env, session.userId);
+              await recordGoogleLogin(env, session.userId, session.createdAt);
+            }
+          },
+        },
+      },
+      account: {
+        create: {
+          before: async (account) => ({ data: withoutProviderTokens(account) }),
+          after: async (account) => {
+            if (account.providerId === 'google')
+              await clearLinkedPassword(env, account.userId);
+          },
+        },
+        update: {
+          before: async (account) => ({ data: withoutProviderTokens(account) }),
         },
       },
       user: {
         create: {
-          before: (user, context) => {
-            // 인증 방식에 맞는 초기 표시명을 사용자 INSERT 전에 확인한다.
-            return (
-              context?.path === '/sign-in/anonymous'
-                ? availableGuestNickname(env)
-                : context?.path === '/sign-up/email'
-                  ? checkedSignupNickname(env, user.name)
-                  : checkedSocialNickname(env, user.name)
-            ).then((name) => {
-              // 최종 중복 생성은 DB 고유 제약에서 차단한다.
-              return { data: { ...user, name } };
-            });
-          },
+          before: async (user) => ({
+            data: { ...user, name: '여행자', image: null },
+          }),
         },
         update: {
-          before: (user, context) => {
-            // 인증 라이브러리의 직접 이름 수정도 새 닉네임 규칙을 지킨다.
-            return context?.path === '/update-user' && user.name !== undefined
-              ? checkedUpdatedNickname(
-                  env,
-                  user.name,
-                  context.context.session?.user.id ||
-                    rejectRequest('AUTH_REQUIRED'),
-                ).then((name) => {
-                  // 이름 검증 외의 인증 프로필 필드는 기존 값으로 전달한다.
-                  return { data: { ...user, name } };
-                })
-              : Promise.resolve({ data: user });
-          },
+          before: async (user) => ({
+            data: { ...user, name: '여행자', image: null },
+          }),
         },
       },
     },
@@ -94,10 +145,7 @@ export function cloudAuth(env: Env, callbackState?: string) {
       naverOAuth(env, callbackState),
       anonymous({
         disableDeleteAnonymousUser: true,
-        generateName: () => {
-          // DB 등록 전에 전체 회원과 겹치지 않는 게스트 이름을 발급한다.
-          return availableGuestNickname(env);
-        },
+        generateName: () => '여행자',
         // 여행 연결은 별도 선택·확인 화면에서 실행하며 인증만으로 전체 이전하지 않는다.
       }),
     ],

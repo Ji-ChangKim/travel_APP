@@ -1,5 +1,6 @@
+import { seedLegacyAccount } from '../fixtures/cloudAccount.mjs';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { Buffer } from 'node:buffer';
@@ -58,30 +59,18 @@ const png = Buffer.from(
 test('공개 일정 담기는 D1에 본인 여행으로 원자 저장되며 재시도·편집·철회가 원본을 바꾸지 않는다', async (t) => {
   // 공개 검수 글은 이 검사 전용 D1에만 만들며 외부 서버는 호출하지 않는다.
   const author = await accountResponse(
-    await request(
-      '/api/auth/sign-up/email',
-      'POST',
-      {
-        name: '담기 원작자',
-        email: `${randomUUID()}@example.test`,
-        password: 'import-test-strong-password!',
-      },
-      undefined,
-      { 'CF-Connecting-IP': '203.0.113.221' },
-    ),
+    await seedLegacyAccount(mf, {
+      name: '담기 원작자',
+      email: `${randomUUID()}@example.test`,
+      password: 'import-test-strong-password!',
+    }),
   );
   const reader = await accountResponse(
-    await request(
-      '/api/auth/sign-up/email',
-      'POST',
-      {
-        name: '담기 여행자',
-        email: `${randomUUID()}@example.test`,
-        password: 'import-test-strong-password!',
-      },
-      undefined,
-      { 'CF-Connecting-IP': '203.0.113.222' },
-    ),
+    await seedLegacyAccount(mf, {
+      name: '담기 여행자',
+      email: `${randomUUID()}@example.test`,
+      password: 'import-test-strong-password!',
+    }),
   );
   const original = (
     await json(
@@ -326,17 +315,11 @@ test('공개 일정 담기는 D1에 본인 여행으로 원자 저장되며 재�
 test('여행계획은 DAY·장소 원문으로 D1 저장하며 단건 공개 조회와 철회가 일치한다', async () => {
   // 별도 회원·여행에서 실제 Worker·D1 명령을 거치며 외부 서버는 호출하지 않는다.
   const member = await accountResponse(
-    await request(
-      '/api/auth/sign-up/email',
-      'POST',
-      {
-        name: '계획 원문 검수',
-        email: `${randomUUID()}@example.test`,
-        password: 'plan-test-strong-password!',
-      },
-      undefined,
-      { 'CF-Connecting-IP': '203.0.113.219' },
-    ),
+    await seedLegacyAccount(mf, {
+      name: '계획 원문 검수',
+      email: `${randomUUID()}@example.test`,
+      password: 'plan-test-strong-password!',
+    }),
   );
   const created = await json(
     await request(
@@ -679,17 +662,11 @@ test('R08 Worker 공개 정책은 운영값 미설정에서 인증·DB 조회 �
 
 test('R07 D1 기간 변경은 실제 날짜의 DAY ID를 유지하고 연결 날짜 제거를 원자적으로 거부한다', () => {
   // 기존 통합 시나리오와 별도의 회원·여행으로 저장 계약을 확인한다.
-  return request(
-    '/api/auth/sign-up/email',
-    'POST',
-    {
-      name: '기간 검증자',
-      email: `${randomUUID()}@example.test`,
-      password: 'r07-strong-password!',
-    },
-    undefined,
-    { 'CF-Connecting-IP': '203.0.113.107' },
-  )
+  return seedLegacyAccount(mf, {
+    name: '기간 검증자',
+    email: `${randomUUID()}@example.test`,
+    password: 'r07-strong-password!',
+  })
     .then(accountResponse)
     .then((member) => {
       // 날짜의 순서가 바뀌어도 일정의 실제 부모가 같아야 한다.
@@ -839,17 +816,9 @@ before(() => {
   return mf.getD1Database('DB').then((db) => {
     // 실제 배포 파일의 모든 DDL을 원자적으로 적용한다.
     return db.batch(
-      [
-        '0001_cloud_storage.sql',
-        '0002_auth_rate_limit.sql',
-        '0003_upload_deletion.sql',
-        '0004_receipt_scans.sql',
-        '0005_member_onboarding.sql',
-        '0006_unique_nicknames.sql',
-        '0007_account_retirements.sql',
-        '0009_receipt_cleanup_jobs.sql',
-        '0010_home_server_data.sql',
-      ]
+      readdirSync(new URL('../../apps/api/migrations/', import.meta.url))
+        .filter((name) => name.endsWith('.sql'))
+        .sort()
         .map((file) => {
           /* 배포 마이그레이션을 순서대로 읽는다. */ return readFileSync(
             new URL('../../apps/api/migrations/' + file, import.meta.url),
@@ -858,7 +827,7 @@ before(() => {
         })
         .join('\n')
         .replace(/--[^\n]*/g, '')
-        .split(';')
+        .split(/;\s*(?:\r?\n|$)/)
         .filter((sql) => {
           /* 비어 있는 SQL은 실행하지 않는다. */ return sql.trim();
         })
@@ -923,7 +892,7 @@ function migrationSql(file) {
     'utf8',
   )
     .replace(/--[^\n]*/g, '')
-    .split(';')
+    .split(/;\s*(?:\r?\n|$)/)
     .filter((sql) => {
       // 빈 명령은 제외한다.
       return sql.trim();
@@ -998,88 +967,25 @@ function prepareLegacyNicknames(
 }
 
 // 회원과 게스트가 같은 DB 고유 닉네임 규칙을 사용하는지 검사한다.
-test('게스트 이름 발급과 회원 가입·변경의 전역 닉네임 중복 차단', () => {
-  // 테스트 요청 제한은 기존 인증 인수와 별도의 IP로 격리한다.
-  return Promise.all([
-    request('/api/auth/sign-in/anonymous', 'POST', {}, undefined, {
-      'CF-Connecting-IP': '203.0.113.110',
-    }),
-    request('/api/auth/sign-in/anonymous', 'POST', {}, undefined, {
-      'CF-Connecting-IP': '203.0.113.111',
-    }),
-  ])
-    .then((responses) => {
-      // 실제 발급된 세션과 사용자만 중복 검사에 사용한다.
-      return Promise.all(
-        responses.map((response) => {
-          // 성공 응답의 이름 형식을 확인하고 원문 토큰은 출력하지 않는다.
-          return json(response).then((body) => {
-            // 인증 계정 DB의 익명 상태와 규칙을 확인한다.
-            return (
-              assert.match(body.user.name, /^Quest-[A-Z0-9]{6}$/),
-              assert.equal(body.user.isAnonymous, true),
-              {
-                id: body.user.id,
-                nickname: body.user.name,
-                token: response.headers.get('set-auth-token'),
-              }
-            );
-          });
-        }),
-      );
-    })
-    .then((guests) => {
-      // 서로 다른 게스트와 회원이 같은 닉네임을 차지할 수 없다.
-      return (
-        assert.notEqual(guests[0].nickname, guests[1].nickname),
-        Promise.all([
-          request(
-            '/api/auth/sign-up/email',
-            'POST',
-            {
-              name: guests[0].nickname.toLowerCase(),
-              email: 'nickname-collision@example.test',
-              password: 'a-strong-test-password!',
-            },
-            undefined,
-            { 'CF-Connecting-IP': '203.0.113.112' },
-          ).then((response) => {
-            // 게스트 이름을 회원 가입에서 다시 사용하는 것을 거부한다.
-            return (
-              assert.equal(response.status, 409),
-              response.json().then((body) => {
-                // 공개 중복 코드만 응답한다.
-                return assert.equal(body.code, 'NICKNAME_TAKEN');
-              })
-            );
-          }),
-          request(
-            '/api/v1/profile',
-            'PATCH',
-            { nickname: ` ${guests[0].nickname} ` },
-            guests[1],
-          ).then((response) => {
-            // 앞뒤 공백으로 닉네임 중복을 우회할 수 없다.
-            return (
-              assert.equal(response.status, 409),
-              response.json().then((body) => {
-                // 프로필 API도 같은 중복 오류를 사용한다.
-                return assert.equal(body.error.code, 'NICKNAME_TAKEN');
-              })
-            );
-          }),
-          mf.getD1Database('DB').then((db) => {
-            // 직접 SQL 쓰기에도 고유 제약이 적용되어 동시 요청을 보호한다.
-            return assert.rejects(
-              db
-                .prepare('UPDATE user SET name=? WHERE id=?')
-                .bind(guests[0].nickname, guests[1].id)
-                .run(),
-            );
-          }),
-        ])
-      );
+test('신규 이메일·서버 익명 가입과 익명 직접 삭제는 HTTP에서 차단한다', async () => {
+  const db = await mf.getD1Database('DB');
+  const before = await db.prepare('SELECT count(*) AS total FROM user').first();
+  for (const path of [
+    '/api/auth/sign-up/email',
+    '/api/auth/sign-in/anonymous',
+    '/api/auth/delete-anonymous-user',
+  ]) {
+    const response = await request(path, 'POST', {
+      name: '새 회원',
+      email: randomUUID() + '@example.test',
+      password: 'blocked-test-password!',
     });
+    assert.equal(response.status, 404, path);
+  }
+  assert.deepEqual(
+    await db.prepare('SELECT count(*) AS total FROM user').first(),
+    before,
+  );
 });
 
 // 실제 Worker HTTP 경계에서 요청을 실행한다.
@@ -1116,20 +1022,14 @@ function json(response, status = 200) {
       });
 }
 
-// 로그인 서버에서 실제 회원과 서명 토큰을 생성한다.
-function signup(index, headers = {}) {
-  // 비밀번호를 표준 인증 엔드포인트에 등록한다.
-  return request(
-    '/api/auth/sign-up/email',
-    'POST',
-    {
-      email: `user${index}@example.test`,
-      password: 'a-strong-test-password!',
-      name: `여행자 ${index}`,
-    },
-    undefined,
-    headers,
-  ).then((response) => {
+// 기존 이메일 계정 자료와 실제 SDK의 서명 세션을 준비한다.
+function signup(index) {
+  // 신규 가입 HTTP 경로를 열지 않고 기존 자료의 호환성을 검사한다.
+  return seedLegacyAccount(mf, {
+    email: `user${index}@example.test`,
+    password: 'a-strong-test-password!',
+    name: `여행자 ${index}`,
+  }).then((response) => {
     /* 실제 발급 토큰을 보관한다. */ return response.json().then((body) => {
       /* 회원 생성 성공을 검사한다. */ return (
         assert.equal(response.status, 200, JSON.stringify(body)),
@@ -1144,372 +1044,167 @@ function signup(index, headers = {}) {
 }
 
 // R04 입력 계약을 독립된 실제 이메일 계정으로 검사한다.
-function r04Member(name) {
-  // 다른 인증 시나리오의 닉네임과 요청 제한을 공유하지 않는다.
-  return request(
-    '/api/auth/sign-up/email',
-    'POST',
-    {
-      name,
-      email: `${randomUUID()}@example.test`,
-      password: 'r04-strong-password!',
-    },
-    undefined,
-    { 'CF-Connecting-IP': '203.0.113.104' },
-  ).then(accountResponse);
-}
 
 // 프로필 저장 결과를 요청한 필드별 기대값과 비교한다.
-function r04ProfileStep(member, input, expected, status = 200) {
-  // 실패한 입력이 성공으로 처리되거나 저장값을 덮어쓰지 않게 검사한다.
-  return request('/api/v1/profile', 'PATCH', input, member)
-    .then((response) => {
-      // 실패 응답도 실제 HTTP 상태를 확인한다.
-      return json(response, status);
-    })
-    .then((body) => {
-      // 요청마다 확인할 프로필 필드만 비교한다.
-      return Object.entries(expected).forEach(([field, value]) => {
-        // 서버가 응답한 값과 기대값을 정확히 비교한다.
-        return assert.deepEqual(body.data?.[field], value);
-      });
-    });
-}
 
-test('R04 생일 없이 완료하고 재조회·생일 추가·생략·삭제 후에도 완료를 유지한다', () => {
-  // 완료 여부를 생일 값에서 추론하지 않고 실제 D1 저장으로 확인한다.
-  return r04Member('R04 birthday').then((member) =>
-    /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
-      member,
-      { bio: '먼저 소개' },
-      { onboardingCompleted: false, birthDate: null },
-    )
-      .then(() =>
-        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
-          member,
-          { gender: 'unspecified', birthDate: null, onboardingCompleted: true },
-          { onboardingCompleted: true, birthDate: null, gender: 'unspecified' },
-        ),
-      )
-      .then(() =>
-        /* 실제 API 요청으로 다음 입력을 검사한다. */ request(
-          '/api/v1/profile',
-          'GET',
-          undefined,
-          member,
-        ),
-      )
-      .then(json)
-      .then((body) => {
-        // 새 조회에서도 생일 없이 완료한 상태를 복원한다.
-        return assert.deepEqual(
-          [body.data.birthDate, body.data.onboardingCompleted],
-          [null, true],
-        );
-      })
-      .then(() => /* 검증용 D1 바인딩을 가져온다. */ mf.getD1Database('DB'))
-      .then((db) =>
-        /* 검증에 필요한 과거 데이터를 D1에 준비한다. */ db
-          .prepare(
-            'SELECT onboarding_completed_at,birth_date FROM profiles WHERE user_id=?',
-          )
-          .bind(member.id)
-          .first(),
-      )
-      .then((row) => {
-        // 응답만 바뀐 것이 아니라 완료 시각과 빈 생일이 DB에 저장되어야 한다.
-        return assert.ok(
-          row.onboarding_completed_at > 0 && row.birth_date === null,
-        );
-      })
-      .then(() =>
-        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
-          member,
-          { birthDate: '1996-02-29' },
-          { birthDate: '1996-02-29', onboardingCompleted: true },
-        ),
-      )
-      .then(() =>
-        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
-          member,
-          { bio: '생일 유지' },
-          { birthDate: '1996-02-29', onboardingCompleted: true },
-        ),
-      )
-      .then(() =>
-        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
-          member,
-          { birthDate: null },
-          { birthDate: null, onboardingCompleted: true },
-        ),
-      )
-      .then(() =>
-        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
-          member,
-          { birthDate: '2025-02-30' },
-          {},
-          422,
-        ),
-      )
-      .then(() =>
-        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
-          member,
-          { birthDate: '' },
-          {},
-          422,
-        ),
-      )
-      .then(() =>
-        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
-          member,
-          { onboardingCompleted: false },
-          {},
-          422,
-        ),
-      )
-      .then(() =>
-        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
-          member,
-          { bio: '오류 후 유지' },
-          { birthDate: null, onboardingCompleted: true },
-        ),
-      ),
+test('추가 프로필 입력은 받지 않으며 조회에는 성별·생일·소개·여행스타일을 담지 않는다', async () => {
+  const member = await accountResponse(
+    await seedLegacyAccount(mf, {
+      name: 'Private Name',
+      email: randomUUID() + '@example.test',
+      password: 'profile-policy-password!',
+    }),
   );
-});
-
-test('R04 닉네임 바이트 경계와 공백을 검사하고 기존 긴 이름을 보존한다', () => {
-  // 과거 이름은 DB에 직접 준비하되 변경은 실제 인증 API로 실행한다.
-  return r04Member('R04 nickname').then((member) =>
-    /* 검증용 D1 바인딩을 가져온다. */ mf
-      .getD1Database('DB')
-      .then((db) =>
-        /* 검증에 필요한 과거 데이터를 D1에 준비한다. */ db
-          .prepare('UPDATE user SET name=? WHERE id=?')
-          .bind(' 오래된 여행자의 긴 이름 ', member.id)
-          .run(),
-      )
-      .then(() =>
-        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
-          member,
-          {
-            nickname: ' 오래된 여행자의 긴 이름 ',
-            bio: '소개만 변경',
-            onboardingCompleted: true,
-          },
-          { nickname: ' 오래된 여행자의 긴 이름 ', onboardingCompleted: true },
-        ),
-      )
-      .then(() =>
-        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
-          member,
-          { bio: '이름 생략' },
-          { nickname: ' 오래된 여행자의 긴 이름 ' },
-        ),
-      )
-      .then(() =>
-        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
-          member,
-          { nickname: '또 다른 여행자의 긴 이름' },
-          {},
-          422,
-        ),
-      )
-      .then(() =>
-        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
-          member,
-          { nickname: 'a' },
-          {},
-          422,
-        ),
-      )
-      .then(() =>
-        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
-          member,
-          { nickname: '  ' },
-          {},
-          422,
-        ),
-      )
-      .then(() =>
-        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
-          member,
-          { nickname: 'a'.repeat(20) },
-          { nickname: 'a'.repeat(20) },
-        ),
-      )
-      .then(() =>
-        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
-          member,
-          { nickname: 'a'.repeat(21) },
-          {},
-          422,
-        ),
-      )
-      .then(() =>
-        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
-          member,
-          { nickname: '가'.repeat(6) + ' a' },
-          { nickname: '가'.repeat(6) + ' a' },
-        ),
-      )
-      .then(() =>
-        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
-          member,
-          { nickname: '가'.repeat(7) },
-          {},
-          422,
-        ),
-      )
-      .then(() =>
-        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
-          member,
-          { nickname: '😀'.repeat(5) },
-          { nickname: '😀'.repeat(5) },
-        ),
-      )
-      .then(() =>
-        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
-          member,
-          { nickname: '😀'.repeat(6) },
-          {},
-          422,
-        ),
-      )
-      .then(() =>
-        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
-          member,
-          { nickname: ' xy ' },
-          { nickname: ' xy ' },
-        ),
-      )
-      .then(() =>
-        /* 다음 프로필 변경의 저장 결과를 검사한다. */ r04ProfileStep(
-          member,
-          {
-            nickname: '이름은 긴데 예전 이름이라고 주장',
-            previousNickname: '이름은 긴데 예전 이름이라고 주장',
-          },
-          {},
-          422,
-        ),
-      ),
+  const db = await mf.getD1Database('DB');
+  for (const input of [
+    { birthDate: '1996-02-29' },
+    { gender: 'female' },
+    { bio: 'private text', travelStyles: ['미식'] },
+    { onboardingCompleted: true },
+  ]) {
+    const response = await request('/api/v1/profile', 'PATCH', input, member);
+    assert.equal(response.status, 410);
+    assert.equal((await response.json()).error.code, 'PROFILE_INPUT_RETIRED');
+  }
+  assert.equal(
+    await db
+      .prepare('SELECT user_id FROM profiles WHERE user_id=?')
+      .bind(member.id)
+      .first(),
+    null,
   );
+  for (let count = 0; count < 2; count++) {
+    const profile = (
+      await json(await request('/api/v1/profile', 'GET', undefined, member))
+    ).data;
+    assert.equal(profile.nickname, '여행자');
+    assert.equal(profile.avatarUrl, null);
+    assert.equal(profile.onboardingCompleted, true);
+    for (const field of ['gender', 'birthDate', 'bio', 'travelStyles'])
+      assert.equal(Object.hasOwn(profile, field), false, field);
+  }
 });
 
-test('R04 이메일 가입도 2~20바이트를 검사하고 앞뒤 공백을 보존한다', () => {
-  // 화면을 거치지 않은 가입 요청에도 같은 제한을 적용한다.
-  return ['a', 'a'.repeat(21), '가'.repeat(7), '😀'.repeat(6), '  ']
-    .reduce((previous, name) => {
-      // 중복 여부와 무관하게 길이가 잘못된 신규 이름을 거부한다.
-      return previous
-        .then(() =>
-          /* 실제 API 요청으로 다음 입력을 검사한다. */ request(
-            '/api/auth/sign-up/email',
-            'POST',
-            {
-              name,
-              email: `${randomUUID()}@example.test`,
-              password: 'r04-strong-password!',
-            },
-            undefined,
-            { 'CF-Connecting-IP': '203.0.113.105' },
-          ),
-        )
-        .then((response) => {
-          // Better Auth의 입력 오류 계약을 확인한다.
-          return assert.equal(response.status, 400);
-        });
-    }, Promise.resolve())
-    .then(() =>
-      /* 같은 계정의 다음 검증 단계만 실행한다. */ r04Member(' signup space '),
+test('닫힌 프로필 입력은 기존 자료·여행 참조를 덮어쓰지 않는다', async () => {
+  const member = await accountResponse(
+    await seedLegacyAccount(mf, {
+      name: 'Base',
+      email: randomUUID() + '@example.test',
+      password: 'legacy-profile-password!',
+    }),
+  );
+  const db = await mf.getD1Database('DB');
+  await db
+    .prepare('UPDATE user SET name=? WHERE id=?')
+    .bind(' 오래된 여행자의 긴 이름 ', member.id)
+    .run();
+  await db
+    .prepare(
+      'INSERT INTO profiles(user_id,details,gender,birth_date) VALUES(?,?,?,?)',
     )
-    .then((member) =>
-      /* 실제 API 요청으로 다음 입력을 검사한다. */ request(
-        '/api/v1/profile',
-        'GET',
-        undefined,
-        member,
-      ),
+    .bind(
+      member.id,
+      JSON.stringify({ bio: '보존 대상', travelStyles: ['미식'] }),
+      'female',
+      '1996-02-29',
     )
-    .then(json)
-    .then((body) => {
-      // 가입 과정에서도 입력한 공백을 임의 제거하지 않는다.
-      return assert.equal(body.data.nickname, ' signup space ');
-    });
-});
-
-test('R04 인증 이름 수정 경로도 기존 이름을 유지하고 길이·중복 우회를 막는다', () => {
-  // 프로필 API 외에 인증 라이브러리의 공개 이름 수정 경로도 검사한다.
-  return r04Member('R04 collide')
-    .then(() => {
-      // 중복 검사에 쓰는 상대 계정도 이 테스트에서 직접 만든다.
-      return r04Member('R04 auth name');
-    })
-    .then((member) =>
-      /* 검증용 D1 바인딩을 가져온다. */ mf
-        .getD1Database('DB')
-        .then((db) =>
-          /* 검증에 필요한 과거 데이터를 D1에 준비한다. */ db
-            .prepare('UPDATE user SET name=? WHERE id=?')
-            .bind('기존 인증 회원의 긴 이름', member.id)
-            .run(),
-        )
-        .then(() =>
-          /* 실제 API 요청으로 다음 입력을 검사한다. */ request(
-            '/api/auth/update-user',
-            'POST',
-            { name: '기존 인증 회원의 긴 이름' },
-            member,
-          ),
-        )
-        .then(json)
-        .then(() =>
-          /* 실제 API 요청으로 다음 입력을 검사한다. */ request(
-            '/api/auth/update-user',
-            'POST',
-            { name: 'a'.repeat(21) },
-            member,
-          ),
-        )
-        .then((response) => {
-          // 별도 인증 경로에서도 잘못된 길이를 거부한다.
-          return assert.equal(response.status, 400);
-        })
-        .then(() =>
-          /* 실제 API 요청으로 다음 입력을 검사한다. */ request(
-            '/api/auth/update-user',
-            'POST',
-            { name: 'R04 collide' },
-            member,
-          ),
-        )
-        .then((response) => {
-          // 다른 회원의 이름을 가져오지 못하게 한다.
-          return assert.equal(response.status, 409);
-        })
-        .then(() =>
-          /* 실제 API 요청으로 다음 입력을 검사한다. */ request(
-            '/api/auth/update-user',
-            'POST',
-            { name: ' r04 updated ' },
-            member,
-          ),
-        )
-        .then(json)
-        .then(() =>
-          /* 실제 API 요청으로 다음 입력을 검사한다. */ request(
-            '/api/v1/profile',
-            'GET',
-            undefined,
-            member,
-          ),
-        )
-        .then(json)
-        .then((body) => {
-          // 유효한 이름만 공백을 포함해 그대로 저장한다.
-          return assert.equal(body.data.nickname, ' r04 updated ');
-        }),
+    .run();
+  const before = await db
+    .prepare('SELECT * FROM profiles WHERE user_id=?')
+    .bind(member.id)
+    .first();
+  for (const nickname of [
+    'a',
+    'a'.repeat(21),
+    '가'.repeat(7),
+    '😀'.repeat(6),
+    '  ',
+    '새 이름',
+  ])
+    assert.equal(
+      (await request('/api/v1/profile', 'PATCH', { nickname }, member)).status,
+      410,
     );
+  assert.deepEqual(
+    await db
+      .prepare('SELECT * FROM profiles WHERE user_id=?')
+      .bind(member.id)
+      .first(),
+    before,
+  );
+  assert.equal(
+    (
+      await db
+        .prepare('SELECT name FROM user WHERE id=?')
+        .bind(member.id)
+        .first()
+    ).name,
+    ' 오래된 여행자의 긴 이름 ',
+  );
+  assert.equal(
+    (await json(await request('/api/v1/profile', 'GET', undefined, member)))
+      .data.nickname,
+    '여행자',
+  );
+});
+
+test('신규 가입 차단은 이름 길이·문자 종류와 무관하며 개인정보를 저장하지 않는다', async () => {
+  const db = await mf.getD1Database('DB');
+  for (const name of [
+    'a',
+    'a'.repeat(21),
+    '가'.repeat(7),
+    '😀'.repeat(6),
+    '  ',
+    '유효한 이름',
+  ]) {
+    const email = randomUUID() + '@example.test';
+    assert.equal(
+      (
+        await request('/api/auth/sign-up/email', 'POST', {
+          name,
+          email,
+          password: 'blocked-signup-password!',
+        })
+      ).status,
+      404,
+    );
+    assert.equal(
+      await db.prepare('SELECT id FROM user WHERE email=?').bind(email).first(),
+      null,
+    );
+  }
+});
+
+test('직접 인증 프로필·토큰·삭제 경로도 닫혀 기존 계정 자료를 보존한다', async () => {
+  const member = await accountResponse(
+    await seedLegacyAccount(mf, {
+      name: 'Private',
+      email: randomUUID() + '@example.test',
+      password: 'closed-auth-password!',
+    }),
+  );
+  const db = await mf.getD1Database('DB');
+  const before = await db
+    .prepare('SELECT * FROM user WHERE id=?')
+    .bind(member.id)
+    .first();
+  for (const path of [
+    '/api/auth/update-user',
+    '/api/auth/delete-user',
+    '/api/auth/delete-anonymous-user',
+    '/api/auth/get-access-token',
+    '/api/auth/refresh-token',
+  ])
+    assert.equal(
+      (await request(path, 'POST', { name: '새 이름' }, member)).status,
+      404,
+      path,
+    );
+  assert.deepEqual(
+    await db.prepare('SELECT * FROM user WHERE id=?').bind(member.id).first(),
+    before,
+  );
 });
 
 // 공통 저장 명령에서 실제 버전과 멱등 키를 사용한다.
@@ -2040,19 +1735,16 @@ test('동시 요청의 한 번 저장·영수증 원자 저장·삭제 보호·�
         state.users[0],
       ),
     )
-    .then(json)
+    .then((response) => json(response, 410))
     .then((body) => {
-      /* 프로필은 서버 확정 데이터여야 한다. */ return assert.equal(
-        body.data.nickname,
-        '수정한 여행자',
-      );
+      return assert.equal(body.error.code, 'PROFILE_INPUT_RETIRED');
     })
     .then(() => request('/api/v1/profile', 'GET', undefined, state.users[0]))
     .then(json)
     .then((body) => {
-      /* 재조회에서도 상세 프로필이 보존되는지 확인한다. */ return assert.deepEqual(
+      /* 재조회에서도 수집을 중단한 정보를 노출하지 않는다. */ return assert.equal(
         body.data.travelStyles,
-        ['미식'],
+        undefined,
       );
     })
     .then(() =>
@@ -2622,45 +2314,39 @@ test('D1 인증 요청 제한은 여러 Worker 요청에서도 유지된다', ()
 });
 
 // 정책 변경 전에 남은 게스트 여행도 계정 연결 후 같은 ID로 이어져야 한다.
-test('기존 게스트 여행 → 프로필 검증 → 이메일 연결 → 여행 소유권 이전 및 이전 토큰 철회', () => {
-  // 실제 인증 HTTP와 D1 원자 이전을 하나의 인수 흐름으로 검사한다.
-  return guestAccount().then((guest) =>
-    guestTravel(guest).then((tripId) =>
-      request(
-        '/api/auth/sign-up/email',
-        'POST',
-        {
-          email: 'linked@example.test',
-          password: 'strong-link-password!',
-          name: '연결한 여행자',
-        },
-        guest,
-      )
-        .then((response) => accountResponse(response))
-        .then((member) => verifyLinkedTravel(guest, member, tripId)),
-    ),
+test('기존 익명 여행은 다른 회원 로그인만으로 자동 이전하거나 토큰을 철회하지 않는다', async () => {
+  const guest = await guestAccount();
+  const tripId = await guestTravel(guest);
+  const member = await accountResponse(
+    await seedLegacyAccount(mf, {
+      name: '연결 별도 선택',
+      email: randomUUID() + '@example.test',
+      password: 'separate-login-password!',
+    }),
   );
+  await verifyLinkedTravel(guest, member, tripId);
 });
 
-// 게스트 회원과 서명된 토큰이 서버에서 발급되었는지 검사한다.
-function guestAccount() {
-  // 로컬 프로필을 인증 자료로 주입하지 않는다.
-  return request('/api/auth/sign-in/anonymous', 'POST', {})
-    .then(accountResponse)
-    .then((guest) =>
-      request('/api/v1/profile', 'GET', undefined, guest)
-        .then(json)
-        .then((body) => {
-          // 게스트의 ID·연동 정보·가입 절차 생략은 서버 원본이어야 한다.
-          return (
-            assert.equal(body.data.id, guest.id),
-            assert.equal(body.data.authProvider, 'guest'),
-            assert.equal(body.data.linkedId, guest.id),
-            assert.equal(body.data.onboardingCompleted, true),
-            guest
-          );
-        }),
-    );
+// 신규 익명 가입 없이 이전 서버 익명 계정 자료를 구성한다.
+async function guestAccount() {
+  const guest = await accountResponse(
+    await seedLegacyAccount(mf, {
+      name: '기존 익명 자료',
+      email: randomUUID() + '@example.test',
+      password: 'legacy-guest-fixture-password!',
+    }),
+  );
+  const db = await mf.getD1Database('DB');
+  await db
+    .prepare('UPDATE user SET isAnonymous=1 WHERE id=?')
+    .bind(guest.id)
+    .run();
+  const profile = (
+    await json(await request('/api/v1/profile', 'GET', undefined, guest))
+  ).data;
+  assert.equal(profile.authProvider, 'guest');
+  assert.equal(profile.id, guest.id);
+  return guest;
 }
 
 // 실제 서버 응답의 회원 ID와 서명 헤더 토큰을 검사한다.
@@ -2676,57 +2362,55 @@ function accountResponse(response) {
 }
 
 // 기존 동행에게 연결할 때 두 권한을 병합하고 멤버를 중복 생성하지 않는다.
-test('게스트를 이미 참여한 회원에 연결해 소유자·편집자 권한을 보존한다', () => {
-  // 같은 여행에 기존 회원이 있는 두 경우를 실제 인증 연결로 검사한다.
-  return checkMemberCollision('owner').then(() => {
-    // 편집자와 조회자 충돌도 더 높은 실제 권한으로 병합한다.
-    return checkMemberCollision('editor');
-  });
+test('기존 익명 자료와 회원 로그인이 같은 여행의 소유자·편집자 권한을 자동 병합하지 않는다', async () => {
+  await checkMemberCollision('owner');
+  await checkMemberCollision('editor');
 });
 
 // 기존 회원과 게스트가 같은 여행에 참여한 상태에서 계정 연결을 검사한다.
-function checkMemberCollision(role) {
-  // 이전 테스트에서 발급한 실제 계정에 이메일 로그인으로 연결한다.
-  return guestAccount().then((guest) =>
-    guestTravel(guest).then((trip) =>
-      seedMemberCollision(guest, trip, role)
-        .then(() => {
-          // 게스트 토큰을 인증 서버가 확인하도록 헤더로 전달한다.
-          return request(
-            '/api/auth/sign-in/email',
-            'POST',
-            {
-              email: 'user0@example.test',
-              password: 'a-strong-test-password!',
-            },
-            guest,
-          );
-        })
-        .then(accountResponse)
-        .then((member) =>
-          request(`/api/v1/trips/${trip}/workspace`, 'GET', undefined, member),
-        )
-        .then(json)
-        .then((body) => {
-          // 스냅샷과 권한 인덱스가 같은 회원 역할과 한 개의 멤버를 유지한다.
-          return (
-            assert.equal(body.data.myRole, role),
-            assert.equal(
-              body.data.members.filter(
-                (entry) => entry.userId === state.users[0].id,
-              ).length,
-              1,
-            ),
-            assert.equal(
-              body.data.members.find(
-                (entry) => entry.userId === state.users[0].id,
-              ).role,
-              role,
-            ),
-            assert.equal(body.data.trip.version, 2)
-          );
-        }),
+async function checkMemberCollision(role) {
+  const guest = await guestAccount();
+  const trip = await guestTravel(guest);
+  await seedMemberCollision(guest, trip, role);
+  const member = await accountResponse(
+    await request(
+      '/api/auth/sign-in/email',
+      'POST',
+      { email: 'user0@example.test', password: 'a-strong-test-password!' },
+      guest,
     ),
+  );
+  const snapshot = (
+    await json(
+      await request(
+        '/api/v1/trips/' + trip + '/workspace',
+        'GET',
+        undefined,
+        member,
+      ),
+    )
+  ).data;
+  assert.equal(snapshot.myRole, 'viewer');
+  assert.equal(
+    snapshot.members.filter((entry) => entry.userId === state.users[0].id)
+      .length,
+    1,
+  );
+  assert.equal(
+    snapshot.members.find((entry) => entry.userId === guest.id).role,
+    role,
+  );
+  assert.equal(snapshot.trip.version, 1);
+  assert.equal(
+    (
+      await request(
+        '/api/v1/trips/' + trip + '/workspace',
+        'GET',
+        undefined,
+        guest,
+      )
+    ).status,
+    200,
   );
 }
 
@@ -2914,17 +2598,11 @@ test('DEV01 익명 세션은 신규 여행·초안 쓰기를 거부하고 회원
     0,
   );
   const member = await accountResponse(
-    await request(
-      '/api/auth/sign-up/email',
-      'POST',
-      {
-        name: `회원${randomUUID().slice(0, 8)}`,
-        email: `${randomUUID()}@example.test`,
-        password: 'member-only-test-password!',
-      },
-      undefined,
-      { 'CF-Connecting-IP': '203.0.113.240' },
-    ),
+    await seedLegacyAccount(mf, {
+      name: `회원${randomUUID().slice(0, 8)}`,
+      email: `${randomUUID()}@example.test`,
+      password: 'member-only-test-password!',
+    }),
   );
   assert.equal(
     (await request(`/api/v1/plan-drafts/${draftId}`, 'PUT', draft, member))
@@ -2955,95 +2633,39 @@ test('DEV01 익명 세션은 신규 여행·초안 쓰기를 거부하고 회원
 });
 
 // 연결한 회원의 정보·권한·개인정보 입력을 실제 API로 검증한다.
-function verifyLinkedTravel(guest, member, tripId) {
-  // 이전 계정 토큰의 접근은 연결 완료 시 철회되어야 한다.
-  return request('/api/v1/profile', 'GET', undefined, member)
-    .then(json)
-    .then((body) => {
-      // 신규 일반 회원은 세 가지 설정을 완료해야 한다.
-      return (
-        assert.equal(body.data.authProvider, 'email'),
-        assert.equal(body.data.onboardingCompleted, false)
-      );
-    })
-    .then(() =>
-      request(
-        '/api/v1/profile',
-        'PATCH',
-        { nickname: '부산 여행자', gender: 'female', birthDate: '2025-02-30' },
-        member,
+async function verifyLinkedTravel(guest, member, tripId) {
+  const snapshot = (
+    await json(
+      await request(
+        '/api/v1/trips/' + tripId + '/workspace',
+        'GET',
+        undefined,
+        guest,
       ),
     )
-    .then((response) => {
-      // 달력 자동 보정으로 불가능한 생일을 수락하지 않는다.
-      return assert.equal(response.status, 422);
-    })
-    .then(() =>
-      request(
-        '/api/v1/profile',
-        'PATCH',
-        {
-          nickname: '부산 여행자',
-          gender: 'unspecified',
-          birthDate: '1996-02-29',
-          bio: '기존 소개',
-        },
+  ).data;
+  assert.equal(snapshot.trip.ownerId, guest.id);
+  assert.equal(snapshot.myRole, 'owner');
+  assert.equal(snapshot.trip.version, 1);
+  assert.equal(
+    (
+      await request(
+        '/api/v1/trips/' + tripId + '/workspace',
+        'GET',
+        undefined,
         member,
-      ),
-    )
-    .then(json)
-    .then((body) => {
-      // 유효 윤년 생일과 성별 비선택도 설정을 마칠 수 있어야 한다.
-      return (
-        assert.equal(body.data.birthDate, '1996-02-29'),
-        assert.equal(body.data.gender, 'unspecified'),
-        assert.equal(body.data.onboardingCompleted, true)
-      );
-    })
-    .then(() =>
-      request('/api/v1/profile', 'PATCH', { nickname: '새 이름' }, member),
-    )
-    .then(json)
-    .then((body) => {
-      // 닉네임만 변경할 때 상세 프로필을 삭제하지 않는다.
-      return (
-        assert.equal(body.data.birthDate, '1996-02-29'),
-        assert.equal(body.data.bio, '기존 소개')
-      );
-    })
-    .then(() =>
-      request(`/api/v1/trips/${tripId}/workspace`, 'GET', undefined, member),
-    )
-    .then(json)
-    .then((body) => {
-      // 실제 스냅샷과 멤버 권한은 새 회원에게 함께 이전되어야 한다.
-      return (
-        assert.equal(body.data.trip.ownerId, member.id),
-        assert.equal(body.data.myRole, 'owner'),
-        assert.equal(body.data.trip.version, 2),
-        assert.equal(body.data.members.length, 1),
-        assert.equal(body.data.members[0].userId, member.id)
-      );
-    })
-    .then(() =>
-      request(`/api/v1/trips/${tripId}/workspace`, 'GET', undefined, guest),
-    )
-    .then((response) => {
-      // 철회된 게스트 토큰은 여행에 다시 접근할 수 없어야 한다.
-      return assert.equal(response.status, 401);
-    })
-    .then(() =>
-      request(
-        '/api/v1/profile',
-        'PATCH',
-        { nickname: '새 이름', gender: 'male', birthDate: '2999-01-01' },
-        member,
-      ),
-    )
-    .then((response) => {
-      // 미래 날짜도 회원 정보로 저장하지 않는다.
-      return assert.equal(response.status, 422);
-    });
+      )
+    ).status,
+    404,
+  );
+  const db = await mf.getD1Database('DB');
+  assert.equal(
+    await db
+      .prepare('SELECT guest_id FROM guest_links WHERE guest_id=?')
+      .bind(guest.id)
+      .first(),
+    null,
+  );
 }
 
 // 공급자 키가 없는 환경은 SNS 로그인과 임의 복귀를 수락하지 않는다.
@@ -3151,7 +2773,7 @@ function seedHandoff(user, lifetime = 60000, code = randomUUID()) {
         ([hash, challenge]) =>
           db
             .prepare(
-              'INSERT INTO oauth_handoffs(id,provider,challenge,redirect_uri,session_token,code_hash,expires_at,launched_at) VALUES(?,?,?,?,?,?,?,?)',
+              'INSERT INTO oauth_handoffs(id,provider,challenge,redirect_uri,session_token,session_user_id,code_hash,expires_at,launched_at) VALUES(?,?,?,?,?,?,?,?,?)',
             )
             .bind(
               randomUUID(),
@@ -3159,6 +2781,7 @@ function seedHandoff(user, lifetime = 60000, code = randomUUID()) {
               challenge,
               'travelapp://auth/callback',
               user.token,
+              user.id,
               hash,
               Date.now() + lifetime,
               Date.now(),
@@ -3320,36 +2943,34 @@ function r10CachedCurrencyContract() {
   );
 }
 
-test('G11 탈퇴 유예·재로그인 복구·90일 익명화는 동행 권한과 개인 여행을 보존한다', async () => {
+test('기존 G11 요청의 복원·90일 익명화는 동행 권한을 보존하고 신규 요청은 닫는다', async () => {
   // 로컬 Worker에서 실제 회원·여행·파일·세션을 만들고 예약 실행까지 검사한다.
   const accounts = [];
   for (let index = 0; index < 2; index++) {
     const email = `retirement-${randomUUID()}@example.test`;
     const password = 'retirement-strong-password!';
-    const response = await request(
-      '/api/auth/sign-up/email',
-      'POST',
-      { name: `G11-${randomUUID().slice(0, 8)}`, email, password },
-      undefined,
-      { 'CF-Connecting-IP': `203.0.113.${230 + index}` },
-    );
+    const response = await seedLegacyAccount(mf, {
+      name: `G11-${randomUUID().slice(0, 8)}`,
+      email,
+      password,
+    });
     accounts.push({ ...(await accountResponse(response)), email, password });
   }
   let owner = accounts[0];
   const editor = accounts[1];
   const db = await mf.getD1Database('DB');
-  await json(
-    await request(
-      '/api/v1/profile',
-      'PATCH',
-      {
-        bio: 'PRIVATE-PROFILE',
-        birthDate: '1990-01-01',
-        onboardingCompleted: true,
-      },
-      owner,
-    ),
-  );
+  // 신규 개인정보 입력 대신 과거에 저장된 자료의 파기 호환성을 검사한다.
+  await db
+    .prepare(
+      'INSERT INTO profiles(user_id,details,birth_date,onboarding_completed_at) VALUES(?,?,?,?)',
+    )
+    .bind(
+      owner.id,
+      JSON.stringify({ bio: 'PRIVATE-PROFILE' }),
+      '1990-01-01',
+      Date.now(),
+    )
+    .run();
   const journeys = [];
   for (let index = 0; index < 2; index++) {
     const created = (
@@ -3461,49 +3082,29 @@ test('G11 탈퇴 유예·재로그인 복구·90일 익명화는 동행 권한�
       includeCosts: false,
     })
   ).id;
-  // 동의 누락·타인 ID 지정과 오래된 인증은 탈퇴 상태를 만들지 않는다.
+  // 이전 요청 경로는 동의 내용과 무관하게 닫혀 새 유예 요청을 만들지 않는다.
   assert.equal(
     (await request('/api/v1/account/retirement', 'POST', { confirm: true }))
       .status,
     401,
   );
-  assert.equal(
-    (
-      await request(
-        '/api/v1/account/retirement',
-        'POST',
-        { confirm: false },
-        owner,
-      )
-    ).status,
-    422,
-  );
-  assert.equal(
-    (
-      await request(
-        '/api/v1/account/retirement',
-        'POST',
-        { confirm: true, userId: editor.id },
-        owner,
-      )
-    ).status,
-    422,
-  );
-  await db
-    .prepare('UPDATE session SET createdAt=? WHERE userId=?')
-    .bind(Date.now() - 11 * 60000, owner.id)
-    .run();
-  assert.equal(
-    (
-      await request(
-        '/api/v1/account/retirement',
-        'POST',
-        { confirm: true },
-        owner,
-      )
-    ).status,
-    403,
-  );
+  for (const input of [
+    { confirm: false },
+    { confirm: true, userId: editor.id },
+    { confirm: true },
+  ]) {
+    const blocked = await request(
+      '/api/v1/account/retirement',
+      'POST',
+      input,
+      owner,
+    );
+    assert.equal(blocked.status, 410);
+    assert.equal(
+      (await blocked.json()).error.code,
+      'RETIREMENT_POLICY_REPLACED',
+    );
+  }
   assert.equal(
     await db
       .prepare('SELECT user_id FROM account_retirements WHERE user_id=?')
@@ -3511,23 +3112,7 @@ test('G11 탈퇴 유예·재로그인 복구·90일 익명화는 동행 권한�
       .first(),
     null,
   );
-  await db
-    .prepare('UPDATE session SET createdAt=? WHERE userId=?')
-    .bind(Date.now(), owner.id)
-    .run();
-  const requested = await json(
-    await request(
-      '/api/v1/account/retirement',
-      'POST',
-      { confirm: true },
-      owner,
-    ),
-  );
-  assert.equal(
-    Date.parse(requested.data.purgeAfter) -
-      Date.parse(requested.data.requestedAt),
-    90 * 86400000,
-  );
+  await seedLegacyRetirement(db, owner.id);
   assert.equal(
     (await request('/api/v1/trips', 'GET', undefined, owner)).status,
     401,
@@ -3603,14 +3188,7 @@ test('G11 탈퇴 유예·재로그인 복구·90일 익명화는 동행 권한�
       /* 같은 탈퇴 멤버의 표시 이름만 찾는다. */ return x.userId === owner.id;
     }).nickname,
   );
-  await json(
-    await request(
-      '/api/v1/account/retirement',
-      'POST',
-      { confirm: true },
-      owner,
-    ),
-  );
+  await seedLegacyRetirement(db, owner.id);
   // 시간 경계 검사는 운영 DB가 아닌 격리된 D1의 요청 시각만 앞당긴다.
   await db
     .prepare(
@@ -3730,30 +3308,18 @@ test('G11 탈퇴 유예·재로그인 복구·90일 익명화는 동행 권한�
 // 실제 D1과 인증 세션으로 홈 초안과 발행 팁의 원본을 검증한다.
 test('서버 홈: 초안 격리·충돌·재시도·여행 전환·팁 발행', async () => {
   const owner = await accountResponse(
-    await request(
-      '/api/auth/sign-up/email',
-      'POST',
-      {
-        name: '서버홈검수',
-        email: `${randomUUID()}@example.test`,
-        password: 'server-home-strong-password!',
-      },
-      undefined,
-      { 'CF-Connecting-IP': '203.0.113.231' },
-    ),
+    await seedLegacyAccount(mf, {
+      name: '서버홈검수',
+      email: `${randomUUID()}@example.test`,
+      password: 'server-home-strong-password!',
+    }),
   );
   const other = await accountResponse(
-    await request(
-      '/api/auth/sign-up/email',
-      'POST',
-      {
-        name: '다른계정',
-        email: `${randomUUID()}@example.test`,
-        password: 'server-home-strong-password!',
-      },
-      undefined,
-      { 'CF-Connecting-IP': '203.0.113.232' },
-    ),
+    await seedLegacyAccount(mf, {
+      name: '다른계정',
+      email: `${randomUUID()}@example.test`,
+      password: 'server-home-strong-password!',
+    }),
   );
   const id = randomUUID();
   const input = {
@@ -3923,3 +3489,42 @@ test('서버 홈: 초안 격리·충돌·재시도·여행 전환·팁 발행', 
     [],
   );
 });
+
+// 과거 접수된 요청과 당시 표시 상태만 준비한다. 복원·파기는 빌드 Worker가 처리한다.
+async function seedLegacyRetirement(db, userId) {
+  const now = Date.now();
+  const rows = await db
+    .prepare(
+      'SELECT id,snapshot,version FROM trips WHERE id IN(SELECT trip_id FROM trip_members WHERE user_id=?)',
+    )
+    .bind(userId)
+    .all();
+  const statements = [
+    db
+      .prepare(
+        "INSERT INTO account_retirements(user_id,requested_at,purge_after,state) VALUES(?,?,?,'pending')",
+      )
+      .bind(userId, now, now + 90 * 86400000),
+  ];
+  for (const row of rows.results) {
+    const snapshot = JSON.parse(row.snapshot);
+    snapshot.trip.version = row.version + 1;
+    snapshot.members = snapshot.members.map((member) =>
+      member.userId === userId ? { ...member, nickname: '탈퇴 멤버' } : member,
+    );
+    statements.push(
+      db
+        .prepare('UPDATE trips SET snapshot=?,version=? WHERE id=?')
+        .bind(JSON.stringify(snapshot), row.version + 1, row.id),
+    );
+  }
+  statements.push(
+    db
+      .prepare(
+        "UPDATE posts SET snapshot=json_set(snapshot,'$.author','탈퇴 멤버') WHERE author_id=?",
+      )
+      .bind(userId),
+    db.prepare('DELETE FROM session WHERE userId=?').bind(userId),
+  );
+  await db.batch(statements);
+}

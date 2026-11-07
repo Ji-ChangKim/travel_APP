@@ -1,17 +1,10 @@
+import { workspaceEntrySection } from '../model/workspaceNavigation';
 import { useState } from 'react';
 
 export function useWorkspaceNavigationState(section: string | undefined) {
   // 여행 계획과 현장 기록을 작업별 영역으로 나눈다.
   const [activeSection, setActiveSection] = useState(
-    section === 'companions'
-      ? 'companions'
-      : section === 'share'
-        ? 'share'
-        : section === 'map'
-          ? 'map'
-          : section === 'expenses'
-            ? 'expenses'
-            : 'itinerary',
+    workspaceEntrySection(section),
   );
   const [selectedDay, setSelectedDay] = useState('');
   const [selectedScheduleId, setSelectedScheduleId] = useState('');

@@ -2,16 +2,20 @@ import { APIError } from 'better-auth/api';
 import type { D1Result } from '@cloudflare/workers-types';
 import { database } from '../../infrastructure/storage/cloudStore';
 import { rejectRequest } from '../../shared/errors';
+import { assertAccountNotDeleting } from './accountDeletion';
 
 export const graceMilliseconds = 90 * 24 * 60 * 60 * 1000;
 
 type Retirement = { user_id: string; purge_after: number; state: string };
 
-// 탈퇴 유예도 새 로그인만으로 자동 취소하지 않고 별도 복구 절차를 요구한다.
+// 신원을 검증한 새 로그인만 유예 중인 본인 계정을 복구한다.
 export async function assertLoginAllowed(
   env: Env,
   userId: string,
+  freshLogin = false,
 ): Promise<void> {
+  await assertAccountNotDeleting(env, userId);
+  if (freshLogin) return resumeRetiredAccount(env, userId);
   if (await retirement(env, userId))
     throw new APIError('FORBIDDEN', {
       code: 'ACCOUNT_UNAVAILABLE',
@@ -70,6 +74,9 @@ export async function assertActiveAccount(
   env: Env,
   userId: string,
 ): Promise<void> {
+  await assertAccountNotDeleting(env, userId).catch(() =>
+    rejectRequest('SESSION_EXPIRED'),
+  );
   // 탈퇴 취소는 세션 조회가 아닌 새 로그인 세션 발급에서만 수행한다.
   return (await retirement(env, userId))
     ? rejectRequest('SESSION_EXPIRED')
@@ -101,7 +108,7 @@ export async function resumeRetiredAccount(
       )
       .bind(userId, now),
   ]);
-  if (!result.at(-1)?.meta.changes)
+  if (!result.at(-1)?.meta.changes && (await retirement(env, userId)))
     throw new APIError('UNAUTHORIZED', {
       code: 'ACCOUNT_RETIRED',
       message: '계정을 다시 확인해 주세요.',
@@ -116,8 +123,20 @@ export async function purgeRetiredAccount(
 ): Promise<D1Result[]> {
   // 실제 계정 행 대신 비식별 참조만 남겨 공유 여행의 외래키와 소유권을 보존한다.
   const db = database(env);
+  const claim = await db
+    .prepare(
+      "UPDATE account_retirements SET state='purging' WHERE user_id=? AND state='pending' AND purge_after<=?",
+    )
+    .bind(userId, now)
+    .run();
+  if (
+    !claim.meta.changes &&
+    (await retirement(env, userId))?.state !== 'purging'
+  )
+    return [];
+  // 파기 선점을 확인한 뒤에만 R2를 정리하고 미완료 파기는 같은 상태로 재개한다.
   const guard =
-    "EXISTS(SELECT 1 FROM account_retirements WHERE user_id=? AND state='pending' AND purge_after<=?)";
+    "EXISTS(SELECT 1 FROM account_retirements WHERE user_id=? AND state='purging' AND purge_after<=?)";
   const anonymousName = `탈퇴-${crypto.randomUUID().replaceAll('-', '').slice(0, 12)}`;
   // 계정만 비식별화해도 새 프로필 사진·미확정 연결 파일이 남지 않게 원본부터 정리한다.
   const temporary = await db
@@ -167,6 +186,9 @@ export async function purgeRetiredAccount(
       .prepare(`DELETE FROM profiles WHERE user_id=? AND ${guard}`)
       .bind(userId, userId, now),
     db
+      .prepare(`DELETE FROM usage_events WHERE member_id=? AND ${guard}`)
+      .bind(userId, userId, now),
+    db
       .prepare(`DELETE FROM mutation_requests WHERE actor_id=? AND ${guard}`)
       .bind(userId, userId, now),
     db
@@ -188,7 +210,7 @@ export async function purgeRetiredAccount(
       ),
     db
       .prepare(
-        "UPDATE account_retirements SET state='purged',purged_at=? WHERE user_id=? AND state='pending' AND purge_after<=?",
+        "UPDATE account_retirements SET state='purged',purged_at=? WHERE user_id=? AND state='purging' AND purge_after<=?",
       )
       .bind(now, userId, now),
   ]);
@@ -198,13 +220,14 @@ export async function purgeRetiredAccount(
 export async function purgeRetiredAccounts(
   env: Env,
   now = Date.now(),
+  limit = 100,
 ): Promise<void> {
   // 배포·서버 재시작 시각을 90일 기산일로 사용하지 않는다.
   const due = await database(env)
     .prepare(
-      "SELECT user_id FROM account_retirements WHERE state='pending' AND purge_after<=? ORDER BY purge_after LIMIT 100",
+      "SELECT user_id FROM account_retirements WHERE (state='pending' AND purge_after<=?) OR state='purging' ORDER BY purge_after LIMIT ?",
     )
-    .bind(now)
+    .bind(now, limit)
     .all<{ user_id: string }>();
   for (const row of due.results)
     await purgeRetiredAccount(env, row.user_id, now);

@@ -1,22 +1,49 @@
 import { StyleSheet } from 'react-native';
-import tokens from '../../../../../../../docs/02. 디자인/00. 공통규격/ledger-tokens.json';
+import { colors, designTokens, radii, typography } from '@/constants/theme';
 
-// 신규 Stitch 화면에만 적용하며 기존 여행 작성 화면의 공통 토큰은 바꾸지 않는다.
-export const ledgerColors = tokens.color;
-export const ledgerLayout = tokens.layout;
-export const ledgerControl = tokens.control;
+// 여행 일정(Ledger) 및 워크스페이스 셸 화면의 색상·레이아웃·컨트롤을 공통 토큰에서 연결한다.
+export const ledgerColors = {
+  canvas: colors.background,
+  surface: colors.surface,
+  soft: colors.surfaceMuted,
+  selected: colors.selectedSurface,
+  ink: colors.text,
+  muted: colors.muted,
+  accent: colors.actionPressed,
+  navy: colors.primary,
+  border: colors.borderStrong,
+  line: colors.border,
+  private: colors.warningSoft,
+  privateText: colors.warning,
+} as const;
+
+export const ledgerLayout = {
+  breakpoint: designTokens.layout.wideBreakpoint,
+  mobileGutter: designTokens.layout.screenPaddingMobile,
+  mobileMax: designTokens.layout.mobileMaxWidth,
+  wideGutter: designTokens.layout.wideGutter,
+  wideMax: designTokens.layout.wideMaxWidth,
+  sidebar: designTokens.layout.sidebarWidth,
+} as const;
+
+export const ledgerControl = {
+  minimumHeight: designTokens.layout.minimumTouchTarget,
+  primaryHeight: designTokens.control.primary.height,
+  radius: radii.button,
+} as const;
+
 export const ledgerStyles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: ledgerColors.canvas },
   content: {
-    padding: tokens.layout.mobileGutter,
+    padding: ledgerLayout.mobileGutter,
     gap: 20,
     width: '100%',
-    maxWidth: tokens.layout.mobileMax,
+    maxWidth: ledgerLayout.mobileMax,
     alignSelf: 'center',
   },
   wideContent: {
-    maxWidth: tokens.layout.wideMax,
-    padding: tokens.layout.wideGutter,
+    maxWidth: ledgerLayout.wideMax,
+    padding: ledgerLayout.wideGutter,
   },
   row: {
     flexDirection: 'row',
@@ -26,53 +53,53 @@ export const ledgerStyles = StyleSheet.create({
   },
   card: {
     backgroundColor: ledgerColors.surface,
-    borderRadius: 16,
+    borderRadius: radii.card,
     padding: 16,
     gap: 12,
   },
   tinted: {
     backgroundColor: ledgerColors.soft,
-    borderRadius: 16,
+    borderRadius: radii.card,
     padding: 16,
     gap: 12,
   },
   title: {
-    fontSize: tokens.type.title[0],
-    lineHeight: tokens.type.title[1],
+    fontSize: typography.headlineLarge.size,
+    lineHeight: typography.headlineLarge.lineHeight,
     fontWeight: '700',
     color: ledgerColors.ink,
   },
   section: {
-    fontSize: tokens.type.section[0],
-    lineHeight: tokens.type.section[1],
+    fontSize: typography.headlineMedium.size,
+    lineHeight: typography.headlineMedium.lineHeight,
     fontWeight: '700',
     color: ledgerColors.ink,
   },
   place: {
-    fontSize: tokens.type.place[0],
-    lineHeight: tokens.type.place[1],
+    fontSize: typography.headlineSmall.size,
+    lineHeight: typography.headlineSmall.lineHeight,
     fontWeight: '700',
     color: ledgerColors.ink,
   },
   body: {
-    fontSize: tokens.type.body[0],
-    lineHeight: tokens.type.body[1],
+    fontSize: typography.bodyMedium.size,
+    lineHeight: typography.bodyMedium.lineHeight,
     color: ledgerColors.ink,
   },
   meta: {
-    fontSize: tokens.type.meta[0],
-    lineHeight: tokens.type.meta[1],
+    fontSize: typography.bodySmall.size,
+    lineHeight: typography.bodySmall.lineHeight,
     color: ledgerColors.muted,
   },
   eyebrow: {
-    fontSize: 14,
-    lineHeight: 22,
+    fontSize: typography.labelMedium.size,
+    lineHeight: typography.labelMedium.lineHeight,
     fontWeight: '700',
     color: ledgerColors.accent,
   },
   private: {
     backgroundColor: ledgerColors.private,
-    borderRadius: 12,
+    borderRadius: radii.button,
     padding: 16,
     gap: 8,
   },

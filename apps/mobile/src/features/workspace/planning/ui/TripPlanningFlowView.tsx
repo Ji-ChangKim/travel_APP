@@ -36,13 +36,13 @@ export function renderTripPlanning({
             step === 'basics'
               ? recording
                 ? t('다녀온 여행 기록하기')
-                : t('새 여행 만들기')
-              : t('여행 내용 확인')
+                : t('여행 만들기')
+              : t('항공편 등록')
           }
           backLabel={
             step === 'basics'
               ? t('내 여행으로 돌아가기')
-              : t('여행지와 날짜로 돌아가기')
+              : t('여행 만들기로 돌아가기')
           }
           onBack={back}
           disabled={props.locked}

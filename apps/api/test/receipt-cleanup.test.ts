@@ -38,7 +38,7 @@ test('P05 실제 D1/R2: 정리 실패·동일 요청 재생·앱 종료 후 예�
       ).replace(/--[^\n]*/g, '');
       await db.batch(
         sql
-          .split(';')
+          .split(/;\s*(?:\r?\n|$)/)
           .filter((value) => value.trim())
           .map((value) => db.prepare(value)),
       );
@@ -170,7 +170,7 @@ test('P05 실제 D1/R2: 정리 실패·동일 요청 재생·앱 종료 후 예�
       'utf8',
     )
       .replace(/--[^\n]*/g, '')
-      .split(';')
+      .split(/;\s*(?:\r?\n|$)/)
       .find((sql) => sql.includes('INSERT OR IGNORE'))!;
     await db.prepare(backfill).run();
     await retryReceiptCleanup(env);

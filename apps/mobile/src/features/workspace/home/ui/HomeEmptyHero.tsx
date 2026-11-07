@@ -93,7 +93,7 @@ export default function HomeEmptyHero({
           <Text style={styles.exploreText}>
             {t('다른 여행자의 일정 둘러보기')}
           </Text>
-          <Ionicons name="arrow-forward" size={16} color="#37474F" />
+          <Ionicons name="arrow-forward" size={16} color={colors.ink} />
         </Pressable>
       </View>
     </View>
@@ -125,15 +125,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
   },
   title: {
-    color: '#142338',
+    color: colors.ink,
     fontSize: 24,
     lineHeight: 32,
     fontWeight: '700',
     letterSpacing: -0.4,
   },
-  mark: { color: '#FF8A65', fontSize: 18, fontWeight: '700' },
+  mark: { color: colors.accent, fontSize: 18, fontWeight: '700' },
   description: {
-    color: '#455A74',
+    color: colors.muted,
     fontSize: 14,
     lineHeight: 22,
     fontWeight: '500',
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   exploreText: {
-    color: '#37474F',
+    color: colors.ink,
     fontSize: 14,
     lineHeight: 22,
     fontWeight: '600',

@@ -14,6 +14,7 @@
   "scripts": {
     "start": "npm --workspace=@wherego/mobile run start",
     "android": "npm --workspace=@wherego/mobile run android",
+    "android:dev": "node scripts/android/start-studio.mjs",
     "android:metro": "node scripts/android/start-studio-metro.mjs",
     "ios": "npm --workspace=@wherego/mobile run ios",
     "web": "npm --workspace=@wherego/mobile run web",

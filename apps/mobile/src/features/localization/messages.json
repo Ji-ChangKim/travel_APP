@@ -5107,5 +5107,13 @@
     "Can't find the city you're looking for?",
     "お探しの都市がありませんか？"
   ],
-  "목적지 직접 입력하기": ["Enter destination manually", "目的地を直接入力する"]
+  "목적지 직접 입력하기": [
+    "Enter destination manually",
+    "目的地を直接入力する"
+  ],
+  "여정": ["Journey", "旅程"],
+  "여행 이름과 출발일을 확인해 주세요. 여행 기간은 최대 30일이에요.": [
+    "Check the trip name and start date. Trips can be up to 30 days.",
+    "旅行名と出発日を確認してください。旅行期間は最大30日です。"
+  ]
 }

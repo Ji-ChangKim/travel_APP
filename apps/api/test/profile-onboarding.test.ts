@@ -52,7 +52,7 @@ before(async () => {
     .map((file) => readFileSync(new URL(file, directory), 'utf8'))
     .join('\n')
     .replace(/--[^\n]*/g, '')
-    .split(';')
+    .split(/;\s*(?:\r?\n|$)/)
     .filter((sql) => sql.trim());
   await db.batch(statements.map((sql) => db.prepare(sql)));
   for (const id of [owner, other]) {
@@ -175,6 +175,57 @@ test('최초 완료·응답 재조회·재시도는 같은 프로필이며 완�
     .prepare('UPDATE user SET name=? WHERE id=?')
     .bind('하루01', other)
     .run();
+});
+
+test('프로필 편집은 닉네임 경계·한글 정규화·기존 이름 예외를 D1 재조회로 확인한다', async () => {
+  const db = await mf.getD1Database('DB');
+  const patch = (body: unknown) =>
+    app.request(
+      '/api/v1/profile',
+      {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      },
+      env,
+    );
+  const nickname = async () =>
+    ((await (await request('')).json()) as { data: { nickname: string } }).data
+      .nickname;
+  try {
+    for (const value of [
+      '',
+      '가',
+      '가'.repeat(11),
+      '여행 자',
+      '여행😀',
+      'ㅎㄱ',
+    ]) {
+      assert.equal((await patch({ nickname: value })).status, 422);
+      assert.equal(await nickname(), '하루01');
+    }
+    for (const value of ['가나', '가나다라마바사아자차'.normalize('NFD')]) {
+      assert.equal((await patch({ nickname: value })).status, 200);
+      assert.equal(await nickname(), value.normalize('NFC'));
+    }
+    const legacy = ' 오래된 여행자의 이름 ';
+    await db
+      .prepare('UPDATE user SET name=? WHERE id=?')
+      .bind(legacy, owner)
+      .run();
+    assert.equal(
+      (await patch({ nickname: legacy, bio: '소개만 수정' })).status,
+      200,
+    );
+    assert.equal(await nickname(), legacy);
+    assert.equal((await patch({ nickname: legacy + '가' })).status, 422);
+    assert.equal(await nickname(), legacy);
+  } finally {
+    await db
+      .prepare('UPDATE user SET name=? WHERE id=?')
+      .bind('하루01', owner)
+      .run();
+  }
 });
 
 test('이미지 선택 참조는 배타적이며 임의 아바타를 허용하지 않는다', () => {

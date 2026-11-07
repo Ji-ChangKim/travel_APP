@@ -1,5 +1,5 @@
-import type { PersistedTripInput } from '@wherego/domain';
 import {
+  persistedTripCreateSchema,
   workspaceCommandSchema,
   communityPostSchema,
   communityFeedQuerySchema,
@@ -244,7 +244,11 @@ async function createTripMutation(m: Mutation): Promise<unknown> {
   const nickname = await actorName(m);
   return insertTrip(
     m,
-    newTrip(m.args.p_input as PersistedTripInput, m.session.userId, nickname),
+    newTrip(
+      persistedTripCreateSchema.parse(m.args.p_input),
+      m.session.userId,
+      nickname,
+    ),
   );
 }
 

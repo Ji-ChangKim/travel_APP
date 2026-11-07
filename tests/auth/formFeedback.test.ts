@@ -126,7 +126,7 @@ test('여행 제목을 조용히 자르지 않고 길이 초과를 거부한다'
   // 잘린 제목으로 저장된 것을 사용자가 모르는 상황을 방지한다.
   return assert.throws(() => {
     /* 첫 단계와 최종 저장은 같은 제한을 사용한다. */ return tripCreationInput({
-      title: 'a'.repeat(51),
+      title: 'a'.repeat(61),
       country: '일본',
       city: '오사카',
       startDate: '2026-11-01',

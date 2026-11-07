@@ -1,0 +1,27 @@
+{
+  "brand": "TripPrint",
+  "role": "startup-motion",
+  "source": "사용자가 승인한 비행기 한 대의 4초 반복 모션. 앱에서는 한 번만 무음 재생.",
+  "sourceArtifact": "TripPrint-orbit-silent-1080p.mp4",
+  "assets": [
+    {
+      "filename": "tripprint_bi.mp4",
+      "bytes": 137570,
+      "sha256": "21b5df2752964d852cac2c8d001191e40c27abd0329fa2e1a74036c0a2bea0a3",
+      "width": 1920,
+      "height": 1080,
+      "durationSeconds": 4,
+      "fps": 30,
+      "codec": "h264",
+      "audioTracks": 0
+    },
+    {
+      "filename": "tripprint_bi_poster.png",
+      "bytes": 61446,
+      "sha256": "65881d0277907ab8423a7d68d33f4896351af774092be61ce568c64e34ad5d55",
+      "width": 1920,
+      "height": 1080,
+      "role": "static-fallback"
+    }
+  ]
+}

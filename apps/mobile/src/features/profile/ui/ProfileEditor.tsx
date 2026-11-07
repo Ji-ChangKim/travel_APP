@@ -60,6 +60,7 @@ export function renderProfileEditor({
             isSavingProfile={isSavingProfile}
             setEditNickname={setEditNickname}
             currentUser={currentUser}
+            showError={Boolean(profileError)}
           />
 
           <ProfileBioField

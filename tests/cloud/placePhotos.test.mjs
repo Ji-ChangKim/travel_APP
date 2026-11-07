@@ -87,7 +87,7 @@ before(async () => {
     })
     .join('\n')
     .replace(/--[^\n]*/g, '')
-    .split(';')
+    .split(/;\s*(?:\r?\n|$)/)
     .filter((part) => {
       // 빈 SQL 구문은 실행하지 않는다.
       return part.trim();

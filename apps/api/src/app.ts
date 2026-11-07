@@ -7,7 +7,7 @@ import {
   checklistStateSchema,
   foundationUuidSchema,
   mutationResultSchema,
-  persistedTripCreateSchema,
+  tripCreationRequestSchema,
   tripVersionSchema,
 } from '@wherego/validation';
 import { runRpc, verifySession } from './infrastructure/backend';
@@ -19,7 +19,7 @@ import { getGooglePlace, searchPlaces } from './features/places/places';
 import { importMapsShare } from './features/places/mapsShare';
 import { cloudAuth } from './features/auth/cloudAuth';
 import { registerMediaRoutes } from './features/media/cloudMedia';
-import { registerProfileRoutes } from './features/accounts/cloudProfiles';
+import { registerAccountRoutes } from './features/accounts/accountRoutes';
 import { registerDiscoveryRoutes } from './features/discovery/discovery';
 import { startupManifest } from './features/startup/startup';
 import { appConfig } from './config/appConfig';
@@ -29,7 +29,6 @@ import {
   publicPlanPhoto,
 } from './features/places/placePhotos';
 import { registerPlanningRoutes } from './features/planning/planning';
-import { database } from './infrastructure/storage/cloudStore';
 import { registerGuestImportRoutes } from './features/auth/guestImport';
 
 type ApiContext = Context<ApiEnvironment>;
@@ -65,20 +64,6 @@ async function attachSession(
   session: VerifiedSession,
 ): Promise<void> {
   // 요청별 문맥으로만 인증 상태를 보관한다.
-  if (c.env.DB && !session.isAnonymous) {
-    const complete = await database(c.env)
-      .prepare('SELECT onboarding_completed_at FROM profiles WHERE user_id=?')
-      .bind(session.userId)
-      .first<{ onboarding_completed_at: number | null }>();
-    const path = c.req.path;
-    const onboardingRoute =
-      path === '/api/v1/profile' ||
-      path === '/api/v1/profile/avatars' ||
-      path === '/api/v1/profile/complete' ||
-      /^\/api\/v1\/profile\/(?:operations|photo)\/[0-9a-f-]{36}$/.test(path);
-    if (!complete?.onboarding_completed_at && !onboardingRoute)
-      return rejectRequest('ONBOARDING_REQUIRED');
-  }
   c.set('session', session);
   return next();
 }
@@ -240,7 +225,7 @@ function createTrip(fetcher: typeof fetch, c: ApiContext): Promise<Response> {
         c.get('session'),
         'wherego_create_trip',
         {
-          p_input: persistedTripCreateSchema.parse(body),
+          p_input: tripCreationRequestSchema.parse(body),
           p_key: requestKey(c),
         },
         fetcher,
@@ -319,7 +304,7 @@ export function createApp(fetcher: typeof fetch = fetch): Hono<ApiEnvironment> {
       registerPlanningRoutes(
         registerDiscoveryRoutes(
           registerSocialRoutes(
-            registerProfileRoutes(
+            registerAccountRoutes(
               registerMediaRoutes(
                 registerWorkspaceRoutes(
                   new Hono<ApiEnvironment>()

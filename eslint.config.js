@@ -18,6 +18,7 @@ module.exports = defineConfig([
       '**/expo-env.d.ts',
       '**/node_modules/**',
       'docs/98. keys/**',
+      'docs/999. deletefile/**',
     ],
   },
   expoConfig,

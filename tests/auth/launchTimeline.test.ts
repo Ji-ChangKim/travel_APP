@@ -134,7 +134,7 @@ test('R13 첫 프레임 후 실제 종료만 전환하며 반복 종료는 무�
 
 test('R13 손상·길이 오류·종료 누락은 같은 정적 대체로 복구한다', () => {
   // 손상된 영상이나 허용 범위 밖 영상으로 사용자를 가두지 않는다.
-  for (const duration of [0, 0.99, 3.01, NaN, Infinity]) {
+  for (const duration of [0, 0.99, 4.01, NaN, Infinity]) {
     const clock = new Clock();
     const bi = new BiTimeline(true, clock);
     bi.connect(normal);
@@ -151,11 +151,26 @@ test('R13 손상·길이 오류·종료 누락은 같은 정적 대체로 복구
     bi.posterReady();
     bi.firstFrame();
     if (failure === 'decode') bi.failed();
-    else clock.tick(3500);
+    else clock.tick(4500);
     assert.equal(bi.getSnapshot().failure, failure);
     clock.tick(1500);
     assert.equal(bi.getSnapshot().phase, 'done');
   }
+});
+
+test('승인한 4초 BI는 마지막 프레임까지 재생하고 실제 종료 뒤 전환한다', () => {
+  const clock = new Clock();
+  const bi = new BiTimeline(true, clock);
+  bi.connect(normal);
+  bi.loaded(4);
+  bi.firstFrame();
+  clock.tick(4000);
+  assert.equal(bi.getSnapshot().phase, 'video');
+  assert.equal(bi.getSnapshot().failure, undefined);
+  bi.ended();
+  assert.equal(bi.getSnapshot().phase, 'fade');
+  clock.tick(500);
+  assert.equal(bi.getSnapshot().phase, 'done');
 });
 
 test('R13 첫 프레임·정적 표시·fade는 백그라운드 시간을 소비하지 않는다', () => {

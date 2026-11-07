@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { seedLegacyAccount } from '../fixtures/cloudAccount.mjs';
 import { readFileSync, readdirSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
@@ -65,7 +66,7 @@ function importLink(text, authenticated = true) {
 }
 
 before(async () => {
-  // 서비스와 같은 마이그레이션·인증 API를 격리 DB에서 실행한다.
+  // 최신 스키마와 기존 이메일 자료를 준비하고 요청은 빌드 Worker로 검사한다.
   const db = await mf.getD1Database('DB');
   const root = new URL('../../apps/api/migrations/', import.meta.url);
   for (const name of readdirSync(root)
@@ -73,18 +74,14 @@ before(async () => {
     .sort()) {
     for (const sql of readFileSync(new URL(name, root), 'utf8')
       .replace(/--[^\n]*/g, '')
-      .split(';')) {
+      .split(/;\s*(?:\r?\n|$)/)) {
       if (sql.trim()) await db.prepare(sql).run();
     }
   }
-  const response = await mf.dispatchFetch(api + '/api/auth/sign-up/email', {
-    method: 'POST',
-    headers: { Origin: origin, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      email: `${randomUUID()}@example.test`,
-      password: 'maps-fixture-strong-password!',
-      name: 'MapsSecurity',
-    }),
+  const response = await seedLegacyAccount(mf, {
+    email: `${randomUUID()}@example.test`,
+    password: 'maps-fixture-strong-password!',
+    name: 'MapsSecurity',
   });
   assert.equal(response.status, 200);
   token = response.headers.get('set-auth-token');

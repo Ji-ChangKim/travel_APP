@@ -64,28 +64,55 @@ export function ScheduleOptions({
   );
 }
 
+const EXPENSE_CATEGORIES = [
+  { key: 'food', label: '식비' },
+  { key: 'transport', label: '교통' },
+  { key: 'stay', label: '숙박' },
+  { key: 'activity', label: '관광·액티비티' },
+  { key: 'shopping', label: '쇼핑' },
+  { key: 'etc', label: '기타' },
+] as const;
+
 export function ExpenseOptions({ form, onChange }: EditorOptionProps) {
   useLocale();
   return (
     <>
       {form.kind === 'expense' && (
-        <View style={styles.row}>
-          <Action
-            label={t('실제 지출')}
-            selected={form.values.isActual === 'true'}
-            onPress={() => {
-              // 실제 지출로 명시한다.
-              onChange('isActual', 'true');
-            }}
-          />
-          <Action
-            label={t('예상 비용')}
-            selected={form.values.isActual === 'false'}
-            onPress={() => {
-              // 예상 비용과 실제 지출은 합계를 분리한다.
-              onChange('isActual', 'false');
-            }}
-          />
+        <View style={styles.card}>
+          <Text style={styles.title}>{t('지출 분류')}</Text>
+          <View style={styles.row}>
+            {EXPENSE_CATEGORIES.map((cat) => (
+              <Action
+                key={cat.key}
+                label={t(cat.label)}
+                size="chip"
+                selected={(form.values.category || 'etc') === cat.key}
+                onPress={() => {
+                  // 지출 카테고리를 선택한다.
+                  onChange('category', cat.key);
+                }}
+              />
+            ))}
+          </View>
+          <Text style={styles.title}>{t('지출 구분')}</Text>
+          <View style={styles.row}>
+            <Action
+              label={t('실제 지출')}
+              selected={form.values.isActual === 'true'}
+              onPress={() => {
+                // 실제 지출로 명시한다.
+                onChange('isActual', 'true');
+              }}
+            />
+            <Action
+              label={t('예상 비용')}
+              selected={form.values.isActual === 'false'}
+              onPress={() => {
+                // 예상 비용과 실제 지출은 합계를 분리한다.
+                onChange('isActual', 'false');
+              }}
+            />
+          </View>
         </View>
       )}
     </>

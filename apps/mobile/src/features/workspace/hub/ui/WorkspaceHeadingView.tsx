@@ -36,6 +36,7 @@ type RenderWorkspaceSummaryProps = {
   scanning?: boolean;
   hasPending?: boolean;
   openDraft?: (kind: WorkspaceDraftKind) => void;
+  setActiveSection?: Dispatch<SetStateAction<string>>;
 };
 
 // 날짜 문자열(YYYY-MM-DD)에서 짧은 요일 이름을 추출한다.
@@ -94,6 +95,7 @@ export function renderWorkspaceSummary({
   scanning,
   hasPending,
   openDraft,
+  setActiveSection,
 }: RenderWorkspaceSummaryProps) {
   const presentation = tripPresentation(snapshot.trip);
   const guide = guideForTrip(snapshot.trip.country, snapshot.trip.city);
@@ -152,7 +154,6 @@ export function renderWorkspaceSummary({
                   .join(' · ')}
               </Text>
             </View>
-            <View style={hub.metaDot} aria-hidden />
             <View style={hub.metaItem}>
               <TripIcon
                 name="calendar-outline"
@@ -197,6 +198,22 @@ export function renderWorkspaceSummary({
             {t('동행 {p0}명', { p0: Math.max(1, snapshot.members.length) })}
           </Text>
         </View>
+        {setActiveSection ? (
+          <Pressable
+            testID="trip-invite-friend-btn"
+            accessibilityRole="button"
+            accessibilityLabel={t('친구 초대')}
+            disabled={Boolean(busy || scanning || hasPending)}
+            onPress={() => {
+              // 동행 초대 및 편집 권한 공유 화면으로 이동한다.
+              setActiveSection('companions');
+            }}
+            style={hub.editButton}
+          >
+            <TripIcon name="plus-outline" size={13} color={colors.brandCoral} />
+            <Text style={hub.editButtonText}>{t('친구 초대')}</Text>
+          </Pressable>
+        ) : null}
       </View>
       {presentation.phase === 'COMPLETED' && (
         <Text style={hub.meta}>

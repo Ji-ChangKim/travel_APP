@@ -11,6 +11,7 @@ import {
 import { rejectRequest } from '../../shared/errors';
 import { publicImage } from './publicImage';
 import type { ApiEnvironment } from '../../shared/types';
+import { checkAccountFileWrite } from '../accounts/accountFileWrite';
 type Ctx = Context<ApiEnvironment>;
 
 // 실제 비공개 버킷 바인딩만 사용한다.
@@ -45,16 +46,6 @@ function fileActor(c: Ctx): Promise<Actor> {
     ? cloudSession(c.env, (c.req.header('Authorization') || '').slice(7)).then(
         async (session) => {
           // 가입 미완료 계정은 여행 파일 경로로 프로필 권한 제한을 우회할 수 없다.
-          if (!session.isAnonymous) {
-            const profile = await database(c.env)
-              .prepare(
-                'SELECT onboarding_completed_at FROM profiles WHERE user_id=?',
-              )
-              .bind(session.userId)
-              .first<{ onboarding_completed_at: number | null }>();
-            if (!profile?.onboarding_completed_at)
-              return rejectRequest('ONBOARDING_REQUIRED');
-          }
           return { env: c.env, session };
         },
       )
@@ -119,7 +110,9 @@ function storeImage(
       httpMetadata: { contentType: mime },
       customMetadata: { actor: actor.session.userId },
     })
-    .then((object) => {
+    .then(async (object) => {
+      if (object)
+        await checkAccountFileWrite(c.env, actor.session.userId, path);
       /* 조건부 업로드 실패를 덮어쓰기 성공으로 처리하지 않는다. */ return object
         ? database(c.env)
             .prepare(
@@ -134,7 +127,8 @@ function storeImage(
               Date.now(),
             )
             .run()
-            .then(() => {
+            .then(async () => {
+              await checkAccountFileWrite(c.env, actor.session.userId, path);
               /* 실제 저장 메타데이터를 전달한다. */ return c.json(
                 {
                   data: { id: c.req.param('mediaId'), path, mimeType: mime },
@@ -142,6 +136,10 @@ function storeImage(
                 },
                 201,
               );
+            })
+            .catch(async (error: unknown) => {
+              await checkAccountFileWrite(c.env, actor.session.userId, path);
+              throw error;
             })
         : rejectRequest('VERSION_CONFLICT');
     });
@@ -275,7 +273,7 @@ function canRead(c: Ctx, path: string): Promise<boolean> {
     ? publicPath(c.env, path)
     : database(c.env)
         .prepare(
-          "SELECT 1 FROM trip_members m JOIN trips t ON t.id=m.trip_id JOIN json_each(t.snapshot,'$.media') media WHERE m.trip_id=? AND m.user_id=? AND json_extract(media.value,'$.path')=? AND NOT EXISTS(SELECT 1 FROM account_retirements r WHERE r.user_id=m.user_id)",
+          "SELECT 1 FROM trip_members m JOIN trips t ON t.id=m.trip_id JOIN json_each(t.snapshot,'$.media') media WHERE m.trip_id=? AND m.user_id=? AND json_extract(media.value,'$.path')=? AND NOT EXISTS(SELECT 1 FROM account_retirements r WHERE r.user_id=m.user_id) AND NOT EXISTS(SELECT 1 FROM account_deletion_jobs d WHERE d.user_id IN(m.user_id,t.owner_id))",
         )
         .bind(path.split('/')[0], c.req.query('user') || '', path)
         .first()

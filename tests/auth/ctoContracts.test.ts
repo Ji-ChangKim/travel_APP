@@ -23,7 +23,7 @@ import {
   ledgerActionContainer,
   ledgerActionForeground,
 } from '../../apps/mobile/src/features/workspace/my-trips/model/ledgerActionAppearance';
-import ledgerTokens from '../../docs/02. 디자인/00. 공통규격/ledger-tokens.json';
+import designTokens from '../../docs/02. 디자인/00. 공통규격/design-tokens.json';
 
 test('로그인·프로필·기기 기록의 공통 안내도 미확인 예외 원문을 숨긴다', () => {
   // 같은 정책을 쓰는 다른 화면에서 원문 노출이 다시 생기지 않게 한다.
@@ -230,12 +230,18 @@ test('Ledger 버튼은 기본·선택·비활성·초점 상태에서 현행 치
   );
   assert.equal(
     ledgerActionContainer({ ...base, blocked: true }).backgroundColor,
-    ledgerTokens.color.soft,
+    designTokens.color.surface.low,
   );
   assert.equal(
     ledgerActionContainer({ ...base, focused: true }).borderColor,
-    ledgerTokens.color.ink,
+    designTokens.color.text.primary,
   );
-  assert.equal(ledgerActionForeground(false, true), ledgerTokens.color.surface);
-  assert.equal(ledgerActionForeground(true, true), ledgerTokens.color.muted);
+  assert.equal(
+    ledgerActionForeground(false, true),
+    designTokens.color.surface.card,
+  );
+  assert.equal(
+    ledgerActionForeground(true, true),
+    designTokens.color.text.secondary,
+  );
 });

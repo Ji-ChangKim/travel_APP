@@ -216,7 +216,7 @@ export function renderWorkspaceMoreMenu({
   );
 }
 
-// 선택 DAY에 맞는 작성·순서 편집을 하단에서 제공한다.
+// 선택 DAY에 맞는 장소 검색 추가·영수증 촬영 추가·순서 편집을 하단에서 제공한다.
 export function renderWorkspaceAddSchedule({
   busy,
   scanning,
@@ -225,6 +225,7 @@ export function renderWorkspaceAddSchedule({
   selectedDay,
   snapshot,
   setOrderingDay,
+  setShowReceiptCapture,
 }: {
   busy: boolean;
   scanning: boolean;
@@ -233,6 +234,7 @@ export function renderWorkspaceAddSchedule({
   selectedDay: string;
   snapshot: WorkspaceSnapshot | undefined;
   setOrderingDay: Dispatch<SetStateAction<string>>;
+  setShowReceiptCapture?: Dispatch<SetStateAction<boolean>>;
 }): import('react').ReactNode {
   const dayId =
     snapshot?.days.find((day) => day.id === selectedDay)?.id ||
@@ -252,6 +254,19 @@ export function renderWorkspaceAddSchedule({
             label={t('순서 편집')}
             disabled={locked || count < 2}
             onPress={() => setOrderingDay(dayId)}
+          />
+        </View>
+      )}
+      {setShowReceiptCapture && (
+        <View style={hub.secondaryActionWrap}>
+          <DesignButton
+            label={t('영수증 추가')}
+            accessibilityLabel={t('영수증 촬영으로 일정 추가')}
+            disabled={locked}
+            icon={(color) => (
+              <Ionicons name="receipt-outline" size={18} color={color} />
+            )}
+            onPress={() => setShowReceiptCapture(true)}
           />
         </View>
       )}

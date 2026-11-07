@@ -21,7 +21,13 @@ export function nicknameValidationError(value: string): string | null {
       : '한글, 영문, 숫자만 사용할 수 있어요.';
 }
 
-export const profileNicknameError = nicknameValidationError;
+export function profileNicknameError(
+  value: string,
+  previous?: string,
+): string | null {
+  // 기존 이름을 그대로 유지하는 편집에는 신규 형식 제한을 소급하지 않는다.
+  return value === previous ? null : nicknameValidationError(value);
+}
 
 // 기기와 서버에서 UTF-8 저장 길이를 같은 방식으로 계산한다.
 export function nicknameBytes(value: string): number {
@@ -44,16 +50,17 @@ export function validProfileNickname(
   previous?: string,
 ): boolean {
   // 기존 회원이 이름을 그대로 둘 때는 길이와 공백을 바꾸지 않는다.
-  return value === previous || nicknameValidationError(value) === null;
+  return profileNicknameError(value, previous) === null;
 }
 
 export const nicknameSchema = z
   .string()
   .transform(normalizeProfileNickname)
-  .refine((value) => {
-    // 가입 입력에는 기존 닉네임 예외를 적용하지 않는다.
-    return validProfileNickname(value);
-  }, nicknameError);
+  .superRefine((value, context) => {
+    // 가입에는 기존 이름 예외를 적용하지 않으며 실패 이유도 앱과 일치시킨다.
+    const error = nicknameValidationError(value);
+    if (error) context.addIssue({ code: 'custom', message: error });
+  });
 
 // 생일을 입력한 경우에만 실제 날짜와 허용 범위를 검사한다.
 export function validProfileBirthDate(value: string): boolean {

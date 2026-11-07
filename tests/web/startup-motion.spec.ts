@@ -107,6 +107,152 @@ async function network(page: Page, member = false) {
 for (const viewport of [
   { width: 320, height: 568 },
   { width: 390, height: 844 },
+  { width: 1024, height: 1366 },
+]) {
+  test(`승인 BI 영상: ${viewport.width}×${viewport.height} 무음으로 4초 재생하고 시작 화면으로 이어진다`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    await network(page);
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.goto('/');
+    const video = page.locator('video');
+    await expect(video).toBeVisible();
+    await expect(page.getByTestId('startup-bi')).toHaveAttribute(
+      'data-bi-phase',
+      'video',
+    );
+    await expect
+      .poll(() =>
+        video.evaluate((element: HTMLVideoElement) => element.currentTime),
+      )
+      .toBeGreaterThan(0.1);
+    expect(await video.boundingBox()).toEqual({ x: 0, y: 0, ...viewport });
+    const playback = await video.evaluate((element: HTMLVideoElement) => ({
+      muted: element.muted,
+      volume: element.volume,
+      duration: element.duration,
+      width: element.videoWidth,
+      height: element.videoHeight,
+      controls: element.controls,
+      loop: element.loop,
+      fit: getComputedStyle(element).objectFit,
+    }));
+    expect(playback).toEqual({
+      muted: true,
+      volume: 0,
+      duration: 4,
+      width: 1920,
+      height: 1080,
+      controls: false,
+      loop: false,
+      fit: 'contain',
+    });
+    if (viewport.width === 320)
+      await page.evaluate(() => {
+        document.documentElement.style.fontSize = '32px';
+        window.dispatchEvent(new Event('resize'));
+      });
+    await page.screenshot({
+      path: `outputs/startup-motion-app/video-${viewport.width}x${viewport.height}.png`,
+    });
+    await expect
+      .poll(() =>
+        video.evaluate((element: HTMLVideoElement) => element.currentTime),
+      )
+      .toBeGreaterThan(3);
+    await expect(page).toHaveURL(/\/welcome$/, { timeout: 8000 });
+    await expect(
+      page.getByRole('button', { name: '게스트로 시작하기', exact: true }),
+    ).toBeEnabled();
+    await expect(video).toHaveCount(0);
+  });
+}
+
+test('승인 BI 영상: 영상이 끝나도 시작 점검을 기다리는 동안 정지 심볼을 유지한다', async ({
+  page,
+}) => {
+  await network(page);
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  let releaseStartup!: () => void;
+  const startupGate = new Promise<void>((resolve) => {
+    releaseStartup = resolve;
+  });
+  await page.route('**/public/startup', async (route) => {
+    await startupGate;
+    return route.fulfill({
+      json: {
+        data: {
+          protocolVersion: 1,
+          commonDataVersion: 'a'.repeat(64),
+          guestDataVersion: 1,
+        },
+      },
+    });
+  });
+  await page.goto('/');
+  await expect(page.getByTestId('startup-bi')).toHaveAttribute(
+    'data-bi-phase',
+    'video',
+  );
+  await expect(page.getByTestId('startup-bi')).toHaveAttribute(
+    'data-bi-phase',
+    'done',
+    { timeout: 8000 },
+  );
+  await expect(page.locator('video')).toHaveCount(0);
+  await expect(page.getByTestId('startup-bi-poster')).toBeVisible();
+  await page.screenshot({
+    path: 'outputs/startup-motion-app/video-awaiting-startup.png',
+  });
+  releaseStartup();
+  await expect(page).toHaveURL(/\/welcome$/);
+});
+
+test('승인 BI 영상: 동작 줄이기에서는 영상을 요청하지 않고 정지 이미지로 이어진다', async ({
+  page,
+}) => {
+  await network(page);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const requests: string[] = [];
+  page.on('request', (request) => {
+    if (new URL(request.url()).pathname.endsWith('.mp4'))
+      requests.push(request.url());
+  });
+  await page.goto('/');
+  await expect(page.getByTestId('startup-bi-poster')).toBeVisible();
+  await page.screenshot({
+    path: 'outputs/startup-motion-app/video-reduced-motion.png',
+  });
+  await expect(page).toHaveURL(/\/welcome$/);
+  await expect(page.locator('video')).toHaveCount(0);
+  expect(requests).toEqual([]);
+});
+
+test('승인 BI 영상: 재생 파일 오류가 나도 정지 이미지 뒤 로그인 선택을 연다', async ({
+  page,
+}) => {
+  await network(page);
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.route('**/*.mp4', (route) => route.abort());
+  await page.goto('/');
+  await expect(page.getByTestId('startup-bi-poster')).toBeVisible();
+  await expect(page.getByTestId('startup-bi')).toHaveAttribute(
+    'data-bi-phase',
+    'poster',
+  );
+  await page.screenshot({
+    path: 'outputs/startup-motion-app/video-error-poster.png',
+  });
+  await expect(page).toHaveURL(/\/welcome$/);
+  await expect(
+    page.getByRole('button', { name: 'Google 계정으로 계속', exact: true }),
+  ).toBeEnabled();
+});
+
+for (const viewport of [
+  { width: 320, height: 568 },
+  { width: 390, height: 844 },
   { width: 430, height: 932 },
   { width: 844, height: 390 },
   { width: 1024, height: 1366 },
@@ -116,6 +262,8 @@ for (const viewport of [
   }) => {
     await page.setViewportSize(viewport);
     await network(page);
+    // 배경·안전 영역 검사는 영상 오류 시의 정적 대체 화면을 기준으로 한다.
+    await page.route('**/*.mp4', (route) => route.abort());
     let releaseStartup!: () => void;
     const startupGate = new Promise<void>((resolve) => {
       releaseStartup = resolve;
@@ -178,11 +326,11 @@ for (const viewport of [
     const background = page.getByTestId('startup-bi-background');
     await expect(background.locator('stop').nth(0)).toHaveAttribute(
       'stop-color',
-      '#FFF9F6',
+      '#FFFFFF',
     );
     await expect(background.locator('stop').nth(1)).toHaveAttribute(
       'stop-color',
-      '#FFF0EC',
+      '#FFFFFF',
     );
     const box = (await poster.boundingBox())!;
     expect(Math.abs(box.x + box.width / 2 - viewport.width / 2)).toBeLessThan(
@@ -239,7 +387,8 @@ test('BI 배경·중앙: 창 크기 변경과 원본 이미지 실패에도 중�
 }) => {
   const state = await network(page);
   state.startupFailure = true;
-  await page.route('**/*tripprint-app-icon-source*', (route) => route.abort());
+  await page.route('**/*.mp4', (route) => route.abort());
+  await page.route('**/*tripprint_bi_poster*', (route) => route.abort());
   await page.goto('/');
   const brand = page
     .getByTestId('startup-bi')
@@ -277,6 +426,7 @@ test('시작 연출: 중앙 심볼을 상단으로 잇고 버튼을 제자리 �
       phase: string;
       y: number;
       width: number;
+      height: number;
       google: number;
       guest: number;
     };
@@ -304,6 +454,7 @@ test('시작 연출: 중앙 심볼을 상단으로 잇고 버튼을 제자리 �
           phase: moving ? 'moving' : 'bi',
           y: box.y,
           width: box.width,
+          height: box.height,
           google: opacity('welcome-google-entrance'),
           guest: opacity('welcome-guest-entrance'),
         });
@@ -328,6 +479,7 @@ test('시작 연출: 중앙 심볼을 상단으로 잇고 버튼을 제자리 �
             phase: string;
             y: number;
             width: number;
+            height: number;
             google: number;
             guest: number;
           }[];
@@ -346,7 +498,13 @@ test('시작 연출: 중앙 심볼을 상단으로 잇고 버튼을 제자리 �
   });
   expect(bi.length).toBeGreaterThan(2);
   expect(moving.length).toBeGreaterThan(3);
-  expect(Math.abs(bi.at(-1)!.y - moving[0]!.y)).toBeLessThan(8);
+  // 여백을 포함한 16:9 포스터와 로그인 심볼의 중앙을 비교한다.
+  const lastBi = bi.at(-1)!;
+  expect(
+    Math.abs(
+      lastBi.y + lastBi.height / 2 - moving[0]!.y - moving[0]!.height / 2,
+    ),
+  ).toBeLessThan(8);
   expect(moving[0]!.y - moving.at(-1)!.y).toBeGreaterThan(100);
   expect(
     moving.some(
@@ -757,6 +915,8 @@ test('자동 복구: 로고 위치를 측정하지 못해도 팝업 없이 로�
     };
   });
   await page.goto('/');
+  // 4초 BI가 끝난 뒤 로그인 화면의 위치 측정 복구 시간을 별도로 확인한다.
+  await expect(page).toHaveURL(/\/welcome$/, { timeout: 8000 });
   await expect(
     page.getByRole('button', { name: 'Google 계정으로 계속', exact: true }),
   ).toBeEnabled();

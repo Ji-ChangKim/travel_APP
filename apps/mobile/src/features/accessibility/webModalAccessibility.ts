@@ -28,21 +28,41 @@ export function connectWebModal(
       'aria-label',
       node.querySelector('[role="heading"]')?.textContent || '여행 내용',
     );
+  let composing = false;
+  let composingKeyDown = false;
+  const compositionStart = () => {
+    composing = true;
+  };
+  const compositionEnd = () => {
+    composing = false;
+  };
   const keydown = (event: KeyboardEvent) => {
     // 중첩 창에서는 현재 최상위 창만 키보드를 처리한다.
     if (topModal()?.id !== id) return;
+    composingKeyDown = composing || event.isComposing || event.keyCode === 229;
+    if (composingKeyDown) return;
     if (event.key === 'Tab') cycleFocus(node, strict, event);
   };
   const keyup = (event: KeyboardEvent) => {
-    if (topModal()?.id !== id || event.key !== 'Escape') return;
+    if (topModal()?.id !== id) return;
+    // IME가 keyup 전에 compositionend를 보내도 같은 조합 취소 키를 기억한다.
+    const compositionKey =
+      composingKeyDown ||
+      composing ||
+      event.isComposing ||
+      event.keyCode === 229;
+    composingKeyDown = false;
+    if (event.key !== 'Escape') return;
     // RN 웹 모달도 keyup을 사용한다. keydown에서 새 확인창을 열면 같은 키의
     // keyup이 확인창까지 닫으므로 현재 최상위 창에서 한 번만 처리한다.
     event.preventDefault();
     event.stopImmediatePropagation();
-    close();
+    if (!compositionKey) close();
   };
   document.addEventListener('keydown', keydown, true);
   document.addEventListener('keyup', keyup, true);
+  node.addEventListener('compositionstart', compositionStart);
+  node.addEventListener('compositionend', compositionEnd);
   const rememberFocus = (event: FocusEvent) => {
     // 중첩 창이 열리며 버튼이 잠기기 전에 읽던 위치를 보관한다.
     if (event.target instanceof HTMLElement) memory.inside = event.target;
@@ -58,6 +78,8 @@ export function connectWebModal(
     // 이전 배경 속성을 정확히 복원하고 새 창의 초점을 빼앗지 않는다.
     document.removeEventListener('keydown', keydown, true);
     document.removeEventListener('keyup', keyup, true);
+    node.removeEventListener('compositionstart', compositionStart);
+    node.removeEventListener('compositionend', compositionEnd);
     node.removeEventListener('focusin', rememberFocus);
     restored.forEach((restore) => {
       // 숨기기 전의 읽기·입력 상태로 돌린다.

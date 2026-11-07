@@ -10,6 +10,9 @@ import {
 import { colors, radii, typography } from '@/constants/theme';
 import { AppFontsReady } from './AppFontProvider';
 import { appFontFamily } from './appFontFamily';
+import AndroidTextInput from './AndroidTextInput';
+
+const Input = Platform.OS === 'android' ? AndroidTextInput : TextInput;
 
 type Props = TextInputProps & { inputRef?: Ref<TextInput> };
 
@@ -40,7 +43,7 @@ function InputView({
   const { fontScale } = useAppAccessibility();
   // 비활성 입력은 투명도를 낮추지 않고 배경과 실제 편집 상태로 구분한다.
   return (
-    <TextInput
+    <Input
       {...props}
       ref={inputRef}
       placeholderTextColor={colors.muted}

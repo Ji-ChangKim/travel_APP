@@ -62,11 +62,14 @@ function trustedRequest(c: Ctx): Ctx {
 }
 
 // 신규 인증 준비 시 만료한 임시 토큰과 코드를 제거한다.
-function purge(c: Ctx): Promise<unknown> {
+export function purgeExpiredOAuthHandoffs(
+  env: Env,
+  now = Date.now(),
+): Promise<unknown> {
   // 완료하지 않은 인증의 임시 자격 증명도 짧게 보관한다.
-  return database(c.env)
+  return database(env)
     .prepare('DELETE FROM oauth_handoffs WHERE expires_at<=?')
-    .bind(Date.now())
+    .bind(now)
     .run();
 }
 
@@ -99,6 +102,7 @@ function prepareInput(
             session?.user.isAnonymous
               ? c.req.header('Authorization')?.slice(7) || null
               : null,
+            session?.user.isAnonymous ? session.user.id : null,
           );
         });
 }
@@ -108,15 +112,16 @@ function insertHandoff(
   c: Ctx,
   input: z.infer<typeof prepareSchema>,
   guest: string | null,
+  guestUserId: string | null,
   id = crypto.randomUUID(),
 ): Promise<Response> {
   // 브라우저 시작 주소에는 회원 토큰을 포함하지 않는다.
-  return purge(c)
+  return purgeExpiredOAuthHandoffs(c.env)
     .then(() => {
       // 공급자 인증을 시작할 수 있는 준비 ID는 보안 난수로 만든다.
       return database(c.env)
         .prepare(
-          'INSERT INTO oauth_handoffs(id,provider,challenge,redirect_uri,guest_token,expires_at) VALUES(?,?,?,?,?,?)',
+          'INSERT INTO oauth_handoffs(id,provider,challenge,redirect_uri,guest_token,guest_user_id,expires_at) VALUES(?,?,?,?,?,?,?)',
         )
         .bind(
           id,
@@ -124,6 +129,7 @@ function insertHandoff(
           input.challenge,
           redirectUri(c, input.redirectUri),
           guest,
+          guestUserId,
           Date.now() + 600000,
         )
         .run();
@@ -246,6 +252,7 @@ function saveReturned(
                       parseCookies(c.req.header('Cookie') || '').get(
                         context.authCookies.sessionToken.name,
                       ) || rejectRequest('SESSION_EXPIRED'),
+                      session.user.id,
                     );
                   })
                 : c.redirect(`${row.redirect_uri}?error=verification_failed`);
@@ -260,6 +267,7 @@ function saveCode(
   row: Handoff,
   code: string,
   token: string,
+  userId: string,
 ): Promise<Response> {
   // 실제 로그인 토큰은 URL에 포함하지 않는다.
   return authDigest(code)
@@ -267,9 +275,9 @@ function saveCode(
       // 동일 callback의 중복 완료를 조건부 저장으로 차단한다.
       return database(c.env)
         .prepare(
-          'UPDATE oauth_handoffs SET code_hash=?,session_token=?,guest_token=NULL,expires_at=? WHERE id=? AND code_hash IS NULL',
+          'UPDATE oauth_handoffs SET code_hash=?,session_token=?,session_user_id=?,guest_token=NULL,guest_user_id=NULL,expires_at=? WHERE id=? AND code_hash IS NULL',
         )
-        .bind(hash, token, Date.now() + 60000, row.id)
+        .bind(hash, token, userId, Date.now() + 60000, row.id)
         .run();
     })
     .then(() => {

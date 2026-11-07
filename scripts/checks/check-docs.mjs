@@ -22,6 +22,9 @@ export function checkDocumentation(projectRoot) {
         continue;
       }
       if (entry.isDirectory()) {
+        if (entry.name === '999. deletefile') {
+          continue;
+        }
         const number = entry.name.match(/^(\d{2})\. .+$/)?.[1];
         if (!number || numbers.has(number)) {
           problems.push(
@@ -74,6 +77,13 @@ export function checkDocumentation(projectRoot) {
           ) {
             problems.push(
               `${relative(projectRoot, full)}: 프로젝트 밖으로 연결되는 로컬 링크 ${target}`,
+            );
+          } else if (
+            location === `docs${sep}999. deletefile` ||
+            location.startsWith(`docs${sep}999. deletefile${sep}`)
+          ) {
+            problems.push(
+              `${relative(projectRoot, full)}: 삭제 보관 폴더(999. deletefile)로 연결되는 링크 ${target}`,
             );
           } else if (!existsSync(destination)) {
             problems.push(

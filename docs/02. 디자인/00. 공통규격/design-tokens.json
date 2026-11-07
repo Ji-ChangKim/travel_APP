@@ -1,16 +1,9 @@
 {
   "schemaVersion": 3,
-  "revision": "3.0.5",
-  "date": "2026-10-26",
+  "revision": "3.1.0",
+  "date": "2026-11-06",
   "status": "app-integrated",
   "unit": "logical-pixel",
-  "sourceScreens": {
-    "project": "13238536021221568181",
-    "designSystem": "assets/9104657915771630257",
-    "foundations": "88f59027549748a18770d582a90d91ac",
-    "controls": "8477d769989249159094c66152b7e2c8",
-    "travel": "f2592cafe17e4ca8804b0ce32d051a00"
-  },
   "color": {
     "brand": {
       "coral": "#FF6B57",
@@ -169,7 +162,12 @@
     "sectionGap": 24,
     "minimumTouchTarget": 48,
     "referenceMobileWidth": 390,
-    "reviewMobileWidths": [360, 390, 430]
+    "reviewMobileWidths": [360, 390, 430],
+    "mobileMaxWidth": 640,
+    "wideGutter": 24,
+    "wideMaxWidth": 1200,
+    "wideBreakpoint": 1024,
+    "sidebarWidth": 256
   },
   "control": {
     "primary": {
@@ -233,8 +231,8 @@
     {
       "role": "text.primary",
       "foreground": "#203247",
-      "background": "#FFF9F3",
-      "ratio": 12.492822413186602,
+      "background": "#F8F9FF",
+      "ratio": 12.42,
       "minimumForSmallText": 4.5,
       "passes": true,
       "allowedForSmallText": true
@@ -243,16 +241,16 @@
       "role": "text.secondary.white",
       "foreground": "#596574",
       "background": "#FFFFFF",
-      "ratio": 5.934831470738994,
+      "ratio": 5.93,
       "minimumForSmallText": 4.5,
       "passes": true,
       "allowedForSmallText": true
     },
     {
-      "role": "text.secondary.ivory",
+      "role": "text.secondary.canvas",
       "foreground": "#596574",
-      "background": "#FFF9F3",
-      "ratio": 5.679488355868999,
+      "background": "#F8F9FF",
+      "ratio": 5.65,
       "minimumForSmallText": 4.5,
       "passes": true,
       "allowedForSmallText": true
@@ -260,8 +258,8 @@
     {
       "role": "text.link",
       "foreground": "#A43E31",
-      "background": "#FFF9F3",
-      "ratio": 6.06795792371236,
+      "background": "#F8F9FF",
+      "ratio": 6.03,
       "minimumForSmallText": 4.5,
       "passes": true,
       "allowedForSmallText": true
@@ -270,7 +268,7 @@
       "role": "button.primary",
       "foreground": "#203247",
       "background": "#FF6B57",
-      "ratio": 4.657779332381318,
+      "ratio": 4.66,
       "minimumForSmallText": 4.5,
       "passes": true,
       "allowedForSmallText": true
@@ -279,7 +277,7 @@
       "role": "button.pressed",
       "foreground": "#FFFFFF",
       "background": "#A43E31",
-      "ratio": 6.340766173339224,
+      "ratio": 6.34,
       "minimumForSmallText": 4.5,
       "passes": true,
       "allowedForSmallText": true
@@ -288,7 +286,7 @@
       "role": "button.disabled",
       "foreground": "#596574",
       "background": "#EEE8E2",
-      "ratio": 4.882464624469171,
+      "ratio": 4.88,
       "minimumForSmallText": 4.5,
       "passes": true,
       "allowedForSmallText": true
@@ -297,7 +295,7 @@
       "role": "selection",
       "foreground": "#203247",
       "background": "#FFF0EB",
-      "ratio": 11.758775762551155,
+      "ratio": 11.76,
       "minimumForSmallText": 4.5,
       "passes": true,
       "allowedForSmallText": true
@@ -306,73 +304,19 @@
       "role": "control.border.white",
       "foreground": "#8A7B70",
       "background": "#FFFFFF",
-      "ratio": 4.079405693597352,
+      "ratio": 4.08,
       "minimumForSmallText": 3,
       "passes": true,
       "allowedForSmallText": false
     },
     {
-      "role": "control.border.ivory",
+      "role": "control.border.canvas",
       "foreground": "#8A7B70",
-      "background": "#FFF9F3",
-      "ratio": 3.9038913320257955,
+      "background": "#F8F9FF",
+      "ratio": 3.88,
       "minimumForSmallText": 3,
       "passes": true,
       "allowedForSmallText": false
-    },
-    {
-      "role": "focus.coral",
-      "foreground": "#203247",
-      "background": "#FF6B57",
-      "ratio": 4.657779332381318,
-      "minimumForSmallText": 3,
-      "passes": true,
-      "allowedForSmallText": false
-    },
-    {
-      "role": "status.error",
-      "foreground": "#9E3438",
-      "background": "#FCEEEF",
-      "ratio": 6.200715956482817,
-      "minimumForSmallText": 4.5,
-      "passes": true,
-      "allowedForSmallText": true
-    },
-    {
-      "role": "status.success",
-      "foreground": "#28614E",
-      "background": "#EBF4EF",
-      "ratio": 6.432433573380185,
-      "minimumForSmallText": 4.5,
-      "passes": true,
-      "allowedForSmallText": true
-    },
-    {
-      "role": "status.warning",
-      "foreground": "#765214",
-      "background": "#FFF4D9",
-      "ratio": 6.425212562733147,
-      "minimumForSmallText": 4.5,
-      "passes": true,
-      "allowedForSmallText": true
-    },
-    {
-      "role": "sky.label",
-      "foreground": "#203247",
-      "background": "#8FD3E8",
-      "ratio": 7.8643159499280815,
-      "minimumForSmallText": 4.5,
-      "passes": true,
-      "allowedForSmallText": true
-    },
-    {
-      "role": "sun.label",
-      "foreground": "#203247",
-      "background": "#FFC857",
-      "ratio": 8.486244902315603,
-      "minimumForSmallText": 4.5,
-      "passes": true,
-      "allowedForSmallText": true
     }
   ],
   "decisions": [
@@ -387,44 +331,6 @@
     {
       "id": "action-v3",
       "basis": "주 행동은 코랄/네이비, 눌림은 딥 코랄/흰색. 기존 화면의 primary 별칭은 네이비로 보존하고 actionPrimary로 새 주 행동을 지정한다."
-    }
-  ],
-  "historicalDecisions": [
-    {
-      "id": "brand-palette",
-      "basis": "원본 설명표와 아이콘 자료에 명시한 코랄·네이비를 채택. TOOL KIT Tailwind primary/secondary 값은 혼합하지 않음."
-    },
-    {
-      "id": "radius-scale",
-      "basis": "원본 설명표의 4/8/12/16/24를 숫자 토큰으로 보존. 충돌하는 Tailwind 별칭은 사용하지 않음."
-    },
-    {
-      "id": "semantic-colors",
-      "basis": "경고는 아이콘 자료의 노랑, 정보는 하늘색, 오류 본문은 TOOL KIT의 진한 빨강. 진한 전경색은 가독성 보완 토큰."
-    },
-    {
-      "id": "cta-contrast",
-      "basis": "밝은 브랜드 코랄을 유지하고 소형 글자는 네이비로 조합. 흰 글자 조합은 별도의 진한 코랄 변형으로 제공."
-    },
-    {
-      "id": "font-stack",
-      "basis": "한글은 Pretendard, 영문은 Plus Jakarta Sans가 디자인 기준. 현재 일정 화면은 웹·네이티브 모두 Pretendard Regular/Bold OTF로 통일하고 Plus Jakarta Sans 연결은 보류."
-    },
-    {
-      "id": "reading-v2",
-      "basis": "승인한 하루 UI Kit v3의 코랄·네이비·아이보리를 유지한다. 화면당 코랄 주요 행동은 하나 이하로 둔다."
-    },
-    {
-      "id": "readable-body",
-      "basis": "본문 16/26, 보조 정보 14/22 이상. 작은 글자는 네이비·읽히는 회색·진한 링크색을 사용한다."
-    },
-    {
-      "id": "button-state",
-      "basis": "주요·보조·위험·선택·비활성·눌림·초점을 공통 컴포넌트로 구분한다. 잠금은 실제 disabled 속성을 유지한다."
-    },
-    {
-      "id": "source-preservation",
-      "basis": "v1 HTML·SVG와 로고·마스코트 원본은 보존한다. 앱 아이콘의 보조 채색은 렌더러에서 의미 토큰으로 변환한다."
     }
   ],
   "interactionHierarchy": {
@@ -454,14 +360,14 @@
     "gnb": {
       "background": "#FFFFFF",
       "border": "#E2E8F0",
-      "foreground": "#45464D",
-      "selectedForeground": "#B3261E",
-      "selectedBackground": "#FFDAD2",
-      "pressedBackground": "#F5F1EC",
-      "actionBackground": "#B3261E",
+      "foreground": "#596574",
+      "selectedForeground": "#A43E31",
+      "selectedBackground": "#FFF0EB",
+      "pressedBackground": "#F1F4FA",
+      "actionBackground": "#A43E31",
       "actionPressedBackground": "#A43E31",
       "actionForeground": "#FFFFFF",
-      "actionLabel": "#334155",
+      "actionLabel": "#203247",
       "minimumHeight": 64,
       "chipWidth": 48,
       "chipHeight": 28,
@@ -474,8 +380,8 @@
   },
   "startup": {
     "bi": {
-      "backgroundTop": "#FFF9F6",
-      "backgroundBottom": "#FFF0EC"
+      "backgroundTop": "#FFFFFF",
+      "backgroundBottom": "#FFFFFF"
     }
   },
   "format": {

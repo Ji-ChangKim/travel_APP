@@ -52,7 +52,7 @@ before(async () => {
     .flatMap((name) =>
       readFileSync(new URL(name, directory), 'utf8')
         .replace(/--[^\n]*/g, '')
-        .split(';')
+        .split(/;\s*(?:\r?\n|$)/)
         .filter((sql) => sql.trim()),
     );
   await env.DB!.batch(statements.map((sql) => env.DB!.prepare(sql)));
@@ -252,7 +252,7 @@ test('사진이 누락된 여행은 목록에 표시하지 않고 수신 후 같
   );
 });
 
-test('다른 계정의 작업·사진과 미완료 회원의 연결 요청을 차단한다', async () => {
+test('다른 계정의 작업·사진은 차단하고 추가 프로필 입력 없이 본인 기기 여행을 연결한다', async () => {
   const input = fixture();
   const id = crypto.randomUUID();
   const mediaId = crypto.randomUUID();
@@ -288,7 +288,7 @@ test('다른 계정의 작업·사진과 미완료 회원의 연결 요청을 �
   );
   assert.equal(
     (await request(crypto.randomUUID(), fixture(), pendingId)).status,
-    403,
+    200,
   );
   input.trip.itinerary.push({
     id: crypto.randomUUID(),

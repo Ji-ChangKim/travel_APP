@@ -121,6 +121,8 @@ export {
   foundationUuidSchema,
   mutationResultSchema,
   persistedTripCreateSchema,
+  tripCreationRequestSchema,
+  tripTitleSchema,
   tripVersionSchema,
 } from './foundation';
 export {
@@ -151,3 +153,5 @@ export * from './planning';
 export { tripDestinationSchema, tripDestinationsSchema } from './foundation';
 
 export * from './homeData';
+
+export { suggestedTripTitle } from './tripNames';

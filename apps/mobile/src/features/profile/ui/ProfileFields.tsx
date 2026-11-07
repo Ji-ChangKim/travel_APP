@@ -3,11 +3,8 @@ import DesignButton from '@/components/ui/DesignButton';
 import TextInput from '@/components/ui/DesignInput';
 import { colors } from '@/constants/theme';
 import { t } from '@/features/localization/translate';
-import {
-  nicknameError,
-  nicknameHint,
-  validProfileNickname,
-} from '@wherego/validation';
+import { nicknameHint, profileNicknameError } from '@wherego/validation';
+import { useState } from 'react';
 import { View } from 'react-native';
 import { styles } from '../styles/myAccountStyles';
 import type { ProfileEditorProps } from '../model/myAccountTypes';
@@ -27,10 +24,13 @@ export function ProfileNicknameField({
   isSavingProfile,
   setEditNickname,
   currentUser,
+  showError = false,
 }: Pick<
   ProfileEditorProps,
   'editNickname' | 'isSavingProfile' | 'setEditNickname' | 'currentUser'
->) {
+> & { showError?: boolean }) {
+  const [focused, setFocused] = useState(false);
+  const error = profileNicknameError(editNickname, currentUser?.nickname);
   return (
     <View style={styles.editInputGroup}>
       <Text style={styles.editInputLabel}>{t('닉네임')}</Text>
@@ -39,17 +39,19 @@ export function ProfileNicknameField({
         value={editNickname}
         editable={!isSavingProfile}
         onChangeText={setEditNickname}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
         accessibilityLabel={t('닉네임')}
         placeholder={t('닉네임 입력')}
         placeholderTextColor={colors.mutedLight}
       />
       <Text style={styles.inputHint}>{t(nicknameHint)}</Text>
-      {!validProfileNickname(editNickname, currentUser?.nickname) ? (
+      {(!focused || showError) && error ? (
         <Text
           accessibilityRole="alert"
           style={[styles.editInputLabel, { color: colors.danger }]}
         >
-          {t(nicknameError)}
+          {t(error)}
         </Text>
       ) : null}
     </View>

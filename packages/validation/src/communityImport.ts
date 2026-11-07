@@ -1,3 +1,4 @@
+import { suggestedTripTitle } from './tripNames';
 import { z } from 'zod';
 import type { CommunityPost, WorkspaceSnapshot } from '@wherego/domain';
 import { validTravelLeg } from '@wherego/domain';
@@ -5,6 +6,7 @@ import {
   calendarDateSchema,
   isSupportedTimezone,
   persistedTripCreateSchema,
+  tripTitleInputSchema,
 } from './foundation';
 import { communityPostSchema, workspaceSnapshotSchema } from './workspace';
 import {
@@ -17,7 +19,7 @@ import {
 export const communityImportSchema = z
   .object({
     startDate: calendarDateSchema,
-    title: z.string().trim().max(50).optional(),
+    title: z.union([z.string().trim().max(0), tripTitleInputSchema]).optional(),
     timezone: z.string().max(100).refine(isSupportedTimezone),
     defaultCurrency: z.enum(['KRW', 'JPY', 'USD']).default('KRW'),
   })
@@ -52,7 +54,7 @@ export function importCommunityTrip(
   const snapshot = newTrip(
     persistedTripCreateSchema.parse({
       ...input,
-      title: input.title || post.title.slice(0, 50),
+      title: input.title || suggestedTripTitle(post.title),
       country: post.snapshot.country,
       city: post.snapshot.city,
       endDate: communityImportEnd(post, input.startDate),

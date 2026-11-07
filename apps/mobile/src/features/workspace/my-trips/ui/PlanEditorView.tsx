@@ -116,7 +116,7 @@ export function renderPlanEditor({
                   ? t('영수증 수정')
                   : t('영수증 확인')
                 : form?.kind === 'expense'
-                  ? t('비용 기록')
+                  ? t('장소 · 금액 입력')
                   : form?.kind === 'metadata'
                     ? t('여행 정보 수정')
                     : form?.kind === 'period'

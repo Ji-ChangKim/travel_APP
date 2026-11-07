@@ -12,9 +12,9 @@ export const accounts = {
 
 // 실제 마이그레이션 파일을 순서대로 읽는다.
 function readMigrations(): Promise<string[]> {
-  // 테스트 전용 SQL로 실제 마이그레이션을 대체하지 않는다.
+  // 퇴역한 PostgreSQL 계약은 HEAD db0dc16의 원본 SQL 보존본으로 검증한다.
   return readdir(
-    new URL('../../../supabase/migrations/', import.meta.url),
+    new URL('../../../tests/fixtures/legacy-postgres/', import.meta.url),
   ).then((names) => {
     // 날짜 순으로 모든 실제 SQL 파일을 읽는다.
     return Promise.all(
@@ -27,7 +27,10 @@ function readMigrations(): Promise<string[]> {
         .map((name) => {
           // 실제 저장소의 파일을 UTF-8로 읽는다.
           return readFile(
-            new URL(`../../../supabase/migrations/${name}`, import.meta.url),
+            new URL(
+              `../../../tests/fixtures/legacy-postgres/${name}`,
+              import.meta.url,
+            ),
             'utf8',
           );
         }),

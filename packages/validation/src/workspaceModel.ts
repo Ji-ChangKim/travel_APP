@@ -1,3 +1,5 @@
+import { suggestedTripTitle } from './tripNames';
+import { tripTitleSchema } from './foundation';
 import type { CommunityPost, PersistedTripInput } from '@wherego/domain';
 import { tripDestinations, validTravelLeg } from '@wherego/domain';
 import {
@@ -79,7 +81,9 @@ export function newTrip(
         ...tripMetadata(input),
         id,
         ownerId: actor,
-        title: input.title || `${name}의 ${input.country} 여행`,
+        title: tripTitleSchema.parse(
+          input.title || suggestedTripTitle(`${name}의 ${input.country} 여행`),
+        ),
         status: 'PLANNED',
         version: 1,
         defaultCurrency: input.defaultCurrency || 'KRW',
@@ -506,6 +510,7 @@ function applyCommand(
         trip: {
           ...s.trip,
           ...command.input,
+          title: tripTitleSchema.parse(command.input.title),
           ...(s.trip.destinations
             ? {
                 destinations: representativeDestinations(

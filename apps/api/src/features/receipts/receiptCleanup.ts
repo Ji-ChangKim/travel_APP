@@ -30,11 +30,12 @@ export async function cleanReceiptOriginal(
 }
 
 // 앱을 종료해도 기존 예약 실행에서 정리를 재개한다. 한 실패가 나머지 작업을 막지 않는다.
-export async function retryReceiptCleanup(env: Env): Promise<void> {
+export async function retryReceiptCleanup(env: Env, limit = 50): Promise<void> {
   const jobs = await database(env)
     .prepare(
-      'SELECT path FROM receipt_cleanup_jobs WHERE completed_at IS NULL ORDER BY coalesce(attempted_at,0),created_at LIMIT 50',
+      'SELECT path FROM receipt_cleanup_jobs WHERE completed_at IS NULL ORDER BY coalesce(attempted_at,0),created_at LIMIT ?',
     )
+    .bind(limit)
     .all<{ path: string }>();
   for (const job of jobs.results) {
     try {

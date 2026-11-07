@@ -101,7 +101,7 @@ export function useCommunityImport(postId: string, userId: string) {
           : failure instanceof FoundationClientError && failure.status === 401
             ? '로그인 상태를 확인한 뒤 다시 담아 주세요.'
             : failure instanceof FoundationClientError && failure.status === 422
-              ? '여행 이름과 출발일을 확인해 주세요. 여행 기간은 최대 90일이에요.'
+              ? '여행 이름과 출발일을 확인해 주세요. 여행 기간은 최대 30일이에요.'
               : '저장을 확인하지 못했어요. 다시 시도하면 같은 요청의 결과를 확인해요.',
       );
     } finally {

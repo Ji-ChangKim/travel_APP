@@ -118,15 +118,17 @@ export const tripHubStyles = StyleSheet.create({
     gap: 8,
   },
   metaInlineRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: 8,
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: 6,
   },
   metaItem: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
+    alignItems: 'flex-start',
+    gap: 6,
+    flexShrink: 1,
+    minWidth: 0,
+    width: '100%',
   },
   metaDot: {
     width: 3,
@@ -265,6 +267,7 @@ export const tripHubStyles = StyleSheet.create({
     fontFamily: theme.font.regular,
   },
   status: {
+    flexShrink: 1,
     fontSize: 14,
     color: theme.color.text.secondary,
     lineHeight: 22,

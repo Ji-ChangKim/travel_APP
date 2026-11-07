@@ -7,7 +7,7 @@ import { updateUserProfile } from '@/services/profileService';
 import { userFacingMessage } from '@/services/userFacingError';
 import { useTripStore } from '@/stores/useTripStore';
 import type { Profile } from '@wherego/domain';
-import { nicknameError, validProfileNickname } from '@wherego/validation';
+import { profileNicknameError } from '@wherego/validation';
 import { type Dispatch, type RefObject, type SetStateAction } from 'react';
 
 // 프로필 입력·검증·저장과 계정별 응답 보호를 구성한다.
@@ -85,10 +85,14 @@ export function useProfileEditorActions({
 
   // 프로필 정보 수정을 서버 및 스토어에 반영한다.
   const handleSaveProfile = () => {
+    const nicknameError = profileNicknameError(
+      editNickname,
+      currentUser?.nickname,
+    );
     // 실제 서버 저장이 끝나야 완료 안내를 표시한다.
     return !currentUser
       ? setProfileError('로그인과 닉네임을 확인해 주세요.')
-      : !validProfileNickname(editNickname, currentUser.nickname)
+      : nicknameError
         ? setProfileError(nicknameError)
         : profileSave.current.running
           ? undefined

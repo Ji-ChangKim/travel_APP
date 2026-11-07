@@ -10,12 +10,6 @@ const tokens = JSON.parse(
   ),
 );
 const c = tokens.color;
-const ledger = JSON.parse(
-  readFileSync(
-    path.join(root, 'docs/02. 디자인/00. 공통규격/ledger-tokens.json'),
-    'utf8',
-  ),
-).color;
 
 // sRGB 원색을 선형 상대 휘도로 변환하며 계산 중 반올림하지 않는다.
 function luminance(hex) {
@@ -114,32 +108,6 @@ for (const name of ['canvas', 'card', 'low']) {
 }
 checks.push(
   pair('focus/primary', c.border.focus, c.action.primary, 3, 'non-text'),
-);
-
-for (const background of ['canvas', 'surface', 'soft', 'selected', 'private']) {
-  for (const foreground of ['ink', 'muted', 'accent'])
-    checks.push(
-      pair(
-        `ledger.${foreground}/${background}`,
-        ledger[foreground],
-        ledger[background],
-        4.5,
-      ),
-    );
-  checks.push(
-    pair(
-      `ledger.focus/${background}`,
-      ledger.ink,
-      ledger[background],
-      3,
-      'non-text',
-    ),
-  );
-}
-checks.push(
-  pair('ledger.primary', ledger.surface, ledger.accent, 4.5),
-  pair('ledger.selected', ledger.surface, ledger.navy, 4.5),
-  pair('ledger.private', ledger.privateText, ledger.private, 4.5),
 );
 
 // 헤더와 GNB의 기본·선택·눌림 상태도 실제 적용 토큰으로 검사한다.

@@ -93,7 +93,7 @@ const config: ExpoConfig = {
     [
       'expo-splash-screen',
       {
-        // OS 스플래시는 단색을 쓰고 React BI에서 같은 계열의 그라데이션으로 잇는다.
+        // 무음 BI 영상의 흰 배경과 OS 스플래시를 같은 색으로 잇는다.
         backgroundColor: designTokens.startup.bi.backgroundTop,
         image: './assets/brand/tripprint-v1/tripprint-app-icon-source.png',
         imageWidth: 160,

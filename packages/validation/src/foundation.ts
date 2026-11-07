@@ -28,14 +28,18 @@ export function isSupportedTimezone(value: string): boolean {
 }
 
 // 여행 기간 상한을 계산한다.
-export function isAllowedTripPeriod(value: {
-  startDate: string;
-  endDate: string;
-}): boolean {
-  // 시작일부터 종료일까지 1~90일 범위를 확인한다.
+export function isAllowedTripPeriod(
+  value: {
+    startDate: string;
+    endDate: string;
+  },
+  maximumDays = 90,
+): boolean {
+  // 기존 여행의 기간 수정은 90일, 신규 생성은 별도 상한을 적용한다.
   return (
     value.startDate <= value.endDate &&
-    (Date.parse(value.endDate) - Date.parse(value.startDate)) / 86400000 < 90
+    (Date.parse(value.endDate) - Date.parse(value.startDate)) / 86400000 <
+      maximumDays
   );
 }
 
@@ -74,7 +78,7 @@ export const tripDestinationsSchema = z
     );
   }, '같은 도시는 한 번만 추가할 수 있어요.');
 
-export const persistedTripCreateSchema = z
+const persistedTripInputSchema = z
   .object({
     draftRevision: z.number().int().positive().optional(),
     destinations: tripDestinationsSchema.optional(),
@@ -95,43 +99,87 @@ export const persistedTripCreateSchema = z
       .regex(/^#[0-9a-fA-F]{6}$/)
       .default('#246A54'),
   })
-  .strict()
+  .strict();
+
+export const tripTitleSchema = z
+  .string()
+  .transform((value) => value.trim().normalize('NFC'))
   .refine(
-    (input) =>
-      !input.destinations ||
-      (input.destinations[0]!.country === input.country &&
-        input.destinations[0]!.city === input.city &&
-        input.destinations[0]!.timezone === input.timezone),
-    {
-      message: '첫 여행지와 대표 여행지 정보를 확인해 주세요.',
-      path: ['destinations'],
-    },
-  )
-  .refine(isAllowedTripPeriod, {
-    message: '여행 기간은 시작일 포함 1~90일이어야 합니다.',
-    path: ['endDate'],
-  })
-  .refine(
-    (value) => {
-      // 같은 역할의 출발편·도착편 중복과 여행 기간 밖의 항공편을 거부한다.
-      return (
-        !(value.flight && value.flights) &&
-        (value.flights || []).every(
-          (flight) =>
-            flight.date >= value.startDate && flight.date <= value.endDate,
-        ) &&
-        ['outbound', 'inbound'].every(
-          (role) =>
-            (value.flights || []).filter((flight) => flight.role === role)
-              .length <= 1,
-        )
-      );
-    },
-    {
-      message: '항공편의 출발일과 중복 등록 여부를 확인해 주세요.',
-      path: ['flights'],
-    },
+    (value) => Array.from(value).length >= 1 && Array.from(value).length <= 60,
+    '여행 이름은 1~60자로 입력해 주세요.',
   );
+
+// 요청 원문은 이전 멱등 해시와 비교하고 NFC 정규화는 실제 저장 단계에 적용한다.
+export const tripTitleInputSchema = z
+  .string()
+  .trim()
+  .refine((value) => {
+    const length = Array.from(value.normalize('NFC')).length;
+    return length >= 1 && length <= 60;
+  }, '여행 이름은 1~60자로 입력해 주세요.');
+
+const optionalTripTitleSchema = z.preprocess(
+  (value) => (typeof value === 'string' && !value.trim() ? undefined : value),
+  tripTitleSchema.optional(),
+);
+
+function tripCreationSchema(
+  maximumDays: 30 | 90,
+  titleSchema: z.ZodType<string | undefined, z.ZodTypeDef, unknown>,
+) {
+  return persistedTripInputSchema
+    .extend({ title: titleSchema })
+    .refine(
+      (input) =>
+        !input.destinations ||
+        (input.destinations[0]!.country === input.country &&
+          input.destinations[0]!.city === input.city &&
+          input.destinations[0]!.timezone === input.timezone),
+      {
+        message: '첫 여행지와 대표 여행지 정보를 확인해 주세요.',
+        path: ['destinations'],
+      },
+    )
+    .refine((value) => isAllowedTripPeriod(value, maximumDays), {
+      message: `여행 기간은 시작일 포함 1~${maximumDays}일이어야 합니다.`,
+      path: ['endDate'],
+    })
+    .refine(
+      (value) => {
+        // 같은 역할의 출발편·도착편 중복과 여행 기간 밖의 항공편을 거부한다.
+        return (
+          !(value.flight && value.flights) &&
+          (value.flights || []).every(
+            (flight) =>
+              flight.date >= value.startDate && flight.date <= value.endDate,
+          ) &&
+          ['outbound', 'inbound'].every(
+            (role) =>
+              (value.flights || []).filter((flight) => flight.role === role)
+                .length <= 1,
+          )
+        );
+      },
+      {
+        message: '항공편의 출발일과 중복 등록 여부를 확인해 주세요.',
+        path: ['flights'],
+      },
+    );
+}
+
+export const persistedTripCreateSchema = tripCreationSchema(
+  30,
+  optionalTripTitleSchema,
+);
+
+// 이전에 성공한 요청의 해시와 결과를 재생할 때만 기존 입력 계약을 사용한다.
+export const legacyTripCreateSchema = tripCreationSchema(
+  90,
+  z.string().trim().max(50).optional(),
+);
+export const tripCreationRequestSchema = legacyTripCreateSchema.or(
+  persistedTripCreateSchema,
+);
 
 // 요청과 리소스 식별자는 UUID로 검증한다.
 export const foundationUuidSchema = z.string().uuid();

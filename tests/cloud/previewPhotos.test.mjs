@@ -1,3 +1,4 @@
+import { seedLegacyAccount } from '../fixtures/cloudAccount.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
@@ -101,10 +102,10 @@ async function request(path, token, method = 'GET', body, headers = {}) {
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
 }
-// 실제 가입 응답에서 테스트 세션만 얻는다.
+// 기존 이메일 자료 fixture에서 실제 SDK의 서명 세션을 얻는다.
 async function account() {
   // 별도 격리 DB 계정이며 서비스 약관이나 외부 계정에 영향을 주지 않는다.
-  const response = await request('/api/auth/sign-up/email', null, 'POST', {
+  const response = await seedLegacyAccount(mf, {
     name: `Photo${randomUUID().slice(0, 8)}`,
     email: `${randomUUID()}@example.test`,
     password: 'preview-fixture-strong-password!',
@@ -143,7 +144,7 @@ before(async () => {
     .sort()) {
     for (const sql of readFileSync(new URL(name, root), 'utf8')
       .replace(/--[^\n]*/g, '')
-      .split(';'))
+      .split(/;\s*(?:\r?\n|$)/))
       if (sql.trim()) await db.prepare(sql).run();
   }
   owner = await account();

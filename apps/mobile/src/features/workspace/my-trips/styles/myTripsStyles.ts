@@ -1,20 +1,21 @@
 import { StyleSheet } from 'react-native';
+import { colors, designTokens } from '@/constants/theme';
 
-// 내 여행 두 HTML의 화면 전용 색이며 공통 메뉴·다른 화면 토큰은 바꾸지 않는다.
+// 내 여행 화면의 색상을 공통 디자인 토큰으로 연결한다.
 export const myTripsColors = {
-  background: '#F8F9FF',
-  card: '#FFFFFF',
-  ink: '#0B1C30',
-  muted: '#45464D',
-  primary: '#AE3115',
-  navy: '#131B2E',
-  soft: '#EFF4FF',
-  blue: '#E5EEFF',
-  high: '#DCE9FF',
-  warm: '#FFDAD2',
-  border: '#E5E7ED',
-  green: '#086747',
-};
+  background: colors.background,
+  card: colors.surface,
+  ink: colors.text,
+  muted: colors.muted,
+  primary: colors.actionPressed,
+  navy: colors.primary,
+  soft: colors.surfaceMuted,
+  blue: designTokens.color.surface.raised,
+  high: designTokens.color.surface.raised,
+  warm: colors.selectedSurface,
+  border: colors.border,
+  green: colors.success,
+} as const;
 const c = myTripsColors;
 
 // 작은 보조 문구와 사진 비율을 시안대로 유지하며 긴 글자는 내용만큼 확장한다.
@@ -79,7 +80,7 @@ export const myTripsStyles = StyleSheet.create({
   },
   selectedChip: { backgroundColor: c.primary },
   chipText: { fontSize: 12, lineHeight: 16, color: c.muted, fontWeight: '600' },
-  inverse: { color: '#FFFFFF' },
+  inverse: { color: colors.textLight },
   search: {
     flexDirection: 'row',
     alignItems: 'center',

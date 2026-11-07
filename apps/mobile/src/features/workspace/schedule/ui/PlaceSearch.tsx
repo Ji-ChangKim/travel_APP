@@ -43,7 +43,7 @@ export default function PlaceSearch({
   const Button = compact ? ScheduleButton : Action;
   const [error, setError] = useState('');
   const [expanded, setExpanded] = useState(
-    Boolean(initialShare) || startExpanded,
+    Boolean(initialShare) || startExpanded || !simple,
   );
   // 외부 지도에서 장소를 확인한 다음 사용자가 일정을 작성한다.
   return (
@@ -59,7 +59,7 @@ export default function PlaceSearch({
           accessibilityLabel="제목"
           value={query}
           onChange={setQuery}
-          placeholder={t('어디에 가고 싶으세요?')}
+          placeholder={t('방문할 맛집, 명소, 숙소를 검색해 보세요')}
         />
       ) : (
         <Field label="장소 검색어" value={query} onChange={setQuery} />
