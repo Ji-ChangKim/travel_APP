@@ -18,4 +18,4 @@
 2. **GitHub Actions 워크플로 실행 (`.github/workflows/play-internal.yml`)**:
    - 대상 브랜치(`main`), 산출물 형식(`aab` 또는 `apk`), Play Console 자동 제출 여부(`submit_play`)를 지정해 실행합니다.
 3. **로컬 산출물 경로**:
-   - 로컬 Android 빌드 시 기본 산출물 위치는 `outputs/android/`이며 소스 트리와 분리해 관리합니다.
+   - 로컬 Android 빌드 시 기본 산출물 위치는 `../travel_APP_bulid/`(`J:\002. Project_Service\travel_APP_bulid`)이며 소스 트리와 분리해 관리합니다.

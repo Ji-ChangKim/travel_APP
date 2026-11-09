@@ -11,7 +11,7 @@ function repositoryPath(...segments) {
 function androidBuildOutput(environment = process.env) {
   return environment.TRIPPRINT_BUILD_OUTPUT_DIR
     ? resolve(repositoryRoot, environment.TRIPPRINT_BUILD_OUTPUT_DIR)
-    : repositoryPath('outputs/android');
+    : repositoryPath('../travel_APP_bulid');
 }
 
 module.exports = { repositoryRoot, repositoryPath, androidBuildOutput };

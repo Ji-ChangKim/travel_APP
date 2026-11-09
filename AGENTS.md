@@ -103,7 +103,7 @@
 - 기준은 `docs/03. 개발/00. 구조설계/저장소_아키텍처규격.md`입니다. 코드 폴더는 소문자 kebab-case, TypeScript 모듈은 camelCase, React 컴포넌트는 PascalCase를 사용하며 프레임워크와 출처 보존 예외를 따릅니다.
 - API 기능은 `apps/api/src/features`, 공통 오류·타입·HTTP 처리는 `shared`, 저장소 연결은 `infrastructure`에 둡니다. 공통 기능이 개별 기능에 의존하지 않게 합니다.
 - 도구는 `scripts/android`, `build`, `checks`, `design`, `qa`, `release`, `shared`로 구분합니다. 화면별 Playwright 설정은 `tests/config`에 둡니다.
-- 저장소 경로는 `scripts/shared/repository-paths.cjs`, 네이티브 연결은 `apps/mobile/plugins/gradleScript.cjs`와 `scripts/android/repository-root.gradle`을 기준으로 합니다. 새 Android 산출물의 기본 경로는 `outputs/android`이며 기존 외부 산출물은 보존합니다.
+- 저장소 경로는 `scripts/shared/repository-paths.cjs`, 네이티브 연결은 `apps/mobile/plugins/gradleScript.cjs`와 `scripts/android/repository-root.gradle`을 기준으로 합니다. 새 Android 산출물의 기본 경로는 `../travel_APP_bulid`(`J:\002. Project_Service\travel_APP_bulid`)이며 기존 외부 산출물은 보존합니다.
 - 파일 이동 후 npm 명령·import·플러그인·Gradle·CI·문서 참조를 함께 갱신하고 `npm run check`와 관련 회귀 검사로 확인합니다.
 
 ---

@@ -11,7 +11,7 @@ import {
 import { appendGradleScript } from '../../apps/mobile/plugins/gradleScript.cjs';
 
 test('Android 출력의 기본값과 상대 경로는 저장소를 기준으로 계산한다', () => {
-  assert.equal(androidBuildOutput({}), repositoryPath('outputs/android'));
+  assert.equal(androidBuildOutput({}), repositoryPath('../travel_APP_bulid'));
   assert.equal(
     androidBuildOutput({
       TRIPPRINT_BUILD_OUTPUT_DIR: 'outputs/custom-android',
