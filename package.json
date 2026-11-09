@@ -16,6 +16,7 @@
     "reports:preview": "node scripts/design/preview-daily-reports.mjs",
     "test:reports:web": "npm run reports:build && node scripts/qa/verify-daily-reports.mjs",
     "test:reports:tc": "npm run reports:build && node scripts/qa/verify-report-tc.mjs",
+    "test:reports:designs": "npm run reports:build && node scripts/qa/verify-report-designs.mjs",
     "start": "npm --workspace=@wherego/mobile run start",
     "android": "npm --workspace=@wherego/mobile run android",
     "android:dev": "node scripts/android/start-studio.mjs",

@@ -118,15 +118,18 @@ const [template, css, js] = await Promise.all(
     'daily-report-site.js',
   ].map((name) => readFile(join(templateRoot, name), 'utf8')),
 );
-const [tcScript, tcCss, tcCatalog, tcResults] = await Promise.all([
-  readFile(join(templateRoot, 'daily-report-tc.js'), 'utf8'),
-  readFile(join(templateRoot, 'daily-report-tc.css'), 'utf8'),
-  readFile(
-    resolve(root, 'docs/03. 개발/04. 검증/페이지별_TC_목록.json'),
-    'utf8',
-  ).then(JSON.parse),
-  readFile(join(reportRoot, 'tc-results.json'), 'utf8').then(JSON.parse),
-]);
+const [tcScript, tcCss, tcCatalog, tcResults, designScript, designCss] =
+  await Promise.all([
+    readFile(join(templateRoot, 'daily-report-tc.js'), 'utf8'),
+    readFile(join(templateRoot, 'daily-report-tc.css'), 'utf8'),
+    readFile(
+      resolve(root, 'docs/03. 개발/04. 검증/페이지별_TC_목록.json'),
+      'utf8',
+    ).then(JSON.parse),
+    readFile(join(reportRoot, 'tc-results.json'), 'utf8').then(JSON.parse),
+    readFile(join(templateRoot, 'daily-report-designs.js'), 'utf8'),
+    readFile(join(templateRoot, 'daily-report-designs.css'), 'utf8'),
+  ]);
 const ids = new Set();
 for (const page of tcCatalog.pages) {
   if (
@@ -164,9 +167,12 @@ const data = JSON.stringify({
 const output = template
   // 보고서의 달러·백틱 조합도 치환 문법으로 해석하지 않고 그대로 보관한다.
   .replace('/* REPORT_TOKENS */', () => cssTokens)
-  .replace('/* REPORT_CSS */', () => css + '\n' + tcCss)
+  .replace('/* REPORT_CSS */', () => css + '\n' + tcCss + '\n' + designCss)
   .replace('/* REPORT_RENDERER */', () => renderReportMarkdown.toString())
-  .replace('/* REPORT_SCRIPT */', () => tcScript + '\n' + js)
+  .replace(
+    '/* REPORT_SCRIPT */',
+    () => designScript + '\n' + tcScript + '\n' + js,
+  )
   .replace('REPORT_DATA_JSON', () => data);
 const formatOptions = await prettier.resolveConfig(join(root, 'package.json'));
 await writeFile(

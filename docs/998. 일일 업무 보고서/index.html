@@ -2228,6 +2228,250 @@
           display: none !important;
         }
       }
+
+      .tc-design-panel {
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 24px;
+        background: var(--paper);
+        margin-bottom: 24px;
+        min-width: 0;
+      }
+      .tc-design-heading {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+      .tc-design-heading .eyebrow {
+        margin-bottom: 8px;
+      }
+      .tc-design-heading h3 {
+        font-size: 1.125rem;
+        margin: 0;
+      }
+      .tc-design-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+      }
+      .tc-design-content {
+        display: grid;
+        grid-template-columns: minmax(180px, 280px) minmax(0, 1fr);
+        gap: 28px;
+      }
+      .tc-design-thumb {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+        width: 100%;
+        border-radius: 16px;
+        background: var(--low);
+        border: 1px solid var(--border);
+      }
+      .tc-design-thumb img {
+        width: 100%;
+        height: 260px;
+        object-fit: contain;
+      }
+      .tc-design-thumb > span {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 0.8125rem;
+      }
+      .tc-design-thumb svg {
+        width: 18px;
+        height: 18px;
+      }
+      .tc-design-kind {
+        display: inline-block;
+        padding: 4px 10px;
+        font-size: 0.75rem;
+        color: var(--coralDark);
+        background: var(--coralSoft);
+        border-radius: 8px;
+        margin-bottom: 12px;
+      }
+      .tc-design-info h4 {
+        margin: 0 0 16px;
+        font-size: 1.125rem;
+        overflow-wrap: anywhere;
+      }
+      .tc-design-info dl {
+        display: grid;
+        grid-template-columns: 80px minmax(0, 1fr);
+        gap: 8px 16px;
+        font-size: 0.8125rem;
+        margin: 0;
+      }
+      .tc-design-info dt {
+        color: var(--muted);
+      }
+      .tc-design-info dd {
+        margin: 0;
+        overflow-wrap: anywhere;
+      }
+      .tc-design-note {
+        font-size: 0.875rem;
+        color: var(--muted);
+        line-height: 1.8;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        margin: 20px 0;
+      }
+      .tc-design-storage,
+      .tc-design-help {
+        font-size: 0.75rem;
+        line-height: 1.9;
+        color: var(--muted);
+        margin: 20px 0 0;
+      }
+      .tc-design-empty {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        padding: 24px;
+        border-radius: 16px;
+        background: var(--low);
+      }
+      .tc-design-placeholder {
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        width: 64px;
+        height: 64px;
+        color: var(--muted);
+        background: var(--paper);
+        border-radius: 16px;
+      }
+      .tc-design-placeholder svg {
+        width: 28px;
+        height: 28px;
+      }
+      .tc-design-empty h4 {
+        font-size: 0.9375rem;
+        margin: 0 0 8px;
+      }
+      .tc-design-empty p,
+      .tc-design-panel > p {
+        font-size: 0.8125rem;
+        color: var(--muted);
+        line-height: 1.9;
+        margin: 0;
+      }
+      .tc-design-editor label {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 20px;
+        font-size: 0.875rem;
+        font-weight: 700;
+      }
+      .tc-design-editor input,
+      .tc-design-editor select,
+      .tc-design-editor textarea {
+        width: 100%;
+        min-width: 0;
+      }
+      .tc-design-editor input[type='file'] {
+        white-space: normal;
+        font-size: 0.8125rem;
+      }
+      .tc-design-editor input::file-selector-button {
+        display: block;
+        border: 1px solid var(--strong);
+        background: var(--paper);
+        color: var(--ink);
+        border-radius: 10px;
+        padding: 12px;
+        min-height: 48px;
+        font: inherit;
+        margin-bottom: 8px;
+        cursor: pointer;
+      }
+      .tc-design-preview {
+        margin-top: 20px;
+        padding: 16px;
+        background: var(--low);
+        border-radius: 16px;
+      }
+      .tc-design-preview img {
+        display: block;
+        width: 100%;
+        max-height: 240px;
+        object-fit: contain;
+      }
+      dialog.tc-design-viewer {
+        width: min(1040px, calc(100vw - 32px));
+        max-width: calc(100vw - 32px);
+      }
+      .tc-design-viewer > img {
+        display: block;
+        width: 100%;
+        max-height: 70dvh;
+        object-fit: contain;
+        background: var(--low);
+        border-radius: 12px;
+      }
+      .tc-design-viewer > p {
+        font-size: 0.875rem;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        margin-top: 20px;
+      }
+      .tc-design-viewer .dialog-top h2,
+      .tc-design-editor .dialog-top h2 {
+        overflow-wrap: anywhere;
+      }
+      .tc-design-actions .danger-text {
+        color: var(--red);
+      }
+      @media (max-width: 1100px) {
+        .tc-design-heading {
+          flex-direction: column;
+        }
+      }
+      @media (max-width: 760px) {
+        .tc-design-panel {
+          padding: 20px;
+        }
+        .tc-design-content {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .tc-design-empty {
+          flex-direction: column;
+          align-items: start;
+          padding: 20px;
+          gap: 16px;
+        }
+        .tc-design-info dl {
+          grid-template-columns: minmax(0, 1fr);
+          gap: 4px;
+        }
+        .tc-design-info dd {
+          margin-bottom: 10px;
+        }
+        .tc-design-actions {
+          width: 100%;
+        }
+        .tc-design-actions button {
+          white-space: normal;
+        }
+      }
+      @media print {
+        .tc-design-editor,
+        .tc-design-viewer,
+        #tc-design-confirm {
+          display: none !important;
+        }
+      }
     </style>
   </head>
   <body>
@@ -2569,6 +2813,12 @@
                 "after": "18개 페이지·64 TC의 3단계 체크 차트, 상세 기준·검수 메모·파일 보관 제공",
                 "boundary": "앱의 실제 개발·에뮬레이터·실기기 판정은 초기 미검증",
                 "status": "done"
+              },
+              {
+                "area": "페이지별 디자인",
+                "after": "페이지별 이미지 등록·교체·확대·삭제, 종류·버전·메모와 별도 디자인 백업·복원 제공",
+                "boundary": "현재 브라우저에 보관. 확인되지 않은 과거 화면은 자동 등록하지 않음",
+                "status": "done"
               }
             ],
             "improvements": [
@@ -2659,6 +2909,26 @@
               {
                 "before": "검수 결과를 다른 환경으로 옮기거나 출력할 전용 기능이 없었다",
                 "after": "TC 전용 JSON 내려받기·가져오기와 현재 선택 항목 인쇄를 제공한다. 잘못된 파일과 저장 실패는 기존 결과를 보존한다"
+              },
+              {
+                "before": "페이지별 TC는 있어도 대조할 화면을 함께 보관할 수 없었다",
+                "after": "페이지를 선택하면 TC 위에서 현재 디자인 한 장과 제목·버전/빌드·메모·등록 시각을 확인한다"
+              },
+              {
+                "before": "실제 앱 화면과 시안·구조 스케치를 구분해 등록할 방법이 없었다",
+                "after": "실제 앱 캡처·디자인 시안·구조 스케치를 구분한다. 확인되지 않은 과거 이미지를 자동 지정하지 않는다"
+              },
+              {
+                "before": "페이지별 디자인 교체·확대·원본 보관·이동 수단이 없었다",
+                "after": "이미지 추가·수정·교체·크게 보기·원본 내려받기·삭제와 전체 디자인 JSON 백업·복원을 제공한다"
+              },
+              {
+                "before": "ver.text 및 apps/mobile/public/release.json의 versionCode가 16으로 설정됨",
+                "after": "ver.text와 apps/mobile/public/release.json의 versionCode를 14(versionName=0.0.1)로 일원화하여 Expo·Gradle·릴리스 메타데이터를 통일"
+              },
+              {
+                "before": "scripts/shared/repository-paths.cjs의 기본 Android 산출물 경로가 outputs/android",
+                "after": "androidBuildOutput() 기본값을 repositoryPath('../travel_APP_bulid')(J:\\002. Project_Service\\travel_APP_bulid)로 변경하여 기존 이력과 연결"
               }
             ],
             "checks": [
@@ -2701,6 +2971,11 @@
                 "name": "npm run test:reports:web",
                 "result": "TC 메뉴 추가 후 기존 보고서의 탐색·등록·수정·재조회·안전한 가져오기·인쇄 회귀 통과",
                 "evidence": "outputs/daily-report-site/tc/report-regression.log"
+              },
+              {
+                "name": "npm run test:reports:designs",
+                "result": "현재 디자인 등록·종류·재조회·교체·원본·백업·복원·실패 복구·반응형 통과",
+                "evidence": "outputs/daily-report-site/designs/browser-final.log, verification.json"
               }
             ],
             "next": [
@@ -2740,7 +3015,7 @@
                 "status": "제안 단계"
               }
             ],
-            "markdown": "# 일일 통합 작업 보고서\n\n- 작업일: 2026-11-09, 한국 시간 기준.\n- 대상: TripPrint 앱 기본 구조, 계정·프로필, 여행 일정, 헤더·GNB 검수, Git 패치와 홈 구성 검토.\n- 기능 반영 버전: `main`의 [c470064](https://github.com/Ji-ChangKim/travel_APP/commit/c470064e128c0735814fe5f7798b3e6b7c96ebd6). 기준 커밋은 `d92abb9cfd640fd84a8aa5eb3aeceaec99ad7eb0`이다.\n- 이 날짜의 작업은 이 보고서 한 개에서 관리한다. 기능·디자인·데이터의 현행 기준은 아래에 연결한 각 규격 문서에 둔다.\n\n## 1. 완료 내용과 남은 범위\n\n앱 기본 화면을 연결하고 Google 회원의 선택적 닉네임·사진 변경을 구현했다. 함께 작업된 여행 일정 개편을 반영했으며 현재 구조에 맞춘 헤더·GNB 회귀 검사 22개가 모두 통과했다. 코드·문서·검수 기록 109개 파일은 `origin/main`에 커밋·푸시했고 원격 커밋 일치와 작업 폴더에 남은 변경이 없음을 확인했다.\n\n| 구분             | 완료한 내용                                                                                                                         | 남은 항목·판정 범위                                        |\n| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |\n| 앱 기본 구조     | 실행 → 로그인 선택 → 추가 입력 없는 기본 프로필 → 홈·커뮤니티·MY·설정 연결                                                          | 실제 Google 외부 인증·설치본 인수는 미검증                 |\n| 계정 관리        | 계정 확인, 삭제 사전 확인, 소유권 이전, 명시적 삭제 접수·로그아웃 연결                                                              | HTTP 202는 접수이며 실제 삭제 완료와 구분                  |\n| MY 프로필        | Google 회원 닉네임·사진 변경, 중복·30일 제한, 고정 PNG 교체·재조회                                                                  | 원격 DB·R2 적용, 실기기 촬영·권한은 미검증                 |\n| 여행 일정        | 여행 요약·계획/가계부·DAY 전체 연속 노출·방문 시간/소요시간 배제·순번 배지·동선 지도                                                | 실제 공급자 연결과 여행 전체 사이클은 별도 검수            |\n| 일정 상세·가계부 | 04_3 일정 상세 7대 항목·아이디어 A 후기($0 딥링크+자체 리뷰), 04_4 가계부(시간·환율 제거, 현지 통화·Card/Cash 구분, 일정 상세 연동) | 서버 DB 자체 리뷰 교차 집계·영수증 OCR 본연동은 후속 과제  |\n| 헤더·GNB         | 큰 글꼴의 긴 제목 넘침 수정, 현재 이동 경로를 따르는 22개 회귀 통과                                                                 | 공통 색상·글꼴·4탭 구성·선택 표시·모션 유지                |\n| Git              | 커밋·푸시 및 원격 반영 확인                                                                                                         | 서버 배포·원격 DB 적용·Android 설치본 생성은 수행하지 않음 |\n| 홈 구성          | 인사·내 여행·도시 탐색·빠른 실행·공개 여행 검토안 정리                                                                              | 레퍼런스를 적용한 새 홈 레이아웃은 미구현                  |\n| 게스트           | 현재 기기 프로필·여행 이용 유지                                                                                                     | 요청한 서버 DB 저장·재조회는 후속 과제                     |\n| 보고서 관리      | 작업 완료 때 원본 누적·HTML 갱신을 프로젝트 규칙에 반영                                                                             | 브라우저에서 직접 쓴 일지는 별도 백업으로 보관             |\n| 페이지별 TC      | 18개 페이지·64 TC의 3단계 체크 차트, 상세 기준·검수 메모·파일 보관 제공                                                             | 앱의 실제 개발·에뮬레이터·실기기 판정은 초기 미검증        |\n\n## 2. 앱 기본 구조와 계정 관리\n\n로그인 직후에는 생일·성별·소개·여행 스타일을 입력받지 않는다. 기본 이름은 ‘여행자’이며 실제 확인한 이용 방식만 표시한다. 과거 `/profile-setup` 주소도 추가 입력 없이 허용된 원래 목적지로 돌아간다. Google 회원이 나중에 MY에서 닉네임·사진을 고르는 행동은 시작 과정의 필수 입력과 구분한다.\n\n홈은 TripPrint 브랜드 헤더, 내 여행·커뮤니티·MY는 공통 제목 헤더를 사용한다. `/footprints`와 `/community`는 같은 커뮤니티 화면과 검색 구성을 사용한다. 하단 GNB는 홈 → 내 여행 → 커뮤니티 → MY의 기존 4탭을 유지한다.\n\n계정 관리는 본인 정보 → 삭제 사전 확인 → 필요한 소유권 이전 → 삭제 내용 확인 → 명시적 요청 순서다. 조회 실패 때 삭제 버튼을 열지 않고 재시도를 제공한다. 신규 삭제는 90일 복구 유예를 안내하지 않는다. 늦게 도착한 이전 계정의 응답을 새 계정에 적용하지 않으며, 게스트 자료는 로그인만으로 자동 전송하지 않는다.\n\n기본 화면의 상세 구현·로컬 실제 서버 검수는 [앱 기본 구조 구현 검수](\u003c../../03. 개발/04. 검증/앱기본구조_구현검수.md>)에 있다. 실제 약관·개인정보 페이지와 게시 주소는 후속 작업으로 남았다.\n\n## 3. MY 닉네임·프로필 사진\n\nGoogle 회원은 MY에서 닉네임 변경 → 입력 → 중복 확인 → 저장 순서로 바꾼다. 저장 후 홈·MY와 서버 재조회에서 같은 값을 확인한다. 게스트에는 Google 로그인 안내를 제공하고 변경 API도 서버에서 권한을 검사한다.\n\n| 닉네임 항목    | 확정 기준                                                                                                     |\n| -------------- | ------------------------------------------------------------------------------------------------------------- |\n| 문자           | 영어·숫자·한글·일본어 히라가나·가타카나와 일본어 장음 `ー`. 한자·이모지·특수문자 거부                         |\n| 길이           | NFC 정규화 후 1~10자. 중간 공백도 글자 수에 포함                                                              |\n| 공백           | 앞뒤 공백·공백만·탭·줄바꿈 거부. 문자 사이 ASCII 공백은 총 2개까지 허용. 자동으로 잘라 저장하지 않음          |\n| 중복           | NFC + 소문자 비교. `A가나다`와 `a가나다`는 동일. 중간 공백 수는 보존                                          |\n| 변경 간격      | 마지막 성공 저장 후 정확히 30일, 2,592,000,000ms. 달력 월 기준이 아님                                         |\n| 최초·같은 값   | 최초 선택은 즉시 가능. 완전히 같은 값은 변경 시각·기회를 갱신하지 않음                                        |\n| 기본 이름      | 미설정 ‘여행자’는 공용 표시이며 예약이 아님. 직접 선택한 이름만 고유 예약                                     |\n| 동시 요청·실패 | 사전 중복 확인은 예약이 아님. 저장 시 고유 제약·30일 조건 재검사. 실패를 성공 처리하거나 기회를 차감하지 않음 |\n\n`\"a b c\"`와 `\"a  b\"`는 허용한다. `\" asd\"`, `\"asd \"`, `\" asd \"`, `\"a b c d\"`는 거부한다. 예시의 따옴표는 공백 위치를 구분하기 위한 표시다. 아직 30일이 지나지 않으면 변경 버튼을 잠그고 다음 변경 시각을 보여준다. 통신 실패·응답 유실은 현재 프로필을 다시 조회해 확인하도록 안내한다.\n\n| 개선 전                                                                       | 개선 후                                                                                    |\n| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |\n| MY의 기본 프로필은 읽기 전용이어서 회원이 표시 이름과 사진을 선택할 수 없었음 | Google 회원이 MY에서 선택적으로 닉네임·사진 변경. 시작할 때는 추가 입력 없이 이용          |\n| 사용자가 바꾼 닉네임이 인증 정보 갱신 때 기본 ‘여행자’로 덮어써질 수 있었음   | 공급자 이름 갱신을 제외하고 사용자가 선택한 이름을 보존. 같은 조건에서 저장·재조회 검사    |\n| 닉네임 변경 간격과 중복을 화면 안내만으로 처리할 수 없었음                    | 서버에서 마지막 변경 후 30일과 대소문자 무시 고유 예약을 함께 확인하고 다음 변경 시각 표시 |\n\n사진은 앨범 선택 또는 촬영으로 언제든 교체하며 닉네임의 30일 제한을 적용하지 않는다. 앱에서 긴 변 최대 1,024px의 실제 PNG로 변환하고 서버가 PNG·10MiB 상한을 검사해 불필요한 메타데이터를 제거한다. 취소하면 기존 사진을 유지한다.\n\n- 버킷: `tripprint-staging-private`, Worker 바인딩 `MEDIA`.\n- 객체 키: `User/profile/pfImg_{유저ID}.png`. 같은 회원이면 같은 키를 덮어써 현재 객체 한 개를 유지한다.\n- 조회: 인증한 본인의 현재 사진만 제공하며 `no-store`와 ETag 버전을 사용한다. 공개 R2 주소를 만들지 않는다.\n- 상태: R2 현재 객체가 사진의 기준이다. 과거 `profile_photos`에 새 파일 행을 만들지 않는다. 회원 전환 뒤 늦은 응답·미리보기를 새 회원 화면에 적용하지 않는다.\n- 정리: 과거 개인정보 정리에서 새 선택 닉네임·사진은 보존하며 계정 삭제·고아 파일 정리는 새 경로도 처리한다.\n\n닉네임은 `0016_member_profile_names.sql`의 고유 예약 테이블에 저장한다. 예약·`user.name`·기존 게시물 작성자·참여 여행 표시 이름 갱신은 D1 배치 한 트랜잭션으로 확정한다. 인증 정보 갱신이 선택 이름을 ‘여행자’로 덮어쓰던 문제도 재현·수정했다. 공급자 이름·사진을 새로 수집하는 기능은 추가하지 않았다.\n\n세부 계약은 [MY 프로필 변경 규격](\u003c../../02. 디자인/01. 화면설계/MY_프로필변경_규격.md>), [앱·서버 API 계약](\u003c../../03. 개발/01. API계약/앱서버_API계약.md>), [DB·객체 사전](\u003c../../03. 개발/02. 데이터정의/DB_객체사전.txt>)을 따른다.\n\n## 4. 여행 일정 화면\n\n현재 여행 상세는 공통 헤더의 여행 제목·더보기 → 여행 요약 → 일정/가계부 → DAY 선택 → 항공권 추가·동선 지도 → 일차별 타임라인 → 하단 중앙 장소 추가 순서다. 지도·사진·영수증·준비물·동행·여행 공유는 더보기에서 연다.\n\n| 영역      | 반영한 동작                                                                                                                                        |\n| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |\n| 여행 요약 | 여행 제목, 여행 기간과 박수, 동행 정보. 동일 연도는 `11.27~11.30 (3박 4일)`, 연도 변경은 `26.12.30~27.01.02 (3박 4일)`, 날짜 미정은 예정 일수 표시 |\n| DAY 선택  | 날짜를 반복 표시하지 않고 DAY 번호로 선택                                                                                                          |\n| 항공권    | DAY 아래 ‘항공권 추가’와 빈 일정의 항공편 입력 진입. 장소 추가 → 이동 → 항공편 등록 경로도 유지                                                    |\n| 지도·거리 | 선택 DAY의 번호 핀·연결선. 네이티브 지도와 웹 SVG 동선 도식을 구분. 인접 좌표의 거리는 직선 거리이며 실제 길찾기 거리로 표시하지 않음              |\n| 타임라인  | 장소 상세·접기/펼치기·관리·길찾기, 일차 제목·소개, 기록 배지 연결                                                                                  |\n| 순서 편집 | 일차의 편집/완료 모드에서 삭제·위/아래 이동. 변경 순서와 동선 표시 연결                                                                            |\n| 중앙 추가 | 원형 `+`의 접근성 이름은 ‘장소 추가’. 눌림·잠금 색상과 아이콘 전경을 공통 토큰으로 보완                                                            |\n\n장소 검색·상세와 항공편 조회·수동 입력, `schedule.save` 등 저장 명령의 연결을 정리했다. 영수증 진입은 사진·영수증 영역과 지원하는 작성 경로에서 확인한다. 코드 연결·검수 자료를 쓴 회귀 통과를 실제 Google 검색·실제 항공 공급자·카메라·OCR·서버 등록 전체의 통과로 확대하지 않는다.\n\n당일 개별 보고서의 초기 ‘지출’ 표기는 최종 ‘가계부’로 맞췄다. 초기에는 없던 직접 항공권 추가 진입이 후속 작업에 포함됐으므로 최종 구조를 기준으로 합쳤다. 화면 규격은 [여행 일정 화면 규격](\u003c../../02. 디자인/01. 화면설계/여행일정_화면규격.md>)에서 관리한다.\n\n## 5. 헤더·GNB 실패 원인과 조치\n\n| 문제                                                | 조치                                                                       |\n| --------------------------------------------------- | -------------------------------------------------------------------------- |\n| 과거 지도·비용 고정 탭과 버튼 경로를 기다림         | 일정·가계부 2탭과 더보기, 현재 항공편 입력 경로로 검사 갱신                |\n| 커뮤니티 제목과 GNB의 같은 문구를 중복 선택         | 제목 역할·복귀 주소·커뮤니티 탭 선택을 함께 검사                           |\n| 320px·글자 200%에서 긴 제목 폭이 한 글자보다 좁아짐 | 뒤로가기·우측 행동이 함께 있으면 공통 헤더의 아래 제목 행에서 전체 폭 사용 |\n| 중앙 장소 추가의 눌림 표시 누락                     | 기존 배치·크기는 유지하고 공통 눌림·잠금·전경 색상 적용                    |\n| 본문이 열리기 전에 큰 글꼴 검사가 끝날 수 있음      | 실제 여행 작업 영역 표시를 기다린 뒤 대비·가로 넘침 검사                   |\n| 일일 보고서 폴더가 일반 두 자리 번호 규칙과 다름    | 지정한 `998. 일일 업무 보고서/YY.MM.DD/`와 달력상 유효한 날짜만 예외 허용  |\n\n제목 26/36, 확대 시 52/72, 굵기 700·왼쪽 정렬·최소 터치 영역 48을 유지했다. 글자나 버튼을 줄이지 않고 헤더 높이와 줄바꿈으로 대응했다. 공통 색상·글꼴 토큰과 GNB 탭 수·순서·아이콘·선택·모션은 바꾸지 않았다. 검사 수·시간 제한·대비·터치·초점·이탈 보호 기준도 낮추지 않았다.\n\n| 22개 회귀 묶음                                 | 개수 | 결과                     |\n| ---------------------------------------------- | ---- | ------------------------ |\n| WCAG AA 읽기·입력·눌림·비활성·키보드·글자 200% | 3    | 320·390·430px 통과       |\n| 전체 화면 제목·정렬·줄바꿈                     | 6    | 세 너비 × 일반·200% 통과 |\n| GNB 선택·큰 글꼴·탭 상태·생성·이탈 보호        | 3    | 세 너비 통과             |\n| 준비물 재진입·검색 보존·공개 상세 오류 복귀    | 2    | 통과                     |\n| MY 인증 확인·오류·복구                         | 6    | 세 너비 × 일반·200% 통과 |\n| 작성 진입 인증 오류·안전한 복귀                | 2    | 통과                     |\n| 합계                                           | 22   | 모두 통과                |\n\n기준은 [디자인 시스템](\u003c../../02. 디자인/00. 공통규격/디자인시스템.md>), [헤더·GNB 공통 규격](\u003c../../02. 디자인/00. 공통규격/헤더GNB_규격.md>)이다. 원인·조치와 상세 검수는 [상단 타이틀·GNB 규격화 검수](\u003c../../03. 개발/04. 검증/상단타이틀_GNB_규격화검수.md>)에도 반영했다.\n\n## 6. 검증 환경·결과·증거\n\n환경은 Windows·Node.js 22.17.0·npm 11.5.2·Chrome이다. 헤더는 전용 웹 포트 8810에서 검사했다. 기본 구조·프로필은 웹 8920/API 8921과 격리한 Worker·Miniflare D1/R2를 사용했다. 검수용 계정·Google 연결 행·세션을 사용했으며 운영 자료·실제 개인정보를 검수 대상으로 쓰지 않았다.\n\n아래는 해당 기능 반영 시점의 최종 결과다. 이번 보고서 통합에서 앱 기능 검사를 새로 실행한 것으로 기록하지 않는다. 같은 항목의 초기 실행·최종 실행·보완 실행은 합산하지 않는다.\n\n| 검사                           | 결과                                                                                              | 증거                                                                   |\n| ------------------------------ | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |\n| `npm run check`                | 문서·디자인·자원·구조·이동·타입·린트·서식 통과, 종료 코드 0                                       | `outputs/member-profile/check-final5.log`                              |\n| `npm run test:auth`            | 357개 통과                                                                                        | `outputs/member-profile/auth-final3.log`                               |\n| `npm run test:foundation`      | 179개 통과                                                                                        | `outputs/member-profile/foundation-final4.log`                         |\n| `npm run test:profile:web`     | 3개 통과                                                                                          | `outputs/member-profile/browser-final2.log`, `profile-ui-results.json` |\n| `npm run test:headers:web`     | 22개 통과                                                                                         | `outputs/member-profile/headers-final2.log`                            |\n| 본문 표시 대기 보완 후 WCAG AA | 세 너비 3개 통과. 전체 22개와 별도 기록                                                           | `outputs/member-profile/headers-ready-state.log`                       |\n| `npm run test:release`         | Git 패치 준비 때 106개 통과                                                                       | `outputs/member-profile/git-patch-release.log`                         |\n| Git 커밋 전 검사               | 문서 47개·링크 207개, 대비 52/52, 자원, 구조 585개 파일·이동 495개 소스/23개 화면, 타입 검사 통과 | `outputs/member-profile/git-patch-commit.log`                          |\n| 커밋 전 파일 대조              | 주요 프로필 코드·검사 파일의 SHA-256 일치, Git 공백 오류 없음                                     | `outputs/member-profile/source-manifest.json`, `git diff --check`      |\n| `npm run test:reports:tc`      | TC 추가 후 웹 검수 통과. 18개 페이지·64 TC의 체크·단계 독립·메모·복원·반응형·인쇄 확인            | `outputs/daily-report-site/tc/browser-final.log`, `verification.json`  |\n| `npm run test:reports:web`     | TC 메뉴 추가 후 기존 보고서의 탐색·등록·수정·재조회·안전한 가져오기·인쇄 회귀 통과                | `outputs/daily-report-site/tc/report-regression.log`                   |\n\n여행 일정 개별 보고서에는 단위 검사 50개 통과와 ESLint·구조·이동·디자인·문서 검사 통과가 기록돼 있다. 50개의 상세 실행 명령·원로그는 그 보고서에 명시되지 않아 위 최종 검사 수에 더하지 않았다. 문서 44개·링크 182개, 초기 기본 구조의 인증 356개·API 174개 같은 수치는 이전 작성 시점의 기록이며 현재 결과와 혼합하지 않는다.\n\n| 실제 조작                                                      | 기대 결과·확인 결과                                         | 판정                                                     |\n| -------------------------------------------------------------- | ----------------------------------------------------------- | -------------------------------------------------------- |\n| Google 검수 회원 → MY → 닉네임 중복 확인·저장 → 홈·MY·새로고침 | 저장 이름 재조회, 30일 잠금, 추가 가입 입력 없음            | 로컬 통과                                                |\n| 같은 회원의 동시 변경·회원 간 대소문자 중복 저장               | 한 번만 확정, 고유 제약·실패 시 롤백, 여행 표시 이름 전파   | 격리 DB 통과                                             |\n| 인증 DB 정보 갱신                                              | 선택 이름을 기본 이름·공급자 이름으로 덮어쓰지 않음         | 수정 전 재현 후 같은 조건의 5개 검사·전체 API 179개 통과 |\n| 사진 두 번 선택·저장 → 재진입·새로고침 → 객체 확인             | PNG, 새 ETag, 고정 키 현재 객체 한 개, 인증 미리보기 재조회 | 로컬 통과                                                |\n| 게스트 MY                                                      | 닉네임·업로드 대신 Google 로그인 안내                       | 통과                                                     |\n| 320px·글자 200% → 닉네임 중복 → 취소                           | 입력·오류·취소 접근, 가로 넘침 없음, 실패 이름 미저장       | 통과                                                     |\n| 실제 Google OAuth·실기기 촬영·원격 저장                        | 외부 인증·권한·사진 변환·원격 저장·재조회                   | 미검증                                                   |\n\n실제 화면은 `outputs/member-profile/nickname-confirm.png`, `photo-reloaded.png`, `my-320-font200.png`, `nickname-320-font200.png`, `guest-profile-guidance.png`에서 확인했다. 공통 구성요소·LINE Seed·큰 글꼴 줄바꿈·세로 스크롤을 대조했다. 여행 화면은 `outputs/header-standard/detail-일정-320-200.png`, `outputs/haru-wcag-aa/detail-large-320.png`를 확인했다. 웹 캡처를 실기기 인수나 완성 디자인 시안으로 표현하지 않는다.\n\n초기 헤더 수정 전·후 증거는 `outputs/header-regression/`의 `headers-final.log`, `check-final.log`, `title-overflow/`, `first-run/`, `source-manifest.json`에 있다. 기본 화면의 실제 서버·브라우저 흐름과 캡처는 `outputs/app-shell/`에 있다. 로컬 산출물은 Git 제외 대상이므로 다른 환경에서는 이 보고서의 재현 조건·판정과 연결된 현행 검수 문서를 함께 사용한다.\n\n## 7. 주요 변경 파일과 이유\n\n| 영역                | 파일·책임                                                                                                                                                                                                                                                            |\n| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |\n| 공통 헤더·이동      | `ScreenHeader.tsx`, `screenNavigationPolicy.json`, `authReturn.ts`, `destination.ts`: 제목·큰 글꼴·인증 복귀·GNB 배정                                                                                                                                                |\n| 시작·계정           | `AuthGate.tsx`, `ProfileSetupScreen.tsx`, `useDefaultProfileEntry.ts`, 계정 관리 서비스·MY·설정·탈퇴 화면: 입력 관문 제거와 현재 계정 정책 연결                                                                                                                      |\n| 프로필 규칙·응답    | `packages/validation/src/profile.ts`, `packages/domain/src/index.ts`, `profileResponse.ts`: 문자·공백·비교 키·30일·변경 권한·다음 시각                                                                                                                               |\n| 프로필 서버         | `0016_member_profile_names.sql`, `memberProfile.ts`, `memberProfilePhoto.ts`, `accountRoutes.ts`, `app.ts`, `errors.ts`: 닉네임 고유 예약·저장, 고정 PNG 교체·인증 조회·제한                                                                                         |\n| 인증·정리           | `cloudAuth.ts`, `accountDataCleanup.ts`, `accountOrphanFiles.ts`: 선택 이름 보존, 새 사진 경로의 탈퇴·고아 정리                                                                                                                                                      |\n| MY 표현·통신        | `MemberProfileCard.tsx`, `AccountProfileCard.tsx`, `MyAccountView.tsx`, `useMemberProfileEditor.ts`, `memberProfileService.ts`, `memberProfilePhotoService.ts`: 입력·중복·저장·변환·재조회·세션 전환 처리                                                            |\n| 커뮤니티·홈         | 커뮤니티 화면·공개 조건 선택·`HomeConciergeSections.tsx`: 공통 제목·호환 주소 통합과 실제 기능에 맞는 안내                                                                                                                                                           |\n| 여행 상단·작업 영역 | `presentation.ts`, `TripSectionNavigation.tsx`, `WorkspaceHeadingView.tsx`, `WorkspaceView.tsx`, `WorkspaceExpenseView.tsx`, `expensePaymentMeta.ts`, `PlanEditorOptions.tsx`, `formCommands.ts`: 요약·기간·동행·여행 계획/가계부·공유·Card/Cash 구분·현지 통화 집계 |\n| 일정·지도·입력      | `WorkspaceItineraryView.tsx`, `WorkspaceDialogs.tsx`, `TripTimeline.tsx`, `DaySchedule.tsx`, `SchedulePlaceCard.tsx`, `ScheduleEditorView.tsx`, 관련 스타일: 항공권·DAY·지도·타임라인·순번 배지·04_3 일정 상세·아이디어 A 후기                                       |\n| 번역·검수           | `messages.json`, `workspace.spec.ts`, 프로필·계정 인증/API 검사, `verify-app-shell.mjs`, `appShellRuntime.mjs`, `package.json`: 영어·일본어와 반복 가능한 로컬 검수                                                                                                  |\n| 문서 검사           | `check-docs.mjs`, `docs-structure.test.mjs`: 지정 보고서 날짜 경로만 허용하고 잘못된 위치·날짜·깨진 링크는 차단                                                                                                                                                      |\n| 기획·명세           | 페이지별 기능 정의, 화면 규격, API 계약, DB 사전, 사용자 탐색 흐름·이미지 3개와 일일 보고서                                                                                                                                                                          |\n\n상세 기능·화면 배정은 [페이지별 기능 정의서](\u003c../../01. 서비스기획/01. 기능정의/앱기본구조_페이지별기능정의서.md>)와 [앱 기본 구조 화면 규격](\u003c../../02. 디자인/01. 화면설계/앱기본구조_화면규격.md>)을 따른다. DB·객체 변경은 해당 사전에 기록했으며 공통 규격을 페이지 로컬 스타일로 덮어쓰지 않았다.\n\n## 8. Git 반영 결과\n\n사용자가 반영 범위를 ‘Git 커밋·푸시까지’로 선택했다. 커밋 메시지는 `타이틀 : 설명` 규칙을 따랐으며 기존 사용자 수정·흐름 이미지 3개도 보존했다. 환경 변수·키·로컬 `outputs/`는 커밋에서 제외했다.\n\n- 커밋: `c470064e128c0735814fe5f7798b3e6b7c96ebd6`, 109개 파일 변경.\n- 메시지: `feat: 앱 기본 구조·MY 프로필 변경·여행 일정 개편 통합 : 추가 입력 없는 시작과 계정 관리, 닉네임 중복·30일 제한과 고정 PNG 교체, 일정·가계부 및 헤더 회귀 22개와 기능·검수 문서 반영`.\n- 원격: `origin/main`에 푸시 후 같은 SHA를 확인했다. 당시 로컬·원격 차이 0/0, 작업 폴더 변경 없음.\n- [GitHub CI 실행](https://github.com/Ji-ChangKim/travel_APP/actions/runs/42572759823)은 푸시 직후 확인 당시 진행 중이었다. 이번 문서 통합에서 CI 결과를 새로 조회하거나 통과로 판정하지 않았다.\n- 웹·API 배포와 Play 내부 배포는 별도 수동 작업이다. Git 반영을 서버 배포·원격 DB 적용으로 표시하지 않는다.\n\n이전 개별 보고서의 ‘커밋·푸시 미실행’은 Git 요청 전의 기록이다. 이 절은 뒤에 완료한 Git 반영 결과이며, 이번 보고서 통합 편집 자체의 재커밋·재푸시를 의미하지 않는다.\n\n## 9. 홈 정보 구성 검토안\n\n홈은 여행을 시작하고 기존 여행·기록을 이어가는 화면으로 제안했다. 레퍼런스의 인사말·원형 도시·빠른 실행 구성을 참고하되 TripPrint 공통 헤더·하단 4탭은 유지한다. 아래 내용은 검토안이며 새 홈 레이아웃 구현 완료가 아니다.\n\n| 순서 | 정보·행동                                            | 필요한 데이터                                              |\n| ---- | ---------------------------------------------------- | ---------------------------------------------------------- |\n| 1    | 닉네임 인사·D-Day·여행 일차                          | 프로필 이름, 여행 날짜·상태                                |\n| 2    | 진행 중 또는 가장 가까운 예정 여행 한 개·이어서 열기 | 여행 ID·도시·제목·기간·작성 상태                           |\n| 3    | 검색·도시 원형 바로가기                              | 도시 ID·이름·국가·대표 이미지                              |\n| 4    | 새 여행·영수증 등록·가계부·준비물                    | 대상 여행·실제 연결 화면. 저장·재조회 검수된 기능부터 노출 |\n| 5    | 다른 여행자의 공개 일정·방문 기록                    | 공개 게시물 ID·유형·도시·기간·대표 이미지                  |\n\n여행이 없으면 도시 탐색·새 여행, 여행 전에는 계획 이어보기, 여행 중에는 오늘 일정·영수증 등록, 여행 후에는 기록 정리·공유를 우선하는 안이다. 기존 도시·여행·공개 목록 자료를 활용할 수 있으나 오늘 일정·영수증 상태의 홈 연결은 별도 검수가 필요하다. ‘인기’·‘NEW’는 집계·등록일 근거를 갖춘 뒤 사용한다. 실시간 날씨·환율은 이번 기본안에 추가하지 않는다.\n\n## 10. 남은 작업과 적용 순서\n\n| 우선 항목        | 다음 확인·작업                                                              | 현재 판정                                     |\n| ---------------- | --------------------------------------------------------------------------- | --------------------------------------------- |\n| 실제 회원 흐름   | Google 로그인 → 기본 프로필 → 여행 생성·장소 추가 → 공유·공개 재조회        | 외부 공급자를 포함한 전체 사이클 미검증       |\n| 게스트 저장      | 게스트 프로필로 서버 DB 저장 → 화면 이탈·재진입 → 같은 기록 재조회          | 미구현. 현재 기기 저장으로 대체 판정하지 않음 |\n| 장소 추가        | 실제 Google 검색 → 장소 선택 → 등록·수정·삭제·재조회, 권한·실패 복구        | 실제 공급자 성공 흐름 후속 검수               |\n| 영수증           | 촬영·업로드 → OCR → 사용자 확인 → 기존 방문 연결/새 실제 방문 → 저장·재조회 | 실기기·실제 OCR·전체 저장 흐름 미검증         |\n| 프로필 원격 반영 | 대상 DB·백업 확인 → 0016 마이그레이션 → API → 앱 → 실제 R2 교체·재조회      | 원격 미적용                                   |\n| 설치본           | Android·iOS 로그인·카메라 권한·촬영·안전 영역·큰 글꼴·재실행                | 미실행                                        |\n| 홈               | 구성안 확정 → 데이터·이동 연결 → 실제 화면 대조                             | 제안 단계                                     |\n\n복구 시 새 닉네임 테이블·R2 객체를 즉시 삭제하지 않는다. 자료를 보존한 채 이전 개인정보 정리 코드가 새 선택 자료를 지우지 않는지 확인한다. 운영 변경·삭제는 해당 대상과 승인 범위에서 별도로 실행한다.\n\n모든 버튼·API의 정상·빈 상태·오류·처리 중 조건을 나누고, 저장 직후 표시뿐 아니라 재진입·재조회까지 확인한다. 게스트·보기 전용·다른 계정·오프라인·중복 요청·버전 충돌도 기능에 필요한 범위로 선정한다. 전체 과거 여행 편집 웹 검사 묶음은 이번 보고서 통합에서 실행하지 않았다. 전체 수용 기준은 [핵심 사용자 사이클 검수](\u003c../../03. 개발/04. 검증/핵심_사용자사이클_검수.md>)에 있다.\n\n## 11. 검토 기록과 문서 통합\n\n| 쟁점 ID·대상                       | 차수       | 결과                                                                            |\n| ---------------------------------- | ---------- | ------------------------------------------------------------------------------- |\n| SHELL-NAV-01 / 제목·이동           | 재검토 1회 | 현재 조작 경로와 22개 검사 일치                                                 |\n| SHELL-HEADER-REFLOW-01 / 공통 헤더 | 최초 0회   | 제목 넘침 재현·수정 후 같은 너비·글꼴에서 통과                                  |\n| SHELL-REPORT-PATH-01 / 보고서 경로 | 최초 0회   | 사용자 지정 날짜 경로만 예외 허용. 다른 위치·잘못된 날짜·깨진 링크 차단         |\n| PROFILE-01 / 프로필 정책           | 최초 0회   | 시작 입력 제거와 MY 선택 변경 구분. 과거 소개·생일·완료 요청은 열지 않음        |\n| PROFILE-02 / 사진·인증·정리        | 최초 0회   | 회원 전환·늦은 응답·기존 정리와의 충돌을 회원/세션·고정 경로·자료 보존으로 처리 |\n| PROFILE-03 / 인증 정보 갱신        | 최초 0회   | 선택 이름 덮어쓰기 재현 후 수정. 외부 Google OAuth 검증과 구분                  |\n| DOC-REPORT-MERGE-01 / 일일 보고서  | 최초 0회   | 보고서 4개를 한 문서로 통합. 중복 제거·시점 차이 정리·참조 링크 갱신·원본 보관  |\n\n원본은 상단 타이틀·GNB 전체 회귀, 여행 일정 페이지 개편, MY 닉네임·사진 변경, Git 패치 반영 보고서 4개다. 개별 원본은 삭제 보관 폴더로 이관해 이력을 보존했다. 이 날짜 폴더의 현행 보고서는 이 파일 하나다. 기존 보고서로 연결되던 프로필 규격·헤더 검수 문서의 링크도 이 통합 보고서로 바꾼다.\n\n이번 편집은 보고서 통합과 참조 정리이며 앱 코드·기능·DB를 변경하지 않았다. `npm run check:docs`의 검사 7개와 문서 44개·링크 200개가 오류 없이 통과했다. 변경 문서 3개의 Prettier 서식과 `git diff --check`도 통과했다. 원본 4개는 이동 전·후 SHA-256이 같았다. 증거는 `outputs/report-merge/docs-check.log`와 `originals-manifest.json`에 보관했다.\n\n이번 통합은 로컬 문서 변경이며 추가 커밋·푸시는 수행하지 않았다. 기능 검수의 주 에이전트 책임과 기존 검토 차수는 이 통합으로 초기화하지 않는다.\n\n## 12. 일일 보고서 문서 사이트\n\n사용자의 추가 지시에 따라 날짜·요일별 작업과 개선 결과를 읽고 일지를 작성하는 [HTML 문서 사이트](../index.html)를 제작했다. 진입 파일은 같은 보고서 루트의 `index.html`이다. 기존 여행 앱 화면과 분리했으며 앱의 헤더·GNB·API·DB는 변경하지 않았다.\n\n| 개선 전                                                                                    | 개선 후                                                                                            |\n| ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |\n| Markdown 보고서를 파일별로 열어야 해서 날짜·요일별 작업과 개선 내용을 한눈에 보기 어려웠음 | 주간 달력·등록 일지 목록에서 날짜를 선택하고 작업 요약·개선 전후·전체 문서·검증·후속 작업으로 탐색 |\n| 문서 파일을 직접 편집해야 새 작업을 남길 수 있었음                                         | 일지 등록 창과 브라우저 보관, 수정·삭제, Markdown 내려받기·JSON 백업/가져오기·인쇄 제공            |\n\n원본이 있는 2026-11-09 월요일만 초기 등록 자료로 사용한다. 다른 날짜는 기록 없음으로 표시한다. 직접 작성한 일지는 이 브라우저에만 저장하고, 다른 기기로 옮기려면 백업·가져오기를 사용한다. 서버 저장·자동 저장소 반영으로 표시하지 않는다. 원본 문서에서 온 일지는 화면에서 덮어쓰지 않는다.\n\n`npm run reports:build`는 날짜별 원본 Markdown과 공통 토큰·템플릿으로 HTML 한 파일을 생성한다. `npm run reports:preview`는 보고서·필요한 글꼴만 허용한 로컬 미리보기를 연다. 원본이 바뀌면 다시 생성하며 생성 HTML은 직접 편집하지 않는다. 화면 규격은 [일일 보고서 사이트 규격](\u003c../../02. 디자인/01. 화면설계/일일보고서_사이트규격.md>)을 따른다.\n\n생성·미리보기 도구는 `scripts/design/build-daily-reports.mjs`, `daily-report-markdown.mjs`, `preview-daily-reports.mjs`다. 템플릿·스타일·동작은 `docs/02. 디자인/02. 리소스/00. 일일보고서사이트/`에, 브라우저 검수 도구는 `scripts/qa/verify-daily-reports.mjs`에 있다. HTML·가져온 내용은 실행하지 않도록 이스케이프하고 파일 형식·날짜·문자열·크기를 검사한다. 잘못된 가져오기와 저장 실패는 기존 기록을 유지한다.\n\n`npm run test:reports:web`로 파일 직접 열기·월요일/주간 이동·검색과 빈 결과·등록 후 새로고침·수정/삭제·백업/가져오기·HTML 실행 차단·320/390/768/1440px·글자 200%·인쇄를 확인했다. 저장이 실패할 때는 성공으로 처리하지 않고 입력·기존 기록을 보존하는 것도 확인했다. 브라우저 오류는 0개다. 최종 검수 결과는 `outputs/daily-report-site/results.json`과 `browser-final3.log`, 실제 캡처는 같은 폴더에 있다.\n\n공통 토큰·LINE Seed를 기준으로 데스크톱 요약·개선 전후·전체 원문, 작은 화면과 큰 글꼴의 메뉴·작성 창을 실제 캡처와 대조했다. 브라우저의 기본 대화창 최대 폭이 큰 글꼴에서 더 좁아지는 부분은 뷰포트 기준 최대 폭으로 보완했다. 숨김이나 글자 축소로 넘침을 피하지 않았다. 최종 폭 보완 후 브라우저 검수와 전체 필수 검사 `npm run check`가 모두 통과했다(`outputs/daily-report-site/check-final3.log`, 종료 코드 0). 외부 서비스 게시·운영 배포·추가 커밋·푸시는 이번 사이트 제작 범위에 포함하지 않는다.\n\n## 13. 작업 완료 후 누적 기록과 저장 위치\n\n사용자가 작업이 끝날 때마다 날짜·요일별 작업 내용, 개선 전후, 검수 결과와 남은 작업을 이 사이트에 누적하도록 요청했다. `AGENTS.md`와 문서 관리 규칙에 완료 절차를 기록했다. 같은 날에는 원본 한 개에 이어 쓰며, 새 날짜에는 그날 파일을 만들고 HTML을 다시 생성한다. 생성본만 직접 편집하거나 브라우저의 임시 보관 기록으로 공식 파일 기록을 대신하지 않는다.\n\n| 개선 전                                                                   | 개선 후                                                                                                               |\n| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |\n| 사이트 제작 후 작업 기록을 언제·어디에 누적할지 고정된 완료 절차가 없었음 | 한국 시간 날짜별 원본 누적 → HTML 생성 → 날짜·요일·작업·개선·검수·후속 반영 확인 → 완료 보고를 프로젝트 규칙으로 관리 |\n\n사이트 파일은 `docs/998. 일일 업무 보고서/index.html`, 날짜별 공식 원본은 `docs/998. 일일 업무 보고서/YY.MM.DD/일일_통합_작업보고서.md`다. 화면의 등록 창으로 직접 작성한 일지는 이와 별개로 현재 브라우저의 `tripprint.daily-journal.v1`에 보관된다. `file://` 페이지와 로컬 미리보기 주소도 서로 다른 브라우저 저장 공간을 사용한다. 브라우저 기록을 파일로 보관하려면 백업 버튼으로 JSON을 내려받는다.\n\n일지가 늘어도 브라우저 검수가 특정 항목 수·이미 등록된 날짜 때문에 실패하지 않도록 검수 자료의 개수와 미등록 날짜를 현재 자료에서 정한다. 이번 변경은 기록 관리·검수 도구에 한정하며 여행 앱 기능은 변경하지 않는다. 실제 새 세션에서 규칙을 읽는 동작까지 검증한 것으로 보고하지 않는다.\n\n누적 기록 갱신 후 `npm run test:reports:web`는 날짜 탐색·저장/재조회·수정/삭제·백업/가져오기·큰 글꼴·인쇄를 통과했다(`outputs/daily-report-site/accumulation-browser.log`). 이번 검수 도구의 ESLint는 오류·경고 0건, 문서 검사는 7개 검사와 문서 45개·링크 205개 오류 없음으로 통과했다. 변경 문서·HTML·검수 도구의 서식도 통과했다. 이전에 보고됐던 `WorkspaceExpenseView.tsx`의 `TripIcon` import 경로와 `runningIndex` 재할당 오류 2건도 이어진 가계부 개편 작업에서 모두 해결해 전체 `npm run check`가 오류 0건으로 통과한다.\n\n## 14. 여행 계획(04_1~04_3) 및 가계부(04_4) DAY 타임라인 개편\n\n사용자가 제시한 Figma 핵심 레퍼런스(`04_1_여행계획_DAY타임라인`, `04_2_일정추가_장소동선`, `04_3_일정상세`, `04_4_가계부_DAY타임라인`)를 바탕으로 용어 정의와 화면·도메인 규칙을 확정하고 모바일 작업 영역 전체에 반영했다. 전체 여행을 관리하는 단위는 **계획(`여행 계획`)**, 계획 안의 개별 장소(숙소·항공·식사·관광명소·역·버스정류장)는 **일정**으로 통일했다.\n\n| 개선 전                                                                                          | 개선 후                                                                                                                                  |\n| ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |\n| 일정 카드와 작성 화면에 방문 시각(`10:00`)과 실시간 이동 소요시간 계산이 섞여 입력 부담이 큼     | 방문 시각·체류 시간 입력과 실시간 경로 소요시간 계산을 제거하고 순번 원형 배지(`1, 2, 3`)·태그·타이틀·순서 이동(`⋮`) 중심으로 단순화     |\n| 유료 Google Places 리뷰 API 호출 시 건당 과금($25~$35/1,000건)과 캐싱 약관 제약 발생             | 아이디어 A 채택: `[구글 실제 후기·평점 보기]` 딥링크로 API 과금 $0 달성 + 앱 자체 별점·리뷰·사진(`APP 내 자체 리뷰`) 자산화 구조 적용    |\n| 가계부에 결제 시각·환율·원화 환산액과 불필요한 카드 썸네일 이미지가 섞여 핵심 지출 파악이 난잡함 | 가계부에서 시간·환율·원화 환산·우측 이미지를 모두 제거하고 현지 통화 금액과 `💳 Card / 💵 Cash` 결제 수단 구분·1/N 부담액만 명확히 표시  |\n| 가계부의 지출 항목과 여행 계획의 일정 상세가 분리되어 장소 정보·길찾기를 다시 찾아야 했음        | 가계부 지출 카드 클릭 시 `여행 계획` 탭과 동일하게 연결된 일정의 `04_3_일정상세` 모달로 즉시 이동해 위치·길찾기·메모·지출·후기 통합 확인 |\n\n- **`04_1_여행계획_DAY타임라인`** (`WorkspaceHeadingView.tsx`, `TripSectionNavigation.tsx`, `WorkspaceItineraryView.tsx`, `DaySchedule.tsx`, `SchedulePlaceCard.tsx`): 상단 `← 여행 계획 | ⋮` 헤더, 여행 타이틀과 우측 원형 지도 버튼, 동행자 아바타 스택과 여행 기간(`05.15 ~ 05.19 (4박 5일)`), `[여행 계획] / [가계부]` 알약 탭과 우측 `[공유]`, `[전체] | DAY1 ~ DAYN` 필터, 빈 일차의 `[ DAY N 일정 없음 ]` 박스, 하단 `[동선 지도 보기] | [+ 일정 추가]` 고정 바를 반영했다.\n- **`04_2_일정추가_장소동선`** (`ScheduleEditorView.tsx`): 불필요한 `일정 시간 (HH:mm)` 및 `체류 예정 시간 (분)` 입력을 제거하고 장소 검색·방문 순서 배치(`afterScheduleId`)·일정 메모·예상 지출 금액 입력에 집중하도록 정리했다.\n- **`04_3_일정상세` & 아이디어 A** (`DaySchedule.tsx`): 일정 카드 전체 영역 클릭 시 열리는 상세 화면에 ① 위치 보기(구글 좌표), ② 일정 정보(태그·주소), ③ `[구글 지도로 길찾기]`($0 딥링크), ④ 일정 메모·수정, ⑤ 지출금 기록, ⑥ 후기 남기기(별점 1~5·사진 추가·구글 지도 리뷰 남기기 브릿지), ⑦ 후기 보기(`APP 내 자체 리뷰` + `[구글 실제 후기·평점 보기]`) 7대 항목을 모두 연결했다.\n- **`04_4_가계부_DAY타임라인`** (`WorkspaceExpenseView.tsx`, `expensePaymentMeta.ts`, `PlanEditorOptions.tsx`, `formCommands.ts`): 시간과 환율(원화 환산)을 전면 제거하고 현지 통화(`¥`, `$`, `₩`) 기준 총지출과 `[총 경비 (팀 전체)] ↔ [내 정산 몫 (개인)]` 토글, `💳 Card / 💵 Cash` 결제 합계·필터·배지, 우측 썸네일 이미지 없는 깔끔한 지출 카드, 카드 클릭 시 `04_3_일정상세` 모달 연동, 빈 일차 `[ DAY N 등록된 지출 없음 ]` 박스, 하단 `[+ 지출 추가]` 버튼을 구현했다.\n- **6대 항목 전체 검수**: ① UI/UX 통일성(`schedulePageStyles.ts` 토큰 및 `DesignButton` 통일, WCAG AA 52/52 통과), ② 모든 버튼 클릭 동작(상단 요약·탭·DAY 필터·일정/지출 카드·상세 모달·하단 CTA), ③ 기능 아이콘(`TripIcon`, `Ionicons` `ellipsis-vertical` 등), ④ 사용자 관점 문구(개발 용어 배제, 한·영·일 `messages.json` 반영), ⑤ DB/도메인 스냅샷 연동(`schedule.save`, `expense.save`, `schedule.reorder` 원자적 버전 제어), ⑥ API 연동(`Google Maps` 길찾기/리뷰 $0 딥링크 + 서버 API 스키마 호환, `npm run typecheck` 및 ESLint 오류 0건 통과)을 점검·완료했다.\n\n## 15. MY 페이지 및 설정 화면 5대 핵심 구성 간소화 개편\n\n사용자가 제시한 MY 레퍼런스 이미지와 5대 필수 구성 원칙(① 공용 타이틀, ② 공용 프로필(이미지·닉네임), ③ 계정 연동(게스트 시 Google 계정 연결 버튼 / Google 회원 시 연동 표시), ④ 공용 설정(언어 변경·이용약관/개인정보 처리방침·로그아웃), ⑤ 공용 앱 버전 정보)에 맞춰 `MyAccountView.tsx`, `AccountProfileCard.tsx`, `MyAccountMenus.tsx`, `SettingsSections.tsx`, `myAccountStyles.ts`를 개편했다.\n\n| 개선 전                                                                                | 개선 후                                                                                                                                   |\n| -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |\n| MY 화면에 여행 통계·보관함 등 중복 메뉴가 섞여 있어 프로필·계정·설정의 집중도가 낮음   | 불필요한 중복 블록을 걷어내고 ① 타이틀 ② 프로필 카드 ③ Google 계정 연결 카드 ④ 환경설정 및 계정(`설정` / `앱 버전 정보`)만 간결하게 배치  |\n| 게스트 기본 아바타와 Google 연결 배너가 텍스트 카드 형태여서 시안과 시각적 차이가 큼   | 피치 코랄 원형 이니셜(`G`) 아바타 + `[게스트]` 알약 배지, Google 로고 아이콘 박스와 풀사이즈 코랄 `[Google 계정 연결]` 버튼 적용          |\n| 설정 화면에서 이용약관·개인정보 처리방침 확인과 앱 버전 정보 시트가 분리되어 있지 않음 | MY의 `앱 버전 정보` 클릭 시 현재 버전 ActionSheet를 표시하고, `설정` 화면 안에 `약관 및 정책`(`서비스 이용약관`·`개인정보 처리방침`) 추가 |\n\n## 15. 페이지별 TC 체크 차트 추가\n\n- 기록일: 2026-11-09 월요일, 한국 시간 기준.\n- 목적: 앱 페이지마다 무엇을 검사할지 정하고, 개발 완료·Android Studio 에뮬레이터·내부 빌드 실기기의 결과를 따로 남긴다.\n- 범위: 일일 보고서 사이트의 ‘페이지별 TC’, TC 정의·결과 파일, 생성 도구와 웹 검수 도구. 앱 화면·공통 헤더·GNB·DB·API와 운영 배포는 이번 변경 대상에 포함하지 않는다.\n- 대상 버전: `main`의 `c470064` 이후 로컬 보고서 사이트 수정본. 같은 작업 폴더에서 진행 중인 여행 일정·가계부 변경은 별도 작업으로 구분한다.\n\n| 개선 전                                                                               | 개선 후                                                                                                         |\n| ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |\n| 검사 결과가 보고서 본문에 흩어져 페이지별 확인과 실기기 검수 여부를 구분하기 어려웠다 | 18개 페이지·64개 TC를 한 차트로 모으고 개발·에뮬레이터·실기기의 성공·실패·미검증을 각각 집계한다                |\n| 단계별 수동 판정과 재현 정보·실패 증거를 함께 남길 화면이 없었다                      | 성공·실패 체크, 검사 순서·기대 결과, 단계별 검수자·빌드·기기·메모·최근 이력을 제공한다                          |\n| 검수 결과를 다른 환경으로 옮기거나 출력할 전용 기능이 없었다                          | TC 전용 JSON 내려받기·가져오기와 현재 선택 항목 인쇄를 제공한다. 잘못된 파일과 저장 실패는 기존 결과를 보존한다 |\n\n앱 실행, 로그인, 기본 프로필, 홈, 내 여행, 커뮤니티, 공개 여행 상세, MY, 설정, 계정 관리, 여행 만들기, 여행 일정, 장소 추가, 영수증 등록, 가계부, 준비물, 동행, 공유를 다룬다. 게스트 서버 저장·재조회는 미구현 후속 과제로 명시하고 기기 저장으로 통과를 대신하지 않는다. 장소 검색과 영수증 OCR은 실제 공급자·저장·재조회 검수를 요구한다.\n\n한 단계에서 성공과 실패를 동시에 체크할 수 없다. 선택한 체크를 해제하면 미검증으로 돌아간다. 개발 성공을 체크해도 나머지 두 단계는 바뀌지 않는다. 세 단계 모두 성공일 때만 해당 TC를 전체 성공으로 집계한다. 체크는 검수자의 수동 기록이며 앱 테스트를 자동 실행하지 않는다. 최초 파일에는 판정을 넣지 않았다.\n\n페이지별 진행 현황을 펼쳐 영역별 수치를 확인하고, 페이지·TC 검색·결과 상태로 항목을 좁힌다. ‘기준·메모’에서 사전 조건 → 조작 순서 → 기대 결과를 읽고 실제 검사 후 결과와 증거를 남긴다. 저장 실패 때는 안내를 읽고 저장 공간을 확인한 뒤 다시 시도한다. 기존 파일 결과를 가져올 때는 같은 TC·단계가 바뀌는 범위를 확인하고 적용한다.\n\n**보관 위치**\n\n- 진입: [일일 보고서 사이트](../index.html)의 왼쪽 ‘페이지별 TC’ 메뉴.\n- 정의: [페이지별 TC 목록](\u003c../../03. 개발/04. 검증/페이지별_TC_목록.json>). 18개 페이지·64 TC, 개정 값 `1`.\n- 프로젝트 결과 원본: [tc-results.json](../tc-results.json). 브라우저에서 체크해도 이 파일을 자동 덮어쓰지 않는다.\n- 화면에서 기록한 결과: 현재 브라우저의 `tripprint.tc-results.v1`. 일지의 `tripprint.daily-journal.v1`과 분리한다. `file://`와 미리보기 주소의 저장 공간도 다르다. 브라우저 변경·초기화 전에 ‘검수 기록 내려받기’로 보관한다.\n- 구현: 문서 리소스 폴더의 `daily-report-tc.js`·`daily-report-tc.css`, 생성 도구 `scripts/design/build-daily-reports.mjs`, 검수 도구 `scripts/qa/verify-report-tc.mjs`.\n\n**검수 기록**\n\n| 대상·사전 조건                           | 조작 순서와 기대 결과                                                                         | 실제 결과·판정                                                                  | 증거                                                                               |\n| ---------------------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |\n| TC 차트 / 격리된 Chrome / HTML 직접 열기 | 단계별 체크·반대 결과 선택·해제·새로고침. 같은 단계는 배타적이고 다른 단계·재조회 결과는 유지 | 통과                                                                            | `outputs/daily-report-site/tc/verification.json`                                   |\n| 상세·파일 / 검수용 값만 사용             | 메모 입력·저장·재진입, JSON 내려받기·적용 취소·복원, 잘못된 파일·HTML 입력·저장 실패 확인     | 통과. 메모만 저장해도 성공으로 바꾸지 않으며 실패 시 기존 자료 유지             | 같은 폴더 `tc-results-test.json`, 검수 도구                                        |\n| 반응형·접근성 / 1440·390·320px·글꼴 200% | 페이지·검색·상태 필터·키보드·48px 체크 영역·상세창·인쇄 확인                                  | 통과. 문서 가로 넘침 없음, 표 내부 가로 스크롤                                  | 같은 폴더 `desktop.png`, `mobile-320.png`, `detail-large-font.png`, `tc-print.pdf` |\n| 기존 보고서 기능 / 별도 격리 브라우저    | 날짜·검색·등록·재조회·수정·삭제·백업·가져오기·인쇄                                            | 통과                                                                            | 같은 폴더 `report-regression.log`                                                  |\n| Android Studio / 내부 빌드               | 앱의 각 TC를 에뮬레이터와 실제 설치본에서 실행                                                | 미검증. 이번 작업은 문서 사이트 제작·웹 검수이며 앱 설치본 검사는 실행하지 않음 | 해당 없음                                                                          |\n\n참조한 [사이트 규격](\u003c../../02. 디자인/01. 화면설계/일일보고서_사이트규격.md>)과 공통 디자인 시스템·토큰에 맞춰 네이비·코럴·LINE Seed·48px 터치 영역을 적용했다. 실제 데스크톱·320px·큰 글꼴 상세창 캡처와 대조했다. 앱 헤더·GNB 변경은 없어 관련 앱 이동 회귀는 이번 변경에 해당하지 않는다. 구조용 스케치가 아닌 실제 HTML 화면을 검수했다.\n\n보고서에 포함된 달러·백틱 조합이 문자열 치환 문법으로 해석되어 생성 HTML의 JSON을 깨뜨리는 문제도 재현·수정했다. 템플릿에 원문을 그대로 넣도록 보완한 뒤 기존 보고서 검수를 통과했다.\n\n- 검토 쟁점 `REPORT-TC-01` / 대상: TC 정의·화면·보관 계약 / 최초 0회. 단계 독립, 초기 미검증, 저장 실패 보존, 실제 앱 검수와 웹 검수의 구분을 확인했다.\n- 남은 작업: 실제 앱 버전과 검수 계정을 준비해 개발 → 에뮬레이터 → 내부 빌드 실기기 순으로 실행하고, 각 단계의 빌드·기기·증거를 함께 기록한다. 실행하지 않은 검사를 체크하지 않는다. 팀 보관이 필요하면 내려받은 결과를 검토한 뒤 프로젝트의 `tc-results.json`에 반영하고 HTML을 다시 생성한다.\n\n전체 품질 검사의 첫 실행에서는 별도 가계부 작업 파일 `expensePaymentMeta.ts` 끝의 여분 빈 줄 한 건을 확인했다. 본문이 같은지 비교한 뒤 파일 끝 공백만 정리했다. 가계부 동작은 변경하지 않았다. 이번 TC 작업은 로컬 수정이며 추가 커밋·푸시·외부 게시·운영 배포는 실행하지 않았다.\n",
+            "markdown": "# 일일 통합 작업 보고서\n\n- 작업일: 2026-11-09, 한국 시간 기준.\n- 대상: TripPrint 앱 기본 구조, 계정·프로필, 여행 일정, 헤더·GNB 검수, Git 패치와 홈 구성 검토.\n- 기능 반영 버전: `main`의 [c470064](https://github.com/Ji-ChangKim/travel_APP/commit/c470064e128c0735814fe5f7798b3e6b7c96ebd6). 기준 커밋은 `d92abb9cfd640fd84a8aa5eb3aeceaec99ad7eb0`이다.\n- 이 날짜의 작업은 이 보고서 한 개에서 관리한다. 기능·디자인·데이터의 현행 기준은 아래에 연결한 각 규격 문서에 둔다.\n\n## 1. 완료 내용과 남은 범위\n\n앱 기본 화면을 연결하고 Google 회원의 선택적 닉네임·사진 변경을 구현했다. 함께 작업된 여행 일정 개편을 반영했으며 현재 구조에 맞춘 헤더·GNB 회귀 검사 22개가 모두 통과했다. 코드·문서·검수 기록 109개 파일은 `origin/main`에 커밋·푸시했고 원격 커밋 일치와 작업 폴더에 남은 변경이 없음을 확인했다.\n\n| 구분             | 완료한 내용                                                                                                                         | 남은 항목·판정 범위                                                |\n| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |\n| 앱 기본 구조     | 실행 → 로그인 선택 → 추가 입력 없는 기본 프로필 → 홈·커뮤니티·MY·설정 연결                                                          | 실제 Google 외부 인증·설치본 인수는 미검증                         |\n| 계정 관리        | 계정 확인, 삭제 사전 확인, 소유권 이전, 명시적 삭제 접수·로그아웃 연결                                                              | HTTP 202는 접수이며 실제 삭제 완료와 구분                          |\n| MY 프로필        | Google 회원 닉네임·사진 변경, 중복·30일 제한, 고정 PNG 교체·재조회                                                                  | 원격 DB·R2 적용, 실기기 촬영·권한은 미검증                         |\n| 여행 일정        | 여행 요약·계획/가계부·DAY 전체 연속 노출·방문 시간/소요시간 배제·순번 배지·동선 지도                                                | 실제 공급자 연결과 여행 전체 사이클은 별도 검수                    |\n| 일정 상세·가계부 | 04_3 일정 상세 7대 항목·아이디어 A 후기($0 딥링크+자체 리뷰), 04_4 가계부(시간·환율 제거, 현지 통화·Card/Cash 구분, 일정 상세 연동) | 서버 DB 자체 리뷰 교차 집계·영수증 OCR 본연동은 후속 과제          |\n| 헤더·GNB         | 큰 글꼴의 긴 제목 넘침 수정, 현재 이동 경로를 따르는 22개 회귀 통과                                                                 | 공통 색상·글꼴·4탭 구성·선택 표시·모션 유지                        |\n| Git              | 커밋·푸시 및 원격 반영 확인                                                                                                         | 서버 배포·원격 DB 적용·Android 설치본 생성은 수행하지 않음         |\n| 홈 구성          | 인사·내 여행·도시 탐색·빠른 실행·공개 여행 검토안 정리                                                                              | 레퍼런스를 적용한 새 홈 레이아웃은 미구현                          |\n| 게스트           | 현재 기기 프로필·여행 이용 유지                                                                                                     | 요청한 서버 DB 저장·재조회는 후속 과제                             |\n| 보고서 관리      | 작업 완료 때 원본 누적·HTML 갱신을 프로젝트 규칙에 반영                                                                             | 브라우저에서 직접 쓴 일지는 별도 백업으로 보관                     |\n| 페이지별 TC      | 18개 페이지·64 TC의 3단계 체크 차트, 상세 기준·검수 메모·파일 보관 제공                                                             | 앱의 실제 개발·에뮬레이터·실기기 판정은 초기 미검증                |\n| 페이지별 디자인  | 페이지별 이미지 등록·교체·확대·삭제, 종류·버전·메모와 별도 디자인 백업·복원 제공                                                    | 현재 브라우저에 보관. 확인되지 않은 과거 화면은 자동 등록하지 않음 |\n\n## 2. 앱 기본 구조와 계정 관리\n\n로그인 직후에는 생일·성별·소개·여행 스타일을 입력받지 않는다. 기본 이름은 ‘여행자’이며 실제 확인한 이용 방식만 표시한다. 과거 `/profile-setup` 주소도 추가 입력 없이 허용된 원래 목적지로 돌아간다. Google 회원이 나중에 MY에서 닉네임·사진을 고르는 행동은 시작 과정의 필수 입력과 구분한다.\n\n홈은 TripPrint 브랜드 헤더, 내 여행·커뮤니티·MY는 공통 제목 헤더를 사용한다. `/footprints`와 `/community`는 같은 커뮤니티 화면과 검색 구성을 사용한다. 하단 GNB는 홈 → 내 여행 → 커뮤니티 → MY의 기존 4탭을 유지한다.\n\n계정 관리는 본인 정보 → 삭제 사전 확인 → 필요한 소유권 이전 → 삭제 내용 확인 → 명시적 요청 순서다. 조회 실패 때 삭제 버튼을 열지 않고 재시도를 제공한다. 신규 삭제는 90일 복구 유예를 안내하지 않는다. 늦게 도착한 이전 계정의 응답을 새 계정에 적용하지 않으며, 게스트 자료는 로그인만으로 자동 전송하지 않는다.\n\n기본 화면의 상세 구현·로컬 실제 서버 검수는 [앱 기본 구조 구현 검수](\u003c../../03. 개발/04. 검증/앱기본구조_구현검수.md>)에 있다. 실제 약관·개인정보 페이지와 게시 주소는 후속 작업으로 남았다.\n\n## 3. MY 닉네임·프로필 사진\n\nGoogle 회원은 MY에서 닉네임 변경 → 입력 → 중복 확인 → 저장 순서로 바꾼다. 저장 후 홈·MY와 서버 재조회에서 같은 값을 확인한다. 게스트에는 Google 로그인 안내를 제공하고 변경 API도 서버에서 권한을 검사한다.\n\n| 닉네임 항목    | 확정 기준                                                                                                     |\n| -------------- | ------------------------------------------------------------------------------------------------------------- |\n| 문자           | 영어·숫자·한글·일본어 히라가나·가타카나와 일본어 장음 `ー`. 한자·이모지·특수문자 거부                         |\n| 길이           | NFC 정규화 후 1~10자. 중간 공백도 글자 수에 포함                                                              |\n| 공백           | 앞뒤 공백·공백만·탭·줄바꿈 거부. 문자 사이 ASCII 공백은 총 2개까지 허용. 자동으로 잘라 저장하지 않음          |\n| 중복           | NFC + 소문자 비교. `A가나다`와 `a가나다`는 동일. 중간 공백 수는 보존                                          |\n| 변경 간격      | 마지막 성공 저장 후 정확히 30일, 2,592,000,000ms. 달력 월 기준이 아님                                         |\n| 최초·같은 값   | 최초 선택은 즉시 가능. 완전히 같은 값은 변경 시각·기회를 갱신하지 않음                                        |\n| 기본 이름      | 미설정 ‘여행자’는 공용 표시이며 예약이 아님. 직접 선택한 이름만 고유 예약                                     |\n| 동시 요청·실패 | 사전 중복 확인은 예약이 아님. 저장 시 고유 제약·30일 조건 재검사. 실패를 성공 처리하거나 기회를 차감하지 않음 |\n\n`\"a b c\"`와 `\"a  b\"`는 허용한다. `\" asd\"`, `\"asd \"`, `\" asd \"`, `\"a b c d\"`는 거부한다. 예시의 따옴표는 공백 위치를 구분하기 위한 표시다. 아직 30일이 지나지 않으면 변경 버튼을 잠그고 다음 변경 시각을 보여준다. 통신 실패·응답 유실은 현재 프로필을 다시 조회해 확인하도록 안내한다.\n\n| 개선 전                                                                       | 개선 후                                                                                    |\n| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |\n| MY의 기본 프로필은 읽기 전용이어서 회원이 표시 이름과 사진을 선택할 수 없었음 | Google 회원이 MY에서 선택적으로 닉네임·사진 변경. 시작할 때는 추가 입력 없이 이용          |\n| 사용자가 바꾼 닉네임이 인증 정보 갱신 때 기본 ‘여행자’로 덮어써질 수 있었음   | 공급자 이름 갱신을 제외하고 사용자가 선택한 이름을 보존. 같은 조건에서 저장·재조회 검사    |\n| 닉네임 변경 간격과 중복을 화면 안내만으로 처리할 수 없었음                    | 서버에서 마지막 변경 후 30일과 대소문자 무시 고유 예약을 함께 확인하고 다음 변경 시각 표시 |\n\n사진은 앨범 선택 또는 촬영으로 언제든 교체하며 닉네임의 30일 제한을 적용하지 않는다. 앱에서 긴 변 최대 1,024px의 실제 PNG로 변환하고 서버가 PNG·10MiB 상한을 검사해 불필요한 메타데이터를 제거한다. 취소하면 기존 사진을 유지한다.\n\n- 버킷: `tripprint-staging-private`, Worker 바인딩 `MEDIA`.\n- 객체 키: `User/profile/pfImg_{유저ID}.png`. 같은 회원이면 같은 키를 덮어써 현재 객체 한 개를 유지한다.\n- 조회: 인증한 본인의 현재 사진만 제공하며 `no-store`와 ETag 버전을 사용한다. 공개 R2 주소를 만들지 않는다.\n- 상태: R2 현재 객체가 사진의 기준이다. 과거 `profile_photos`에 새 파일 행을 만들지 않는다. 회원 전환 뒤 늦은 응답·미리보기를 새 회원 화면에 적용하지 않는다.\n- 정리: 과거 개인정보 정리에서 새 선택 닉네임·사진은 보존하며 계정 삭제·고아 파일 정리는 새 경로도 처리한다.\n\n닉네임은 `0016_member_profile_names.sql`의 고유 예약 테이블에 저장한다. 예약·`user.name`·기존 게시물 작성자·참여 여행 표시 이름 갱신은 D1 배치 한 트랜잭션으로 확정한다. 인증 정보 갱신이 선택 이름을 ‘여행자’로 덮어쓰던 문제도 재현·수정했다. 공급자 이름·사진을 새로 수집하는 기능은 추가하지 않았다.\n\n세부 계약은 [MY 프로필 변경 규격](\u003c../../02. 디자인/01. 화면설계/MY_프로필변경_규격.md>), [앱·서버 API 계약](\u003c../../03. 개발/01. API계약/앱서버_API계약.md>), [DB·객체 사전](\u003c../../03. 개발/02. 데이터정의/DB_객체사전.txt>)을 따른다.\n\n## 4. 여행 일정 화면\n\n현재 여행 상세는 공통 헤더의 여행 제목·더보기 → 여행 요약 → 일정/가계부 → DAY 선택 → 항공권 추가·동선 지도 → 일차별 타임라인 → 하단 중앙 장소 추가 순서다. 지도·사진·영수증·준비물·동행·여행 공유는 더보기에서 연다.\n\n| 영역      | 반영한 동작                                                                                                                                        |\n| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |\n| 여행 요약 | 여행 제목, 여행 기간과 박수, 동행 정보. 동일 연도는 `11.27~11.30 (3박 4일)`, 연도 변경은 `26.12.30~27.01.02 (3박 4일)`, 날짜 미정은 예정 일수 표시 |\n| DAY 선택  | 날짜를 반복 표시하지 않고 DAY 번호로 선택                                                                                                          |\n| 항공권    | DAY 아래 ‘항공권 추가’와 빈 일정의 항공편 입력 진입. 장소 추가 → 이동 → 항공편 등록 경로도 유지                                                    |\n| 지도·거리 | 선택 DAY의 번호 핀·연결선. 네이티브 지도와 웹 SVG 동선 도식을 구분. 인접 좌표의 거리는 직선 거리이며 실제 길찾기 거리로 표시하지 않음              |\n| 타임라인  | 장소 상세·접기/펼치기·관리·길찾기, 일차 제목·소개, 기록 배지 연결                                                                                  |\n| 순서 편집 | 일차의 편집/완료 모드에서 삭제·위/아래 이동. 변경 순서와 동선 표시 연결                                                                            |\n| 중앙 추가 | 원형 `+`의 접근성 이름은 ‘장소 추가’. 눌림·잠금 색상과 아이콘 전경을 공통 토큰으로 보완                                                            |\n\n장소 검색·상세와 항공편 조회·수동 입력, `schedule.save` 등 저장 명령의 연결을 정리했다. 영수증 진입은 사진·영수증 영역과 지원하는 작성 경로에서 확인한다. 코드 연결·검수 자료를 쓴 회귀 통과를 실제 Google 검색·실제 항공 공급자·카메라·OCR·서버 등록 전체의 통과로 확대하지 않는다.\n\n당일 개별 보고서의 초기 ‘지출’ 표기는 최종 ‘가계부’로 맞췄다. 초기에는 없던 직접 항공권 추가 진입이 후속 작업에 포함됐으므로 최종 구조를 기준으로 합쳤다. 화면 규격은 [여행 일정 화면 규격](\u003c../../02. 디자인/01. 화면설계/여행일정_화면규격.md>)에서 관리한다.\n\n## 5. 헤더·GNB 실패 원인과 조치\n\n| 문제                                                | 조치                                                                       |\n| --------------------------------------------------- | -------------------------------------------------------------------------- |\n| 과거 지도·비용 고정 탭과 버튼 경로를 기다림         | 일정·가계부 2탭과 더보기, 현재 항공편 입력 경로로 검사 갱신                |\n| 커뮤니티 제목과 GNB의 같은 문구를 중복 선택         | 제목 역할·복귀 주소·커뮤니티 탭 선택을 함께 검사                           |\n| 320px·글자 200%에서 긴 제목 폭이 한 글자보다 좁아짐 | 뒤로가기·우측 행동이 함께 있으면 공통 헤더의 아래 제목 행에서 전체 폭 사용 |\n| 중앙 장소 추가의 눌림 표시 누락                     | 기존 배치·크기는 유지하고 공통 눌림·잠금·전경 색상 적용                    |\n| 본문이 열리기 전에 큰 글꼴 검사가 끝날 수 있음      | 실제 여행 작업 영역 표시를 기다린 뒤 대비·가로 넘침 검사                   |\n| 일일 보고서 폴더가 일반 두 자리 번호 규칙과 다름    | 지정한 `998. 일일 업무 보고서/YY.MM.DD/`와 달력상 유효한 날짜만 예외 허용  |\n\n제목 26/36, 확대 시 52/72, 굵기 700·왼쪽 정렬·최소 터치 영역 48을 유지했다. 글자나 버튼을 줄이지 않고 헤더 높이와 줄바꿈으로 대응했다. 공통 색상·글꼴 토큰과 GNB 탭 수·순서·아이콘·선택·모션은 바꾸지 않았다. 검사 수·시간 제한·대비·터치·초점·이탈 보호 기준도 낮추지 않았다.\n\n| 22개 회귀 묶음                                 | 개수 | 결과                     |\n| ---------------------------------------------- | ---- | ------------------------ |\n| WCAG AA 읽기·입력·눌림·비활성·키보드·글자 200% | 3    | 320·390·430px 통과       |\n| 전체 화면 제목·정렬·줄바꿈                     | 6    | 세 너비 × 일반·200% 통과 |\n| GNB 선택·큰 글꼴·탭 상태·생성·이탈 보호        | 3    | 세 너비 통과             |\n| 준비물 재진입·검색 보존·공개 상세 오류 복귀    | 2    | 통과                     |\n| MY 인증 확인·오류·복구                         | 6    | 세 너비 × 일반·200% 통과 |\n| 작성 진입 인증 오류·안전한 복귀                | 2    | 통과                     |\n| 합계                                           | 22   | 모두 통과                |\n\n기준은 [디자인 시스템](\u003c../../02. 디자인/00. 공통규격/디자인시스템.md>), [헤더·GNB 공통 규격](\u003c../../02. 디자인/00. 공통규격/헤더GNB_규격.md>)이다. 원인·조치와 상세 검수는 [상단 타이틀·GNB 규격화 검수](\u003c../../03. 개발/04. 검증/상단타이틀_GNB_규격화검수.md>)에도 반영했다.\n\n## 6. 검증 환경·결과·증거\n\n환경은 Windows·Node.js 22.17.0·npm 11.5.2·Chrome이다. 헤더는 전용 웹 포트 8810에서 검사했다. 기본 구조·프로필은 웹 8920/API 8921과 격리한 Worker·Miniflare D1/R2를 사용했다. 검수용 계정·Google 연결 행·세션을 사용했으며 운영 자료·실제 개인정보를 검수 대상으로 쓰지 않았다.\n\n아래는 해당 기능 반영 시점의 최종 결과다. 이번 보고서 통합에서 앱 기능 검사를 새로 실행한 것으로 기록하지 않는다. 같은 항목의 초기 실행·최종 실행·보완 실행은 합산하지 않는다.\n\n| 검사                           | 결과                                                                                              | 증거                                                                       |\n| ------------------------------ | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |\n| `npm run check`                | 문서·디자인·자원·구조·이동·타입·린트·서식 통과, 종료 코드 0                                       | `outputs/member-profile/check-final5.log`                                  |\n| `npm run test:auth`            | 357개 통과                                                                                        | `outputs/member-profile/auth-final3.log`                                   |\n| `npm run test:foundation`      | 179개 통과                                                                                        | `outputs/member-profile/foundation-final4.log`                             |\n| `npm run test:profile:web`     | 3개 통과                                                                                          | `outputs/member-profile/browser-final2.log`, `profile-ui-results.json`     |\n| `npm run test:headers:web`     | 22개 통과                                                                                         | `outputs/member-profile/headers-final2.log`                                |\n| 본문 표시 대기 보완 후 WCAG AA | 세 너비 3개 통과. 전체 22개와 별도 기록                                                           | `outputs/member-profile/headers-ready-state.log`                           |\n| `npm run test:release`         | Git 패치 준비 때 106개 통과                                                                       | `outputs/member-profile/git-patch-release.log`                             |\n| Git 커밋 전 검사               | 문서 47개·링크 207개, 대비 52/52, 자원, 구조 585개 파일·이동 495개 소스/23개 화면, 타입 검사 통과 | `outputs/member-profile/git-patch-commit.log`                              |\n| 커밋 전 파일 대조              | 주요 프로필 코드·검사 파일의 SHA-256 일치, Git 공백 오류 없음                                     | `outputs/member-profile/source-manifest.json`, `git diff --check`          |\n| `npm run test:reports:tc`      | TC 추가 후 웹 검수 통과. 18개 페이지·64 TC의 체크·단계 독립·메모·복원·반응형·인쇄 확인            | `outputs/daily-report-site/tc/browser-final.log`, `verification.json`      |\n| `npm run test:reports:web`     | TC 메뉴 추가 후 기존 보고서의 탐색·등록·수정·재조회·안전한 가져오기·인쇄 회귀 통과                | `outputs/daily-report-site/tc/report-regression.log`                       |\n| `npm run test:reports:designs` | 현재 디자인 등록·종류·재조회·교체·원본·백업·복원·실패 복구·반응형 통과                            | `outputs/daily-report-site/designs/browser-final.log`, `verification.json` |\n\n여행 일정 개별 보고서에는 단위 검사 50개 통과와 ESLint·구조·이동·디자인·문서 검사 통과가 기록돼 있다. 50개의 상세 실행 명령·원로그는 그 보고서에 명시되지 않아 위 최종 검사 수에 더하지 않았다. 문서 44개·링크 182개, 초기 기본 구조의 인증 356개·API 174개 같은 수치는 이전 작성 시점의 기록이며 현재 결과와 혼합하지 않는다.\n\n| 실제 조작                                                      | 기대 결과·확인 결과                                         | 판정                                                     |\n| -------------------------------------------------------------- | ----------------------------------------------------------- | -------------------------------------------------------- |\n| Google 검수 회원 → MY → 닉네임 중복 확인·저장 → 홈·MY·새로고침 | 저장 이름 재조회, 30일 잠금, 추가 가입 입력 없음            | 로컬 통과                                                |\n| 같은 회원의 동시 변경·회원 간 대소문자 중복 저장               | 한 번만 확정, 고유 제약·실패 시 롤백, 여행 표시 이름 전파   | 격리 DB 통과                                             |\n| 인증 DB 정보 갱신                                              | 선택 이름을 기본 이름·공급자 이름으로 덮어쓰지 않음         | 수정 전 재현 후 같은 조건의 5개 검사·전체 API 179개 통과 |\n| 사진 두 번 선택·저장 → 재진입·새로고침 → 객체 확인             | PNG, 새 ETag, 고정 키 현재 객체 한 개, 인증 미리보기 재조회 | 로컬 통과                                                |\n| 게스트 MY                                                      | 닉네임·업로드 대신 Google 로그인 안내                       | 통과                                                     |\n| 320px·글자 200% → 닉네임 중복 → 취소                           | 입력·오류·취소 접근, 가로 넘침 없음, 실패 이름 미저장       | 통과                                                     |\n| 실제 Google OAuth·실기기 촬영·원격 저장                        | 외부 인증·권한·사진 변환·원격 저장·재조회                   | 미검증                                                   |\n\n실제 화면은 `outputs/member-profile/nickname-confirm.png`, `photo-reloaded.png`, `my-320-font200.png`, `nickname-320-font200.png`, `guest-profile-guidance.png`에서 확인했다. 공통 구성요소·LINE Seed·큰 글꼴 줄바꿈·세로 스크롤을 대조했다. 여행 화면은 `outputs/header-standard/detail-일정-320-200.png`, `outputs/haru-wcag-aa/detail-large-320.png`를 확인했다. 웹 캡처를 실기기 인수나 완성 디자인 시안으로 표현하지 않는다.\n\n초기 헤더 수정 전·후 증거는 `outputs/header-regression/`의 `headers-final.log`, `check-final.log`, `title-overflow/`, `first-run/`, `source-manifest.json`에 있다. 기본 화면의 실제 서버·브라우저 흐름과 캡처는 `outputs/app-shell/`에 있다. 로컬 산출물은 Git 제외 대상이므로 다른 환경에서는 이 보고서의 재현 조건·판정과 연결된 현행 검수 문서를 함께 사용한다.\n\n## 7. 주요 변경 파일과 이유\n\n| 영역                | 파일·책임                                                                                                                                                                                                                                                            |\n| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |\n| 공통 헤더·이동      | `ScreenHeader.tsx`, `screenNavigationPolicy.json`, `authReturn.ts`, `destination.ts`: 제목·큰 글꼴·인증 복귀·GNB 배정                                                                                                                                                |\n| 시작·계정           | `AuthGate.tsx`, `ProfileSetupScreen.tsx`, `useDefaultProfileEntry.ts`, 계정 관리 서비스·MY·설정·탈퇴 화면: 입력 관문 제거와 현재 계정 정책 연결                                                                                                                      |\n| 프로필 규칙·응답    | `packages/validation/src/profile.ts`, `packages/domain/src/index.ts`, `profileResponse.ts`: 문자·공백·비교 키·30일·변경 권한·다음 시각                                                                                                                               |\n| 프로필 서버         | `0016_member_profile_names.sql`, `memberProfile.ts`, `memberProfilePhoto.ts`, `accountRoutes.ts`, `app.ts`, `errors.ts`: 닉네임 고유 예약·저장, 고정 PNG 교체·인증 조회·제한                                                                                         |\n| 인증·정리           | `cloudAuth.ts`, `accountDataCleanup.ts`, `accountOrphanFiles.ts`: 선택 이름 보존, 새 사진 경로의 탈퇴·고아 정리                                                                                                                                                      |\n| MY 표현·통신        | `MemberProfileCard.tsx`, `AccountProfileCard.tsx`, `MyAccountView.tsx`, `useMemberProfileEditor.ts`, `memberProfileService.ts`, `memberProfilePhotoService.ts`: 입력·중복·저장·변환·재조회·세션 전환 처리                                                            |\n| 커뮤니티·홈         | 커뮤니티 화면·공개 조건 선택·`HomeConciergeSections.tsx`: 공통 제목·호환 주소 통합과 실제 기능에 맞는 안내                                                                                                                                                           |\n| 여행 상단·작업 영역 | `presentation.ts`, `TripSectionNavigation.tsx`, `WorkspaceHeadingView.tsx`, `WorkspaceView.tsx`, `WorkspaceExpenseView.tsx`, `expensePaymentMeta.ts`, `PlanEditorOptions.tsx`, `formCommands.ts`: 요약·기간·동행·여행 계획/가계부·공유·Card/Cash 구분·현지 통화 집계 |\n| 일정·지도·입력      | `WorkspaceItineraryView.tsx`, `WorkspaceDialogs.tsx`, `TripTimeline.tsx`, `DaySchedule.tsx`, `SchedulePlaceCard.tsx`, `ScheduleEditorView.tsx`, 관련 스타일: 항공권·DAY·지도·타임라인·순번 배지·04_3 일정 상세·아이디어 A 후기                                       |\n| 번역·검수           | `messages.json`, `workspace.spec.ts`, 프로필·계정 인증/API 검사, `verify-app-shell.mjs`, `appShellRuntime.mjs`, `package.json`: 영어·일본어와 반복 가능한 로컬 검수                                                                                                  |\n| 문서 검사           | `check-docs.mjs`, `docs-structure.test.mjs`: 지정 보고서 날짜 경로만 허용하고 잘못된 위치·날짜·깨진 링크는 차단                                                                                                                                                      |\n| 기획·명세           | 페이지별 기능 정의, 화면 규격, API 계약, DB 사전, 사용자 탐색 흐름·이미지 3개와 일일 보고서                                                                                                                                                                          |\n\n상세 기능·화면 배정은 [페이지별 기능 정의서](\u003c../../01. 서비스기획/01. 기능정의/앱기본구조_페이지별기능정의서.md>)와 [앱 기본 구조 화면 규격](\u003c../../02. 디자인/01. 화면설계/앱기본구조_화면규격.md>)을 따른다. DB·객체 변경은 해당 사전에 기록했으며 공통 규격을 페이지 로컬 스타일로 덮어쓰지 않았다.\n\n## 8. Git 반영 결과\n\n사용자가 반영 범위를 ‘Git 커밋·푸시까지’로 선택했다. 커밋 메시지는 `타이틀 : 설명` 규칙을 따랐으며 기존 사용자 수정·흐름 이미지 3개도 보존했다. 환경 변수·키·로컬 `outputs/`는 커밋에서 제외했다.\n\n- 커밋: `c470064e128c0735814fe5f7798b3e6b7c96ebd6`, 109개 파일 변경.\n- 메시지: `feat: 앱 기본 구조·MY 프로필 변경·여행 일정 개편 통합 : 추가 입력 없는 시작과 계정 관리, 닉네임 중복·30일 제한과 고정 PNG 교체, 일정·가계부 및 헤더 회귀 22개와 기능·검수 문서 반영`.\n- 원격: `origin/main`에 푸시 후 같은 SHA를 확인했다. 당시 로컬·원격 차이 0/0, 작업 폴더 변경 없음.\n- [GitHub CI 실행](https://github.com/Ji-ChangKim/travel_APP/actions/runs/42572759823)은 푸시 직후 확인 당시 진행 중이었다. 이번 문서 통합에서 CI 결과를 새로 조회하거나 통과로 판정하지 않았다.\n- 웹·API 배포와 Play 내부 배포는 별도 수동 작업이다. Git 반영을 서버 배포·원격 DB 적용으로 표시하지 않는다.\n\n이전 개별 보고서의 ‘커밋·푸시 미실행’은 Git 요청 전의 기록이다. 이 절은 뒤에 완료한 Git 반영 결과이며, 이번 보고서 통합 편집 자체의 재커밋·재푸시를 의미하지 않는다.\n\n## 9. 홈 정보 구성 검토안\n\n홈은 여행을 시작하고 기존 여행·기록을 이어가는 화면으로 제안했다. 레퍼런스의 인사말·원형 도시·빠른 실행 구성을 참고하되 TripPrint 공통 헤더·하단 4탭은 유지한다. 아래 내용은 검토안이며 새 홈 레이아웃 구현 완료가 아니다.\n\n| 순서 | 정보·행동                                            | 필요한 데이터                                              |\n| ---- | ---------------------------------------------------- | ---------------------------------------------------------- |\n| 1    | 닉네임 인사·D-Day·여행 일차                          | 프로필 이름, 여행 날짜·상태                                |\n| 2    | 진행 중 또는 가장 가까운 예정 여행 한 개·이어서 열기 | 여행 ID·도시·제목·기간·작성 상태                           |\n| 3    | 검색·도시 원형 바로가기                              | 도시 ID·이름·국가·대표 이미지                              |\n| 4    | 새 여행·영수증 등록·가계부·준비물                    | 대상 여행·실제 연결 화면. 저장·재조회 검수된 기능부터 노출 |\n| 5    | 다른 여행자의 공개 일정·방문 기록                    | 공개 게시물 ID·유형·도시·기간·대표 이미지                  |\n\n여행이 없으면 도시 탐색·새 여행, 여행 전에는 계획 이어보기, 여행 중에는 오늘 일정·영수증 등록, 여행 후에는 기록 정리·공유를 우선하는 안이다. 기존 도시·여행·공개 목록 자료를 활용할 수 있으나 오늘 일정·영수증 상태의 홈 연결은 별도 검수가 필요하다. ‘인기’·‘NEW’는 집계·등록일 근거를 갖춘 뒤 사용한다. 실시간 날씨·환율은 이번 기본안에 추가하지 않는다.\n\n## 10. 남은 작업과 적용 순서\n\n| 우선 항목        | 다음 확인·작업                                                              | 현재 판정                                     |\n| ---------------- | --------------------------------------------------------------------------- | --------------------------------------------- |\n| 실제 회원 흐름   | Google 로그인 → 기본 프로필 → 여행 생성·장소 추가 → 공유·공개 재조회        | 외부 공급자를 포함한 전체 사이클 미검증       |\n| 게스트 저장      | 게스트 프로필로 서버 DB 저장 → 화면 이탈·재진입 → 같은 기록 재조회          | 미구현. 현재 기기 저장으로 대체 판정하지 않음 |\n| 장소 추가        | 실제 Google 검색 → 장소 선택 → 등록·수정·삭제·재조회, 권한·실패 복구        | 실제 공급자 성공 흐름 후속 검수               |\n| 영수증           | 촬영·업로드 → OCR → 사용자 확인 → 기존 방문 연결/새 실제 방문 → 저장·재조회 | 실기기·실제 OCR·전체 저장 흐름 미검증         |\n| 프로필 원격 반영 | 대상 DB·백업 확인 → 0016 마이그레이션 → API → 앱 → 실제 R2 교체·재조회      | 원격 미적용                                   |\n| 설치본           | Android·iOS 로그인·카메라 권한·촬영·안전 영역·큰 글꼴·재실행                | 미실행                                        |\n| 홈               | 구성안 확정 → 데이터·이동 연결 → 실제 화면 대조                             | 제안 단계                                     |\n\n복구 시 새 닉네임 테이블·R2 객체를 즉시 삭제하지 않는다. 자료를 보존한 채 이전 개인정보 정리 코드가 새 선택 자료를 지우지 않는지 확인한다. 운영 변경·삭제는 해당 대상과 승인 범위에서 별도로 실행한다.\n\n모든 버튼·API의 정상·빈 상태·오류·처리 중 조건을 나누고, 저장 직후 표시뿐 아니라 재진입·재조회까지 확인한다. 게스트·보기 전용·다른 계정·오프라인·중복 요청·버전 충돌도 기능에 필요한 범위로 선정한다. 전체 과거 여행 편집 웹 검사 묶음은 이번 보고서 통합에서 실행하지 않았다. 전체 수용 기준은 [핵심 사용자 사이클 검수](\u003c../../03. 개발/04. 검증/핵심_사용자사이클_검수.md>)에 있다.\n\n## 11. 검토 기록과 문서 통합\n\n| 쟁점 ID·대상                       | 차수       | 결과                                                                            |\n| ---------------------------------- | ---------- | ------------------------------------------------------------------------------- |\n| SHELL-NAV-01 / 제목·이동           | 재검토 1회 | 현재 조작 경로와 22개 검사 일치                                                 |\n| SHELL-HEADER-REFLOW-01 / 공통 헤더 | 최초 0회   | 제목 넘침 재현·수정 후 같은 너비·글꼴에서 통과                                  |\n| SHELL-REPORT-PATH-01 / 보고서 경로 | 최초 0회   | 사용자 지정 날짜 경로만 예외 허용. 다른 위치·잘못된 날짜·깨진 링크 차단         |\n| PROFILE-01 / 프로필 정책           | 최초 0회   | 시작 입력 제거와 MY 선택 변경 구분. 과거 소개·생일·완료 요청은 열지 않음        |\n| PROFILE-02 / 사진·인증·정리        | 최초 0회   | 회원 전환·늦은 응답·기존 정리와의 충돌을 회원/세션·고정 경로·자료 보존으로 처리 |\n| PROFILE-03 / 인증 정보 갱신        | 최초 0회   | 선택 이름 덮어쓰기 재현 후 수정. 외부 Google OAuth 검증과 구분                  |\n| DOC-REPORT-MERGE-01 / 일일 보고서  | 최초 0회   | 보고서 4개를 한 문서로 통합. 중복 제거·시점 차이 정리·참조 링크 갱신·원본 보관  |\n\n원본은 상단 타이틀·GNB 전체 회귀, 여행 일정 페이지 개편, MY 닉네임·사진 변경, Git 패치 반영 보고서 4개다. 개별 원본은 삭제 보관 폴더로 이관해 이력을 보존했다. 이 날짜 폴더의 현행 보고서는 이 파일 하나다. 기존 보고서로 연결되던 프로필 규격·헤더 검수 문서의 링크도 이 통합 보고서로 바꾼다.\n\n이번 편집은 보고서 통합과 참조 정리이며 앱 코드·기능·DB를 변경하지 않았다. `npm run check:docs`의 검사 7개와 문서 44개·링크 200개가 오류 없이 통과했다. 변경 문서 3개의 Prettier 서식과 `git diff --check`도 통과했다. 원본 4개는 이동 전·후 SHA-256이 같았다. 증거는 `outputs/report-merge/docs-check.log`와 `originals-manifest.json`에 보관했다.\n\n이번 통합은 로컬 문서 변경이며 추가 커밋·푸시는 수행하지 않았다. 기능 검수의 주 에이전트 책임과 기존 검토 차수는 이 통합으로 초기화하지 않는다.\n\n## 12. 일일 보고서 문서 사이트\n\n사용자의 추가 지시에 따라 날짜·요일별 작업과 개선 결과를 읽고 일지를 작성하는 [HTML 문서 사이트](../index.html)를 제작했다. 진입 파일은 같은 보고서 루트의 `index.html`이다. 기존 여행 앱 화면과 분리했으며 앱의 헤더·GNB·API·DB는 변경하지 않았다.\n\n| 개선 전                                                                                    | 개선 후                                                                                            |\n| ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |\n| Markdown 보고서를 파일별로 열어야 해서 날짜·요일별 작업과 개선 내용을 한눈에 보기 어려웠음 | 주간 달력·등록 일지 목록에서 날짜를 선택하고 작업 요약·개선 전후·전체 문서·검증·후속 작업으로 탐색 |\n| 문서 파일을 직접 편집해야 새 작업을 남길 수 있었음                                         | 일지 등록 창과 브라우저 보관, 수정·삭제, Markdown 내려받기·JSON 백업/가져오기·인쇄 제공            |\n\n원본이 있는 2026-11-09 월요일만 초기 등록 자료로 사용한다. 다른 날짜는 기록 없음으로 표시한다. 직접 작성한 일지는 이 브라우저에만 저장하고, 다른 기기로 옮기려면 백업·가져오기를 사용한다. 서버 저장·자동 저장소 반영으로 표시하지 않는다. 원본 문서에서 온 일지는 화면에서 덮어쓰지 않는다.\n\n`npm run reports:build`는 날짜별 원본 Markdown과 공통 토큰·템플릿으로 HTML 한 파일을 생성한다. `npm run reports:preview`는 보고서·필요한 글꼴만 허용한 로컬 미리보기를 연다. 원본이 바뀌면 다시 생성하며 생성 HTML은 직접 편집하지 않는다. 화면 규격은 [일일 보고서 사이트 규격](\u003c../../02. 디자인/01. 화면설계/일일보고서_사이트규격.md>)을 따른다.\n\n생성·미리보기 도구는 `scripts/design/build-daily-reports.mjs`, `daily-report-markdown.mjs`, `preview-daily-reports.mjs`다. 템플릿·스타일·동작은 `docs/02. 디자인/02. 리소스/00. 일일보고서사이트/`에, 브라우저 검수 도구는 `scripts/qa/verify-daily-reports.mjs`에 있다. HTML·가져온 내용은 실행하지 않도록 이스케이프하고 파일 형식·날짜·문자열·크기를 검사한다. 잘못된 가져오기와 저장 실패는 기존 기록을 유지한다.\n\n`npm run test:reports:web`로 파일 직접 열기·월요일/주간 이동·검색과 빈 결과·등록 후 새로고침·수정/삭제·백업/가져오기·HTML 실행 차단·320/390/768/1440px·글자 200%·인쇄를 확인했다. 저장이 실패할 때는 성공으로 처리하지 않고 입력·기존 기록을 보존하는 것도 확인했다. 브라우저 오류는 0개다. 최종 검수 결과는 `outputs/daily-report-site/results.json`과 `browser-final3.log`, 실제 캡처는 같은 폴더에 있다.\n\n공통 토큰·LINE Seed를 기준으로 데스크톱 요약·개선 전후·전체 원문, 작은 화면과 큰 글꼴의 메뉴·작성 창을 실제 캡처와 대조했다. 브라우저의 기본 대화창 최대 폭이 큰 글꼴에서 더 좁아지는 부분은 뷰포트 기준 최대 폭으로 보완했다. 숨김이나 글자 축소로 넘침을 피하지 않았다. 최종 폭 보완 후 브라우저 검수와 전체 필수 검사 `npm run check`가 모두 통과했다(`outputs/daily-report-site/check-final3.log`, 종료 코드 0). 외부 서비스 게시·운영 배포·추가 커밋·푸시는 이번 사이트 제작 범위에 포함하지 않는다.\n\n## 13. 작업 완료 후 누적 기록과 저장 위치\n\n사용자가 작업이 끝날 때마다 날짜·요일별 작업 내용, 개선 전후, 검수 결과와 남은 작업을 이 사이트에 누적하도록 요청했다. `AGENTS.md`와 문서 관리 규칙에 완료 절차를 기록했다. 같은 날에는 원본 한 개에 이어 쓰며, 새 날짜에는 그날 파일을 만들고 HTML을 다시 생성한다. 생성본만 직접 편집하거나 브라우저의 임시 보관 기록으로 공식 파일 기록을 대신하지 않는다.\n\n| 개선 전                                                                   | 개선 후                                                                                                               |\n| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |\n| 사이트 제작 후 작업 기록을 언제·어디에 누적할지 고정된 완료 절차가 없었음 | 한국 시간 날짜별 원본 누적 → HTML 생성 → 날짜·요일·작업·개선·검수·후속 반영 확인 → 완료 보고를 프로젝트 규칙으로 관리 |\n\n사이트 파일은 `docs/998. 일일 업무 보고서/index.html`, 날짜별 공식 원본은 `docs/998. 일일 업무 보고서/YY.MM.DD/일일_통합_작업보고서.md`다. 화면의 등록 창으로 직접 작성한 일지는 이와 별개로 현재 브라우저의 `tripprint.daily-journal.v1`에 보관된다. `file://` 페이지와 로컬 미리보기 주소도 서로 다른 브라우저 저장 공간을 사용한다. 브라우저 기록을 파일로 보관하려면 백업 버튼으로 JSON을 내려받는다.\n\n일지가 늘어도 브라우저 검수가 특정 항목 수·이미 등록된 날짜 때문에 실패하지 않도록 검수 자료의 개수와 미등록 날짜를 현재 자료에서 정한다. 이번 변경은 기록 관리·검수 도구에 한정하며 여행 앱 기능은 변경하지 않는다. 실제 새 세션에서 규칙을 읽는 동작까지 검증한 것으로 보고하지 않는다.\n\n누적 기록 갱신 후 `npm run test:reports:web`는 날짜 탐색·저장/재조회·수정/삭제·백업/가져오기·큰 글꼴·인쇄를 통과했다(`outputs/daily-report-site/accumulation-browser.log`). 이번 검수 도구의 ESLint는 오류·경고 0건, 문서 검사는 7개 검사와 문서 45개·링크 205개 오류 없음으로 통과했다. 변경 문서·HTML·검수 도구의 서식도 통과했다. 이전에 보고됐던 `WorkspaceExpenseView.tsx`의 `TripIcon` import 경로와 `runningIndex` 재할당 오류 2건도 이어진 가계부 개편 작업에서 모두 해결해 전체 `npm run check`가 오류 0건으로 통과한다.\n\n## 14. 여행 계획(04_1~04_3) 및 가계부(04_4) DAY 타임라인 개편\n\n사용자가 제시한 Figma 핵심 레퍼런스(`04_1_여행계획_DAY타임라인`, `04_2_일정추가_장소동선`, `04_3_일정상세`, `04_4_가계부_DAY타임라인`)를 바탕으로 용어 정의와 화면·도메인 규칙을 확정하고 모바일 작업 영역 전체에 반영했다. 전체 여행을 관리하는 단위는 **계획(`여행 계획`)**, 계획 안의 개별 장소(숙소·항공·식사·관광명소·역·버스정류장)는 **일정**으로 통일했다.\n\n| 개선 전                                                                                          | 개선 후                                                                                                                                  |\n| ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |\n| 일정 카드와 작성 화면에 방문 시각(`10:00`)과 실시간 이동 소요시간 계산이 섞여 입력 부담이 큼     | 방문 시각·체류 시간 입력과 실시간 경로 소요시간 계산을 제거하고 순번 원형 배지(`1, 2, 3`)·태그·타이틀·순서 이동(`⋮`) 중심으로 단순화     |\n| 유료 Google Places 리뷰 API 호출 시 건당 과금($25~$35/1,000건)과 캐싱 약관 제약 발생             | 아이디어 A 채택: `[구글 실제 후기·평점 보기]` 딥링크로 API 과금 $0 달성 + 앱 자체 별점·리뷰·사진(`APP 내 자체 리뷰`) 자산화 구조 적용    |\n| 가계부에 결제 시각·환율·원화 환산액과 불필요한 카드 썸네일 이미지가 섞여 핵심 지출 파악이 난잡함 | 가계부에서 시간·환율·원화 환산·우측 이미지를 모두 제거하고 현지 통화 금액과 `💳 Card / 💵 Cash` 결제 수단 구분·1/N 부담액만 명확히 표시  |\n| 가계부의 지출 항목과 여행 계획의 일정 상세가 분리되어 장소 정보·길찾기를 다시 찾아야 했음        | 가계부 지출 카드 클릭 시 `여행 계획` 탭과 동일하게 연결된 일정의 `04_3_일정상세` 모달로 즉시 이동해 위치·길찾기·메모·지출·후기 통합 확인 |\n\n- **`04_1_여행계획_DAY타임라인`** (`WorkspaceHeadingView.tsx`, `TripSectionNavigation.tsx`, `WorkspaceItineraryView.tsx`, `DaySchedule.tsx`, `SchedulePlaceCard.tsx`): 상단 `← 여행 계획 | ⋮` 헤더, 여행 타이틀과 우측 원형 지도 버튼, 동행자 아바타 스택과 여행 기간(`05.15 ~ 05.19 (4박 5일)`), `[여행 계획] / [가계부]` 알약 탭과 우측 `[공유]`, `[전체] | DAY1 ~ DAYN` 필터, 빈 일차의 `[ DAY N 일정 없음 ]` 박스, 하단 `[동선 지도 보기] | [+ 일정 추가]` 고정 바를 반영했다.\n- **`04_2_일정추가_장소동선`** (`ScheduleEditorView.tsx`): 불필요한 `일정 시간 (HH:mm)` 및 `체류 예정 시간 (분)` 입력을 제거하고 장소 검색·방문 순서 배치(`afterScheduleId`)·일정 메모·예상 지출 금액 입력에 집중하도록 정리했다.\n- **`04_3_일정상세` & 아이디어 A** (`DaySchedule.tsx`): 일정 카드 전체 영역 클릭 시 열리는 상세 화면에 ① 위치 보기(구글 좌표), ② 일정 정보(태그·주소), ③ `[구글 지도로 길찾기]`($0 딥링크), ④ 일정 메모·수정, ⑤ 지출금 기록, ⑥ 후기 남기기(별점 1~5·사진 추가·구글 지도 리뷰 남기기 브릿지), ⑦ 후기 보기(`APP 내 자체 리뷰` + `[구글 실제 후기·평점 보기]`) 7대 항목을 모두 연결했다.\n- **`04_4_가계부_DAY타임라인`** (`WorkspaceExpenseView.tsx`, `expensePaymentMeta.ts`, `PlanEditorOptions.tsx`, `formCommands.ts`): 시간과 환율(원화 환산)을 전면 제거하고 현지 통화(`¥`, `$`, `₩`) 기준 총지출과 `[총 경비 (팀 전체)] ↔ [내 정산 몫 (개인)]` 토글, `💳 Card / 💵 Cash` 결제 합계·필터·배지, 우측 썸네일 이미지 없는 깔끔한 지출 카드, 카드 클릭 시 `04_3_일정상세` 모달 연동, 빈 일차 `[ DAY N 등록된 지출 없음 ]` 박스, 하단 `[+ 지출 추가]` 버튼을 구현했다.\n- **6대 항목 전체 검수**: ① UI/UX 통일성(`schedulePageStyles.ts` 토큰 및 `DesignButton` 통일, WCAG AA 52/52 통과), ② 모든 버튼 클릭 동작(상단 요약·탭·DAY 필터·일정/지출 카드·상세 모달·하단 CTA), ③ 기능 아이콘(`TripIcon`, `Ionicons` `ellipsis-vertical` 등), ④ 사용자 관점 문구(개발 용어 배제, 한·영·일 `messages.json` 반영), ⑤ DB/도메인 스냅샷 연동(`schedule.save`, `expense.save`, `schedule.reorder` 원자적 버전 제어), ⑥ API 연동(`Google Maps` 길찾기/리뷰 $0 딥링크 + 서버 API 스키마 호환, `npm run typecheck` 및 ESLint 오류 0건 통과)을 점검·완료했다.\n\n## 15. MY 페이지 및 설정 화면 5대 핵심 구성 간소화 개편\n\n사용자가 제시한 MY 레퍼런스 이미지와 5대 필수 구성 원칙(① 공용 타이틀, ② 공용 프로필(이미지·닉네임), ③ 계정 연동(게스트 시 Google 계정 연결 버튼 / Google 회원 시 연동 표시), ④ 공용 설정(언어 변경·이용약관/개인정보 처리방침·로그아웃), ⑤ 공용 앱 버전 정보)에 맞춰 `MyAccountView.tsx`, `AccountProfileCard.tsx`, `MyAccountMenus.tsx`, `SettingsSections.tsx`, `myAccountStyles.ts`를 개편했다.\n\n| 개선 전                                                                                | 개선 후                                                                                                                                   |\n| -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |\n| MY 화면에 여행 통계·보관함 등 중복 메뉴가 섞여 있어 프로필·계정·설정의 집중도가 낮음   | 불필요한 중복 블록을 걷어내고 ① 타이틀 ② 프로필 카드 ③ Google 계정 연결 카드 ④ 환경설정 및 계정(`설정` / `앱 버전 정보`)만 간결하게 배치  |\n| 게스트 기본 아바타와 Google 연결 배너가 텍스트 카드 형태여서 시안과 시각적 차이가 큼   | 피치 코랄 원형 이니셜(`G`) 아바타 + `[게스트]` 알약 배지, Google 로고 아이콘 박스와 풀사이즈 코랄 `[Google 계정 연결]` 버튼 적용          |\n| 설정 화면에서 이용약관·개인정보 처리방침 확인과 앱 버전 정보 시트가 분리되어 있지 않음 | MY의 `앱 버전 정보` 클릭 시 현재 버전 ActionSheet를 표시하고, `설정` 화면 안에 `약관 및 정책`(`서비스 이용약관`·`개인정보 처리방침`) 추가 |\n\n## 16. 페이지별 TC 체크 차트 추가\n\n- 기록일: 2026-11-09 월요일, 한국 시간 기준.\n- 목적: 앱 페이지마다 무엇을 검사할지 정하고, 개발 완료·Android Studio 에뮬레이터·내부 빌드 실기기의 결과를 따로 남긴다.\n- 범위: 일일 보고서 사이트의 ‘페이지별 TC’, TC 정의·결과 파일, 생성 도구와 웹 검수 도구. 앱 화면·공통 헤더·GNB·DB·API와 운영 배포는 이번 변경 대상에 포함하지 않는다.\n- 대상 버전: `main`의 `c470064` 이후 로컬 보고서 사이트 수정본. 같은 작업 폴더에서 진행 중인 여행 일정·가계부 변경은 별도 작업으로 구분한다.\n\n| 개선 전                                                                               | 개선 후                                                                                                         |\n| ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |\n| 검사 결과가 보고서 본문에 흩어져 페이지별 확인과 실기기 검수 여부를 구분하기 어려웠다 | 18개 페이지·64개 TC를 한 차트로 모으고 개발·에뮬레이터·실기기의 성공·실패·미검증을 각각 집계한다                |\n| 단계별 수동 판정과 재현 정보·실패 증거를 함께 남길 화면이 없었다                      | 성공·실패 체크, 검사 순서·기대 결과, 단계별 검수자·빌드·기기·메모·최근 이력을 제공한다                          |\n| 검수 결과를 다른 환경으로 옮기거나 출력할 전용 기능이 없었다                          | TC 전용 JSON 내려받기·가져오기와 현재 선택 항목 인쇄를 제공한다. 잘못된 파일과 저장 실패는 기존 결과를 보존한다 |\n\n앱 실행, 로그인, 기본 프로필, 홈, 내 여행, 커뮤니티, 공개 여행 상세, MY, 설정, 계정 관리, 여행 만들기, 여행 일정, 장소 추가, 영수증 등록, 가계부, 준비물, 동행, 공유를 다룬다. 게스트 서버 저장·재조회는 미구현 후속 과제로 명시하고 기기 저장으로 통과를 대신하지 않는다. 장소 검색과 영수증 OCR은 실제 공급자·저장·재조회 검수를 요구한다.\n\n한 단계에서 성공과 실패를 동시에 체크할 수 없다. 선택한 체크를 해제하면 미검증으로 돌아간다. 개발 성공을 체크해도 나머지 두 단계는 바뀌지 않는다. 세 단계 모두 성공일 때만 해당 TC를 전체 성공으로 집계한다. 체크는 검수자의 수동 기록이며 앱 테스트를 자동 실행하지 않는다. 최초 파일에는 판정을 넣지 않았다.\n\n페이지별 진행 현황을 펼쳐 영역별 수치를 확인하고, 페이지·TC 검색·결과 상태로 항목을 좁힌다. ‘기준·메모’에서 사전 조건 → 조작 순서 → 기대 결과를 읽고 실제 검사 후 결과와 증거를 남긴다. 저장 실패 때는 안내를 읽고 저장 공간을 확인한 뒤 다시 시도한다. 기존 파일 결과를 가져올 때는 같은 TC·단계가 바뀌는 범위를 확인하고 적용한다.\n\n**보관 위치**\n\n- 진입: [일일 보고서 사이트](../index.html)의 왼쪽 ‘페이지별 TC’ 메뉴.\n- 정의: [페이지별 TC 목록](\u003c../../03. 개발/04. 검증/페이지별_TC_목록.json>). 18개 페이지·64 TC, 개정 값 `1`.\n- 프로젝트 결과 원본: [tc-results.json](../tc-results.json). 브라우저에서 체크해도 이 파일을 자동 덮어쓰지 않는다.\n- 화면에서 기록한 결과: 현재 브라우저의 `tripprint.tc-results.v1`. 일지의 `tripprint.daily-journal.v1`과 분리한다. `file://`와 미리보기 주소의 저장 공간도 다르다. 브라우저 변경·초기화 전에 ‘검수 기록 내려받기’로 보관한다.\n- 구현: 문서 리소스 폴더의 `daily-report-tc.js`·`daily-report-tc.css`, 생성 도구 `scripts/design/build-daily-reports.mjs`, 검수 도구 `scripts/qa/verify-report-tc.mjs`.\n\n**검수 기록**\n\n| 대상·사전 조건                           | 조작 순서와 기대 결과                                                                         | 실제 결과·판정                                                                  | 증거                                                                               |\n| ---------------------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |\n| TC 차트 / 격리된 Chrome / HTML 직접 열기 | 단계별 체크·반대 결과 선택·해제·새로고침. 같은 단계는 배타적이고 다른 단계·재조회 결과는 유지 | 통과                                                                            | `outputs/daily-report-site/tc/verification.json`                                   |\n| 상세·파일 / 검수용 값만 사용             | 메모 입력·저장·재진입, JSON 내려받기·적용 취소·복원, 잘못된 파일·HTML 입력·저장 실패 확인     | 통과. 메모만 저장해도 성공으로 바꾸지 않으며 실패 시 기존 자료 유지             | 같은 폴더 `tc-results-test.json`, 검수 도구                                        |\n| 반응형·접근성 / 1440·390·320px·글꼴 200% | 페이지·검색·상태 필터·키보드·48px 체크 영역·상세창·인쇄 확인                                  | 통과. 문서 가로 넘침 없음, 표 내부 가로 스크롤                                  | 같은 폴더 `desktop.png`, `mobile-320.png`, `detail-large-font.png`, `tc-print.pdf` |\n| 기존 보고서 기능 / 별도 격리 브라우저    | 날짜·검색·등록·재조회·수정·삭제·백업·가져오기·인쇄                                            | 통과                                                                            | 같은 폴더 `report-regression.log`                                                  |\n| Android Studio / 내부 빌드               | 앱의 각 TC를 에뮬레이터와 실제 설치본에서 실행                                                | 미검증. 이번 작업은 문서 사이트 제작·웹 검수이며 앱 설치본 검사는 실행하지 않음 | 해당 없음                                                                          |\n\n참조한 [사이트 규격](\u003c../../02. 디자인/01. 화면설계/일일보고서_사이트규격.md>)과 공통 디자인 시스템·토큰에 맞춰 네이비·코럴·LINE Seed·48px 터치 영역을 적용했다. 실제 데스크톱·320px·큰 글꼴 상세창 캡처와 대조했다. 앱 헤더·GNB 변경은 없어 관련 앱 이동 회귀는 이번 변경에 해당하지 않는다. 구조용 스케치가 아닌 실제 HTML 화면을 검수했다.\n\n보고서에 포함된 달러·백틱 조합이 문자열 치환 문법으로 해석되어 생성 HTML의 JSON을 깨뜨리는 문제도 재현·수정했다. 템플릿에 원문을 그대로 넣도록 보완한 뒤 기존 보고서 검수를 통과했다.\n\n- 검토 쟁점 `REPORT-TC-01` / 대상: TC 정의·화면·보관 계약 / 최초 0회. 단계 독립, 초기 미검증, 저장 실패 보존, 실제 앱 검수와 웹 검수의 구분을 확인했다.\n- 남은 작업: 실제 앱 버전과 검수 계정을 준비해 개발 → 에뮬레이터 → 내부 빌드 실기기 순으로 실행하고, 각 단계의 빌드·기기·증거를 함께 기록한다. 실행하지 않은 검사를 체크하지 않는다. 팀 보관이 필요하면 내려받은 결과를 검토한 뒤 프로젝트의 `tc-results.json`에 반영하고 HTML을 다시 생성한다.\n\n전체 품질 검사의 첫 실행에서는 별도 가계부 작업 파일 `expensePaymentMeta.ts` 끝의 여분 빈 줄 한 건을 확인했다. 본문이 같은지 비교한 뒤 파일 끝 공백만 정리했다. 가계부 동작은 변경하지 않았다. 이번 TC 작업은 로컬 수정이며 추가 커밋·푸시·외부 게시·운영 배포는 실행하지 않았다.\n\n## 17. 페이지별 현재 디자인 등록\n\n- 기록일: 2026-11-09 월요일, 한국 시간 기준.\n- 목적: TC를 확인하면서 해당 페이지의 디자인을 함께 보고, 어떤 화면·빌드로 검사했는지 남긴다.\n- 대상: `dee47ec` 이후 로컬 문서 사이트 수정본. 앱 화면·공통 헤더·GNB·API·운영 DB·R2는 바꾸지 않았다.\n\n| 개선 전                                                       | 개선 후                                                                                           |\n| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |\n| 페이지별 TC는 있어도 대조할 화면을 함께 보관할 수 없었다      | 페이지를 선택하면 TC 위에서 현재 디자인 한 장과 제목·버전/빌드·메모·등록 시각을 확인한다          |\n| 실제 앱 화면과 시안·구조 스케치를 구분해 등록할 방법이 없었다 | 실제 앱 캡처·디자인 시안·구조 스케치를 구분한다. 확인되지 않은 과거 이미지를 자동 지정하지 않는다 |\n| 페이지별 디자인 교체·확대·원본 보관·이동 수단이 없었다        | 이미지 추가·수정·교체·크게 보기·원본 내려받기·삭제와 전체 디자인 JSON 백업·복원을 제공한다        |\n\n사용 순서는 ‘페이지별 TC’ → 페이지 선택 → ‘현재 디자인 추가’ → 이미지 종류·제목·파일·버전·메모 입력 → ‘디자인 저장’이다. 저장 뒤 같은 페이지를 다시 열어 이미지와 설명을 확인한다. 전체 페이지 선택 상태에서는 개별 페이지를 먼저 고르도록 안내한다. 이미지가 없으면 등록 안내를 보여준다. 디자인을 등록해도 TC 판정은 자동으로 바뀌지 않는다.\n\nPNG·JPEG·WebP 한 장을 페이지마다 등록한다. 한 장은 2MB 이하이며 가로·세로 각 8,000px, 전체 1,200만 픽셀 이하다. 파일의 바이너리 헤더와 브라우저 해독을 확인한다. 확장자만 바꾼 HTML·SVG, 손상되거나 너무 큰 이미지는 저장하지 않는다. 원본 바이트를 보존하며 비율을 유지해 전체 이미지를 보여준다. 페이지를 빠르게 바꿔도 늦게 읽힌 이전 이미지를 새 페이지에 적용하지 않는다.\n\n이미지는 현재 브라우저의 IndexedDB `tripprint.tc-designs.v1`에 보관한다. 같은 페이지의 디자인을 바꾸면 한 행만 교체한다. 브라우저 초기화나 기기 변경 전에 ‘디자인 백업’을 내려받는다. 가져오기는 모든 페이지·설명·이미지를 먼저 확인하고 교체할 페이지 수를 안내한 뒤 한 번에 적용한다. 실패하면 기존 자료를 유지하고, 저장 실패 시 입력을 보존해 다시 시도하도록 한다. 이 백업은 TC 판정 JSON과 별도이며 프로젝트 폴더나 서버에 자동 저장하지 않는다.\n\n참조한 [일일 보고서 사이트 규격](\u003c../../02. 디자인/01. 화면설계/일일보고서_사이트규격.md>)에 등록·보관·오류·검수 기준을 추가했다. 공통 디자인 토큰·LINE Seed·48px 컨트롤을 유지했다. 실제 1440px·390px·320px와 글꼴 200% 캡처를 대조해 등록 창·확대 보기·긴 제목·빈 상태의 문서 가로 넘침이 없음을 확인했다. 이번 기능에서 앱 공통 헤더·GNB를 변경하지 않아 앱 이동 회귀는 해당하지 않는다.\n\n| 검증 대상·환경·사전 조건                  | 조작 순서·기대 결과                                                     | 실제 결과·판정                                                                     | 증거                                                                                 |\n| ----------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |\n| Chrome / HTML 직접 열기 / 격리한 브라우저 | PNG 등록·설명 입력·저장·새로고침·재조회, JPEG 교체와 원본 내려받기      | 통과. 원본 바이트 일치, 다른 페이지 이미지·TC 결과 독립                            | `outputs/daily-report-site/designs/verification.json`, `browser-final.log`           |\n| 삭제·전체 디자인 백업                     | 삭제 취소/실행, 백업 내려받기, 복원 취소/적용                           | 통과. 선택한 페이지에만 적용하고 파일에 없는 페이지는 유지                         | 같은 폴더 `tc-designs-test.json`, `original.png`                                     |\n| 잘못된 파일·보관 실패                     | 알 수 없는/중복 페이지, 위조 이미지·HTML·SVG·용량 초과, 저장 실패       | 통과. 기존 자료와 입력을 보존하고 실패를 성공으로 알리지 않음                      | 검수 도구 `scripts/qa/verify-report-designs.mjs`                                     |\n| 페이지 전환·반응형                        | 이미지 해독을 지연한 상태에서 다른 페이지 선택, 320px·큰 글꼴·확대 보기 | 통과. 이전 이미지가 섞이지 않고 문서·대화창 가로 넘침 없음                         | 같은 폴더 `desktop.png`, `mobile-320.png`, `editor-large-font.png`, `viewer-320.png` |\n| 실제 앱 디자인 지정·실기기 앱 검사        | 확인된 현재 앱 화면과 빌드를 준비해 각 페이지에 등록하고 TC 실행        | 미검증. 기능 검수에는 ‘실제 앱 디자인 아님’으로 표시한 격리 브라우저 샘플을 사용함 | 초기 프로젝트 자료에 디자인·기기 성공을 임의로 채우지 않음                           |\n\n주요 변경은 `daily-report-designs.js`·`daily-report-designs.css`, TC 연결과 HTML 생성 도구, `test:reports:designs` 명령이다. 브라우저 DB 이름·저장소·필드·타입·용량·교체·복구 기준은 [DB 객체 사전](\u003c../../03. 개발/02. 데이터정의/DB_객체사전.txt>)의 G절에 기록했다. 검토 쟁점 `REPORT-DESIGN-01`은 최초 0회이며 실제 화면/시안 구분·원본 보존·단계 독립·실패 복구를 확인했다. `REPORT-DESIGN-RACE-01`도 최초 0회이며 지연 해독을 재현하고 페이지 구분 상태를 보완했다.\n\n남은 작업은 확인한 실제 앱 캡처와 빌드를 페이지별로 등록하고 개발·에뮬레이터·실기기 검수를 진행하는 것이다. 이번 디자인 등록 기능은 로컬 수정이며 별도 운영 게시·배포는 실행하지 않았다.\n\n## 18. 앱 빌드 버전 14 동기화 및 Android 산출물 저장 경로(`travel_APP_bulid`) 연결\n\n- 기록일: 2026-11-09 월요일, 한국 시간 기준.\n- 목적: 앱 빌드 버전을 `versionCode=14`(`versionName=0.0.1`)로 맞추고, 로컬 Android 빌드(APK·AAB)가 `J:\\002. Project_Service\\travel_APP_bulid` 폴더에 자동 저장되도록 기본 출력 경로를 연결한다.\n\n| 개선 전                                                                              | 개선 후                                                                                                                                         |\n| ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |\n| `ver.text` 및 `apps/mobile/public/release.json`의 `versionCode`가 `16`으로 설정됨    | `ver.text`와 `apps/mobile/public/release.json`의 `versionCode`를 `14`(`versionName=0.0.1`)로 일원화하여 Expo·Gradle·릴리스 메타데이터를 통일    |\n| `scripts/shared/repository-paths.cjs`의 기본 Android 산출물 경로가 `outputs/android` | `androidBuildOutput()` 기본값을 `repositoryPath('../travel_APP_bulid')`(`J:\\002. Project_Service\\travel_APP_bulid`)로 변경하여 기존 이력과 연결 |\n\n**검수 결과**: `app-version`, `build-paths`, `release-metadata`, `android-ci`, `android-export` 릴리스 테스트 25/25 통과, `check-docs.mjs` 문서 45개·링크 211개 오류 0건, `npm run typecheck` 및 ESLint 통과.\n\n최종 검증에서 `npm run check` 전체가 통과했다(종료 코드 0, `outputs/daily-report-site/designs/check-final.log`). 디자인 등록·64 TC 차트·기존 보고서 회귀를 최종 수정본으로 다시 확인했으며 모두 통과했다. 근거는 같은 폴더의 `browser-final.log`, `tc-regression.log`, `report-regression.log`다. 실제 Android 에뮬레이터·내부 빌드 기기 검수는 실행하지 않아 초기 판정을 유지한다.\n",
             "sourceHref": "26.11.09/일일_통합_작업보고서.md",
             "origin": "project"
           }
@@ -3600,6 +3875,541 @@
         }
         return result.join('\n');
       }
+      globalThis.createTcDesigns = function createTcDesigns({
+        pages,
+        notify,
+        download,
+        icon,
+      }) {
+        const doc = globalThis.document,
+          win = globalThis.window;
+        const kinds = {
+          capture: '실제 앱 캡처',
+          design: '디자인 시안',
+          sketch: '구조 스케치',
+        };
+        const types = {
+          'image/png': 'png',
+          'image/jpeg': 'jpg',
+          'image/webp': 'webp',
+        };
+        const pageMap = new Map(pages.map((page) => [page.id, page]));
+        const esc = (value) =>
+          String(value ?? '').replace(
+            /[&<>"']/g,
+            (c) =>
+              ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;',
+              })[c],
+          );
+        let database,
+          slot,
+          pageId,
+          generation = 0,
+          current,
+          thumbnailUrl,
+          previewUrl,
+          viewerUrl,
+          editPage,
+          editRecord,
+          picked,
+          selecting = 0,
+          pendingImport;
+        const date = (value) =>
+          new Intl.DateTimeFormat('ko-KR', {
+            timeZone: 'Asia/Seoul',
+            dateStyle: 'medium',
+            timeStyle: 'short',
+          }).format(new Date(value));
+        function open() {
+          if (database) return database;
+          database = new Promise((resolve, reject) => {
+            const request = win.indexedDB.open('tripprint.tc-designs.v1', 1);
+            request.onupgradeneeded = () =>
+              request.result.createObjectStore('pages', { keyPath: 'pageId' });
+            request.onsuccess = () => {
+              const db = request.result;
+              db.onversionchange = () => {
+                db.close();
+                database = null;
+              };
+              resolve(db);
+            };
+            request.onerror = () => {
+              database = null;
+              reject(
+                new Error(
+                  '디자인 저장소를 열지 못했어요. 브라우저 저장 설정을 확인한 뒤 다시 시도해 주세요.',
+                ),
+              );
+            };
+            request.onblocked = () => {
+              database = null;
+              reject(
+                new Error('다른 창의 보고서를 닫은 뒤 다시 시도해 주세요.'),
+              );
+            };
+          });
+          return database;
+        }
+        async function read(id) {
+          const db = await open();
+          return new Promise((resolve, reject) => {
+            const request = db
+              .transaction('pages', 'readonly')
+              .objectStore('pages');
+            const result = id ? request.get(id) : request.getAll();
+            result.onsuccess = () => resolve(result.result);
+            result.onerror = () =>
+              reject(new Error('디자인을 읽지 못했어요. 다시 시도해 주세요.'));
+          });
+        }
+        async function write(entries, removeId) {
+          const db = await open();
+          return new Promise((resolve, reject) => {
+            // 여러 페이지를 복원할 때도 모두 저장돼야 기존 자료를 교체한다.
+            const failed = () =>
+              reject(
+                new Error(
+                  '디자인을 저장하지 못했어요. 기존 자료는 유지됩니다. 저장 공간을 확인한 뒤 다시 시도해 주세요.',
+                ),
+              );
+            let tx;
+            try {
+              tx = db.transaction('pages', 'readwrite');
+              const store = tx.objectStore('pages');
+              if (removeId) store.delete(removeId);
+              else entries.forEach((entry) => store.put(entry));
+              tx.oncomplete = resolve;
+              tx.onabort = tx.onerror = failed;
+            } catch {
+              tx?.abort();
+              failed();
+            }
+          });
+        }
+        function field(value, max, required = false) {
+          if (
+            typeof value !== 'string' ||
+            value.length > max ||
+            (required && !value.trim())
+          )
+            throw new Error(
+              '디자인 제목·버전·메모의 형식과 길이를 확인해 주세요.',
+            );
+          return value;
+        }
+        function metadata(value) {
+          if (
+            !value ||
+            !pageMap.has(value.pageId) ||
+            typeof value.kind !== 'string' ||
+            !Object.hasOwn(kinds, value.kind) ||
+            typeof value.updatedAt !== 'string' ||
+            !/^\d{4}-\d{2}-\d{2}T/.test(value.updatedAt) ||
+            !Number.isFinite(Date.parse(value.updatedAt))
+          )
+            throw new Error('디자인의 페이지·종류·등록 시각을 확인해 주세요.');
+          return {
+            pageId: value.pageId,
+            kind: value.kind,
+            title: field(value.title, 100, true),
+            build: field(value.build, 160),
+            note: field(value.note, 1000),
+            updatedAt: value.updatedAt,
+          };
+        }
+        async function imageInfo(blob) {
+          if (
+            !(blob instanceof win.Blob) ||
+            !Object.hasOwn(types, blob.type) ||
+            blob.size === 0 ||
+            blob.size > 2 * 1024 * 1024
+          )
+            throw new Error('2MB 이하의 PNG·JPEG·WebP 이미지를 선택해 주세요.');
+          const bytes = new Uint8Array(await blob.slice(0, 12).arrayBuffer());
+          const png = [137, 80, 78, 71, 13, 10, 26, 10].every(
+            (n, i) => bytes[i] === n,
+          );
+          const jpeg = bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255;
+          const webp =
+            String.fromCharCode(...bytes.slice(0, 4)) === 'RIFF' &&
+            String.fromCharCode(...bytes.slice(8, 12)) === 'WEBP';
+          if (
+            !{ 'image/png': png, 'image/jpeg': jpeg, 'image/webp': webp }[
+              blob.type
+            ]
+          )
+            throw new Error(
+              '파일 내용이 이미지 형식과 달라요. PNG·JPEG·WebP 원본을 선택해 주세요.',
+            );
+          const url = win.URL.createObjectURL(blob),
+            img = new win.Image();
+          try {
+            img.src = url;
+            await img.decode();
+            if (
+              !img.naturalWidth ||
+              !img.naturalHeight ||
+              img.naturalWidth > 8000 ||
+              img.naturalHeight > 8000 ||
+              img.naturalWidth * img.naturalHeight > 12000000
+            )
+              throw new Error(
+                '이미지는 가로·세로 8,000px 이하, 전체 1,200만 픽셀 이하로 선택해 주세요.',
+              );
+            return { width: img.naturalWidth, height: img.naturalHeight };
+          } catch (error) {
+            if (error.name === 'EncodingError')
+              throw new Error(
+                '이미지를 읽지 못했어요. 다른 원본 파일을 선택해 주세요.',
+              );
+            throw error;
+          } finally {
+            win.URL.revokeObjectURL(url);
+          }
+        }
+        function revoke(url) {
+          if (url) win.URL.revokeObjectURL(url);
+        }
+        function storageNote() {
+          return '<p class="tc-design-storage">이미지는 이 브라우저에 보관됩니다. 다른 기기로 옮기거나 브라우저를 초기화하기 전에 ‘디자인 백업’을 내려받으세요. TC 결과 파일과 별도입니다.</p>';
+        }
+        async function mount(target, id) {
+          slot = target;
+          pageId = id;
+          current = null;
+          const token = ++generation;
+          revoke(thumbnailUrl);
+          thumbnailUrl = null;
+          if (!pageMap.has(id)) {
+            slot.innerHTML =
+              '<section class="tc-design-panel"><h3>현재 디자인</h3><p>페이지를 하나 선택하면 해당 화면의 디자인을 추가하거나 확인할 수 있어요.</p></section>';
+            return;
+          }
+          slot.innerHTML =
+            '<section class="tc-design-panel"><h3>현재 디자인</h3><p role="status">저장한 디자인을 확인하고 있어요.</p></section>';
+          try {
+            const entry = await read(id);
+            if (token !== generation || !slot.isConnected) return;
+            const loaded = entry
+              ? {
+                  ...metadata(entry),
+                  blob: entry.blob,
+                  ...(await imageInfo(entry.blob)),
+                }
+              : null;
+            if (token !== generation || !slot.isConnected) return;
+            // 이전 페이지의 이미지 해독이 늦어도 새 페이지 상태에 넣지 않는다.
+            current = loaded;
+            render();
+          } catch (error) {
+            if (token !== generation || !slot.isConnected) return;
+            slot.innerHTML = `<section class="tc-design-panel"><h3>현재 디자인</h3><p role="alert">${esc(error.message)}</p><button class="secondary-button" data-design-action="retry">다시 시도</button></section>`;
+            bind();
+          }
+        }
+        function render() {
+          if (!slot?.isConnected) return;
+          if (current) thumbnailUrl = win.URL.createObjectURL(current.blob);
+          slot.innerHTML = `<section class="tc-design-panel" aria-label="선택 페이지의 현재 디자인"><div class="tc-design-heading"><div><p class="eyebrow">${pageId} · PAGE DESIGN</p><h3>현재 디자인</h3></div><div class="tc-design-actions"><button class="quiet-button" data-design-action="backup">디자인 백업</button><button class="quiet-button" data-design-action="import">디자인 가져오기</button><button class="${current ? 'secondary' : 'primary'}-button" data-design-action="edit">${current ? '디자인 수정·교체' : '현재 디자인 추가'}</button></div></div>${current ? `<div class="tc-design-content"><button class="tc-design-thumb" data-design-action="view" aria-label="${esc(current.title)} 크게 보기"><img src="${thumbnailUrl}" alt="${esc(current.title)}"><span>${icon('search')} 크게 보기</span></button><div class="tc-design-info"><span class="tc-design-kind">${kinds[current.kind]}</span><h4>${esc(current.title)}</h4><dl><dt>버전·빌드</dt><dd>${esc(current.build || '입력하지 않음')}</dd><dt>등록·수정</dt><dd>${esc(date(current.updatedAt))}</dd><dt>이미지</dt><dd>${current.width} × ${current.height}px · ${Math.ceil(current.blob.size / 1024)}KB</dd></dl><p class="tc-design-note">${esc(current.note || '등록한 메모가 없어요.')}</p><div class="tc-design-actions"><button class="secondary-button" data-design-action="download">원본 내려받기</button><button class="quiet-button danger-text" data-design-action="delete">디자인 삭제</button></div></div></div>` : `<div class="tc-design-empty"><span class="tc-design-placeholder">${icon('layers')}</span><div><h4>${esc(pageMap.get(pageId).name)}의 디자인을 추가하세요</h4><p>실제 앱 캡처나 시안을 등록하면 이 페이지의 TC와 함께 확인할 수 있어요.<br>등록 전에는 확인되지 않은 화면을 대신 표시하지 않습니다.</p></div></div>`}${storageNote()}</section>`;
+          bind();
+        }
+        function bind() {
+          slot.onclick = (event) => {
+            const action = event.target.closest('[data-design-action]')?.dataset
+              .designAction;
+            if (action === 'edit') showEditor();
+            else if (action === 'view') showViewer();
+            else if (action === 'download')
+              download(
+                current.blob,
+                `${pageId}-design.${types[current.blob.type]}`,
+                current.blob.type,
+              );
+            else if (action === 'delete') confirmDelete();
+            else if (action === 'backup') backup();
+            else if (action === 'import') importInput.click();
+            else if (action === 'retry') mount(slot, pageId);
+          };
+        }
+        const editor = doc.createElement('dialog');
+        editor.className = 'tc-design-editor';
+        editor.setAttribute('aria-labelledby', 'design-editor-title');
+        editor.id = 'tc-design-editor';
+        doc.body.append(editor);
+        function showEditor() {
+          editPage = pageId;
+          editRecord = current;
+          picked = null;
+          selecting++;
+          revoke(previewUrl);
+          previewUrl = current ? win.URL.createObjectURL(current.blob) : null;
+          editor.innerHTML = `<div class="dialog-top"><div><p class="eyebrow">${editPage} · ${esc(pageMap.get(editPage).name)}</p><h2 id="design-editor-title">현재 디자인 ${current ? '수정·교체' : '추가'}</h2></div><button class="icon-button" data-design-close aria-label="디자인 등록 닫기">${icon('close')}</button></div><form id="tc-design-form"><label>이미지 종류<select name="kind">${Object.entries(
+            kinds,
+          )
+            .map(
+              ([value, title]) =>
+                `<option value="${value}" ${current?.kind === value ? 'selected' : ''}>${title}</option>`,
+            )
+            .join(
+              '',
+            )}</select></label><label>제목<input name="title" maxlength="100" required value="${esc(current?.title || pageMap.get(editPage).name)}"></label><label>이미지 파일<input type="file" name="image" accept="image/png,image/jpeg,image/webp" ${current ? '' : 'required'}></label><p class="tc-design-help">PNG·JPEG·WebP · 2MB 이하 · 최대 1,200만 픽셀. 개인정보가 없는 화면을 사용하세요.${current ? ' 파일을 선택하지 않으면 현재 이미지를 유지합니다.' : ''}</p><div class="tc-design-preview" ${previewUrl ? '' : 'hidden'}><img id="tc-design-preview" ${previewUrl ? `src="${previewUrl}"` : ''} alt="저장 전 디자인 미리보기"></div><label>버전·빌드<input name="build" maxlength="160" placeholder="예: 앱 버전, 검수 빌드 번호" value="${esc(current?.build || '')}"></label><label>메모<textarea name="note" maxlength="1000" rows="3" placeholder="확인할 부분이나 이전 화면과 달라진 점">${esc(current?.note || '')}</textarea></label><p class="form-error" id="design-editor-error" role="alert"></p><div class="dialog-actions"><button type="button" class="secondary-button" data-design-close>취소</button><button type="submit" class="primary-button">디자인 저장</button></div></form>`;
+          editor.showModal();
+        }
+        editor.addEventListener('click', (event) => {
+          if (event.target.closest('[data-design-close]')) editor.close();
+        });
+        editor.addEventListener('close', () => {
+          selecting++;
+          picked = null;
+          revoke(previewUrl);
+          previewUrl = null;
+          slot
+            ?.querySelector('[data-design-action="edit"]')
+            ?.focus({ preventScroll: true });
+        });
+        editor.addEventListener('change', async (event) => {
+          if (event.target.name !== 'image') return;
+          const input = event.target,
+            file = input.files[0],
+            token = ++selecting;
+          const submit = editor.querySelector('[type="submit"]');
+          submit.disabled = Boolean(file);
+          picked = null;
+          revoke(previewUrl);
+          previewUrl = editRecord
+            ? win.URL.createObjectURL(editRecord.blob)
+            : null;
+          editor.querySelector('.tc-design-preview').hidden = !previewUrl;
+          const preview = editor.querySelector('#tc-design-preview');
+          if (previewUrl) preview.src = previewUrl;
+          else preview.removeAttribute('src');
+          editor.querySelector('#design-editor-error').textContent = '';
+          if (!file) return;
+          try {
+            const info = await imageInfo(file);
+            if (token !== selecting || !editor.open) return;
+            picked = { blob: file, ...info };
+            revoke(previewUrl);
+            previewUrl = win.URL.createObjectURL(file);
+            editor.querySelector('#tc-design-preview').src = previewUrl;
+            editor.querySelector('.tc-design-preview').hidden = false;
+          } catch (error) {
+            if (token !== selecting) return;
+            input.value = '';
+            editor.querySelector('#design-editor-error').textContent =
+              error.message;
+          } finally {
+            if (token === selecting) submit.disabled = false;
+          }
+        });
+        editor.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const form = event.target,
+            submit = form.querySelector('[type="submit"]');
+          if (form.elements.image.files.length && !picked) {
+            editor.querySelector('#design-editor-error').textContent =
+              '이미지를 확인한 뒤 저장해 주세요.';
+            return;
+          }
+          if (!picked && !editRecord) {
+            editor.querySelector('#design-editor-error').textContent =
+              '이미지를 선택해 주세요.';
+            return;
+          }
+          try {
+            submit.disabled = true;
+            const entry = {
+              ...metadata({
+                pageId: editPage,
+                kind: form.elements.kind.value,
+                title: form.elements.title.value,
+                build: form.elements.build.value,
+                note: form.elements.note.value,
+                updatedAt: new Date().toISOString(),
+              }),
+              ...(picked || {
+                blob: editRecord.blob,
+                width: editRecord.width,
+                height: editRecord.height,
+              }),
+            };
+            await write([entry]);
+            editor.close();
+            if (slot?.isConnected) mount(slot, pageId);
+            notify('이 페이지의 디자인을 저장했어요.');
+          } catch (error) {
+            editor.querySelector('#design-editor-error').textContent =
+              error.message;
+          } finally {
+            submit.disabled = false;
+          }
+        });
+        const viewer = doc.createElement('dialog');
+        viewer.className = 'tc-design-viewer';
+        viewer.id = 'tc-design-viewer';
+        viewer.setAttribute('aria-labelledby', 'design-view-title');
+        doc.body.append(viewer);
+        function showViewer() {
+          if (!current) return;
+          revoke(viewerUrl);
+          viewerUrl = win.URL.createObjectURL(current.blob);
+          viewer.innerHTML = `<div class="dialog-top"><div><p class="eyebrow">${kinds[current.kind]} · ${esc(current.build || '버전 입력 없음')}</p><h2 id="design-view-title">${esc(current.title)}</h2></div><button class="icon-button" data-viewer-close aria-label="디자인 크게 보기 닫기">${icon('close')}</button></div><img src="${viewerUrl}" alt="${esc(current.title)}"><p>${esc(current.note)}</p><button class="secondary-button" data-viewer-close>닫기</button>`;
+          viewer.showModal();
+        }
+        viewer.addEventListener('click', (event) => {
+          if (event.target.closest('[data-viewer-close]')) viewer.close();
+        });
+        viewer.addEventListener('close', () => {
+          revoke(viewerUrl);
+          viewerUrl = null;
+          slot
+            ?.querySelector('[data-design-action="view"]')
+            ?.focus({ preventScroll: true });
+        });
+        const confirm = doc.createElement('dialog');
+        confirm.className = 'confirm-dialog';
+        confirm.id = 'tc-design-confirm';
+        confirm.setAttribute('aria-labelledby', 'design-confirm-title');
+        doc.body.append(confirm);
+        confirm.addEventListener('close', () => {
+          pendingImport = null;
+        });
+        function confirmDelete() {
+          pendingImport = null;
+          confirm.innerHTML = `<h2 id="design-confirm-title">이 페이지의 디자인을 삭제할까요?</h2><p>${esc(pageMap.get(pageId).name)}에 등록한 이미지·메모를 지웁니다. TC 결과와 다른 페이지의 디자인은 유지합니다.</p><p class="form-error" role="alert"></p><div class="dialog-actions"><button class="secondary-button" data-design-cancel>취소</button><button class="primary-button" data-design-remove="${pageId}">디자인 삭제</button></div>`;
+          confirm.showModal();
+        }
+        confirm.addEventListener('click', async (event) => {
+          if (event.target.closest('[data-design-cancel]')) {
+            confirm.close();
+            return;
+          }
+          const removeId = event.target.closest('[data-design-remove]')?.dataset
+              .designRemove,
+            apply = event.target.closest('[data-design-apply]');
+          if (!removeId && !apply) return;
+          const button = event.target.closest('button');
+          button.disabled = true;
+          try {
+            await write(pendingImport || [], removeId);
+            confirm.close();
+            if (slot?.isConnected) mount(slot, pageId);
+            notify(
+              removeId
+                ? '이 페이지의 디자인을 삭제했어요.'
+                : '디자인 백업을 가져왔어요.',
+            );
+            pendingImport = null;
+          } catch (error) {
+            confirm.querySelector('.form-error').textContent = error.message;
+          } finally {
+            button.disabled = false;
+          }
+        });
+        function dataUrl(blob) {
+          return new Promise((resolve, reject) => {
+            const reader = new win.FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () =>
+              reject(
+                new Error(
+                  '이미지를 백업 파일로 읽지 못했어요. 다시 시도해 주세요.',
+                ),
+              );
+            reader.readAsDataURL(blob);
+          });
+        }
+        async function backup() {
+          try {
+            const entries = await read();
+            if (!entries.length) {
+              notify(
+                '백업할 디자인이 없어요. 페이지의 디자인을 먼저 추가해 주세요.',
+              );
+              return;
+            }
+            const saved = [];
+            for (const entry of entries)
+              saved.push({
+                ...metadata(entry),
+                dataUrl: await dataUrl(entry.blob),
+              });
+            download(
+              JSON.stringify({ schemaVersion: 1, entries: saved }, null, 2),
+              'tc-designs.json',
+              'application/json;charset=utf-8',
+            );
+            notify('전체 페이지의 디자인 백업을 내려받습니다.');
+          } catch (error) {
+            notify(error.message);
+          }
+        }
+        const importInput = doc.createElement('input');
+        importInput.hidden = true;
+        importInput.type = 'file';
+        importInput.accept = 'application/json,.json';
+        importInput.id = 'tc-design-import';
+        doc.body.append(importInput);
+        importInput.addEventListener('change', async (event) => {
+          const file = event.target.files[0];
+          if (!file) return;
+          try {
+            if (file.size > 60 * 1024 * 1024)
+              throw new Error('디자인 백업은 60MB 이하로 선택해 주세요.');
+            const value = JSON.parse(await file.text());
+            if (
+              value?.schemaVersion !== 1 ||
+              !Array.isArray(value.entries) ||
+              !value.entries.length ||
+              value.entries.length > pages.length
+            )
+              throw new Error(
+                '현재 페이지 목록에 맞는 디자인 백업 JSON을 선택해 주세요.',
+              );
+            const entries = [],
+              ids = new Set();
+            for (const item of value.entries) {
+              const meta = metadata(item);
+              if (ids.has(meta.pageId))
+                throw new Error('같은 페이지가 중복된 디자인 백업이에요.');
+              ids.add(meta.pageId);
+              if (
+                typeof item.dataUrl !== 'string' ||
+                item.dataUrl.length > 2800000 ||
+                !/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(
+                  item.dataUrl,
+                )
+              )
+                throw new Error('백업의 이미지 형식을 확인해 주세요.');
+              const [header, body] = item.dataUrl.split(','),
+                mime = header.slice(5, header.indexOf(';')),
+                bytes = Uint8Array.from(win.atob(body), (c) => c.charCodeAt(0)),
+                blob = new win.Blob([bytes], { type: mime });
+              entries.push({ ...meta, blob, ...(await imageInfo(blob)) });
+            }
+            pendingImport = entries;
+            confirm.innerHTML = `<h2 id="design-confirm-title">디자인 백업을 가져올까요?</h2><p>${entries.length}개 페이지의 디자인을 교체합니다. 파일에 없는 페이지와 TC 결과는 유지합니다. 현재 디자인이 필요하면 먼저 백업해 주세요.</p><p class="form-error" role="alert"></p><div class="dialog-actions"><button class="secondary-button" data-design-cancel>취소</button><button class="primary-button" data-design-apply>디자인 적용</button></div>`;
+            confirm.showModal();
+          } catch (error) {
+            pendingImport = null;
+            notify(
+              error instanceof SyntaxError
+                ? '디자인 백업 JSON을 읽지 못했어요. 기존 자료는 유지합니다.'
+                : error.message,
+            );
+          } finally {
+            event.target.value = '';
+          }
+        });
+        return { mount };
+      };
+
       globalThis.createTcChart = function createTcChart({
         catalog,
         source,
@@ -3609,6 +4419,12 @@
       }) {
         const doc = globalThis.document,
           win = globalThis.window;
+        const designs = globalThis.createTcDesigns({
+          pages: catalog.pages,
+          notify,
+          download,
+          icon,
+        });
         const key = 'tripprint.tc-results.v1';
         const stages = [
           {
@@ -3903,7 +4719,7 @@
             )
             .join(
               '',
-            )}</select></label></div><div class="tc-list-heading"><div><h3>${selected ? `${selected.id} · ${esc(selected.name)}` : '전체 페이지'}</h3><p>${selected ? esc(selected.route) : '페이지별로 기능과 결과를 확인합니다.'}</p></div><span>${visible.length}개 표시 · 전체 ${catalog.pages.length}개 페이지 / ${cases.length} TC</span></div><p class="tc-scroll-hint">표를 좌우로 밀어 세 단계의 결과를 확인하세요.</p><div class="tc-table-scroll" tabindex="0" role="region" aria-label="페이지별 TC 체크 차트"><table class="tc-matrix"><thead><tr><th>TC · 검사 내용</th>${stages.map((stage, i) => `<th><span class="tc-column-step">0${i + 1}</span>${stage.title}<small>${stage.description}</small></th>`).join('')}<th>상세·기록</th></tr></thead><tbody>${
+            )}</select></label></div><div class="tc-list-heading"><div><h3>${selected ? `${selected.id} · ${esc(selected.name)}` : '전체 페이지'}</h3><p>${selected ? esc(selected.route) : '페이지별로 기능과 결과를 확인합니다.'}</p></div><span>${visible.length}개 표시 · 전체 ${catalog.pages.length}개 페이지 / ${cases.length} TC</span></div><div id="tc-design-slot"></div><p class="tc-scroll-hint">표를 좌우로 밀어 세 단계의 결과를 확인하세요.</p><div class="tc-table-scroll" tabindex="0" role="region" aria-label="페이지별 TC 체크 차트"><table class="tc-matrix"><thead><tr><th>TC · 검사 내용</th>${stages.map((stage, i) => `<th><span class="tc-column-step">0${i + 1}</span>${stage.title}<small>${stage.description}</small></th>`).join('')}<th>상세·기록</th></tr></thead><tbody>${
             visible.length
               ? visible
                   .map(
@@ -3922,6 +4738,7 @@
           }</tbody></table></div><p class="tc-bottom-note">전체 기준: 3단계 성공 ${overall.pass} · 실패 있음 ${overall.fail} · 완료 전 ${overall.unverified}. 웹 자동 검사 통과만으로 에뮬레이터·실기기 성공을 표시하지 않습니다.</p></section>`;
           if (selectedPage === 'all')
             doc.getElementById('tc-page-select').value = 'all';
+          designs.mount(host.querySelector('#tc-design-slot'), selectedPage);
           refreshPrint();
           if (!attached) {
             host.addEventListener('change', onChange);

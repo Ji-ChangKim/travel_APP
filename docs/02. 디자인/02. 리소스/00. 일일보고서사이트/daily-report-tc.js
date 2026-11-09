@@ -7,6 +7,12 @@ globalThis.createTcChart = function createTcChart({
 }) {
   const doc = globalThis.document,
     win = globalThis.window;
+  const designs = globalThis.createTcDesigns({
+    pages: catalog.pages,
+    notify,
+    download,
+    icon,
+  });
   const key = 'tripprint.tc-results.v1';
   const stages = [
     {
@@ -296,7 +302,7 @@ globalThis.createTcChart = function createTcChart({
       )
       .join(
         '',
-      )}</select></label></div><div class="tc-list-heading"><div><h3>${selected ? `${selected.id} · ${esc(selected.name)}` : '전체 페이지'}</h3><p>${selected ? esc(selected.route) : '페이지별로 기능과 결과를 확인합니다.'}</p></div><span>${visible.length}개 표시 · 전체 ${catalog.pages.length}개 페이지 / ${cases.length} TC</span></div><p class="tc-scroll-hint">표를 좌우로 밀어 세 단계의 결과를 확인하세요.</p><div class="tc-table-scroll" tabindex="0" role="region" aria-label="페이지별 TC 체크 차트"><table class="tc-matrix"><thead><tr><th>TC · 검사 내용</th>${stages.map((stage, i) => `<th><span class="tc-column-step">0${i + 1}</span>${stage.title}<small>${stage.description}</small></th>`).join('')}<th>상세·기록</th></tr></thead><tbody>${
+      )}</select></label></div><div class="tc-list-heading"><div><h3>${selected ? `${selected.id} · ${esc(selected.name)}` : '전체 페이지'}</h3><p>${selected ? esc(selected.route) : '페이지별로 기능과 결과를 확인합니다.'}</p></div><span>${visible.length}개 표시 · 전체 ${catalog.pages.length}개 페이지 / ${cases.length} TC</span></div><div id="tc-design-slot"></div><p class="tc-scroll-hint">표를 좌우로 밀어 세 단계의 결과를 확인하세요.</p><div class="tc-table-scroll" tabindex="0" role="region" aria-label="페이지별 TC 체크 차트"><table class="tc-matrix"><thead><tr><th>TC · 검사 내용</th>${stages.map((stage, i) => `<th><span class="tc-column-step">0${i + 1}</span>${stage.title}<small>${stage.description}</small></th>`).join('')}<th>상세·기록</th></tr></thead><tbody>${
       visible.length
         ? visible
             .map(
@@ -315,6 +321,7 @@ globalThis.createTcChart = function createTcChart({
     }</tbody></table></div><p class="tc-bottom-note">전체 기준: 3단계 성공 ${overall.pass} · 실패 있음 ${overall.fail} · 완료 전 ${overall.unverified}. 웹 자동 검사 통과만으로 에뮬레이터·실기기 성공을 표시하지 않습니다.</p></section>`;
     if (selectedPage === 'all')
       doc.getElementById('tc-page-select').value = 'all';
+    designs.mount(host.querySelector('#tc-design-slot'), selectedPage);
     refreshPrint();
     if (!attached) {
       host.addEventListener('change', onChange);

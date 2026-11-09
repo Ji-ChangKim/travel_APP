@@ -461,3 +461,22 @@ updatedAt | string ISO datetime | 기존 속성 | user.updatedAt·changed_at·R2
 
 적용 순서: 대상 DB·백업 상태 확인 → 0016 마이그레이션 → 새 API → 앱. 원격 DB·R2·운영 배포는 이번 로컬 구현에서 변경하지 않았다.
 복구: 앱/API를 이전 버전으로 되돌릴 때 새 테이블·R2 객체를 즉시 삭제하지 않는다. 새 닉네임·사진을 보존한 상태에서 이전 개인정보 정리 작업이 이 자료를 지우지 않는지 확인한 뒤 복구 범위를 정한다. 운영 적용·삭제는 별도 승인 범위를 따른다.
+
+================================================================================
+G. 일일 보고서 사이트 / 페이지별 현재 디자인 (브라우저 전용)
+================================================================================
+DB명: IndexedDB tripprint.tc-designs.v1 / schema version 1. file://와 HTTP 미리보기 등 각 브라우저 출처별 별도 보관. 서버 D1·R2와 무관하다.
+저장소(테이블)명: pages / 페이지당 현재 디자인 이미지 한 장과 검수용 설명. keyPath pageId, 별도 인덱스 없음.
+pageId | string | NOT NULL, PK, 현행 TC 목록의 P01~P18 | 기본값 없음 | 같은 페이지 put은 해당 한 행만 교체. 알 수 없는 페이지·가져오기 중 중복 ID 거부
+kind | string enum | NOT NULL, capture/design/sketch | 입력 화면 기본 capture | 실제 앱 캡처/디자인 시안/구조 스케치를 구분하는 등록자 선택값. 자동 진위 확인을 뜻하지 않음
+title | string | NOT NULL, 공백만 금지, 최대 100자 | 입력 화면 기본 페이지 이름 | 디자인 제목. 표시 시 HTML 이스케이프
+build | string | NOT NULL, 최대 160자 | 빈 문자열 | 앱 버전·검수 빌드 등의 선택 설명
+note | string | NOT NULL, 최대 1000자 | 빈 문자열 | 차이·확인 사항을 적는 선택 메모
+updatedAt | string ISO datetime | NOT NULL, 유효한 시각 | 저장 시 현재 시각 | 한국 시간 표시. 백업 복원 시 파일 시각 보존
+blob | Blob 또는 File(IndexedDB 구조화 복제) | NOT NULL, 0 < size <= 2097152 | 기본값 없음 | PNG/JPEG/WebP 원본. MIME·바이너리 헤더·브라우저 이미지 해독 확인. SVG/HTML 거부. 자동 변환하지 않음
+width | number integer | NOT NULL, 1~8000 | 이미지에서 해독 | 실제 이미지 폭. 복원 시 재계산
+height | number integer | NOT NULL, 1~8000 | 이미지에서 해독 | 실제 이미지 높이. width*height <=12000000
+원자성: 페이지 교체·삭제와 여러 페이지 복원은 readwrite 트랜잭션으로 실행한다. 실패하면 기존 자료를 유지하며 TC 결과 localStorage에는 쓰지 않는다.
+초기 상태: 행 없음. 앱의 과거 캡처·시안·구조 스케치를 현재 디자인으로 자동 등록하지 않는다. 실제 앱 계정·사진 저장소가 아닌 문서 검수 도구다.
+백업 객체: {schemaVersion:1,entries:[{pageId,kind,title,build,note,updatedAt,dataUrl}]}. dataUrl은 허용된 MIME의 base64 이미지이며 한 장 2MB·파일 60MB·최대 현행 페이지 수를 검사한다. width/height는 복원할 이미지에서 다시 해독한다.
+복원: 먼저 전체 형식·이미지를 검사하고 교체할 페이지 수를 안내한 뒤 적용한다. 파일에 없는 페이지와 TC 판정은 유지한다. 브라우저 초기화 전 JSON 또는 원본 이미지 내려받기로 보관한다. 프로젝트 파일·서버에 자동 반영하지 않는다.
