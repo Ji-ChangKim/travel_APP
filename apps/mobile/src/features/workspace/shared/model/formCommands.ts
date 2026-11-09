@@ -6,6 +6,7 @@ import { publicationInput } from '../../community/model/publication';
 import { receiptItems } from '../../receipt/model/receiptChecks';
 import { schedulePlanInput } from '../../schedule/model/schedulePlanInput';
 import { destinationCommandInput } from '../../planning/model/destinationForms';
+import { setExpensePaymentMeta } from '../../my-trips/model/expensePaymentMeta';
 
 export function formCommandValue(form: PlanForm, snapshot: WorkspaceSnapshot) {
   // 문자열 폼의 변환만 담당하고 저장 전 스키마 검증은 호출부에서 한 번 수행한다.
@@ -112,6 +113,12 @@ function lastScheduleId(
 
 function expenseInput(form: PlanForm, snapshot: WorkspaceSnapshot) {
   const values = form.values;
+  if (values.paymentMethod === 'CARD' || values.paymentMethod === 'CASH') {
+    setExpensePaymentMeta(form.id, { paymentMethod: values.paymentMethod });
+  }
+  if (values.splitType === 'SHARED' || values.splitType === 'PERSONAL') {
+    setExpensePaymentMeta(form.id, { splitType: values.splitType });
+  }
   return {
     id: form.id,
     title: values.title,
@@ -126,7 +133,9 @@ function expenseInput(form: PlanForm, snapshot: WorkspaceSnapshot) {
             (item) => item.id === values.scheduleId,
           )?.dayId,
         }
-      : {}),
+      : values.dayId
+        ? { dayId: values.dayId }
+        : {}),
   };
 }
 

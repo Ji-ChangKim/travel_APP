@@ -26,7 +26,7 @@ export function memberRoleLabel(role: string): string {
 
 // 여행 상세의 작업 영역을 같은 순서와 이름으로 표시한다.
 export const workspaceSections = [
-  ['itinerary', '일정'],
+  ['itinerary', '여행 계획'],
   ['expenses', '가계부'],
   ['map', '지도'],
   ['photos', '사진·영수증'],

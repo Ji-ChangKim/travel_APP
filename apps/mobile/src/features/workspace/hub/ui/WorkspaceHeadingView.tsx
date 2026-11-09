@@ -50,7 +50,7 @@ function formatTripNightsDays(startDate: string, endDate: string): string {
     : t('당일치기');
 }
 
-// 여행일정 타원 배지에 들어갈 날짜 범위(동일 연도·연도 변경·일정 미정)와 박수를 조합한다.
+// 히어로 요약 영역의 일정 기간 문구(일정 05.15 ~ 05.19 (4박 5일) / 연도 변경 / 일정 미정)를 조합한다.
 function formatTripSchedulePillLabel(snapshot: WorkspaceSnapshot): string {
   // 날짜가 확정된 경우 동일 연도는 MM.DD, 해가 바뀌면 YY.MM.DD 형식으로 표기한다.
   if (validTripDates(snapshot.trip)) {
@@ -63,17 +63,21 @@ function formatTripSchedulePillLabel(snapshot: WorkspaceSnapshot): string {
     const dateRange =
       startDate === endDate
         ? fmt(startDate)
-        : `${fmt(startDate)}~${fmt(endDate)}`;
+        : `${fmt(startDate)} ~ ${fmt(endDate)}`;
     const nightsDays = formatTripNightsDays(startDate, endDate);
-    return nightsDays ? `${dateRange} (${nightsDays})` : dateRange;
+    return nightsDays
+      ? `${t('일정')} ${dateRange} (${nightsDays})`
+      : `${t('일정')} ${dateRange}`;
   }
   const dayCount = Math.max(1, snapshot.days.length);
-  return dayCount > 1
-    ? t('{p0}박 {p1}일', { p0: dayCount - 1, p1: dayCount })
-    : t('당일치기');
+  const duration =
+    dayCount > 1
+      ? t('{p0}박 {p1}일', { p0: dayCount - 1, p1: dayCount })
+      : t('당일치기');
+  return `${t('일정')} (${duration})`;
 }
 
-// 상단 요약 박스에 1행(여행 타이틀)과 2행((여행일정) 타원 배지 | 동반자)을 표시한다.
+// 04_1 히어로 요약(1행: 여행 제목 + 우측 지도 버튼 / 2행: 좌측 동행 아바타 그룹 + [+] | 우측 일정 기간)을 표시한다.
 export function renderWorkspaceSummary({
   snapshot,
   router,
@@ -87,30 +91,83 @@ export function renderWorkspaceSummary({
   const presentation = tripPresentation(snapshot.trip);
   const scheduleLabel = formatTripSchedulePillLabel(snapshot);
   const locked = Boolean(busy || scanning || hasPending);
+  const visibleMembers = snapshot.members.slice(0, 3);
 
   return (
     <View style={hub.tripHeader} testID="trip-overview-card">
       <View style={hub.summaryTitleRow}>
         <ScreenTitle grow>{snapshot.trip.title}</ScreenTitle>
-        {owner && openDraft ? (
-          <Pressable
-            testID="trip-overview-edit"
-            accessibilityRole="button"
-            accessibilityLabel={t('여행 기본 정보 수정')}
-            disabled={locked}
-            onPress={() => {
-              // 여행 타이틀 행 우측의 수정 버튼으로 기본 정보 편집 시트를 연다.
-              return openDraft('metadata');
-            }}
-            style={hub.editButton}
-          >
-            <TripIcon name="journal-outline" size={14} color={colors.muted} />
-            <Text style={hub.editButtonText}>{t('수정')}</Text>
-          </Pressable>
-        ) : null}
+        <View style={hub.summaryTitleRight}>
+          {owner && openDraft ? (
+            <Pressable
+              testID="trip-overview-edit"
+              accessibilityRole="button"
+              accessibilityLabel={t('여행 기본 정보 수정')}
+              disabled={locked}
+              onPress={() => {
+                // 여행 타이틀 우측의 수정 버튼으로 기본 정보 편집 시트를 연다.
+                return openDraft('metadata');
+              }}
+              style={hub.editButton}
+            >
+              <TripIcon name="journal-outline" size={14} color={colors.muted} />
+              <Text style={hub.editButtonText}>{t('수정')}</Text>
+            </Pressable>
+          ) : null}
+          {setActiveSection ? (
+            <Pressable
+              testID="trip-hero-map-btn"
+              accessibilityRole="button"
+              accessibilityLabel={t('동선 지도 보기')}
+              disabled={locked}
+              onPress={() => {
+                // 우측 상단 지도 아이콘 버튼으로 동선 지도 영역을 즉시 연다.
+                setActiveSection('map');
+              }}
+              style={hub.heroMapIconBtn}
+            >
+              <TripIcon
+                name="map-outline"
+                size={18}
+                color={colors.brandCoral}
+              />
+            </Pressable>
+          ) : null}
+        </View>
       </View>
-      <View style={hub.summaryDivider} />
       <View style={hub.summaryBottomRow}>
+        <Pressable
+          testID="trip-companion-badge"
+          accessibilityRole="button"
+          accessibilityLabel={t('동행 관리 ({p0})', {
+            p0: t('동행 {p0}명', {
+              p0: Math.max(1, snapshot.members.length),
+            }),
+          })}
+          disabled={locked || !setActiveSection}
+          onPress={() => {
+            // 좌측 동행 아바타 스택 및 [+] 버튼을 눌러 동행 초대/관리 화면을 연다.
+            setActiveSection?.('companions');
+          }}
+          style={hub.avatarStackRow}
+        >
+          {(visibleMembers.length
+            ? visibleMembers
+            : [{ memberId: 'me', nickname: t('나') }]
+          ).map((member, index) => (
+            <View
+              key={member.memberId}
+              style={[hub.avatarCircle, index > 0 && hub.avatarOverlap]}
+            >
+              <Text style={hub.avatarInitialText}>
+                {(member.nickname || '여행').slice(0, 1)}
+              </Text>
+            </View>
+          ))}
+          <View style={hub.avatarPlusCircle} aria-hidden>
+            <TripIcon name="plus-outline" size={13} color={colors.text} />
+          </View>
+        </Pressable>
         {owner && openDraft ? (
           <Pressable
             testID="trip-schedule-pill"
@@ -120,55 +177,16 @@ export function renderWorkspaceSummary({
             })}
             disabled={locked}
             onPress={() => {
-              // (여행일정) 타원 배지를 눌러 여행 기간을 수정한다.
+              // 우측 일정 기간 문구를 눌러 여행 기간을 수정한다.
               return openDraft('period');
             }}
             style={hub.summarySchedulePill}
           >
-            <TripIcon
-              name="calendar-outline"
-              size={14}
-              color={colors.primary}
-            />
             <Text style={hub.summarySchedulePillText}>{scheduleLabel}</Text>
           </Pressable>
         ) : (
           <View style={hub.summarySchedulePill} testID="trip-schedule-pill">
-            <TripIcon
-              name="calendar-outline"
-              size={14}
-              color={colors.primary}
-            />
             <Text style={hub.summarySchedulePillText}>{scheduleLabel}</Text>
-          </View>
-        )}
-        {setActiveSection ? (
-          <Pressable
-            testID="trip-companion-badge"
-            accessibilityRole="button"
-            accessibilityLabel={t('동행 관리 ({p0})', {
-              p0: t('동행 {p0}명', {
-                p0: Math.max(1, snapshot.members.length),
-              }),
-            })}
-            disabled={locked}
-            onPress={() => {
-              // 우측 동반자 영역을 눌러 동행 목록 및 초대 화면을 연다.
-              setActiveSection('companions');
-            }}
-            style={hub.summaryCompanionBtn}
-          >
-            <TripIcon name="user-outline" size={15} color={colors.primary} />
-            <Text style={hub.summaryCompanionText}>
-              {t('동행 {p0}명', { p0: Math.max(1, snapshot.members.length) })}
-            </Text>
-          </Pressable>
-        ) : (
-          <View style={hub.summaryCompanionBtn} testID="trip-companion-badge">
-            <TripIcon name="user-outline" size={15} color={colors.primary} />
-            <Text style={hub.summaryCompanionText}>
-              {t('동행 {p0}명', { p0: Math.max(1, snapshot.members.length) })}
-            </Text>
           </View>
         )}
       </View>

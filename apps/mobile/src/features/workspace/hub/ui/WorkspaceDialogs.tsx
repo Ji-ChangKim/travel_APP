@@ -1,9 +1,9 @@
 import { t } from '@/features/localization/translate';
-import { colors } from '@/constants/theme';
+import DesignButton from '@/components/ui/DesignButton';
 import { Ionicons } from '@expo/vector-icons';
 import type { WorkspaceSchedule, WorkspaceSnapshot } from '@wherego/domain';
 import type { Dispatch, SetStateAction } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import PlanEditor from '../../my-trips/manager/PlanEditor';
 import ReceiptCapture from '../../receipt/ui/ReceiptCapture';
 import { TripMoreMenu } from './TripSectionNavigation';
@@ -216,7 +216,7 @@ export function renderWorkspaceMoreMenu({
   );
 }
 
-// 선택 DAY에 맞는 하단 중앙 원형 ( + ) 일정 추가 버튼을 제공한다.
+// 04_1 하단 고정 액션바([ 🗺️ 동선 지도 보기 ] | [ + 일정 추가 ])를 제공한다.
 export function renderWorkspaceAddSchedule({
   busy,
   scanning,
@@ -224,6 +224,7 @@ export function renderWorkspaceAddSchedule({
   actions,
   selectedDay,
   snapshot,
+  setActiveSection,
 }: {
   busy: boolean;
   scanning: boolean;
@@ -231,6 +232,7 @@ export function renderWorkspaceAddSchedule({
   actions: WorkspaceScreenActions;
   selectedDay: string;
   snapshot: WorkspaceSnapshot | undefined;
+  setActiveSection?: Dispatch<SetStateAction<string>>;
 }): import('react').ReactNode {
   const dayId =
     snapshot?.days.find((day) => day.id === selectedDay)?.id ||
@@ -238,36 +240,33 @@ export function renderWorkspaceAddSchedule({
     '';
   const locked = busy || scanning || hasPending;
   return (
-    <View style={hub.primaryBar} testID="trip-primary-action">
-      <Pressable
-        testID="trip-center-plus-button"
-        accessibilityRole="button"
-        accessibilityLabel={t('장소 추가')}
-        disabled={locked}
-        onPress={() => {
-          // 하단 중앙 ( + ) 버튼을 눌러 선택한 DAY에 새 일정을 추가한다.
-          return actions.addSchedule(dayId);
-        }}
-        style={({ pressed }) => [
-          hub.centerPlusButton,
-          pressed && hub.centerPlusPressed,
-          locked && hub.centerPlusDisabled,
-        ]}
-      >
-        {({ pressed }) => (
-          <Ionicons
-            name="add"
-            size={28}
-            color={
-              locked
-                ? colors.muted
-                : pressed
-                  ? colors.actionPressedForeground
-                  : colors.actionForeground
-            }
+    <View
+      style={[hub.primaryBar, hub.primaryActionRow]}
+      testID="trip-primary-action"
+    >
+      {setActiveSection && (
+        <View style={hub.secondaryActionWrap}>
+          <DesignButton
+            label={t('동선 지도 보기')}
+            accessibilityLabel={t('동선 지도 보기')}
+            disabled={locked}
+            icon={(color) => (
+              <Ionicons name="map-outline" size={18} color={color} />
+            )}
+            onPress={() => setActiveSection('map')}
           />
-        )}
-      </Pressable>
+        </View>
+      )}
+      <View style={hub.primaryActionWrap}>
+        <DesignButton
+          label={t('일정 추가')}
+          accessibilityLabel={t('장소 추가')}
+          variant="primary"
+          disabled={locked}
+          icon={(color) => <Ionicons name="add" size={20} color={color} />}
+          onPress={() => actions.addSchedule(dayId)}
+        />
+      </View>
     </View>
   );
 }

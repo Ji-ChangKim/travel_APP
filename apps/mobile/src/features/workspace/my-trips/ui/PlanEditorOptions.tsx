@@ -7,6 +7,11 @@ import type { PlanForm } from '../../shared/model/forms';
 import { DestinationFields } from '../../planning/ui/TravelInputs';
 import { Action } from '../../shared/ui/ui';
 import { styles } from '../../hub/styles/workspaceStyles';
+import {
+  resolveExpensePaymentMethod,
+  resolveExpenseSplitType,
+  setExpensePaymentMeta,
+} from '../model/expensePaymentMeta';
 
 type EditorOptionProps = {
   form: PlanForm;
@@ -75,10 +80,61 @@ const EXPENSE_CATEGORIES = [
 
 export function ExpenseOptions({ form, onChange }: EditorOptionProps) {
   useLocale();
+  const paymentMethod =
+    (form.values.paymentMethod as 'CARD' | 'CASH' | undefined) ||
+    resolveExpensePaymentMethod({
+      id: form.id,
+      title: form.values.title || '',
+    });
+  const splitType =
+    (form.values.splitType as 'SHARED' | 'PERSONAL' | undefined) ||
+    resolveExpenseSplitType({ id: form.id, title: form.values.title || '' }, 2);
   return (
     <>
       {form.kind === 'expense' && (
         <View style={styles.card}>
+          <Text style={styles.title}>{t('결제 수단')}</Text>
+          <View style={styles.row}>
+            <Action
+              label={`💳 ${t('카드 (Card)')}`}
+              selected={paymentMethod === 'CARD'}
+              onPress={() => {
+                // 카드 결제로 구분한다.
+                setExpensePaymentMeta(form.id, { paymentMethod: 'CARD' });
+                onChange('paymentMethod', 'CARD');
+              }}
+            />
+            <Action
+              label={`💵 ${t('현금 (Cash)')}`}
+              selected={paymentMethod === 'CASH'}
+              onPress={() => {
+                // 현금 결제로 구분한다.
+                setExpensePaymentMeta(form.id, { paymentMethod: 'CASH' });
+                onChange('paymentMethod', 'CASH');
+              }}
+            />
+          </View>
+          <Text style={styles.title}>{t('정산 방식')}</Text>
+          <View style={styles.row}>
+            <Action
+              label={t('공동 정산')}
+              selected={splitType === 'SHARED'}
+              onPress={() => {
+                // 동행자 1/N 공동 정산 항목으로 지정한다.
+                setExpensePaymentMeta(form.id, { splitType: 'SHARED' });
+                onChange('splitType', 'SHARED');
+              }}
+            />
+            <Action
+              label={t('개인 지출')}
+              selected={splitType === 'PERSONAL'}
+              onPress={() => {
+                // 개인 전액 부담 항목으로 지정한다.
+                setExpensePaymentMeta(form.id, { splitType: 'PERSONAL' });
+                onChange('splitType', 'PERSONAL');
+              }}
+            />
+          </View>
           <Text style={styles.title}>{t('지출 분류')}</Text>
           <View style={styles.row}>
             {EXPENSE_CATEGORIES.map((cat) => (

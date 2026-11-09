@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { useState } from 'react';
 import DesignButton from '@/components/ui/DesignButton';
 import ActionSheet from '@/components/ui/ActionSheet';
-import TripIcon, { type TripIconName } from '@/components/icons/TripIcon';
+import type { TripIconName } from '@/components/icons/TripIcon';
 import Text from '@/components/ui/AppText';
 import { colors } from '@/constants/theme';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
@@ -16,7 +16,7 @@ const sectionIcons: Record<string, TripIconName> = {
   expenses: 'receipt-scan-outline',
 };
 
-// 핵심 두 영역(일정·지출)을 세그먼트 탭으로 고정하고 부가 기능은 더보기에서 연다.
+// 핵심 두 영역(여행 계획·가계부)을 좌측 캡슐 탭으로, 공유를 우측 캡슐 버튼으로 표시한다.
 export function TripSectionNavigation({
   selected,
   onSelect,
@@ -30,26 +30,37 @@ export function TripSectionNavigation({
     <View
       accessibilityLabel={t('여행 작업 영역')}
       testID="trip-section-navigation"
-      style={s.nav}
+      style={s.navRow}
     >
-      {workspaceSections.slice(0, 2).map(([key, label]) => (
-        <SectionButton
-          key={key}
-          icon={sectionIcons[key] || 'checklist-outline'}
-          label={t(label)}
-          selected={selected === key}
-          onPress={() => {
-            /* 실제 영역 하나만 연다. */ return onSelect(key);
-          }}
-        />
-      ))}
+      <View style={s.leftGroup}>
+        {workspaceSections.slice(0, 2).map(([key, label]) => (
+          <SectionButton
+            key={key}
+            icon={sectionIcons[key] || 'checklist-outline'}
+            label={t(label)}
+            selected={selected === key}
+            onPress={() => {
+              /* 실제 영역 하나만 연다. */ return onSelect(key);
+            }}
+          />
+        ))}
+      </View>
+      <SectionButton
+        icon="share-outline"
+        label={t('공유')}
+        selected={selected === 'share'}
+        onPress={() => {
+          /* 우측 공유 캡슐을 누르면 여행 공유 영역을 연다. */ return onSelect(
+            'share',
+          );
+        }}
+      />
     </View>
   );
 }
 
-// 세그먼트 트랙 안에서 활성 탭을 입체 카드로 강조해 표시한다.
+// 캡슐형 필(Pill) 버튼으로 활성 탭을 코랄 색상으로 강조한다.
 function SectionButton({
-  icon,
   label,
   accessibilityLabel = label,
   selected,
@@ -62,7 +73,7 @@ function SectionButton({
   onPress: () => void;
 }) {
   useLocale();
-  const { largeText } = useAppAccessibility();
+  useAppAccessibility();
   // 일반 버튼과 같은 눌림·초점 토큰을 사용한다.
   const [focused, setFocused] = useState(false);
   return (
@@ -80,20 +91,13 @@ function SectionButton({
       }}
       style={({ pressed }) => {
         /* 선택과 실제 눌림 상태를 함께 표시한다. */ return [
-          s.tab,
-          selected && s.selected,
+          s.pill,
+          selected && s.selectedPill,
           pressed && s.pressed,
           focused && s.focused,
         ];
       }}
     >
-      {!largeText && (
-        <TripIcon
-          name={icon}
-          size={16}
-          color={selected ? colors.brandCoral : colors.muted}
-        />
-      )}
       <Text style={[s.label, selected && s.selectedLabel]}>{t(label)}</Text>
     </Pressable>
   );
@@ -175,45 +179,46 @@ export function TripMoreMenu({
 }
 
 const s = StyleSheet.create({
-  nav: {
+  navRow: {
     flexDirection: 'row',
-    gap: 4,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
     width: '100%',
-    padding: 4,
-    borderRadius: 14,
+  },
+  leftGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  pill: {
+    minHeight: 48,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 9999,
     backgroundColor: colors.surfaceMuted,
     borderWidth: 1,
     borderColor: colors.border,
-  },
-  tab: {
-    flex: 1,
-    minWidth: 0,
-    minHeight: 48,
-    paddingHorizontal: 6,
-    paddingVertical: 8,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'transparent',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
   },
-  selected: {
-    backgroundColor: colors.surface,
-    borderColor: colors.border,
+  selectedPill: {
+    backgroundColor: colors.brandCoral,
+    borderColor: colors.brandCoral,
   },
-  pressed: { backgroundColor: colors.selectedSurface },
+  pressed: { opacity: 0.88 },
   focused: { outlineColor: colors.focus, outlineWidth: 2, outlineOffset: 2 },
   label: {
-    color: colors.muted,
+    color: colors.text,
     fontSize: 14,
-    lineHeight: 22,
+    lineHeight: 20,
     fontWeight: '600',
     textAlign: 'center',
   },
   selectedLabel: {
-    color: colors.secondary,
+    color: '#FFFFFF',
     fontWeight: '700',
   },
 });

@@ -5,11 +5,10 @@ import type { ReactNode } from 'react';
 import { styles } from '../styles/myAccountStyles';
 import type { AccountProfileProps } from '../model/myAccountTypes';
 
-// 기본 프로필은 읽기 전용이며 회원 종류를 확인한 범위에서만 표시한다.
+// 기본 프로필(프로필 이미지/이니셜 + 닉네임 + 회원 종류 배지)을 간결한 카드 형태로 표시한다.
 export function renderAccountProfile({
   largeText,
   currentUser,
-  userId,
   imageSource,
   children,
 }: AccountProfileProps & {
@@ -17,6 +16,11 @@ export function renderAccountProfile({
   children?: ReactNode;
 }) {
   const guest = currentUser?.authProvider === 'guest';
+  const displayName = currentUser?.nickname?.trim() || t('여행자');
+  const initialChar = (
+    guest ? 'G' : displayName.slice(0, 1) || 'G'
+  ).toUpperCase();
+
   return (
     <View style={styles.profileCard} testID="account-default-profile">
       <View
@@ -25,23 +29,25 @@ export function renderAccountProfile({
           largeText && styles.profileCardHeaderLarge,
         ]}
       >
-        <Image
-          source={
-            imageSource ||
-            require('../../../../assets/brand/haru-v1/TripPrint_Haru_loading_1233x1275.png')
-          }
-          style={styles.profileAvatarImage}
-          accessibilityLabel={t(
-            imageSource ? '내 프로필 사진' : '기본 프로필 이미지',
-          )}
-        />
+        {imageSource ? (
+          <Image
+            source={imageSource}
+            style={[styles.profileAvatarImage, { borderRadius: 28 }]}
+            accessibilityLabel={t('내 프로필 사진')}
+          />
+        ) : (
+          <View
+            style={styles.guestInitialCircle}
+            accessibilityLabel={t('기본 프로필 이미지')}
+          >
+            <Text style={styles.guestInitialText}>{initialChar}</Text>
+          </View>
+        )}
         <View style={styles.profileInfo}>
           <View style={styles.nameRow}>
-            <Text style={styles.userName}>
-              {currentUser?.nickname?.trim() || t('여행자')}
-            </Text>
-            <View style={styles.authBadge}>
-              <Text style={styles.authBadgeText}>
+            <Text style={styles.userName}>{displayName}</Text>
+            <View style={styles.guestPillBadge}>
+              <Text style={styles.guestPillBadgeText}>
                 {t(
                   guest
                     ? '게스트'
@@ -52,15 +58,6 @@ export function renderAccountProfile({
               </Text>
             </View>
           </View>
-          <Text style={styles.userEmail}>
-            {t(
-              guest
-                ? '게스트 여행은 이 기기에만 보관합니다'
-                : userId
-                  ? '계정에 저장한 여행과 기록을 확인해요.'
-                  : '로그인 후 이용해 주세요',
-            )}
-          </Text>
         </View>
       </View>
       {children}

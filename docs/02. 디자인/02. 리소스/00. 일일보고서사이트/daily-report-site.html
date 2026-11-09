@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <meta
+      name="description"
+      content="TripPrint의 날짜별 작업, 개선 전후, 검증 결과를 모은 일일 보고서입니다."
+    />
+    <title>일일 보고서 · TripPrint</title>
+    <style>
+      /* REPORT_TOKENS */
+      /* REPORT_CSS */
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar" aria-label="문서 탐색">
+        <a class="brand" href="#" aria-label="TripPrint 일일 보고서"
+          ><span>Trip<span class="brand-accent">Print</span></span
+          ><span class="brand-caption">PROJECT WORKSPACE</span></a
+        >
+        <div class="workspace-label">
+          <span class="workspace-icon" data-icon="notebook"></span
+          ><span>여행을 만드는 기록<small>개발 · 개선 · 검수</small></span>
+        </div>
+        <p class="nav-caption">WORKSPACE</p>
+        <nav class="main-nav" aria-label="보고서 메뉴">
+          <button data-view="overview" class="nav-link active">
+            <span data-icon="book"></span>일일 보고서<span
+              class="nav-count"
+              id="report-count"
+              >1</span
+            >
+          </button>
+          <button data-view="improvements" class="nav-link">
+            <span data-icon="changes"></span>개선 기록
+          </button>
+          <button data-view="checks" class="nav-link">
+            <span data-icon="shield"></span>검증 결과
+          </button>
+          <button data-view="tc" class="nav-link">
+            <span data-icon="check"></span>페이지별 TC
+          </button>
+          <button data-view="next" class="nav-link">
+            <span data-icon="flag"></span>남은 작업
+          </button>
+        </nav>
+        <div class="sidebar-dates">
+          <p class="nav-caption">등록된 일지 <span id="month-label"></span></p>
+          <div id="date-list"></div>
+        </div>
+        <div class="sidebar-bottom">
+          <div class="archive-note">
+            <span class="tiny-dot"></span>작업 기록을 차곡차곡<small
+              >원본 문서와 작성한 일지를 함께 봅니다.</small
+            >
+          </div>
+          <div class="backup-tools">
+            <button id="backup-button">
+              <span data-icon="download"></span>백업</button
+            ><button id="import-button">
+              <span data-icon="upload"></span>가져오기
+            </button>
+          </div>
+          <input
+            id="import-file"
+            type="file"
+            accept="application/json,.json"
+            hidden
+          />
+          <p class="version-label">TripPrint · Daily Journal</p>
+        </div>
+      </aside>
+      <button
+        class="menu-backdrop"
+        id="menu-backdrop"
+        aria-label="탐색 메뉴 닫기"
+        hidden
+      ></button>
+      <div class="main-shell">
+        <header class="topbar">
+          <div class="breadcrumb">
+            <button
+              class="icon-button mobile-menu"
+              id="menu-button"
+              aria-label="탐색 메뉴 열기"
+              aria-expanded="false"
+              aria-controls="sidebar"
+            >
+              <span data-icon="menu"></span></button
+            ><span>워크스페이스</span><span class="breadcrumb-divider">/</span
+            ><strong>일일 보고서</strong>
+          </div>
+          <div class="top-actions">
+            <button class="search-trigger" id="search-button">
+              <span data-icon="search"></span><span>기록 검색</span
+              ><kbd>Ctrl K</kbd></button
+            ><button class="primary-button" id="new-button">
+              <span data-icon="plus"></span><span>일지 등록</span>
+            </button>
+          </div>
+        </header>
+        <main id="main" tabindex="-1">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">THE DAILY PROGRESS</p>
+              <h1>일일 보고서<span class="heading-dot">.</span></h1>
+              <p class="page-description">
+                오늘의 작업과 달라진 점을 기록합니다.
+              </p>
+            </div>
+            <div class="record-summary">
+              <span class="summary-symbol" data-icon="calendar"></span>
+              <div>
+                <strong id="registered-count">01</strong
+                ><span>일의 작업 기록</span>
+              </div>
+            </div>
+          </div>
+          <section class="week-section" aria-label="주간 날짜 선택">
+            <div class="week-heading">
+              <h2 id="week-label"></h2>
+              <div class="week-actions">
+                <button class="quiet-button" id="today-button">이번 주</button
+                ><button
+                  class="icon-button"
+                  id="previous-week"
+                  aria-label="이전 주"
+                >
+                  <span data-icon="left"></span></button
+                ><button
+                  class="icon-button"
+                  id="next-week"
+                  aria-label="다음 주"
+                >
+                  <span data-icon="right"></span>
+                </button>
+              </div>
+            </div>
+            <div class="week-scroll">
+              <div class="week-grid" id="week-grid"></div>
+            </div>
+          </section>
+          <div id="report-content"></div>
+          <footer class="page-footer">
+            <span>작은 개선이 모여 더 나은 여행이 됩니다.</span
+            ><span>TripPrint Worklog</span>
+          </footer>
+        </main>
+      </div>
+    </div>
+    <dialog
+      id="search-dialog"
+      class="search-dialog"
+      aria-labelledby="search-title"
+    >
+      <form method="dialog" class="dialog-top">
+        <h2 id="search-title">작업 기록 검색</h2>
+        <button class="icon-button" aria-label="검색 닫기">
+          <span data-icon="close"></span>
+        </button>
+      </form>
+      <label class="search-field"
+        ><span data-icon="search"></span
+        ><input
+          id="search-input"
+          type="search"
+          placeholder="날짜, 작업명, 개선 내용을 검색하세요"
+          autocomplete="off"
+      /></label>
+      <div id="search-results" class="search-results" aria-live="polite"></div>
+    </dialog>
+    <dialog
+      id="editor-dialog"
+      class="editor-dialog"
+      aria-labelledby="editor-title"
+    >
+      <form id="editor-form">
+        <div class="dialog-top">
+          <div>
+            <p class="eyebrow">DAILY ENTRY</p>
+            <h2 id="editor-title">새 일지 등록</h2>
+          </div>
+          <button
+            type="button"
+            class="icon-button"
+            id="editor-close"
+            aria-label="일지 작성 닫기"
+          >
+            <span data-icon="close"></span>
+          </button>
+        </div>
+        <p class="editor-notice">
+          <span data-icon="info"></span>작성한 일지는 이 브라우저에 저장됩니다.
+          백업 파일로 내려받아 다른 기기에서도 가져올 수 있어요.
+        </p>
+        <div class="form-grid">
+          <label>작업 날짜<input name="date" type="date" required /></label
+          ><label
+            >진행 상태<select name="status">
+              <option value="done">완료</option>
+              <option value="pending">진행 중</option>
+              <option value="review">검토</option>
+            </select></label
+          >
+        </div>
+        <label
+          >일지 제목<input
+            name="title"
+            maxlength="100"
+            placeholder="예: MY 프로필 변경과 로그인 흐름 개선"
+            required /></label
+        ><label
+          >오늘 한 작업<textarea
+            name="summary"
+            rows="3"
+            maxlength="5000"
+            placeholder="어떤 작업을 했는지 적어 주세요."
+            required
+          ></textarea>
+        </label>
+        <div class="form-grid">
+          <label
+            >개선 전<textarea
+              name="before"
+              rows="3"
+              maxlength="3000"
+              placeholder="기존에 어떤 불편이나 문제가 있었나요?"
+              required
+            ></textarea></label
+          ><label
+            >개선 후<textarea
+              name="after"
+              rows="3"
+              maxlength="3000"
+              placeholder="어디를 어떻게 바꿨나요?"
+              required
+            ></textarea>
+          </label>
+        </div>
+        <label
+          >다음에 할 작업 <span class="optional">선택</span
+          ><textarea
+            name="next"
+            rows="2"
+            maxlength="3000"
+            placeholder="확인이 필요하거나 이어서 할 일을 적어 주세요."
+          ></textarea>
+        </label>
+        <p class="form-error" id="editor-error" role="alert"></p>
+        <div class="dialog-actions">
+          <button type="button" class="quiet-button" id="draft-download">
+            파일로 내려받기</button
+          ><button type="button" class="secondary-button" id="editor-cancel">
+            취소</button
+          ><button type="submit" class="primary-button">일지 저장</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog
+      id="delete-dialog"
+      class="confirm-dialog"
+      aria-labelledby="delete-title"
+    >
+      <span class="confirm-symbol" data-icon="trash"></span>
+      <h2 id="delete-title">이 일지를 삭제할까요?</h2>
+      <p>
+        이 브라우저에 등록한 일지가 삭제됩니다.<br />필요한 내용은 먼저 백업해
+        주세요.
+      </p>
+      <div class="dialog-actions">
+        <button class="secondary-button" id="delete-cancel">
+          계속 보관하기</button
+        ><button class="danger-button" id="delete-confirm">삭제하기</button>
+      </div>
+    </dialog>
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+    <script type="application/json" id="report-data">
+      REPORT_DATA_JSON
+    </script>
+    <script>
+      /* REPORT_RENDERER */
+      /* REPORT_SCRIPT */
+    </script>
+  </body>
+</html>

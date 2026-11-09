@@ -122,9 +122,16 @@ export function renderWorkspaceItinerary({
   reload,
 }: RenderWorkspaceItineraryProps) {
   // 유효한 선택 날짜와 해당 날짜의 지도 방문 핀 목록을 계산한다.
-  const daySelection = workspaceDaySelection(snapshot.days, selectedDay);
+  const daySelection = workspaceDaySelection(
+    snapshot.days,
+    selectedDay || 'all',
+    true,
+  );
   const activeDayId =
-    daySelection.visibleDays[0]?.id || snapshot.days[0]?.id || '';
+    daySelection.currentDayId ||
+    daySelection.visibleDays[0]?.id ||
+    snapshot.days[0]?.id ||
+    '';
   const mapStops = tripMapStops(snapshot.itinerary, activeDayId);
 
   return (
@@ -132,6 +139,7 @@ export function renderWorkspaceItinerary({
       <>
         <TripDayStrip
           days={snapshot.days}
+          allowAll
           counts={Object.fromEntries(
             snapshot.days.map((day) => [
               day.id,

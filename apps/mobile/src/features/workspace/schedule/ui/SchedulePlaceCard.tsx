@@ -43,20 +43,50 @@ function formatFlightSummary(
   return [airlinePart, numberPart, depPart, arrPart].filter(Boolean).join(' ');
 }
 
-// 시간 열·타임라인 축(점선 또는 번호 원)·일정 제목·접기/펼치기 상세를 렌더링한다.
+// 일정의 제목과 유형을 분석해 카드 상단 1차 일정 태그 문구를 반환한다.
+function resolveCategoryTagLabel(item: WorkspaceSchedule): string {
+  if (
+    item.type === 'STAY' ||
+    /호텔|숙소|리조트|료칸|호스텔/i.test(item.title)
+  ) {
+    return t('숙소');
+  }
+  if (
+    item.type === 'TRANSPORT' ||
+    Boolean(item.flight) ||
+    /항공|공항|역|정류장|터미널|신칸센/i.test(item.title)
+  ) {
+    return t('교통·이동');
+  }
+  if (/카페|커피|베이커리|디저트|블루보틀/i.test(item.title)) {
+    return t('카페');
+  }
+  if (
+    /식당|라멘|맛집|이자카야|우동|스시|쌀국수|식사|곤파치/i.test(item.title)
+  ) {
+    return t('식사');
+  }
+  if (/쇼핑|백화점|스퀘어|전망|타워|스카이/i.test(item.title)) {
+    return t('쇼핑 & 전망');
+  }
+  if (item.type === 'MEMO' || item.type === 'TODO') {
+    return t('메모');
+  }
+  return t('관광명소');
+}
+
+// 방문 시간 없이 순번 원형 배지(좌)와 일정 카드(1.타이틀 / 2.태그 / 3.순서변경 아이콘 / 4.전체 클릭 시 상세 이동)를 렌더링한다.
 export default function SchedulePlaceCard({
   item,
   index,
   stepNumber,
   tripDate,
-  nextDistanceLabel,
   editingOrder = false,
   canMoveUp = false,
   canMoveDown = false,
   onMoveUp,
   onMoveDown,
   onQuickDelete,
-  last,
   selected,
   editable,
   disabled,
@@ -92,14 +122,12 @@ export default function SchedulePlaceCard({
   useLocale();
   const { largeText } = useAppAccessibility();
   const [focused, setFocused] = useState(false);
-  const [expanded, setExpanded] = useState(true);
 
   const isFlight = Boolean(item.flight);
   const isMemo =
     item.type === 'MEMO' ||
     item.type === 'TODO' ||
     item.title.trim() === '메모';
-  const timeLabel = item.timeSlot || '';
   const flightSummary = formatFlightSummary(item, tripDate);
   const memoText =
     item.memo && !(isFlight && item.memo === '사용자 등록 항공편')
@@ -107,23 +135,22 @@ export default function SchedulePlaceCard({
       : '';
   const planDesc = item.planContent?.description?.trim() || '';
   const canNavigate = Boolean(onDirections && !isFlight && !isMemo);
-  const hasDetails = Boolean(
-    flightSummary ||
-    memoText ||
-    item.address ||
-    planDesc ||
-    canNavigate ||
-    expenses.length > 0 ||
-    photos.length > 0,
-  );
   const displayStep = stepNumber ?? index + 1;
+  const categoryLabel = resolveCategoryTagLabel(item);
+  const isReserved =
+    item.type === 'RESERVATION' || /예약/i.test(`${memoText} ${planDesc}`);
+  const isFeatured = photos.length > 0 || isReserved || displayStep % 2 === 0;
+  const primaryExpense = expenses[0];
+  const shortAddress = item.address
+    ? item.address.split(',')[0]?.trim() || item.address
+    : '';
 
   return (
     <View
       style={[s.stop, selected && s.selected]}
       testID={`schedule-card-${item.id}`}
     >
-      <View style={s.timeColumn}>
+      <View style={s.rail} aria-hidden>
         {editingOrder && editable ? (
           <Pressable
             accessibilityRole="button"
@@ -134,64 +161,62 @@ export default function SchedulePlaceCard({
           >
             <Ionicons name="remove-circle" size={24} color={colors.danger} />
           </Pressable>
-        ) : timeLabel ? (
-          <Text style={s.timeColumnText}>{timeLabel}</Text>
-        ) : null}
-      </View>
-
-      <View style={s.rail} aria-hidden>
-        {isFlight ? (
-          <>
-            <View style={s.dottedRail}>
-              {[0, 1, 2, 3, 4, 5, 6].map((dot) => (
-                <View key={dot} style={s.railDot} />
-              ))}
-            </View>
-            {!last && <View style={s.line} />}
-          </>
         ) : (
-          <>
-            <View style={[s.topLine, index === 0 && s.hiddenLine]} />
-            <View style={[s.marker, isMemo ? s.memoMarker : s.placeMarker]}>
-              <Text style={s.number}>{displayStep}</Text>
-            </View>
-            {!last && (
-              <>
-                <View style={s.line} />
-                {nextDistanceLabel ? (
-                  <View style={s.distancePill}>
-                    <Text style={s.distanceText}>{nextDistanceLabel}</Text>
-                  </View>
-                ) : null}
-                {nextDistanceLabel ? <View style={s.line} /> : null}
-              </>
-            )}
-          </>
+          <View
+            style={[
+              s.marker,
+              isMemo ? s.memoMarker : s.placeMarker,
+              isFeatured && s.featuredMarker,
+            ]}
+          >
+            <Text style={[s.number, isFeatured && s.featuredNumber]}>
+              {displayStep}
+            </Text>
+          </View>
         )}
       </View>
 
-      <View style={s.card}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t('{p0} 일정 상세', { p0: item.title })}
+        onPress={onOpen}
+        onLongPress={editable && !disabled ? onMore : undefined}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        style={({ pressed }) => [
+          s.card,
+          pressed && s.pressed,
+          focused && s.focus,
+        ]}
+      >
         <View style={s.timelineHeaderRow}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('{p0} 일정 상세', { p0: item.title })}
-            onPress={onOpen}
-            onLongPress={editable && !disabled ? onMore : undefined}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-            style={({ pressed }) => [
-              s.timelineTitleButton,
-              pressed && s.pressed,
-              focused && s.focus,
-            ]}
-          >
-            <Text
-              style={s.timelineItemTitle}
-              numberOfLines={largeText ? undefined : 2}
-            >
-              {item.title}
-            </Text>
-          </Pressable>
+          <View style={s.tagRow}>
+            <View style={s.categoryTagPill}>
+              <Text style={s.categoryTagText}>{categoryLabel}</Text>
+            </View>
+            {isReserved && (
+              <View style={s.reserveTagPill}>
+                <Text style={s.reserveTagText}>{t('예약완료')}</Text>
+              </View>
+            )}
+            {primaryExpense ? (
+              <View
+                style={s.subTagPill}
+                testID={`schedule-expense-badge-${primaryExpense.id}`}
+              >
+                <Text style={s.subTagText}>
+                  {t('예산 {p0} {p1}', {
+                    p0: primaryExpense.currency,
+                    p1: primaryExpense.amount,
+                  })}
+                </Text>
+              </View>
+            ) : shortAddress ? (
+              <Text style={s.inlineMetaText} numberOfLines={1}>
+                {shortAddress}
+              </Text>
+            ) : null}
+          </View>
 
           <View style={s.timelineRightActions}>
             {editingOrder && editable ? (
@@ -220,141 +245,94 @@ export default function SchedulePlaceCard({
                 />
               </>
             ) : (
-              <>
-                {hasDetails && (
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel={item.title}
-                    onPress={() => setExpanded((prev) => !prev)}
-                    style={s.chevronButton}
-                  >
+              editable && (
+                <DesignButton
+                  size="icon"
+                  variant="quiet"
+                  label=""
+                  accessibilityLabel={t('{p0} 일정 관리', { p0: item.title })}
+                  disabled={disabled}
+                  onPress={onMore}
+                  icon={(color) => (
                     <Ionicons
-                      name={expanded ? 'chevron-up' : 'chevron-down'}
-                      size={18}
-                      color={colors.muted}
+                      name="ellipsis-vertical"
+                      size={16}
+                      color={color}
                     />
-                  </Pressable>
-                )}
-                {editable && (
-                  <DesignButton
-                    size="icon"
-                    variant="quiet"
-                    label=""
-                    accessibilityLabel={t('{p0} 일정 관리', { p0: item.title })}
-                    disabled={disabled}
-                    onPress={onMore}
-                    icon={(color) => (
-                      <Ionicons
-                        name="ellipsis-horizontal"
-                        size={18}
-                        color={color}
-                      />
-                    )}
-                  />
-                )}
-              </>
+                  )}
+                />
+              )
             )}
           </View>
         </View>
 
-        {expanded && hasDetails && (
-          <Pressable onPress={onOpen} style={s.timelineDetailBlock}>
-            {flightSummary ? (
-              <View testID={`schedule-flight-${item.id}`}>
-                <Text
-                  style={s.timelineDetailText}
-                  numberOfLines={largeText ? undefined : 2}
-                >
-                  {flightSummary}
-                </Text>
-              </View>
-            ) : null}
-            {memoText ? (
-              <Text
-                style={s.timelineDetailText}
-                numberOfLines={largeText ? undefined : 2}
-              >
-                {memoText}
+        <Text
+          style={s.timelineItemTitle}
+          numberOfLines={largeText ? undefined : 2}
+        >
+          {item.title}
+        </Text>
+
+        {flightSummary ? (
+          <View testID={`schedule-flight-${item.id}`}>
+            <Text
+              style={s.timelineDetailText}
+              numberOfLines={largeText ? undefined : 2}
+            >
+              {flightSummary}
+            </Text>
+          </View>
+        ) : null}
+
+        {memoText ? (
+          <Text
+            style={s.timelineDetailText}
+            numberOfLines={largeText ? undefined : 2}
+          >
+            {memoText}
+          </Text>
+        ) : null}
+
+        {photos.length > 0 && (
+          <View
+            style={s.photoPreviewBox}
+            testID={`schedule-photo-badge-${item.id}`}
+          >
+            <View style={s.tagRow}>
+              <Ionicons
+                name="image-outline"
+                size={18}
+                color={colors.brandCoral}
+              />
+              <Text style={s.recordBadgeText}>
+                {t('사진 {p0}장', { p0: photos.length })}
               </Text>
-            ) : null}
-            {item.address ? (
-              <Text
-                style={s.timelineDetailText}
-                numberOfLines={largeText ? undefined : 1}
-              >
-                {item.address}
-              </Text>
-            ) : null}
-            {planDesc && planDesc !== memoText ? (
-              <Text
-                style={s.timelineDetailText}
-                numberOfLines={largeText ? undefined : 2}
-              >
-                {planDesc}
-              </Text>
-            ) : null}
-            {(expenses.length > 0 || photos.length > 0) && (
-              <View style={s.recordBadgeRow}>
-                {expenses.map((expense) => (
-                  <View
-                    key={expense.id}
-                    style={s.recordBadge}
-                    testID={`schedule-expense-badge-${expense.id}`}
-                  >
-                    <TripIcon
-                      name="receipt-scan-outline"
-                      size={14}
-                      color={colors.secondary}
-                    />
-                    <Text style={s.recordBadgeText}>
-                      {`${expense.currency} ${expense.amount}${
-                        expense.title && expense.title !== item.title
-                          ? ` · ${expense.title}`
-                          : ''
-                      }`}
-                    </Text>
-                  </View>
-                ))}
-                {photos.length > 0 && (
-                  <View
-                    style={s.recordBadge}
-                    testID={`schedule-photo-badge-${item.id}`}
-                  >
-                    <Ionicons
-                      name="camera-outline"
-                      size={14}
-                      color={colors.primary}
-                    />
-                    <Text style={s.recordBadgeText}>
-                      {t('사진 {p0}장', { p0: photos.length })}
-                    </Text>
-                  </View>
-                )}
-              </View>
-            )}
-            {canNavigate && (
-              <View style={s.timelineInlineActions}>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={t('{p0} 길찾기', { p0: item.title })}
-                  onPress={onDirections}
-                  style={({ pressed }) => [
-                    s.timelineDirectionsBtn,
-                    pressed && s.pressed,
-                  ]}
-                >
-                  <TripIcon
-                    name="map-pin-outline"
-                    size={14}
-                    color={colors.secondary}
-                  />
-                  <Text style={s.timelineDirectionsText}>{t('길찾기')}</Text>
-                </Pressable>
-              </View>
-            )}
-          </Pressable>
+            </View>
+            <Text style={s.inlineMetaText}>{t('상세 보기 ›')}</Text>
+          </View>
         )}
-      </View>
+
+        {canNavigate && (
+          <View style={s.timelineInlineActions}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('{p0} 길찾기', { p0: item.title })}
+              onPress={onDirections}
+              style={({ pressed }) => [
+                s.timelineDirectionsBtn,
+                pressed && s.pressed,
+              ]}
+            >
+              <TripIcon
+                name="map-pin-outline"
+                size={14}
+                color={colors.secondary}
+              />
+              <Text style={s.timelineDirectionsText}>{t('길찾기')}</Text>
+            </Pressable>
+          </View>
+        )}
+      </Pressable>
     </View>
   );
 }

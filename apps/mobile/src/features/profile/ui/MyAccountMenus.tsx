@@ -1,11 +1,14 @@
-import Text from '@/components/ui/AppText';
-import { colors } from '@/constants/theme';
-import { t } from '@/features/localization/translate';
-import { Action } from '@/features/workspace/shared/ui/ui';
+import { useState } from 'react';
+import Constants from 'expo-constants';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, View } from 'react-native';
+import Text from '@/components/ui/AppText';
+import ActionSheet from '@/components/ui/ActionSheet';
+import { colors } from '@/constants/theme';
+import { t } from '@/features/localization/translate';
 import { styles } from '../styles/myAccountStyles';
 import type { MyAccountViewProps } from '../model/myAccountTypes';
+
 // 저장한 계획과 발자국 목록으로 이동하는 메뉴를 표시한다.
 export function MyAccountArchiveMenu({
   router,
@@ -67,63 +70,133 @@ export function MyAccountArchiveMenu({
     </View>
   );
 }
-// 프로필 저장 중 이동을 막고 설정 화면 진입을 표시한다.
+
+// 환경설정 및 계정(4. 설정 / 5. 앱 버전 정보) 2행 리스트 카드를 표시한다.
 export function MyAccountSettingsMenu({
   router,
 }: Pick<MyAccountViewProps, 'router'>) {
+  const [versionOpen, setVersionOpen] = useState(false);
+  const appVersion = Constants.expoConfig?.version || '0.0.2';
+
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{t('환경설정 및 계정')}</Text>
       <View style={styles.listCard}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={t('설정 열기')}
+          accessibilityLabel={t('설정')}
           onPress={() => router.push('/settings')}
           style={({ pressed }) => [
             styles.listRow,
             pressed && styles.listRowPressed,
           ]}
         >
-          <View style={styles.listIconBoxNeutral}>
-            <Ionicons name="settings-outline" size={20} color={colors.text} />
+          <View style={styles.softBlueIconBox}>
+            <Ionicons name="notifications-outline" size={20} color="#0F172A" />
           </View>
           <View style={styles.listTextGroup}>
-            <Text style={styles.listTitle}>{t('설정 열기')}</Text>
-            <Text style={styles.listSubtitle}>
-              {t('언어 · 앱 정보 · 계정 관리')}
-            </Text>
+            <Text style={styles.listTitle}>{t('설정')}</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={colors.muted} />
+        </Pressable>
+
+        <View style={styles.listDivider} />
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('앱 버전 정보')}
+          onPress={() => setVersionOpen(true)}
+          style={({ pressed }) => [
+            styles.listRow,
+            pressed && styles.listRowPressed,
+          ]}
+        >
+          <View style={styles.softBlueIconBox}>
+            <Ionicons
+              name="information-circle-outline"
+              size={20}
+              color="#0F172A"
+            />
+          </View>
+          <View style={styles.listTextGroup}>
+            <Text style={styles.listTitle}>{t('앱 버전 정보')}</Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color={colors.muted} />
         </Pressable>
       </View>
+
+      <ActionSheet
+        visible={versionOpen}
+        title={t('앱 버전 정보')}
+        onClose={() => setVersionOpen(false)}
+      >
+        <View style={styles.accountActions}>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>{t('현재 버전')}</Text>
+            <Text style={styles.infoValue}>{`v${appVersion}`}</Text>
+          </View>
+          <Text style={styles.settingDesc}>
+            TripPrint Native App · {`v${appVersion}`}
+          </Text>
+        </View>
+      </ActionSheet>
     </View>
   );
 }
-// 기기 게스트에게 기존 기록의 보관 범위와 계정 연결 진입을 안내한다.
+
+// 3. 계정 연동 카드(게스트일 경우 Google 계정 연결 버튼 / Google 회원일 경우 연동 상태)를 표시한다.
 export function MyAccountGuestNotice({
   currentUser,
   router,
 }: Pick<MyAccountViewProps, 'currentUser' | 'router'>) {
-  return (
-    currentUser?.authProvider === 'guest' && (
-      <View style={styles.card}>
-        <Text style={styles.settingTitle}>
-          {t('게스트 여행을 Google 계정에 연결하기')}
-        </Text>
-        <Text style={styles.settingDesc}>
-          {t(
-            'Google 계정으로 로그인하면 새 여행을 계정에 안전하게 보관할 수 있어요. 기존 게스트 여행은 이 기기에 유지돼요.',
-          )}
-        </Text>
-        <Action
-          label={t('Google 계정 연결하기')}
-          variant="primary"
+  if (currentUser?.authProvider === 'guest') {
+    return (
+      <View style={styles.guestConnectCard}>
+        <View style={styles.guestConnectTopRow}>
+          <View style={styles.googleLogoBox} aria-hidden>
+            <Ionicons name="logo-google" size={22} color="#EA4335" />
+          </View>
+          <Text style={styles.guestConnectTitle}>
+            {t('게스트 여행을 Google 계정에 연결하기')}
+          </Text>
+        </View>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('Google 계정 연결')}
           onPress={() => {
-            // 게스트 세션을 유지한 채 실제 계정 인증을 시작한다.
+            // 로그인 화면으로 이동해 Google 계정 연결을 시작한다.
             return router.push('/login');
           }}
-        />
+          style={({ pressed }) => [
+            styles.googleConnectBtn,
+            pressed && styles.listRowPressed,
+          ]}
+        >
+          <Text style={styles.googleConnectBtnText}>
+            {t('Google 계정 연결')}
+          </Text>
+        </Pressable>
       </View>
-    )
-  );
+    );
+  }
+
+  if (currentUser?.authProvider === 'google') {
+    return (
+      <View style={styles.guestConnectCard}>
+        <View style={styles.guestConnectTopRow}>
+          <View style={styles.googleLogoBox} aria-hidden>
+            <Ionicons name="logo-google" size={22} color="#EA4335" />
+          </View>
+          <View style={styles.listTextGroup}>
+            <Text style={styles.listTitle}>{t('Google 계정 연결됨')}</Text>
+            <Text style={styles.listSubtitle}>
+              {t('계정에 저장한 여행과 기록을 확인해요.')}
+            </Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  return null;
 }

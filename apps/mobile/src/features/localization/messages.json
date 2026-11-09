@@ -602,6 +602,41 @@
   "지도 보기": ["View map", "地図を見る"],
   "동선 지도 보기": ["View route map", "ルートを地図で見る"],
   "일정 추가": ["Add activity", "予定を追加"],
+  "총 경비 (팀 전체)": ["Total (All members)", "総経費（全体）"],
+  "내 정산 몫 (개인)": ["My share", "自分の精算分"],
+  "전체 팀 총 지출": ["Total group expenses", "チーム全体の総支出"],
+  "내 정산 총 지출": ["My total share", "自分の総負担額"],
+  "예상 예산 {p0} 대비": ["vs. planned budget {p0}", "予定予算 {p0} 比"],
+  "{p0}% 사용": ["{p0}% used", "{p0}% 使用"],
+  "1인 평균 지출": ["Avg. per person", "1人あたり平均支出"],
+  "남은 예산": ["Remaining budget", "残りの予算"],
+  "영수증 스캔": ["Scan receipt", "レシートスキャン"],
+  "카테고리 통계": ["Category stats", "カテゴリ統計"],
+  "{p0}개 지출": ["{p0} expenses", "{p0}件の支出"],
+  "DAY {p0} 등록된 지출 없음": [
+    "No expenses for DAY {p0}",
+    "DAY {p0} の支出なし"
+  ],
+  "지출 추가": ["Add expense", "支出を追加"],
+  "결제 수단": ["Payment method", "支払い方法"],
+  "카드 (Card)": ["Card", "カード (Card)"],
+  "현금 (Cash)": ["Cash", "現金 (Cash)"],
+  "정산 방식": ["Split type", "精算方法"],
+  "공동 정산": ["Split (1/N)", "共同精算"],
+  "개인 지출": ["Personal", "個人支出"],
+  "개인 전액 부담": ["Paid 100% personally", "個人全額負担"],
+  "내 부담액 {p0}": ["My share {p0}", "自己負担 {p0}"],
+  "{p0}인 1/N": ["Split {p0} ways", "{p0}人で割り勘"],
+  "Google 계정 연결": ["Connect Google Account", "Googleアカウント連携"],
+  "Google 계정 연결됨": [
+    "Google Account Connected",
+    "Googleアカウント連携済み"
+  ],
+  "앱 버전 정보": ["App version info", "アプリバージョン情報"],
+  "약관 및 정책": ["Terms & Policies", "規約とポリシー"],
+  "서비스 이용약관": ["Terms of Service", "利用規約"],
+  "개인정보 처리방침": ["Privacy Policy", "プライバシーポリシー"],
+  "현재 버전": ["Current version", "現在のバージョン"],
   "지도에서 보는 여행": ["Your trip on a map", "地図で見る旅行"],
   "번호는 방문 순서예요. 연결선은 장소 사이를 잇는 선으로, 실제 이동 경로와 다를 수 있어요.": [
     "Numbers show visit order. Lines connect places and may differ from actual routes.",
@@ -5534,5 +5569,34 @@
     "Could not confirm the photo save. Reload to check your current photo.",
     "写真の保存結果を確認できませんでした。再読み込みで現在の写真を確認してください。"
   ],
-  "가계부": ["Budget", "家計簿"]
+  "가계부": ["Budget", "家計簿"],
+  "여행 계획": ["Trip Plan", "旅行計画"],
+  "공유": ["Share", "共有"],
+  "동선 지도 보기": ["View Route Map", "動線マップを見る"],
+  "일정 추가": ["Add Schedule", "予定を追加"],
+  "{p0}개 일정": ["{p0} schedules", "{p0}件の予定"],
+  "DAY {p0} 일정 없음": ["No schedules for DAY {p0}", "DAY {p0} 予定なし"],
+  "위치 보기": ["Location", "位置を見る"],
+  "일정 정보": ["Schedule Info", "予定情報"],
+  "구글 지도로 길찾기": ["Directions in Google Maps", "Googleマップで経路案内"],
+  "지출금": ["Expenses", "支出額"],
+  "후기 남기기": ["Write a Review", "レビューを残す"],
+  "후기 보기": ["Reviews", "レビューを見る"],
+  "구글 실제 후기·평점 보기": [
+    "View Google Reviews & Ratings",
+    "Googleの実際のレビュー・評価を見る"
+  ],
+  "APP 내 자체 리뷰": ["App Traveler Reviews", "アプリ内レビュー"],
+  "아직 등록된 자체 후기가 없어요. 첫 번째 후기와 사진을 남겨보세요!": [
+    "No app reviews yet. Be the first to leave a review and photo!",
+    "まだアプリ内レビューがありません。最初のレビューと写真を残してみましょう！"
+  ],
+  "작성한 후기를 복사해 구글 지도에도 남기기": [
+    "Copy review & open Google Maps",
+    "レビューをコピーしてGoogleマップにも投稿"
+  ],
+  "방문 순서 배치": ["Visit Order", "訪問順の配置"],
+  "추가 중": ["Adding", "追加中"],
+  "예산 {p0} {p1}": ["Budget {p0} {p1}", "予算 {p0} {p1}"],
+  "예약완료": ["Reserved", "予約完了"]
 }

@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import Text from '@/components/ui/AppText';
+import ActionSheet from '@/components/ui/ActionSheet';
 import { colors } from '@/constants/theme';
 import LanguagePicker from '@/features/localization/LanguagePicker';
 import { t } from '@/features/localization/translate';
@@ -119,10 +121,64 @@ export function SettingsPreferencesSection({
   );
 }
 
-// 앱 정보 카드를 기존 표시 규격으로 구성한다.
+// 앱 정보 및 이용약관·개인정보 처리방침 확인 카드를 구성한다.
 export function SettingsAppInfo() {
+  const [policySheet, setPolicySheet] = useState<'terms' | 'privacy' | null>(
+    null,
+  );
+  const appVersion = Constants.expoConfig?.version || '0.0.2';
+
   return (
     <View style={styles.section}>
+      <Text style={styles.sectionTitle}>{t('약관 및 정책')}</Text>
+      <View style={[styles.listCard, { marginBottom: 16 }]}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('서비스 이용약관')}
+          onPress={() => setPolicySheet('terms')}
+          style={({ pressed }) => [
+            styles.listRow,
+            pressed && styles.listRowPressed,
+          ]}
+        >
+          <View style={styles.listIconBoxNeutral}>
+            <Ionicons
+              name="document-text-outline"
+              size={20}
+              color={colors.text}
+            />
+          </View>
+          <View style={styles.listTextGroup}>
+            <Text style={styles.listTitle}>{t('서비스 이용약관')}</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={colors.muted} />
+        </Pressable>
+
+        <View style={styles.listDivider} />
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('개인정보 처리방침')}
+          onPress={() => setPolicySheet('privacy')}
+          style={({ pressed }) => [
+            styles.listRow,
+            pressed && styles.listRowPressed,
+          ]}
+        >
+          <View style={styles.listIconBoxNeutral}>
+            <Ionicons
+              name="lock-closed-outline"
+              size={20}
+              color={colors.text}
+            />
+          </View>
+          <View style={styles.listTextGroup}>
+            <Text style={styles.listTitle}>{t('개인정보 처리방침')}</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={colors.muted} />
+        </Pressable>
+      </View>
+
       <Text style={styles.sectionTitle}>{t('앱 정보')}</Text>
       <View style={styles.listCard}>
         <View style={styles.listRow}>
@@ -137,11 +193,27 @@ export function SettingsAppInfo() {
             <Text style={styles.listTitle}>{t('앱 버전')}</Text>
             <Text style={styles.listSubtitle}>TripPrint Native App</Text>
           </View>
-          <Text style={styles.listValue}>
-            {Constants.expoConfig?.version || '—'}
-          </Text>
+          <Text style={styles.listValue}>{appVersion}</Text>
         </View>
       </View>
+
+      <ActionSheet
+        visible={policySheet !== null}
+        title={
+          policySheet === 'terms'
+            ? t('서비스 이용약관')
+            : t('개인정보 처리방침')
+        }
+        onClose={() => setPolicySheet(null)}
+      >
+        <View style={styles.accountActions}>
+          <Text style={styles.modalDesc}>
+            {policySheet === 'terms'
+              ? 'TripPrint는 여행 계획 작성, 가계부 기록, 동행자 공유 및 공개 여행 기록 서비스를 제공합니다. 사용자가 작성한 개인 메모와 비공개 여행 기록은 본인과 초대한 동행자에게만 표시됩니다.'
+              : 'TripPrint는 서비스 이용에 필요한 최소한의 계정 식별 정보와 사용자가 직접 등록한 프로필 사진·여행 기록만 보관하며, 계정 삭제 요청 시 관련 데이터를 안전하게 파기합니다.'}
+          </Text>
+        </View>
+      </ActionSheet>
     </View>
   );
 }

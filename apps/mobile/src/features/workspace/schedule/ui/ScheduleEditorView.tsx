@@ -15,10 +15,8 @@ import {
   scheduleCurrencies,
   scheduleDate,
   scheduleEditorHeadingTitle,
-  scheduleTimePresets,
 } from '../model/schedulePresentation';
 import { scheduleStyles as s } from '../styles/scheduleTheme';
-import { DateField } from '../../planning/ui/TravelInputs';
 
 // 일정 작성·수정 섹션이 공통으로 읽는 값과 실행 가능한 행동의 계약이다.
 type ScheduleEditorSectionProps = {
@@ -37,53 +35,11 @@ type ScheduleEditorSectionProps = {
   };
 };
 
-// 방문 시간과 예상 지출 등 세부 입력을 표시한다.
+// 방문 시간 입력을 제거하고 일정 메모와 예상 지출 금액만 간결하게 표시한다.
 export function renderScheduleDetails({ props }: ScheduleEditorSectionProps) {
   // 전달받은 값과 행동을 기존 화면 규격으로 표시한다.
   return (
     <ScheduleSection title={t('일정 세부 설정')} icon="sliders-outline">
-      <DateField
-        label="일정 시간 (HH:mm)"
-        mode="time"
-        value={props.form.values.timeSlot || ''}
-        onChange={(value) => {
-          // 사용자가 선택한 방문 예정 시간을 저장한다.
-          return props.onChange('timeSlot', value);
-        }}
-      />
-      <View style={s.row}>
-        {scheduleTimePresets.map((slot) => {
-          // 자주 쓰는 대표 시간대를 한 번의 터치로 선택하거나 해제한다.
-          return (
-            <ScheduleButton
-              key={slot}
-              label={slot}
-              selected={props.form.values.timeSlot === slot}
-              disabled={props.busy || props.locked}
-              onPress={() => {
-                // 이미 선택된 시간 칩을 다시 누르면 시간 미정 상태로 비운다.
-                return props.onChange(
-                  'timeSlot',
-                  props.form.values.timeSlot === slot ? '' : slot,
-                );
-              }}
-            />
-          );
-        })}
-      </View>
-      {(!['TODO', 'MEMO'].includes(props.form.values.type || '') ||
-        Boolean(props.form.values.durationMinutes)) && (
-        <ScheduleField
-          label="체류 예정 시간 (분)"
-          value={props.form.values.durationMinutes || ''}
-          keyboardType="number-pad"
-          placeholder={t('예: 60')}
-          onChange={(value) => {
-            // 이동시간을 자동으로 계산한 값처럼 표시하지 않는다.
-            return props.onChange('durationMinutes', value);
-          }}
-        />
-      )}
       <ScheduleField
         label="일정 메모"
         value={props.form.values.memo || ''}
