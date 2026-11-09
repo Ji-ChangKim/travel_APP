@@ -29,7 +29,6 @@ import {
   renderWorkspaceChecklist,
   renderWorkspaceCourse,
   renderWorkspaceExpenses,
-  renderWorkspaceFlightPrompt,
   renderWorkspaceHeader,
   renderWorkspaceItinerary,
   renderWorkspaceMap,
@@ -236,9 +235,16 @@ function renderWorkspaceLayout(
                       )}
                     </Text>
                   )}
-                  {renderWorkspaceSummary({ ...props, snapshot })}
-                  {activeSection === 'itinerary' &&
-                    renderWorkspaceFlightPrompt({ ...props, snapshot })}
+                  {renderWorkspaceSummary({
+                    snapshot,
+                    router,
+                    owner: props.owner,
+                    busy,
+                    scanning: props.scanning,
+                    hasPending,
+                    openDraft: props.openDraft,
+                    setActiveSection,
+                  })}
                   <TripSectionNavigation
                     selected={activeSection}
                     onSelect={setActiveSection}

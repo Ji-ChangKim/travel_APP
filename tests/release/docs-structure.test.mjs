@@ -47,6 +47,36 @@ test('누락·중복 번호와 아카이브 밖 삭제 폴더를 차단한다', 
   assert.equal(checkDocumentation(root).problems.length, 3);
 });
 
+test('지정한 일일 보고서의 날짜 폴더는 허용하고 내용과 링크는 검사한다', (context) => {
+  const root = fixture(context, {
+    '00. 안내/규칙.md': '# 규칙',
+    '998. 일일 업무 보고서/26.11.09/회귀검사.md':
+      '[규칙](<../../00. 안내/규칙.md>)',
+    '998. 일일 업무 보고서/28.02.29/보고서.md': '# 윤년 보고서',
+  });
+  assert.deepEqual(checkDocumentation(root), {
+    documents: 3,
+    links: 1,
+    problems: [],
+  });
+  writeFileSync(
+    join(root, 'docs', '998. 일일 업무 보고서', '26.11.09', '회귀검사.md'),
+    '[누락](missing.md)',
+  );
+  assert.match(checkDocumentation(root).problems[0], /없는 대상 missing\.md/);
+});
+
+test('보고서 예외는 잘못된 날짜·다른 이름·다른 위치로 넓히지 않는다', (context) => {
+  const root = fixture(context, {
+    '998. 일일 업무 보고서/26.02.29/보고서.md': '',
+    '998. 일일 업무 보고서/26.13.01/보고서.md': '',
+    '998. 일일 업무 보고서/26.11.31/보고서.md': '',
+    '998. 다른 보고서/보고서.md': '',
+    '00. 안내/998. 일일 업무 보고서/26.11.09/보고서.md': '',
+  });
+  assert.equal(checkDocumentation(root).problems.length, 6);
+});
+
 test('깨진 링크·잘못된 인코딩·프로젝트 밖 파일 연결을 차단한다', (context) => {
   const root = fixture(context, {
     'README.md': '[없음](missing.md)\n[오류](%ZZ.md)\n[외부](../../outside.md)',

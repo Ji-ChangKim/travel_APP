@@ -149,6 +149,6 @@ test('가입은 이메일·닉네임·8자 비밀번호·확인 일치를 요구
         password: 'old',
       }).success,
     ],
-    [true, false, false, false, false, true],
+    [true, false, true, false, false, true],
   );
 });

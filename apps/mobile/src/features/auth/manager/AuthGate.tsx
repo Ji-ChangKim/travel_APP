@@ -21,7 +21,7 @@ import {
   savePendingMapsShare,
 } from '@/features/workspace/hub/model/mapsShare';
 
-// 직접 링크와 화면 복귀에도 로그인 선택 및 개인정보 설정 순서를 지킨다.
+// 직접 링크와 화면 복귀에서도 실제 계정과 허용된 복귀 경로를 확인한다.
 export default function AuthGate() {
   // 서버에서 확정한 프로필만 화면 전환의 근거로 사용한다.
   const starting = useSegments().join('/') === '';
@@ -52,7 +52,7 @@ function useMemberGate(
   url: string | null,
   params: Record<string, unknown>,
 ) {
-  // 게스트는 세 가지 개인정보 설정 없이 여행을 이용한다.
+  // 게스트는 기기 프로필로, 회원은 서버 기본 프로필로 이용한다.
   return useGateEffects(
     user,
     ready,
@@ -88,7 +88,7 @@ function useGateEffects(
   // 인증 복귀 중에는 콜백의 일회용 교환이 먼저 끝나게 한다.
   return (
     useEffect(() => {
-      // 인증 전에는 로그인 선택으로, 신규 회원은 세 가지 프로필 설정으로 이동한다.
+      // 인증 전 개인 화면만 로그인으로 보내고 추가 개인정보 입력은 요구하지 않는다.
       return ready &&
         !starting &&
         path !== '/auth/callback' &&
@@ -98,15 +98,7 @@ function useGateEffects(
           ? isPublicBrowsePath(path)
             ? undefined
             : routeToLogin(path, url, router, params)
-          : !user.onboardingCompleted &&
-              profile?.id === user.id &&
-              !profile.onboardingCompleted &&
-              path !== '/profile-setup'
-            ? router.replace({
-                pathname: '/profile-setup',
-                params: gateReturn(path, params),
-              })
-            : undefined
+          : undefined
         : undefined;
     }, [ready, starting, path, user, profile, router, url, params]),
     useEffect(() => {

@@ -334,7 +334,7 @@ export function createApp(fetcher: typeof fetch = fetch): Hono<ApiEnvironment> {
                     .use('/api/*', (c, next) =>
                       bodyLimit({
                         maxSize:
-                          /^\/api\/v1\/profile\/photo\/[0-9a-f-]{36}$/.test(
+                          /^\/api\/v1\/profile\/photo(?:\/[0-9a-f-]{36})?$/.test(
                             c.req.path,
                           )
                             ? 10485760

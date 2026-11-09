@@ -56,7 +56,7 @@ export default function SettingsScreenView(props: SettingsController) {
                 '게스트 계정을 로그아웃해도 이 기기에 저장된 여행 기록은 유지돼요.',
               )
             : t(
-                '계정에 저장한 여행은 같은 Google 계정으로 다시 로그인하면 언제든 볼 수 있어요.',
+                '계정에 저장한 여행은 같은 계정으로 다시 로그인하면 볼 수 있어요.',
               )
         }
         onCancel={closeLogout}

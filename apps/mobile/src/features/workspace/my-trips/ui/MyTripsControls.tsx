@@ -39,7 +39,7 @@ export function MyTripsHeader({
   const router = useRouter();
   return (
     <ScreenHeader
-      title={t('내 여행 계획')}
+      title={t('내 여행')}
       actions={[
         {
           icon: 'search',

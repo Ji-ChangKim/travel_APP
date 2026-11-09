@@ -1,5 +1,4 @@
 import { t } from '@/features/localization/translate';
-import { getLocale } from '@/features/localization/localeState';
 import { returnToScreen } from '@/components/navigation/navigationModel';
 import Text from '@/components/ui/AppText';
 import { colors } from '@/constants/theme';
@@ -9,18 +8,12 @@ import ScreenTitle from '@/components/navigation/ScreenTitle';
 import TripIcon from '@/components/icons/TripIcon';
 
 import type { UseQueryResult } from '@tanstack/react-query';
-import {
-  tripToday,
-  validTripDates,
-  type WorkspaceSnapshot,
-} from '@wherego/domain';
+import { validTripDates, type WorkspaceSnapshot } from '@wherego/domain';
 import type { ImperativeRouter } from 'expo-router';
 import type { Dispatch, SetStateAction } from 'react';
-import { Image, Pressable, View } from 'react-native';
-import { guideForTrip } from '../../community/model/cityGuides';
+import { Pressable, View } from 'react-native';
 
 import { requestScheduleExit } from '../../schedule/ui/scheduleExitGuard';
-import { travelDateRange } from '../../planning/model/travelDateRange';
 
 import type { WorkspaceDraftKind } from '../model/workspaceDrafts';
 import type { WorkspaceScreenActions } from '../model/workspaceScreenActions';
@@ -38,16 +31,6 @@ type RenderWorkspaceSummaryProps = {
   openDraft?: (kind: WorkspaceDraftKind) => void;
   setActiveSection?: Dispatch<SetStateAction<string>>;
 };
-
-// 날짜 문자열(YYYY-MM-DD)에서 짧은 요일 이름을 추출한다.
-function shortWeekday(date: string): string {
-  // 현지 날짜가 기기 시간대에 밀리지 않도록 UTC 정오 기준으로 계산한다.
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return '';
-  return new Intl.DateTimeFormat(getLocale(), {
-    weekday: 'short',
-    timeZone: 'UTC',
-  }).format(new Date(`${date}T12:00:00Z`));
-}
 
 // 시작일과 종료일(YYYY-MM-DD)로 N박 M일 요약 문구를 계산한다.
 function formatTripNightsDays(startDate: string, endDate: string): string {
@@ -67,26 +50,30 @@ function formatTripNightsDays(startDate: string, endDate: string): string {
     : t('당일치기');
 }
 
-// 출발 전 여행은 D-Day와 준비 상태를 결합한 배지 문구를 생성한다.
-function formatStatusBadgeLabel(
-  snapshot: WorkspaceSnapshot,
-  phase: string,
-  reminder: string,
-): string {
-  // 예정된 여행은 D-N · 여행 준비 중 형식으로 직관적인 카운트다운을 제공한다.
-  if (phase === 'PLANNED' && validTripDates(snapshot.trip)) {
-    const today = tripToday(snapshot.trip.timezone || 'UTC');
-    const diff = Math.round(
-      (Date.parse(snapshot.trip.startDate) - Date.parse(today)) / 86400000,
-    );
-    if (diff > 0) {
-      return `D-${diff} · ${t('여행 준비 중')}`;
-    }
+// 여행일정 타원 배지에 들어갈 날짜 범위(동일 연도·연도 변경·일정 미정)와 박수를 조합한다.
+function formatTripSchedulePillLabel(snapshot: WorkspaceSnapshot): string {
+  // 날짜가 확정된 경우 동일 연도는 MM.DD, 해가 바뀌면 YY.MM.DD 형식으로 표기한다.
+  if (validTripDates(snapshot.trip)) {
+    const { startDate, endDate } = snapshot.trip;
+    const crossYear = startDate.slice(0, 4) !== endDate.slice(0, 4);
+    const fmt = (d: string) =>
+      crossYear
+        ? `${d.slice(2, 4)}.${d.slice(5, 7)}.${d.slice(8, 10)}`
+        : `${d.slice(5, 7)}.${d.slice(8, 10)}`;
+    const dateRange =
+      startDate === endDate
+        ? fmt(startDate)
+        : `${fmt(startDate)}~${fmt(endDate)}`;
+    const nightsDays = formatTripNightsDays(startDate, endDate);
+    return nightsDays ? `${dateRange} (${nightsDays})` : dateRange;
   }
-  return reminder;
+  const dayCount = Math.max(1, snapshot.days.length);
+  return dayCount > 1
+    ? t('{p0}박 {p1}일', { p0: dayCount - 1, p1: dayCount })
+    : t('당일치기');
 }
 
-// 여행 제목·상태·목적지·기간·동행 요약을 상단 벤토 카드로 표시한다.
+// 상단 요약 박스에 1행(여행 타이틀)과 2행((여행일정) 타원 배지 | 동반자)을 표시한다.
 export function renderWorkspaceSummary({
   snapshot,
   router,
@@ -98,138 +85,108 @@ export function renderWorkspaceSummary({
   setActiveSection,
 }: RenderWorkspaceSummaryProps) {
   const presentation = tripPresentation(snapshot.trip);
-  const guide = guideForTrip(snapshot.trip.country, snapshot.trip.city);
-  const startDay = shortWeekday(snapshot.trip.startDate);
-  const endDay = shortWeekday(snapshot.trip.endDate);
-  const weekdayHint = startDay && endDay ? ` (${startDay}~${endDay})` : '';
-  const nightsDays = formatTripNightsDays(
-    snapshot.trip.startDate,
-    snapshot.trip.endDate,
-  );
-  const statusLabel = formatStatusBadgeLabel(
-    snapshot,
-    presentation.phase,
-    presentation.reminder,
-  );
+  const scheduleLabel = formatTripSchedulePillLabel(snapshot);
+  const locked = Boolean(busy || scanning || hasPending);
 
   return (
     <View style={hub.tripHeader} testID="trip-overview-card">
-      {['DRAFT', 'PLANNED', 'IN_PROGRESS'].includes(presentation.phase) && (
-        <View style={hub.badgeRow}>
-          <View style={hub.dateBadge} testID="trip-status-badge">
-            <View style={hub.statusDot} aria-hidden />
-            <Text style={hub.dateBadgeText}>{statusLabel}</Text>
-          </View>
-          {owner && openDraft ? (
-            <Pressable
-              testID="trip-overview-edit"
-              accessibilityRole="button"
-              accessibilityLabel={t('여행 기본 정보 수정')}
-              disabled={Boolean(busy || scanning || hasPending)}
-              onPress={() => {
-                // 상단 요약 카드의 수정 버튼으로 여행 기본 정보 편집 시트를 연다.
-                return openDraft('metadata');
-              }}
-              style={hub.editButton}
-            >
-              <Text style={hub.editButtonText}>{t('수정')}</Text>
-              <TripIcon name="journal-outline" size={14} color={colors.muted} />
-            </Pressable>
-          ) : null}
-        </View>
-      )}
-      <View style={hub.titleRow}>
-        <View style={hub.titleColumn}>
-          <ScreenTitle grow>{snapshot.trip.title}</ScreenTitle>
-          <View style={hub.metaInlineRow}>
-            <View style={hub.metaItem}>
-              <TripIcon
-                name="map-pin-outline"
-                size={15}
-                color={colors.brandCoral}
-              />
-              <Text style={hub.meta}>
-                {[snapshot.trip.country, snapshot.trip.city]
-                  .filter(Boolean)
-                  .join(' · ')}
-              </Text>
-            </View>
-            <View style={hub.metaItem}>
-              <TripIcon
-                name="calendar-outline"
-                size={15}
-                color={colors.primary}
-              />
-              <Text style={hub.status}>
-                {presentation.label} ·{' '}
-                {travelDateRange(
-                  snapshot.trip.startDate,
-                  snapshot.trip.endDate,
-                )}
-                {weekdayHint}
-                {nightsDays ? ` · ${nightsDays}` : ''}
-              </Text>
-            </View>
-          </View>
-        </View>
-        {guide?.photo ? (
-          <Image
-            source={guide.photo}
-            style={hub.thumbnail}
-            testID="trip-overview-thumbnail"
-            accessibilityLabel={t('{p0} 여행지 사진', {
-              p0: snapshot.trip.city || snapshot.trip.country,
-            })}
-          />
-        ) : (
-          <View style={hub.thumbnail} testID="trip-overview-thumbnail">
-            <TripIcon
-              name="landmark-duotone"
-              size={26}
-              color={colors.primary}
-            />
-          </View>
-        )}
-      </View>
-      <View style={hub.bottomBadgeRow}>
-        <View style={hub.companionBadge} testID="trip-companion-badge">
-          <TripIcon name="user-outline" size={14} color={colors.primary} />
-          <Text style={hub.companionBadgeText}>
-            {t('동행 {p0}명', { p0: Math.max(1, snapshot.members.length) })}
-          </Text>
-        </View>
-        {setActiveSection ? (
+      <View style={hub.summaryTitleRow}>
+        <ScreenTitle grow>{snapshot.trip.title}</ScreenTitle>
+        {owner && openDraft ? (
           <Pressable
-            testID="trip-invite-friend-btn"
+            testID="trip-overview-edit"
             accessibilityRole="button"
-            accessibilityLabel={t('친구 초대')}
-            disabled={Boolean(busy || scanning || hasPending)}
+            accessibilityLabel={t('여행 기본 정보 수정')}
+            disabled={locked}
             onPress={() => {
-              // 동행 초대 및 편집 권한 공유 화면으로 이동한다.
-              setActiveSection('companions');
+              // 여행 타이틀 행 우측의 수정 버튼으로 기본 정보 편집 시트를 연다.
+              return openDraft('metadata');
             }}
             style={hub.editButton}
           >
-            <TripIcon name="plus-outline" size={13} color={colors.brandCoral} />
-            <Text style={hub.editButtonText}>{t('친구 초대')}</Text>
+            <TripIcon name="journal-outline" size={14} color={colors.muted} />
+            <Text style={hub.editButtonText}>{t('수정')}</Text>
           </Pressable>
         ) : null}
       </View>
+      <View style={hub.summaryDivider} />
+      <View style={hub.summaryBottomRow}>
+        {owner && openDraft ? (
+          <Pressable
+            testID="trip-schedule-pill"
+            accessibilityRole="button"
+            accessibilityLabel={t('여행 기간 수정: {p0}', {
+              p0: scheduleLabel,
+            })}
+            disabled={locked}
+            onPress={() => {
+              // (여행일정) 타원 배지를 눌러 여행 기간을 수정한다.
+              return openDraft('period');
+            }}
+            style={hub.summarySchedulePill}
+          >
+            <TripIcon
+              name="calendar-outline"
+              size={14}
+              color={colors.primary}
+            />
+            <Text style={hub.summarySchedulePillText}>{scheduleLabel}</Text>
+          </Pressable>
+        ) : (
+          <View style={hub.summarySchedulePill} testID="trip-schedule-pill">
+            <TripIcon
+              name="calendar-outline"
+              size={14}
+              color={colors.primary}
+            />
+            <Text style={hub.summarySchedulePillText}>{scheduleLabel}</Text>
+          </View>
+        )}
+        {setActiveSection ? (
+          <Pressable
+            testID="trip-companion-badge"
+            accessibilityRole="button"
+            accessibilityLabel={t('동행 관리 ({p0})', {
+              p0: t('동행 {p0}명', {
+                p0: Math.max(1, snapshot.members.length),
+              }),
+            })}
+            disabled={locked}
+            onPress={() => {
+              // 우측 동반자 영역을 눌러 동행 목록 및 초대 화면을 연다.
+              setActiveSection('companions');
+            }}
+            style={hub.summaryCompanionBtn}
+          >
+            <TripIcon name="user-outline" size={15} color={colors.primary} />
+            <Text style={hub.summaryCompanionText}>
+              {t('동행 {p0}명', { p0: Math.max(1, snapshot.members.length) })}
+            </Text>
+          </Pressable>
+        ) : (
+          <View style={hub.summaryCompanionBtn} testID="trip-companion-badge">
+            <TripIcon name="user-outline" size={15} color={colors.primary} />
+            <Text style={hub.summaryCompanionText}>
+              {t('동행 {p0}명', { p0: Math.max(1, snapshot.members.length) })}
+            </Text>
+          </View>
+        )}
+      </View>
       {presentation.phase === 'COMPLETED' && (
-        <Text style={hub.meta}>
-          {t(
-            '여행이 끝났어요. 남긴 일정과 사진, 비용을 기록에서 확인해 보세요.',
-          )}
-        </Text>
-      )}
-      {presentation.phase === 'COMPLETED' && (
-        <Action
-          label={t('기록 보러가기')}
-          onPress={() => {
-            // 종료된 여행의 일정·사진·비용을 날짜별로 읽는다.
-            return router.push(`/diary/${snapshot.trip.id}`);
-          }}
-        />
+        <View style={hub.summaryBottomRow}>
+          <Text style={hub.meta}>
+            {t(
+              '여행이 끝났어요. 남긴 일정과 사진, 비용을 기록에서 확인해 보세요.',
+            )}
+          </Text>
+          <Action
+            label={t('기록 보러가기')}
+            onPress={() => {
+              // 종료된 여행의 일정·사진·비용을 날짜별로 읽는다.
+              return router.push(`/diary/${snapshot.trip.id}`);
+            }}
+          />
+        </View>
       )}
     </View>
   );
@@ -335,7 +292,7 @@ type RenderWorkspaceHeaderProps = {
   setActiveSection: Dispatch<SetStateAction<string>>;
 };
 
-// 실제 여행의 공통 이동 헤더를 표시한다.
+// 실제 여행의 공통 이동 헤더(< Title | ⋮)를 표시한다.
 export function renderWorkspaceHeader({
   id,
   router,
@@ -348,11 +305,11 @@ export function renderWorkspaceHeader({
   hasPending,
   confirmation,
   draftSaving,
-  setActiveSection,
 }: RenderWorkspaceHeaderProps): import('react').ReactNode {
   return (
     id && (
       <ScreenHeader
+        title={snapshot?.trip.title || t('여행 일정')}
         backLabel={t('내 여행 목록')}
         disabled={
           busy || scanning || hasPending || Boolean(confirmation) || draftSaving
@@ -371,27 +328,13 @@ export function renderWorkspaceHeader({
           snapshot && !workspace.isError
             ? [
                 {
-                  label: t('공유'),
-                  onPress: () => {
-                    // 상단 공유 버튼으로 공유 영역을 연다.
-                    return setActiveSection('share');
-                  },
-                },
-                {
                   icon: 'more',
                   label: t('여행 더보기'),
                   expanded: showTripMore,
                   onPress: () => {
-                    // 여행에 관련된 보조 행동만 메뉴로 연다.
-                    return setShowTripMore(true);
-                  },
-                },
-                {
-                  icon: 'account',
-                  label: t('MY'),
-                  onPress: () => {
-                    // 내 계정 화면으로 이동한다.
-                    return router.push('/my');
+                    /* 우측 상단 ⋮ 메뉴로 여행 부가 설정을 연다. */ return setShowTripMore(
+                      true,
+                    );
                   },
                 },
               ]

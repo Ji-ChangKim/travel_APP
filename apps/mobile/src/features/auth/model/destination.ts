@@ -9,7 +9,7 @@ import {
   linkedGuestTarget,
 } from '@/services/guestImportService';
 
-// 인증 후에는 개인정보 설정을 먼저 확인한 뒤 원래 요청한 행동을 이어간다.
+// 인증 후 기본 프로필을 확인하고 원래 요청한 행동을 이어간다.
 export function authenticatedDestination(
   next?: string,
   destination?: string,
@@ -26,7 +26,7 @@ export function authenticatedDestination(
   );
 }
 
-// 확인된 회원 프로필로 신규 가입 절차와 기존 여행 복귀를 결정한다.
+// 확인된 회원 프로필을 반영한 뒤 기존 여행이나 홈으로 복귀한다.
 function memberDestination(
   id: string | undefined,
   next?: string,
@@ -48,12 +48,7 @@ function memberDestination(
               params: authReturn(next, destination, tripId, context),
             }
           : (useTripStore.getState().updateProfile(profile),
-            profile.onboardingCompleted
-              ? completedDestination(next, destination, tripId, false, context)
-              : {
-                  pathname: '/profile-setup',
-                  params: authReturn(next, destination, tripId, context),
-                });
+            completedDestination(next, destination, tripId, false, context));
       });
 }
 

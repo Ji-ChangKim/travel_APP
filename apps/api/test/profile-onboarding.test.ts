@@ -132,7 +132,7 @@ test('최초 완료·응답 재조회·재시도는 같은 프로필이며 완�
   const operationId = crypto.randomUUID();
   const command = {
     operationId,
-    nickname: '  하루01 ',
+    nickname: '하루01',
     avatarType: 'avatar',
     avatarId: 'haru-traveler',
   };
@@ -195,11 +195,11 @@ test('프로필 편집은 닉네임 경계·한글 정규화·기존 이름 예�
   try {
     for (const value of [
       '',
-      '가',
+      ' 가',
       '가'.repeat(11),
-      '여행 자',
+      '여행   자',
       '여행😀',
-      'ㅎㄱ',
+      '旅行',
     ]) {
       assert.equal((await patch({ nickname: value })).status, 422);
       assert.equal(await nickname(), '하루01');

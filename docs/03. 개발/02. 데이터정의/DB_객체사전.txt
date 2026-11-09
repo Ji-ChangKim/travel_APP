@@ -6,8 +6,8 @@
 
 A. 저장소 기준
 - 물리 데이터베이스: Cloudflare D1(SQLite), Worker 바인딩 `DB`.
-- 미디어 저장소: 비공개 Cloudflare R2, Worker 바인딩 `MEDIA`. 바이너리는 R2에, 메타데이터와 권한은 D1에 보관한다.
-- 물리 스키마는 `apps/api/migrations/*.sql`을 적용한 업무 테이블 33개(컬럼 199개)로 구성된다.
+- 미디어 저장소: 비공개 Cloudflare R2, Worker 바인딩 `MEDIA`. 바이너리는 R2에, 업무 권한은 D1에 보관한다. 새 MY 사진의 현재 상태·ETag·업로드 시각·MIME은 R2 객체를 기준으로 조회한다.
+- 물리 스키마는 `apps/api/migrations/*.sql`을 적용한 업무 테이블 34개(컬럼 204개)로 구성된다. 0016은 로컬 검증했으며 원격 적용하지 않았다.
 - 앱 서버의 `*_at` 시각은 UTC epoch 밀리초(`INTEGER`)이며, 여행의 날짜(`YYYY-MM-DD`)·현지 시각(`HH:mm`)은 JSON 내부 문자열로 구분한다.
 
 ================================================================================
@@ -19,7 +19,7 @@ B. Cloudflare D1 기본 테이블 명세 (계정 확장·호환 구조는 E절 �
 
 테이블명: user / 인증 계정
 id | TEXT | PK | 없음 | PK | 계정 식별자
-name | TEXT | NOT NULL | 없음 | 고유 제약 없음 | 신규 기본 표시값 여행자. 기존 개인 표시명은 정리 작업으로 제거
+name | TEXT | NOT NULL | 없음 | 고유 제약 없음 | 기본 여행자 또는 MY에서 직접 선택한 member_profile_names.nickname의 표시용 사본. 과거 공급자 개인 표시명만 정리
 email | TEXT | NOT NULL | 없음 | UNIQUE | 로그인 이메일
 emailVerified | INTEGER | NOT NULL | 0 | - | 이메일 확인 여부
 image | TEXT | NULL 허용 | 없음 | - | SDK 호환 컬럼. 신규 NULL, 기존 값 정리
@@ -27,7 +27,7 @@ createdAt | INTEGER | NOT NULL | 없음 | - | 계정 생성 시각
 updatedAt | INTEGER | NOT NULL | 없음 | - | 계정 수정 시각
 isAnonymous | INTEGER | NOT NULL | 0 | - | 서버 익명(게스트) 계정 여부
 DDL: CREATE TABLE user (id TEXT PRIMARY KEY, name TEXT NOT NULL, email TEXT NOT NULL UNIQUE, emailVerified INTEGER NOT NULL DEFAULT 0, image TEXT, createdAt INTEGER NOT NULL, updatedAt INTEGER NOT NULL, isAnonymous INTEGER NOT NULL DEFAULT 0, lastLoginAt INTEGER   CHECK(lastLoginAt IS NULL OR lastLoginAt > 0));
-닉네임 고유 인덱스는 0011에서 제거했다. 추가 닉네임 입력을 받지 않는다.
+user.name의 과거 고유 인덱스는 0011에서 제거했다. 가입에 추가 입력을 요구하지 않는다. MY 선택 닉네임의 고유 예약은 0016의 member_profile_names.nickname_key에서 처리한다.
 
 테이블명: session / 로그인 세션
 id | TEXT | PK | 없음 | PK | 세션 식별자
@@ -284,7 +284,7 @@ DB명: Cloudflare D1. 실행 원본은 0014·0015 마이그레이션이다. 운�
 기존 테이블명: user / 추가 컬럼
 lastLoginAt | INTEGER | NULL 허용 | 기본값 없음 | CHECK(NULL OR >0) | 성공한 Google 로그인 시각, UTC 밀리초. 세션 조회·자동 갱신은 새 로그인으로 세지 않는다.
 기존 id는 여행·권한의 참조를 유지한다. email은 SDK 호환 고유 제약을 유지하되 Google 연결 키·통계 식별자로 사용하지 않는다.
-name은 기본 표시값, image는 NULL을 목표로 하며 직접 프로필 입력과 Google 이름·사진의 신규 영속 수집을 제거한다.
+name은 기본 표시값 또는 MY 선택 닉네임 사본이며 image는 NULL을 유지한다. Google 이름·사진의 신규 영속 수집은 하지 않는다. 0016 이후 사용자가 직접 선택한 새 닉네임·R2 사진은 과거 개인정보 정리에서 보존한다.
 
 기존 테이블명: account / 추가 인덱스
 account_google_user | UNIQUE(userId) WHERE providerId='google' | 내부 계정당 하나의 Google 연결.
@@ -328,7 +328,7 @@ updated_at | INTEGER | NOT NULL | 기본값 없음 | CHECK >0 | 마지막 집계
 
 제거 대상: profiles의 불필요한 계정 입력, profile_photos, profile_submit_operations와 관련 사본·원본.
 제거 순서: 신규 수집 중단 → 앱·API·도메인 의존 제거 → 기존 자료 정리 검증 → 불필요 테이블·컬럼 정리.
-추가 입력 HTTP 경로는 닫았다. 기존 자료 정리·실제 삭제는 서버 작업으로 구현하고 격리 DB에서 검사했다. 운영 데이터는 삭제하지 않았다. 기존 Google 외 계정을 자동 합치거나 폐기하지 않는다.
+과거 추가 입력 HTTP 경로는 닫았다. 0016 이후 MY 닉네임 PATCH와 고정 PNG PUT/GET만 새 계약으로 허용한다. 기존 자료 정리·실제 삭제는 서버 작업으로 구현하고 격리 DB에서 검사했다. 운영 데이터는 삭제하지 않았다. 기존 Google 외 계정을 자동 합치거나 폐기하지 않는다.
 
 아래 호환·작업 테이블은 실제 마이그레이션의 DDL과 함께 관리한다.
 
@@ -398,6 +398,15 @@ profiles 호환 컬럼(신규 입력 중단, 정리 후 행 제거): avatar_type
 
 R2 객체: account-deletions/<userId>.json / 비공개 복원 차단 표식. userId UUID, jobId UUID, policyVersion account-delete-v1, requestedAt 양의 정수 UTC 밀리초. 이메일·sub·이름·여행 본문 없음. 복원 가능한 계정 사본이 없음을 확인한 뒤 운영자가 정리한다. user 행 삭제로 표식을 지우지 않는다.
 
+앱 계정 표시 객체 (기존 서버 계약의 프런트 매핑, DB 스키마 변경 없음)
+profileSchema | GET /api/v1/profile | user, member_profile_names, R2 현재 객체 조회 | gender/birthDate는 nullable·생략 허용. 기본 프로필 복원에 개인정보 입력을 요구하지 않음. 새 선택 닉네임·사진 메타데이터는 F절 참조
+AccountInfo | accountManagement.ts | user/account 조회 | id UUID 필수, accountType enum google_member/legacy_guest/legacy_member 필수, email string|null, createdAt ISO datetime 필수, lastLoginAt ISO datetime|null. 본인 화면 전용
+DeletionPreview | accountManagement.ts | trips/trip_members 조회 | policyVersion account-delete-v1 필수, ownedTripsToDelete/sharedTripsToLeave/ownershipTransfersRequired는 UUID 배열 필수. 개인 삭제·공유 탈퇴·이전 대상을 구분
+TransferTrip | accountManagement.ts | 권한 있는 WorkspaceSnapshot 조회 | id UUID, title string, version 양의 정수, candidates 배열의 id UUID/name string. 현재 소유자의 다른 참여자만 포함. 새 DB 저장 객체 아님
+AccountManagement | accountManagement.ts | 조회 결과 조합 | account AccountInfo, preview DeletionPreview, transfers TransferTrip[]. 계정별 조회 캐시에만 보관. 서버 회원·기기 게스트를 구분
+AccountConfirmation | accountManagement.ts | 화면 내 확인 상태 | kind delete/transfer, actorId UUID 필수. delete는 policyVersion, transfer는 tripId/tripTitle/newOwnerId/name/version을 고정. 서버 쓰기·통계·외부 전송 객체 아님
+deletionAcceptedSchema | DELETE /api/v1/account | account_deletion_jobs 접수 결과 | jobId UUID, state pending, policyVersion account-delete-v1 필수. HTTP 202 접수이며 실제 삭제 완료가 아님
+
 신규 처리 진행 컬럼 및 상태 테이블 (0014 실행 원본)
 account_deletion_jobs.trip_cursor | TEXT | NOT NULL | 빈 문자열 | - | 정리한 공유 여행 UUID의 마지막 위치. 한 호출 최대 2개 여행 처리
 account_deletion_jobs.file_cursor | TEXT | NOT NULL | 빈 문자열 | - | R2 목록 진행 커서. 한 호출 최대 1000개 객체 대조
@@ -412,3 +421,43 @@ DDL: CREATE TABLE account_storage_sweep(id INTEGER PRIMARY KEY CHECK(id=1),curso
 
 account_data_cleanup_due | INDEX(attempted_at,user_id) | 개인정보 정리 순서 조회
 account_deletion_due | INDEX(attempts,requested_at,lease_until) | 실패 작업이 다른 계정 삭제를 막지 않는 조회 순서
+
+================================================================================
+F. MY 선택 닉네임·프로필 사진 (0016 / 로컬 검증, 원격 미적용)
+================================================================================
+DB명: Cloudflare D1 / Worker 바인딩 DB. 스테이징 대상 이름은 배포 환경 설정을 따른다.
+마이그레이션: apps/api/migrations/0016_member_profile_names.sql. 기존 인증·여행 행을 옮기거나 공급자 이름을 수집하지 않는 추가 테이블이다.
+
+테이블명: member_profile_names / Google 회원이 MY에서 직접 선택한 닉네임 예약
+user_id | TEXT | NOT NULL | 없음 | PK, FK user(id) ON DELETE CASCADE | 닉네임을 선택한 내부 회원 UUID. 회원당 최대 한 행
+nickname | TEXT | NOT NULL | 없음 | CHECK length 1~10, trim(nickname)=nickname, ASCII 공백 총 2개 이하 | NFC 정규화한 표시 이름. 공백 포함 길이, 앞뒤 공백 금지
+nickname_key | TEXT | NOT NULL | 없음 | UNIQUE, CHECK nickname_key=lower(nickname) | NFC + 영어 소문자 비교 키. 내부 공백 수 유지
+changed_at | INTEGER | NOT NULL | 없음 | CHECK >0 | 마지막 성공 변경의 서버 UTC epoch 밀리초
+revision | INTEGER | NOT NULL | 1 | CHECK >0 | 최초 1, 실제 이름 변경 시 +1. 같은 표시 이름 요청에는 증가 없음
+API 제약: 영어·숫자·한글·히라가나·가타카나·장음 ー·내부 ASCII 공백만 허용한다. 한자·기호·이모지·탭·줄바꿈·공백만 거부. 허용 문자 검사는 공통 validation, 길이·공백·고유 제약은 DB도 검사한다.
+시간 제약: 최초 선택은 즉시 가능, 이후 changed_at + 2592000000ms부터 변경 가능. UPSERT의 조건으로 같은 회원의 동시 변경 한 번만 확정한다. nickname_key UNIQUE로 회원 간 동시 중복을 거부한다.
+원자성: 닉네임 예약, user.name, 기존 posts.snapshot.author, 참여 trips.snapshot.members[].nickname 및 여행 version 갱신은 D1 배치 한 트랜잭션이다. 실패는 롤백한다. 변경하면 기존 이름의 예약은 해제된다.
+기본값: 선택 행이 없으면 여행자로 표시한다. 기본 표시값은 예약하지 않는다. Google 인증 이름을 최초 닉네임으로 자동 예약하지 않는다.
+트리거: deletion_guard_member_profile_insert / deletion_guard_member_profile_update. account_deletion_jobs에 해당 회원이 있으면 ACCOUNT_DELETION_PENDING으로 거부한다. 삭제 시 user FK cascade로 예약을 제거한다.
+
+R2 DB명(버킷): tripprint-staging-private / Worker 바인딩 MEDIA
+객체명: User/profile/pfImg_{userId}.png / memberProfilePhotoKey(userId)
+내용 | PNG 바이너리 | 필수 | 최대 10485760바이트 | 앱에서 최대 긴 변 1024px로 실제 PNG 변환, 서버 형식 검사·메타데이터 제거
+httpMetadata.contentType | string | 필수 | image/png | 조회 응답 MIME
+httpMetadata.cacheControl | string | 필수 | private, no-store | 비공개 본인 조회. 공통 응답 헤더도 no-store 적용
+customMetadata.actor | string(UUID) | 필수 | 소유 회원 ID | 소유권 대조·탈퇴 및 고아 파일 정리
+etag / uploaded / size | R2 관리 메타데이터 | R2 제공 | 현재 객체 값 | 이미지 버전·수정 시각·용량. 별도 D1 사진 행을 만들지 않음
+제약: 같은 회원 키 덮어쓰기로 현재 객체 한 개. 사진 변경 간격 제한 없음. GET은 인증된 본인 키만 사용한다. 과거 profiles/{id} 및 profile_photos 랜덤 ID 저장을 재사용하지 않는다. 새 사진 공개 배포는 이번 범위 밖이다.
+
+도메인 객체: Profile / 기존 프로필 응답의 선택 필드 확장
+nicknameConfigured | boolean | 선택 | 서버 응답은 항상 포함 | member_profile_names 행 존재 여부. false면 공용 기본 표시
+nicknameChangeAllowed | boolean | 선택 | 서버 응답은 항상 포함 | 현재 Google 회원 권한과 서버 시각으로 변경 가능 여부 판정. 앱 시계가 서버 제한을 대신하지 않음
+nicknameNextChangeAt | string ISO datetime 또는 null | 선택 | 서버 응답은 항상 포함 | 선택한 이름이 있으면 changed_at+30일, 없으면 null
+canEditProfile | boolean | 선택 | 서버 응답은 항상 포함 | 유효 Google 연결 및 계정 수명 상태에 따른 변경 권한
+avatarType | 기존 default/avatar/photo | 기존 속성 | 현재 새 사진은 photo 또는 default | 기존 호환 선택지는 유지하되 새 아바타 선택 기능은 추가하지 않음
+avatarUrl | string URL 또는 null | 기존 속성 | 본인 /api/v1/profile/photo?v={ETag} | 인증 조회 URL. R2 공개 URL이 아님
+photoFileRef | UUID 또는 null | 기존 속성 | 새 사진이면 본인 회원 UUID | 기존 랜덤 파일 ID를 새 사진의 기준으로 사용하지 않음
+updatedAt | string ISO datetime | 기존 속성 | user.updatedAt·changed_at·R2 uploaded 중 최근 | 사진 교체를 닉네임 변경 시각으로 계산하지 않음
+
+적용 순서: 대상 DB·백업 상태 확인 → 0016 마이그레이션 → 새 API → 앱. 원격 DB·R2·운영 배포는 이번 로컬 구현에서 변경하지 않았다.
+복구: 앱/API를 이전 버전으로 되돌릴 때 새 테이블·R2 객체를 즉시 삭제하지 않는다. 새 닉네임·사진을 보존한 상태에서 이전 개인정보 정리 작업이 이 자료를 지우지 않는지 확인한 뒤 복구 범위를 정한다. 운영 적용·삭제는 별도 승인 범위를 따른다.

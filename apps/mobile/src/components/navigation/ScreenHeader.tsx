@@ -5,6 +5,7 @@ import ScreenTitle from './ScreenTitle';
 import HeaderAction from './HeaderAction';
 import HeaderActions, { type HeaderActionItem } from './HeaderActions';
 import { designTokens } from '@/constants/theme';
+import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 
 // 뒤로가기·제목·우측 행동을 화면마다 같은 순서와 규격으로 표시한다.
 export default function ScreenHeader({
@@ -25,6 +26,11 @@ export default function ScreenHeader({
   inlineTitle?: boolean;
 }) {
   useLocale();
+  const { largeText } = useAppAccessibility();
+  // 큰 글꼴과 우측 행동이 겹치면 기존 제목 전용 행에서 전체 폭을 사용한다.
+  const titleBelow = Boolean(
+    onBack && title && (!inlineTitle || (largeText && actions?.length)),
+  );
   // 글자 확대 여부로 빈 행을 만들지 않고 실제 콘텐츠만 배치한다.
   return (
     <View testID="screen-header" style={[s.header, inset && s.inset]}>
@@ -39,7 +45,7 @@ export default function ScreenHeader({
         ) : title ? (
           <ScreenTitle grow>{title}</ScreenTitle>
         ) : null}
-        {onBack && title && inlineTitle ? (
+        {onBack && title && !titleBelow ? (
           <ScreenTitle grow>{title}</ScreenTitle>
         ) : null}
         {actions?.length ? (
@@ -48,7 +54,7 @@ export default function ScreenHeader({
           </View>
         ) : null}
       </View>
-      {onBack && title && !inlineTitle ? (
+      {titleBelow && title ? (
         <View style={s.heading}>
           <ScreenTitle>{title}</ScreenTitle>
         </View>

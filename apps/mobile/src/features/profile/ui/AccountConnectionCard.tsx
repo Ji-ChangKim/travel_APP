@@ -3,45 +3,54 @@ import { colors } from '@/constants/theme';
 import { t } from '@/features/localization/translate';
 import { Ionicons } from '@expo/vector-icons';
 import { View } from 'react-native';
-import { styles as accountStyles } from '../styles/myAccountStyles';
+import { styles } from '../styles/myAccountStyles';
 import type { AccountRetirementController } from '../manager/useAccountRetirement';
-// 현재 연결된 계정과 계정 종류별 안내를 표시한다.
+
+// 외부 공급자는 서버가 확인한 종류만 표시하고 이메일은 본인 화면에만 둔다.
 export default function AccountConnectionCard({
   user,
-}: Pick<AccountRetirementController, 'user'>) {
-  return user ? (
-    <View style={accountStyles.section}>
-      <Text style={accountStyles.sectionTitle}>{t('연결된 계정')}</Text>
-      <View style={accountStyles.listCard}>
-        <View style={accountStyles.listRow}>
-          <View style={accountStyles.listIconBox}>
-            <Ionicons
-              name={
-                user.authProvider === 'guest'
-                  ? 'phone-portrait-outline'
-                  : 'logo-google'
-              }
-              size={20}
-              color={colors.primary}
-            />
-          </View>
-          <View style={accountStyles.listTextGroup}>
-            <Text style={accountStyles.listTitle}>{user.nickname}</Text>
-            <Text style={accountStyles.listSubtitle}>
-              {user.authProvider === 'guest'
-                ? t(
-                    '현재 기기 전용 게스트 계정으로 이용 중이에요. Google 계정의 탈퇴를 진행하려면 해당 계정으로 로그인해 주세요.',
-                  )
-                : t('현재 연결된 Google 계정의 보관 및 탈퇴 정책을 안내해요.')}
+  management,
+}: Pick<AccountRetirementController, 'user' | 'management'>) {
+  if (!user) return null;
+  const guest = user.authProvider === 'guest';
+  const google = management?.account.accountType === 'google_member';
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>{t('현재 이용 방식')}</Text>
+      <View style={styles.card}>
+        <View style={styles.profileCardHeader}>
+          <Ionicons
+            name={
+              guest
+                ? 'phone-portrait-outline'
+                : google
+                  ? 'logo-google'
+                  : 'person-outline'
+            }
+            size={24}
+            color={colors.primary}
+            accessible={false}
+          />
+          <View style={styles.profileInfo}>
+            <Text style={styles.userName}>
+              {user.nickname.trim() || t('여행자')}
+            </Text>
+            <Text style={styles.settingDesc}>
+              {t(guest ? '게스트 계정' : google ? 'Google 계정' : '회원 계정')}
             </Text>
           </View>
-          <Text style={accountStyles.listValue}>
-            {user.authProvider === 'guest'
-              ? t('게스트 계정')
-              : t('Google 계정')}
-          </Text>
         </View>
+        {google && management.account.email ? (
+          <Text style={styles.settingDesc}>{management.account.email}</Text>
+        ) : null}
+        <Text style={styles.settingDesc}>
+          {t(
+            guest
+              ? '게스트 여행은 현재 이 기기에 보관돼요.'
+              : '계정 정보는 본인에게만 표시돼요.',
+          )}
+        </Text>
       </View>
     </View>
-  ) : null;
+  );
 }

@@ -222,7 +222,7 @@ export function cloudProfile(user: CloudUser, osPlatform: OsPlatform): Profile {
   // 실제 회원 UUID와 닉네임을 유지한다.
   return {
     id: user.id,
-    nickname: user.isAnonymous ? user.name : '',
+    nickname: user.isAnonymous ? user.name || '여행자' : '여행자',
     avatarUrl: null,
     authProvider: user.isAnonymous ? 'guest' : 'email',
     onboardingCompleted: Boolean(user.isAnonymous),

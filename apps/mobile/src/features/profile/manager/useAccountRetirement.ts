@@ -1,119 +1,264 @@
 import { submitOnce } from '@/features/forms/submissionLock';
 import { serverOptions } from '@/features/workspace/shared/manager/service';
+import {
+  completeFormExit,
+  useScheduleExitGuard,
+} from '@/features/workspace/schedule/ui/scheduleExitGuard';
 import { authRevision, clearRevokedCloudSession } from '@/services/cloudAuth';
 import { useTripStore } from '@/stores/useTripStore';
-import { FoundationClientError, requestFoundation } from '@wherego/api-client';
+import { t } from '@/features/localization/translate';
+import { foundationQueryKey } from '@wherego/api-client';
+import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { useRef, useState } from 'react';
-import { z } from 'zod';
-const responseSchema = z.object({
-  data: z.object({
-    requestedAt: z.string().datetime(),
-    purgeAfter: z.string().datetime(),
-  }),
-});
-// 탈퇴 요청과 재인증의 상태를 관리하며 확인한 계정의 응답만 적용한다.
+import { useEffect, useRef, useState } from 'react';
+import {
+  accountRequestFailure,
+  type AccountConfirmation,
+} from '../model/accountManagement';
+import {
+  loadAccountManagement,
+  submitAccountDeletion,
+  submitOwnershipTransfer,
+} from './accountManagementService';
+
+type AccountActionState = {
+  actorId: string;
+  revision: number;
+  busy: boolean;
+  error: string;
+  notice: string;
+  reauthenticate: boolean;
+  needsRefresh: boolean;
+  selection: Record<string, string>;
+  confirmation: AccountConfirmation | null;
+};
+function emptyAction(actorId: string, revision: number): AccountActionState {
+  return {
+    actorId,
+    revision,
+    busy: false,
+    error: '',
+    notice: '',
+    reauthenticate: false,
+    needsRefresh: false,
+    selection: {},
+    confirmation: null,
+  };
+}
+
+// 조회 캐시와 변경 요청 모두 계정·인증 수명으로 구분한다.
 export function useAccountRetirement() {
-  // 같은 화면에서 계정이 바뀌면 이전 확인 대상을 새 계정에 적용하지 않는다.
-  const user = useTripStore((state) => {
-    return state.currentUser;
-  });
-
-  const router = useRouter();
-
-  const lock = useRef(false);
-
-  const [busy, setBusy] = useState(false);
-
-  const [confirming, setConfirming] = useState('');
-
-  const [error, setError] = useState('');
-
-  const [reauthenticate, setReauthenticate] = useState(false);
-
-  const [completed, setCompleted] = useState('');
-
+  const user = useTripStore((state) => state.currentUser);
   const userId = user?.id || '';
+  const member = Boolean(userId && user?.authProvider !== 'guest');
+  const revision = authRevision();
+  const router = useRouter();
+  const lock = useRef(false);
+  const scope = useRef({ active: true });
+  const [action, setAction] = useState(() => emptyAction(userId, revision));
+  const [acceptedRevision, setAcceptedRevision] = useState<number | null>(null);
+  const state =
+    action.actorId === userId && action.revision === revision
+      ? action
+      : emptyAction(userId, revision);
+  const query = useQuery({
+    queryKey: foundationQueryKey(userId, 'account-management'),
+    queryFn: async ({ signal }) =>
+      loadAccountManagement(await serverOptions(userId), userId, signal),
+    enabled: member,
+    staleTime: 0,
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+  const management =
+    !state.needsRefresh && query.data?.account.id === userId
+      ? query.data
+      : null;
+  const loading = member && (query.isPending || query.isFetching);
+  const recovery = query.isError ? accountRequestFailure(query.error) : null;
+  const completed = acceptedRevision !== null && acceptedRevision === revision;
+  const confirming = state.confirmation;
+  const busy = state.busy;
 
-  function retire(): void {
-    // 확인한 계정과 현재 계정이 같을 때 한 번만 전송한다.
-    if (!userId || confirming !== userId || busy || lock.current) return;
-    setBusy(true);
-    setError('');
-    setConfirming('');
-    const started = authRevision();
-    submitOnce(lock, async () => {
-      // 정상 인증과 서버의 최근 로그인 검사를 통과한 뒤에만 기기 세션을 비운다.
-      const options = await serverOptions(userId);
-      if (!options.accessToken || authRevision() !== started) return;
-      const result = responseSchema.parse(
-        await requestFoundation(options, '/account/retirement', {
-          method: 'POST',
-          body: JSON.stringify({ confirm: true }),
-        }),
-      );
-      if (
-        authRevision() !== started ||
-        useTripStore.getState().currentUser?.id !== userId
+  useEffect(() => {
+    const current = scope.current;
+    current.active = true;
+    return () => {
+      current.active = false;
+    };
+  }, []);
+  useScheduleExitGuard(null, busy, () => {});
+
+  function valid(actorId: string, started: number): boolean {
+    return (
+      scope.current.active &&
+      authRevision() === started &&
+      useTripStore.getState().currentUser?.id === actorId
+    );
+  }
+  function patch(change: Partial<AccountActionState>): void {
+    setAction((previous) => ({
+      ...(previous.actorId === userId && previous.revision === revision
+        ? previous
+        : emptyAction(userId, revision)),
+      ...change,
+    }));
+  }
+  function reload(): void {
+    if (busy || lock.current || !member) return;
+    patch({
+      error: '',
+      reauthenticate: false,
+      needsRefresh: true,
+      confirmation: null,
+      selection: {},
+    });
+    void query.refetch().then((result) => {
+      if (valid(userId, revision) && result.isSuccess)
+        patch({ needsRefresh: false });
+    });
+  }
+  function chooseOwner(tripId: string, newOwnerId: string): void {
+    if (
+      busy ||
+      loading ||
+      !management?.transfers.some(
+        (trip) =>
+          trip.id === tripId &&
+          trip.candidates.some((candidate) => candidate.id === newOwnerId),
       )
-        return;
-      const cleared = await clearRevokedCloudSession(options.accessToken);
-      // 인증 구독이 계정을 반영하므로 여기서 새 화면 계정을 직접 비우지 않는다.
-      if (cleared && authRevision() === started + 1)
-        setCompleted(result.data.purgeAfter);
+    )
+      return;
+    patch({
+      selection: { ...state.selection, [tripId]: newOwnerId },
+      confirmation: null,
+    });
+  }
+  function confirmTransfer(tripId: string): void {
+    const trip = management?.transfers.find((value) => value.id === tripId);
+    const candidate = trip?.candidates.find(
+      (value) => value.id === state.selection[tripId],
+    );
+    if (!trip || !candidate || busy || loading) return;
+    patch({
+      confirmation: {
+        kind: 'transfer',
+        actorId: userId,
+        tripId,
+        tripTitle: trip.title,
+        newOwnerId: candidate.id,
+        name: t('{name} · 동행자 {number}', {
+          name: candidate.name,
+          number:
+            trip.candidates.findIndex((value) => value.id === candidate.id) + 1,
+        }),
+        version: trip.version,
+      },
+    });
+  }
+  function confirmDeletion(): void {
+    if (
+      !management ||
+      busy ||
+      loading ||
+      management.preview.ownershipTransfersRequired.length
+    )
+      return;
+    patch({
+      confirmation: {
+        kind: 'delete',
+        actorId: userId,
+        policyVersion: management.preview.policyVersion,
+      },
+    });
+  }
+  function cancelConfirmation(): void {
+    if (!busy && !lock.current) patch({ confirmation: null });
+  }
+  function confirmRequest(): void {
+    if (!confirming || !management || busy || loading || lock.current) return;
+    const submitted = confirming;
+    const started = revision;
+    patch({ busy: true, error: '', notice: '', reauthenticate: false });
+    submitOnce(lock, async () => {
+      const options = await serverOptions(submitted.actorId);
+      if (!options.accessToken || !valid(submitted.actorId, started)) return;
+      if (submitted.kind === 'transfer') {
+        await submitOwnershipTransfer(options, submitted);
+        if (!valid(submitted.actorId, started)) return;
+        patch({
+          confirmation: null,
+          selection: {},
+          needsRefresh: true,
+          notice: '소유권을 이전했어요. 계정에 남은 여행을 다시 확인해 주세요.',
+        });
+        const refreshed = await query.refetch();
+        if (valid(submitted.actorId, started) && refreshed.isSuccess)
+          patch({ needsRefresh: false });
+      } else {
+        await submitAccountDeletion(options, submitted.policyVersion);
+        if (!valid(submitted.actorId, started)) return;
+        const cleared = await clearRevokedCloudSession(options.accessToken);
+        // 서버 접수 뒤에도 기다리는 동안 바뀐 새 계정의 세션은 지우지 않는다.
+        if (scope.current.active && cleared && authRevision() === started + 1) {
+          setAcceptedRevision(started + 1);
+        }
+      }
     })
       ?.catch((failure: unknown) => {
-        // 재인증과 연결 실패를 구분하고 성공하지 않은 요청을 탈퇴 완료로 표시하지 않는다.
-        if (
-          authRevision() !== started ||
-          useTripStore.getState().currentUser?.id !== userId
-        )
-          return;
-        const recent =
-          failure instanceof FoundationClientError && failure.status === 403;
-        setReauthenticate(recent);
-        setError(
-          recent
-            ? '계정 보호를 위해 다시 로그인한 뒤 요청해 주세요.'
-            : '요청 결과를 확인하지 못했어요. 다시 로그인해 계정 상태를 확인해 주세요.',
-        );
-      })
-      .finally(() => {
-        // 다음 요청도 중복 잠금의 수명을 따르게 한다.
-        return setBusy(false);
-      });
-  }
-  // 정상 로그아웃을 마친 뒤 같은 계정 관리 목적지로 재인증한다.
-  function requestReauthentication(): void {
-    // 기존 세션을 정상 종료한 뒤 실제 인증 화면에서 다시 확인한다.
-    return void useTripStore
-      .getState()
-      .logout()
-      .then(() => {
-        // 재인증 후 같은 계정 관리 경로로 돌아온다.
-        return router.replace({
-          pathname: '/login',
-          params: { next: 'account' },
+        if (!valid(submitted.actorId, started)) return;
+        const failureState = accountRequestFailure(failure);
+        patch({
+          confirmation: null,
+          error: failureState.message,
+          reauthenticate: failureState.reauthenticate,
+          needsRefresh: failureState.refresh,
         });
       })
-      .catch(() => {
-        // 로그아웃 실패를 재인증 성공으로 넘기지 않는다.
-        return setError(
-          '로그아웃하지 못했어요. 연결을 확인하고 다시 시도해 주세요.',
-        );
+      .finally(() => {
+        if (valid(submitted.actorId, started)) patch({ busy: false });
+      });
+  }
+  function requestReauthentication(): void {
+    if (busy || lock.current) return;
+    const started = revision;
+    patch({ busy: true });
+    submitOnce(lock, async () => {
+      await useTripStore.getState().logout();
+      if (!scope.current.active || authRevision() !== started + 1) return;
+      completeFormExit(() =>
+        router.replace({ pathname: '/login', params: { next: 'account' } }),
+      );
+    })
+      ?.catch(() => {
+        if (valid(userId, started))
+          patch({
+            error: '로그아웃하지 못했어요. 연결을 확인하고 다시 시도해 주세요.',
+          });
+      })
+      .finally(() => {
+        if (valid(userId, started)) patch({ busy: false });
       });
   }
   return {
     user,
-    router,
     userId,
+    router,
+    management,
+    loading,
     busy,
-    confirming,
-    error,
-    reauthenticate,
+    error: state.error || recovery?.message || '',
+    notice: state.notice,
+    reauthenticate: state.reauthenticate || Boolean(recovery?.reauthenticate),
     completed,
-    setConfirming,
-    retire,
+    confirming,
+    selection: state.selection,
+    reload,
+    chooseOwner,
+    confirmTransfer,
+    confirmDeletion,
+    cancelConfirmation,
+    confirmRequest,
     requestReauthentication,
   };
 }

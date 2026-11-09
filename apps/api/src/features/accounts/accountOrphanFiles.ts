@@ -18,7 +18,9 @@ export async function removeOrphanAccountFiles(env: Env): Promise<void> {
   const candidates: { key: string; actor: string; tripId: string | null }[] =
     [];
   for (const item of page.objects) {
-    const profile = /^profiles\/([0-9a-f-]{36})\//.exec(item.key);
+    const profile =
+      /^profiles\/([0-9a-f-]{36})\//.exec(item.key) ||
+      /^User\/profile\/pfImg_([0-9a-f-]{36})\.png$/.exec(item.key);
     const actor = item.customMetadata?.actor || profile?.[1];
     if (!foundationUuidSchema.safeParse(actor).success) continue;
     if (profile) {

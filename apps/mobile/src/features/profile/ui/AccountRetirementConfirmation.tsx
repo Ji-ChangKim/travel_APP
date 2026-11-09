@@ -3,42 +3,49 @@ import Text from '@/components/ui/AppText';
 import { t } from '@/features/localization/translate';
 import { Action } from '@/features/workspace/shared/ui/ui';
 import type { AccountRetirementController } from '../manager/useAccountRetirement';
-// 보존 범위를 확인한 계정의 탈퇴 유예 시작만 확정한다.
+
+// 사용자가 읽은 대상과 계정에 대해서만 소유권 이전 또는 삭제를 확정한다.
 export default function AccountRetirementConfirmation({
   confirming,
-  userId,
-  setConfirming,
-  retire,
+  busy,
+  cancelConfirmation,
+  confirmRequest,
 }: Pick<
   AccountRetirementController,
-  'confirming' | 'userId' | 'setConfirming' | 'retire'
+  'confirming' | 'busy' | 'cancelConfirmation' | 'confirmRequest'
 >) {
+  const transfer = confirming?.kind === 'transfer' ? confirming : null;
   return (
     <ActionSheet
       variant="confirm"
-      title={t('탈퇴 유예를 시작할까요?')}
-      visible={Boolean(confirming && confirming === userId)}
-      onClose={() => {
-        // 취소는 서버 상태와 계정 연결을 유지한다.
-        return setConfirming('');
-      }}
+      title={t(transfer ? '소유권을 이전할까요?' : '계정 삭제를 요청할까요?')}
+      visible={Boolean(confirming)}
+      dismissDisabled={busy}
+      onClose={cancelConfirmation}
     >
       <Text>
-        {t(
-          '지금 로그아웃돼요. 90일 안에 다시 로그인하면 취소할 수 있어요. 여행·사진·영수증과 공개본은 계정과 분리해 보관해요.',
-        )}
+        {transfer
+          ? t(
+              '‘{trip}’의 소유권을 ‘{name}’에게 넘겨요. 나는 편집자로 남고, 새 소유자가 여행을 관리해요.',
+              { trip: transfer.tripTitle, name: transfer.name },
+            )
+          : t(
+              '모든 기기에서 로그아웃하고 계정과 개인 기록을 삭제해요. 삭제를 요청하면 취소하거나 복구할 수 없어요.',
+            )}
       </Text>
       <Action
         label={t('계속 이용하기')}
-        onPress={() => {
-          // 안전한 선택은 원래 계정 화면으로 돌아간다.
-          return setConfirming('');
-        }}
+        disabled={busy}
+        onPress={cancelConfirmation}
       />
       <Action
-        label={t('탈퇴 유예 시작')}
+        label={t(
+          busy ? '요청 중…' : transfer ? '소유권 이전하기' : '계정 삭제 요청',
+        )}
         variant="destructive"
-        onPress={retire}
+        disabled={busy}
+        loading={busy}
+        onPress={confirmRequest}
       />
     </ActionSheet>
   );

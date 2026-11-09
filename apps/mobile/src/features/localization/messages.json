@@ -1,4 +1,6 @@
 {
+  "여행 기간 수정: {p0}": ["Edit travel dates: {p0}", "旅行期間を変更: {p0}"],
+  "동행 관리 ({p0})": ["Manage travelers ({p0})", "同行者を管理（{p0}）"],
   "이 기기의 여행을 계정에 연결할까요?": [
     "Connect this device’s trips to your account?",
     "この端末の旅行をアカウントに連携しますか？"
@@ -1224,14 +1226,8 @@
     "How would you like to add a place?",
     "どの方法で場所を追加しますか？"
   ],
-  "영수증 촬영으로 추가": [
-    "Add by taking a receipt photo",
-    "レシートを撮影して追加"
-  ],
-  "영수증 사진으로 추가": [
-    "Add from a receipt photo",
-    "レシートの写真から追加"
-  ],
+  "영수증 촬영으로 추가": ["Add by taking receipt photo", "レシート撮影で追加"],
+  "영수증 사진으로 추가": ["Add from receipt photo", "レシート写真から追加"],
   "선택한 구글 장소 연결 해제": [
     "Unlink selected Google place",
     "選択したGoogleの場所の関連付けを解除"
@@ -5101,8 +5097,6 @@
   "{p0} 사진 추가": ["Add photo for {p0}", "{p0}の写真を追加"],
   "사용 비용 기록": ["Record spent amount", "使用した費用を記録"],
   "찍은 사진 추가": ["Add taken photo", "撮影した写真を追加"],
-  "영수증 촬영으로 추가": ["Add by taking receipt photo", "レシート撮影で追加"],
-  "영수증 사진으로 추가": ["Add from receipt photo", "レシート写真から追加"],
   "찾으시는 도시가 없나요?": [
     "Can't find the city you're looking for?",
     "お探しの都市がありませんか？"
@@ -5115,5 +5109,430 @@
   "여행 이름과 출발일을 확인해 주세요. 여행 기간은 최대 30일이에요.": [
     "Check the trip name and start date. Trips can be up to 30 days.",
     "旅行名と出発日を確認してください。旅行期間は最大30日です。"
-  ]
+  ],
+  "계정 확인": ["Check account", "アカウントの確認"],
+  "계정을 확인하지 못했어요. 다시 시도해 주세요.": [
+    "Could not verify your account. Please try again.",
+    "アカウントを確認できませんでした。もう一度お試しください。"
+  ],
+  "소유권을 이전했어요. 계정에 남은 여행을 다시 확인해 주세요.": [
+    "Ownership transferred. Please review the trips remaining in your account.",
+    "所有権を移しました。アカウントに残っている旅行をもう一度確認してください。"
+  ],
+  "계정을 보호하기 위해 다시 로그인한 뒤 확인해 주세요.": [
+    "Please sign in again to protect your account.",
+    "アカウントを保護するため、もう一度ログインして確認してください。"
+  ],
+  "함께한 여행의 상태가 바뀌었어요. 다시 불러온 뒤 확인해 주세요.": [
+    "A shared trip has changed. Reload it and check again.",
+    "共有旅行の状態が変わりました。読み込み直して確認してください。"
+  ],
+  "요청 결과를 확인하지 못했어요. 계정 상태를 다시 확인해 주세요.": [
+    "Could not confirm the result. Please check your account status again.",
+    "処理結果を確認できませんでした。アカウントの状態をもう一度確認してください。"
+  ],
+  "현재 이용 방식": ["Current account type", "現在の利用方法"],
+  "회원 계정": ["Member account", "会員アカウント"],
+  "게스트 여행은 현재 이 기기에 보관돼요.": [
+    "Guest trips are currently stored on this device.",
+    "ゲストの旅行は現在、この端末に保存されます。"
+  ],
+  "계정 정보는 본인에게만 표시돼요.": [
+    "Your account information is visible only to you.",
+    "アカウント情報は本人にだけ表示されます。"
+  ],
+  "기본 프로필 이미지": ["Default profile image", "初期プロフィール画像"],
+  "계정에 저장한 여행과 기록을 확인해요.": [
+    "View the trips and records saved to your account.",
+    "アカウントに保存した旅行と記録を確認できます。"
+  ],
+  "소유권을 이전할까요?": ["Transfer ownership?", "所有権を移しますか？"],
+  "계정 삭제를 요청할까요?": [
+    "Request account deletion?",
+    "アカウントの削除を申請しますか？"
+  ],
+  "‘{trip}’의 소유권을 ‘{name}’에게 넘겨요. 나는 편집자로 남고, 새 소유자가 여행을 관리해요.": [
+    "Transfer ownership of “{trip}” to “{name}”. You will remain an editor, and the new owner will manage the trip.",
+    "「{trip}」の所有権を「{name}」に移します。あなたは編集者として残り、新しい所有者が旅行を管理します。"
+  ],
+  "모든 기기에서 로그아웃하고 계정과 개인 기록을 삭제해요. 삭제를 요청하면 취소하거나 복구할 수 없어요.": [
+    "You will be signed out on all devices, and your account and personal records will be deleted. The request cannot be canceled or restored.",
+    "すべての端末からログアウトし、アカウントと個人記録を削除します。削除申請後は取り消しや復元ができません。"
+  ],
+  "소유권 이전하기": ["Transfer ownership", "所有権を移す"],
+  "계정 삭제 요청": ["Request account deletion", "アカウント削除を申請"],
+  "삭제 요청을 접수했어요": [
+    "Deletion request received",
+    "削除申請を受け付けました"
+  ],
+  "계정 이용을 종료하고 자료를 삭제하고 있어요. 삭제가 모두 끝났다는 뜻은 아니에요.": [
+    "Your account is closed and its data is being deleted. Deletion is still in progress.",
+    "アカウントの利用を終了し、データを削除しています。すべての削除が完了したわけではありません。"
+  ],
+  "기기에 보관한 게스트 여행은 회원 계정 삭제로 지워지지 않아요. 회원 계정은 로그인한 뒤 관리할 수 있어요.": [
+    "Deleting a member account does not remove guest trips stored on this device. Sign in to manage a member account.",
+    "会員アカウントを削除しても、この端末のゲスト旅行は消えません。会員アカウントはログイン後に管理できます。"
+  ],
+  "계정 삭제 전 확인": [
+    "Before deleting your account",
+    "アカウント削除前の確認"
+  ],
+  "계정 삭제를 요청하면 모든 기기에서 로그아웃돼요. 복구 유예 없이 계정과 개인 여행·사진·영수증을 삭제해요.": [
+    "Requesting deletion signs you out on all devices. Your account, personal trips, photos, and receipts are deleted without a recovery grace period.",
+    "削除を申請すると、すべての端末からログアウトします。復元の猶予期間なしで、アカウントと個人の旅行・写真・レシートを削除します。"
+  ],
+  "함께한 여행에서는 나의 참여와 개인정보를 정리해요. 다른 동행자의 기록은 남아요.": [
+    "Your participation and personal information are removed from shared trips. Other travelers’ records remain.",
+    "共有旅行から、あなたの参加情報と個人情報を整理します。他の同行者の記録は残ります。"
+  ],
+  "계정과 여행을 확인하고 있어요.": [
+    "Checking your account and trips.",
+    "アカウントと旅行を確認しています。"
+  ],
+  "계정 상태 다시 확인": [
+    "Check account status again",
+    "アカウントの状態を再確認"
+  ],
+  "다시 로그인하고 확인": ["Sign in again and check", "再ログインして確認"],
+  "계정 삭제 내용 확인": [
+    "Review account deletion",
+    "アカウント削除の内容を確認"
+  ],
+  "삭제할 개인 여행 {count}개": [
+    "{count} personal trips to delete",
+    "削除する個人旅行 {count}件"
+  ],
+  "참여를 종료할 공유 여행 {count}개": [
+    "{count} shared trips to leave",
+    "参加を終了する共有旅行 {count}件"
+  ],
+  "소유권 이전이 필요한 여행 {count}개": [
+    "{count} trips requiring ownership transfer",
+    "所有権の移行が必要な旅行 {count}件"
+  ],
+  "함께 관리하는 여행은 소유권을 먼저 넘겨주세요. 현재 참여한 동행자 중 새 소유자를 직접 선택해 주세요.": [
+    "Transfer ownership of jointly managed trips first. Choose a new owner from the current travelers.",
+    "共同管理している旅行は、先に所有権を移してください。現在の同行者から新しい所有者を選んでください。"
+  ],
+  "{name} · 동행자 {number}": [
+    "{name} · Traveler {number}",
+    "{name} · 同行者 {number}"
+  ],
+  "이전할 동행자를 찾지 못했어요. 계정 상태를 다시 확인해 주세요.": [
+    "No traveler is available for transfer. Please check your account status again.",
+    "所有権を移せる同行者が見つかりません。アカウントの状態をもう一度確認してください。"
+  ],
+  "소유권 이전 내용 확인": [
+    "Review ownership transfer",
+    "所有権の移行内容を確認"
+  ],
+  "언어 · 앱 정보 · 계정 관리": [
+    "Language · App information · Account",
+    "言語・アプリ情報・アカウント管理"
+  ],
+  "계정 및 데이터 관리": ["Account and data", "アカウントとデータの管理"],
+  "연결된 계정 확인과 계정 삭제 안내": [
+    "View your linked account and deletion information",
+    "連携アカウントの確認と削除のご案内"
+  ],
+  "현재 계정에서 로그아웃해요": [
+    "Sign out of your current account",
+    "現在のアカウントからログアウトします"
+  ],
+  "다른 여행자가 공개한 계획과 기록을 둘러보세요.": [
+    "Explore plans and records shared by other travelers.",
+    "他の旅行者が公開した計画や記録を見てみましょう。"
+  ],
+  "가고 싶은 곳을 고르고 나만의 여행을 준비해 보세요.": [
+    "Choose where to go and start preparing your trip.",
+    "行きたい場所を選んで、自分だけの旅行を準備しましょう。"
+  ],
+  "나의 여행 시작하기": ["Start your trip", "自分の旅行を始める"],
+  "목적지와 날짜부터": [
+    "Start with a destination and dates",
+    "目的地と日付から"
+  ],
+  "가고 싶은 도시와 날짜를 고르고 방문할 곳을 일정에 추가해 보세요.": [
+    "Choose your city and dates, then add places to your itinerary.",
+    "行きたい都市と日付を選び、訪れたい場所を日程に追加しましょう。"
+  ],
+  "공식 여행 정보로 둘러보기": [
+    "Explore official travel guides",
+    "公式の旅行情報を見る"
+  ],
+  "이 도시로 여행 만들기": [
+    "Plan a trip to this city",
+    "この都市への旅行を作る"
+  ],
+  "여행 경비 기록": ["Record travel expenses", "旅費を記録"],
+  "영수증 추가": ["Add receipt", "レシートを追加"],
+  "영수증 촬영으로 일정 추가": [
+    "Add a visit from a receipt photo",
+    "レシートを撮影して日程に追加"
+  ],
+  "선택한 분류에 기록한 지출이 없어요": [
+    "No expenses in this category",
+    "この分類の支出はありません"
+  ],
+  "비용 추가에서 방문한 장소와 사용한 금액을 남겨보세요.": [
+    "Add an expense to record where you visited and how much you spent.",
+    "費用の追加から、訪れた場所と使った金額を記録しましょう。"
+  ],
+  "지출 분류": ["Expense category", "支出の分類"],
+  "지출 구분": ["Expense type", "支出の区分"],
+  "장소 · 금액 입력": ["Enter place and amount", "場所・金額を入力"],
+  "여행 내 사용한 금액": ["Amount spent on this trip", "旅行で使った金額"],
+  "실제 지출 {p0}건": ["{p0} actual expenses", "実際の支出 {p0}件"],
+  "내 여행 기간": ["Travel dates", "旅行の期間"],
+  "내 여행 기간 선택": ["Choose travel dates", "旅行期間を選ぶ"],
+  "언제 떠나시나요?": ["When are you going?", "いつ出発しますか？"],
+  "터치해서 날짜를 고르거나 여행 일수만 먼저 정해보세요": [
+    "Choose dates or start with the number of days",
+    "タップして日付を選ぶか、旅行日数だけ先に決めましょう"
+  ],
+  "여행 일정": ["Travel itinerary", "旅行日程"],
+  "나의 여행 목적지는?": ["Where do you want to go?", "旅行の目的地は？"],
+  "나의 여행 목적지는? 목적지 선택 열기": [
+    "Open destination selection",
+    "目的地の選択を開く"
+  ],
+  "터치해서 다른 나라나 도시로 바꿀 수 있어요": [
+    "Tap to change the country or city",
+    "タップすると国や都市を変更できます"
+  ],
+  "터치해서 여행할 나라나 도시를 골라보세요": [
+    "Tap to choose a country or city",
+    "タップして旅行する国や都市を選びましょう"
+  ],
+  "변경": ["Change", "変更"],
+  "옆으로 넘겨 인기 여행지를 둘러보세요": [
+    "Swipe to explore popular destinations",
+    "横にスワイプして人気の旅行先を見てみましょう"
+  ],
+  "세부 일정 만들기": ["Create itinerary", "詳しい日程を作る"],
+  "항공편 먼저 등록하기 (선택)": [
+    "Add flights first (optional)",
+    "先にフライトを登録（任意）"
+  ],
+  "여행 목적지 선택": ["Choose a destination", "旅行先を選ぶ"],
+  "여행 만들기로 돌아가기": ["Back to trip creation", "旅行作成に戻る"],
+  "나라 또는 도시를 검색해 보세요": [
+    "Search for a country or city",
+    "国や都市を検索してください"
+  ],
+  "{p0} 지역 보기": ["View {p0} destinations", "{p0}の地域を見る"],
+  "인기 여행 도시": ["Popular travel cities", "人気の旅行都市"],
+  "{p0} 주요 도시": ["Major cities in {p0}", "{p0}の主な都市"],
+  "선택 완료": ["Confirm selection", "選択完了"],
+  "목적지 선택 완료": ["Confirm destination", "目的地の選択を完了"],
+  "여행 일정을 선택해 주세요": [
+    "Choose travel dates",
+    "旅行日程を選んでください"
+  ],
+  "목적지를 선택해 주세요": ["Choose a destination", "目的地を選んでください"],
+  "언제 떠나시나요? 정확한 출발 날짜나 예상 여행 일수를 선택하면 세부 일정을 바로 만들 수 있어요.": [
+    "When are you going? Choose a departure date or expected trip length to create an itinerary.",
+    "いつ出発しますか？出発日または予定日数を選ぶと、詳しい日程を作れます。"
+  ],
+  "어디로 떠나시나요? 여행할 나라나 대표 도시를 먼저 선택해 주세요.": [
+    "Where are you going? Choose a country or main city first.",
+    "どこへ出かけますか？まず旅行する国や主な都市を選んでください。"
+  ],
+  "여행 일정 선택하기": ["Choose travel dates", "旅行日程を選ぶ"],
+  "여행 목적지 선택하기": ["Choose a destination", "旅行先を選ぶ"],
+  "확인": ["Confirm", "確認"],
+  "선택한 여행 목적지가 여기에 표시돼요": [
+    "Your selected destination will appear here",
+    "選んだ旅行先がここに表示されます"
+  ],
+  "정확한 일정이 있어요": ["I have exact dates", "日程が決まっています"],
+  "아직 일정을 못 정했어요": [
+    "My dates are not decided yet",
+    "まだ日程が決まっていません"
+  ],
+  "며칠 동안 여행할 계획인가요?": [
+    "How many days will you travel?",
+    "何日間の旅行を予定していますか？"
+  ],
+  "출발 날짜가 정해지지 않아도 여행 일수만 고르면 DAY 1부터 일정을 바로 짤 수 있어요.": [
+    "Even without a departure date, choose the number of days to start planning from DAY 1.",
+    "出発日が未定でも、日数を選ぶだけでDAY 1から日程を組めます。"
+  ],
+  "여행 일수 하루 줄이기": [
+    "Decrease trip length by one day",
+    "旅行日数を1日減らす"
+  ],
+  "당일치기 (1일)": ["Day trip (1 day)", "日帰り（1日）"],
+  "DAY 1 ~ DAY {p0} 일정표로 준비돼요": [
+    "An itinerary from DAY 1 to DAY {p0} will be created",
+    "DAY 1～DAY {p0}の日程表を用意します"
+  ],
+  "여행 일수 하루 늘리기": [
+    "Increase trip length by one day",
+    "旅行日数を1日増やす"
+  ],
+  "날짜는 여행을 만든 뒤에도 언제든 바꿀 수 있어요.": [
+    "You can change the dates after creating your trip.",
+    "旅行を作成した後も、日付はいつでも変更できます。"
+  ],
+  "일정 선택 완료": ["Confirm dates", "日程の選択を完了"],
+  "여행 일정을 확인해 주세요": [
+    "Check your travel dates",
+    "旅行日程を確認してください"
+  ],
+  "방문 장소 · 지출 정보 확인": [
+    "Review place and expense information",
+    "訪問先・支出情報を確認"
+  ],
+  "여행 중이나 여행 후에 방문한 장소 이름, 주소, 사용 금액을 확인해 일정에 남겨보세요.": [
+    "During or after your trip, review the place name, address, and amount spent, then add them to your itinerary.",
+    "旅行中や旅行後に、訪れた場所の名前・住所・金額を確認して日程に記録しましょう。"
+  ],
+  "방문한 장소 이름을 입력해 주세요": [
+    "Enter the name of the place you visited",
+    "訪れた場所の名前を入力してください"
+  ],
+  "장소 주소를 입력해 주세요": [
+    "Enter the place address",
+    "場所の住所を入力してください"
+  ],
+  "어느 날 일정에 추가할까요?": [
+    "Which day should this be added to?",
+    "何日目の日程に追加しますか？"
+  ],
+  "사용 금액 기록 여부": [
+    "Whether to record the amount",
+    "使用金額を記録するか選択"
+  ],
+  "사용 금액 함께 남기기": ["Record the amount too", "使用金額も記録する"],
+  "장소만 일정에 남기기": [
+    "Add only the place to the itinerary",
+    "場所だけを日程に記録する"
+  ],
+  "사용한 금액을 입력해 주세요": [
+    "Enter the amount spent",
+    "使った金額を入力してください"
+  ],
+  "주문한 메뉴나 메모할 내용을 남겨보세요 (선택)": [
+    "Add ordered items or a note (optional)",
+    "注文した品目やメモを残しましょう（任意）"
+  ],
+  "방문할 맛집, 명소, 숙소를 검색해 보세요": [
+    "Search for restaurants, sights, or accommodation",
+    "訪れたい飲食店・名所・宿泊先を検索しましょう"
+  ],
+  "기본 프로필": ["Default profile", "初期プロフィール"],
+  "지출": ["Expenses", "支出"],
+  "제목 없음": ["Untitled", "タイトルなし"],
+  "항공편 조회로 채우기": ["Fill by flight lookup", "フライト照会で埋める"],
+  "내 프로필 사진": ["My profile photo", "自分のプロフィール写真"],
+  "닉네임 변경": ["Change nickname", "ニックネームを変更"],
+  "다음 닉네임 변경: {date}": [
+    "Next nickname change: {date}",
+    "次回変更できる日時：{date}"
+  ],
+  "닉네임은 변경 후 30일이 지나면 다시 바꿀 수 있어요.": [
+    "You can change your nickname again after 30 days.",
+    "ニックネームは変更から30日後に再び変更できます。"
+  ],
+  "앨범에서 프로필 사진 선택": [
+    "Choose a profile photo",
+    "アルバムから写真を選ぶ"
+  ],
+  "프로필 사진 촬영": ["Take a profile photo", "プロフィール写真を撮る"],
+  "사진은 언제든 바꿀 수 있어요. 새 사진을 저장하면 이전 사진이 교체돼요.": [
+    "Change your photo at any time. Saving a new photo replaces the previous one.",
+    "写真はいつでも変更できます。保存すると以前の写真が置き換わります。"
+  ],
+  "닉네임과 사진을 바꾸려면 Google 계정으로 로그인해 주세요.": [
+    "Sign in with Google to change your nickname and photo.",
+    "ニックネームと写真を変更するにはGoogleでログインしてください。"
+  ],
+  "프로필을 불러오지 못했어요. 다시 불러와 주세요.": [
+    "Could not load your profile. Please reload it.",
+    "プロフィールを読み込めませんでした。もう一度読み込んでください。"
+  ],
+  "프로필 다시 불러오기": ["Reload profile", "プロフィールを再読み込み"],
+  "특수문자와 앞뒤 공백은 사용할 수 없어요. 영어 대소문자는 같은 이름으로 확인해요.": [
+    "No symbols or leading or trailing spaces. English letters are case-insensitive.",
+    "記号と前後の空白は使えません。英字の大文字と小文字は同じ名前として扱います。"
+  ],
+  "저장하면 30일 동안 닉네임을 다시 바꿀 수 없어요.": [
+    "After saving, you cannot change your nickname for 30 days.",
+    "保存後30日間はニックネームを変更できません。"
+  ],
+  "닉네임 중복 확인": [
+    "Check nickname availability",
+    "ニックネームの重複を確認"
+  ],
+  "사용할 수 있는 닉네임이에요.": [
+    "This nickname is available.",
+    "このニックネームは使えます。"
+  ],
+  "닉네임 저장": ["Save nickname", "ニックネームを保存"],
+  "프로필 사진을 바꿨어요.": [
+    "Profile photo updated.",
+    "プロフィール写真を変更しました。"
+  ],
+  "닉네임을 바꿨어요.": ["Nickname updated.", "ニックネームを変更しました。"],
+  "이미 사용 중인 닉네임이에요. 다른 이름을 입력해 주세요.": [
+    "This nickname is taken. Please choose another.",
+    "このニックネームは使用されています。別の名前を入力してください。"
+  ],
+  "닉네임을 바꾼 뒤 30일이 지나야 다시 변경할 수 있어요.": [
+    "Please wait 30 days after your last nickname change.",
+    "前回の変更から30日後に再び変更できます。"
+  ],
+  "Google 계정으로 다시 로그인한 뒤 시도해 주세요.": [
+    "Sign in with Google again and retry.",
+    "Googleで再ログインしてからお試しください。"
+  ],
+  "프로필을 저장하지 못했어요. 다시 불러와 현재 상태를 확인한 뒤 시도해 주세요.": [
+    "Could not save your profile. Reload it to check its current state, then retry.",
+    "プロフィールを保存できませんでした。再読み込みで現在の状態を確認してからお試しください。"
+  ],
+  "프로필 사진을 불러오지 못했어요. 다시 불러와 주세요.": [
+    "Could not load your profile photo. Please reload.",
+    "プロフィール写真を読み込めませんでした。もう一度読み込んでください。"
+  ],
+  "사진을 저장하지 못했어요. 다시 불러와 현재 사진을 확인해 주세요.": [
+    "Could not confirm the photo save. Reload to check your current photo.",
+    "写真の保存を確認できませんでした。再読み込みで現在の写真を確認してください。"
+  ],
+  "영어·숫자·한글·히라가나·가타카나로 공백 포함 1~10자, 중간 공백은 총 2개까지 사용할 수 있어요.": [
+    "Use 1–10 English letters, digits, Korean, hiragana or katakana characters, including up to two spaces between characters.",
+    "英字・数字・ハングル・ひらがな・カタカナで、空白を含め1〜10文字。文字の間の空白は合計2個まで使えます。"
+  ],
+  "닉네임은 공백을 포함해 1~10자로 입력해 주세요.": [
+    "Enter 1–10 characters, including spaces.",
+    "空白を含め1〜10文字で入力してください。"
+  ],
+  "닉네임 앞뒤에는 공백을 넣을 수 없어요.": [
+    "No leading or trailing spaces.",
+    "前後に空白は入れられません。"
+  ],
+  "이름 중간의 공백은 총 2개까지 사용할 수 있어요.": [
+    "Use no more than two spaces between characters.",
+    "文字の間の空白は合計2個まで使えます。"
+  ],
+  "영어·숫자·한글·히라가나·가타카나만 사용할 수 있어요.": [
+    "Use English letters, digits, Korean, hiragana or katakana only.",
+    "英字・数字・ハングル・ひらがな・カタカナだけ使えます。"
+  ],
+  "프로필 변경을 처리하고 있어요…": [
+    "Processing your profile change…",
+    "プロフィールの変更を処理しています…"
+  ],
+  "편집": ["Edit", "編集"],
+  "{p0} 위로 이동": ["Move {p0} up", "{p0}を上に移動"],
+  "{p0} 아래로 이동": ["Move {p0} down", "{p0}を下に移動"],
+  "프로필 저장 결과를 확인하지 못했어요. 다시 불러와 현재 상태를 확인해 주세요.": [
+    "Could not confirm the profile save. Reload to check its current state.",
+    "プロフィールの保存結果を確認できませんでした。再読み込みで現在の状態を確認してください。"
+  ],
+  "사진 저장 결과를 확인하지 못했어요. 다시 불러와 현재 사진을 확인해 주세요.": [
+    "Could not confirm the photo save. Reload to check your current photo.",
+    "写真の保存結果を確認できませんでした。再読み込みで現在の写真を確認してください。"
+  ],
+  "가계부": ["Budget", "家計簿"]
 }

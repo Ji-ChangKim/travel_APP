@@ -32,6 +32,8 @@
     "test:foundation": "npm --workspace=@wherego/api run test",
     "test:trail:web": "node scripts/qa/verify-planning-journey.mjs --device-records",
     "test:auth": "tsx --test tests/auth/*.test.ts",
+    "test:app-shell:web": "node scripts/qa/verify-app-shell.mjs",
+    "test:profile:web": "node scripts/qa/verify-app-shell.mjs --member-profile",
     "test:release": "node --test tests/release/*.test.mjs",
     "release:check": "node --env-file-if-exists=.env.release scripts/release/release-config.mjs",
     "release:config": "node --env-file-if-exists=.env.release scripts/release/release-config.mjs --write-worker",

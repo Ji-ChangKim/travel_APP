@@ -1,10 +1,11 @@
 import { z } from 'zod';
 
-export const nicknameHint = '한글, 영문, 숫자로 2~10자 입력해 주세요.';
-export const nicknameError = '닉네임은 2~10자로 입력해 주세요.';
+export const nicknameHint =
+  '영어·숫자·한글·히라가나·가타카나로 공백 포함 1~10자, 중간 공백은 총 2개까지 사용할 수 있어요.';
+export const nicknameError = '닉네임은 공백을 포함해 1~10자로 입력해 주세요.';
 
 export function normalizeProfileNickname(value: string): string {
-  return value.trim().normalize('NFC');
+  return value.normalize('NFC');
 }
 
 export function nicknameLength(value: string): number {
@@ -14,12 +15,30 @@ export function nicknameLength(value: string): number {
 export function nicknameValidationError(value: string): string | null {
   const normalized = normalizeProfileNickname(value);
   const length = nicknameLength(normalized);
-  return length < 2 || length > 10
+  return length < 1 || length > 10
     ? nicknameError
-    : /^[가-힣A-Za-z0-9]+$/.test(normalized)
-      ? null
-      : '한글, 영문, 숫자만 사용할 수 있어요.';
+    : normalized.trim() !== normalized || normalized.trim().length === 0
+      ? '닉네임 앞뒤에는 공백을 넣을 수 없어요.'
+      : (normalized.match(/ /g)?.length || 0) > 2
+        ? '이름 중간의 공백은 총 2개까지 사용할 수 있어요.'
+        : Array.from(normalized).every(
+              (character) =>
+                /^[A-Za-z0-9 ]$/.test(character) ||
+                character === 'ー' ||
+                (/^\p{Letter}$/u.test(character) &&
+                  /^[\p{Script=Hangul}\p{Script=Hiragana}\p{Script=Katakana}]$/u.test(
+                    character,
+                  )),
+            )
+          ? null
+          : '영어·숫자·한글·히라가나·가타카나만 사용할 수 있어요.';
 }
+
+export function profileNicknameKey(value: string): string {
+  return normalizeProfileNickname(value).toLowerCase();
+}
+
+export const nicknameChangeIntervalMs = 30 * 24 * 60 * 60 * 1000;
 
 export function profileNicknameError(
   value: string,

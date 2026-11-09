@@ -15,10 +15,47 @@ import { useLocale } from '@/features/localization/localeState';
 import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 import { schedulePageStyles as s } from '../styles/schedulePageStyles';
 
-// 방문 순서 번호 레일과 시간 배지·항공편명·장소명·주소·메모·비용/사진 기록·길찾기 카드를 렌더링한다.
+// 항공편 일정의 항공사·편명·출발·도착 요약 문자열을 생성한다.
+function formatFlightSummary(
+  item: WorkspaceSchedule,
+  tripDate?: string,
+): string {
+  if (!item.flight) return '';
+  const number = item.flight.number || '';
+  const airlineCandidate = number
+    ? item.title.replace(number, '').replace(/→.*/, '').trim()
+    : '';
+  const airlinePart = airlineCandidate ? `항공사: ${airlineCandidate}` : '';
+  const numberPart = number ? `항공편: ${number}` : '';
+  const depTime = item.timeSlot || '';
+  const depDateStr = [tripDate, depTime].filter(Boolean).join(' ');
+  const depPart = item.flight.departure
+    ? `출발: ${item.flight.departure}${depDateStr ? ` · ${depDateStr}` : ''}`
+    : '';
+  const arrDate =
+    item.flight.arrivalDate || (item.flight.arrivalTime ? tripDate : '') || '';
+  const arrDateStr = [arrDate, item.flight.arrivalTime]
+    .filter(Boolean)
+    .join(' ');
+  const arrPart = item.flight.arrival
+    ? `도착: ${item.flight.arrival}${arrDateStr ? ` · ${arrDateStr}` : ''}`
+    : '';
+  return [airlinePart, numberPart, depPart, arrPart].filter(Boolean).join(' ');
+}
+
+// 시간 열·타임라인 축(점선 또는 번호 원)·일정 제목·접기/펼치기 상세를 렌더링한다.
 export default function SchedulePlaceCard({
   item,
   index,
+  stepNumber,
+  tripDate,
+  nextDistanceLabel,
+  editingOrder = false,
+  canMoveUp = false,
+  canMoveDown = false,
+  onMoveUp,
+  onMoveDown,
+  onQuickDelete,
   last,
   selected,
   editable,
@@ -28,11 +65,18 @@ export default function SchedulePlaceCard({
   onOpen,
   onMore,
   onDirections,
-  onExpense,
-  onPhoto,
 }: {
   item: WorkspaceSchedule;
   index: number;
+  stepNumber?: number | null;
+  tripDate?: string;
+  nextDistanceLabel?: string;
+  editingOrder?: boolean;
+  canMoveUp?: boolean;
+  canMoveDown?: boolean;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  onQuickDelete?: () => void;
   last: boolean;
   selected: boolean;
   editable: boolean;
@@ -41,206 +85,275 @@ export default function SchedulePlaceCard({
   photos?: WorkspaceMedia[];
   onOpen: () => void;
   onMore: () => void;
-  onDirections: () => void;
+  onDirections?: () => void;
   onExpense?: () => void;
   onPhoto?: () => void;
 }) {
   useLocale();
   const { largeText } = useAppAccessibility();
   const [focused, setFocused] = useState(false);
-  const flightInfo = item.flight?.number
-    ? [
-        item.flight.number,
-        item.flight.departure && item.flight.arrival
-          ? `${item.flight.departure} → ${item.flight.arrival}`
-          : '',
-      ]
-        .filter(Boolean)
-        .join(' · ')
-    : '';
+  const [expanded, setExpanded] = useState(true);
+
+  const isFlight = Boolean(item.flight);
+  const isMemo =
+    item.type === 'MEMO' ||
+    item.type === 'TODO' ||
+    item.title.trim() === '메모';
+  const timeLabel = item.timeSlot || '';
+  const flightSummary = formatFlightSummary(item, tripDate);
+  const memoText =
+    item.memo && !(isFlight && item.memo === '사용자 등록 항공편')
+      ? item.memo
+      : '';
+  const planDesc = item.planContent?.description?.trim() || '';
+  const canNavigate = Boolean(onDirections && !isFlight && !isMemo);
+  const hasDetails = Boolean(
+    flightSummary ||
+    memoText ||
+    item.address ||
+    planDesc ||
+    canNavigate ||
+    expenses.length > 0 ||
+    photos.length > 0,
+  );
+  const displayStep = stepNumber ?? index + 1;
 
   return (
-    <View style={s.stop} testID={`schedule-card-${item.id}`}>
-      <View style={s.rail} aria-hidden>
-        <View style={s.marker}>
-          <Text style={s.number}>{index + 1}</Text>
-        </View>
-        {!last && <View style={s.line} />}
+    <View
+      style={[s.stop, selected && s.selected]}
+      testID={`schedule-card-${item.id}`}
+    >
+      <View style={s.timeColumn}>
+        {editingOrder && editable ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('{p0} 삭제', { p0: item.title })}
+            disabled={disabled}
+            onPress={onQuickDelete}
+            style={s.deleteInlineBtn}
+          >
+            <Ionicons name="remove-circle" size={24} color={colors.danger} />
+          </Pressable>
+        ) : timeLabel ? (
+          <Text style={s.timeColumnText}>{timeLabel}</Text>
+        ) : null}
       </View>
-      <View style={[s.card, selected && s.selected]}>
-        <View style={s.row}>
-          <View style={s.badgeGroup}>
-            <View style={s.timePill}>
-              <TripIcon name="clock-outline" size={14} color={colors.primary} />
-              <Text style={s.timeText}>{item.timeSlot || t('시간 미정')}</Text>
+
+      <View style={s.rail} aria-hidden>
+        {isFlight ? (
+          <>
+            <View style={s.dottedRail}>
+              {[0, 1, 2, 3, 4, 5, 6].map((dot) => (
+                <View key={dot} style={s.railDot} />
+              ))}
             </View>
-            {flightInfo ? (
-              <View style={s.flightPill} testID={`schedule-flight-${item.id}`}>
-                <TripIcon
-                  name="flight-outline"
-                  size={14}
-                  color={colors.secondary}
+            {!last && <View style={s.line} />}
+          </>
+        ) : (
+          <>
+            <View style={[s.topLine, index === 0 && s.hiddenLine]} />
+            <View style={[s.marker, isMemo ? s.memoMarker : s.placeMarker]}>
+              <Text style={s.number}>{displayStep}</Text>
+            </View>
+            {!last && (
+              <>
+                <View style={s.line} />
+                {nextDistanceLabel ? (
+                  <View style={s.distancePill}>
+                    <Text style={s.distanceText}>{nextDistanceLabel}</Text>
+                  </View>
+                ) : null}
+                {nextDistanceLabel ? <View style={s.line} /> : null}
+              </>
+            )}
+          </>
+        )}
+      </View>
+
+      <View style={s.card}>
+        <View style={s.timelineHeaderRow}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('{p0} 일정 상세', { p0: item.title })}
+            onPress={onOpen}
+            onLongPress={editable && !disabled ? onMore : undefined}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            style={({ pressed }) => [
+              s.timelineTitleButton,
+              pressed && s.pressed,
+              focused && s.focus,
+            ]}
+          >
+            <Text
+              style={s.timelineItemTitle}
+              numberOfLines={largeText ? undefined : 2}
+            >
+              {item.title}
+            </Text>
+          </Pressable>
+
+          <View style={s.timelineRightActions}>
+            {editingOrder && editable ? (
+              <>
+                <DesignButton
+                  size="icon"
+                  variant="quiet"
+                  label=""
+                  accessibilityLabel={t('{p0} 위로 이동', { p0: item.title })}
+                  disabled={disabled || !canMoveUp}
+                  onPress={() => onMoveUp?.()}
+                  icon={(color) => (
+                    <Ionicons name="arrow-up" size={18} color={color} />
+                  )}
                 />
-                <Text style={s.flightPillText}>{flightInfo}</Text>
+                <DesignButton
+                  size="icon"
+                  variant="quiet"
+                  label=""
+                  accessibilityLabel={t('{p0} 아래로 이동', { p0: item.title })}
+                  disabled={disabled || !canMoveDown}
+                  onPress={() => onMoveDown?.()}
+                  icon={(color) => (
+                    <Ionicons name="arrow-down" size={18} color={color} />
+                  )}
+                />
+              </>
+            ) : (
+              <>
+                {hasDetails && (
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={item.title}
+                    onPress={() => setExpanded((prev) => !prev)}
+                    style={s.chevronButton}
+                  >
+                    <Ionicons
+                      name={expanded ? 'chevron-up' : 'chevron-down'}
+                      size={18}
+                      color={colors.muted}
+                    />
+                  </Pressable>
+                )}
+                {editable && (
+                  <DesignButton
+                    size="icon"
+                    variant="quiet"
+                    label=""
+                    accessibilityLabel={t('{p0} 일정 관리', { p0: item.title })}
+                    disabled={disabled}
+                    onPress={onMore}
+                    icon={(color) => (
+                      <Ionicons
+                        name="ellipsis-horizontal"
+                        size={18}
+                        color={color}
+                      />
+                    )}
+                  />
+                )}
+              </>
+            )}
+          </View>
+        </View>
+
+        {expanded && hasDetails && (
+          <Pressable onPress={onOpen} style={s.timelineDetailBlock}>
+            {flightSummary ? (
+              <View testID={`schedule-flight-${item.id}`}>
+                <Text
+                  style={s.timelineDetailText}
+                  numberOfLines={largeText ? undefined : 2}
+                >
+                  {flightSummary}
+                </Text>
               </View>
             ) : null}
-          </View>
-          {editable && (
-            <DesignButton
-              size="icon"
-              variant="quiet"
-              label=""
-              accessibilityLabel={t('{p0} 일정 관리', { p0: item.title })}
-              disabled={disabled}
-              onPress={onMore}
-              icon={(color) => {
-                // 카드 우측 상단의 더보기 아이콘을 렌더링한다.
-                return (
-                  <Ionicons
-                    name="ellipsis-horizontal"
-                    size={22}
-                    color={color}
-                  />
-                );
-              }}
-            />
-          )}
-        </View>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('{p0} 일정 상세', { p0: item.title })}
-          onPress={onOpen}
-          onFocus={() => {
-            // 카드 본문에 키보드 초점이 들어오면 외곽선을 표시한다.
-            return setFocused(true);
-          }}
-          onBlur={() => {
-            // 키보드 초점이 이동하면 카드 본문 외곽선을 해제한다.
-            return setFocused(false);
-          }}
-          style={({ pressed }) => {
-            // 눌림과 키보드 초점 상태를 카드 본문에 반영한다.
-            return [s.cardMain, pressed && s.pressed, focused && s.focus];
-          }}
-        >
-          <Text style={s.title} numberOfLines={largeText ? undefined : 2}>
-            {item.title}
-          </Text>
-          {item.address ? (
-            <View style={s.addressRow}>
-              <TripIcon
-                name="map-pin-outline"
-                size={15}
-                color={colors.primary}
-              />
-              <Text style={s.meta} numberOfLines={largeText ? undefined : 1}>
+            {memoText ? (
+              <Text
+                style={s.timelineDetailText}
+                numberOfLines={largeText ? undefined : 2}
+              >
+                {memoText}
+              </Text>
+            ) : null}
+            {item.address ? (
+              <Text
+                style={s.timelineDetailText}
+                numberOfLines={largeText ? undefined : 1}
+              >
                 {item.address}
               </Text>
-            </View>
-          ) : null}
-          {item.memo ? (
-            <View style={s.memoBox}>
-              <Text style={s.body} numberOfLines={largeText ? undefined : 2}>
-                {item.memo}
+            ) : null}
+            {planDesc && planDesc !== memoText ? (
+              <Text
+                style={s.timelineDetailText}
+                numberOfLines={largeText ? undefined : 2}
+              >
+                {planDesc}
               </Text>
-            </View>
-          ) : null}
-          {(expenses.length > 0 || photos.length > 0) && (
-            <View style={s.recordBadgeRow}>
-              {expenses.map((expense) => (
-                <View
-                  key={expense.id}
-                  style={s.recordBadge}
-                  testID={`schedule-expense-badge-${expense.id}`}
+            ) : null}
+            {(expenses.length > 0 || photos.length > 0) && (
+              <View style={s.recordBadgeRow}>
+                {expenses.map((expense) => (
+                  <View
+                    key={expense.id}
+                    style={s.recordBadge}
+                    testID={`schedule-expense-badge-${expense.id}`}
+                  >
+                    <TripIcon
+                      name="receipt-scan-outline"
+                      size={14}
+                      color={colors.secondary}
+                    />
+                    <Text style={s.recordBadgeText}>
+                      {`${expense.currency} ${expense.amount}${
+                        expense.title && expense.title !== item.title
+                          ? ` · ${expense.title}`
+                          : ''
+                      }`}
+                    </Text>
+                  </View>
+                ))}
+                {photos.length > 0 && (
+                  <View
+                    style={s.recordBadge}
+                    testID={`schedule-photo-badge-${item.id}`}
+                  >
+                    <Ionicons
+                      name="camera-outline"
+                      size={14}
+                      color={colors.primary}
+                    />
+                    <Text style={s.recordBadgeText}>
+                      {t('사진 {p0}장', { p0: photos.length })}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            )}
+            {canNavigate && (
+              <View style={s.timelineInlineActions}>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t('{p0} 길찾기', { p0: item.title })}
+                  onPress={onDirections}
+                  style={({ pressed }) => [
+                    s.timelineDirectionsBtn,
+                    pressed && s.pressed,
+                  ]}
                 >
                   <TripIcon
-                    name="receipt-scan-outline"
+                    name="map-pin-outline"
                     size={14}
                     color={colors.secondary}
                   />
-                  <Text style={s.recordBadgeText}>
-                    {`${expense.currency} ${expense.amount}${
-                      expense.title && expense.title !== item.title
-                        ? ` · ${expense.title}`
-                        : ''
-                    }`}
-                  </Text>
-                </View>
-              ))}
-              {photos.length > 0 && (
-                <View
-                  style={s.recordBadge}
-                  testID={`schedule-photo-badge-${item.id}`}
-                >
-                  <Ionicons
-                    name="camera-outline"
-                    size={14}
-                    color={colors.primary}
-                  />
-                  <Text style={s.recordBadgeText}>
-                    {t('사진 {p0}장', { p0: photos.length })}
-                  </Text>
-                </View>
-              )}
-            </View>
-          )}
-        </Pressable>
-        <View style={s.cardFooter}>
-          <DesignButton
-            label={t('길찾기')}
-            accessibilityLabel={t('{p0} 길찾기', { p0: item.title })}
-            variant="quiet"
-            onPress={onDirections}
-            icon={(color) => {
-              // 외부 지도 길찾기 아이콘을 버튼 상태 색상에 맞춰 표시한다.
-              return (
-                <Ionicons
-                  name="navigate-outline"
-                  size={18}
-                  color={color || colors.text}
-                />
-              );
-            }}
-          />
-          {editable && onExpense ? (
-            <DesignButton
-              label={t('비용 기록')}
-              accessibilityLabel={t('{p0} 비용 기록', { p0: item.title })}
-              variant="quiet"
-              disabled={disabled}
-              onPress={onExpense}
-              icon={(color) => {
-                // 방문 장소의 식사·구매 비용 기록 아이콘을 표시한다.
-                return (
-                  <Ionicons
-                    name="wallet-outline"
-                    size={18}
-                    color={color || colors.text}
-                  />
-                );
-              }}
-            />
-          ) : null}
-          {editable && onPhoto ? (
-            <DesignButton
-              label={t('사진 공유')}
-              accessibilityLabel={t('{p0} 사진 추가', { p0: item.title })}
-              variant="quiet"
-              disabled={disabled}
-              onPress={onPhoto}
-              icon={(color) => {
-                // 방문 장소에서 찍은 사진 공유 아이콘을 표시한다.
-                return (
-                  <Ionicons
-                    name="camera-outline"
-                    size={18}
-                    color={color || colors.text}
-                  />
-                );
-              }}
-            />
-          ) : null}
-        </View>
+                  <Text style={s.timelineDirectionsText}>{t('길찾기')}</Text>
+                </Pressable>
+              </View>
+            )}
+          </Pressable>
+        )}
       </View>
     </View>
   );

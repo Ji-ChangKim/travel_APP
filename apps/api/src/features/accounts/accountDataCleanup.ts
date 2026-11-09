@@ -31,7 +31,7 @@ export async function minimizeAccountData(env: Env): Promise<void> {
       await db.batch([
         db
           .prepare(
-            "UPDATE user SET name=CASE WHEN EXISTS(SELECT 1 FROM account_retirements WHERE user_id=?) THEN '탈퇴 멤버' ELSE '여행자' END,image=NULL WHERE id=?",
+            "UPDATE user SET name=CASE WHEN EXISTS(SELECT 1 FROM account_retirements WHERE user_id=?) THEN '탈퇴 멤버' ELSE coalesce((SELECT nickname FROM member_profile_names WHERE user_id=user.id),'여행자') END,image=NULL WHERE id=?",
           )
           .bind(id, id),
         db

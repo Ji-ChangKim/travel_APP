@@ -1,88 +1,69 @@
 import Text from '@/components/ui/AppText';
-import DesignButton from '@/components/ui/DesignButton';
-import { colors } from '@/constants/theme';
 import { t } from '@/features/localization/translate';
-import { Ionicons } from '@expo/vector-icons';
-import { View } from 'react-native';
+import { Image, View, type ImageSourcePropType } from 'react-native';
+import type { ReactNode } from 'react';
 import { styles } from '../styles/myAccountStyles';
 import type { AccountProfileProps } from '../model/myAccountTypes';
-// 현재 계정의 닉네임·소개·여행 스타일과 편집 진입을 표시한다.
+
+// 기본 프로필은 읽기 전용이며 회원 종류를 확인한 범위에서만 표시한다.
 export function renderAccountProfile({
   largeText,
   currentUser,
   userId,
-  isSavingProfile,
-  openProfileEditModal,
-}: AccountProfileProps) {
+  imageSource,
+  children,
+}: AccountProfileProps & {
+  imageSource?: ImageSourcePropType;
+  children?: ReactNode;
+}) {
+  const guest = currentUser?.authProvider === 'guest';
   return (
-    <View style={styles.profileCard}>
+    <View style={styles.profileCard} testID="account-default-profile">
       <View
         style={[
           styles.profileCardHeader,
           largeText && styles.profileCardHeaderLarge,
         ]}
       >
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
-            {(currentUser?.nickname || '나')[0]}
-          </Text>
-        </View>
+        <Image
+          source={
+            imageSource ||
+            require('../../../../assets/brand/haru-v1/TripPrint_Haru_loading_1233x1275.png')
+          }
+          style={styles.profileAvatarImage}
+          accessibilityLabel={t(
+            imageSource ? '내 프로필 사진' : '기본 프로필 이미지',
+          )}
+        />
         <View style={styles.profileInfo}>
           <View style={styles.nameRow}>
             <Text style={styles.userName}>
-              {currentUser?.nickname || t('여행자')}
+              {currentUser?.nickname?.trim() || t('여행자')}
             </Text>
             <View style={styles.authBadge}>
               <Text style={styles.authBadgeText}>
-                {currentUser?.authProvider === 'guest'
-                  ? t('게스트')
-                  : t('Google 계정')}
+                {t(
+                  guest
+                    ? '게스트'
+                    : currentUser?.authProvider === 'google'
+                      ? 'Google 계정'
+                      : '회원 계정',
+                )}
               </Text>
             </View>
           </View>
           <Text style={styles.userEmail}>
-            {currentUser?.authProvider === 'guest'
-              ? t('게스트 여행은 이 기기에만 보관합니다')
-              : userId
-                ? t('여행과 기록을 Google 계정에 보관합니다')
-                : t('로그인 후 이용해 주세요')}
+            {t(
+              guest
+                ? '게스트 여행은 이 기기에만 보관합니다'
+                : userId
+                  ? '계정에 저장한 여행과 기록을 확인해요.'
+                  : '로그인 후 이용해 주세요',
+            )}
           </Text>
         </View>
-        <DesignButton
-          label={t('수정')}
-          accessibilityLabel={t('프로필 수정')}
-          size="chip"
-          variant="quiet"
-          disabled={isSavingProfile}
-          onPress={openProfileEditModal}
-          icon={(color) => {
-            return <Ionicons name="pencil" size={18} color={color} />;
-          }}
-        />
       </View>
-
-      {/* 한 줄 자기소개 */}
-      {currentUser?.bio ? (
-        <View style={styles.bioContainer}>
-          <Ionicons
-            name="chatbubble-ellipses-outline"
-            size={14}
-            color={colors.muted}
-          />
-          <Text style={styles.bioText}>{currentUser.bio}</Text>
-        </View>
-      ) : null}
-
-      {/* 선호 여행 스타일 태그 목록 */}
-      {currentUser?.travelStyles && currentUser.travelStyles.length > 0 ? (
-        <View style={styles.travelStylesWrap}>
-          {currentUser.travelStyles.map((style) => (
-            <View key={style} style={styles.travelStyleChip}>
-              <Text style={styles.travelStyleChipText}>#{style}</Text>
-            </View>
-          ))}
-        </View>
-      ) : null}
+      {children}
     </View>
   );
 }

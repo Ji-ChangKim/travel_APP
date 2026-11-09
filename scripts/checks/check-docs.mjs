@@ -2,6 +2,21 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// 사용자가 지정한 일일 보고서의 날짜 폴더만 달력상 유효한 YY.MM.DD로 허용한다.
+function dailyReportDate(name) {
+  const parts = name.match(/^(\d{2})\.(\d{2})\.(\d{2})$/);
+  if (!parts) return undefined;
+  const year = 2000 + Number(parts[1]);
+  const month = Number(parts[2]);
+  const day = Number(parts[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+    ? name
+    : undefined;
+}
+
 // 비공개 폴더 자체의 이름은 확인하되 내부 구조와 파일은 검사하지 않는다.
 export function checkDocumentation(projectRoot) {
   const docs = resolve(projectRoot, 'docs');
@@ -25,7 +40,13 @@ export function checkDocumentation(projectRoot) {
         if (entry.name === '999. deletefile') {
           continue;
         }
-        const number = entry.name.match(/^(\d{2})\. .+$/)?.[1];
+        const reportRoot = resolve(docs, '998. 일일 업무 보고서');
+        const number =
+          full === reportRoot
+            ? '998'
+            : folder === reportRoot
+              ? dailyReportDate(entry.name)
+              : entry.name.match(/^(\d{2})\. .+$/)?.[1];
         if (!number || numbers.has(number)) {
           problems.push(
             `${relative(projectRoot, folder)}: 폴더 번호가 없거나 중복됩니다.`,

@@ -5,6 +5,10 @@ import {
 } from '@wherego/domain';
 
 import type { Dispatch, SetStateAction } from 'react';
+import { View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import DesignButton from '@/components/ui/DesignButton';
+import { t } from '@/features/localization/translate';
 
 import ScheduleCoursePicker from '../../schedule/ui/ScheduleCoursePicker';
 
@@ -16,6 +20,8 @@ import TripTimeline, {
 import type { WorkspaceDraftKind } from '../model/workspaceDrafts';
 import type { WorkspaceScreenActions } from '../model/workspaceScreenActions';
 import { workspaceDaySelection } from '../model/workspaceDaySelection';
+import { tripMapStops } from '../model/tripMapModel';
+import TripMapCanvas from './TripMapCanvas';
 
 type RenderWorkspaceCourseProps = {
   snapshot: WorkspaceSnapshot | undefined;
@@ -117,6 +123,9 @@ export function renderWorkspaceItinerary({
 }: RenderWorkspaceItineraryProps) {
   // 유효한 선택 날짜와 해당 날짜의 지도 방문 핀 목록을 계산한다.
   const daySelection = workspaceDaySelection(snapshot.days, selectedDay);
+  const activeDayId =
+    daySelection.visibleDays[0]?.id || snapshot.days[0]?.id || '';
+  const mapStops = tripMapStops(snapshot.itinerary, activeDayId);
 
   return (
     activeSection === 'itinerary' && (
@@ -136,6 +145,31 @@ export function renderWorkspaceItinerary({
             setSelectedDay(dayId);
           }}
         />
+        {writable && (
+          <View style={{ alignItems: 'flex-start' }} testID="trip-flight-add">
+            <DesignButton
+              size="chip"
+              label={t('항공권 추가')}
+              accessibilityLabel={t('항공권 추가')}
+              disabled={busy || scanning || hasPending}
+              icon={(color) => (
+                <Ionicons name="airplane-outline" size={16} color={color} />
+              )}
+              onPress={() => actions.addFlightSchedule(activeDayId)}
+            />
+          </View>
+        )}
+        {mapStops.length > 0 && (
+          <TripMapCanvas
+            stops={mapStops}
+            selectedId={selectedScheduleId}
+            onSelect={(id) => {
+              // 상단 동선 지도 핀 선택을 아래 타임라인 카드 강조와 동기화한다.
+              triggerHaptic('selection');
+              setSelectedScheduleId?.(id);
+            }}
+          />
+        )}
         {daySelection.visibleDays.map((day) => {
           // 표시 대상인 각 일차의 타임라인과 빈 상태 가이드를 렌더링한다.
           return (
@@ -169,6 +203,10 @@ export function renderWorkspaceItinerary({
               onAdd={() => {
                 // 해당 날짜의 장소 검색이 펼쳐진 일정 작성 초안을 연다.
                 return actions.addSchedule(day.id);
+              }}
+              onAddFlight={() => {
+                // 해당 날짜의 항공편 조회·등록 초안을 즉시 연다.
+                return actions.addFlightSchedule(day.id);
               }}
               onCourse={() => {
                 // 코스를 넣을 날짜를 선택 당시 값으로 고정한다.

@@ -6,8 +6,6 @@ export type CommunityFeedViewProps = ReturnType<
   typeof useDiscoveryController
 > & {
   title: string;
-  headerVariant?: 'public-brand';
-  hideSearchBar?: boolean;
 };
 export type CommunityFeedCard = ReturnType<typeof communityFeedCard>;
 export type CommunityFeedPostProps = Pick<

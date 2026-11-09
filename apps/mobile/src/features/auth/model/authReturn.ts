@@ -14,6 +14,7 @@ export type AuthReturn = {
     | 'new-trip'
     | 'community'
     | 'account'
+    | 'my'
     | 'invite'
     | 'import-place';
   destination?: string;
@@ -69,6 +70,7 @@ function baseAuthReturn(
               )?.key || '',
           }
         : next === 'plans' ||
+            next === 'my' ||
             next === 'account' ||
             next === 'community' ||
             next === 'invite' ||
@@ -160,17 +162,19 @@ function verifiedReturnPath(params: AuthReturn): Href {
               : ('/(tabs)/community' as const)
             : params.next === 'account'
               ? ('/account' as const)
-              : params.next === 'my-footprints'
-                ? ('/my-footprints' as const)
-                : params.next === 'footprints'
-                  ? ('/(tabs)/footprints' as const)
-                  : params.next === 'plans'
-                    ? ('/plans' as const)
-                    : params.next === 'invite'
-                      ? ('/invite' as const)
-                      : params.next === 'import-place'
-                        ? ('/import-place' as const)
-                        : ('/(tabs)' as const);
+              : params.next === 'my'
+                ? ('/(tabs)/my' as const)
+                : params.next === 'my-footprints'
+                  ? ('/my-footprints' as const)
+                  : params.next === 'footprints'
+                    ? ('/(tabs)/footprints' as const)
+                    : params.next === 'plans'
+                      ? ('/plans' as const)
+                      : params.next === 'invite'
+                        ? ('/invite' as const)
+                        : params.next === 'import-place'
+                          ? ('/import-place' as const)
+                          : ('/(tabs)' as const);
 }
 
 // 로그인 만료와 접근 불가를 통신 장애와 구분한다.

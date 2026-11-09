@@ -12,7 +12,7 @@ import {
   storedGuestSchema,
 } from '../../apps/mobile/src/services/guestProfileStorage';
 
-test('닉네임은 NFC 정규화와 공백 제거 후 한글·영문·숫자 2~10자를 허용한다', () => {
+test('닉네임은 NFC 문자 1~10자와 중간 공백을 허용하며 앞뒤 공백을 거부한다', () => {
   assert.deepEqual(
     [
       'a',
@@ -25,9 +25,9 @@ test('닉네임은 NFC 정규화와 공백 제거 후 한글·영문·숫자 2~1
       '  AB  ',
       '하루',
     ].map((value) => nicknameSchema.safeParse(value).success),
-    [false, true, false, true, false, false, false, true, true],
+    [true, true, true, true, false, true, false, false, true],
   );
-  assert.equal(nicknameSchema.parse('  하루01 '), '하루01');
+  assert.equal(nicknameSchema.parse('하루01'), '하루01');
   assert.equal(nicknameBytes('가😀'), Buffer.byteLength('가😀'));
 });
 
@@ -40,14 +40,14 @@ test('기존 이름은 보존하고 실제 이름 변경에는 새 제한을 적
     validProfileNickname('새로운 여행자의 긴 이름', ' 오래된 여행자의 이름 '),
     false,
   );
-  assert.equal(nicknameSchema.parse(' 여행자01 '), '여행자01');
+  assert.equal(nicknameSchema.safeParse(' 여행자01 ').success, false);
   assert.equal(
     profileNicknameError('여행😀'),
-    '한글, 영문, 숫자만 사용할 수 있어요.',
+    '영어·숫자·한글·히라가나·가타카나만 사용할 수 있어요.',
   );
   assert.equal(
     profileNicknameError('가'.repeat(11)),
-    '닉네임은 2~10자로 입력해 주세요.',
+    '닉네임은 공백을 포함해 1~10자로 입력해 주세요.',
   );
   assert.equal(
     profileNicknameError(' 오래된 여행자의 이름 ', ' 오래된 여행자의 이름 '),
@@ -59,7 +59,7 @@ test('기존 이름은 보존하고 실제 이름 변경에는 새 제한을 적
   if (!invalid.success)
     assert.equal(
       invalid.error.issues[0]?.message,
-      '한글, 영문, 숫자만 사용할 수 있어요.',
+      '영어·숫자·한글·히라가나·가타카나만 사용할 수 있어요.',
     );
 });
 test('생일은 실제 날짜만 허용하고 윤년·미래·1900년 이전을 검증한다', () => {

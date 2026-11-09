@@ -1,116 +1,18 @@
-import {
-  connectProfileSaveScope,
-  type ProfileSaveScope,
-} from '@/features/auth/manager/profileSave';
-import { useScheduleExitGuard } from '@/features/workspace/schedule/ui/scheduleExitGuard';
 import { tripListQueryOptions } from '../../workspace/shared/manager/tripQueries';
-
 import { useTripDateRefresh } from '@/features/workspace/shared/manager/useTripDateRefresh';
 import { useTripStore } from '@/stores/useTripStore';
 import { useQuery } from '@tanstack/react-query';
-
 import { useRouter } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
-import { useProfileEditorActions } from './profileEditorActions';
 
-// 현재 계정과 편집 요청의 수명을 관리하고 표시용 상태·행동을 반환한다.
+// MY는 기본 프로필과 실제 여행 통계를 읽고 설정으로 연결한다.
 export function useMyAccountController() {
-  // 예정 여행 통계도 현지 날짜 경계와 전경 복귀에서 함께 갱신한다.
   useTripDateRefresh();
   const router = useRouter();
-  const { currentUser, updateProfile } = useTripStore();
-
-  // 활동 통계도 내 여행과 동일한 계정별 서버 원본을 조회한다.
+  const currentUser = useTripStore((store) => store.currentUser);
   const userId = currentUser?.id || '';
   const serverTrips = useQuery({
-    ...tripListQueryOptions(userId || ''),
+    ...tripListQueryOptions(userId),
     enabled: Boolean(userId),
   });
-
-  // 프로필 편집 모달 및 폼 상태를 관리한다.
-  const [isProfileEditModalOpen, setIsProfileEditModalOpen] =
-    useState<boolean>(false);
-  const [editNickname, setEditNickname] = useState<string>('');
-  const [editBio, setEditBio] = useState<string>('');
-  const [editTravelStyles, setEditTravelStyles] = useState<string[]>([]);
-  const [isSavingProfile, setIsSavingProfile] = useState<boolean>(false);
-  const [profileError, setProfileError] = useState('');
-  const [profileNotice, setProfileNotice] = useState('');
-  const profileSave = useRef<ProfileSaveScope>({
-    accountId: userId,
-    active: true,
-    sequence: 0,
-    running: false,
-  });
-  useScheduleExitGuard(
-    isProfileEditModalOpen
-      ? {
-          kind: 'profile',
-          id: userId,
-          values: {
-            nickname: editNickname,
-            bio: editBio,
-            travelStyles: editTravelStyles,
-          },
-        }
-      : null,
-    isSavingProfile,
-    () => {
-      // 버리기를 선택한 프로필 폼만 닫는다.
-      return setIsProfileEditModalOpen(false);
-    },
-  );
-  useEffect(() => {
-    // 개발 모드의 효과 재연결도 새 요청 수명으로 구분한다.
-    return connectProfileSaveScope(profileSave.current);
-  }, []);
-
-  // 프로필 수정 모달을 열고 현재 데이터를 폼 상태에 채운다.
-  const {
-    openProfileEditModal,
-    closeProfileEditModal,
-    handleToggleTravelStyle,
-    handleSaveProfile,
-  } = useProfileEditorActions({
-    profileSave,
-    setProfileError,
-    setProfileNotice,
-    setEditNickname,
-    currentUser,
-    setEditBio,
-    setEditTravelStyles,
-    setIsProfileEditModalOpen,
-    editNickname,
-    setIsSavingProfile,
-    userId,
-    editBio,
-    editTravelStyles,
-    updateProfile,
-  });
-
-  const changeNickname: typeof setEditNickname = (value) => {
-    // 새 입력에 이전 제출의 오류가 다시 나타나지 않게 한다.
-    setProfileError('');
-    setEditNickname(value);
-  };
-  // 화면에는 요청 원문과 잠금 참조 대신 준비된 상태와 행동을 전달한다.
-  return {
-    profileNotice,
-    currentUser,
-    userId,
-    isSavingProfile,
-    openProfileEditModal,
-    router,
-    serverTrips,
-    isProfileEditModalOpen,
-    closeProfileEditModal,
-    editNickname,
-    setEditNickname: changeNickname,
-    editBio,
-    setEditBio,
-    editTravelStyles,
-    handleToggleTravelStyle,
-    profileError,
-    handleSaveProfile,
-  };
+  return { currentUser, userId, router, serverTrips };
 }

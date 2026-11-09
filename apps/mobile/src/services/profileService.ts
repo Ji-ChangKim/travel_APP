@@ -1,31 +1,11 @@
 import { UserFacingError } from './userFacingError';
 import type { Profile, ProfileUpdate } from '@wherego/domain';
-import { z } from 'zod';
+import { profileSchema } from '@/features/auth/model/profileResponse';
 import { requestFoundation, FoundationClientError } from '@wherego/api-client';
 import { serverOptions } from '@/features/workspace/shared/manager/service';
 import { useTripStore } from '@/stores/useTripStore';
 import { saveGuestSession } from './guestAuthService';
-export const profileSchema = z.object({
-  id: z.string().uuid(),
-  nickname: z.string(),
-  avatarUrl: z.string().nullable(),
-  bio: z.string().nullable().optional(),
-  travelStyles: z.array(z.string()).optional(),
-  authProvider: z.enum(['email', 'google', 'kakao', 'naver', 'apple', 'guest']),
-  linkedId: z.string(),
-  linkedAt: z.string(),
-  gender: z.enum(['female', 'male', 'unspecified']).nullable(),
-  birthDate: z.string().nullable(),
-  onboardingCompleted: z.boolean(),
-  osPlatform: z.enum(['web', 'ios', 'android']),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-  avatarType: z.enum(['default', 'avatar', 'photo']).optional(),
-  avatarId: z.string().nullable().optional(),
-  photoFileRef: z.string().nullable().optional(),
-  completedAt: z.string().nullable().optional(),
-  revision: z.number().int().optional(),
-});
+export { profileSchema } from '@/features/auth/model/profileResponse';
 // 현재 서버 계정의 프로필을 조회한다.
 export function fetchUserProfile(userId: string): Promise<Profile | null> {
   // 임의 사용자 ID로 다른 계정의 프로필을 읽지 않는다.

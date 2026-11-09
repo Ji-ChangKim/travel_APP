@@ -191,7 +191,7 @@ function TravelHome({
           onCreate={create}
           onBrowseCourses={() => {
             // 인기 여행 코스 둘러보기 클릭 시 발자국 화면으로 이동한다.
-            router.push('/community');
+            router.push('/footprints');
           }}
           onOpenGuide={(key) => {
             // 공식 도시 가이드 상세 화면으로 이동한다.

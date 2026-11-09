@@ -118,9 +118,11 @@ export function cloudAuth(env: Env, callbackState?: string) {
           }),
         },
         update: {
-          before: async (user) => ({
-            data: { ...user, name: '여행자', image: null },
-          }),
+          before: async (user) => {
+            // 공급자 정보 갱신이 MY에서 직접 정한 표시 이름을 덮어쓰지 않게 한다.
+            // 훅 결과는 원본과 병합되므로 undefined로 덮어써 갱신 항목에서 제외한다.
+            return { data: { ...user, name: undefined, image: null } };
+          },
         },
       },
     },

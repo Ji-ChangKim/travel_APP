@@ -51,6 +51,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   avatarText: { fontSize: 20, fontWeight: '700', color: colors.text },
+  profileAvatarImage: { width: 52, height: 52, resizeMode: 'contain' },
   profileInfo: { flex: 1, minWidth: 0, gap: 4 },
   nameRow: {
     flexDirection: 'row',
@@ -72,7 +73,7 @@ export const styles = StyleSheet.create({
     borderRadius: 6,
   },
   authBadgeText: { fontSize: 14, fontWeight: '700', color: colors.primary },
-  userEmail: { fontSize: 14, color: colors.muted },
+  userEmail: { fontSize: 14, lineHeight: 22, color: colors.muted },
   editProfileBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -221,6 +222,7 @@ export const styles = StyleSheet.create({
   },
   listTextGroup: {
     flex: 1,
+    minWidth: 0,
     gap: 2,
   },
   listTitle: {
@@ -236,11 +238,12 @@ export const styles = StyleSheet.create({
     color: colors.danger,
   },
   listSubtitle: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: 14,
+    lineHeight: 22,
     color: colors.muted,
   },
   listValue: {
+    flexShrink: 1,
     fontSize: 14,
     lineHeight: 20,
     fontWeight: '600',

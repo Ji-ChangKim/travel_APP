@@ -1,184 +1,186 @@
 import Text from '@/components/ui/AppText';
-import { colors } from '@/constants/theme';
 import { t } from '@/features/localization/translate';
-import { Ionicons } from '@expo/vector-icons';
 import { View } from 'react-native';
-import { styles as accountStyles } from '../styles/myAccountStyles';
+import { Action } from '@/features/workspace/shared/ui/ui';
+import { styles } from '../styles/myAccountStyles';
 import type { AccountRetirementController } from '../manager/useAccountRetirement';
 
-import { getLocale } from '@/features/localization/localeState';
-import { Action } from '@/features/workspace/shared/ui/ui';
-import { styles } from '@/features/workspace/hub/styles/workspaceStyles';
-
-// 탈퇴 완료 상태와 요청 전 정책 안내 중 현재 필요한 내용을 선택한다.
+// 삭제할 자료·공유 참여·소유권 이전을 구분하고 실제 접수 결과를 표시한다.
 export default function AccountRetirementSection(
   props: AccountRetirementController,
 ) {
-  const { completed } = props;
-  return completed ? (
-    <AccountRetirementCompleted {...props} />
-  ) : (
-    <View style={accountStyles.section}>
-      <Text style={accountStyles.sectionTitle}>{t('회원 탈퇴')}</Text>
-      <AccountRetirementPolicy />
-      <AccountRetirementActions {...props} />
-    </View>
-  );
-}
-// 서버가 확정한 삭제 예정일과 복구 진입을 표시한다.
-function AccountRetirementCompleted({
-  completed,
-  router,
-}: Pick<AccountRetirementController, 'completed' | 'router'>) {
-  return (
-    <View style={accountStyles.section}>
-      <Text style={accountStyles.sectionTitle}>
-        {t('탈퇴 유예를 시작했어요')}
-      </Text>
-      <View style={[accountStyles.card, { gap: 12 }]}>
-        <Text>
-          {new Date(completed).toLocaleDateString(getLocale())}
+  if (props.completed)
+    return (
+      <View style={styles.section}>
+        <Text accessibilityRole="header" style={styles.sectionTitle}>
+          {t('삭제 요청을 접수했어요')}
+        </Text>
+        <View style={[styles.card, { gap: 12 }]}>
+          <Text>
+            {t(
+              '계정 이용을 종료하고 자료를 삭제하고 있어요. 삭제가 모두 끝났다는 뜻은 아니에요.',
+            )}
+          </Text>
+          <Action
+            label={t('로그인 화면으로')}
+            variant="primary"
+            onPress={() => props.router.replace('/login')}
+          />
+        </View>
+      </View>
+    );
+  if (!props.user || props.user.authProvider === 'guest')
+    return (
+      <View style={[styles.card, { gap: 12 }]}>
+        <Text style={styles.settingDesc}>
           {t(
-            '에 계정 연결 정보를 삭제해요. 90일 안에 다시 로그인하면 탈퇴가 취소되고 여행을 다시 볼 수 있어요.',
+            '기기에 보관한 게스트 여행은 회원 계정 삭제로 지워지지 않아요. 회원 계정은 로그인한 뒤 관리할 수 있어요.',
           )}
         </Text>
         <Action
-          label={t('로그인 화면으로')}
-          variant="primary"
-          onPress={() => {
-            // 실제 탈퇴 요청 성공 뒤 로그인 화면으로 이동한다.
-            return router.replace('/login');
-          }}
+          label={t('로그인하고 계정 관리')}
+          onPress={() =>
+            props.router.push({
+              pathname: '/login',
+              params: { next: 'account' },
+            })
+          }
         />
       </View>
-    </View>
-  );
-}
-// 계정과 분리해 보관할 자료와 복구 유예 정책을 설명한다.
-function AccountRetirementPolicy() {
+    );
   return (
-    <View style={accountStyles.listCard}>
-      <View style={accountStyles.listRow}>
-        <View style={accountStyles.listIconBoxNeutral}>
-          <Ionicons
-            name="person-remove-outline"
-            size={20}
-            color={colors.text}
-          />
-        </View>
-        <View style={accountStyles.listTextGroup}>
-          <Text style={accountStyles.listTitle}>
-            {t('즉시 로그아웃 및 탈퇴 멤버 전환')}
-          </Text>
-          <Text style={accountStyles.listSubtitle}>
-            {t(
-              '탈퇴를 요청하면 로그아웃되고, 여행에서는 ‘탈퇴 멤버’로 표시돼요.',
-            )}
-          </Text>
-        </View>
+    <View style={[styles.section, { gap: 16 }]}>
+      <Text accessibilityRole="header" style={styles.sectionTitle}>
+        {t('계정 삭제 전 확인')}
+      </Text>
+      <View style={[styles.card, { gap: 12 }]}>
+        <Text>
+          {t(
+            '계정 삭제를 요청하면 모든 기기에서 로그아웃돼요. 복구 유예 없이 계정과 개인 여행·사진·영수증을 삭제해요.',
+          )}
+        </Text>
+        <Text style={styles.settingDesc}>
+          {t(
+            '함께한 여행에서는 나의 참여와 개인정보를 정리해요. 다른 동행자의 기록은 남아요.',
+          )}
+        </Text>
       </View>
-      <View style={accountStyles.listDivider} />
-      <View style={accountStyles.listRow}>
-        <View style={accountStyles.listIconBoxNeutral}>
-          <Ionicons name="time-outline" size={20} color={colors.text} />
-        </View>
-        <View style={accountStyles.listTextGroup}>
-          <Text style={accountStyles.listTitle}>
-            {t('90일 복구 유예 기간')}
-          </Text>
-          <Text style={accountStyles.listSubtitle}>
-            {t(
-              '90일 안에 같은 계정으로 다시 로그인하면 탈퇴를 취소하고 여행을 복구할 수 있어요. 90일이 지나면 이메일·로그인 연결·프로필을 삭제해요.',
-            )}
-          </Text>
-        </View>
-      </View>
-      <View style={accountStyles.listDivider} />
-      <View style={accountStyles.listRow}>
-        <View style={accountStyles.listIconBoxNeutral}>
-          <Ionicons name="folder-open-outline" size={20} color={colors.text} />
-        </View>
-        <View style={accountStyles.listTextGroup}>
-          <Text style={accountStyles.listTitle}>
-            {t('여행·영수증·동행자 기록 보존')}
-          </Text>
-          <Text style={accountStyles.listSubtitle}>
-            {t(
-              '내가 만든 여행과 함께한 여행, 사진·영수증·공개본은 계정과 분리해 보관해요. 혼자 만든 여행도 보관되며 동행자의 여행 접근과 기존 권한은 유지돼요. 소유권을 다른 동행자에게 넘기지 않아요.',
-            )}
-          </Text>
-        </View>
-      </View>
-    </View>
-  );
-}
-// 현재 회원 상태에 따라 탈퇴 확인 또는 재인증 행동을 제공한다.
-function AccountRetirementActions({
-  user,
-  userId,
-  busy,
-  error,
-  reauthenticate,
-  router,
-  setConfirming,
-  requestReauthentication,
-}: Pick<
-  AccountRetirementController,
-  | 'user'
-  | 'userId'
-  | 'busy'
-  | 'error'
-  | 'reauthenticate'
-  | 'router'
-  | 'setConfirming'
-  | 'requestReauthentication'
->) {
-  return (
-    <View style={{ marginTop: 16, gap: 12 }}>
-      {!user || user.authProvider === 'guest' ? (
-        <>
-          <Text style={accountStyles.settingDesc}>
-            {user
-              ? t(
-                  '기기에 보관한 게스트 여행은 회원 탈퇴로 삭제되지 않아요. 연결한 회원 계정을 관리하려면 해당 계정으로 로그인해 주세요.',
-                )
-              : t('TripPrint 계정으로 로그인한 뒤 탈퇴를 요청할 수 있어요.')}
-          </Text>
-          <Action
-            label={t('로그인하고 계정 관리')}
-            variant="primary"
-            onPress={() => {
-              // 로그인 후 외부 주소 대신 고정된 계정 관리로 돌아온다.
-              return router.push({
-                pathname: '/login',
-                params: { next: 'account' },
-              });
-            }}
-          />
-        </>
-      ) : (
-        <Action
-          label={busy ? t('요청 중…') : t('탈퇴 내용 확인')}
-          variant="danger"
-          loading={busy}
-          onPress={() => {
-            // 보존 범위를 읽은 본인 계정으로 확인 대상을 고정한다.
-            return setConfirming(userId);
-          }}
-        />
-      )}
-      {error ? (
-        <Text accessibilityRole="alert" style={styles.error}>
-          {t(error)}
+      {props.loading ? (
+        <Text accessibilityLiveRegion="polite">
+          {t('계정과 여행을 확인하고 있어요.')}
         </Text>
       ) : null}
-      {reauthenticate && (
+      {props.management ? <DeletionSummary {...props} /> : null}
+      {props.notice ? (
+        <Text accessibilityLiveRegion="polite">{t(props.notice)}</Text>
+      ) : null}
+      {props.error ? (
+        <Text accessibilityRole="alert" style={styles.settingDesc}>
+          {t(props.error)}
+        </Text>
+      ) : null}
+      {!props.loading && !props.management ? (
         <Action
-          label={t('로그아웃하고 다시 확인')}
-          disabled={busy}
-          onPress={requestReauthentication}
+          label={t('계정 상태 다시 확인')}
+          disabled={props.busy}
+          onPress={props.reload}
         />
-      )}
+      ) : null}
+      {props.error && props.management ? (
+        <Action
+          label={t('계정 상태 다시 확인')}
+          disabled={props.busy}
+          onPress={props.reload}
+        />
+      ) : null}
+      {props.reauthenticate ? (
+        <Action
+          label={t('다시 로그인하고 확인')}
+          disabled={props.busy}
+          onPress={props.requestReauthentication}
+        />
+      ) : null}
+      <Action
+        label={t('계정 삭제 내용 확인')}
+        variant="danger"
+        disabled={
+          props.busy ||
+          props.loading ||
+          !props.management ||
+          props.reauthenticate ||
+          Boolean(props.management.preview.ownershipTransfersRequired.length)
+        }
+        onPress={props.confirmDeletion}
+      />
+    </View>
+  );
+}
+
+function DeletionSummary(props: AccountRetirementController) {
+  const data = props.management;
+  if (!data) return null;
+  return (
+    <View style={{ gap: 16 }}>
+      <View style={[styles.card, { gap: 12 }]}>
+        <Text>
+          {t('삭제할 개인 여행 {count}개', {
+            count: data.preview.ownedTripsToDelete.length,
+          })}
+        </Text>
+        <Text>
+          {t('참여를 종료할 공유 여행 {count}개', {
+            count: data.preview.sharedTripsToLeave.length,
+          })}
+        </Text>
+        <Text>
+          {t('소유권 이전이 필요한 여행 {count}개', {
+            count: data.preview.ownershipTransfersRequired.length,
+          })}
+        </Text>
+      </View>
+      {data.transfers.length ? (
+        <Text style={styles.settingDesc}>
+          {t(
+            '함께 관리하는 여행은 소유권을 먼저 넘겨주세요. 현재 참여한 동행자 중 새 소유자를 직접 선택해 주세요.',
+          )}
+        </Text>
+      ) : null}
+      {data.transfers.map((trip) => (
+        <View key={trip.id} style={[styles.card, { gap: 12 }]}>
+          <Text accessibilityRole="header" style={styles.userName}>
+            {trip.title}
+          </Text>
+          {trip.candidates.map((member, index) => (
+            <Action
+              key={member.id}
+              label={t('{name} · 동행자 {number}', {
+                name: member.name,
+                number: index + 1,
+              })}
+              selected={props.selection[trip.id] === member.id}
+              disabled={props.busy || props.loading}
+              onPress={() => props.chooseOwner(trip.id, member.id)}
+            />
+          ))}
+          {!trip.candidates.length ? (
+            <Text style={styles.settingDesc}>
+              {t(
+                '이전할 동행자를 찾지 못했어요. 계정 상태를 다시 확인해 주세요.',
+              )}
+            </Text>
+          ) : null}
+          <Action
+            label={t('소유권 이전 내용 확인')}
+            disabled={
+              props.busy ||
+              props.loading ||
+              props.reauthenticate ||
+              !props.selection[trip.id]
+            }
+            onPress={() => props.confirmTransfer(trip.id)}
+          />
+        </View>
+      ))}
     </View>
   );
 }

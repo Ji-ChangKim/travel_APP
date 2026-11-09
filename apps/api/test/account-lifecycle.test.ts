@@ -181,9 +181,9 @@ test('최소 계정 조회는 Google 연결로 구분하며 추가 개인정보 
   assert.equal(JSON.stringify(profile).includes('private-google-sub'), false);
   assert.equal('birthDate' in profile.data, false);
   assert.equal(
-    (await request('/api/v1/profile', user, 'PATCH', { nickname: '개인정보' }))
+    (await request('/api/v1/profile', user, 'PATCH', { bio: '개인정보' }))
       .status,
-    410,
+    422,
   );
   assert.equal(
     (await request('/api/v1/profile/complete', user, 'POST', {})).status,

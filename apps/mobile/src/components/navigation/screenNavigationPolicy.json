@@ -24,21 +24,21 @@
     "file": "(tabs)/plans.tsx",
     "path": "/plans",
     "header": "root",
-    "title": "내 여행 계획",
+    "title": "내 여행",
     "gnb": true
   },
   {
     "file": "(tabs)/footprints.tsx",
     "path": "/footprints",
-    "header": "brand",
-    "title": "TripPrint",
+    "header": "root",
+    "title": "커뮤니티",
     "gnb": true
   },
   {
     "file": "(tabs)/community.tsx",
     "path": "/community",
     "header": "root",
-    "title": "여행 커뮤니티",
+    "title": "커뮤니티",
     "gnb": true
   },
   {
@@ -143,7 +143,7 @@
     "file": "profile-setup.tsx",
     "path": "/profile-setup",
     "header": "task",
-    "title": "프로필 설정",
+    "title": "계정 확인",
     "gnb": false
   },
   {

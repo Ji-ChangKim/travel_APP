@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { Linking, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import type { WorkspaceSchedule, WorkspaceSnapshot } from '@wherego/domain';
+import {
+  validTripDates,
+  type WorkspaceSchedule,
+  type WorkspaceSnapshot,
+} from '@wherego/domain';
 import AppModal from '@/components/ui/AppModal';
 import ActionSheet from '@/components/ui/ActionSheet';
 import ScreenHeader from '@/components/navigation/ScreenHeader';
@@ -12,21 +16,69 @@ import { colors } from '@/constants/theme';
 import { t } from '@/features/localization/translate';
 import { getLocale, useLocale } from '@/features/localization/localeState';
 import { schedulesForDay } from '../model/schedulePresentation';
-import { scheduleDirectionsUrl } from '../model/scheduleOrder';
+import {
+  moveScheduleOrder,
+  scheduleDirectionsUrl,
+} from '../model/scheduleOrder';
 import { schedulePageStyles as s } from '../styles/schedulePageStyles';
 import SchedulePlaceCard from '../ui/SchedulePlaceCard';
 import type { Props } from './TripTimeline';
 
-// 날짜 문자열(YYYY-MM-DD)을 섹션 헤더 우측의 월 일 요일(예: 11월 15일 일요일) 형식으로 변환한다.
-function formatFullDayDate(date: string): string {
-  // 기기 시간대 영향을 받지 않도록 UTC 정오 시각 기준으로 포맷한다.
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
-  return new Intl.DateTimeFormat(getLocale(), {
-    month: 'long',
-    day: 'numeric',
-    weekday: 'long',
-    timeZone: 'UTC',
-  }).format(new Date(`${date}T12:00:00Z`));
+// 인접한 두 방문 장소에 좌표가 모두 있으면 직선 거리(예: 58.4km, 850m)를 계산한다.
+function formatStopDistance(
+  current: WorkspaceSchedule,
+  next?: WorkspaceSchedule,
+): string {
+  if (!current.location || !next?.location) return '';
+  const rad = (deg: number) => (deg * Math.PI) / 180;
+  const dLat = rad(next.location.latitude - current.location.latitude);
+  const dLon = rad(next.location.longitude - current.location.longitude);
+  const lat1 = rad(current.location.latitude);
+  const lat2 = rad(next.location.latitude);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+  const km = 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  if (!Number.isFinite(km) || km <= 0.01) return '';
+  if (km < 1) return `${Math.round(km * 1000)}m`;
+  return `${km >= 10 ? km.toFixed(1).replace(/\.0$/, '') : km.toFixed(1)}km`;
+}
+
+// 날짜 문자열(YYYY-MM-DD)을 섹션 헤더의 월. 일(예: 11. 27, 연도 변경 시 26. 12. 30, 일정 미정 시 빈 문자열)로 변환한다.
+function formatShortDayDate(date: string, snapshot: WorkspaceSnapshot): string {
+  // 일정 날짜가 미정이거나 유효하지 않으면 날짜 표시를 생략한다.
+  if (!validTripDates(snapshot.trip) || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return '';
+  }
+  const crossYear =
+    snapshot.trip.startDate.slice(0, 4) !== snapshot.trip.endDate.slice(0, 4);
+  return crossYear
+    ? `${date.slice(2, 4)}. ${date.slice(5, 7)}. ${date.slice(8, 10)}`
+    : `${date.slice(5, 7)}. ${date.slice(8, 10)}`;
+}
+
+// 해당 일차에 연결된 지출 합계를 통화 코드와 함께 포맷한다(예: KRW 0).
+function formatDayExpenseSummary(
+  snapshot: WorkspaceSnapshot,
+  dayId: string,
+  items: WorkspaceSchedule[],
+): string {
+  const scheduleIds = new Set(items.map((item) => item.id));
+  const dayExpenses = snapshot.expenses.filter(
+    (expense) =>
+      expense.dayId === dayId ||
+      (expense.scheduleId && scheduleIds.has(expense.scheduleId)),
+  );
+  const currency =
+    dayExpenses[0]?.currency || snapshot.trip.defaultCurrency || 'KRW';
+  const total = dayExpenses.reduce(
+    (sum, expense) => sum + (Number(expense.amount) || 0),
+    0,
+  );
+  const formatted = new Intl.NumberFormat(getLocale(), {
+    maximumFractionDigits: currency === 'USD' ? 2 : 0,
+  }).format(total);
+  return `${currency} ${formatted}`;
 }
 
 // 여행 스냅샷의 시작일·종료일로 N박 M일 문자열을 계산한다.
@@ -109,6 +161,7 @@ export default function DaySchedule(props: Props) {
   const [moveId, setMoveId] = useState('');
   const [targetDay, setTargetDay] = useState(props.day.id);
   const [notice, setNotice] = useState('');
+  const [editingOrder, setEditingOrder] = useState(false);
   const detail = items.find((item) => {
     // 현재 상세 모달로 열려 있는 일정을 찾는다.
     return item.id === detailId;
@@ -138,172 +191,276 @@ export default function DaySchedule(props: Props) {
     }
   }
 
+  const dayExpenseSummary = formatDayExpenseSummary(
+    props.snapshot,
+    props.day.id,
+    items,
+  );
+  const planTitle = props.day.planTitle?.trim() || '';
+  const stepNumbers = items.map((item, idx) =>
+    item.flight
+      ? null
+      : items.slice(0, idx + 1).filter((candidate) => !candidate.flight).length,
+  );
+
   return (
     <View style={s.section}>
       <View style={s.headingRow} testID="schedule-timeline-header">
         <View style={s.headingLeft}>
+          <Text accessibilityRole="header" style={s.heading}>
+            {`DAY ${props.day.dayNumber}`}
+          </Text>
+          {formatShortDayDate(props.day.tripDate, props.snapshot) ? (
+            <Text style={s.dateText} testID="schedule-timeline-date">
+              {formatShortDayDate(props.day.tripDate, props.snapshot)}
+            </Text>
+          ) : null}
+        </View>
+        <View style={s.dateBadgeRow}>
+          <Text style={s.placeCountText} testID="schedule-place-count">
+            {dayExpenseSummary}
+          </Text>
+          {props.canCreate && items.length > 0 && (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={editingOrder ? t('완료') : t('편집')}
+              disabled={props.disabled}
+              onPress={() => setEditingOrder((prev) => !prev)}
+              style={({ pressed }) => [s.editHeaderBtn, pressed && s.pressed]}
+            >
+              <Text style={s.editHeaderBtnText}>
+                {editingOrder ? t('완료') : t('편집')}
+              </Text>
+            </Pressable>
+          )}
+        </View>
+      </View>
+      <View style={s.dayBoardCard}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={planTitle || t('제목 없음')}
+          disabled={!props.canCreate || props.disabled}
+          onPress={() => {
+            // 일차 제목 행을 터치하면 이날 제목·소개 편집 모달을 연다.
+            return props.onPlan?.();
+          }}
+          style={({ pressed }) => [
+            s.dayPlanHeaderRow,
+            pressed && props.canCreate && !props.disabled && s.pressed,
+          ]}
+        >
           <View
             style={s.timelineDot}
             testID="schedule-timeline-dot"
             aria-hidden
           />
-          <Text accessibilityRole="header" style={s.heading}>
-            {t('DAY {p0} 일정', { p0: props.day.dayNumber })}
+          <Text
+            style={[
+              s.dayPlanTitleText,
+              Boolean(planTitle) && s.dayPlanTitleActive,
+            ]}
+            numberOfLines={1}
+          >
+            {planTitle || t('제목 없음')}
           </Text>
-          <Text style={s.placeCountText} testID="schedule-place-count">
-            {t('{p0}개 장소', { p0: items.length })}
-          </Text>
-        </View>
-        <View style={s.dateBadgeRow} testID="schedule-timeline-date">
-          <TripIcon name="clock-outline" size={14} color={colors.muted} />
-          <Text style={s.dateText}>
-            {formatFullDayDate(props.day.tripDate)}
-          </Text>
-        </View>
-      </View>
-      {!items.length && (
-        <View style={s.empty} testID="schedule-empty">
-          <Text style={s.title}>{t('아직 등록된 일정이 없어요')}</Text>
-          <Text style={s.emptyText}>
-            {props.canCreate
-              ? t(
-                  '가고 싶은 {p0} 명소, 카페, 맛집을 검색하거나\n영수증 사진으로 빠르게 일정을 채워보세요!',
-                  { p0: destinationName },
-                )
-              : t('등록한 장소는 여기에서 확인할 수 있어요.')}
-          </Text>
-          {props.canCreate && (
-            <>
-              <View style={s.keywordSection} testID="schedule-empty-keywords">
-                <Text style={s.keywordHeader}>
-                  {t('추천 키워드로 바로 찾기')}
-                </Text>
-                <View style={s.keywordChipRow}>
-                  {keywords.map((chip, index) => (
+        </Pressable>
+        <View style={s.dayPlanDivider} />
+        {!items.length && (
+          <View style={s.empty} testID="schedule-empty">
+            <Text style={s.title}>{t('아직 등록된 일정이 없어요')}</Text>
+            <Text style={s.emptyText}>
+              {props.canCreate
+                ? t(
+                    '가고 싶은 {p0} 명소, 카페, 맛집을 검색하거나\n영수증 사진으로 빠르게 일정을 채워보세요!',
+                    { p0: destinationName },
+                  )
+                : t('등록한 장소는 여기에서 확인할 수 있어요.')}
+            </Text>
+            {props.canCreate && (
+              <>
+                <View style={s.keywordSection} testID="schedule-empty-keywords">
+                  <Text style={s.keywordHeader}>
+                    {t('추천 키워드로 바로 찾기')}
+                  </Text>
+                  <View style={s.keywordChipRow}>
+                    {keywords.map((chip, index) => (
+                      <Pressable
+                        key={chip.label}
+                        testID={`schedule-keyword-chip-${index + 1}`}
+                        accessibilityRole="button"
+                        accessibilityLabel={chip.label}
+                        disabled={props.disabled}
+                        onPress={() => {
+                          // 추천 키워드로 장소 제목이 미리 채워진 일정 추가 모달을 연다.
+                          if (props.onSelectCategory) {
+                            props.onSelectCategory({
+                              emoji: chip.emoji,
+                              label: chip.label,
+                              type: 'PLACE',
+                              query: chip.query,
+                            });
+                            return;
+                          }
+                          props.onAdd();
+                        }}
+                        style={({ pressed }) => [
+                          s.keywordChip,
+                          pressed && s.pressed,
+                        ]}
+                      >
+                        <Text style={s.keywordEmoji} aria-hidden>
+                          {chip.emoji}
+                        </Text>
+                        <Text style={s.keywordChipText}>{chip.label}</Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                </View>
+                <View style={s.guideLinksCol} testID="schedule-empty-guides">
+                  <Pressable
+                    testID="schedule-empty-template"
+                    accessibilityRole="button"
+                    accessibilityLabel={t('추천 코스 불러오기')}
+                    disabled={props.disabled}
+                    onPress={() => {
+                      // 목적지 추천 템플릿(추천 코스) 선택 시트를 연다.
+                      return props.onCourse();
+                    }}
+                    style={({ pressed }) => [
+                      s.templateLink,
+                      pressed && s.pressed,
+                    ]}
+                  >
+                    <Text style={s.templateLinkText}>
+                      {t('추천 {p0} {p1} 템플릿 불러오기', {
+                        p0: destinationName,
+                        p1: durationLabel,
+                      })}
+                    </Text>
+                    <Text style={s.templateChevron} aria-hidden>
+                      ›
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    testID="schedule-empty-search-guide"
+                    accessibilityRole="button"
+                    accessibilityLabel={t('장소 검색으로 추가')}
+                    disabled={props.disabled}
+                    onPress={() => {
+                      // 선택한 DAY의 장소 검색 작성 모달을 즉시 연다.
+                      return props.onAdd();
+                    }}
+                    style={({ pressed }) => [
+                      s.secondaryGuideLink,
+                      pressed && s.pressed,
+                    ]}
+                  >
+                    <Text style={s.secondaryGuideText}>
+                      {t('직접 장소 검색으로 채우기')}
+                    </Text>
+                    <Text style={s.secondaryGuideChevron} aria-hidden>
+                      ›
+                    </Text>
+                  </Pressable>
+                  {props.onAddFlight && (
                     <Pressable
-                      key={chip.label}
-                      testID={`schedule-keyword-chip-${index + 1}`}
+                      testID="schedule-empty-flight-guide"
                       accessibilityRole="button"
-                      accessibilityLabel={chip.label}
+                      accessibilityLabel={t('항공편 조회로 채우기')}
                       disabled={props.disabled}
                       onPress={() => {
-                        // 추천 키워드로 장소 제목이 미리 채워진 일정 추가 모달을 연다.
-                        if (props.onSelectCategory) {
-                          props.onSelectCategory({
-                            emoji: chip.emoji,
-                            label: chip.label,
-                            type: 'PLACE',
-                            query: chip.query,
-                          });
-                          return;
-                        }
-                        props.onAdd();
+                        // 선택한 DAY의 항공권 조회·추가 모달을 즉시 연다.
+                        return props.onAddFlight?.();
                       }}
                       style={({ pressed }) => [
-                        s.keywordChip,
+                        s.secondaryGuideLink,
                         pressed && s.pressed,
                       ]}
                     >
-                      <Text style={s.keywordEmoji} aria-hidden>
-                        {chip.emoji}
+                      <Text style={s.secondaryGuideText}>
+                        {t('항공편 조회로 채우기')}
                       </Text>
-                      <Text style={s.keywordChipText}>{chip.label}</Text>
+                      <Text style={s.secondaryGuideChevron} aria-hidden>
+                        ›
+                      </Text>
                     </Pressable>
-                  ))}
+                  )}
                 </View>
-              </View>
-              <View style={s.guideLinksCol} testID="schedule-empty-guides">
-                <Pressable
-                  testID="schedule-empty-template"
-                  accessibilityRole="button"
-                  accessibilityLabel={t('추천 코스 불러오기')}
-                  disabled={props.disabled}
-                  onPress={() => {
-                    // 목적지 추천 템플릿(추천 코스) 선택 시트를 연다.
-                    return props.onCourse();
-                  }}
-                  style={({ pressed }) => [
-                    s.templateLink,
-                    pressed && s.pressed,
-                  ]}
-                >
-                  <Text style={s.templateLinkText}>
-                    {t('추천 {p0} {p1} 템플릿 불러오기', {
-                      p0: destinationName,
-                      p1: durationLabel,
-                    })}
-                  </Text>
-                  <Text style={s.templateChevron} aria-hidden>
-                    ›
-                  </Text>
-                </Pressable>
-                <Pressable
-                  testID="schedule-empty-search-guide"
-                  accessibilityRole="button"
-                  accessibilityLabel={t('장소 검색으로 추가')}
-                  disabled={props.disabled}
-                  onPress={() => {
-                    // 선택한 DAY의 장소 검색 작성 모달을 즉시 연다.
-                    return props.onAdd();
-                  }}
-                  style={({ pressed }) => [
-                    s.secondaryGuideLink,
-                    pressed && s.pressed,
-                  ]}
-                >
-                  <Text style={s.secondaryGuideText}>
-                    {t('직접 장소 검색으로 채우기')}
-                  </Text>
-                  <Text style={s.secondaryGuideChevron} aria-hidden>
-                    ›
-                  </Text>
-                </Pressable>
-              </View>
-            </>
-          )}
-        </View>
-      )}
-      {items.map((item, index) => (
-        <SchedulePlaceCard
-          key={item.id}
-          item={item}
-          index={index}
-          last={index === items.length - 1}
-          selected={props.selectedScheduleId === item.id}
-          editable={props.canCreate}
-          disabled={props.disabled}
-          expenses={props.snapshot.expenses.filter(
-            (expense) => expense.scheduleId === item.id,
-          )}
-          photos={props.snapshot.media.filter(
-            (media) =>
-              media.scheduleId === item.id && media.purpose === 'photo',
-          )}
-          onOpen={() => {
-            // 선택한 장소의 상세 모달을 열고 이전 안내 문구를 지운다.
-            setNotice('');
-            setDetailId(item.id);
-            props.onSelectSchedule?.(item.id);
-          }}
-          onMore={() => {
-            // 선택한 장소의 수정·이동·삭제 관리 시트를 연다.
-            setNotice('');
-            setMenuId(item.id);
-          }}
-          onDirections={() => {
-            // 선택한 장소로 바로 길찾기를 실행한다.
-            void directions(item);
-          }}
-          onExpense={() => {
-            // 해당 장소에서 사용한 식비·입장료 등 비용 기록 시트를 연다.
-            props.onExpense(item);
-          }}
-          onPhoto={() => {
-            // 해당 장소에서 찍은 사진을 앨범에서 선택해 공유·첨부한다.
-            props.onPhoto(item);
-          }}
-        />
-      ))}
+              </>
+            )}
+          </View>
+        )}
+        {items.length > 0 && (
+          <View style={s.timelineList}>
+            {items.map((item, index) => (
+              <SchedulePlaceCard
+                key={item.id}
+                item={item}
+                index={index}
+                stepNumber={stepNumbers[index]}
+                tripDate={props.day.tripDate}
+                nextDistanceLabel={formatStopDistance(item, items[index + 1])}
+                editingOrder={editingOrder}
+                canMoveUp={index > 0}
+                canMoveDown={index < items.length - 1}
+                onMoveUp={() =>
+                  props.onReorder(
+                    moveScheduleOrder(
+                      items.map((entry) => entry.id),
+                      item.id,
+                      -1,
+                    ),
+                  )
+                }
+                onMoveDown={() =>
+                  props.onReorder(
+                    moveScheduleOrder(
+                      items.map((entry) => entry.id),
+                      item.id,
+                      1,
+                    ),
+                  )
+                }
+                onQuickDelete={() => props.onDelete(item)}
+                last={index === items.length - 1}
+                selected={props.selectedScheduleId === item.id}
+                editable={props.canCreate}
+                disabled={props.disabled}
+                expenses={props.snapshot.expenses.filter(
+                  (expense) => expense.scheduleId === item.id,
+                )}
+                photos={props.snapshot.media.filter(
+                  (media) =>
+                    media.scheduleId === item.id && media.purpose === 'photo',
+                )}
+                onOpen={() => {
+                  // 선택한 장소의 상세 모달을 열고 이전 안내 문구를 지운다.
+                  setNotice('');
+                  setDetailId(item.id);
+                  props.onSelectSchedule?.(item.id);
+                }}
+                onMore={() => {
+                  // 선택한 장소의 수정·이동·삭제 관리 시트를 연다.
+                  setNotice('');
+                  setMenuId(item.id);
+                }}
+                onDirections={() => {
+                  // 선택한 장소로 바로 길찾기를 실행한다.
+                  void directions(item);
+                }}
+                onExpense={() => {
+                  // 해당 장소에서 사용한 식비·입장료 등 비용 기록 시트를 연다.
+                  props.onExpense(item);
+                }}
+                onPhoto={() => {
+                  // 해당 장소에서 찍은 사진을 앨범에서 선택해 공유·첨부한다.
+                  props.onPhoto(item);
+                }}
+              />
+            ))}
+          </View>
+        )}
+      </View>
       {notice && !detail ? (
         <Text accessibilityRole="alert" style={s.error}>
           {notice}

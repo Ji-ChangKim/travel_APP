@@ -91,7 +91,7 @@ export function HomeGreetingSection({
         </View>
       ) : (
         <Text style={s.greetingEmptySub}>
-          {t('어디로 떠나볼까요? 목적지만 정하면 일정이 완성돼요.')}
+          {t('가고 싶은 곳을 고르고 나만의 여행을 준비해 보세요.')}
         </Text>
       )}
     </View>
@@ -126,10 +126,10 @@ export function HomeEmptySection({
               accessible={false}
             />
             <Text style={s.emptyPlannerPillText}>
-              {t('1분 완성 여행 플래너')}
+              {t('나의 여행 시작하기')}
             </Text>
           </View>
-          <Text style={s.emptyPlannerMeta}>{t('초간편 생성')}</Text>
+          <Text style={s.emptyPlannerMeta}>{t('목적지와 날짜부터')}</Text>
         </View>
 
         <Text accessibilityRole="header" style={s.emptyPlannerTitle}>
@@ -141,7 +141,7 @@ export function HomeEmptySection({
         </Text>
         <Text style={s.emptyPlannerDesc}>
           {t(
-            '가고 싶은 도시와 날짜를 선택하면 최적 동선과 추천 장소가 자동으로 정리됩니다.',
+            '가고 싶은 도시와 날짜를 고르고 방문할 곳을 일정에 추가해 보세요.',
           )}
         </Text>
 
@@ -299,7 +299,7 @@ export function HomeVerifiedCoursesSection({
       <View style={s.courseHeaderRow}>
         <View style={s.courseHeaderTitleRow}>
           <Text accessibilityRole="header" style={s.courseHeaderTitle}>
-            {t('실제 여행자 검증 코스')}
+            {t('공식 여행 정보로 둘러보기')}
           </Text>
           <Ionicons
             name="checkmark-circle-outline"
@@ -366,7 +366,7 @@ export function HomeVerifiedCoursesSection({
 
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel={`${t(course.cityTag)} ${t('내 일정에 담기')}`}
+                  accessibilityLabel={`${t(course.cityTag)} ${t('이 도시로 여행 만들기')}`}
                   style={({ pressed }) => [
                     s.courseActionBtn,
                     pressed && { opacity: 0.85 },
@@ -383,7 +383,7 @@ export function HomeVerifiedCoursesSection({
                     accessible={false}
                   />
                   <Text style={s.courseActionBtnText} accessible={false}>
-                    {t('내 일정에 담기')}
+                    {t('이 도시로 여행 만들기')}
                   </Text>
                 </Pressable>
               </View>
@@ -438,10 +438,10 @@ export function HomeCoreToolsGrid({
             />
           </View>
           <Text style={s.toolCardTitle} accessible={false}>
-            {t('가계부 / 환율')}
+            {t('여행 경비 기록')}
           </Text>
           <Text style={s.toolCardSub} accessible={false}>
-            {t('실시간 계산')}
+            {t('기록할 여행 선택')}
           </Text>
         </Pressable>
 

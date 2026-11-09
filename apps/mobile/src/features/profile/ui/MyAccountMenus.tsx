@@ -70,8 +70,7 @@ export function MyAccountArchiveMenu({
 // 프로필 저장 중 이동을 막고 설정 화면 진입을 표시한다.
 export function MyAccountSettingsMenu({
   router,
-  isSavingProfile,
-}: Pick<MyAccountViewProps, 'router' | 'isSavingProfile'>) {
+}: Pick<MyAccountViewProps, 'router'>) {
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{t('환경설정 및 계정')}</Text>
@@ -79,12 +78,10 @@ export function MyAccountSettingsMenu({
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t('설정 열기')}
-          disabled={isSavingProfile}
           onPress={() => router.push('/settings')}
           style={({ pressed }) => [
             styles.listRow,
             pressed && styles.listRowPressed,
-            isSavingProfile && styles.listRowDisabled,
           ]}
         >
           <View style={styles.listIconBoxNeutral}>
@@ -93,10 +90,9 @@ export function MyAccountSettingsMenu({
           <View style={styles.listTextGroup}>
             <Text style={styles.listTitle}>{t('설정 열기')}</Text>
             <Text style={styles.listSubtitle}>
-              {t('언어 · 앱 정보 (v0.0.1) · 계정 관리')}
+              {t('언어 · 앱 정보 · 계정 관리')}
             </Text>
           </View>
-          <Text style={styles.listValue}>v0.0.1</Text>
           <Ionicons name="chevron-forward" size={18} color={colors.muted} />
         </Pressable>
       </View>

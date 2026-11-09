@@ -177,7 +177,9 @@ export function renderSchedulePlace({ props }: ScheduleEditorSectionProps) {
               return props.onChange('address', value);
             }}
           />
-          {!props.form.id && (
+          {!props.snapshot.itinerary.some(
+            (item) => item.id === props.form.id,
+          ) && (
             <View style={s.row}>
               <ScheduleButton
                 label={t('영수증 촬영으로 추가')}

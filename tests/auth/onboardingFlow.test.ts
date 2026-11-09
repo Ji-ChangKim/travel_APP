@@ -49,13 +49,13 @@ test('신고 초안은 같은 계정 또는 명시적인 게스트 전환에서�
 
 test('최초 닉네임은 정규화한 글자 수로 검증하며 초과 입력을 자르지 않는다', () => {
   assert.deepEqual(profileInput('  여행01 '), {
-    nickname: '여행01',
-    length: 4,
-    error: null,
+    nickname: '  여행01 ',
+    length: 7,
+    error: '닉네임 앞뒤에는 공백을 넣을 수 없어요.',
   });
   assert.equal(profileInput('abcdefghijk').length, 11);
   assert.ok(profileInput('abcdefghijk').error);
-  assert.ok(profileInput('여행 자').error);
+  assert.equal(profileInput('여행 자').error, null);
   assert.ok(profileInput('여행😀').error);
 });
 test('프로필 이미지 종류마다 서로 다른 참조를 섞어 제출하지 않는다', () => {

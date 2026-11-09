@@ -4,7 +4,6 @@ import Text from '@/components/ui/AppText';
 import { FlatList, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ScreenHeader from '@/components/navigation/ScreenHeader';
-import HomeHeader from '@/components/navigation/HomeHeader';
 import { Action } from '../../shared/ui/ui';
 import PublicFeedCard from './PublicFeedCard';
 import PublicFeedControls from './PublicFeedControls';
@@ -28,17 +27,9 @@ export function renderDiscoveryContent(props: CommunityFeedViewProps) {
   } = props;
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={s.screen}>
-      {props.headerVariant === 'public-brand' ? (
-        <HomeHeader
-          signedIn={Boolean(props.userId)}
-          ready
-          variant="public-feed"
-        />
-      ) : (
-        <ScreenHeader title={title || t('여행 커뮤니티')} />
-      )}
+      <ScreenHeader title={t(title)} />
       <FlatList
-        accessibilityLabel={t('{p0} 공개 일정', { p0: title })}
+        accessibilityLabel={t('{p0} 공개 일정', { p0: t(title) })}
         style={{ flex: 1 }}
         contentContainerStyle={s.content}
         keyboardShouldPersistTaps="handled"

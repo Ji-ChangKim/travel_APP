@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Pressable, ScrollView } from 'react-native';
 import { t } from '@/features/localization/translate';
-import { getLocale, useLocale } from '@/features/localization/localeState';
+import { useLocale } from '@/features/localization/localeState';
 import DesignButton from '@/components/ui/DesignButton';
 import Text from '@/components/ui/AppText';
 import type {
@@ -23,6 +23,7 @@ export interface Props {
   disabled: boolean;
   canCreate: boolean;
   onAdd: () => void;
+  onAddFlight?: () => void;
   onCourse: () => void;
   onPlan?: () => void;
   onSelectCategory?: (category: EmptyScheduleCategory) => void;
@@ -47,20 +48,7 @@ export interface Props {
   onSelectSchedule?: (id: string) => void;
 }
 
-// 날짜 문자열(YYYY-MM-DD)을 DAY 카드 하단의 월.일(요일)(예: 11.15(일)) 형식으로 변환한다.
-function formatDayCardDate(date: string, locale: string): string {
-  // 기기 시간대 영향을 받지 않도록 UTC 정오 시각으로 요일을 계산한다.
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
-  const month = date.slice(5, 7);
-  const day = date.slice(8, 10);
-  const weekday = new Intl.DateTimeFormat(locale, {
-    weekday: 'short',
-    timeZone: 'UTC',
-  }).format(new Date(`${date}T12:00:00Z`));
-  return `${month}.${day}(${weekday})`;
-}
-
-// 가로 스크롤 바에 DAY 번호와 날짜(요일)를 2줄 세로형 카드로 배치한다.
+// 가로 스크롤 바에 DAY 번호(DAY 1 ~ DAY M) 카드를 배치한다.
 export function TripDayStrip({
   days,
   selected,
@@ -75,9 +63,8 @@ export function TripDayStrip({
   counts?: Record<string, number>;
 }) {
   useLocale();
-  const locale = getLocale();
   const [focusedId, setFocusedId] = useState('');
-  // 긴 여행도 한 줄에서 일차와 날짜를 직관적으로 탐색한다.
+  // 긴 여행도 한 줄에서 일차(DAY N)를 직관적으로 탐색한다.
   return (
     <ScrollView
       horizontal
@@ -102,13 +89,13 @@ export function TripDayStrip({
         const countLabel = counts
           ? t('장소 {p0}개', { p0: counts[day.id] ?? 0 })
           : '';
-        // 선택한 날짜를 코랄 채움형 2줄 카드로 강조해 표시한다.
+        // 선택한 일차를 코랄 채움형 카드로 강조해 표시한다.
         return (
           <Pressable
             key={day.id}
             testID={`trip-day-card-${day.dayNumber}`}
             accessibilityRole="button"
-            accessibilityLabel={`DAY ${day.dayNumber} · ${day.tripDate}${countLabel ? ` · ${countLabel}` : ''}`}
+            accessibilityLabel={`DAY ${day.dayNumber}${countLabel ? ` · ${countLabel}` : ''}`}
             accessibilityState={{ selected: isSelected }}
             aria-selected={isSelected}
             onFocus={() => {
@@ -138,11 +125,6 @@ export function TripDayStrip({
               style={[s.dayCardTitleText, isSelected && s.dayCardTextSelected]}
             >
               {`DAY ${day.dayNumber}`}
-            </Text>
-            <Text
-              style={[s.dayCardDateText, isSelected && s.dayCardTextSelected]}
-            >
-              {formatDayCardDate(day.tripDate, locale)}
             </Text>
           </Pressable>
         );

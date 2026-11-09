@@ -49,7 +49,7 @@ function WorkspaceExpensesContent({
 
   return (
     <View testID="trip-expenses-panel" style={detail.section}>
-      <Text style={detail.title}>{t('비용')}</Text>
+      <Text style={detail.title}>{t('가계부')}</Text>
       <TripCostSummary
         expenses={snapshot.expenses}
         selectedCategory={selectedCategory}

@@ -40,6 +40,10 @@ export type AuthProvider =
 export interface Profile {
   id: string;
   nickname: string;
+  nicknameConfigured?: boolean;
+  nicknameNextChangeAt?: string | null;
+  nicknameChangeAllowed?: boolean;
+  canEditProfile?: boolean;
   avatarUrl?: string | null;
   bio?: string | null;
   travelStyles?: string[];

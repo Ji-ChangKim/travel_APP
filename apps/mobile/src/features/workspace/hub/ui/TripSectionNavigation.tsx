@@ -16,7 +16,7 @@ const sectionIcons: Record<string, TripIconName> = {
   expenses: 'receipt-scan-outline',
 };
 
-// 핵심 세 영역(일정·지도·비용)을 세그먼트 탭으로 고정하고 부가 기능은 더보기에서 연다.
+// 핵심 두 영역(일정·지출)을 세그먼트 탭으로 고정하고 부가 기능은 더보기에서 연다.
 export function TripSectionNavigation({
   selected,
   onSelect,
@@ -32,7 +32,7 @@ export function TripSectionNavigation({
       testID="trip-section-navigation"
       style={s.nav}
     >
-      {workspaceSections.slice(0, 3).map(([key, label]) => (
+      {workspaceSections.slice(0, 2).map(([key, label]) => (
         <SectionButton
           key={key}
           icon={sectionIcons[key] || 'checklist-outline'}
@@ -126,7 +126,7 @@ export function TripMoreMenu({
   return (
     <ActionSheet title={t('여행 더보기')} visible={visible} onClose={onClose}>
       {workspaceSections
-        .slice(3)
+        .slice(2)
         .filter(([key]) => {
           /* 공개 관리의 소유자 제한을 유지한다. */ return (
             key !== 'share' || owner

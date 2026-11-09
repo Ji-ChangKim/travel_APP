@@ -9,6 +9,8 @@ import {
   deletionPolicyVersion,
   enqueueAccountDeletion,
 } from './accountDeletion';
+import { registerMemberProfileRoutes } from './memberProfile';
+import { registerMemberProfilePhotoRoutes } from './memberProfilePhoto';
 
 type Ctx = Context<ApiEnvironment>;
 
@@ -56,47 +58,6 @@ async function account(c: Ctx): Promise<Response> {
       lastLoginAt: row.lastLoginAt
         ? new Date(row.lastLoginAt).toISOString()
         : null,
-    },
-    meta: { requestId: c.get('requestId') },
-  });
-}
-
-// 구 앱의 조회 계약은 유지하되 Google 주체·옛 추가 입력은 응답에 담지 않는다.
-async function profile(c: Ctx): Promise<Response> {
-  const row = await database(c.env)
-    .prepare(
-      "SELECT u.id,u.createdAt,u.updatedAt,u.isAnonymous,(SELECT providerId FROM account a WHERE a.userId=u.id ORDER BY (providerId='google') DESC,createdAt DESC LIMIT 1) AS provider FROM user u WHERE id=?",
-    )
-    .bind(c.get('session').userId)
-    .first<{
-      id: string;
-      createdAt: number;
-      updatedAt: number;
-      isAnonymous: number;
-      provider: string | null;
-    }>();
-  if (!row) return rejectRequest('SESSION_EXPIRED');
-  return c.json({
-    data: {
-      id: row.id,
-      nickname: '여행자',
-      avatarUrl: null,
-      avatarType: 'default',
-      avatarId: null,
-      photoFileRef: null,
-      authProvider: row.isAnonymous
-        ? 'guest'
-        : row.provider === 'credential'
-          ? 'email'
-          : row.provider || 'email',
-      linkedId: row.id,
-      linkedAt: new Date(row.createdAt).toISOString(),
-      onboardingCompleted: true,
-      completedAt: new Date(row.createdAt).toISOString(),
-      revision: 1,
-      osPlatform: 'web',
-      createdAt: new Date(row.createdAt).toISOString(),
-      updatedAt: new Date(row.updatedAt).toISOString(),
     },
     meta: { requestId: c.get('requestId') },
   });
@@ -201,12 +162,10 @@ export function registerAccountRoutes(
     .get('/api/v1/account', account)
     .get('/api/v1/account/deletion-preview', deletionPreview)
     .delete('/api/v1/account', remove)
-    .post('/api/v1/account/owned-trips/:tripId/transfer', transfer)
-    .get('/api/v1/profile', profile);
+    .post('/api/v1/account/owned-trips/:tripId/transfer', transfer);
+  registerMemberProfilePhotoRoutes(registerMemberProfileRoutes(app));
   // 추가 개인정보를 받던 이전 경로를 서버에서 닫는다.
-  app
-    .all('/api/v1/profile/*', () => rejectRequest('PROFILE_INPUT_RETIRED'))
-    .patch('/api/v1/profile', () => rejectRequest('PROFILE_INPUT_RETIRED'));
+  app.all('/api/v1/profile/*', () => rejectRequest('PROFILE_INPUT_RETIRED'));
   return app.post('/api/v1/account/retirement', () =>
     rejectRequest('RETIREMENT_POLICY_REPLACED'),
   );

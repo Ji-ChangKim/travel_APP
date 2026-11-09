@@ -29,7 +29,6 @@ export default function PublicFeedControls({
   query,
   userId,
   router,
-  hideSearchBar = false,
 }: CommunityFeedViewProps) {
   useLocale();
   // 선택 시트의 표시만 로컬 상태로 관리한다.
@@ -37,37 +36,40 @@ export default function PublicFeedControls({
 
   return (
     <View style={s.controls}>
-      {!hideSearchBar ? (
-        <View style={s.searchRow}>
-          <Ionicons name="search-outline" size={22} color={c.muted} />
-          <DesignInput
-            accessibilityLabel={t('도시·여행 이름 검색')}
-            placeholder={t('도시나 여행 이름을 찾아보세요')}
-            value={search}
-            onChangeText={setSearch}
-            onSubmitEditing={searchTrips}
-            returnKeyType="search"
-            style={s.search}
-          />
-          <PublicFeedButton
-            label={t('여행 검색')}
-            onPress={searchTrips}
-            style={s.iconButton}
-          >
-            <Ionicons name="arrow-forward" size={22} color={c.primary} />
-          </PublicFeedButton>
-          <PublicFeedButton
-            label={t('여행 조건 선택')}
-            onPress={() => {
-              setOpened(true);
-            }}
-            style={s.iconButton}
-            expanded={opened}
-          >
-            <Ionicons name="options-outline" size={22} color={c.muted} />
-          </PublicFeedButton>
-        </View>
-      ) : null}
+      <View style={s.sheet} testID="community-introduction">
+        <Text style={s.meta}>
+          {t('다른 여행자가 공개한 계획과 기록을 둘러보세요.')}
+        </Text>
+      </View>
+      <View style={s.searchRow}>
+        <Ionicons name="search-outline" size={22} color={c.muted} />
+        <DesignInput
+          accessibilityLabel={t('도시·여행 이름 검색')}
+          placeholder={t('도시나 여행 이름을 찾아보세요')}
+          value={search}
+          onChangeText={setSearch}
+          onSubmitEditing={searchTrips}
+          returnKeyType="search"
+          style={s.search}
+        />
+        <PublicFeedButton
+          label={t('여행 검색')}
+          onPress={searchTrips}
+          style={s.iconButton}
+        >
+          <Ionicons name="arrow-forward" size={22} color={c.primary} />
+        </PublicFeedButton>
+        <PublicFeedButton
+          label={t('여행 조건 선택')}
+          onPress={() => {
+            setOpened(true);
+          }}
+          style={s.iconButton}
+          expanded={opened}
+        >
+          <Ionicons name="options-outline" size={22} color={c.muted} />
+        </PublicFeedButton>
+      </View>
       {searchError ? (
         <Text accessibilityRole="alert" style={s.link}>
           {searchError}

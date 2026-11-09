@@ -6,6 +6,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { Pressable, View } from 'react-native';
 import { styles } from '../styles/myAccountStyles';
 import type { SettingsController } from '../manager/useSettingsController';
+import Constants from 'expo-constants';
+import { useAppAccessibility } from '@/features/accessibility/appAccessibility';
 
 // 현재 계정과 게스트의 계정 연결 진입을 표시한다.
 export function SettingsAccountSection({
@@ -13,18 +15,27 @@ export function SettingsAccountSection({
   currentUser,
   router,
 }: Pick<SettingsController, 'isGuest' | 'currentUser' | 'router'>) {
+  const { largeText } = useAppAccessibility();
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{t('계정 정보')}</Text>
       <View style={styles.listCard}>
-        <View style={styles.listRow}>
+        <View
+          style={[styles.listRow, largeText && styles.profileCardHeaderLarge]}
+        >
           <View style={styles.listIconBox}>
             <Ionicons name="person-outline" size={20} color={colors.primary} />
           </View>
           <View style={styles.listTextGroup}>
-            <Text style={styles.listTitle}>{t('현재 닉네임')}</Text>
+            <Text style={styles.listTitle}>{t('기본 프로필')}</Text>
             <Text style={styles.listSubtitle}>
-              {isGuest ? t('게스트 (이 기기에만 저장)') : t('Google 계정')}
+              {t(
+                isGuest
+                  ? '게스트 (이 기기에만 저장)'
+                  : currentUser?.authProvider === 'google'
+                    ? 'Google 계정'
+                    : '회원 계정',
+              )}
             </Text>
           </View>
           <Text style={styles.listValue}>
@@ -40,6 +51,7 @@ export function SettingsAccountSection({
               onPress={() => router.push('/login')}
               style={({ pressed }) => [
                 styles.listRow,
+                largeText && styles.profileCardHeaderLarge,
                 pressed && styles.listRowPressed,
               ]}
             >
@@ -125,7 +137,9 @@ export function SettingsAppInfo() {
             <Text style={styles.listTitle}>{t('앱 버전')}</Text>
             <Text style={styles.listSubtitle}>TripPrint Native App</Text>
           </View>
-          <Text style={styles.listValue}>v0.0.1 (Build 14)</Text>
+          <Text style={styles.listValue}>
+            {Constants.expoConfig?.version || '—'}
+          </Text>
         </View>
       </View>
     </View>
@@ -148,7 +162,7 @@ export function SettingsManagementSection({
       <View style={styles.listCard}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={t('회원 탈퇴 및 데이터 보관 안내')}
+          accessibilityLabel={t('계정 및 데이터 관리')}
           disabled={logoutBusy}
           onPress={() => router.push('/account')}
           style={({ pressed }) => [
@@ -165,11 +179,9 @@ export function SettingsManagementSection({
             />
           </View>
           <View style={styles.listTextGroup}>
-            <Text style={styles.listTitle}>
-              {t('회원 탈퇴 및 데이터 보관 안내')}
-            </Text>
+            <Text style={styles.listTitle}>{t('계정 및 데이터 관리')}</Text>
             <Text style={styles.listSubtitle}>
-              {t('90일 유예 정책 및 여행 데이터 보존 안내')}
+              {t('연결된 계정 확인과 계정 삭제 안내')}
             </Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color={colors.muted} />
@@ -194,7 +206,7 @@ export function SettingsManagementSection({
             <Text style={styles.listSubtitle}>
               {isGuest
                 ? t('현재 기기의 게스트 세션을 종료해요')
-                : t('현재 연결된 Google 계정에서 로그아웃해요')}
+                : t('현재 계정에서 로그아웃해요')}
             </Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color={colors.danger} />

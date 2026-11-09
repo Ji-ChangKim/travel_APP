@@ -793,7 +793,7 @@ function r06Network(page: Page): Promise<void> {
       },
       () => {
         /* 실제 목록의 제목이 표시된다. */ return expect(
-          page.getByText('내 여행 계획', { exact: true }),
+          page.getByRole('heading', { name: '내 여행', exact: true }),
         ).toBeVisible();
       },
     ]);
@@ -10967,15 +10967,16 @@ test('Haru 상세 준비물: 완료 저장 중 잠금·완료 개수·다시 조
 
 // 보조 영역은 제품과 같은 더보기 메뉴를 거쳐 연다.
 async function openTripSection(page: Page, label: string): Promise<void> {
-  // 고정 세 영역은 바로 선택하고 보조 영역은 메뉴에서 선택한다.
-  if (['사진·영수증', '준비물', '동행', '발자국 공유'].includes(label)) {
+  // 과거 비용·지출 호출도 현재 가계부 탭으로 연결한다.
+  const section = ['비용', '지출'].includes(label) ? '가계부' : label;
+  if (!['일정', '가계부'].includes(section)) {
     await page
       .getByRole('button', { name: '여행 더보기', exact: true })
       .click();
     await page
       .getByTestId('action-sheet')
       .getByRole('button', {
-        name: label === '발자국 공유' ? '여행 공유' : label,
+        name: section === '발자국 공유' ? '여행 공유' : section,
         exact: true,
       })
       .click();
@@ -10984,7 +10985,10 @@ async function openTripSection(page: Page, label: string): Promise<void> {
     ).toBeVisible();
     return;
   }
-  await page.getByRole('button', { name: label, exact: true }).click();
+  await page
+    .getByTestId('trip-section-navigation')
+    .getByRole('button', { name: section, exact: true })
+    .click();
 }
 
 // 실제 렌더링에서 코랄 배경의 주요 행동만 센다.
@@ -11732,6 +11736,12 @@ for (const width of [320, 390, 430]) {
     ).toBeFocused();
     await page.keyboard.press('Enter');
     await page
+      .getByRole('button', {
+        name: '나의 여행 목적지는? 목적지 선택 열기',
+        exact: true,
+      })
+      .click();
+    await page
       .getByRole('button', { name: '목적지 직접 입력하기', exact: true })
       .click();
     await expect(page.getByTestId('trip-country')).toBeVisible();
@@ -11739,14 +11749,13 @@ for (const width of [320, 390, 430]) {
     await page.screenshot({ path: `outputs/haru-wcag-aa/create-${width}.png` });
     await page.goto('/trips/' + trip);
     await expect(page.getByTestId('trip-section-navigation')).toBeVisible();
+    await expect(
+      page.getByTestId('trip-section-navigation').getByRole('button'),
+    ).toHaveText(['일정', '가계부']);
     const more = page.getByRole('button', { name: '여행 더보기', exact: true });
     await page
       .getByRole('button', { name: '내 여행 목록', exact: true })
       .focus();
-    await page.keyboard.press('Tab');
-    await expect(
-      page.getByRole('button', { name: '공유', exact: true }),
-    ).toBeFocused();
     await page.keyboard.press('Tab');
     await expect(more).toBeFocused();
     await expect(more).toHaveCSS('outline-width', '2px');
@@ -11776,27 +11785,28 @@ for (const width of [320, 390, 430]) {
       .fill('읽기 대비를 확인하는 일정');
     await expect.poll(() => haruReadingAudit(page)).toEqual([]);
     await page.goto('/trips/' + trip);
-    for (const section of ['지도', '비용', '사진·영수증', '준비물', '동행']) {
+    for (const section of ['지도', '가계부', '사진·영수증', '준비물', '동행']) {
       await openTripSection(page, section);
       await expect.poll(() => haruReadingAudit(page)).toEqual([]);
     }
     for (const [route, title] of [
-      ['/footprints', 'TripPrint'],
+      ['/footprints', '커뮤니티'],
       ['/my-footprints', '나의 발자국'],
-      ['/community', '여행 커뮤니티'],
-      ['/my', '프로필 수정'],
+      ['/community', '커뮤니티'],
+      ['/my', 'MY'],
     ]) {
       await page.goto(route!);
       await expect(
         route === '/my'
-          ? page.getByRole('button', { name: title!, exact: true })
-          : title === 'TripPrint'
-            ? page.getByRole('heading', { name: title, exact: true })
-            : page.getByText(title!, { exact: true }),
+          ? page.locator(
+              '[data-testid="account-default-profile"]:not([aria-hidden="true"] *):not([inert] *)',
+            )
+          : page.getByRole('heading', { name: title, exact: true }),
       ).toBeVisible();
       await expect.poll(() => haruReadingAudit(page)).toEqual([]);
     }
     await page.goto('/trips/' + trip);
+    await expect(page.getByTestId('trip-section-navigation')).toBeVisible();
     await page.evaluate(() => {
       // 사용자가 글자를 두 배로 설정한 상태로 읽기와 배치를 검사한다.
       document.documentElement.style.fontSize = '32px';
@@ -12271,7 +12281,7 @@ for (const width of [320, 390, 430]) {
       await inspectHeader(page, 'home', width, scale, testInfo);
       await page.goto('/plans');
       await expect(
-        page.getByText('내 여행 계획', { exact: true }),
+        page.getByRole('heading', { name: '내 여행', exact: true }),
       ).toBeVisible();
       await inspectHeader(page, 'plans', width, scale, testInfo);
       await expect(
@@ -12283,6 +12293,13 @@ for (const width of [320, 390, 430]) {
       await page
         .getByRole('button', { name: '도쿄 추천 여행지 선택', exact: true })
         .click();
+      await page
+        .getByRole('button', {
+          name: '나의 여행 목적지는? 목적지 선택 열기',
+          exact: true,
+        })
+        .click();
+      await inspectHeader(page, 'create-destination', width, scale, testInfo);
       await page
         .getByRole('button', { name: '목적지 직접 입력하기', exact: true })
         .click();
@@ -12299,18 +12316,28 @@ for (const width of [320, 390, 430]) {
         .getByRole('button', { name: '선택 닫기', exact: true })
         .click();
       await page
-        .getByRole('button', { name: '여행 기간 선택', exact: true })
+        .getByRole('button', { name: '여행 만들기로 돌아가기', exact: true })
+        .click();
+      await page
+        .getByRole('button', { name: '내 여행 기간 선택', exact: true })
         .click();
       await inspectHeader(page, 'creation-period', width, scale, testInfo);
       await page
-        .getByRole('button', { name: '기간 선택 닫기', exact: true })
+        .getByRole('button', { name: '여행 만들기로 돌아가기', exact: true })
         .click();
       await page.goto(`/trips/${trip}`);
-      await expect(page.getByTestId('trip-flight-card')).toBeVisible();
+      await expect(page.getByTestId('trip-section-navigation')).toBeVisible();
       await inspectHeader(page, 'flights', width, scale, testInfo);
       await page
-        .getByRole('button', { name: '항공권 추가', exact: true })
+        .getByRole('button', { name: '장소 추가', exact: true })
         .click();
+      await page.getByRole('button', { name: '이동', exact: true }).click();
+      await page
+        .getByRole('button', { name: '항공편으로 등록', exact: true })
+        .click();
+      await expect(
+        page.getByLabel('항공 편명 (예: KE123)', { exact: true }),
+      ).toBeVisible();
       await inspectHeader(page, 'ticket', width, scale, testInfo);
       await page
         .getByRole('button', { name: 'DAY 1 일정에 추가', exact: true })
@@ -12320,10 +12347,13 @@ for (const width of [320, 390, 430]) {
       expect(state.writes).toHaveLength(0);
       await page.goto(`/trips/${trip}`);
       await expect(page.getByTestId('trip-section-navigation')).toBeVisible();
+      await expect(
+        page.getByTestId('trip-section-navigation').getByRole('button'),
+      ).toHaveText(['일정', '가계부']);
       for (const section of [
         '일정',
         '지도',
-        '비용',
+        '가계부',
         '사진·영수증',
         '준비물',
         '동행',
@@ -12354,9 +12384,9 @@ for (const width of [320, 390, 430]) {
       await openTripSettings(page, '여행 기간 변경');
       await inspectHeader(page, 'period', width, scale, testInfo);
       for (const [route, file, title] of [
-        ['/footprints', 'footprints-public', 'TripPrint'],
+        ['/footprints', 'footprints-public', '커뮤니티'],
         ['/my-footprints', 'footprints', '나의 발자국'],
-        ['/community', 'community', '여행 커뮤니티'],
+        ['/community', 'community', '커뮤니티'],
         ['/my', 'my', 'MY'],
         ['/destinations/tokyo', 'guide', '도쿄 여행 가이드'],
         ['/diary/' + trip, 'diary', snapshot.trip.title],
@@ -12384,13 +12414,46 @@ for (const width of [320, 390, 430]) {
         await inspectHeader(page, file!, width, scale, testInfo);
       }
       await page.goto('/my');
+      await expect(
+        page.locator(
+          '[data-testid="account-default-profile"]:not([aria-hidden="true"] *):not([inert] *)',
+        ),
+      ).toBeVisible();
+      await expect(
+        page.getByRole('button', { name: '프로필 수정', exact: true }),
+      ).toHaveCount(0);
+      await page.getByRole('button', { name: '설정', exact: true }).click();
+      await expect(
+        page.getByRole('heading', { name: '설정', exact: true }),
+      ).toBeVisible();
+      await inspectHeader(page, 'settings', width, scale, testInfo);
       await page
-        .getByRole('button', { name: '프로필 수정', exact: true })
+        .getByRole('button', { name: '계정 및 데이터 관리', exact: true })
         .click();
-      await inspectHeader(page, 'profile', width, scale, testInfo);
+      await expect(
+        page.getByRole('heading', { name: '계정 관리', exact: true }),
+      ).toBeVisible();
+      await inspectHeader(
+        page,
+        'account-from-settings',
+        width,
+        scale,
+        testInfo,
+      );
       await page
-        .getByRole('button', { name: '프로필 수정 닫기', exact: true })
+        .getByRole('button', { name: '설정으로 돌아가기', exact: true })
         .click();
+      await expect(
+        page.getByRole('heading', { name: '설정', exact: true }),
+      ).toBeVisible();
+      await page
+        .getByRole('button', { name: 'MY로 돌아가기', exact: true })
+        .click();
+      await expect(
+        page.locator(
+          '[data-testid="account-default-profile"]:not([aria-hidden="true"] *):not([inert] *)',
+        ),
+      ).toBeVisible();
       await page.goto('/login?reauth=1');
       await expect(page.getByTestId('screen-title')).toHaveText('로그인');
       await inspectHeader(page, 'login', width, scale, testInfo);
@@ -12412,11 +12475,11 @@ async function inspectHeader(
     document.documentElement.style.fontSize = `${16 * size}px`;
     await document.fonts.ready;
   }, scale);
-  if (file !== 'home' && file !== 'footprints-public')
+  if (file !== 'home')
     await expect
       .poll(() => page.locator('[data-testid="screen-title"]:visible').count())
       .toBeGreaterThan(0);
-  if (file !== 'home' && file !== 'footprints-public')
+  if (file !== 'home')
     await expect(
       page.locator('[data-testid="screen-title"]:visible').first(),
     ).toHaveCSS('font-size', `${26 * scale}px`);
@@ -14126,7 +14189,19 @@ for (const width of [320, 390, 430]) {
       .getByRole('button', { name: '도쿄 추천 여행지 선택', exact: true })
       .click();
     await page
+      .getByRole('button', {
+        name: '나의 여행 목적지는? 목적지 선택 열기',
+        exact: true,
+      })
+      .click();
+    await page
       .getByRole('button', { name: '목적지 직접 입력하기', exact: true })
+      .click();
+    await expect(
+      page.getByTestId('trip-country').getByRole('button'),
+    ).toHaveText('일본');
+    await page
+      .getByRole('button', { name: '여행 만들기로 돌아가기', exact: true })
       .click();
     const back = page.getByRole('button', {
       name: '내 여행으로 돌아가기',
@@ -14137,9 +14212,9 @@ for (const width of [320, 390, 430]) {
       page.getByRole('dialog', { name: '작성 중인 내용을 버릴까요?' }),
     ).toBeVisible();
     await page.keyboard.press('Escape');
-    await expect(
-      page.getByTestId('trip-country').getByRole('button'),
-    ).toHaveText('일본');
+    await expect(page.getByTestId('destination-selector-box')).toContainText(
+      '도쿄',
+    );
     await back.click();
     await page
       .getByRole('button', { name: '내용 버리고 이동', exact: true })
@@ -14217,7 +14292,13 @@ test('헤더 복귀: 상세 진입 전 검색 조건·직접 링크 오류·브�
   await page
     .getByRole('button', { name: '이전 화면으로 돌아가기', exact: true })
     .click();
-  await expect(page.getByTestId('brand-header')).toBeVisible();
+  await expect(page).toHaveURL(/\/footprints$/);
+  await expect(
+    page.getByRole('heading', { name: '커뮤니티', exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: '커뮤니티 탭', exact: true }),
+  ).toHaveAttribute('aria-selected', 'true');
 });
 
 // 중앙 오류창에는 페이지 헤더를 복제하지 않는다. 뒤쪽 공통 헤더 규격과 입력 차단을 함께 확인한다.
@@ -14304,7 +14385,9 @@ for (const width of [320, 390, 430]) {
         .click();
       await expect(recovery).toHaveCount(0);
       await expect(
-        page.getByRole('button', { name: '프로필 수정', exact: true }),
+        page.locator(
+          '[data-testid="account-default-profile"]:not([aria-hidden="true"] *):not([inert] *)',
+        ),
       ).toBeVisible();
       await inspectHeader(page, 'my-auth-restored', width, scale, testInfo);
       expect(
