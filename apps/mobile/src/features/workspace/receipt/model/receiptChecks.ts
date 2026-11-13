@@ -1,5 +1,5 @@
 import { t } from '@/features/localization/translate';
-import type { WorkspaceSnapshot } from '@wherego/domain';
+import { SUPPORTED_CURRENCIES, type WorkspaceSnapshot } from '@wherego/domain';
 import { z } from 'zod';
 import {
   receiptItemSchema,
@@ -59,7 +59,9 @@ export function receiptCanSave(
       (!review.exact &&
         (!review.candidates.length ||
           form.values.duplicateAccepted === review.fingerprint))) &&
-    ['KRW', 'JPY', 'USD'].includes(form.values.currency || '') &&
+    (SUPPORTED_CURRENCIES as readonly string[]).includes(
+      form.values.currency || '',
+    ) &&
     (!receiptDifference(form) ||
       form.values.totalDifferenceAccepted === 'true') &&
     form.values.dayId &&
@@ -143,8 +145,8 @@ export function receiptDifference(
 export function receiptCurrencyIssue(currency: string): string {
   // 미지원 통화를 다른 통화로 바꾸어 저장하도록 유도하지 않는다.
   return !currency
-    ? '결제 통화를 읽지 못했어요. 원본을 확인하고 KRW·JPY·USD 중 실제 결제 통화를 선택해 주세요.'
-    : !['KRW', 'JPY', 'USD'].includes(currency)
+    ? '결제 통화를 읽지 못했어요. 원본을 확인하고 KRW·JPY·USD·TWD·VND·THB·CNY·SGD 중 실제 결제 통화를 선택해 주세요.'
+    : !(SUPPORTED_CURRENCIES as readonly string[]).includes(currency)
       ? t(
           '{currency} 영수증은 읽었지만 이 통화의 지출은 아직 저장할 수 없어요. 원본 사진을 보관하고, 장소는 일정 추가에서 직접 기록해 주세요.',
           { currency },

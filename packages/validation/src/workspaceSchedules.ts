@@ -177,6 +177,13 @@ export function saveSchedule(
           : input.flight,
     location:
       input.location === undefined ? previous?.location : input.location,
+    ...(input.category === undefined
+      ? previous?.category !== undefined
+        ? { category: previous.category }
+        : {}
+      : input.category
+        ? { category: input.category }
+        : {}),
     timeSlot: input.timeSlot || null,
     memo: input.memo || null,
     googlePlaceId: input.googlePlaceId || undefined,

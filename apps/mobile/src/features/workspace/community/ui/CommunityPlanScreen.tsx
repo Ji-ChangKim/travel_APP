@@ -5,7 +5,11 @@ import { ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
-import { communityPostSchema, foundationUuidSchema } from '@wherego/validation';
+import {
+  communityPostSchema,
+  findCommunitySeedPost,
+  foundationUuidSchema,
+} from '@wherego/validation';
 import { LedgerScreen } from '../../my-trips/ui/LedgerUI';
 import { ledgerStyles } from '../../my-trips/styles/ledgerTheme';
 import HaruState from '@/components/feedback/HaruState';
@@ -54,7 +58,13 @@ function PublicPlanContent() {
       return fetch(
         `${apiBaseUrl()}/public/community/${encodeURIComponent(postId)}`,
         { signal: requestSignal(signal) },
-      ).then(readPlan);
+      )
+        .then(readPlan)
+        .catch((error) => {
+          const seed = findCommunitySeedPost(postId);
+          if (seed) return communityPostSchema.parse(seed);
+          throw error;
+        });
     },
     retry: false,
   });
@@ -79,7 +89,7 @@ function PublicPlanContent() {
           title={t('공유된 여행을 열 수 없어요')}
           description={
             query.error?.message ||
-            t('주소를 다시 확인하거나 발자국에서 다른 여행을 살펴보세요.')
+            t('주소를 다시 확인하거나 커뮤니티에서 다른 여행을 살펴보세요.')
           }
         >
           {validId && (
@@ -127,7 +137,7 @@ async function readPlan(response: Response) {
   if (!response.ok)
     throw new Error(
       response.status === 404
-        ? '공개가 중단됐거나 찾을 수 없는 여행이에요. 발자국에서 다른 여행을 살펴보세요.'
+        ? '공개가 중단됐거나 찾을 수 없는 여행이에요. 커뮤니티에서 다른 여행을 살펴보세요.'
         : '여행을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.',
     );
   const data: unknown = await response.json();

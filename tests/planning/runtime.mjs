@@ -79,11 +79,14 @@ async function migratePlanningDb(db) {
     .sort()
     .flatMap((file) => {
       // 현재 배포와 같은 테이블·제약을 사용한다.
-      return readFileSync(new URL(file, folder), 'utf8')
-        .replace(/--[^\n]*/g, '')
-        .split(';')
-        .filter((sql) => sql.trim())
-        .map((sql) => db.prepare(sql));
+      return (
+        readFileSync(new URL(file, folder), 'utf8')
+          .replace(/--[^\n]*/g, '')
+          // 트리거 본문의 ';'는 같은 줄에 있으므로 줄 끝의 ';'만 문장 경계로 본다.
+          .split(/;\s*(?:\r?\n|$)/)
+          .filter((sql) => sql.trim())
+          .map((sql) => db.prepare(sql))
+      );
     });
   await db.batch(statements);
 }

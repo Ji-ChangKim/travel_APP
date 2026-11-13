@@ -5,9 +5,12 @@ import { Image, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
 import { useRouter } from 'expo-router';
+import { useQueryClient } from '@tanstack/react-query';
 import type { PersistedTrip, WorkspaceSnapshot } from '@wherego/domain';
 import Text from '@/components/ui/AppText';
 import ActionSheet from '@/components/ui/ActionSheet';
+import CenteredNoticeModal from '@/components/ui/CenteredNoticeModal';
+import DesignButton from '@/components/ui/DesignButton';
 import MyTripsButton from './MyTripsButton';
 import {
   myTripsStyles as s,
@@ -17,6 +20,7 @@ import { myTripFacts, myTripTiming } from '../model/myTripsModel';
 import { useMyTripDetails } from '../manager/useMyTripDetails';
 import { usePrivatePhotoQuery } from '../../schedule/manager/usePrivatePhoto';
 import { travelPlanPath } from '../../shared/model/travelPlans';
+import { deleteTrip } from '../../shared/manager/service';
 
 // 실제 여행 요약과 현재 계정이 읽을 수 있는 개인 원본을 카드에 연결한다.
 export default function MyTripCard({
@@ -30,9 +34,14 @@ export default function MyTripCard({
   // 권한 오류가 나면 이전 원본의 사진·건수·공개 상태를 표시하지 않는다.
   const query = useMyTripDetails(userId, trip.id);
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [menu, setMenu] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
   const snapshot = query.isError ? undefined : query.data;
   const timing = myTripTiming(snapshot?.trip || trip);
+  const isOwner = (snapshot?.trip.ownerId || trip.ownerId) === userId;
   return (
     <View style={s.card} testID={`my-trip-card-${trip.id}`}>
       <MyTripCover
@@ -93,7 +102,7 @@ export default function MyTripCard({
         )}
         <View style={s.actions}>
           <MyTripsButton
-            label={`${trip.title} ${timing.action}`}
+            label={`${trip.title} (${timing.dates}) ${timing.action}`}
             onPress={() => {
               /* 완료 여행은 기존 다이어리로, 나머지는 일정 상세로 이동한다. */ return router.push(
                 travelPlanPath(trip),
@@ -190,7 +199,74 @@ export default function MyTripCard({
         >
           <Text style={s.actionText}>{t('공개 범위 관리')}</Text>
         </MyTripsButton>
+        <MyTripsButton
+          label={isOwner ? t('여행 삭제') : t('여행 나가기')}
+          onPress={() => {
+            setMenu(false);
+            setDeleteError('');
+            setConfirmDelete(true);
+          }}
+          style={s.action}
+        >
+          <Text style={[s.actionText, { color: '#DC2626' }]}>
+            {isOwner ? t('여행 삭제') : t('여행 나가기')}
+          </Text>
+        </MyTripsButton>
       </ActionSheet>
+      <CenteredNoticeModal
+        visible={confirmDelete}
+        title={isOwner ? t('여행을 삭제할까요?') : t('여행에서 나갈까요?')}
+        paragraphs={
+          isOwner
+            ? [
+                t(
+                  '삭제하면 일정·영수증·사진이 모두 지워지고, 커뮤니티에 공개한 글도 함께 내려갑니다. 이 작업은 되돌릴 수 없어요.',
+                ),
+              ]
+            : [
+                t(
+                  '나가면 내 여행 목록에서 이 여행이 사라집니다. 다시 참여하려면 새 초대 링크가 필요해요.',
+                ),
+              ]
+        }
+      >
+        <View style={{ gap: 10 }}>
+          {deleteError ? (
+            <Text accessibilityRole="alert" style={{ color: '#DC2626' }}>
+              {t(deleteError)}
+            </Text>
+          ) : null}
+          <DesignButton
+            label={isOwner ? t('여행 삭제') : t('여행 나가기')}
+            variant="danger"
+            loading={deleting}
+            disabled={deleting}
+            onPress={() => {
+              setDeleting(true);
+              setDeleteError('');
+              void deleteTrip(userId, trip.id)
+                .then(() => {
+                  setConfirmDelete(false);
+                  return queryClient.invalidateQueries({ queryKey: ['trips'] });
+                })
+                .catch(() => {
+                  setDeleteError(
+                    '여행을 정리하지 못했어요. 잠시 후 다시 시도해 주세요.',
+                  );
+                })
+                .finally(() => {
+                  setDeleting(false);
+                });
+            }}
+          />
+          <DesignButton
+            label={t('취소')}
+            variant="secondary"
+            disabled={deleting}
+            onPress={() => setConfirmDelete(false)}
+          />
+        </View>
+      </CenteredNoticeModal>
     </View>
   );
 }
@@ -292,6 +368,7 @@ function MyTripCover({
             style={[s.caption, facts?.photo ? s.inverse : { color: c.muted }]}
           >
             {[trip.country, trip.city].filter(Boolean).join(' · ')}
+            {timing.dates ? ` · ${timing.dates}` : ''}
             {timing.total > 0
               ? t(' · {p0}박 {p1}일', {
                   p0: timing.total - 1,

@@ -117,6 +117,7 @@ export default function DaySchedule(props: Props) {
   const [moveId, setMoveId] = useState('');
   const [targetDay, setTargetDay] = useState(props.day.id);
   const [notice, setNotice] = useState('');
+  const [failedAddress, setFailedAddress] = useState('');
   const [editingOrder, setEditingOrder] = useState(false);
   const detail = items.find((item) => {
     // 현재 상세 모달로 열려 있는 일정을 찾는다.
@@ -135,14 +136,17 @@ export default function DaySchedule(props: Props) {
   async function directions(item: WorkspaceSchedule) {
     const url = scheduleDirectionsUrl(item);
     if (!url) {
+      setFailedAddress('');
       setNotice(t('위치 정보가 없어요. 일정 수정에서 주소를 입력해 주세요.'));
       setDetailId(item.id);
       return;
     }
     try {
+      setFailedAddress('');
       // 웹 지도 링크는 지도 앱이 없어도 같은 목적지로 열 수 있다.
       await Linking.openURL(url);
     } catch {
+      setFailedAddress(item.address || item.title);
       setNotice(t('지도를 열지 못했어요. 길찾기를 다시 눌러 주세요.'));
     }
   }
@@ -406,9 +410,29 @@ export default function DaySchedule(props: Props) {
         </View>
       )}
       {notice && !detail ? (
-        <Text accessibilityRole="alert" style={s.error}>
-          {notice}
-        </Text>
+        <View style={s.row}>
+          <Text accessibilityRole="alert" style={s.error}>
+            {notice}
+          </Text>
+          {failedAddress ? (
+            <DesignButton
+              label={t('주소 복사')}
+              size="chip"
+              onPress={() => {
+                if (
+                  typeof navigator !== 'undefined' &&
+                  navigator.clipboard?.writeText
+                ) {
+                  void navigator.clipboard.writeText(failedAddress);
+                }
+                setNotice(
+                  t('주소를 복사했어요. 지도 앱에 붙여넣어 검색해 보세요.'),
+                );
+                setFailedAddress('');
+              }}
+            />
+          ) : null}
+        </View>
       ) : null}
       <ActionSheet
         visible={Boolean(menu)}
@@ -459,6 +483,7 @@ export default function DaySchedule(props: Props) {
             />
             <DesignButton
               label={t('일정 삭제')}
+              variant="danger"
               disabled={props.disabled}
               onPress={() => {
                 // 관리 시트를 닫고 삭제 확인 절차를 시작한다.
@@ -717,9 +742,31 @@ export default function DaySchedule(props: Props) {
               )}
 
               {notice ? (
-                <Text accessibilityRole="alert" style={s.error}>
-                  {notice}
-                </Text>
+                <View style={s.row}>
+                  <Text accessibilityRole="alert" style={s.error}>
+                    {notice}
+                  </Text>
+                  {failedAddress ? (
+                    <DesignButton
+                      label={t('주소 복사')}
+                      size="chip"
+                      onPress={() => {
+                        if (
+                          typeof navigator !== 'undefined' &&
+                          navigator.clipboard?.writeText
+                        ) {
+                          void navigator.clipboard.writeText(failedAddress);
+                        }
+                        setNotice(
+                          t(
+                            '주소를 복사했어요. 지도 앱에 붙여넣어 검색해 보세요.',
+                          ),
+                        );
+                        setFailedAddress('');
+                      }}
+                    />
+                  ) : null}
+                </View>
               ) : null}
             </ScrollView>
           </SafeAreaView>

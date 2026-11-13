@@ -29,5 +29,8 @@ export function communityFeedCard(post: CommunityPost) {
     startDate: post.snapshot.startDate,
     endDate: post.snapshot.endDate,
     scheduleCount: post.snapshot.itinerary.length,
+    ...(post.snapshot.itinerary.some((item) => item.hasReceipt)
+      ? { hasReceipt: true }
+      : {}),
   };
 }

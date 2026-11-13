@@ -290,6 +290,20 @@ function mediaUrl(fetcher: typeof fetch, c: Ctx): Promise<Response> {
         : respond(c, { url: result.data.signedUrl });
     });
 }
+// 소유자는 여행과 공개 게시물을 함께 삭제하고, 동행 참여자는 여행에서 나간다.
+function removeTrip(fetcher: typeof fetch, c: Ctx): Promise<Response> {
+  return runRpc(
+    c.env,
+    c.get('session'),
+    'wherego_delete_trip',
+    {
+      p_trip: foundationUuidSchema.parse(c.req.param('tripId')),
+      p_key: foundationUuidSchema.parse(c.req.header('Idempotency-Key')),
+    },
+    fetcher,
+  ).then(mutation.bind(null, c));
+}
+
 // 기존 인증 정책 아래에 완성 기능 경로를 등록한다.
 export function registerWorkspaceRoutes(
   app: Hono<ApiEnvironment>,
@@ -298,6 +312,7 @@ export function registerWorkspaceRoutes(
   // 공개 피드는 비공개 여행 경로에서 분리한다.
   return app
     .get('/api/v1/trips/:tripId/workspace', workspace.bind(null, fetcher))
+    .delete('/api/v1/trips/:tripId', removeTrip.bind(null, fetcher))
     .post('/api/v1/trips/:tripId/commands', command.bind(null, fetcher))
     .post('/api/v1/invites/accept', accept.bind(null, fetcher))
     .get('/api/v1/community', feed.bind(null, fetcher))

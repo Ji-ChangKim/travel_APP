@@ -1,4 +1,8 @@
-import type { SupportedCurrency, WorkspaceExpense } from '@wherego/domain';
+import {
+  isDecimalCurrency,
+  type SupportedCurrency,
+  type WorkspaceExpense,
+} from '@wherego/domain';
 
 export type ExpensePaymentMethod = 'CARD' | 'CASH';
 export type ExpenseSplitType = 'SHARED' | 'PERSONAL';
@@ -45,6 +49,17 @@ export function resolveExpenseSplitType(
   return 'SHARED';
 }
 
+const currencySymbols: Record<string, string> = {
+  KRW: '₩',
+  JPY: '¥',
+  USD: '$',
+  TWD: 'NT$',
+  VND: '₫',
+  THB: '฿',
+  CNY: 'CN¥',
+  SGD: 'S$',
+};
+
 // 환율 변환 없이 현지 통화 기호와 천 단위 구분자만 적용해 표시한다.
 export function formatLocalCurrency(
   amount: number | string,
@@ -52,15 +67,8 @@ export function formatLocalCurrency(
 ): string {
   const numeric = typeof amount === 'number' ? amount : Number(amount || 0);
   const safe = Number.isFinite(numeric) ? numeric : 0;
-  const symbol =
-    currency === 'JPY'
-      ? '¥'
-      : currency === 'USD'
-        ? '$'
-        : currency === 'KRW'
-          ? '₩'
-          : `${currency} `;
-  if (currency === 'USD') {
+  const symbol = currencySymbols[currency] || `${currency} `;
+  if (isDecimalCurrency(currency)) {
     return `${symbol}${safe.toLocaleString('en-US', {
       minimumFractionDigits: safe % 1 === 0 ? 0 : 2,
       maximumFractionDigits: 2,

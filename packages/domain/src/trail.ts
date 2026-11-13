@@ -1,3 +1,5 @@
+import type { SupportedCurrency } from './foundation';
+
 // 영수증으로 계획을 구체화하는 기기 저장 콘텐츠 모델을 정의한다.
 export interface TrailFlight {
   id: string;
@@ -28,7 +30,7 @@ export interface TrailReceipt {
   date: string;
   time: string;
   amount: string;
-  currency: 'KRW' | 'JPY' | 'USD';
+  currency: SupportedCurrency;
   details: string;
   note: string;
   attachment: { name: string; uri: string; mimeType: string };

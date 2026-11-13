@@ -71,10 +71,10 @@ export function MyAccountArchiveMenu({
   );
 }
 
-// 환경설정 및 계정(4. 설정 / 5. 앱 버전 정보) 2행 리스트 카드를 표시한다.
-export function MyAccountSettingsMenu({
-  router,
-}: Pick<MyAccountViewProps, 'router'>) {
+// 환경설정 및 계정(앱 버전 정보) 리스트 카드를 표시한다.
+export function MyAccountSettingsMenu(
+  _props: Pick<MyAccountViewProps, 'router'>,
+) {
   const [versionOpen, setVersionOpen] = useState(false);
   const appVersion = Constants.expoConfig?.version || '0.0.2';
 
@@ -82,26 +82,6 @@ export function MyAccountSettingsMenu({
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{t('환경설정 및 계정')}</Text>
       <View style={styles.listCard}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('설정')}
-          onPress={() => router.push('/settings')}
-          style={({ pressed }) => [
-            styles.listRow,
-            pressed && styles.listRowPressed,
-          ]}
-        >
-          <View style={styles.softBlueIconBox}>
-            <Ionicons name="notifications-outline" size={20} color="#0F172A" />
-          </View>
-          <View style={styles.listTextGroup}>
-            <Text style={styles.listTitle}>{t('설정')}</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={18} color={colors.muted} />
-        </Pressable>
-
-        <View style={styles.listDivider} />
-
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t('앱 버전 정보')}
@@ -156,9 +136,16 @@ export function MyAccountGuestNotice({
           <View style={styles.googleLogoBox} aria-hidden>
             <Ionicons name="logo-google" size={22} color="#EA4335" />
           </View>
-          <Text style={styles.guestConnectTitle}>
-            {t('게스트 여행을 Google 계정에 연결하기')}
-          </Text>
+          <View style={styles.listTextGroup}>
+            <Text style={styles.guestConnectTitle}>
+              {t('게스트 여행을 Google 계정에 연결하기')}
+            </Text>
+            <Text style={styles.listSubtitle}>
+              {t(
+                '지금 만든 여행은 이 기기에 저장돼요. Google 계정을 연결하면 기기를 바꿔도 이어보고, 동행자 초대·커뮤니티 공개를 바로 쓸 수 있어요.',
+              )}
+            </Text>
+          </View>
         </View>
         <Pressable
           accessibilityRole="button"

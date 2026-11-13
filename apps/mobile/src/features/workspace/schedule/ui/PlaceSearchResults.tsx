@@ -18,7 +18,7 @@ type Props = {
   query: string;
   disabled: boolean;
   compact: boolean;
-  onSelect: (id: string, title: string) => void;
+  onSelect: (id: string, title: string, category?: string) => void;
 };
 type State = {
   busy: boolean;
@@ -120,13 +120,21 @@ export default function PlaceSearchResults(props: Props) {
           ) : null}
           {state.results.map((place) => (
             <View key={place.id} style={{ gap: 8 }}>
-              <Text style={styles.subtitle}>{place.address}</Text>
+              <Text style={styles.subtitle}>
+                {place.category
+                  ? `${t(place.category)} · ${place.address}`
+                  : place.address}
+              </Text>
               <Button
                 label={t('{p0} 선택', { p0: place.title })}
                 disabled={props.disabled}
                 onPress={() => {
-                  // 공급자 이름·주소는 저장하지 않고 직접 입력한 제목을 유지한다.
-                  return props.onSelect(place.id, props.query.trim());
+                  // 공급자 이름·주소는 저장하지 않고 직접 입력한 제목과 업종 분류를 전달한다.
+                  return props.onSelect(
+                    place.id,
+                    props.query.trim(),
+                    place.category,
+                  );
                 }}
               />
               {place.attributions.length > 0 ? (
@@ -142,9 +150,16 @@ export default function PlaceSearchResults(props: Props) {
         </>
       ) : null}
       {state.error ? (
-        <Text accessibilityRole="alert" style={styles.error}>
-          {t(state.error)}
-        </Text>
+        <View style={{ gap: 6 }}>
+          <Text accessibilityRole="alert" style={styles.error}>
+            {t(state.error)}
+          </Text>
+          <Text style={styles.subtitle}>
+            {t(
+              '검색 결과 없이도 입력한 제목으로 바로 일정을 저장할 수 있어요.',
+            )}
+          </Text>
+        </View>
       ) : null}
     </View>
   );
@@ -169,8 +184,11 @@ function lookupPlaces(userId: string, query: string, signal: AbortSignal) {
 // 검색 실패 종류에 맞는 복구 방법만 사용자에게 표시한다.
 function searchError(error?: unknown) {
   // 검색을 사용할 수 없어도 직접 입력과 외부 지도 경로는 유지한다.
+  if (error instanceof FoundationClientError && error.status === 429) {
+    return '오늘의 장소 검색 한도를 모두 사용했어요. 장소 이름을 직접 입력해 일정을 저장해 주세요.';
+  }
   return error instanceof FoundationClientError &&
     [401, 403].includes(error.status)
     ? '로그인 후 다시 검색해 주세요. 직접 입력하거나 Google Maps에서 찾을 수도 있어요.'
-    : '장소를 찾지 못했어요. 다시 검색하거나 Google Maps에서 찾아 주세요.';
+    : '장소를 찾지 못했어요. 다시 검색하거나 직접 입력해 주세요.';
 }

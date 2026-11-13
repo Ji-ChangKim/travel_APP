@@ -2,6 +2,7 @@ import { TextInput, View } from 'react-native';
 import Text from '@/components/ui/AppText';
 import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
+import { SUPPORTED_CURRENCIES } from '@wherego/domain';
 import type { TrailEditor, TrailModel } from '../model/trailTypes';
 import {
   closeEditor,
@@ -109,7 +110,7 @@ export default function TrailEditorView({ model }: { model: TrailModel }) {
             {t('영수증 사진과 결제 내역을 남겨 지난 여행을 정리해 보세요.')}
           </Text>
           <View style={styles.row}>
-            {(['KRW', 'JPY', 'USD'] as const).map((currency) => {
+            {SUPPORTED_CURRENCIES.map((currency) => {
               // 통화가 다른 기록을 합산하지 않는다.
               return (
                 <TrailAction

@@ -89,6 +89,8 @@ function WorkspaceExpensesContent({
   const [menuExpenseId, setMenuExpenseId] = useState('');
   const [detailScheduleId, setDetailScheduleId] = useState('');
   const [reviewRating, setReviewRating] = useState(5);
+  const [mapNotice, setMapNotice] = useState('');
+  const [failedMapAddress, setFailedMapAddress] = useState('');
 
   const daySelection = workspaceDaySelection(
     snapshot.days,
@@ -322,7 +324,10 @@ function WorkspaceExpensesContent({
                 ? t('예상 예산 {p0} 대비', {
                     p0: formatLocalCurrency(plannedTotal, primaryCurrency),
                   })
-                : `💳 Card ${progressRatio}% · 💵 Cash ${Math.max(0, 100 - progressRatio)}%`}
+                : teamTotal > 0
+                  ? `💳 Card ${progressRatio}% · 💵 Cash ${Math.max(0, 100 - progressRatio)}%`
+                  : // 지출이 없으면 비율을 계산할 수 없으므로 현금 100%로 표시하지 않는다.
+                    '💳 Card – · 💵 Cash –'}
             </Text>
             <Text style={es.progressHighlightText}>
               {plannedTotal > 0
@@ -730,6 +735,7 @@ function WorkspaceExpensesContent({
                 />
                 <DesignButton
                   label={t('비용 삭제')}
+                  variant="danger"
                   disabled={busy || scanning || hasPending}
                   onPress={() => {
                     setMenuExpenseId('');
@@ -787,6 +793,8 @@ function WorkspaceExpensesContent({
                   label={t('구글 지도로 길찾기')}
                   variant="primary"
                   onPress={() => {
+                    setMapNotice('');
+                    setFailedMapAddress('');
                     const dest = encodeURIComponent(
                       detailSchedule.location
                         ? `${detailSchedule.location.latitude},${detailSchedule.location.longitude}`
@@ -797,9 +805,45 @@ function WorkspaceExpensesContent({
                       : '';
                     void Linking.openURL(
                       `https://www.google.com/maps/dir/?api=1&destination=${dest}${placeParam}`,
-                    ).catch(() => undefined);
+                    ).catch(() => {
+                      setFailedMapAddress(
+                        detailSchedule.address || detailSchedule.title,
+                      );
+                      setMapNotice(
+                        t('지도를 열지 못했어요. 길찾기를 다시 눌러 주세요.'),
+                      );
+                    });
                   }}
                 />
+                {mapNotice ? (
+                  <View style={s.row}>
+                    <Text accessibilityRole="alert" style={s.error}>
+                      {mapNotice}
+                    </Text>
+                    {failedMapAddress ? (
+                      <DesignButton
+                        label={t('주소 복사')}
+                        size="chip"
+                        onPress={() => {
+                          if (
+                            typeof navigator !== 'undefined' &&
+                            navigator.clipboard?.writeText
+                          ) {
+                            void navigator.clipboard.writeText(
+                              failedMapAddress,
+                            );
+                          }
+                          setMapNotice(
+                            t(
+                              '주소를 복사했어요. 지도 앱에 붙여넣어 검색해 보세요.',
+                            ),
+                          );
+                          setFailedMapAddress('');
+                        }}
+                      />
+                    ) : null}
+                  </View>
+                ) : null}
               </View>
 
               {/* [iv] 메모 */}

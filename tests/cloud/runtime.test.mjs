@@ -1047,7 +1047,7 @@ function signup(index) {
 
 // 프로필 저장 결과를 요청한 필드별 기대값과 비교한다.
 
-test('추가 프로필 입력은 받지 않으며 조회에는 성별·생일·소개·여행스타일을 담지 않는다', async () => {
+test('이전 계정의 프로필 변경과 Google 회원의 추가 프로필 입력을 받지 않으며 조회에는 성별·생일·소개·여행스타일을 담지 않는다', async () => {
   const member = await accountResponse(
     await seedLegacyAccount(mf, {
       name: 'Private Name',
@@ -1062,10 +1062,29 @@ test('추가 프로필 입력은 받지 않으며 조회에는 성별·생일·�
     { bio: 'private text', travelStyles: ['미식'] },
     { onboardingCompleted: true },
   ]) {
+    // Google 회원이 아닌 이전 계정은 프로필을 바꿀 수 없다.
     const response = await request('/api/v1/profile', 'PATCH', input, member);
-    assert.equal(response.status, 410);
-    assert.equal((await response.json()).error.code, 'PROFILE_INPUT_RETIRED');
+    assert.equal(response.status, 403);
+    assert.equal((await response.json()).error.code, 'ROLE_FORBIDDEN');
   }
+  // Google 회원도 닉네임 외의 개인 정보 항목은 함께 보낼 수 없다.
+  await db
+    .prepare("UPDATE account SET providerId='google' WHERE userId=?")
+    .bind(member.id)
+    .run();
+  for (const input of [
+    { nickname: '새 여행자', birthDate: '1996-02-29' },
+    { nickname: '새 여행자', gender: 'female' },
+    { nickname: '새 여행자', bio: 'private text', travelStyles: ['미식'] },
+    { birthDate: '1996-02-29' },
+  ]) {
+    const response = await request('/api/v1/profile', 'PATCH', input, member);
+    assert.equal(response.status, 422, JSON.stringify(input));
+  }
+  await db
+    .prepare("UPDATE account SET providerId='credential' WHERE userId=?")
+    .bind(member.id)
+    .run();
   assert.equal(
     await db
       .prepare('SELECT user_id FROM profiles WHERE user_id=?')
@@ -1085,7 +1104,7 @@ test('추가 프로필 입력은 받지 않으며 조회에는 성별·생일·�
   }
 });
 
-test('닫힌 프로필 입력은 기존 자료·여행 참조를 덮어쓰지 않는다', async () => {
+test('이전 계정의 프로필 변경 요청은 기존 자료·여행 참조를 덮어쓰지 않는다', async () => {
   const member = await accountResponse(
     await seedLegacyAccount(mf, {
       name: 'Base',
@@ -1123,7 +1142,7 @@ test('닫힌 프로필 입력은 기존 자료·여행 참조를 덮어쓰지 �
   ])
     assert.equal(
       (await request('/api/v1/profile', 'PATCH', { nickname }, member)).status,
-      410,
+      403,
     );
   assert.deepEqual(
     await db
@@ -1640,128 +1659,136 @@ function idempotency(
 
 test('동시 요청의 한 번 저장·영수증 원자 저장·삭제 보호·앱 Origin 로그인', () => {
   // 회원과 여행을 실제 D1에 저장한 상태에서 추가 무결성을 검증한다.
-  return request(
-    '/api/auth/sign-in/email',
-    'POST',
-    { email: 'user0@example.test', password: 'a-strong-test-password!' },
-    undefined,
-    { Origin: 'travelapp://' },
-  )
-    .then((response) => {
-      // 네이티브 앱의 Origin으로도 실제 표준 세션이 발급되어야 한다.
-      return json(response).then(() => {
-        /* 서명된 로그인 토큰만 테스트에 사용한다. */ return (state.users[0].token =
-          response.headers.get('set-auth-token'));
-      });
-    })
-    .then(() =>
-      request(
-        '/api/v1/trips',
-        'POST',
-        {
-          title: '영수증 검사',
-          country: '미국',
-          city: '뉴욕',
-          startDate: '2026-10-06',
-          endDate: '2026-10-07',
-          timezone: 'America/New_York',
-        },
-        state.users[0],
-        { 'Idempotency-Key': randomUUID() },
-      ),
+  return (
+    request(
+      '/api/auth/sign-in/email',
+      'POST',
+      { email: 'user0@example.test', password: 'a-strong-test-password!' },
+      undefined,
+      { Origin: 'travelapp://' },
     )
-    .then((response) => json(response, 201))
-    .then((body) => {
-      /* 새 여행의 버전을 사용한다. */ return (
-        (state.trip = body.data.tripId),
-        (state.version = 1)
-      );
-    })
-    .then(() =>
-      request(
-        `/api/v1/trips/${state.trip}/workspace`,
-        'GET',
-        undefined,
-        state.users[0],
-      ),
-    )
-    .then(json)
-    .then((body) => {
-      /* 현재 여행 DAY를 선택한다. */ return (state.day = body.data.days[0].id);
-    })
-    .then(() => concurrentSave())
-    .then(() =>
-      command('schedule.save', {
-        id: randomUUID(),
-        dayId: randomUUID(),
-        title: '다른 여행 날짜',
-        type: 'PLACE',
-        sortOrder: 1,
-      }),
-    )
-    .then((response) => {
-      /* 다른 여행 부모 ID를 거부한다. */ return assert.equal(
-        response.status,
-        422,
-      );
-    })
-    .then(() =>
-      request(
-        `/files/${state.trip}/${state.media}`,
-        'POST',
-        png,
-        state.users[0],
-        { 'Content-Type': 'image/png' },
-      ),
-    )
-    .then((response) => json(response, 201))
-    .then((body) => {
-      /* 원본 저장 경로를 확인한다. */ return (state.path = body.data.path);
-    })
-    .then(() =>
-      save('media.register', {
-        id: state.media,
-        path: state.path,
-        mimeType: 'image/png',
-        purpose: 'receipt',
-      }),
-    )
-    .then(() => receiptIntegrity())
-    .then(() =>
-      request(
-        '/api/v1/profile',
-        'PATCH',
-        { nickname: '수정한 여행자', bio: '나의 여행', travelStyles: ['미식'] },
-        state.users[0],
-      ),
-    )
-    .then((response) => json(response, 410))
-    .then((body) => {
-      return assert.equal(body.error.code, 'PROFILE_INPUT_RETIRED');
-    })
-    .then(() => request('/api/v1/profile', 'GET', undefined, state.users[0]))
-    .then(json)
-    .then((body) => {
-      /* 재조회에서도 수집을 중단한 정보를 노출하지 않는다. */ return assert.equal(
-        body.data.travelStyles,
-        undefined,
-      );
-    })
-    .then(() =>
-      request(
-        '/api/auth/sign-in/email',
-        'POST',
-        { email: 'user0@example.test', password: 'a-strong-test-password!' },
-        undefined,
-        { Origin: 'https://evil.test' },
-      ),
-    )
-    .then((response) => {
-      /* 허용하지 않은 Origin에서는 로그인하지 않는다. */ return assert.equal(
-        response.status,
-        403,
-      );
-    });
+      .then((response) => {
+        // 네이티브 앱의 Origin으로도 실제 표준 세션이 발급되어야 한다.
+        return json(response).then(() => {
+          /* 서명된 로그인 토큰만 테스트에 사용한다. */ return (state.users[0].token =
+            response.headers.get('set-auth-token'));
+        });
+      })
+      .then(() =>
+        request(
+          '/api/v1/trips',
+          'POST',
+          {
+            title: '영수증 검사',
+            country: '미국',
+            city: '뉴욕',
+            startDate: '2026-10-06',
+            endDate: '2026-10-07',
+            timezone: 'America/New_York',
+          },
+          state.users[0],
+          { 'Idempotency-Key': randomUUID() },
+        ),
+      )
+      .then((response) => json(response, 201))
+      .then((body) => {
+        /* 새 여행의 버전을 사용한다. */ return (
+          (state.trip = body.data.tripId),
+          (state.version = 1)
+        );
+      })
+      .then(() =>
+        request(
+          `/api/v1/trips/${state.trip}/workspace`,
+          'GET',
+          undefined,
+          state.users[0],
+        ),
+      )
+      .then(json)
+      .then((body) => {
+        /* 현재 여행 DAY를 선택한다. */ return (state.day =
+          body.data.days[0].id);
+      })
+      .then(() => concurrentSave())
+      .then(() =>
+        command('schedule.save', {
+          id: randomUUID(),
+          dayId: randomUUID(),
+          title: '다른 여행 날짜',
+          type: 'PLACE',
+          sortOrder: 1,
+        }),
+      )
+      .then((response) => {
+        /* 다른 여행 부모 ID를 거부한다. */ return assert.equal(
+          response.status,
+          422,
+        );
+      })
+      .then(() =>
+        request(
+          `/files/${state.trip}/${state.media}`,
+          'POST',
+          png,
+          state.users[0],
+          { 'Content-Type': 'image/png' },
+        ),
+      )
+      .then((response) => json(response, 201))
+      .then((body) => {
+        /* 원본 저장 경로를 확인한다. */ return (state.path = body.data.path);
+      })
+      .then(() =>
+        save('media.register', {
+          id: state.media,
+          path: state.path,
+          mimeType: 'image/png',
+          purpose: 'receipt',
+        }),
+      )
+      .then(() => receiptIntegrity())
+      .then(() =>
+        request(
+          '/api/v1/profile',
+          'PATCH',
+          {
+            nickname: '수정한 여행자',
+            bio: '나의 여행',
+            travelStyles: ['미식'],
+          },
+          state.users[0],
+        ),
+      )
+      // 프로필 변경은 Google 회원의 닉네임만 허용하므로 이전 이메일 계정은 권한 오류로 막는다.
+      .then((response) => json(response, 403))
+      .then((body) => {
+        return assert.equal(body.error.code, 'ROLE_FORBIDDEN');
+      })
+      .then(() => request('/api/v1/profile', 'GET', undefined, state.users[0]))
+      .then(json)
+      .then((body) => {
+        /* 재조회에서도 수집을 중단한 정보를 노출하지 않는다. */ return assert.equal(
+          body.data.travelStyles,
+          undefined,
+        );
+      })
+      .then(() =>
+        request(
+          '/api/auth/sign-in/email',
+          'POST',
+          { email: 'user0@example.test', password: 'a-strong-test-password!' },
+          undefined,
+          { Origin: 'https://evil.test' },
+        ),
+      )
+      .then((response) => {
+        /* 허용하지 않은 Origin에서는 로그인하지 않는다. */ return assert.equal(
+          response.status,
+          403,
+        );
+      })
+  );
 });
 
 // 같은 명령의 동시 재시도가 항목을 두 번 만들지 않는지 검사한다.

@@ -3,7 +3,7 @@ import type { Context } from 'hono';
 import type { ApiEnvironment } from '../../shared/types';
 import { rejectRequest } from '../../shared/errors';
 import { readBounded } from '../../shared/http/readBounded';
-import { reserveGoogleCall } from './googleUsage';
+import { reserveGoogleCall, reserveGuestPlaceSearch } from './googleUsage';
 
 const querySchema = z.string().trim().min(2).max(200);
 const responseSchema = z.object({
@@ -13,6 +13,8 @@ const responseSchema = z.object({
         id: z.string().regex(/^[A-Za-z0-9_-]{1,200}$/),
         displayName: z.object({ text: z.string().min(1).max(300) }),
         formattedAddress: z.string().max(1000).default(''),
+        primaryType: z.string().max(120).optional(),
+        types: z.array(z.string().max(120)).max(50).optional(),
         attributions: z
           .array(
             z.object({
@@ -35,21 +37,68 @@ const responseSchema = z.object({
     .default([]),
 });
 
+// 구글 장소 업종 코드를 일정 표준 분류로 변환한다.
+export function resolveGooglePlaceCategory(
+  primaryType?: string,
+  types?: string[],
+): string | undefined {
+  if (!primaryType && (!types || types.length === 0)) {
+    return undefined;
+  }
+  const all = [primaryType, ...(types || [])]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+  if (/cafe|coffee|bakery|dessert|tea_house/.test(all)) return '카페';
+  if (
+    /restaurant|food|meal|ramen|sushi|bar|izakaya|bistro|diner|fast_food/.test(
+      all,
+    )
+  )
+    return '식당';
+  if (/lodging|hotel|motel|hostel|resort|guest_house|ryokan/.test(all))
+    return '숙소';
+  if (
+    /airport|train_station|subway_station|transit_station|bus_station|ferry_terminal|light_rail_station/.test(
+      all,
+    )
+  )
+    return '이동';
+  if (
+    /shopping_mall|department_store|market|supermarket|store|book_store|clothing_store|convenience_store|gift_shop/.test(
+      all,
+    )
+  )
+    return '쇼핑';
+  if (
+    /tourist_attraction|museum|art_gallery|park|amusement_park|aquarium|zoo|historical_landmark|cultural_landmark|place_of_worship|shrine|temple|church|castle|observation_deck/.test(
+      all,
+    )
+  )
+    return '명소';
+  return '장소';
+}
+
 // 구글 검색·상세 요청에 필요한 비밀 키와 필드 마스크를 구성한다.
 function googleHeaders(
   key: string,
   prefix = 'places.',
 ): Record<string, string> {
   // 서버 키는 URL과 앱 번들에 포함하지 않고 필요한 필드만 요청한다.
+  const fields = prefix
+    ? [
+        'id',
+        'displayName',
+        'formattedAddress',
+        'primaryType',
+        'types',
+        'attributions',
+      ]
+    : ['id', 'displayName', 'formattedAddress', 'attributions'];
   return {
     'Content-Type': 'application/json',
     'X-Goog-Api-Key': key,
-    'X-Goog-FieldMask': [
-      'id',
-      'displayName',
-      'formattedAddress',
-      'attributions',
-    ]
+    'X-Goog-FieldMask': fields
       .map((field) => {
         // 검색과 상세 응답의 필드 경로를 각각 구성한다.
         return prefix + field;
@@ -61,11 +110,13 @@ function googleHeaders(
 // 실시간 구글 장소 표시 데이터를 저장 객체와 구분한다.
 function displayPlace(place: z.infer<typeof responseSchema>['places'][number]) {
   // 장소 ID 외 공급자 데이터는 서버 DB에 기록하지 않는다.
+  const category = resolveGooglePlaceCategory(place.primaryType, place.types);
   return {
     id: place.id,
     title: place.displayName.text,
     address: place.formattedAddress,
     attributions: place.attributions,
+    ...(category ? { category } : {}),
   };
 }
 
@@ -115,8 +166,12 @@ export async function searchPlaces(
 ): Promise<Response> {
   // 서버 비밀 키가 없으면 준비되지 않은 검색을 성공처럼 표시하지 않는다.
   querySchema.parse(c.req.query('q'));
-  if (c.env.GOOGLE_PLACES_API_KEY)
+  const session = c.get('session');
+  if (session?.isAnonymous) {
+    await reserveGuestPlaceSearch(c.env, session.userId);
+  } else if (c.env.GOOGLE_PLACES_API_KEY) {
     await reserveGoogleCall(c.env, 'text-search');
+  }
   return c.env.GOOGLE_PLACES_API_KEY
     ? fetcher('https://places.googleapis.com/v1/places:searchText', {
         method: 'POST',

@@ -8,7 +8,10 @@ import {
   communityFeedPeriod,
 } from '../../apps/mobile/src/features/workspace/community/model/communityFeedCard';
 import {
+  COMMUNITY_SEED_POSTS,
   communityPostSchema,
+  filterCommunitySeedPosts,
+  findCommunitySeedPost,
   newTrip,
   persistedTripCreateSchema,
   transform,
@@ -443,4 +446,36 @@ test('공개 카드의 박·일은 전체 달력 기간으로 계산하고 같�
     ].map(communityFeedPeriod),
     ['3박 4일', '당일 여행', '2박 3일', '2박 3일'],
   );
+});
+
+test('커뮤니티 초기 시드는 8개 주요 도시마다 3개 이상의 영수증 근거 게시물을 제공한다', () => {
+  assert.equal(COMMUNITY_SEED_POSTS.length, 24);
+  for (const post of COMMUNITY_SEED_POSTS) {
+    communityPostSchema.parse(post);
+    const card = communityFeedCard(post);
+    assert.equal(card.hasReceipt, true);
+    assert.ok(
+      post.snapshot.itinerary.some(
+        (item) =>
+          item.hasReceipt &&
+          item.receiptPreview &&
+          item.receiptPreview.length > 0,
+      ),
+    );
+  }
+  const cities = [
+    '도쿄',
+    '오사카',
+    '후쿠오카',
+    '방콕',
+    '상하이',
+    '타이베이',
+    '다낭',
+    '싱가포르',
+  ];
+  for (const city of cities) {
+    const cityPosts = filterCommunitySeedPosts({ q: city });
+    assert.equal(cityPosts.length, 3, city);
+    assert.ok(findCommunitySeedPost(cityPosts[0]!.id));
+  }
 });

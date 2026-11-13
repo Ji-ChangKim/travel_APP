@@ -125,6 +125,11 @@ function TravelHome({
     router.push('/new-trip');
   }
 
+  // 다녀온 여행 기록 모드로 새 여행 생성 페이지를 연다.
+  function createRecord() {
+    router.push({ pathname: '/new-trip', params: { mode: 'record' } });
+  }
+
   // 특정 추천 도시가 선택된 상태로 새 여행 생성 페이지를 연다.
   function createWithDestination(destinationKey: string) {
     // 선택한 도시 키를 쿼리 파라미터로 전달해 첫 입력 단계를 단축한다.
@@ -132,6 +137,11 @@ function TravelHome({
       pathname: '/new-trip',
       params: { destination: destinationKey },
     });
+  }
+
+  // 선택한 도시의 커뮤니티 다녀온 기록 목록으로 이동한다.
+  function openCommunityCity(city: string) {
+    router.push({ pathname: '/footprints', params: { q: city } });
   }
 
   return (
@@ -189,6 +199,7 @@ function TravelHome({
             void drafts.refetch();
           }}
           onCreate={create}
+          onCreateRecord={createRecord}
           onBrowseCourses={() => {
             // 인기 여행 코스 둘러보기 클릭 시 발자국 화면으로 이동한다.
             router.push('/footprints');
@@ -198,18 +209,6 @@ function TravelHome({
             router.push(`/destinations/${key}`);
           }}
         />
-
-        {!showEmptyPlanner && (
-          <HomeJourneyStart
-            ready={ready}
-            onCreate={create}
-            onReceipts={() => {
-              // 영수증 기록 대상 여행 선택 시트를 연다.
-              setReceiptSelection(true);
-            }}
-            subtitle={t('추천: 도쿄 3박 4일 일정 만들기')}
-          />
-        )}
 
         {!loading && groups.scheduled.length > 0 && (
           <View testID="home-scheduled" style={s.section}>
@@ -249,12 +248,25 @@ function TravelHome({
           </View>
         )}
 
+        {!showEmptyPlanner && (
+          <HomeJourneyStart
+            ready={ready}
+            onCreate={create}
+            onReceipts={() => {
+              // 영수증 기록 대상 여행 선택 시트를 연다.
+              setReceiptSelection(true);
+            }}
+            subtitle={t('추천: 도쿄 3박 4일 일정 만들기')}
+          />
+        )}
+
         <HomeVerifiedCoursesSection
           onStartCourse={createWithDestination}
           onOpenGuide={(key) => {
             // 선택한 코스의 공식 도시 가이드를 연다.
             router.push(`/destinations/${key}`);
           }}
+          onOpenCommunityCity={openCommunityCity}
         />
 
         <HomeCoreToolsGrid
@@ -332,6 +344,7 @@ function HomeConciergeMainBody({
   onRefetchTrips,
   onRefetchDrafts,
   onCreate,
+  onCreateRecord,
   onBrowseCourses,
   onOpenGuide,
 }: {
@@ -346,6 +359,7 @@ function HomeConciergeMainBody({
   onRefetchTrips: () => void;
   onRefetchDrafts: () => void;
   onCreate: () => void;
+  onCreateRecord: () => void;
   onBrowseCourses: () => void;
   onOpenGuide: (key: string) => void;
 }) {
@@ -412,11 +426,30 @@ function HomeConciergeMainBody({
           <HomeTravelCard item={groups.upcoming} userId={userId} hero />
         </View>
       )}
+      {!groups.active.length &&
+        !groups.upcoming &&
+        groups.past &&
+        groups.past.length > 0 && (
+          <View style={s.section}>
+            <Text accessibilityRole="header" style={s.title}>
+              {t('다녀온 여행 정리')}
+            </Text>
+            {groups.past.slice(0, 1).map((item) => (
+              <HomeTravelCard
+                key={item.id}
+                item={item}
+                userId={userId}
+                inTrip
+              />
+            ))}
+          </View>
+        )}
       {showEmptyPlanner && (
         <HomeEmptySection
           ready={ready}
           hasCompleted={hasCompleted}
           onCreate={onCreate}
+          onCreateRecord={onCreateRecord}
           onBrowseCourses={onBrowseCourses}
           onOpenGuide={onOpenGuide}
         />

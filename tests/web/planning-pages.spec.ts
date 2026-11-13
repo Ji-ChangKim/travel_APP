@@ -126,7 +126,7 @@ for (const width of [320, 390, 430]) {
     await expect(page.getByTestId('schedule-empty-keywords')).toBeVisible();
     await expect(page.getByTestId('schedule-empty-template')).toBeVisible();
     await expect(
-      page.getByRole('button', { name: '장소 추가', exact: true }),
+      page.getByRole('button', { name: '일정 추가', exact: true }),
     ).toHaveCount(1);
     await expect(
       page.getByRole('button', { name: '순서 편집', exact: true }),
@@ -315,7 +315,7 @@ test('기획서 화면: 게스트 오프라인 장소 저장·재진입', async 
 }) => {
   await setup(page);
   await context.setOffline(true);
-  await page.getByRole('button', { name: '장소 추가', exact: true }).click();
+  await page.getByRole('button', { name: '일정 추가', exact: true }).click();
   await page.getByLabel('제목', { exact: true }).fill('오프라인에 저장한 장소');
   await page.getByLabel('일정 시간 (HH:mm)', { exact: true }).fill('00:00');
   await page

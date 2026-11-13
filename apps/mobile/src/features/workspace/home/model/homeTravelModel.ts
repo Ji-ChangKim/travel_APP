@@ -66,7 +66,22 @@ export function homeTravelGroups(
       (a, b) =>
         a.startDate.localeCompare(b.startDate) || a.id.localeCompare(b.id),
     );
-  return { upcoming: future[0], scheduled: future.slice(1), undated, active };
+  const past = dated
+    .filter(
+      (item) =>
+        homeDaysLeft(item, now) < 0 &&
+        item.endDate < tripToday(item.timezone, now),
+    )
+    .sort(
+      (a, b) => b.endDate.localeCompare(a.endDate) || a.id.localeCompare(b.id),
+    );
+  return {
+    upcoming: future[0],
+    scheduled: future.slice(1),
+    undated,
+    active,
+    past,
+  };
 }
 
 // 달력 날짜를 UTC 날짜 수로 변환해 서머타임 때문에 D-day가 달라지지 않게 한다.

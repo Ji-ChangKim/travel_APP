@@ -162,6 +162,7 @@ export function useWorkspaceFormActions({
         return;
       }
       const input = tripCreationInput(activeForm.values);
+      const isRecording = activeForm.values.recording === 'true';
       const key = activeForm.id;
       execute(() => {
         // 여행과 DAY와 소유자 생성은 서버에서 원자적으로 수행한다.
@@ -176,6 +177,7 @@ export function useWorkspaceFormActions({
               ? createdTrip(
                   z.object({ trip: workspaceTripSchema }).parse(result.data)
                     .trip.id,
+                  isRecording,
                 )
               : undefined;
           });
@@ -200,18 +202,22 @@ export function useWorkspaceFormActions({
   // 생성 성공 후에만 작성 수명을 해제하고 서버 여행으로 이동한다.
   const createdTrip = async function createdTrip(
     tripId: string,
+    isRecording = false,
   ): Promise<void> {
     if (useTripStore.getState().currentUser?.id !== userId) return;
     if (form) clearCreationHandoff(form.id);
+    const suffix = importing
+      ? '?importPlace=1'
+      : isRecording
+        ? '?section=expenses&receiptCapture=1'
+        : '';
     // 일반 이탈 보호가 성공한 여행 생성의 화면 이동을 막지 않게 한다.
     return void (clearPending(),
     setForm(null),
     finishOperation(),
     completeFormExit(() => {
-      // 확인된 서버 ID와 원래 장소 가져오기 목적을 전달한다.
-      return router.replace(
-        `/trips/${tripId}${importing ? '?importPlace=1' : ''}`,
-      );
+      // 확인된 서버 ID와 원래 장소 가져오기 또는 영수증 기록 목적을 전달한다.
+      return router.replace(`/trips/${tripId}${suffix}`);
     }));
   };
   // 폼 필드 하나를 바꾸되 연결 일정의 DAY를 일치시킨다.

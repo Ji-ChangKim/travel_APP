@@ -119,8 +119,10 @@ export {
   checklistStateSchema,
   decimalExpenseSchema,
   foundationUuidSchema,
+  isValidDecimalExpense,
   mutationResultSchema,
   persistedTripCreateSchema,
+  supportedCurrencySchema,
   tripCreationRequestSchema,
   tripTitleSchema,
   tripVersionSchema,
@@ -148,6 +150,7 @@ export {
 export * from './receiptReview';
 export * from './receiptDuplicates';
 export * from './communityFeed';
+export * from './communitySeeds';
 export * from './communityImport';
 export * from './planning';
 export { tripDestinationSchema, tripDestinationsSchema } from './foundation';

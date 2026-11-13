@@ -134,6 +134,18 @@ export function renderPublicationSelection({
               );
             }}
           />
+          <LedgerAction
+            label={t('영수증 메뉴명·가격 함께 공개')}
+            checked={form.values.includeReceiptItems === 'true'}
+            disabled={busy}
+            onPress={() => {
+              // 선택한 일정에 연결된 영수증의 메뉴명·가격 공개 여부를 전환한다.
+              return onChange(
+                'includeReceiptItems',
+                form.values.includeReceiptItems === 'true' ? 'false' : 'true',
+              );
+            }}
+          />
           {issue && (
             <>
               <Text
@@ -247,8 +259,23 @@ export function renderPublicationPreview({
             <View key={index}>
               <Text>
                 {item.date} · {item.timeSlot || t('시간 미정')} · {item.title}
+                {item.hasReceipt ? ` · ${t('영수증 기록 있음')}` : ''}
               </Text>
               <Text>{item.address || t('주소 없음')}</Text>
+              {item.receiptPreview?.map((receipt, rIndex) => (
+                <View key={rIndex}>
+                  {receipt.totalAmount ? (
+                    <Text>
+                      {`${t('영수증 합계')}: ${receipt.currency} ${receipt.totalAmount}`}
+                    </Text>
+                  ) : null}
+                  {receipt.items?.map((entry, eIndex) => (
+                    <Text key={eIndex}>
+                      {`• ${entry.name}${entry.quantity ? ` ×${entry.quantity}` : ''}${entry.amount ? ` (${receipt.currency} ${entry.amount})` : ''}`}
+                    </Text>
+                  ))}
+                </View>
+              ))}
             </View>
           );
         })}

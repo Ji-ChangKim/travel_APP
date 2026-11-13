@@ -97,7 +97,7 @@ export function useCommunityImport(postId: string, userId: string) {
       if (rejected) attempt.current = null;
       setError(
         failure instanceof FoundationClientError && failure.status === 404
-          ? '공개가 중단됐거나 담을 수 없는 일정이에요. 발자국에서 다른 일정을 선택해 주세요.'
+          ? '공개가 중단됐거나 담을 수 없는 일정이에요. 커뮤니티에서 다른 일정을 선택해 주세요.'
           : failure instanceof FoundationClientError && failure.status === 401
             ? '로그인 상태를 확인한 뒤 다시 담아 주세요.'
             : failure instanceof FoundationClientError && failure.status === 422

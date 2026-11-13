@@ -198,23 +198,30 @@ test('R10 합계·품목·통화·연결 수정과 수정 시작은 두 확인�
   );
 });
 
-test('R10 사진 선택은 합계 차이 동의를 바꾸지 않으며 미지원 통화는 저장할 수 없다', () => {
-  // 다른 통화 금액을 달러로 해석해 확정하지 않는다.
+test('R10 사진 선택은 합계 차이 동의를 바꾸지 않으며 지원 8개 통화는 저장 가능하고 미지원 통화는 저장할 수 없다', () => {
+  // 아시아 5개 통화(TWD·VND·THB·CNY·SGD)는 저장 가능하고 미지원 통화(EUR·GBP·빈 값)는 차단한다.
   const form = receiptForm('0.30');
   return assert.deepEqual(
     [
       receiptConfirmationValues('keepPhoto', 'false'),
-      ...['TWD', 'VND', 'THB', 'CNY', 'SGD', ''].map((currency) => {
+      ...['TWD', 'VND', 'THB', 'CNY', 'SGD'].map((currency) => {
+        return receiptCanSave({
+          ...form,
+          values: { ...form.values, currency },
+        });
+      }),
+      ...['EUR', 'GBP', ''].map((currency) => {
         // 원 통화 값은 그대로 검사한다.
         return receiptCanSave({
           ...form,
           values: { ...form.values, currency },
         });
       }),
-      receiptCurrencyIssue('TWD').includes('읽었지만'),
+      receiptCurrencyIssue('TWD'),
+      receiptCurrencyIssue('EUR').includes('읽었지만'),
       receiptCurrencyIssue('').includes('읽지 못했어요'),
     ],
-    [{}, false, false, false, false, false, false, true, true],
+    [{}, true, true, true, true, true, false, false, false, '', true, true],
   );
 });
 

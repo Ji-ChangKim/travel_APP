@@ -1,9 +1,10 @@
 import { getLocale } from '@/features/localization/localeState';
 import { t } from '@/features/localization/translate';
-import type {
-  TravelLeg,
-  WorkspaceSchedule,
-  WorkspaceSnapshot,
+import {
+  SUPPORTED_CURRENCIES,
+  type TravelLeg,
+  type WorkspaceSchedule,
+  type WorkspaceSnapshot,
 } from '@wherego/domain';
 import type { TripIconName } from '@/components/icons/TripIcon';
 
@@ -30,7 +31,7 @@ export const scheduleTimePresets = [
   '20:00',
 ] as const;
 
-export const scheduleCurrencies = ['KRW', 'JPY', 'USD'] as const;
+export const scheduleCurrencies = SUPPORTED_CURRENCIES;
 
 export const scheduleKinds: {
   type: WorkspaceSchedule['type'];

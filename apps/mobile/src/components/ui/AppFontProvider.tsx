@@ -1,9 +1,6 @@
-import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
 import { createContext, type ReactNode } from 'react';
-import { ActivityIndicator, View } from 'react-native';
 import { useFonts } from 'expo-font';
-import { colors } from '@/constants/theme';
 
 export const AppFontsReady = createContext(false);
 
@@ -34,7 +31,7 @@ export default function AppFontProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// 글꼴 조회 실패 시에도 시스템 글꼴로 앱을 사용할 수 있게 한다.
+// 글꼴 조회 중에도 시스템 글꼴로 첫 화면을 즉시 표시하고 로드 후 교체한다.
 function FontView({
   state: [ready, error],
   children,
@@ -43,21 +40,9 @@ function FontView({
   children: ReactNode;
 }) {
   useLocale();
-  // 처음 읽는 화면에서 글꼴이 뒤늦게 바뀌는 현상을 줄인다.
-  return ready || error ? (
-    <AppFontsReady.Provider value={ready}>{children}</AppFontsReady.Provider>
-  ) : (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: colors.background,
-        justifyContent: 'center',
-      }}
-    >
-      <ActivityIndicator
-        color={colors.primary}
-        accessibilityLabel={t('화면을 준비하는 중')}
-      />
-    </View>
+  return (
+    <AppFontsReady.Provider value={Boolean(ready && !error)}>
+      {children}
+    </AppFontsReady.Provider>
   );
 }

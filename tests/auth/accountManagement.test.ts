@@ -224,3 +224,73 @@ test('소유권 이전은 확인한 동행자와 버전을 보내고 다른 수�
   wrongRecipient = true;
   await assert.rejects(submitOwnershipTransfer(options, confirmation));
 });
+
+test('2인 공유 여행 소유권 이전 후 재조회하면 차단 목록이 비워지고 계정 삭제가 접수된다', async () => {
+  let transferred = false;
+  const options: FoundationClientOptions = {
+    baseUrl: 'https://api.test',
+    accessToken: 'fixture-token',
+    fetcher: async (input, init) => {
+      const path = new URL(String(input)).pathname;
+      if (path.endsWith('/transfer') && init?.method === 'POST') {
+        transferred = true;
+        return Response.json({
+          data: {
+            tripId: snapshot.trip.id,
+            newOwnerId: member,
+            version: snapshot.trip.version + 1,
+          },
+        });
+      }
+      if (path === '/api/v1/account' && init?.method === 'DELETE') {
+        assert.equal(transferred, true);
+        return Response.json(
+          {
+            data: {
+              jobId: randomUUID(),
+              state: 'pending',
+              policyVersion: 'account-delete-v1',
+            },
+          },
+          { status: 202 },
+        );
+      }
+      return Response.json({
+        data: path.endsWith('/workspace')
+          ? snapshot
+          : path.endsWith('/deletion-preview')
+            ? transferred
+              ? { ...preview, ownershipTransfersRequired: [] }
+              : preview
+            : account,
+        meta: { requestId: 'fixture' },
+      });
+    },
+  };
+  const beforeTransfer = await loadAccountManagement(
+    options,
+    actor,
+    new AbortController().signal,
+  );
+  assert.equal(beforeTransfer.transfers.length, 1);
+  await submitOwnershipTransfer(options, {
+    kind: 'transfer',
+    actorId: actor,
+    tripId: snapshot.trip.id,
+    tripTitle: snapshot.trip.title,
+    newOwnerId: member,
+    name: '동행자',
+    version: snapshot.trip.version,
+  });
+  const afterTransfer = await loadAccountManagement(
+    options,
+    actor,
+    new AbortController().signal,
+  );
+  assert.equal(afterTransfer.transfers.length, 0);
+  const deletion = await submitAccountDeletion(
+    options,
+    afterTransfer.preview.policyVersion,
+  );
+  assert.equal(deletion.state, 'pending');
+});

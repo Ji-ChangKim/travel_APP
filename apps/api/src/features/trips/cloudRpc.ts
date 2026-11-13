@@ -3,6 +3,8 @@ import {
   workspaceCommandSchema,
   communityPostSchema,
   communityFeedQuerySchema,
+  filterCommunitySeedPosts,
+  findCommunitySeedPost,
   type CommunityFeedFilters,
 } from '@wherego/validation';
 import {
@@ -86,9 +88,11 @@ function dispatch(actor: Actor, name: string, args: Args): Promise<unknown> {
         .bind(String(args.p_post))
         .first<{ snapshot: string }>()
         .then((row) => {
-          // 철회된 공개 행은 개인 여행으로 대체하지 않는다.
-          return row
-            ? communityPostSchema.parse(JSON.parse(row.snapshot))
+          // 철회된 공개 행은 개인 여행으로 대체하지 않으며 초기 시드 게시물 ID만 보조 조회한다.
+          if (row) return communityPostSchema.parse(JSON.parse(row.snapshot));
+          const seed = findCommunitySeedPost(String(args.p_post));
+          return seed
+            ? communityPostSchema.parse(seed)
             : rejectRequest('RESOURCE_NOT_FOUND');
         });
     case 'wherego_report':
@@ -205,14 +209,20 @@ function feed(
       offset,
     )
     .all<{ snapshot: string }>()
-    .then((result) => {
-      /* 공개 스냅샷만 JSON으로 반환한다. */ return result.results.map(
-        (row) => {
-          /* 민감 필드가 없는 게시물 객체를 읽는다. */ return JSON.parse(
-            row.snapshot,
-          ) as unknown;
-        },
-      );
+    .then(async (result) => {
+      /* 공개 스냅샷만 JSON으로 반환하며 DB에 게시물이 없을 때만 초기 시드를 제공한다. */
+      const rows = result.results.map((row) => {
+        /* 민감 필드가 없는 게시물 객체를 읽는다. */ return JSON.parse(
+          row.snapshot,
+        ) as unknown;
+      });
+      if (rows.length > 0) return rows;
+      const total = await database(actor.env)
+        .prepare('SELECT COUNT(*) AS count FROM posts')
+        .first<{ count: number }>();
+      return (total?.count ?? 0) === 0
+        ? filterCommunitySeedPosts(filters, offset)
+        : rows;
     });
 }
 
@@ -226,6 +236,7 @@ async function mutate(m: Mutation, name: string): Promise<unknown> {
   if (name === 'wherego_accept_invite') return accept(m);
   if (name === 'wherego_import_community') return importPublicTrip(m);
   if (name === 'wherego_create_trip') return createTripMutation(m);
+  if (name === 'wherego_delete_trip') return deleteOrLeaveTripMutation(m);
 
   // 멤버십이 철회된 사용자는 과거에 성공한 요청도 재생할 수 없다.
   const snapshot = await readTrip(m, String(m.args.p_trip));
@@ -235,6 +246,76 @@ async function mutate(m: Mutation, name: string): Promise<unknown> {
     return rejectRequest('VERSION_CONFLICT');
   }
   return mutationChange(m, name, snapshot);
+}
+
+async function deleteOrLeaveTripMutation(m: Mutation): Promise<unknown> {
+  const data = await replay(m);
+  if (data) return { data, replayed: true };
+  const tripId = String(m.args.p_trip);
+  const snapshot = await readTrip(m, tripId);
+  if (
+    snapshot.myRole === 'owner' ||
+    snapshot.trip.ownerId === m.session.userId
+  ) {
+    const resultData = { tripId, deleted: true, action: 'deleted' };
+    await database(m.env).batch([
+      database(m.env).prepare('DELETE FROM posts WHERE trip_id=?').bind(tripId),
+      database(m.env)
+        .prepare('DELETE FROM invites WHERE trip_id=?')
+        .bind(tripId),
+      database(m.env)
+        .prepare('DELETE FROM trip_members WHERE trip_id=?')
+        .bind(tripId),
+      database(m.env)
+        .prepare('DELETE FROM trips WHERE id=? AND owner_id=?')
+        .bind(tripId, m.session.userId),
+      database(m.env)
+        .prepare(
+          'INSERT OR IGNORE INTO mutation_requests(actor_id,request_key,input_hash,result,created_at) VALUES(?,?,?,?,?)',
+        )
+        .bind(
+          m.session.userId,
+          m.key,
+          m.hash,
+          JSON.stringify(resultData),
+          Date.now(),
+        ),
+    ]);
+    return { data: resultData, replayed: false };
+  }
+  const nextSnapshot: Snapshot = {
+    ...snapshot,
+    trip: { ...snapshot.trip, version: snapshot.trip.version + 1 },
+    members: snapshot.members.filter(
+      (member) => member.userId !== m.session.userId,
+    ),
+  };
+  const resultData = { tripId, deleted: true, action: 'left' };
+  await database(m.env).batch([
+    database(m.env)
+      .prepare('UPDATE trips SET snapshot=?, version=?, last_key=? WHERE id=?')
+      .bind(
+        JSON.stringify(nextSnapshot),
+        nextSnapshot.trip.version,
+        `${m.session.userId}:${m.key}`,
+        tripId,
+      ),
+    database(m.env)
+      .prepare('DELETE FROM trip_members WHERE trip_id=? AND user_id=?')
+      .bind(tripId, m.session.userId),
+    database(m.env)
+      .prepare(
+        'INSERT OR IGNORE INTO mutation_requests(actor_id,request_key,input_hash,result,created_at) VALUES(?,?,?,?,?)',
+      )
+      .bind(
+        m.session.userId,
+        m.key,
+        m.hash,
+        JSON.stringify(resultData),
+        Date.now(),
+      ),
+  ]);
+  return { data: resultData, replayed: false };
 }
 
 async function createTripMutation(m: Mutation): Promise<unknown> {

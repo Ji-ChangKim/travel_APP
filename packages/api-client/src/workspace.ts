@@ -11,6 +11,7 @@ import {
   workspaceCommandSchema,
   communityFeedSearch,
   communityImportSchema,
+  findCommunitySeedPost,
   type CommunityImportInput,
   type CommunityFeedFilters,
   type WorkspaceCommand,
@@ -54,14 +55,45 @@ export function getPublicCommunityPost(
   return fetch(
     `${baseUrl.replace(/\/$/, '')}/public/community/${encodeURIComponent(postId)}`,
     { signal: requestSignal(signal) },
-  ).then((response) => {
-    // 공개 중단과 통신 실패를 빈 일정으로 바꾸지 않는다.
-    return response.ok
-      ? response.json().then((payload: unknown) => {
+  )
+    .then((response) => {
+      // 공개 중단과 통신 실패를 빈 일정으로 바꾸지 않는다.
+      if (response.ok) {
+        return response.json().then((payload: unknown) => {
           // 실제 공개 계약을 통과한 내용만 전달한다.
           return z.object({ data: communityPostSchema }).parse(payload).data;
-        })
-      : Promise.reject(new FoundationClientError(response.status, null));
+        });
+      }
+      const seed = findCommunitySeedPost(postId);
+      return seed
+        ? Promise.resolve(communityPostSchema.parse(seed))
+        : Promise.reject(new FoundationClientError(response.status, null));
+    })
+    .catch((error) => {
+      const seed = findCommunitySeedPost(postId);
+      return seed
+        ? Promise.resolve(communityPostSchema.parse(seed))
+        : Promise.reject(error);
+    });
+}
+
+// 소유자의 여행 삭제 또는 동행자의 여행 나가기를 실행한다.
+export function deleteServerTrip(
+  options: FoundationClientOptions,
+  id: string,
+  key: string,
+): Promise<{ tripId: string; deleted: boolean; action?: string }> {
+  return requestFoundation(options, `/trips/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    headers: { 'Idempotency-Key': key },
+  }).then((response) => {
+    return z
+      .object({
+        tripId: z.string(),
+        deleted: z.boolean().default(true),
+        action: z.string().optional(),
+      })
+      .parse(response.data);
   });
 }
 

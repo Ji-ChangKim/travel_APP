@@ -10,10 +10,12 @@ import { useLocale } from '@/features/localization/localeState';
 import Text from '@/components/ui/AppText';
 import ScreenHeader from '@/components/navigation/ScreenHeader';
 
+import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ScheduleFlightFields from '../../planning/ui/FlightEntryFields';
+import { ScheduleButton } from '../ui/ScheduleControls';
 
 import {
   renderScheduleDetails,
@@ -44,15 +46,25 @@ export default function ScheduleEditor(props: Props) {
 // 장소·동선·방문 설정을 차례로 표시한다.
 function EditorContent({ scroll, ...props }: Props) {
   useLocale();
+  const isEditingExisting = props.snapshot.itinerary.some(
+    (item) => item.id === props.form.id,
+  );
+  const hasOptionalValues = Boolean(
+    isEditingExisting ||
+    props.form.values.address ||
+    props.form.values.memo ||
+    props.form.values.estimatedAmount ||
+    props.form.values.mapLocation ||
+    props.form.values.planDescription ||
+    props.form.values.planChoiceGroup,
+  );
+  const [showDetails, setShowDetails] = useState(hasOptionalValues);
   // 미리보기에서 선택한 순서는 같은 저장 요청으로 반영한다.
   return (
     <>
       <ScreenHeader
         title={
-          props.snapshot.itinerary.some((item) => {
-            // 원본 일정 ID가 있을 때만 수정 화면으로 안내한다.
-            return item.id === props.form.id;
-          })
+          isEditingExisting
             ? t('일정 수정')
             : props.form.copySourceTitle
               ? t('일정 복사')
@@ -92,9 +104,23 @@ function EditorContent({ scroll, ...props }: Props) {
           values={props.form.values}
           onChange={props.onChange}
         />
-        {renderSchedulePlace({ props })}
-        {renderScheduleDetails({ props })}
-        <ScheduleAdvancedFields {...props} />
+        {renderSchedulePlace({ props, showDetails })}
+        <ScheduleButton
+          label={
+            showDetails
+              ? t('상세 입력 접기')
+              : t('상세 입력 열기 (주소 · 영수증 · 메모 · 예상 비용)')
+          }
+          selected={showDetails}
+          disabled={props.busy || props.locked}
+          onPress={() => setShowDetails((prev) => !prev)}
+        />
+        {showDetails && (
+          <>
+            {renderScheduleDetails({ props })}
+            <ScheduleAdvancedFields {...props} />
+          </>
+        )}
       </ScrollView>
       <ScheduleEditorActions {...props} />
     </>

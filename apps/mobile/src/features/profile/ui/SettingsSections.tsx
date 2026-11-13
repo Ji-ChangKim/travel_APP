@@ -5,7 +5,8 @@ import { colors } from '@/constants/theme';
 import LanguagePicker from '@/features/localization/LanguagePicker';
 import { t } from '@/features/localization/translate';
 import { Ionicons } from '@expo/vector-icons';
-import { Pressable, View } from 'react-native';
+import { Linking, Pressable, View } from 'react-native';
+import DesignButton from '@/components/ui/DesignButton';
 import { styles } from '../styles/myAccountStyles';
 import type { SettingsController } from '../manager/useSettingsController';
 import Constants from 'expo-constants';
@@ -209,9 +210,39 @@ export function SettingsAppInfo() {
         <View style={styles.accountActions}>
           <Text style={styles.modalDesc}>
             {policySheet === 'terms'
-              ? 'TripPrint는 여행 계획 작성, 가계부 기록, 동행자 공유 및 공개 여행 기록 서비스를 제공합니다. 사용자가 작성한 개인 메모와 비공개 여행 기록은 본인과 초대한 동행자에게만 표시됩니다.'
-              : 'TripPrint는 서비스 이용에 필요한 최소한의 계정 식별 정보와 사용자가 직접 등록한 프로필 사진·여행 기록만 보관하며, 계정 삭제 요청 시 관련 데이터를 안전하게 파기합니다.'}
+              ? t(
+                  'TripPrint는 여행 계획 작성, 가계부 기록, 동행자 공유 및 공개 여행 기록 서비스를 제공합니다. 사용자가 작성한 개인 메모와 비공개 여행 기록은 본인과 초대한 동행자에게만 표시됩니다.',
+                )
+              : t(
+                  'TripPrint는 서비스 이용에 필요한 최소한의 계정 식별 정보와 사용자가 직접 등록한 프로필 사진·여행 기록만 보관하며, 계정 삭제 요청 시 관련 데이터를 안전하게 파기합니다.',
+                )}
           </Text>
+          <Text style={styles.listSubtitle}>
+            {policySheet === 'terms'
+              ? t(
+                  '• 주요 내용: 서비스 이용 범위, 게시물 공개·비공개 권한, 계정 및 데이터 관리 기준',
+                )
+              : t(
+                  '• 주요 내용: 최소 수집 항목(계정 식별자·여행 기록), 보관 기간 및 탈퇴 시 즉시 파기 절차',
+                )}
+          </Text>
+          {((policySheet === 'terms' && process.env.EXPO_PUBLIC_TERMS_URL) ||
+            (policySheet === 'privacy' &&
+              process.env.EXPO_PUBLIC_PRIVACY_URL)) && (
+            <DesignButton
+              label={t('전문 보기')}
+              variant="secondary"
+              onPress={() => {
+                const url =
+                  policySheet === 'terms'
+                    ? process.env.EXPO_PUBLIC_TERMS_URL
+                    : process.env.EXPO_PUBLIC_PRIVACY_URL;
+                if (url) {
+                  void Linking.openURL(url).catch(() => undefined);
+                }
+              }}
+            />
+          )}
         </View>
       </ActionSheet>
     </View>

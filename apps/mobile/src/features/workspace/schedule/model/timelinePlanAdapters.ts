@@ -146,6 +146,8 @@ export function adaptCommunityPostToTimeline(
           address: item.address,
           planContent: item.planContent,
           googlePlaceId: item.googlePlaceId,
+          hasReceipt: item.hasReceipt,
+          receiptPreview: item.receiptPreview,
           badgeLabel:
             item.type === 'TRANSPORT'
               ? '이동'

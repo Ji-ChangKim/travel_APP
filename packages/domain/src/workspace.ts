@@ -31,6 +31,8 @@ export interface WorkspaceSchedule {
   memo: string | null;
   address: string;
   googlePlaceId?: string;
+  // 장소 검색 결과의 분류를 저장하며 직접 입력은 기본 분류로 표시한다.
+  category?: string | null;
   // 사용자가 지도에서 선택한 실제 위치만 선택적으로 보관한다.
   location?: { latitude: number; longitude: number } | null;
   // 생략은 이전 앱의 기록이며 null은 사용자가 항공편 연결을 해제한 상태다.
@@ -127,12 +129,24 @@ export interface CommunityPost {
       dayNumber?: number;
       sortOrder?: number;
       type?: ScheduleType;
+      category?: string | null;
       googlePlaceId?: string;
       planContent?: SchedulePlanContent | null;
       title: string;
       date: string;
       timeSlot: string | null;
       address: string;
+      hasReceipt?: boolean;
+      receiptPreview?: {
+        currency: SupportedCurrency;
+        totalAmount?: string;
+        items?: {
+          name: string;
+          quantity?: number | null;
+          unitPrice?: string;
+          amount?: string;
+        }[];
+      }[];
     }[];
     costs: Partial<Record<SupportedCurrency, string>>;
   };

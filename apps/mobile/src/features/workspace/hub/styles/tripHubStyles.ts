@@ -9,7 +9,7 @@ export const tripHubStyles = StyleSheet.create({
     width: '100%',
     maxWidth: 640,
     alignSelf: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 14,
     paddingVertical: 10,
     borderTopWidth: 1,
     borderTopColor: colors.border,
@@ -19,17 +19,17 @@ export const tripHubStyles = StyleSheet.create({
   primaryActionRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 10,
+    gap: 8,
     flexWrap: 'wrap',
   },
   primaryButton: { width: '100%', maxWidth: 600 },
   secondaryActionWrap: {
     flex: 1,
-    minWidth: 120,
+    minWidth: 132,
   },
   primaryActionWrap: {
-    flex: 1.4,
-    minWidth: 160,
+    flex: 1.2,
+    minWidth: 132,
   },
   mapPreviewCard: {
     marginBottom: 16,

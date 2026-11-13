@@ -114,6 +114,7 @@ export default function LaunchIntro({
           </View>
         ) : (
           <View key="poster-image" style={s.wordmark}>
+            {!posterReady && <Text style={s.brand}>TripPrint</Text>}
             <Image
               testID="startup-bi-poster"
               source={require('../../../../assets/brand/tripprint-v1/tripprint_bi_poster.png')}

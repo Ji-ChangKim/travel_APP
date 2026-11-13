@@ -6,6 +6,7 @@ import {
   calendarDateSchema,
   isSupportedTimezone,
   persistedTripCreateSchema,
+  supportedCurrencySchema,
   tripTitleInputSchema,
 } from './foundation';
 import { communityPostSchema, workspaceSnapshotSchema } from './workspace';
@@ -21,7 +22,7 @@ export const communityImportSchema = z
     startDate: calendarDateSchema,
     title: z.union([z.string().trim().max(0), tripTitleInputSchema]).optional(),
     timezone: z.string().max(100).refine(isSupportedTimezone),
-    defaultCurrency: z.enum(['KRW', 'JPY', 'USD']).default('KRW'),
+    defaultCurrency: supportedCurrencySchema.default('KRW'),
   })
   .strict();
 export type CommunityImportInput = z.infer<typeof communityImportSchema>;
@@ -99,6 +100,7 @@ export function importCommunityTrip(
           sortOrder: item.sortOrder || index + 1,
           memo: null,
           address: item.address,
+          ...(item.category ? { category: item.category } : {}),
           ...(item.googlePlaceId ? { googlePlaceId: item.googlePlaceId } : {}),
           ...(item.planContent ? { planContent: { ...item.planContent } } : {}),
         };

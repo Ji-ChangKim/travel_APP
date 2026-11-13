@@ -12,7 +12,19 @@ function documentFile(userId: string): File {
   return new File(Paths.document, `tripprint-guest-${userId}.json`);
 }
 
-// 웹과 네이티브의 영구 기기 저장소에서 읽는다.
+function remoteBackupUrl(userId: string): string | null {
+  const baseUrl = process.env.EXPO_PUBLIC_API_URL;
+  if (
+    !baseUrl ||
+    process.env.NODE_TEST_CONTEXT ||
+    typeof fetch !== 'function'
+  ) {
+    return null;
+  }
+  return `${baseUrl.replace(/\/$/, '')}/public/guest-workspace/${encodeURIComponent(userId)}`;
+}
+
+// 웹과 네이티브의 영구 기기 저장소에서 읽고, 기기 문서가 없으면 서버 게스트 백업을 확인한다.
 export function readGuestWorkspace(userId: string): Promise<GuestWorkspace> {
   // 잘못된 문서는 빈 기록으로 바꾸어 덮어쓰지 않는다.
   return (
@@ -27,24 +39,50 @@ export function readGuestWorkspace(userId: string): Promise<GuestWorkspace> {
         : Promise.resolve(null)
   ).then((text) => {
     // 문서와 현재 게스트 UUID 일치는 처리 계층에서 다시 확인한다.
-    return text
-      ? guestWorkspaceSchema.parse(JSON.parse(text))
-      : emptyGuestWorkspace(userId);
+    if (text) {
+      return guestWorkspaceSchema.parse(JSON.parse(text));
+    }
+    const url = remoteBackupUrl(userId);
+    if (!url) {
+      return emptyGuestWorkspace(userId);
+    }
+    return fetch(url, {
+      headers: { Authorization: `Bearer guest:${userId}` },
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((payload: { data?: unknown } | null) =>
+        payload?.data
+          ? guestWorkspaceSchema.parse(payload.data)
+          : emptyGuestWorkspace(userId),
+      )
+      .catch(() => emptyGuestWorkspace(userId));
   });
 }
 
-// 전체 여행·요청 결과를 하나의 영구 문서로 저장한다.
+// 전체 여행·요청 결과를 하나의 영구 문서로 저장하고 서버 게스트 백업에도 비동기 동기화한다.
 export function writeGuestWorkspace(document: GuestWorkspace): Promise<void> {
+  const parsed = guestWorkspaceSchema.parse(document);
+  const url = remoteBackupUrl(parsed.ownerId);
+  if (url) {
+    void fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer guest:${parsed.ownerId}`,
+      },
+      body: JSON.stringify({ ...parsed, files: {} }),
+    }).catch(() => undefined);
+  }
   // 용량 부족 등 실제 저장 실패를 성공으로 처리하지 않는다.
   return Platform.OS === 'web'
     ? Promise.resolve().then(() => {
         // localStorage의 한 키 교체는 중간 JSON을 노출하지 않는다.
         return localStorage.setItem(
-          `tripprint-guest-${document.ownerId}`,
-          JSON.stringify(guestWorkspaceSchema.parse(document)),
+          `tripprint-guest-${parsed.ownerId}`,
+          JSON.stringify(parsed),
         );
       })
-    : writeDocument(documentFile(document.ownerId), document);
+    : writeDocument(documentFile(parsed.ownerId), parsed);
 }
 
 // 기기 문서를 완전히 쓴 후 기존 파일 위치로 교체한다.

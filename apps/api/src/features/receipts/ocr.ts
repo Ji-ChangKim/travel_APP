@@ -179,7 +179,16 @@ export function scanReceipt(
 // 원본 조회에 필요한 최소 여행·파일 계약을 검증한다.
 const receiptSnapshot = z.object({
   trip: z.object({
-    defaultCurrency: z.enum(['KRW', 'JPY', 'USD']),
+    defaultCurrency: z.enum([
+      'KRW',
+      'JPY',
+      'USD',
+      'TWD',
+      'VND',
+      'THB',
+      'CNY',
+      'SGD',
+    ]),
     status: z.string(),
   }),
   myRole: z.enum(['owner', 'editor', 'viewer']),

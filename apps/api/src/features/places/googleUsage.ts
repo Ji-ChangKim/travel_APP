@@ -44,6 +44,32 @@ export async function reserveGoogleCall(
   if (!reservation) return rejectRequest('PLACE_PHOTO_RATE_LIMITED');
 }
 
+export const guestPlaceDailyLimit = 30;
+const guestDailyUsage = new Map<string, number>();
+
+// 게스트 세션별 일일 장소 검색 호출 상한을 확인하고 예약한다.
+export async function reserveGuestPlaceSearch(
+  env: ApiEnvironment['Bindings'],
+  guestId: string,
+  now = new Date(),
+): Promise<void> {
+  const day = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Seoul',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(now);
+  const key = `${day}:${guestId}`;
+  const current = guestDailyUsage.get(key) || 0;
+  if (current >= guestPlaceDailyLimit) {
+    return rejectRequest('PLACE_SEARCH_RATE_LIMITED');
+  }
+  guestDailyUsage.set(key, current + 1);
+  if (env.DB) {
+    await reserveGoogleCall(env, 'text-search');
+  }
+}
+
 // 공급자 오류 원문을 숨기되 서버의 한도 오류는 그대로 유지한다.
 export function googleRequestFailure(error: unknown): never {
   // 응답 본문·API 키를 외부 오류나 로그에 포함하지 않는다.

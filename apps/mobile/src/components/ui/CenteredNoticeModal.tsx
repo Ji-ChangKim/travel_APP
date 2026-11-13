@@ -1,5 +1,6 @@
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import {
+  AccessibilityInfo,
   Image,
   ScrollView,
   StyleSheet,
@@ -34,6 +35,13 @@ export default function CenteredNoticeModal({
   // 비대칭 안전 영역에도 카드 중심을 옮기지 않고 양쪽에 같은 최소 여유를 확보한다.
   const vertical = Math.max(20, insets.top, insets.bottom);
   const horizontal = Math.max(20, insets.left, insets.right);
+  useEffect(() => {
+    if (!visible) return;
+    const message = [title, ...paragraphs].filter(Boolean).join('. ');
+    if (message) {
+      AccessibilityInfo.announceForAccessibility?.(message);
+    }
+  }, [visible, title, paragraphs]);
   return (
     <AppModal
       native
@@ -52,6 +60,8 @@ export default function CenteredNoticeModal({
         testID="entry-notice-stage"
       >
         <View
+          accessibilityRole="alert"
+          accessibilityLiveRegion="assertive"
           style={[
             styles.card,
             { maxHeight: Math.max(0, height - vertical * 2) },

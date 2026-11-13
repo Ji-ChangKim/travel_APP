@@ -148,10 +148,10 @@ export default function HomeTravelCard({
         snapshot={snapshot}
         onOpen={open}
         onOpenExpenses={() => {
-          // 여행 중 영수증·비용 탭으로 바로 이동한다.
+          // 여행 중·다녀온 뒤 영수증 촬영·업로드 시트로 1단계 진입한다.
           router.push({
             pathname: '/trips/[id]',
-            params: { id: item.id, section: 'expenses' },
+            params: { id: item.id, section: 'expenses', receiptCapture: '1' },
           });
         }}
       />
@@ -659,42 +659,42 @@ function HomeInTripCard({
         <View style={s.conciergeBtnRow}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={t('일정 보기')}
-            style={({ pressed }) => [
-              s.conciergePrimaryBtn,
-              pressed && { opacity: 0.88 },
-            ]}
-            onPress={onOpen}
-          >
-            <Text style={s.conciergePrimaryBtnText} accessible={false}>
-              {t('내 일정 전체보기')}
-            </Text>
-            <Ionicons
-              name="arrow-forward"
-              size={15}
-              color="#FFFFFF"
-              accessible={false}
-            />
-          </Pressable>
-
-          <Pressable
-            accessibilityRole="button"
             accessibilityLabel={t('영수증 촬영 및 업로드')}
             style={({ pressed }) => [
-              s.conciergeSecondaryBtn,
+              s.conciergePrimaryBtn,
               pressed && { opacity: 0.88 },
             ]}
             onPress={onOpenExpenses}
           >
             <Ionicons
               name="receipt-outline"
-              size={16}
+              size={15}
+              color="#FFFFFF"
+              accessible={false}
+            />
+            <Text style={s.conciergePrimaryBtnText} accessible={false}>
+              {t('영수증으로 기록하기')}
+            </Text>
+          </Pressable>
+
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('일정 보기')}
+            style={({ pressed }) => [
+              s.conciergeSecondaryBtn,
+              pressed && { opacity: 0.88 },
+            ]}
+            onPress={onOpen}
+          >
+            <Text style={s.conciergeSecondaryBtnText} accessible={false}>
+              {t('내 일정 전체보기')}
+            </Text>
+            <Ionicons
+              name="arrow-forward"
+              size={15}
               color={homePalette.coralDeep}
               accessible={false}
             />
-            <Text style={s.conciergeSecondaryBtnText} accessible={false}>
-              {t('영수증 촬영 및 업로드')}
-            </Text>
           </Pressable>
         </View>
 

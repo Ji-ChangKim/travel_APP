@@ -110,21 +110,21 @@ export default function TripCalendar({
                     />
                   </View>
                   <View style={s.periodSelectorTextCol}>
-                    <Text style={s.periodSelectorMainText}>
+                    <Text
+                      style={s.periodSelectorMainText}
+                      testID={hasPeriod ? 'selected-period-summary' : undefined}
+                    >
                       {hasPeriod
                         ? `${formatPeriodDisplayDate(values.startDate || '', locale)} ~ ${formatPeriodDisplayDate(values.endDate || '', locale)}`
                         : t('언제 떠나시나요?')}
                     </Text>
-                    <Text
-                      style={s.periodSelectorSubText}
-                      testID={hasPeriod ? 'selected-period-summary' : undefined}
-                    >
-                      {hasPeriod
-                        ? `${values.startDate} ~ ${values.endDate} · ${durationLabel}`
-                        : t(
-                            '터치해서 날짜를 고르거나 여행 일수만 먼저 정해보세요',
-                          )}
-                    </Text>
+                    {!hasPeriod ? (
+                      <Text style={s.periodSelectorSubText}>
+                        {t(
+                          '터치해서 날짜를 고르거나 여행 일수만 먼저 정해보세요',
+                        )}
+                      </Text>
+                    ) : null}
                   </View>
                 </View>
                 {hasPeriod ? (

@@ -300,10 +300,44 @@ async function digestBytes(bytes: Uint8Array): Promise<string> {
   ).join('');
 }
 
+const guestBackupStore = new Map<string, string>();
+
+async function getGuestWorkspaceBackup(c: Ctx): Promise<Response> {
+  const guestId = foundationUuidSchema.parse(c.req.param('guestId'));
+  const authHeader = c.req.header('Authorization') ?? '';
+  if (authHeader !== `Bearer guest:${guestId}`) {
+    return rejectRequest('AUTH_REQUIRED');
+  }
+  const stored = guestBackupStore.get(guestId);
+  return respond(c, stored ? JSON.parse(stored) : null);
+}
+
+async function putGuestWorkspaceBackup(c: Ctx): Promise<Response> {
+  const guestId = foundationUuidSchema.parse(c.req.param('guestId'));
+  const authHeader = c.req.header('Authorization') ?? '';
+  if (authHeader !== `Bearer guest:${guestId}`) {
+    return rejectRequest('AUTH_REQUIRED');
+  }
+  const payload = await c.req
+    .json<Record<string, unknown>>()
+    .catch(() => rejectRequest('INVALID_JSON'));
+  if (
+    !payload ||
+    payload.ownerId !== guestId ||
+    !Array.isArray(payload.trips)
+  ) {
+    return rejectRequest('VALIDATION_FAILED');
+  }
+  guestBackupStore.set(guestId, JSON.stringify(payload));
+  return respond(c, { ownerId: guestId, saved: true });
+}
+
 export function registerGuestImportRoutes(
   app: Hono<ApiEnvironment>,
 ): Hono<ApiEnvironment> {
   return app
+    .get('/public/guest-workspace/:guestId', getGuestWorkspaceBackup)
+    .put('/public/guest-workspace/:guestId', putGuestWorkspaceBackup)
     .post('/api/v1/guest-import/:operationId', start)
     .get('/api/v1/guest-import/:operationId', status)
     .post('/api/v1/guest-import/:operationId/files/:mediaId', upload);

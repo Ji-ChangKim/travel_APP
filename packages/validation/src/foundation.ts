@@ -1,5 +1,17 @@
 import { z } from 'zod';
+import { isDecimalCurrency } from '@wherego/domain';
 import { tripFlightSchema, tripFlightEntrySchema } from './flight';
+
+export const supportedCurrencySchema = z.enum([
+  'KRW',
+  'JPY',
+  'USD',
+  'TWD',
+  'VND',
+  'THB',
+  'CNY',
+  'SGD',
+]);
 
 // 달력 날짜를 UTC 왕복 결과로 검증해 존재하지 않는 날짜를 거부한다.
 export function isCalendarDate(value: string): boolean {
@@ -93,7 +105,7 @@ const persistedTripInputSchema = z
       .string()
       .max(100)
       .refine(isSupportedTimezone, '유효한 여행 시간대를 선택해 주세요.'),
-    defaultCurrency: z.enum(['KRW', 'JPY', 'USD']).default('KRW'),
+    defaultCurrency: supportedCurrencySchema.default('KRW'),
     coverColor: z
       .string()
       .regex(/^#[0-9a-fA-F]{6}$/)
@@ -214,7 +226,7 @@ export function isValidDecimalExpense(value: {
 }): boolean {
   // 정수 통화와 소수 통화의 금액 표현 및 양수 여부를 확인한다.
   return (
-    (value.currency === 'USD'
+    (isDecimalCurrency(value.currency)
       ? /^\d{1,10}(\.\d{1,2})?$/.test(value.amount)
       : /^\d{1,10}$/.test(value.amount)) && Number(value.amount) > 0
   );
@@ -222,6 +234,6 @@ export function isValidDecimalExpense(value: {
 
 // 금액 문자열을 향후 비용 API가 같은 방식으로 검증하도록 공개한다.
 export const decimalExpenseSchema = z
-  .object({ amount: z.string(), currency: z.enum(['KRW', 'JPY', 'USD']) })
+  .object({ amount: z.string(), currency: supportedCurrencySchema })
   .strict()
-  .refine(isValidDecimalExpense, '통화에 맞는 양수 금액을 입력해 주세요.');
+  .refine(isValidDecimalExpense, '0보다 큰 숫자만 입력해 주세요.');

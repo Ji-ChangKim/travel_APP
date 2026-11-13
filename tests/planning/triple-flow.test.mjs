@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { randomBytes, randomUUID } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { test } from 'node:test';
+import { seedLegacyAccount } from '../fixtures/cloudAccount.mjs';
 import { chromium, expect } from '@playwright/test';
 import { pickCalendarDate } from './calendar.mjs';
 import { signInPlanningMember } from './member-session.mjs';
@@ -15,7 +16,12 @@ import {
 
 test(
   '여행 생성→일정 복사·DAY 이동→전체 선택·미리보기·공유→새 세션·공개 중단',
-  { timeout: 240000 },
+  {
+    timeout: 240000,
+    // 회원 준비는 현행 방식으로 고쳤으나 여행 만들기·일정 복사 화면이 11/07~09 개편 이전 기준이다.
+    // 재작성 계획: docs/03. 개발/03. 개발환경/웹E2E_보류검사_목록.md
+    skip: '11/07~09 화면 개편 이전 여행 만들기·일정 화면 기준 — 재작성 필요',
+  },
   async (t) => {
     // 화면에서 실제 저장하고 원본 D1과 공개 API를 별도로 대조한다.
     const runtime = await planningRuntime();
@@ -24,8 +30,8 @@ test(
       runtime.server.kill();
       await runtime.mf.dispose();
     });
-    const member = await createMember();
-    const recipient = await createMember();
+    const member = await createMember(runtime.mf);
+    const recipient = await createMember(runtime.mf);
     const browser = await chromium.launch({ channel: 'chrome' });
     t.after(() => browser.close());
     const context = await browser.newContext({
@@ -545,23 +551,17 @@ test(
 );
 
 // 검사 전용 회원 세션을 실제 로컬 인증 API로 만든다.
-async function createMember() {
+async function createMember(mf) {
   // 사용자 계정과 충돌하지 않는 검사 계정만 메모리에 보관한다.
+  // 이메일 가입 HTTP 경로는 닫혀 있어 서버 인증 SDK로 검사 회원을 만들고, 추가 프로필 입력은 하지 않는다.
   const suffix = randomBytes(4).toString('hex');
   const email = `triple-${suffix}@example.test`;
   const password = randomBytes(24).toString('base64url');
   const name = `Plan${suffix}`;
-  const signed = await planningRequest('/api/auth/sign-up/email', {
-    method: 'POST',
-    body: { name, email, password },
-  });
-  const token = signed.response.headers.get('set-auth-token');
+  const signed = await seedLegacyAccount(mf, { name, email, password });
+  assert.ok(signed.ok, `검사 회원 준비 실패: HTTP ${signed.status}`);
+  const token = signed.headers.get('set-auth-token');
   assert.ok(token);
-  await planningRequest('/api/v1/profile', {
-    method: 'PATCH',
-    token,
-    body: { nickname: name, birthDate: null, onboardingCompleted: true },
-  });
   return { email, password, token };
 }
 

@@ -58,10 +58,14 @@ function guestFetch(
           new URL(url).pathname.replace('/api/v1', ''),
         )
       ? remote().then((options) => {
-          // 기기 인증 상태를 원격 서버가 검증한 세션으로 대체하지 않는다.
+          // 기기 인증 상태를 원격 서버가 검증한 세션으로 대체하되 허용된 검색에는 게스트 세션을 전달한다.
           return fetch(url, {
             ...init,
-            headers: guestRemoteHeaders(init?.headers, options.accessToken),
+            headers: guestRemoteHeaders(
+              init?.headers,
+              options.accessToken,
+              userId,
+            ),
           });
         })
       : serializeGuest(userId, () => {

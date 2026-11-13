@@ -218,14 +218,17 @@ export interface ShareLink {
 }
 
 // 서버 저장 기반 계약을 공개한다.
-export type {
-  DecimalAmount,
-  FoundationApiError,
-  MutationResult,
-  PersistedTrip,
-  PersistedTripInput,
-  FlightDetails,
-  SupportedCurrency,
+export {
+  SUPPORTED_CURRENCIES,
+  DECIMAL_CURRENCIES,
+  isDecimalCurrency,
+  type DecimalAmount,
+  type FoundationApiError,
+  type MutationResult,
+  type PersistedTrip,
+  type PersistedTripInput,
+  type FlightDetails,
+  type SupportedCurrency,
 } from './foundation';
 export type {
   WorkspaceSchedule,

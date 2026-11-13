@@ -2,6 +2,7 @@ import { t } from '@/features/localization/translate';
 import { useLocale } from '@/features/localization/localeState';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import DesignButton from '@/components/ui/DesignButton';
 import ActionSheet from '@/components/ui/ActionSheet';
 import type { TripIconName } from '@/components/icons/TripIcon';
@@ -103,6 +104,14 @@ function SectionButton({
   );
 }
 
+const moreSectionIcons: Record<string, keyof typeof Ionicons.glyphMap> = {
+  map: 'map-outline',
+  photos: 'images-outline',
+  checklist: 'checkbox-outline',
+  companions: 'people-outline',
+  share: 'share-social-outline',
+};
+
 // 보조 기능은 요청했을 때만 화면 아래에서 선택하게 한다.
 export function TripMoreMenu({
   visible,
@@ -113,6 +122,7 @@ export function TripMoreMenu({
   onEditInfo,
   onEditPeriod,
   onEditDestinations,
+  onDeleteOrLeave,
   disabled,
 }: {
   visible: boolean;
@@ -123,12 +133,16 @@ export function TripMoreMenu({
   onEditInfo: () => void;
   onEditPeriod: () => void;
   onEditDestinations: () => void;
+  onDeleteOrLeave?: () => void;
   disabled: boolean;
 }) {
   useLocale();
   // 기존 소유자 권한에 맞는 항목만 표시한다.
   return (
     <ActionSheet title={t('여행 더보기')} visible={visible} onClose={onClose}>
+      <Text accessibilityRole="header" style={s.groupHeader}>
+        {t('여행 기능')}
+      </Text>
       {workspaceSections
         .slice(2)
         .filter(([key]) => {
@@ -141,39 +155,64 @@ export function TripMoreMenu({
             key={key}
             label={t(label)}
             selected={key === selected}
+            icon={(color) => (
+              <Ionicons
+                name={moreSectionIcons[key] || 'albums-outline'}
+                size={18}
+                color={color}
+              />
+            )}
             onPress={() => {
               /* 선택한 보조 화면으로 이동한다. */ return onSelect(key);
             }}
           />
         ))}
+      <Text accessibilityRole="header" style={s.groupHeader}>
+        {t('여행 관리')}
+      </Text>
       {owner && (
         <>
-          <Text accessibilityRole="header" style={s.label}>
-            {t('여행 관리')}
-          </Text>
           <DesignButton
             label={t('여행 정보 / 기록 정리')}
             disabled={disabled}
+            icon={(color) => (
+              <Ionicons name="create-outline" size={18} color={color} />
+            )}
             onPress={onEditInfo}
           />
           <DesignButton
             label={t('여행 기간 변경')}
             disabled={disabled}
+            icon={(color) => (
+              <Ionicons name="calendar-outline" size={18} color={color} />
+            )}
             onPress={onEditPeriod}
           />
           <DesignButton
             label={t('여행 도시 관리')}
             disabled={disabled}
+            icon={(color) => (
+              <Ionicons name="location-outline" size={18} color={color} />
+            )}
             onPress={onEditDestinations}
           />
         </>
       )}
-      <DesignButton
-        label={t('닫기')}
-        size="chip"
-        variant="quiet"
-        onPress={onClose}
-      />
+      {onDeleteOrLeave && (
+        <DesignButton
+          label={owner ? t('여행 삭제') : t('여행 나가기')}
+          variant="danger"
+          disabled={disabled}
+          icon={(color) => (
+            <Ionicons
+              name={owner ? 'trash-outline' : 'exit-outline'}
+              size={18}
+              color={color}
+            />
+          )}
+          onPress={onDeleteOrLeave}
+        />
+      )}
     </ActionSheet>
   );
 }
@@ -220,5 +259,13 @@ const s = StyleSheet.create({
   selectedLabel: {
     color: '#FFFFFF',
     fontWeight: '700',
+  },
+  groupHeader: {
+    color: colors.muted,
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '700',
+    marginTop: 8,
+    marginBottom: 2,
   },
 });

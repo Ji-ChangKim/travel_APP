@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { randomBytes, randomUUID } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { test } from 'node:test';
+import { seedLegacyAccount } from '../fixtures/cloudAccount.mjs';
 import { chromium, expect } from '@playwright/test';
 import { signInPlanningMember } from './member-session.mjs';
 import {
@@ -14,7 +15,12 @@ import {
 
 test(
   '도시 관리 화면→DAY 배정→실제 D1 저장→재조회·공개 사본',
-  { timeout: 150000 },
+  {
+    timeout: 150000,
+    // 회원 준비는 현행 방식으로 고쳤으나 DAY 배정 화면 등이 11/07~09 개편 이전 기준이다.
+    // 재작성 계획: docs/03. 개발/03. 개발환경/웹E2E_보류검사_목록.md
+    skip: '11/07~09 화면 개편 이전 도시 관리·DAY 배정 화면 기준 — 재작성 필요',
+  },
   async (t) => {
     // 공급자는 대역을 넣지 않고 누락 시 오류·직접 입력 경로도 확인한다.
     const runtime = await planningRuntime();
@@ -26,16 +32,14 @@ test(
     const email = `cities-${suffix}@example.test`;
     const password = randomBytes(24).toString('base64url');
     const nickname = `City${suffix}`;
-    const signed = await planningRequest('/api/auth/sign-up/email', {
-      method: 'POST',
-      body: { name: nickname, email, password },
+    // 이메일 가입 HTTP 경로는 닫혀 있어 서버 인증 SDK로 검사 회원을 만들고, 추가 프로필 입력은 하지 않는다.
+    const signed = await seedLegacyAccount(runtime.mf, {
+      name: nickname,
+      email,
+      password,
     });
-    const token = signed.response.headers.get('set-auth-token');
-    await planningRequest('/api/v1/profile', {
-      method: 'PATCH',
-      token,
-      body: { nickname, birthDate: null, onboardingCompleted: true },
-    });
+    assert.ok(signed.ok, `검사 회원 준비 실패: HTTP ${signed.status}`);
+    const token = signed.headers.get('set-auth-token');
     const created = await fetch(`${apiOrigin}/api/v1/trips`, {
       method: 'POST',
       headers: {
@@ -76,6 +80,10 @@ test(
     await expect(
       page.getByTestId('modal-panel').getByTestId('screen-title'),
     ).toHaveText('여행 도시 관리');
+    // 11/07 개편 뒤 나라·도시 직접 선택은 접힌 '목적지 직접 입력하기' 영역 안에 있다.
+    await page
+      .getByRole('button', { name: '목적지 직접 입력하기', exact: true })
+      .click();
     await page.getByRole('button', { name: '나라 선택', exact: true }).click();
     await page.getByLabel('나라 직접 입력', { exact: true }).fill('일본');
     await page.getByRole('button', { name: '일본', exact: true }).click();

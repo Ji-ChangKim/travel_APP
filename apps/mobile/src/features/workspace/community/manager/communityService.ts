@@ -2,6 +2,7 @@ import { z } from 'zod';
 import {
   communityPostSchema,
   communityFeedSearch,
+  filterCommunitySeedPosts,
   type CommunityFeedFilters,
 } from '@wherego/validation';
 import { getCommunity, requestSignal } from '@wherego/api-client';
@@ -16,15 +17,32 @@ export function loadCommunity(
   signal?: AbortSignal,
 ) {
   // 공개 조회를 위해 익명 계정이나 인증 토큰을 새로 만들지 않는다.
-  return userId && useTripStore.getState().currentUser?.authProvider !== 'guest'
-    ? serverOptions(userId).then((options) => {
-        // 인증된 계정의 차단 목록은 서버에서 적용한다.
-        return getCommunity(options, offset, filters, signal);
-      })
-    : fetch(
-        `${apiBaseUrl().replace(/\/$/, '')}/public/community?${communityFeedSearch(filters, offset)}`,
-        { signal: requestSignal(signal) },
-      ).then(readPublicCommunity);
+  const request =
+    userId && useTripStore.getState().currentUser?.authProvider !== 'guest'
+      ? serverOptions(userId).then((options) => {
+          // 인증된 계정의 차단 목록은 서버에서 적용한다.
+          return getCommunity(options, offset, filters, signal);
+        })
+      : fetch(
+          `${apiBaseUrl().replace(/\/$/, '')}/public/community?${communityFeedSearch(filters, offset)}`,
+          { signal: requestSignal(signal) },
+        ).then(readPublicCommunity);
+  return request
+    .then((posts) => {
+      if (posts.length >= 20) return posts;
+      const existingIds = new Set(posts.map((post) => post.id));
+      const seeds = filterCommunitySeedPosts(
+        filters,
+        offset,
+        existingIds,
+        20 - posts.length,
+      );
+      return [...posts, ...seeds];
+    })
+    .catch((error) => {
+      const seeds = filterCommunitySeedPosts(filters, offset);
+      return seeds.length > 0 ? seeds : Promise.reject(error);
+    });
 }
 
 // 정상 응답의 공개 계약만 홈과 커뮤니티에 전달한다.

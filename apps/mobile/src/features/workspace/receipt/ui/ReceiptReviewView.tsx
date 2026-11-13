@@ -1,6 +1,6 @@
 import { t } from '@/features/localization/translate';
 import Text from '@/components/ui/AppText';
-import type { WorkspaceSnapshot } from '@wherego/domain';
+import { SUPPORTED_CURRENCIES, type WorkspaceSnapshot } from '@wherego/domain';
 import { View } from 'react-native';
 import { LedgerAction as Action } from '../../my-trips/ui/LedgerUI';
 import { DateField } from '../../planning/ui/TravelInputs';
@@ -123,7 +123,11 @@ export function renderReceiptItems({
                 mode: 'place_only',
               });
               onChange('amount', '0');
-              if (!['KRW', 'JPY', 'USD'].includes(form.values.currency || '')) {
+              if (
+                !(SUPPORTED_CURRENCIES as readonly string[]).includes(
+                  form.values.currency || '',
+                )
+              ) {
                 onChange('currency', snapshot?.trip.defaultCurrency || 'KRW');
               }
             }}
@@ -141,7 +145,7 @@ export function renderReceiptItems({
         }}
       />
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-        {(['KRW', 'JPY', 'USD'] as const).map((currency) => (
+        {SUPPORTED_CURRENCIES.map((currency) => (
           <Action
             key={currency}
             label={currency}

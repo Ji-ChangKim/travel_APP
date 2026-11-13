@@ -1,7 +1,16 @@
 import { suggestedTripTitle } from './tripNames';
 import { tripTitleSchema } from './foundation';
-import type { CommunityPost, PersistedTripInput } from '@wherego/domain';
-import { tripDestinations, validTravelLeg } from '@wherego/domain';
+import type {
+  CommunityPost,
+  PersistedTripInput,
+  SupportedCurrency,
+} from '@wherego/domain';
+import {
+  SUPPORTED_CURRENCIES,
+  isDecimalCurrency,
+  tripDestinations,
+  validTravelLeg,
+} from '@wherego/domain';
 import {
   updateTripDestinations,
   representativeDestinations,
@@ -216,7 +225,7 @@ export function publicSelection(
   snapshot: Snapshot,
   input: Pick<
     Extract<WorkspaceCommand, { operation: 'community.publish' }>['input'],
-    'scheduleIds' | 'photoIds' | 'includeCosts' | 'kind'
+    'scheduleIds' | 'photoIds' | 'includeCosts' | 'includeReceiptItems' | 'kind'
   >,
 ): Pick<CommunityPost, 'photoPaths' | 'snapshot'> {
   // 공개 필드만 반환하며 비공개 원본을 화면 미리보기에도 섞지 않는다.
@@ -283,7 +292,12 @@ export function publicSelection(
         : {}),
       itinerary: input.scheduleIds.map((id) => {
         // 선택한 일정의 공개 필드만 변환한다.
-        return publicSchedule(snapshot, id, input.kind === 'plan');
+        return publicSchedule(
+          snapshot,
+          id,
+          input.kind === 'plan',
+          Boolean(input.includeReceiptItems),
+        );
       }),
       costs: input.includeCosts ? costTotals(snapshot) : {},
     },
@@ -295,6 +309,7 @@ function publicSchedule(
   snapshot: Snapshot,
   id: string,
   includePlan = false,
+  includeReceiptItems = false,
 ): CommunityPost['snapshot']['itinerary'][number] {
   // 존재하지 않는 ID를 빈 공개 일정으로 만들지 않는다.
   return selectedSchedule(
@@ -304,6 +319,7 @@ function publicSchedule(
       return item.id === id;
     }) || rejectRequest('VALIDATION_FAILED'),
     includePlan,
+    includeReceiptItems,
   );
 }
 
@@ -312,10 +328,16 @@ function selectedSchedule(
   snapshot: Snapshot,
   item: Snapshot['itinerary'][number],
   includePlan: boolean,
+  includeReceiptItems = false,
 ): CommunityPost['snapshot']['itinerary'][number] {
   // 메모와 Google 원본 링크는 제외한다.
+  const linkedReceipts = snapshot.receipts.filter(
+    (receipt) => receipt.scheduleId === item.id,
+  );
+  const hasReceipt = linkedReceipts.length > 0;
   return {
     title: item.title,
+    ...(item.category ? { category: item.category } : {}),
     ...(includePlan ? publicPlanSchedule(snapshot, item) : {}),
     address: item.address,
     timeSlot: item.timeSlot,
@@ -324,6 +346,27 @@ function selectedSchedule(
         // 저장된 부모 날짜를 찾는다.
         return day.id === item.dayId;
       })?.tripDate || rejectRequest('VALIDATION_FAILED'),
+    ...(hasReceipt ? { hasReceipt: true } : {}),
+    ...(includeReceiptItems && hasReceipt
+      ? {
+          receiptPreview: linkedReceipts.map((receipt) => ({
+            currency: receipt.currency,
+            totalAmount: receipt.amount,
+            ...(receipt.items && receipt.items.length > 0
+              ? {
+                  items: receipt.items.map((entry) => ({
+                    name: entry.name,
+                    ...(entry.quantity !== null && entry.quantity !== undefined
+                      ? { quantity: entry.quantity }
+                      : {}),
+                    ...(entry.unitPrice ? { unitPrice: entry.unitPrice } : {}),
+                    ...(entry.amount ? { amount: entry.amount } : {}),
+                  })),
+                }
+              : {}),
+          })),
+        }
+      : {}),
   };
 }
 
@@ -378,11 +421,17 @@ function publicPlanSchedule(
 
 // 통화별 실제 비용을 정밀하게 집계한다.
 function costTotals(snapshot: Snapshot): CommunityPost['snapshot']['costs'] {
-  // 원화·엔·달러를 환율 없이 서로 합산하지 않는다.
+  // 원화·엔·달러를 환율 없이 서로 합산하지 않으며 아시아 확장 통화는 실제 지출이 있을 때 함께 포함한다.
   return Object.fromEntries(
-    (['KRW', 'JPY', 'USD'] as const).map((currency) => {
-      // 달러도 정수 센트 단위로 합산한다.
-      return [currency, totalCurrency(snapshot, currency)];
+    SUPPORTED_CURRENCIES.flatMap((currency) => {
+      const total = totalCurrency(snapshot, currency);
+      if (
+        !['KRW', 'JPY', 'USD'].includes(currency) &&
+        (total === '0' || total === '0.00')
+      ) {
+        return [];
+      }
+      return [[currency, total]];
     }),
   );
 }
@@ -390,7 +439,7 @@ function costTotals(snapshot: Snapshot): CommunityPost['snapshot']['costs'] {
 // 특정 통화의 금액을 문자열로 계산한다.
 function totalCurrency(
   snapshot: Snapshot,
-  currency: 'KRW' | 'JPY' | 'USD',
+  currency: SupportedCurrency,
 ): string {
   // 십진 부동 소수 오차를 피한다.
   return formatTotal(
@@ -413,8 +462,8 @@ function totalCurrency(
 
 // 정수 합계를 통화별 표시 규칙으로 변환한다.
 function formatTotal(amount: bigint, currency: string): string {
-  // 달러만 소수 두 자리를 표시한다.
-  return currency === 'USD'
+  // 소수점 통화는 소수 두 자리를 표시한다.
+  return isDecimalCurrency(currency)
     ? `${amount / 100n}.${String(amount % 100n).padStart(2, '0')}`
     : String(amount / 100n);
 }

@@ -43,36 +43,34 @@ function formatFlightSummary(
   return [airlinePart, numberPart, depPart, arrPart].filter(Boolean).join(' ');
 }
 
-// 일정의 제목과 유형을 분석해 카드 상단 1차 일정 태그 문구를 반환한다.
+// 일정의 저장된 업종 분류와 유형을 확인해 카드 상단 1차 일정 태그 문구를 반환한다.
 function resolveCategoryTagLabel(item: WorkspaceSchedule): string {
-  if (
-    item.type === 'STAY' ||
-    /호텔|숙소|리조트|료칸|호스텔/i.test(item.title)
-  ) {
+  if (item.category) {
+    if (item.category === '식당' || item.category === '식사') return t('식당');
+    if (item.category === '카페') return t('카페');
+    if (item.category === '숙소') return t('숙소');
+    if (item.category === '명소' || item.category === '관광명소')
+      return t('명소');
+    if (item.category === '쇼핑' || item.category === '쇼핑 & 전망')
+      return t('쇼핑');
+    if (item.category === '이동' || item.category === '교통·이동')
+      return t('이동');
+    return t(item.category);
+  }
+  if (item.type === 'STAY') {
     return t('숙소');
   }
-  if (
-    item.type === 'TRANSPORT' ||
-    Boolean(item.flight) ||
-    /항공|공항|역|정류장|터미널|신칸센/i.test(item.title)
-  ) {
+  if (item.type === 'TRANSPORT' || Boolean(item.flight)) {
     return t('교통·이동');
-  }
-  if (/카페|커피|베이커리|디저트|블루보틀/i.test(item.title)) {
-    return t('카페');
-  }
-  if (
-    /식당|라멘|맛집|이자카야|우동|스시|쌀국수|식사|곤파치/i.test(item.title)
-  ) {
-    return t('식사');
-  }
-  if (/쇼핑|백화점|스퀘어|전망|타워|스카이/i.test(item.title)) {
-    return t('쇼핑 & 전망');
   }
   if (item.type === 'MEMO' || item.type === 'TODO') {
     return t('메모');
   }
-  return t('관광명소');
+  if (item.type === 'RESERVATION') {
+    return t('예약');
+  }
+  // 분류가 없는 직접 입력 일정은 틀린 분류로 추정하지 않고 기본 분류(장소)로 표시한다.
+  return t('장소');
 }
 
 // 방문 시간 없이 순번 원형 배지(좌)와 일정 카드(1.타이틀 / 2.태그 / 3.순서변경 아이콘 / 4.전체 클릭 시 상세 이동)를 렌더링한다.

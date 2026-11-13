@@ -79,6 +79,11 @@ export default function PublicFeedCard(props: CommunityFeedPostProps) {
           <View style={s.badge}>
             <Text style={s.badgeText}>{month}</Text>
           </View>
+          {post.hasReceipt ? (
+            <View style={[s.badge, s.durationBadge]}>
+              <Text style={s.durationText}>{t('영수증 기록 있음')}</Text>
+            </View>
+          ) : null}
         </View>
         <Text accessibilityRole="header" style={s.title}>
           {post.title}

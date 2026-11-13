@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isDecimalCurrency } from '@wherego/domain';
 import { flightDetailsSchema } from './flight';
 import {
   destinationsInputSchema,
@@ -11,6 +12,7 @@ import {
   decimalExpenseSchema,
   foundationUuidSchema,
   isAllowedTripPeriod,
+  supportedCurrencySchema,
   tripTitleInputSchema,
 } from './foundation';
 
@@ -60,6 +62,7 @@ export const scheduleInputSchema = z
     durationMinutes: z.number().int().min(1).max(1440).nullable().optional(),
     afterScheduleId: foundationUuidSchema.nullable().optional(),
     estimatedCost: decimalExpenseSchema.nullable().optional(),
+    category: z.string().trim().max(40).nullable().optional(),
     googlePlaceId: z
       .string()
       .regex(/^[A-Za-z0-9_-]{1,200}$|^$/)
@@ -77,7 +80,7 @@ export const expenseInputSchema = z
     scheduleId: optionalId,
     title,
     amount: z.string(),
-    currency: z.enum(['KRW', 'JPY', 'USD']),
+    currency: supportedCurrencySchema,
     category: z.enum([
       'food',
       'transport',
@@ -89,13 +92,16 @@ export const expenseInputSchema = z
     isActual: z.boolean(),
   })
   .strict()
-  .refine((value) => {
-    // 통화별 소수 규칙은 공통 검증을 사용한다.
-    return decimalExpenseSchema.safeParse({
-      amount: value.amount,
-      currency: value.currency,
-    }).success;
-  });
+  .refine(
+    (value) => {
+      // 통화별 소수 규칙은 공통 검증을 사용한다.
+      return decimalExpenseSchema.safeParse({
+        amount: value.amount,
+        currency: value.currency,
+      }).success;
+    },
+    { message: '0보다 큰 숫자만 입력해 주세요.', path: ['amount'] },
+  );
 // 원문 메뉴명과 인식된 수량·가격만 저장하며 알 수 없는 숫자는 비워 둔다.
 export const receiptItemSchema = z
   .object({
@@ -138,7 +144,7 @@ export const receiptInputSchema = z
     merchant: title,
     transactionDate: calendarDateSchema,
     amount: z.string(),
-    currency: z.enum(['KRW', 'JPY', 'USD']),
+    currency: supportedCurrencySchema,
     details: z.string().max(1000).default(''),
     address: z.string().max(200).default(''),
     transactionTime: receiptTimeSchema.default(''),
@@ -165,7 +171,7 @@ export const receiptInputSchema = z
           amount &&
           !(
             Number(amount) === 0 &&
-            (value.currency === 'USD' || !amount.includes('.'))
+            (isDecimalCurrency(value.currency) || !amount.includes('.'))
           ) &&
           !decimalExpenseSchema.safeParse({ amount, currency: value.currency })
             .success
@@ -311,6 +317,7 @@ export const workspaceCommandSchema = z.discriminatedUnion('operation', [
           scheduleIds: z.array(foundationUuidSchema).max(300),
           photoIds: z.array(foundationUuidSchema).max(30),
           includeCosts: z.boolean(),
+          includeReceiptItems: z.boolean().optional(),
         })
         .strict()
         .refine((input) => {
@@ -351,7 +358,7 @@ export const workspaceTripSchema = z.object({
   startDate: calendarDateSchema,
   endDate: calendarDateSchema,
   timezone: z.string(),
-  defaultCurrency: z.enum(['KRW', 'JPY', 'USD']),
+  defaultCurrency: supportedCurrencySchema,
   coverColor: z.string(),
   status: z.enum(['DRAFT', 'PLANNED', 'IN_PROGRESS', 'COMPLETED', 'ARCHIVED']),
   version: z.number().int().positive(),
@@ -391,6 +398,7 @@ export const workspaceSnapshotSchema = z.object({
       flight: flightDetailsSchema.nullable().optional(),
       planContent: schedulePlanContentSchema.nullable().optional(),
       durationMinutes: z.number().int().min(1).max(1440).nullable().optional(),
+      category: z.string().trim().max(40).nullable().optional(),
       googlePlaceId: z
         .string()
         .regex(/^[A-Za-z0-9_-]{1,200}$/)
@@ -402,7 +410,7 @@ export const workspaceSnapshotSchema = z.object({
       id: foundationUuidSchema,
       title: z.string(),
       amount: z.string(),
-      currency: z.enum(['KRW', 'JPY', 'USD']),
+      currency: supportedCurrencySchema,
       isActual: z.boolean(),
       dayId: z.string().nullable(),
       scheduleId: z.string().nullable(),
@@ -443,7 +451,7 @@ export const workspaceSnapshotSchema = z.object({
       merchant: z.string(),
       date: calendarDateSchema,
       amount: z.string(),
-      currency: z.enum(['KRW', 'JPY', 'USD']),
+      currency: supportedCurrencySchema,
       details: z.string(),
       address: z.string().default(''),
       transactionTime: receiptTimeSchema.default(''),
@@ -497,6 +505,7 @@ export const communityPostSchema = z.object({
         type: z
           .enum(['PLACE', 'TRANSPORT', 'STAY', 'RESERVATION', 'TODO', 'MEMO'])
           .optional(),
+        category: z.string().trim().max(40).nullable().optional(),
         planContent: schedulePlanContentSchema.nullable().optional(),
         googlePlaceId: z
           .string()
@@ -506,12 +515,36 @@ export const communityPostSchema = z.object({
         date: calendarDateSchema,
         timeSlot: z.string().nullable(),
         address: z.string(),
+        hasReceipt: z.boolean().optional(),
+        receiptPreview: z
+          .array(
+            z.object({
+              currency: supportedCurrencySchema,
+              totalAmount: z.string().optional(),
+              items: z
+                .array(
+                  z.object({
+                    name: z.string(),
+                    quantity: z.number().int().positive().nullable().optional(),
+                    unitPrice: z.string().optional(),
+                    amount: z.string().optional(),
+                  }),
+                )
+                .optional(),
+            }),
+          )
+          .optional(),
       }),
     ),
     costs: z.object({
       KRW: z.string().optional(),
       JPY: z.string().optional(),
       USD: z.string().optional(),
+      TWD: z.string().optional(),
+      VND: z.string().optional(),
+      THB: z.string().optional(),
+      CNY: z.string().optional(),
+      SGD: z.string().optional(),
     }),
   }),
 });

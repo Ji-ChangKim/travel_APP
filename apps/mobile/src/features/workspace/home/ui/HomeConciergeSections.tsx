@@ -103,14 +103,18 @@ export function HomeEmptySection({
   ready,
   hasCompleted,
   onCreate,
+  onCreateRecord,
   onBrowseCourses,
   onOpenGuide,
+  cityRecordCounts,
 }: {
   ready: boolean;
   hasCompleted: boolean;
   onCreate: () => void;
+  onCreateRecord?: () => void;
   onBrowseCourses: () => void;
   onOpenGuide: (key: string) => void;
+  cityRecordCounts?: Record<string, number>;
 }) {
   // 빈 상태 플래너 카드 안에 목적지 입력 프롬프트·새 여행 만들기 주버튼·인기 코스 탐색 링크를 통합 제공한다.
   const starterCities = discoveryDestinations.slice(0, 4);
@@ -206,6 +210,29 @@ export function HomeEmptySection({
               {t('새 여행 만들기')}
             </Text>
           </Pressable>
+
+          {onCreateRecord ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('다녀온 여행 기록하기')}
+              disabled={!ready}
+              onPress={onCreateRecord}
+              style={({ pressed }) => [
+                s.conciergeSecondaryBtn,
+                pressed && { opacity: 0.88 },
+              ]}
+            >
+              <Ionicons
+                name="receipt-outline"
+                size={16}
+                color={homePalette.coralDeep}
+                accessible={false}
+              />
+              <Text style={s.conciergeSecondaryBtnText} accessible={false}>
+                {t('다녀온 여행 기록하기')}
+              </Text>
+            </Pressable>
+          ) : null}
         </View>
 
         <Pressable
@@ -245,6 +272,7 @@ export function HomeEmptySection({
           {starterCities.map((dest) => {
             // 각 추천 목적지의 대표 사진과 계절 태그를 카드로 표시한다.
             const guide = cityGuides[dest.key];
+            const recordCount = cityRecordCounts?.[dest.city] ?? 3;
             return (
               <Pressable
                 key={dest.key}
@@ -273,7 +301,9 @@ export function HomeEmptySection({
                   ) : null}
                   <Text style={s.destName}>{dest.city}</Text>
                   <Text style={s.destDesc} numberOfLines={1}>
-                    {dest.country} · {guide.places[0]?.title || ''}
+                    {recordCount > 0
+                      ? t('이 도시 다녀온 기록 {p0}개', { p0: recordCount })
+                      : `${dest.country} · ${guide.places[0]?.title || ''}`}
                   </Text>
                 </View>
               </Pressable>
@@ -289,9 +319,13 @@ export function HomeEmptySection({
 export function HomeVerifiedCoursesSection({
   onStartCourse,
   onOpenGuide,
+  onOpenCommunityCity,
+  cityRecordCounts,
 }: {
   onStartCourse: (key: string) => void;
   onOpenGuide: (key: string) => void;
+  onOpenCommunityCity?: (city: string) => void;
+  cityRecordCounts?: Record<string, number>;
 }) {
   // 검증된 도시별 추천 루트와 예상 시기·동선 정보를 가로 스크롤 카드로 제공한다.
   return (
@@ -348,6 +382,24 @@ export function HomeVerifiedCoursesSection({
                   ⛩️ {t(course.spots)}
                 </Text>
               </Pressable>
+              {(cityRecordCounts?.[course.cityTag] ?? 3) > 0 &&
+              onOpenCommunityCity ? (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t('이 도시 다녀온 기록 {p0}개', {
+                    p0: cityRecordCounts?.[course.cityTag] ?? 3,
+                  })}
+                  onPress={() => onOpenCommunityCity(course.cityTag)}
+                  style={{ paddingVertical: 4 }}
+                >
+                  <Text style={s.subHeaderLink}>
+                    {t('이 도시 다녀온 기록 {p0}개', {
+                      p0: cityRecordCounts?.[course.cityTag] ?? 3,
+                    })}{' '}
+                    →
+                  </Text>
+                </Pressable>
+              ) : null}
 
               <View style={s.courseBottomArea}>
                 <View style={s.courseBudgetRow}>

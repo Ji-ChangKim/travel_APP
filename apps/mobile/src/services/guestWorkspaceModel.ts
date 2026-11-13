@@ -271,6 +271,24 @@ function changeGuestTrip(
   headers: Headers,
   identify: WorkspaceId,
 ): GuestResult {
+  if (method === 'DELETE' && /^\/trips\/[0-9a-f-]{36}$/.test(path)) {
+    const snapshot = ownedTrip(document, path.split('/')[2]!);
+    return {
+      document: {
+        ...document,
+        trips: document.trips.filter(
+          (item) => item.trip.id !== snapshot.trip.id,
+        ),
+        files: Object.fromEntries(
+          Object.entries(document.files).filter(
+            ([filePath]) => !filePath.startsWith(`${snapshot.trip.id}/`),
+          ),
+        ),
+      },
+      data: { tripId: snapshot.trip.id, deleted: true, action: 'deleted' },
+      write: true,
+    };
+  }
   // 초대·공개 게시 등 원격 저장이 필요한 행동은 회원 가입 후 사용한다.
   return /^(POST|PATCH)$/.test(method) &&
     /^\/(trips\/[0-9a-f-]{36}\/(commands|checklists)|checklists\/[0-9a-f-]{36})$/.test(

@@ -9,12 +9,15 @@ export function publicationIds(value = ''): string[] {
 
 // 공개 선택을 서버와 같은 필드 묶음으로 만든다.
 export function publicationInput(values: Record<string, string>) {
-  // 비용은 명시적으로 선택한 경우에만 포함한다.
+  // 비용과 영수증 메뉴·가격은 명시적으로 선택한 경우에만 포함한다.
   return {
     ...(values.kind === 'plan' ? { kind: 'plan' as const } : {}),
     scheduleIds: publicationIds(values.scheduleIds),
     photoIds: publicationIds(values.photoIds),
     includeCosts: values.includeCosts === 'true',
+    ...(values.includeReceiptItems === 'true'
+      ? { includeReceiptItems: true }
+      : {}),
   };
 }
 

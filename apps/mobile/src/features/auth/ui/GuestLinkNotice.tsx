@@ -46,7 +46,12 @@ export default function GuestLinkNotice({
     active.current = true;
     void localGuestTrips()
       .then((value) => {
-        if (active.current) setLocal(value);
+        if (active.current) {
+          setLocal(value);
+          if (value) {
+            setSelected(value.document.trips.map((item) => item.trip.id));
+          }
+        }
       })
       .catch(() => {
         if (active.current)

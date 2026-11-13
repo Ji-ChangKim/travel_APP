@@ -24,15 +24,16 @@ export const periodPickerStyles = StyleSheet.create({
   endpointRow: {
     flexDirection: 'row',
     alignItems: 'stretch',
-    flexWrap: 'wrap',
-    gap: 10,
+    flexWrap: 'nowrap',
+    gap: 8,
   },
-  endpointColumn: { flex: 1, minWidth: 120, gap: 6 },
+  endpointColumn: { flex: 1, minWidth: 0, gap: 6 },
   endpointBox: {
     flex: 1,
-    minWidth: 124,
+    flexBasis: 0,
+    minWidth: 0,
     minHeight: 72,
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 10,
     borderRadius: 12,
     borderWidth: 1.5,
@@ -204,6 +205,11 @@ export const periodPickerStyles = StyleSheet.create({
   dayButtonSelected: {
     backgroundColor: colors.selected,
   },
+  dayButtonToday: {
+    borderWidth: 1.5,
+    borderColor: colors.primary,
+    backgroundColor: colors.selectedSurface,
+  },
   dayButtonPressed: {
     backgroundColor: colors.surfaceMuted,
   },
@@ -235,6 +241,9 @@ export const periodPickerStyles = StyleSheet.create({
     fontWeight: '700',
     color: colors.surface,
     textAlign: 'center',
+  },
+  dayBadgeTextToday: {
+    color: colors.primary,
   },
   infoBanner: {
     flexDirection: 'row',

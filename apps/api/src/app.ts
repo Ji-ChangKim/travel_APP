@@ -68,12 +68,28 @@ async function attachSession(
   return next();
 }
 
-// 전체 M1 API에 실제 인증 검사를 적용한다.
+// 전체 M1 API에 실제 인증 검사를 적용하되, 허용된 조회 경로는 게스트 세션도 수용한다.
 function sessionMiddleware(
   fetcher: typeof fetch,
 ): MiddlewareHandler<ApiEnvironment> {
   // 인증 결과가 확인된 뒤에만 라우트로 진행한다.
   return (c, next) => {
+    const authHeader = c.req.header('Authorization') ?? '';
+    const guestMatch = /^Bearer guest:([0-9a-f-]{36})$/i.exec(authHeader);
+    if (
+      guestMatch &&
+      c.req.method === 'GET' &&
+      /^\/api\/v1\/(places\/search|places\/import|places\/[^/]+|flights\/lookup)$/.test(
+        c.req.path,
+      ) &&
+      foundationUuidSchema.safeParse(guestMatch[1]).success
+    ) {
+      return attachSession(c, next, {
+        userId: guestMatch[1]!,
+        token: `guest:${guestMatch[1]!}`,
+        isAnonymous: true,
+      });
+    }
     // 실제 Auth 사용자 검증을 단일 비동기 흐름으로 실행한다.
     return verifySession(c.env, c.req.header('Authorization'), fetcher).then(
       (session) => {

@@ -280,6 +280,7 @@ const RECOMMENDED_CARDS: {
 // 1.a 여행 만들기 허브(장소·일정 선택 박스 + 추천 여행지 가로 카드 + 세부 일정 만들기)와 1.b 목적지 선택 모달을 제공한다.
 export default function TripFields({
   values,
+  recording = false,
   locked = false,
   onChange,
   onApplyPeriod,
@@ -287,6 +288,7 @@ export default function TripFields({
   onOpenFlights,
 }: {
   values: Record<string, string>;
+  recording?: boolean;
   locked?: boolean;
   onChange: (key: string, value: string) => void;
   onApplyPeriod?: (startDate: string, endDate: string) => void;
@@ -297,6 +299,7 @@ export default function TripFields({
   const [destinationModalOpen, setDestinationModalOpen] = useState(false);
   const [periodModalOpen, setPeriodModalOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [searchFocused, setSearchFocused] = useState(false);
   const [activeCountryFilter, setActiveCountryFilter] = useState('전체');
   const [constraintPopup, setConstraintPopup] = useState<
     'destination' | 'period' | 'modal-empty' | null
@@ -522,17 +525,36 @@ export default function TripFields({
         </ScrollView>
       </View>
 
-      {/* 4. 하단 메인 CTA: 세부 일정 만들기 */}
+      {/* 4. 하단 메인 CTA: 세부 일정 만들기 / 다녀온 여행 영수증 올리기 */}
       <View style={s.ctaSection}>
+        {recording ? (
+          <Text style={s.selectorSubText}>
+            {t(
+              '다녀온 여행지와 기간을 선택하면 영수증 사진을 올려 날짜별 지출과 방문 장소를 바로 정리할 수 있어요.',
+            )}
+          </Text>
+        ) : null}
         <View testID="create-trip-submit-btn">
           <DesignButton
             label={t('세부 일정 만들기')}
             accessibilityLabel={t('세부 일정 만들기')}
-            variant="primary"
+            variant={recording ? 'secondary' : 'primary'}
             disabled={locked}
             onPress={handleCreatePress}
           />
         </View>
+        {recording ? (
+          <DesignButton
+            label={t('영수증 사진 한꺼번에 올리기')}
+            accessibilityLabel={t('영수증 사진 한꺼번에 올리기')}
+            variant="primary"
+            disabled={locked}
+            onPress={() => {
+              onChange('recording', 'true');
+              handleCreatePress();
+            }}
+          />
+        ) : null}
         {onOpenFlights && hasDestination && hasValidPeriod ? (
           <DesignButton
             label={t('항공편 먼저 등록하기 (선택)')}
@@ -563,7 +585,10 @@ export default function TripFields({
           >
             <View style={s.sectionBlock}>
               <Text style={s.sectionLabel}>{t('나의 여행 목적지는?')}</Text>
-              <View style={s.searchPanel} testID="destination-search-panel">
+              <View
+                style={[s.searchPanel, searchFocused && s.searchPanelFocused]}
+                testID="destination-search-panel"
+              >
                 <Ionicons
                   name="search-outline"
                   size={20}
@@ -574,6 +599,8 @@ export default function TripFields({
                   placeholder={t('나라 또는 도시를 검색해 보세요')}
                   value={query}
                   onChangeText={setQuery}
+                  onFocus={() => setSearchFocused(true)}
+                  onBlur={() => setSearchFocused(false)}
                   style={s.searchInput}
                 />
                 {Boolean(query) && (
@@ -977,6 +1004,12 @@ const s = StyleSheet.create({
     borderColor: colors.borderStrong,
     paddingHorizontal: 12,
     gap: 8,
+  },
+  searchPanelFocused: {
+    borderColor: colors.focus,
+    outlineColor: colors.focus,
+    outlineWidth: 2,
+    outlineOffset: 2,
   },
   searchInput: {
     flex: 1,

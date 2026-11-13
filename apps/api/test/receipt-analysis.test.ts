@@ -167,8 +167,32 @@ function assertReceiptChange(change: ReturnType<typeof transform>) {
 
 // 저장 통화 제한과 인식 결과 보존은 서로 다른 계약이다.
 test('R10 미지원 통화 초안은 원 통화·금액·품목을 보존하고 확정 저장을 거부한다', () => {
-  // 여행 기본 통화가 USD여도 원본을 달러로 변환하지 않는다.
-  return ['TWD', 'VND', 'THB', 'CNY', 'SGD', 'EUR'].forEach((currency) => {
+  // 확장된 아시아 5개 통화(TWD·VND·THB·CNY·SGD)는 정상 지원 통화로 확정 저장을 허용한다.
+  ['TWD', 'VND', 'THB', 'CNY', 'SGD'].forEach((currency) => {
+    const supportedResult = parseReceiptAnalysis(
+      JSON.stringify({ ...draft, currency }),
+      'USD',
+    );
+    assert.equal(supportedResult.currency, currency);
+    assert.equal(
+      workspaceCommandSchema.safeParse({
+        operation: 'receipt.confirm',
+        input: {
+          id: receiptId,
+          mediaId: media,
+          dayId: receiptId,
+          merchant: supportedResult.merchant,
+          transactionDate: supportedResult.transactionDate,
+          amount: supportedResult.amount,
+          currency: supportedResult.currency,
+          items: supportedResult.items,
+        },
+      }).success,
+      true,
+    );
+  });
+  // 여행 기본 통화가 USD여도 미지원 통화 원본을 달러로 변환하지 않는다.
+  return ['EUR', 'GBP', 'HKD', 'AUD', 'CAD', 'CHF'].forEach((currency) => {
     // 인식 결과는 성공한 초안으로 반환하되 확정만 막는다.
     const result = parseReceiptAnalysis(
       JSON.stringify({ ...draft, currency }),

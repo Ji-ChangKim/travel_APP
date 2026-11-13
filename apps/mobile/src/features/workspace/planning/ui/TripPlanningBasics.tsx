@@ -9,6 +9,7 @@ import type { RenderTripPlanningProps } from '../model/tripPlanningViewTypes';
 // 1단계 여행 만들기 허브(목적지·기간·추천 여행지)에서 세부 일정 만들기 시 여행 일정 상세로 연결한다.
 export default function TripPlanningBasics({
   props,
+  recording,
   next,
   create,
   setBasicsError,
@@ -38,6 +39,7 @@ export default function TripPlanningBasics({
   return (
     <TripFields
       values={props.form.values}
+      recording={recording}
       locked={props.locked}
       onChange={(key, value) => {
         // 입력을 고치면 이전 첫 단계 안내만 지운다.

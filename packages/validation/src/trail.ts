@@ -1,5 +1,9 @@
 import { z } from 'zod';
-import { calendarDateSchema, decimalExpenseSchema } from './foundation';
+import {
+  calendarDateSchema,
+  decimalExpenseSchema,
+  supportedCurrencySchema,
+} from './foundation';
 
 // 시간대 오프셋이 포함된 실제 항공 시각만 허용한다.
 const flightTime = z.string().datetime({ offset: true });
@@ -47,7 +51,7 @@ export const trailReceiptSchema = z
     date: calendarDateSchema,
     time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
     amount: z.string(),
-    currency: z.enum(['KRW', 'JPY', 'USD']),
+    currency: supportedCurrencySchema,
     details: z.string().trim().min(1).max(1000),
     note: z.string().trim().max(1000),
   })

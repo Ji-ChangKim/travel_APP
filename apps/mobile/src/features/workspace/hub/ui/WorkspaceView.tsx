@@ -275,7 +275,7 @@ function renderWorkspaceLayout(
           {user?.authProvider === 'guest' && (
             <Text style={detail.meta}>
               {t(
-                '이 여행은 이 기기에만 저장돼요. 앱이나 저장 데이터를 삭제하면 복구할 수 없어요.',
+                '게스트 여행은 서버에도 임시 백업되며, Google 계정을 연결하면 선택한 여행을 계정에 영구 보관할 수 있어요.',
               )}
             </Text>
           )}

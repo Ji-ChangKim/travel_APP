@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import Text from '@/components/ui/AppText';
 import { t } from '@/features/localization/translate';
 import { Image, View, type ImageSourcePropType } from 'react-native';
@@ -40,7 +41,11 @@ export function renderAccountProfile({
             style={styles.guestInitialCircle}
             accessibilityLabel={t('기본 프로필 이미지')}
           >
-            <Text style={styles.guestInitialText}>{initialChar}</Text>
+            {guest ? (
+              <Ionicons name="person" size={26} color="#FFFFFF" aria-hidden />
+            ) : (
+              <Text style={styles.guestInitialText}>{initialChar}</Text>
+            )}
           </View>
         )}
         <View style={styles.profileInfo}>

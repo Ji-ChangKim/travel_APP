@@ -245,10 +245,10 @@ C. 도메인 객체 및 저장 경로 (`packages/domain`, `packages/validation`)
 형식: 객체명 | 물리/런타임 저장 위치 | 설명
 
 WorkspaceSnapshot | D1 `trips.snapshot` / 기기 로컬 JSON | 여행 1건의 전체 집계 루트 객체 (`packages/domain/src/workspace.ts`)
-PersistedTrip | `snapshot.trip` | 여행 식별자, 소유자, 제목, 목적지, 시작·종료일, 상태, 기본 통화, 시간대, 버전
+PersistedTrip | `snapshot.trip` | 여행 식별자, 소유자, 제목, 목적지, 시작·종료일, 상태, 기본 통화(`KRW·JPY·USD·TWD·VND·THB·CNY·SGD`), 시간대, 버전
 WorkspaceDay[] | `snapshot.days` | 일차(`DAY 1~N`) 식별자, 순서, 날짜(`YYYY-MM-DD`), 목적지
-WorkspaceSchedule[] | `snapshot.itinerary` | 방문 일정 항목(장소명, 좌표, 시각, 체류시간, 이동수단, 항공편, 메모, 공개 여부)
-WorkspaceExpense[] | `snapshot.expenses` | 십진 문자열 금액, 통화 코드, 예상/실제 구분, 출처, 연결된 `scheduleId`
+WorkspaceSchedule[] | `snapshot.itinerary` | 방문 일정 항목(장소명, 검색 분류 `category`, 좌표, 시각, 체류시간, 이동수단, 항공편, 메모, 공개 여부)
+WorkspaceExpense[] | `snapshot.expenses` | 십진 문자열 금액, 통화 코드(`KRW·JPY·USD·TWD·VND·THB·CNY·SGD`), 예상/실제 구분, 출처, 연결된 `scheduleId`
 WorkspaceReceipt[] | `snapshot.receipts` | 확정된 영수증(상호명, 결제일, 현지 시각, 통화, 총액, `scheduleId`, `mediaId`, `keepPhoto`)
 ReceiptItem[] | `snapshot.receipts[].items` | 영수증 품목 내역(`name`, `quantity`, `unitPrice`, `amount`)
 WorkspaceMedia[] | `snapshot.media` | 여행 미디어 메타데이터(`id`, `path`, `purpose`, `scheduleId`). 원본 바이트는 R2 보관
@@ -256,7 +256,7 @@ WorkspaceChecklist[] | `snapshot.checklists` | 준비물 체크리스트 항목(
 WorkspaceMember[] | `snapshot.members` + D1 `trip_members` | 멤버 표시 정보와 D1 권한 인덱스(`D1.batch` 동시 동기화)
 WorkspaceInvite[] | `snapshot.invites` + D1 `invites` | 동행 초대 메타데이터 및 토큰 해시
 TravelLeg[] | `snapshot.travelLegs` | 도시·장소 간 이동 구간 정보 (`packages/domain/src/planning.ts`)
-CommunityPost | D1 `posts.snapshot` | 발자국 공개 게시물 사본(허용된 일정·사진·총액 요약만 포함)
+CommunityPost | D1 `posts.snapshot` | 커뮤니티 공개 게시물 사본(허용된 일정·사진·총액 요약, 영수증 기록 유무 `hasReceipt`, 선택 공개 시 메뉴명·가격 요약 `receiptPreview` 포함)
 ReceiptDraft | D1 `receipt_scans.draft` | 사용자 확정 전 OCR 추출 초안(`needsConfirmation: true`)
 ServerPlanDraft | D1 `plan_drafts` | 정식 여행 생성 전 단계별 입력 초안
 CreationAuthHandoff | 브라우저 `sessionStorage` / 앱 메모리 | 비로그인 상태에서 작성 중이던 여행 생성 입력을 로그인 복귀 후 이어주는 임시 객체
@@ -266,12 +266,12 @@ LanguagePreference | 기기 `tripprint.language.v1` | 앱 표시 언어(`ko` / `
 ================================================================================
 D. 핵심 데이터 무결성 및 보안 제약
 ================================================================================
-1. 금액 정밀도: 모든 비용과 영수증 금액은 부동소수점 오차를 막기 위해 십진 문자열(`string`)로 저장하고 통화별 소수 자릿수 검증을 거친다.
+1. 금액 정밀도: 모든 비용과 영수증 금액은 부동소수점 오차를 막기 위해 십진 문자열(`string`)로 저장하고 통화별(`KRW·JPY·TWD·VND` 정수, `USD·THB·CNY·SGD` 소수 둘째 자리) 검증을 거친다.
 2. 원자적 갱신과 멱등성: 여행 수정은 `trips.version` 비교(CAS), `trips.snapshot`, `trip_members`, `mutation_requests`를 단일 `D1.batch`로 처리한다.
 3. 영수증 확정 및 원본 정리:
    - 동일 미디어(`mediaId`)의 중복 영수증 확정을 거부한다.
    - `keepPhoto: false` 선택 시 미디어 참조와 OCR 캐시를 즉시 제거하고 `receipt_cleanup_jobs`를 통해 R2 원본을 삭제한다.
-4. 공개 데이터 격리: `posts.snapshot` 생성 시 원본 영수증 이미지, 세부 품목(`ReceiptItem[]`), 개인 메모, 동행자 식별 정보는 제외한다.
+4. 공개 데이터 격리: `posts.snapshot` 생성 시 원본 영수증 이미지, 결제 카드 정보, 개인 메모, 동행자 식별 정보는 제외하며, 영수증 메뉴명·가격(`receiptPreview`)은 작성자가 명시적으로 공개를 선택한 경우에만 포함한다.
 
 ================================================================================
 E. 계정·이용 통계 확장 및 호환 구조 (로컬 구현·격리 검증 / 운영 미적용)

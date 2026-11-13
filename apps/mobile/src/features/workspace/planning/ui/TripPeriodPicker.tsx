@@ -93,6 +93,7 @@ export default function TripPeriodPicker({
         : t('{p0}박 {p1}일', { p0: days - 1, p1: days })
       : '';
   const locale = getLocale();
+  const todayDate = currentTripDate(timezone);
 
   // 미정 모드에서 선택한 여행 일수에 맞춰 기준 출발일과 도착일을 갱신한다.
   function applyUndecidedDays(nextDays: number): void {
@@ -389,11 +390,14 @@ export default function TripPeriodPicker({
                       : t('여행 날짜를 선택해 주세요')}
                   </Text>
                 </View>
-                <Text style={s.meta} accessibilityLiveRegion="polite">
-                  {draft.activeEndpoint === 'startDate'
-                    ? t('출발일을 선택해 주세요.')
-                    : t('도착일을 선택해 주세요.')}
-                </Text>
+                {/* 출발·도착일이 모두 정해진 뒤에는 이미 끝난 선택 안내를 남기지 않는다. */}
+                {duration ? null : (
+                  <Text style={s.meta} accessibilityLiveRegion="polite">
+                    {draft.activeEndpoint === 'startDate'
+                      ? t('출발일을 선택해 주세요.')
+                      : t('도착일을 선택해 주세요.')}
+                  </Text>
+                )}
               </View>
             </View>
             <ScrollView
@@ -542,6 +546,7 @@ export default function TripPeriodPicker({
                       const isStart = Boolean(date && date === draft.startDate);
                       const isEnd = Boolean(date && date === draft.endDate);
                       const isSelected = isStart || isEnd;
+                      const isToday = Boolean(date && date === todayDate);
                       const hasRange = Boolean(
                         draft.startDate &&
                         draft.endDate &&
@@ -560,7 +565,9 @@ export default function TripPeriodPicker({
                             ? t('출발')
                             : isEnd
                               ? t('도착')
-                              : '';
+                              : isToday
+                                ? t('오늘')
+                                : '';
                       return (
                         <View
                           key={date || `blank-${index}`}
@@ -575,7 +582,9 @@ export default function TripPeriodPicker({
                             <Pressable
                               testID={`calendar-day-${date}`}
                               accessibilityRole="button"
-                              accessibilityLabel={date}
+                              accessibilityLabel={
+                                isToday ? `${date} (${t('오늘')})` : date
+                              }
                               accessibilityState={{
                                 selected: isSelected,
                                 disabled: locked,
@@ -601,6 +610,7 @@ export default function TripPeriodPicker({
                                 // 선택된 출발·도착 셀은 채움 배지로, 일반 셀은 경계선 없는 달력 셀로 표현한다.
                                 return [
                                   s.dayButton,
+                                  isToday && !isSelected && s.dayButtonToday,
                                   isSelected && s.dayButtonSelected,
                                   !isSelected && pressed && s.dayButtonPressed,
                                   focusedKey === date && s.dayButtonFocused,
@@ -622,7 +632,15 @@ export default function TripPeriodPicker({
                                 {String(Number(date.slice(-2)))}
                               </Text>
                               {badgeLabel ? (
-                                <Text style={s.dayBadgeText} aria-hidden>
+                                <Text
+                                  style={[
+                                    s.dayBadgeText,
+                                    isToday &&
+                                      !isSelected &&
+                                      s.dayBadgeTextToday,
+                                  ]}
+                                  aria-hidden
+                                >
                                   {badgeLabel}
                                 </Text>
                               ) : null}

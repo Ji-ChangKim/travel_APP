@@ -10,6 +10,7 @@ export const googlePlaceSchema = z.object({
   id: z.string(),
   title: z.string(),
   address: z.string(),
+  category: z.string().optional(),
   attributions: z
     .array(
       z.object({

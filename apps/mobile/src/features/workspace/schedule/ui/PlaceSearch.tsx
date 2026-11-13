@@ -27,7 +27,7 @@ export default function PlaceSearch({
   userId: string;
   city: string;
   disabled: boolean;
-  onSelect: (placeId: string, authoredTitle: string) => void;
+  onSelect: (placeId: string, authoredTitle: string, category?: string) => void;
   initialShare?: string;
   compact?: boolean;
   value?: string;
@@ -44,6 +44,9 @@ export default function PlaceSearch({
   const [error, setError] = useState('');
   const [expanded, setExpanded] = useState(
     Boolean(initialShare) || startExpanded || !simple,
+  );
+  const [otherMethodsOpen, setOtherMethodsOpen] = useState(
+    Boolean(initialShare),
   );
   // 외부 지도에서 장소를 확인한 다음 사용자가 일정을 작성한다.
   return (
@@ -64,16 +67,12 @@ export default function PlaceSearch({
       ) : (
         <Field label="장소 검색어" value={query} onChange={setQuery} />
       )}
-      {compact && !simple && (
+      {compact && !simple && !expanded && (
         <ScheduleButton
-          label={
-            expanded
-              ? t('지도 검색·링크 접기')
-              : t('Google Maps로 찾거나 가져오기')
-          }
+          label={t('Google Maps로 찾거나 가져오기')}
           onPress={() => {
             // 직접 입력은 기본으로 두고 외부 지도 사용은 선택하게 한다.
-            return setExpanded(!expanded);
+            return setExpanded(true);
           }}
         />
       )}
@@ -88,32 +87,48 @@ export default function PlaceSearch({
             compact={compact}
             onSelect={onSelect}
           />
-          <Button
-            label={t('Google Maps에서 찾기')}
-            disabled={disabled || !query.trim()}
-            onPress={() => {
-              // Maps URL은 앱의 Places API를 호출하지 않는다.
-              return void Linking.openURL(
-                `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${city} ${query}`.trim())}`,
-              ).catch(() => {
-                // 입력을 유지하며 다시 시도할 수 있도록 안내한다.
-                return setError('지도를 열지 못했어요. 다시 시도해 주세요.');
-              });
-            }}
-          />
-          <Text style={compact ? schedule.meta : styles.subtitle}>
-            {t(
-              '장소를 확인한 뒤 일정 제목을 입력하고 지도 위치를 선택해 주세요.',
-            )}
-          </Text>
-          <SharedPlaceInput
-            userId={userId}
-            disabled={disabled}
-            initialText={initialShare}
-            compact={compact}
-            onQuery={setQuery}
-            onSelect={onSelect}
-          />
+          {compact ? (
+            <ScheduleButton
+              label={
+                otherMethodsOpen
+                  ? t('다른 방법으로 추가 접기')
+                  : t('다른 방법으로 추가 (Google Maps · 공유 링크)')
+              }
+              onPress={() => setOtherMethodsOpen((prev) => !prev)}
+            />
+          ) : null}
+          {(!compact || otherMethodsOpen) && (
+            <>
+              <Button
+                label={t('Google Maps에서 찾기')}
+                disabled={disabled || !query.trim()}
+                onPress={() => {
+                  // Maps URL은 앱의 Places API를 호출하지 않는다.
+                  return void Linking.openURL(
+                    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${city} ${query}`.trim())}`,
+                  ).catch(() => {
+                    // 입력을 유지하며 다시 시도할 수 있도록 안내한다.
+                    return setError(
+                      '지도를 열지 못했어요. 다시 시도해 주세요.',
+                    );
+                  });
+                }}
+              />
+              <Text style={compact ? schedule.meta : styles.subtitle}>
+                {t(
+                  '장소를 확인한 뒤 일정 제목을 입력하고 지도 위치를 선택해 주세요.',
+                )}
+              </Text>
+              <SharedPlaceInput
+                userId={userId}
+                disabled={disabled}
+                initialText={initialShare}
+                compact={compact}
+                onQuery={setQuery}
+                onSelect={onSelect}
+              />
+            </>
+          )}
         </>
       )}
       {error ? (

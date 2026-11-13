@@ -86,7 +86,10 @@ export function renderScheduleDetails({ props }: ScheduleEditorSectionProps) {
 }
 
 // 일정의 내용과 장소 검색 영역을 표시한다.
-export function renderSchedulePlace({ props }: ScheduleEditorSectionProps) {
+export function renderSchedulePlace({
+  props,
+  showDetails = true,
+}: ScheduleEditorSectionProps & { showDetails?: boolean }) {
   // 전달받은 값과 행동을 기존 화면 규격으로 표시한다.
   return (
     <ScheduleSection
@@ -113,50 +116,52 @@ export function renderSchedulePlace({ props }: ScheduleEditorSectionProps) {
         }
         disabled={props.busy || props.locked}
         initialShare={props.form.values.sharedMapsText}
-        onSelect={(id, title) => {
-          // 검색 결과나 공유 링크에서 선택한 실제 장소 ID만 연결한다.
+        onSelect={(id, title, category) => {
+          // 검색 결과나 공유 링크에서 선택한 실제 장소 ID와 분류를 연결한다.
           return (
             props.onChange('googlePlaceId', id),
             props.onChange('title', title),
-            props.onChange('mapLocation', '')
+            props.onChange('mapLocation', ''),
+            props.onChange('category', category || '장소')
           );
         }}
       />
-      {!['TODO', 'MEMO'].includes(props.form.values.type || '') && (
-        <>
-          <ScheduleField
-            label="주소 또는 위치 메모"
-            accessibilityLabel="지역명·주소"
-            value={props.form.values.address || ''}
-            onChange={(value) => {
-              // 주소만으로 지도 좌표를 추정하지 않는다.
-              return props.onChange('address', value);
-            }}
-          />
-          {!props.snapshot.itinerary.some(
-            (item) => item.id === props.form.id,
-          ) && (
-            <View style={s.row}>
-              <ScheduleButton
-                label={t('영수증 촬영으로 추가')}
-                disabled={props.busy || props.locked}
-                onPress={() => {
-                  // 카메라로 영수증을 촬영해 상호명·시간·비용과 함께 새 장소 기록으로 전환한다.
-                  return props.onReceipt(true);
-                }}
-              />
-              <ScheduleButton
-                label={t('영수증 사진으로 추가')}
-                disabled={props.busy || props.locked}
-                onPress={() => {
-                  // 앨범에서 영수증 사진을 선택해 상호명·시간·비용과 함께 새 장소 기록으로 전환한다.
-                  return props.onReceipt(false);
-                }}
-              />
-            </View>
-          )}
-        </>
-      )}
+      {showDetails &&
+        !['TODO', 'MEMO'].includes(props.form.values.type || '') && (
+          <>
+            <ScheduleField
+              label="주소 또는 위치 메모"
+              accessibilityLabel="지역명·주소"
+              value={props.form.values.address || ''}
+              onChange={(value) => {
+                // 주소만으로 지도 좌표를 추정하지 않는다.
+                return props.onChange('address', value);
+              }}
+            />
+            {!props.snapshot.itinerary.some(
+              (item) => item.id === props.form.id,
+            ) && (
+              <View style={s.row}>
+                <ScheduleButton
+                  label={t('영수증 촬영으로 추가')}
+                  disabled={props.busy || props.locked}
+                  onPress={() => {
+                    // 카메라로 영수증을 촬영해 상호명·시간·비용과 함께 새 장소 기록으로 전환한다.
+                    return props.onReceipt(true);
+                  }}
+                />
+                <ScheduleButton
+                  label={t('영수증 사진으로 추가')}
+                  disabled={props.busy || props.locked}
+                  onPress={() => {
+                    // 앨범에서 영수증 사진을 선택해 상호명·시간·비용과 함께 새 장소 기록으로 전환한다.
+                    return props.onReceipt(false);
+                  }}
+                />
+              </View>
+            )}
+          </>
+        )}
       {props.form.values.googlePlaceId && (
         <>
           <GooglePlace
@@ -169,7 +174,10 @@ export function renderSchedulePlace({ props }: ScheduleEditorSectionProps) {
             disabled={props.busy || props.locked}
             onPress={() => {
               // 작성한 제목과 주소는 유지한다.
-              return props.onChange('googlePlaceId', '');
+              return (
+                props.onChange('googlePlaceId', ''),
+                props.onChange('category', '')
+              );
             }}
           />
         </>

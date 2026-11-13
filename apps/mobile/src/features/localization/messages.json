@@ -4114,6 +4114,14 @@
   "예약": ["Reservation", "予約"],
   "할 일": ["To-do", "やること"],
   "메모": ["Note", "メモ"],
+  "등록된 메모가 없어요.": ["No notes yet.", "登録されたメモはありません。"],
+  "나": ["Me", "自分"],
+  "교통·이동": ["Transport", "交通・移動"],
+  "카페": ["Café", "カフェ"],
+  "식사": ["Dining", "食事"],
+  "쇼핑 & 전망": ["Shopping & views", "ショッピング＆展望"],
+  "관광명소": ["Sights", "観光スポット"],
+  "상세 보기 ›": ["View details ›", "詳細を見る ›"],
   "이름": ["Name", "名前"],
   "수량": ["Quantity", "数量"],
   "단가": ["Unit price", "単価"],
@@ -5598,5 +5606,135 @@
   "방문 순서 배치": ["Visit Order", "訪問順の配置"],
   "추가 중": ["Adding", "追加中"],
   "예산 {p0} {p1}": ["Budget {p0} {p1}", "予算 {p0} {p1}"],
-  "예약완료": ["Reserved", "予約完了"]
+  "예약완료": ["Reserved", "予約完了"],
+  "앱 표시 언어": ["App display language", "アプリの表示言語"],
+  "지금 만든 여행은 이 기기에 저장돼요. Google 계정을 연결하면 기기를 바꿔도 이어보고, 동행자 초대·커뮤니티 공개를 바로 쓸 수 있어요.": [
+    "Trips you create now are saved on this device. Connect your Google account to keep them across devices, invite companions, and publish to the community.",
+    "今作成した旅行はこの端末に保存されます。Googleアカウントを連携すると、機種変更後も引き継げて、同行者の招待やコミュニティ公開もすぐに使えます。"
+  ],
+  "TripPrint는 여행 계획 작성, 가계부 기록, 동행자 공유 및 공개 여행 기록 서비스를 제공합니다. 사용자가 작성한 개인 메모와 비공개 여행 기록은 본인과 초대한 동행자에게만 표시됩니다.": [
+    "TripPrint provides trip planning, expense tracking, companion sharing, and public travel journals. Private notes and non-public trip records are visible only to you and invited companions.",
+    "TripPrintは旅行計画の作成、家計簿の記録、同行者との共有、公開旅行記録サービスを提供します。個人のメモや非公開の旅行記録は、ご本人と招待した同行者にのみ表示されます。"
+  ],
+  "TripPrint는 서비스 이용에 필요한 최소한의 계정 식별 정보와 사용자가 직접 등록한 프로필 사진·여행 기록만 보관하며, 계정 삭제 요청 시 관련 데이터를 안전하게 파기합니다.": [
+    "TripPrint stores only the minimum account identifiers needed for the service along with profile photos and trip records you add, and securely deletes related data upon account deletion.",
+    "TripPrintはサービス利用に必要な最小限のアカウント識別情報と、ご自身が登録したプロフィール写真・旅行記録のみを保管し、アカウント削除の申請時に関連データを安全に破棄します。"
+  ],
+  "• 주요 내용: 서비스 이용 범위, 게시물 공개·비공개 권한, 계정 및 데이터 관리 기준": [
+    "• Key terms: Scope of service, public/private post controls, account and data management standards",
+    "• 主な内容：サービスの利用範囲、投稿の公開・非公開権限、アカウントおよびデータ管理基準"
+  ],
+  "• 주요 내용: 최소 수집 항목(계정 식별자·여행 기록), 보관 기간 및 탈퇴 시 즉시 파기 절차": [
+    "• Key terms: Minimal data collection (account ID and trip records), retention period, and deletion process upon withdrawal",
+    "• 主な内容：最小限の収集項目（アカウント識別子・旅行記録）、保管期間および退会時の即時破棄手続き"
+  ],
+  "전문 보기": ["Read full text", "全文を見る"],
+  "주소를 다시 확인하거나 커뮤니티에서 다른 여행을 살펴보세요.": [
+    "Check the address again or explore other trips in Community.",
+    "アドレスをもう一度確認するか、コミュニティで他の旅行を探してみてください。"
+  ],
+  "공개가 중단됐거나 찾을 수 없는 여행이에요. 커뮤니티에서 다른 여행을 살펴보세요.": [
+    "This trip is no longer public or could not be found. Explore other trips in Community.",
+    "公開が終了したか、見つからない旅行です。コミュニティで他の旅行を探してみてください。"
+  ],
+  "공개가 중단됐거나 담을 수 없는 일정이에요. 커뮤니티에서 다른 일정을 선택해 주세요.": [
+    "This itinerary is no longer public or cannot be saved. Choose another itinerary in Community.",
+    "公開が終了したか、保存できない旅程です。コミュニティで他の旅程を選んでください。"
+  ],
+  "영수증 기록 있음": ["Receipt recorded", "レシート記録あり"],
+  "영수증 합계": ["Receipt total", "レシート合計"],
+  "영수증 메뉴명·가격 함께 공개": [
+    "Also publish receipt item names and prices",
+    "レシートの品目名・価格も一緒に公開"
+  ],
+  "이 도시 다녀온 기록 {p0}개": [
+    "{p0} past trip records for this city",
+    "この都市の旅行記録 {p0}件"
+  ],
+  "여행 기능": ["Trip features", "旅行機能"],
+  "여행 삭제": ["Delete trip", "旅行を削除"],
+  "여행 나가기": ["Leave trip", "旅行から退出"],
+  "나가기": ["Leave", "退出"],
+  "여행을 삭제할까요?": ["Delete this trip?", "この旅行を削除しますか？"],
+  "여행에서 나갈까요?": ["Leave this trip?", "この旅行から退出しますか？"],
+  "삭제하면 일정·영수증·사진이 모두 지워지고, 커뮤니티에 공개한 글도 함께 내려갑니다. 이 작업은 되돌릴 수 없어요.": [
+    "Deleting removes all schedules, receipts, and photos, and takes down any community post for this trip. This cannot be undone.",
+    "削除すると予定・レシート・写真がすべて消去され、コミュニティに公開した投稿も取り下げられます。この操作は元に戻せません。"
+  ],
+  "나가면 내 여행 목록에서 이 여행이 사라집니다. 다시 참여하려면 새 초대 링크가 필요해요.": [
+    "Leaving removes this trip from your trip list. You will need a new invite link to join again.",
+    "退出すると自分の旅行一覧からこの旅行が消えます。再参加するには新しい招待リンクが必要です。"
+  ],
+  "여행에서 나갔어요.": ["You left the trip.", "旅行から退出しました。"],
+  "여행을 삭제했어요.": ["Trip deleted.", "旅行を削除しました。"],
+  "영수증으로 기록": ["Record with receipt", "レシートで記録"],
+  "주소 복사": ["Copy address", "住所をコピー"],
+  "주소를 복사했어요. 지도 앱에 붙여넣어 검색해 보세요.": [
+    "Address copied. Paste it into your map app to search.",
+    "住所をコピーしました。地図アプリに貼り付けて検索してみてください。"
+  ],
+  "게스트 여행은 서버에도 임시 백업되며, Google 계정을 연결하면 선택한 여행을 계정에 영구 보관할 수 있어요.": [
+    "Guest trips are also temporarily backed up on the server. Connect a Google account to permanently keep the trips you select.",
+    "ゲストの旅行はサーバーにも一時バックアップされ、Googleアカウントを連携すると選択した旅行をアカウントに永久保管できます。"
+  ],
+  "제목과 금액은 필수 입력이며, 메모는 선택 입력이에요.": [
+    "Title and amount are required; memo is optional.",
+    "タイトルと金額は必須入力で、メモは任意入力です。"
+  ],
+  "제목은 비워둘 수 없어요. 지출 항목 이름을 입력해 주세요.": [
+    "Title cannot be empty. Enter an expense item name.",
+    "タイトルは空欄にできません。支出項目名を入力してください。"
+  ],
+  "금액은 0보다 큰 숫자만 입력해 주세요.": [
+    "Enter a number greater than 0 for the amount.",
+    "金額には0より大きい数字のみ入力してください。"
+  ],
+  "금액 항목을 확인해 주세요. 0보다 큰 숫자만 입력해 주세요.": [
+    "Check the amount field. Enter a number greater than 0.",
+    "金額項目を確認してください。0より大きい数字のみ入力してください。"
+  ],
+  "0보다 큰 숫자만 입력해 주세요.": [
+    "Enter a number greater than 0.",
+    "0より大きい数字のみ入力してください。"
+  ],
+  "선택 입력": ["Optional", "任意入力"],
+  "다녀온 여행 정리": ["Organize a past trip", "過去の旅行を整理"],
+  "다녀온 여행지와 기간을 선택하면 영수증 사진을 올려 날짜별 지출과 방문 장소를 바로 정리할 수 있어요.": [
+    "Select your past destination and dates to upload receipt photos and organize daily expenses and visited places right away.",
+    "行った旅行先と期間を選ぶと、レシート写真をアップロードして日別の支出や訪問場所をすぐに整理できます。"
+  ],
+  "영수증 사진 한꺼번에 올리기": [
+    "Upload receipt photos at once",
+    "レシート写真をまとめてアップロード"
+  ],
+  "오늘": ["Today", "今日"],
+  "상세 입력 접기": ["Hide detailed fields", "詳細入力を閉じる"],
+  "상세 입력 열기 (주소 · 영수증 · 메모 · 예상 비용)": [
+    "Show detailed fields (address · receipt · memo · estimated cost)",
+    "詳細入力を開く（住所・レシート・メモ・予想費用）"
+  ],
+  "다른 방법으로 추가 접기": ["Hide other ways to add", "他の追加方法を閉じる"],
+  "다른 방법으로 추가 (Google Maps · 공유 링크)": [
+    "Other ways to add (Google Maps · shared link)",
+    "他の方法で追加（Google Maps・共有リンク）"
+  ],
+  "검색 결과 없이도 입력한 제목으로 바로 일정을 저장할 수 있어요.": [
+    "You can save the schedule right away with the title you entered, even without search results.",
+    "検索結果がなくても、入力したタイトルのまま予定をすぐ保存できます。"
+  ],
+  "오늘의 게스트 장소 검색 한도를 모두 사용했어요. 아래에서 주소를 직접 입력하거나 로그인 후 계속 검색해 주세요.": [
+    "You have used today's guest place search limit. Enter the address manually below or sign in to continue searching.",
+    "本日のゲスト場所検索の上限に達しました。下で住所を直接入力するか、ログインして検索を続けてください。"
+  ],
+  "장소 검색이 잠시 지연되고 있어요. 아래에서 이름과 주소를 직접 입력해 일정을 추가할 수 있어요.": [
+    "Place search is temporarily delayed. You can add the schedule by entering the name and address manually below.",
+    "場所検索が一時的に遅延しています。下で名前と住所を直接入力して予定を追加できます。"
+  ],
+  "식당": ["Restaurant", "レストラン"],
+  "명소": ["Attraction", "名所"],
+  "대만 달러": ["New Taiwan dollar", "ニュー台湾ドル"],
+  "베트남 동": ["Vietnamese dong", "ベトナムドン"],
+  "태국 바트": ["Thai baht", "タイバーツ"],
+  "중국 위안": ["Chinese yuan", "中国人民元"],
+  "싱가포르 달러": ["Singapore dollar", "シンガポールドル"]
 }

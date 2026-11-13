@@ -1,4 +1,8 @@
-import type { WorkspaceExpense, WorkspaceSchedule } from '@wherego/domain';
+import {
+  SUPPORTED_CURRENCIES,
+  type WorkspaceExpense,
+  type WorkspaceSchedule,
+} from '@wherego/domain';
 
 export const scheduleLabels: Record<WorkspaceSchedule['type'], string> = {
   PLACE: '맛집·관광지',
@@ -15,31 +19,29 @@ export function diaryCosts(
   actual = true,
 ): { currency: string; amount: string }[] {
   // 환율 정보가 없으므로 서로 다른 통화를 합치지 않는다.
-  return (['KRW', 'JPY', 'USD'] as const)
-    .filter((currency) => {
-      // 실제 결제한 통화만 요약에 표시한다.
-      return expenses.some((item) => {
-        // 예상 비용을 실제 여행 비용에 포함하지 않는다.
-        return item.isActual === actual && item.currency === currency;
-      });
-    })
-    .map((currency) => {
-      // 문자열 센트 단위로 누적해 부동소수점 오차를 피한다.
-      return {
-        currency,
-        amount: formatCents(
-          expenses
-            .filter((item) => {
-              // 현재 통화의 실제 금액만 합산한다.
-              return item.isActual === actual && item.currency === currency;
-            })
-            .reduce((sum, item) => {
-              // 지원 통화의 최대 두 자리 소수를 정수로 변환한다.
-              return sum + amountCents(item.amount);
-            }, 0n),
-        ),
-      };
+  return SUPPORTED_CURRENCIES.filter((currency) => {
+    // 실제 결제한 통화만 요약에 표시한다.
+    return expenses.some((item) => {
+      // 예상 비용을 실제 여행 비용에 포함하지 않는다.
+      return item.isActual === actual && item.currency === currency;
     });
+  }).map((currency) => {
+    // 문자열 센트 단위로 누적해 부동소수점 오차를 피한다.
+    return {
+      currency,
+      amount: formatCents(
+        expenses
+          .filter((item) => {
+            // 현재 통화의 실제 금액만 합산한다.
+            return item.isActual === actual && item.currency === currency;
+          })
+          .reduce((sum, item) => {
+            // 지원 통화의 최대 두 자리 소수를 정수로 변환한다.
+            return sum + amountCents(item.amount);
+          }, 0n),
+      ),
+    };
+  });
 }
 
 // 검증된 소수 금액을 정확한 정수 센트로 변환한다.

@@ -41,6 +41,8 @@ function InputView({
 }) {
   const language = useLocale();
   const { fontScale } = useAppAccessibility();
+  const flatStyle = StyleSheet.flatten(style);
+  const borderless = flatStyle?.borderWidth === 0;
   // 비활성 입력은 투명도를 낮추지 않고 배경과 실제 편집 상태로 구분한다.
   return (
     <Input
@@ -60,20 +62,19 @@ function InputView({
         style,
         fontsReady && {
           fontFamily: appFontFamily(
-            StyleSheet.flatten(style)?.fontFamily || 'TripPrintRegular',
+            flatStyle?.fontFamily || 'TripPrintRegular',
             Platform.OS,
             language,
           ),
         },
         Platform.OS === 'web' && {
           fontSize:
-            (StyleSheet.flatten(style)?.fontSize ??
-              typography.bodyMedium.size) * fontScale,
+            (flatStyle?.fontSize ?? typography.bodyMedium.size) * fontScale,
           lineHeight:
-            (StyleSheet.flatten(style)?.lineHeight ??
-              typography.bodyMedium.lineHeight) * fontScale,
+            (flatStyle?.lineHeight ?? typography.bodyMedium.lineHeight) *
+            fontScale,
         },
-        focused && s.focused,
+        focused && (borderless ? s.focusedBorderless : s.focused),
         props.editable === false && s.disabled,
       ]}
     />
@@ -97,6 +98,9 @@ const s = StyleSheet.create({
     outlineColor: colors.focus,
     outlineWidth: 2,
     outlineOffset: 2,
+  },
+  focusedBorderless: {
+    outlineWidth: 0,
   },
   disabled: { backgroundColor: colors.disabledSurface, color: colors.muted },
 });

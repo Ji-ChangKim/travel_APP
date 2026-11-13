@@ -11,6 +11,7 @@ import { File, FileMode } from 'expo-file-system';
 import { Platform, Share } from 'react-native';
 import type { FoundationClientOptions } from '@wherego/api-client';
 import {
+  deleteServerTrip,
   FoundationClientError,
   getServerMediaUrl,
   requestPolicy,
@@ -366,4 +367,14 @@ export function signedMedia(
 ): Promise<string> {
   // URL 생성 실패는 화면에서 재시도로 처리한다.
   return getServerMediaUrl(options, tripId, mediaId);
+}
+
+// 여행 삭제(소유자) 또는 여행 나가기(참여자)를 서버·게스트 저장소에 반영한다.
+export function deleteTrip(
+  userId: string,
+  tripId: string,
+): Promise<{ tripId: string; deleted: boolean; action?: string }> {
+  return serverOptions(userId).then((options) =>
+    deleteServerTrip(options, tripId, Crypto.randomUUID()),
+  );
 }

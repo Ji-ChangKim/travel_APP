@@ -1,6 +1,7 @@
 import {
   communityImportSchema,
   communityPostSchema,
+  findCommunitySeedPost,
   importCommunityTrip,
 } from '@wherego/validation';
 import {
@@ -31,20 +32,35 @@ function readImportSource(m: Mutation): Promise<unknown> {
     .bind(String(m.args.p_post), m.session.userId)
     .first<{ snapshot: string }>()
     .then((row) => {
-      // 없는 글과 차단·철회한 글은 동일하게 거부한다.
-      return row
+      // 없는 글과 차단·철회한 글은 동일하게 거부하되 초기 시드 게시물 담기를 지원한다.
+      if (row) {
+        return actorName(m).then((name) => {
+          // 원본 확인과 실제 쓰기 사이의 철회·갱신도 원자 저장에서 대조한다.
+          return insertTrip(
+            m,
+            importCommunityTrip(
+              communityPostSchema.parse(JSON.parse(row.snapshot)),
+              communityImportSchema.parse(m.args.p_input),
+              m.session.userId,
+              name,
+              crypto.randomUUID.bind(crypto),
+            ),
+            { postId: String(m.args.p_post), snapshot: row.snapshot },
+          );
+        });
+      }
+      const seed = findCommunitySeedPost(String(m.args.p_post));
+      return seed
         ? actorName(m).then((name) => {
-            // 원본 확인과 실제 쓰기 사이의 철회·갱신도 원자 저장에서 대조한다.
             return insertTrip(
               m,
               importCommunityTrip(
-                communityPostSchema.parse(JSON.parse(row.snapshot)),
+                communityPostSchema.parse(seed),
                 communityImportSchema.parse(m.args.p_input),
                 m.session.userId,
                 name,
                 crypto.randomUUID.bind(crypto),
               ),
-              { postId: String(m.args.p_post), snapshot: row.snapshot },
             );
           })
         : rejectRequest('RESOURCE_NOT_FOUND');

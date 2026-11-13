@@ -122,6 +122,16 @@ const timezones: Record<string, string> = {
   PE: 'America/Lima',
 };
 
+const countryCurrencyMap: Record<string, string> = {
+  일본: 'JPY',
+  미국: 'USD',
+  대만: 'TWD',
+  베트남: 'VND',
+  태국: 'THB',
+  중국: 'CNY',
+  싱가포르: 'SGD',
+};
+
 // 국가 선택에 필요한 도시·대표 시간대·기록 통화 기본값을 함께 반환한다.
 export function countryDefaults(country: string) {
   // 지원하지 않는 현지 통화를 대신 기록 통화 KRW로 시작하고 시간대는 직접 확인한다.
@@ -134,8 +144,7 @@ export function countryDefaults(country: string) {
           return item.country === country;
         })?.code || ''
       ] || 'UTC',
-    defaultCurrency:
-      country === '일본' ? 'JPY' : country === '미국' ? 'USD' : 'KRW',
+    defaultCurrency: countryCurrencyMap[country] || 'KRW',
   };
 }
 

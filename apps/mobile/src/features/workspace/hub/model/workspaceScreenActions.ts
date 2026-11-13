@@ -1,8 +1,9 @@
 import type { sendWorkspaceCommand } from '@wherego/api-client';
-import type {
-  WorkspaceSchedule,
-  WorkspaceSnapshot,
-  TravelLeg,
+import {
+  isDecimalCurrency,
+  type WorkspaceSchedule,
+  type WorkspaceSnapshot,
+  type TravelLeg,
 } from '@wherego/domain';
 import type { WorkspaceCommand } from '@wherego/validation';
 import type { PlanForm, scheduleForm } from '../../shared/model/forms';
@@ -128,8 +129,9 @@ export function createWorkspaceScreenActions(options: Options) {
         id: item.id,
         values: {
           title: item.title,
-          amount:
-            item.currency === 'USD' ? item.amount : item.amount.split('.')[0]!,
+          amount: isDecimalCurrency(item.currency)
+            ? item.amount
+            : item.amount.split('.')[0]!,
           currency: item.currency,
           isActual: String(item.isActual),
           category: item.category,

@@ -16,6 +16,8 @@ export interface TimelineScheduleItem {
   badgeLabel?: string;
   transitInfo?: string;
   costInfo?: { currency: string; amount: string; note?: string };
+  hasReceipt?: boolean;
+  receiptPreview?: import('@wherego/domain').CommunityPost['snapshot']['itinerary'][number]['receiptPreview'];
   durationMinutes?: number | null;
   statusNote?: string;
   flightInfo?: {

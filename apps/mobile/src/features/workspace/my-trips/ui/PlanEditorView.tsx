@@ -1,7 +1,7 @@
 import { t } from '@/features/localization/translate';
 import Text from '@/components/ui/AppText';
 import ScreenHeader from '@/components/navigation/ScreenHeader';
-import type { WorkspaceSnapshot } from '@wherego/domain';
+import { SUPPORTED_CURRENCIES, type WorkspaceSnapshot } from '@wherego/domain';
 import { type RefObject } from 'react';
 import type { LedgerAction } from './LedgerUI';
 import {
@@ -21,6 +21,7 @@ import ReceiptReview from '../../receipt/manager/ReceiptReview';
 import ScheduleLocation from '../../schedule/manager/ScheduleLocation';
 import ReceiptOriginal from '../../receipt/ui/ReceiptOriginal';
 import { DateField } from '../../planning/ui/TravelInputs';
+import TripCalendar from '../../planning/ui/TripCalendar';
 import TripPeriodSummary from '../../planning/ui/TripPeriodSummary';
 import type { PlanForm } from '../../shared/model/forms';
 import { ledgerStyles as l, ledgerColors } from '../styles/ledgerTheme';
@@ -158,6 +159,22 @@ export function renderPlanEditor({
                 onChange,
                 onReceipt,
               })}
+              {form.kind === 'period' && (
+                <TripCalendar
+                  values={{
+                    ...form.values,
+                    timezone: snapshot?.trip.timezone || 'Asia/Seoul',
+                    country: snapshot?.trip.country || '',
+                    city: snapshot?.trip.city || '',
+                  }}
+                  onChange={onChange}
+                />
+              )}
+              {form.kind === 'expense' && (
+                <Text style={styles.subtitle}>
+                  {t('제목과 금액은 필수 입력이며, 메모는 선택 입력이에요.')}
+                </Text>
+              )}
               {renderPlanFields({ form, onChange })}
               <ScheduleOptions
                 form={form}
@@ -396,7 +413,7 @@ export function renderExpenseCurrency({
         (form.values.receiptEditing === 'true' ||
           form.values.receiptStatus === 'manual'))) && (
       <View style={styles.row}>
-        {['KRW', 'JPY', 'USD'].map((currency) => (
+        {SUPPORTED_CURRENCIES.map((currency) => (
           <Action
             key={currency}
             label={currency}
@@ -478,6 +495,14 @@ export function renderPlanFields({ form, onChange }: RenderPlanFieldsProps) {
               : labels[key]!
           }
           value={value}
+          inputMode={key === 'amount' ? 'numeric' : 'text'}
+          placeholder={
+            key === 'amount'
+              ? t('0보다 큰 숫자만 입력해 주세요.')
+              : ['memo', 'address'].includes(key)
+                ? t('선택 입력')
+                : undefined
+          }
           multiline={['memo', 'body', 'details', 'planConcept'].includes(key)}
           onChange={(next) => {
             // 해당 필드 하나만 변경한다.

@@ -33,6 +33,10 @@ export default function PublicFeedControls({
   useLocale();
   // 선택 시트의 표시만 로컬 상태로 관리한다.
   const [opened, setOpened] = useState(false);
+  const filtered =
+    Boolean(filters.q.trim() || search.trim()) ||
+    filters.kind !== 'all' ||
+    filters.days !== 'all';
 
   return (
     <View style={s.controls}>
@@ -120,7 +124,21 @@ export default function PublicFeedControls({
           />
         </HaruState>
       ) : null}
-      {!query.isError && query.data?.pages[0]?.length === 0 ? (
+      {!query.isError && query.data?.pages[0]?.length === 0 && !filtered ? (
+        // 검색·필터 없이 비어 있으면 지울 조건이 없으므로 피드 자체가 빈 상태로 안내한다.
+        <HaruState
+          kind="empty"
+          title={t('아직 공개된 여행이 없어요. 나의 첫 여행을 계획해 보세요.')}
+        >
+          <Action
+            label={t('새 여행 만들기')}
+            onPress={() => {
+              return router.push('/new-trip');
+            }}
+          />
+        </HaruState>
+      ) : null}
+      {!query.isError && query.data?.pages[0]?.length === 0 && filtered ? (
         <HaruState
           kind="empty"
           title={t('조건에 맞는 여행이 없어요')}

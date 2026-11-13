@@ -10,6 +10,7 @@ import { savedReceiptForm, receiptForm } from '../../receipt/model/receiptFlow';
 import { useSharedSchedule } from '../../schedule/manager/useSharedSchedule';
 import { useTripDateRefresh } from '../../shared/manager/useTripDateRefresh';
 import { useWorkspaceScreenActions } from '../model/workspaceScreenActions';
+import { deleteTrip } from '../../shared/manager/service';
 import { useEffect, useRef } from 'react';
 import { authReturn, type AuthReturn } from '@/features/auth/model/authReturn';
 import { rememberCreation } from '../../planning/model/creationAuthHandoff';
@@ -31,16 +32,25 @@ export function useWorkspaceController({
     // 게스트는 서버 작성 권한을 갖지 않는다.
     return state.currentUser;
   });
-  const { id, section, destination, mode, localDate, intentKey, targetRef } =
-    useLocalSearchParams<{
-      id?: string;
-      section?: string;
-      destination?: string;
-      mode?: string;
-      localDate?: string;
-      intentKey?: string;
-      targetRef?: string;
-    }>();
+  const {
+    id,
+    section,
+    destination,
+    mode,
+    localDate,
+    intentKey,
+    targetRef,
+    receiptCapture,
+  } = useLocalSearchParams<{
+    id?: string;
+    section?: string;
+    destination?: string;
+    mode?: string;
+    localDate?: string;
+    intentKey?: string;
+    targetRef?: string;
+    receiptCapture?: string;
+  }>();
   const router = useRouter();
   const cache = useQueryClient();
   const userId = user?.id || '';
@@ -55,6 +65,7 @@ export function useWorkspaceController({
     useWorkspaceData(userId, id, creating);
   const setSelectedDay = navigation.setSelectedDay;
   const restoredDay = useRef('');
+  const openedReceiptCapture = useRef('');
   useEffect(() => {
     const key = `${userId}:${id}:${localDate}`;
     if (!localDate || !snapshot || restoredDay.current === key) return;
@@ -64,6 +75,29 @@ export function useWorkspaceController({
       setSelectedDay(day.id);
     }
   }, [snapshot, localDate, setSelectedDay, userId, id]);
+  useEffect(() => {
+    const key = `${userId}:${id}:${receiptCapture}`;
+    if (
+      creating ||
+      !snapshot ||
+      !writable ||
+      receiptCapture !== '1' ||
+      openedReceiptCapture.current === key
+    )
+      return;
+    openedReceiptCapture.current = key;
+    navigation.setActiveSection('expenses');
+    editor.setShowReceiptCapture(true);
+  }, [
+    creating,
+    snapshot,
+    writable,
+    receiptCapture,
+    userId,
+    id,
+    navigation,
+    editor,
+  ]);
   useSharedSchedule(
     snapshot,
     writable,
@@ -234,6 +268,13 @@ export function useWorkspaceController({
         ? login('invite')
         : operations.invite(...args),
     closeCreation: operations.closeCreation,
+    removeTrip: () => {
+      if (!snapshot) return Promise.resolve();
+      return deleteTrip(userId, snapshot.trip.id).then(() => {
+        void cache.invalidateQueries({ queryKey: ['trips'] });
+        router.replace('/(tabs)');
+      });
+    },
     creating,
     importing,
   };

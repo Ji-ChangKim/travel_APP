@@ -1,10 +1,11 @@
-import { Animated, Image, ScrollView, View } from 'react-native';
+import { Animated, Image, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import Text from '@/components/ui/AppText';
 import { t } from '@/features/localization/translate';
-import { useLocale } from '@/features/localization/localeState';
+import { changeLanguage, useLocale } from '@/features/localization/localeState';
+import { languageNames, languages } from '@/features/localization/localeModel';
 import { useAuthReady } from '../manager/AuthBridge';
 import GoogleLogin from './GoogleLogin';
 import LoginButton from './LoginButton';
@@ -15,7 +16,7 @@ import BiBackground from '@/features/startup/ui/BiBackground';
 import AuthFailureNotice from './AuthFailureNotice';
 
 export default function WelcomeScreen() {
-  useLocale();
+  const language = useLocale();
   const router = useRouter();
   const controller = useLoginController();
   const {
@@ -34,6 +35,7 @@ export default function WelcomeScreen() {
   const member = Boolean(
     controller.currentUser && controller.currentUser.authProvider !== 'guest',
   );
+  const hasSession = Boolean(controller.currentUser);
   const locked = !ready || controller.busy || !done;
   return (
     <View style={styles.screen} onLayout={onLayout} testID="welcome-stage">
@@ -47,6 +49,37 @@ export default function WelcomeScreen() {
       )}
       <SafeAreaView style={styles.stage} testID="welcome-safe-content">
         <ScrollView contentContainerStyle={styles.content}>
+          <View
+            style={styles.localeRow}
+            testID="welcome-language-selector"
+            accessibilityLabel={t('앱 표시 언어')}
+          >
+            {languages.map((code) => {
+              const active = language === code;
+              return (
+                <Pressable
+                  key={code}
+                  testID={`welcome-lang-${code}`}
+                  accessibilityRole="button"
+                  accessibilityLabel={languageNames[code]}
+                  accessibilityState={{ selected: active }}
+                  onPress={() => {
+                    void changeLanguage(code);
+                  }}
+                  style={[styles.localeChip, active && styles.localeChipActive]}
+                >
+                  <Text
+                    style={[
+                      styles.localeChipText,
+                      active && styles.localeChipTextActive,
+                    ]}
+                  >
+                    {languageNames[code]}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
           <View style={styles.brand} testID="welcome-brand">
             <View
               ref={onTargetMount}
@@ -87,7 +120,9 @@ export default function WelcomeScreen() {
             </Animated.View>
             <Animated.View style={guestStyle} testID="welcome-guest-entrance">
               <LoginButton
-                label={member ? t('이어서 시작하기') : t('게스트로 시작하기')}
+                label={
+                  hasSession ? t('이어서 시작하기') : t('게스트로 시작하기')
+                }
                 variant="primary"
                 disabled={locked}
                 busy={

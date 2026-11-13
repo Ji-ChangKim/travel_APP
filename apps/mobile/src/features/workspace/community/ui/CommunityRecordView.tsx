@@ -25,11 +25,26 @@ export default function CommunityRecordView({ post }: { post: CommunityPost }) {
           <View key={item.id || `${item.date}:${index}`} style={s.itinerary}>
             <Text style={s.time}>
               {item.date} · {item.timeSlot || t('시간 미정')}
+              {item.hasReceipt ? ` · ${t('영수증 기록 있음')}` : ''}
             </Text>
             <Text accessibilityRole="header" style={s.title}>
               {item.title}
             </Text>
             {item.address ? <Text style={s.meta}>{item.address}</Text> : null}
+            {item.receiptPreview?.map((receipt, rIndex) => (
+              <View key={rIndex} style={{ gap: 2, marginTop: 4 }}>
+                {receipt.totalAmount ? (
+                  <Text style={s.cost}>
+                    {`${t('영수증 합계')}: ${receipt.currency} ${receipt.totalAmount}`}
+                  </Text>
+                ) : null}
+                {receipt.items?.map((entry, eIndex) => (
+                  <Text key={eIndex} style={s.meta}>
+                    {`• ${entry.name}${entry.quantity ? ` ×${entry.quantity}` : ''}${entry.amount ? ` (${receipt.currency} ${entry.amount})` : ''}`}
+                  </Text>
+                ))}
+              </View>
+            ))}
           </View>
         );
       })}

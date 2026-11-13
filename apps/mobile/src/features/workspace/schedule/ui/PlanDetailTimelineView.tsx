@@ -363,6 +363,11 @@ function TimelineCardItem({
             </Text>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            {item.hasReceipt ? (
+              <View style={s.itemTypeBadge}>
+                <Text style={s.itemTypeBadgeText}>{t('영수증 기록 있음')}</Text>
+              </View>
+            ) : null}
             {item.costInfo ? (
               <Text
                 style={[
@@ -390,6 +395,28 @@ function TimelineCardItem({
           content={item.planContent}
           address={item.address}
         />
+        {item.receiptPreview && item.receiptPreview.length > 0 ? (
+          <View style={s.memoBox}>
+            <View style={s.memoHeader}>
+              <MaterialIcons name="receipt-long" size={15} color={c.primary} />
+              <Text style={s.memoHeaderText}>{t('영수증 기록 있음')}</Text>
+            </View>
+            {item.receiptPreview.map((receipt, rIndex) => (
+              <View key={rIndex} style={{ gap: 2 }}>
+                {receipt.totalAmount ? (
+                  <Text style={s.memoBodyText}>
+                    {`${t('영수증 합계')}: ${receipt.currency} ${receipt.totalAmount}`}
+                  </Text>
+                ) : null}
+                {receipt.items?.map((entry, eIndex) => (
+                  <Text key={eIndex} style={s.itemSubtitle}>
+                    {`• ${entry.name}${entry.quantity ? ` ×${entry.quantity}` : ''}${entry.amount ? ` (${receipt.currency} ${entry.amount})` : ''}`}
+                  </Text>
+                ))}
+              </View>
+            ))}
+          </View>
+        ) : null}
 
         {/* 항공편 전용 부가 안내 */}
         {item.flightInfo ? (

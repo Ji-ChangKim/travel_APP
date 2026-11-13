@@ -1,7 +1,24 @@
 import type { TripStatus } from './index';
 
 // M1 서버 계약을 기존 모바일 메모리 객체와 분리해 단계적으로 이행한다.
-export type SupportedCurrency = 'KRW' | 'JPY' | 'USD';
+export const SUPPORTED_CURRENCIES = [
+  'KRW',
+  'JPY',
+  'USD',
+  'TWD',
+  'VND',
+  'THB',
+  'CNY',
+  'SGD',
+] as const;
+
+export type SupportedCurrency = (typeof SUPPORTED_CURRENCIES)[number];
+
+export const DECIMAL_CURRENCIES = ['USD', 'THB', 'CNY', 'SGD'] as const;
+
+export function isDecimalCurrency(currency: string): boolean {
+  return (DECIMAL_CURRENCIES as readonly string[]).includes(currency);
+}
 
 // API 금액은 정밀도를 보존하는 십진 문자열을 사용한다.
 export type DecimalAmount = string;

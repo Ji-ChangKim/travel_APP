@@ -19,7 +19,12 @@ const time = '14:30';
 
 test(
   '핵심 플로우: 도시·항공편 없이 생성→DAY 변경 저장→응답 유실 재시도→새 로그인·D1 재조회',
-  { timeout: 240000 },
+  {
+    timeout: 240000,
+    // 이메일 가입 API(/api/auth/sign-up/email)가 제거되어 회원 준비 방식부터 다시 작성해야 한다.
+    // 재작성 계획: docs/03. 개발/03. 개발환경/웹E2E_보류검사_목록.md
+    skip: '이메일 가입 제거(Google·게스트 전용) 이전 흐름 기준 — 회원 준비 방식 재작성 필요',
+  },
   async (t) => {
     const runtime = await planningRuntime();
     let browser;

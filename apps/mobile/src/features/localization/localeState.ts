@@ -30,15 +30,33 @@ function publish(language: AppLanguage): void {
   listeners.forEach((listener) => listener());
 }
 
-// 계정과 독립된 기기 설정 한 개만 읽는다. 실패하면 기본 언어로 앱을 연다.
+function detectDeviceLanguage(): AppLanguage {
+  if (typeof process !== 'undefined' && process.env?.NODE_TEST_CONTEXT) {
+    return 'ko';
+  }
+  try {
+    const raw =
+      (typeof navigator !== 'undefined' && navigator.language) ||
+      Intl.DateTimeFormat().resolvedOptions().locale ||
+      '';
+    const lower = raw.toLowerCase();
+    if (lower.startsWith('ja')) return 'ja';
+    if (lower.startsWith('en')) return 'en';
+  } catch {
+    // 기기 로케일 조회 실패 시 한국어를 기본값으로 사용한다.
+  }
+  return 'ko';
+}
+
+// 계정과 독립된 기기 설정 한 개만 읽는다. 저장된 설정이 없으면 기기 언어를 따른다.
 export function restoreLanguage(): Promise<void> {
   restoration ??= Promise.resolve().then(async () => {
     try {
       const { readStoredLanguage } = await import('./localeStorage');
       const value = await readStoredLanguage();
-      publish(readLanguage(value));
+      publish(value ? readLanguage(value) : detectDeviceLanguage());
     } catch {
-      publish('ko');
+      publish(detectDeviceLanguage());
     }
   });
   return restoration;
