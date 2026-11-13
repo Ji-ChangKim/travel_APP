@@ -1,5 +1,5 @@
 # 코드 수정·검사·로컬 빌드만으로 버전을 올리지 않습니다.
 # versionCode는 새 Google Play 업로드를 준비할 때 이전 사용 번호를 확인해 조정합니다.
 # versionName은 사용자가 다음 배포 버전을 정했을 때 변경합니다.
-versionCode=14
+versionCode=15
 versionName=0.0.1

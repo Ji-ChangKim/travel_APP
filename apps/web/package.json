@@ -1,9 +1,20 @@
 {
   "name": "@wherego/web",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "echo \"Next.js web app will be initialized in Phase 4.\"",
-    "build": "echo \"Web build placeholder\""
+    "dev": "node ../../scripts/build/run-web.mjs dev --hostname 127.0.0.1",
+    "build": "node ../../scripts/build/run-web.mjs build",
+    "start": "node ../../scripts/build/run-web.mjs start --hostname 127.0.0.1",
+    "typecheck": "node ../../scripts/build/run-web.mjs typegen && tsc --noEmit",
+    "lint": "eslint . --max-warnings=0"
+  },
+  "dependencies": {
+    "next": "16.4.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "eslint-config-next": "16.4.6"
   }
 }

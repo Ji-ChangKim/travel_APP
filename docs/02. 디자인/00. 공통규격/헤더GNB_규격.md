@@ -8,6 +8,8 @@
 
 ## 1. 핵심 원칙
 
+독립 웹의 소개 랜딩 `/`은 [웹 랜딩 규격](<../01. 화면설계/웹랜딩_화면규격.md>)에 따라 `SiteHeader`·`SiteFooter`를 한 번 정의해 사용한다. 이는 사용자가 요청한 소개 페이지와 서비스 홈 분리에 따른 웹 전용 적용 범위다. 랜딩에는 앱 GNB를 표시하지 않는다. 서비스 홈 `/home`의 `HomeHeader`·4탭과 앱의 기존 `/`·헤더·GNB 규격은 유지한다. 소개 헤더를 서비스 화면의 헤더로 복제하지 않는다.
+
 1. **공통 컴포넌트 단일 사용**: 모든 화면은 `apps/mobile/src/components/navigation/`의 공통 헤더와 하단 GNB만 사용하며, 개별 화면에서 자체 헤더나 탭 바를 만들지 않습니다.
 2. **토큰 기반 스타일**: 색상·높이·여백은 [`design-tokens.json`](design-tokens.json)의 `navigation.header` 및 `navigation.gnb`를 그대로 따릅니다.
 3. **자동 경계 검증**: `npm run check:navigation`으로 로컬 스타일 덮어쓰기나 비인가 헤더 생성 여부를 상시 검사합니다.

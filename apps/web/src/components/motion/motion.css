@@ -1,0 +1,82 @@
+.reading-progress {
+  position: fixed;
+  z-index: 11;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3px;
+  background: var(--color-link);
+  transform: scaleX(var(--reading-progress, 0));
+  transform-origin: left;
+  pointer-events: none;
+}
+html:has([data-motion='paused']) {
+  scroll-behavior: auto;
+}
+[data-motion='paused'] [data-reveal] {
+  transition: none;
+}
+.motion-control {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-small);
+  padding: var(--space-small);
+  min-height: var(--touch-size);
+  border: 0;
+  background: none;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  font-size: var(--small-size);
+}
+.site:not([data-enhanced='true']) .motion-control {
+  display: none;
+}
+.site:not([data-enhanced='true']) .travel-photo {
+  animation: none;
+}
+[data-motion='paused'] .reading-progress {
+  display: none;
+}
+.site[data-observer='false'] .travel-photo {
+  animation: none;
+}
+[data-enhanced='true'] [data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 700ms,
+    transform 700ms;
+}
+[data-enhanced='true'] [data-visible='true'],
+[data-motion='paused'] [data-reveal] {
+  opacity: 1;
+  transform: none;
+}
+[data-motion='paused'] .travel-photo,
+[data-active='false'] .travel-photo,
+[data-scene]:focus-within .travel-photo {
+  animation-play-state: paused !important;
+}
+[data-motion='paused'] .hero-enter,
+[data-motion='paused'] .chapter-copy,
+[data-motion='paused'] .travel-route,
+[data-scene]:focus-within .chapter-copy {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reading-progress {
+    display: none;
+  }
+  .site *,
+  .site *::before,
+  .site *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  [data-enhanced='true'] [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -11,6 +11,14 @@
       "@wherego/api-client": ["./packages/api-client/src/index.ts"]
     }
   },
+  "exclude": [
+    "node_modules",
+    "android",
+    "ios",
+    "apps/mobile/android",
+    "apps/mobile/ios",
+    "apps/web"
+  ],
   "include": [
     "apps/**/*.ts",
     "apps/**/*.tsx",

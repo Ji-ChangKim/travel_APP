@@ -94,7 +94,8 @@ for (const name of (await readdir(repositoryPath('apps/api/migrations')))
   );
   const statements = sql
     .replace(/--[^\n]*/g, '')
-    .split(';')
+    // 트리거 본문의 ';'는 같은 줄에 있으므로 줄 끝의 ';'만 문장 경계로 본다.
+    .split(/;\s*(?:\r?\n|$)/)
     .filter((sql) => sql.trim())
     .map((sql) => db.prepare(sql));
   await db.batch([

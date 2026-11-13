@@ -1,9 +1,9 @@
 {
   "version": "0.0.1",
-  "versionCode": 14,
-  "release": "internal-0.0.1-v14-trip-planning-20261109",
+  "versionCode": 15,
+  "release": "internal-0.0.1-v15-mvp-internal-test-20261112",
   "environment": "staging",
-  "releaseDate": "2026-11-09",
+  "releaseDate": "2026-11-12",
   "webOrigin": "https://tripprint-staging.pages.dev",
   "apiOrigin": "https://tripprint-api-staging.gametps.workers.dev",
   "brand": "TripPrint",

@@ -17,6 +17,8 @@ module.exports = defineConfig([
       '**/.release/**',
       '**/expo-env.d.ts',
       '**/node_modules/**',
+      // 웹은 별도 Next 규칙으로 검사하며 루트 lint 명령에서 함께 실행한다.
+      'apps/web/**',
       'docs/98. keys/**',
       'docs/999. deletefile/**',
     ],

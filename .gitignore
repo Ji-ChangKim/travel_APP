@@ -5,6 +5,8 @@ dist/
 web-build/
 expo-env.d.ts
 *.tsbuildinfo
+.next/
+next-env.d.ts
 .metro-health-check*
 
 # 네이티브 프로젝트는 필요할 때 Expo 설정으로 생성한다.

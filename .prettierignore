@@ -6,6 +6,8 @@ dist/
 **/.expo/
 **/.release/
 **/node_modules/
+**/.next/
+**/next-env.d.ts
 android/
 ios/
 package-lock.json

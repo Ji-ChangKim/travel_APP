@@ -47,3 +47,9 @@ jobs:
 
       - name: 웹 정적 빌드 테스트
         run: npm run build:web
+
+      - name: 독립 웹 프로덕션 빌드
+        run: npm run web:build
+
+      - name: 독립 웹 HTTP 응답과 종료 검사
+        run: npm run test:web:runtime

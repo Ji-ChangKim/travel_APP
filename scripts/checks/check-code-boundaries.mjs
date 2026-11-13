@@ -162,6 +162,31 @@ function runtimeImport(node) {
   );
 }
 
+// 문자열로 지정한 실행 의존성만 검사하며 타입 전용 재내보내기는 제외한다.
+function runtimeDependency(node) {
+  if (ts.isImportDeclaration(node) && runtimeImport(node))
+    return node.moduleSpecifier.text;
+  if (
+    ts.isExportDeclaration(node) &&
+    node.moduleSpecifier &&
+    !node.isTypeOnly &&
+    !(
+      node.exportClause &&
+      ts.isNamedExports(node.exportClause) &&
+      node.exportClause.elements.every((item) => item.isTypeOnly)
+    )
+  )
+    return node.moduleSpecifier.text;
+  if (
+    ts.isCallExpression(node) &&
+    node.expression.kind === ts.SyntaxKind.ImportKeyword &&
+    node.arguments[0] &&
+    ts.isStringLiteralLike(node.arguments[0])
+  )
+    return node.arguments[0].text;
+  return undefined;
+}
+
 // 실제 TypeScript 구문에서 역할 역전과 금지된 기본값을 찾는다.
 export function inspectCodeBoundary(file, text) {
   // 숫자·색·정상 외부 링크를 일괄 금지하지 않고 검증한 경계를 적용한다.
@@ -169,6 +194,13 @@ export function inspectCodeBoundary(file, text) {
   const name = path.basename(file);
   const roleName = name.replace(/\.tsx$/, '.ts');
   const normalized = file.replaceAll('\\', '/');
+  const webSource = normalized.startsWith('apps/web/src/');
+  const clientComponent = source.statements.some(
+    (node) =>
+      ts.isExpressionStatement(node) &&
+      ts.isStringLiteral(node.expression) &&
+      node.expression.text === 'use client',
+  );
   const findings = [];
   function add(node, rule) {
     // 원문이나 인증 값을 복사하지 않고 위치와 규칙만 보고한다.
@@ -196,8 +228,33 @@ export function inspectCodeBoundary(file, text) {
       )
     )
       add(node, '한글 포함 여부만으로 미확인 예외 메시지를 표시할 수 없음');
-    if (ts.isImportDeclaration(node) && runtimeImport(node)) {
-      const dependency = node.moduleSpecifier.text;
+    const dependency = runtimeDependency(node);
+    if (dependency !== undefined) {
+      if (webSource) {
+        const target = dependency.startsWith('@/')
+          ? `apps/web/src/${dependency.slice(2)}`
+          : dependency.startsWith('.')
+            ? path.posix.normalize(
+                path.posix.join(path.posix.dirname(normalized), dependency),
+              )
+            : dependency;
+        if (
+          (/^apps\/(mobile|api)\//.test(target) &&
+            !/^apps\/mobile\/assets\/.*\.(?:png|jpe?g|svg|webp|ttf|otf|woff2?|json)$/.test(
+              target,
+            )) ||
+          /^@wherego\/(mobile|api)(?:\/|$)/.test(target)
+        )
+          add(
+            node,
+            '웹은 앱·API 내부 소스 대신 공통 패키지와 API 계약을 사용해야 함',
+          );
+        if (clientComponent && target.startsWith('apps/web/src/server/'))
+          add(
+            node,
+            '브라우저 컴포넌트가 웹 서버 전용 모듈을 직접 참조할 수 없음',
+          );
+      }
       if (
         /\/WorkspaceScreen$|^\.\/WorkspaceScreen$/.test(dependency) &&
         !normalized.startsWith('apps/mobile/src/app/')
@@ -292,9 +349,12 @@ function sourceFiles(directory) {
 // 계층 위반은 검사 실패로, 함수 길이·catch 수는 수동 검토 지표로 보고한다.
 export function auditCode() {
   // 자동 지표만으로 함수 책임과 예외 처리의 적합성을 확정하지 않는다.
-  const files = ['apps/mobile/src', 'apps/api/src', 'packages'].flatMap(
-    (directory) => sourceFiles(path.join(repository, directory)),
-  );
+  const files = [
+    'apps/mobile/src',
+    'apps/web/src',
+    'apps/api/src',
+    'packages',
+  ].flatMap((directory) => sourceFiles(path.join(repository, directory)));
   const findings = [];
   const longFunctions = [];
   let catches = 0;
